@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wixlib"
+              xmlns="http://wixtoolset.org/schemas/v4/wixlib"
+          xmlns:loc="http://wixtoolset.org/schemas/v4/wxl"
+         xmlns:objs="http://wixtoolset.org/schemas/v4/wixobj">
+    <xs:annotation>
+        <xs:documentation>
+            Schema for describing WiX Library files (.wixlib).
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:import namespace="http://wixtoolset.org/schemas/v4/wixobj" schemaLocation="objects.xsd" />
+
+    <xs:element name="wixLibrary">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="localization" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element ref="objs:section" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+
+            <xs:attribute name="id" type="xs:string" use="required" />
+            <xs:attribute name="version" type="xs:string" use="required">
+                <xs:annotation>
+                    <xs:documentation>Version of WiX used to create this library file</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+  <xs:element name="localization">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="ui" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+      <xs:attribute name="codepage" type="xs:string" use="required" />
+      <xs:attribute name="culture" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="string">
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="overridable" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ui">
+    <xs:complexType>
+      <xs:attribute name="dialog" type="xs:string" />
+      <xs:attribute name="control" type="xs:string" />
+      <xs:attribute name="x" type="xs:int" />
+      <xs:attribute name="y" type="xs:int" />
+      <xs:attribute name="width" type="xs:int" />
+      <xs:attribute name="height" type="xs:int" />
+      <xs:attribute name="rightToLeft" type="xs:string" />
+      <xs:attribute name="rightAligned" type="xs:string" />
+      <xs:attribute name="leftScroll" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

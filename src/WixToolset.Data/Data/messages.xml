@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Messages Namespace="WixToolset.Data" Resources="Data.Messages" xmlns="http://schemas.microsoft.com/genmsgs/2004/07/messages">
+  <Class Name="WixDataErrors" ContainerName="WixDataErrorEventArgs" BaseContainerName="MessageEventArgs" Level="Error">
+    <Message Id="UnexpectedFileFormat" Number="1" SourceLineNumbers="no">
+      <Instance>
+        Unexpected file format loaded from path: {0}. The file was expected to be a {1} but was actually: {2}. Ensure the correct path was provided.
+        <Parameter Type="System.String" Name="path" />
+        <Parameter Type="System.String" Name="expectedFormat" />
+        <Parameter Type="System.String" Name="actualFormat" />
+      </Instance>
+    </Message>
+    <Message Id="CorruptFileFormat" Number="2" SourceLineNumbers="no">
+      <Instance>
+        Attempted to load corrupt file from path: {0}. The file with format {1} contained unexpected content. Ensure the correct path was provided and that the file has not been incorrectly modified.
+        <Parameter Type="System.String" Name="path" />
+        <Parameter Type="System.String" Name="format" />
+      </Instance>
+    </Message>
+    <Message Id="DuplicateLocalizationIdentifier" Number="100">
+      <Instance>
+        The localization identifier '{0}' has been duplicated in multiple locations.  Please resolve the conflict.
+        <Parameter Type="System.String" Name="localizationId" />
+      </Instance>
+    </Message>
+    <Message Id="FileNotFound" Number="103">
+      <Instance>
+        The system cannot find the file '{0}'.
+        <Parameter Type="System.String" Name="file" />
+      </Instance>
+      <Instance>
+        The system cannot find the file '{0}' with type '{1}'.
+        <Parameter Type="System.String" Name="file" />
+        <Parameter Type="System.String" Name="fileType" />
+      </Instance>
+    </Message>
+    <Message Id="DuplicatePrimaryKey" Number="130">
+      <Instance>
+        The primary key '{0}' is duplicated in table '{1}'.  Please remove one of the entries or rename a part of the primary key to avoid the collision.
+        <Parameter Type="System.String" Name="primaryKey" />
+        <Parameter Type="System.String" Name="tableName" />
+      </Instance>
+    </Message>
+    <Message Id="InvalidIdt" Number="136">
+      <Instance>
+        There was an error importing the file '{0}'.
+        <Parameter Type="System.String" Name="idtFile" />
+      </Instance>
+      <Instance>
+        There was an error importing table '{1}' from file '{0}'.
+        <Parameter Type="System.String" Name="idtFile" />
+        <Parameter Type="System.String" Name="tableName" />
+      </Instance>
+    </Message>
+    <Message Id="VersionMismatch" Number="141">
+      <Instance>
+        The {0} file format version {1} is not compatible with the expected {0} file format version {2}.
+        <Parameter Type="System.String" Name="fileType" />
+        <Parameter Type="System.String" Name="version" />
+        <Parameter Type="System.String" Name="expectedVersion" />
+      </Instance>
+    </Message>
+    <Message Id="IllegalFileCompressionAttributes" Number="167">
+      <Instance>Cannot have both the MsidbFileAttributesCompressed and MsidbFileAttributesNoncompressed options set in a file attributes column.</Instance>
+    </Message>
+    <Message Id="MissingTableDefinition" Number="182" SourceLineNumbers="no">
+      <Instance>
+        Cannot find the table definitions for the '{0}' table.  This is likely due to a typing error or missing extension.  Please ensure all the necessary extensions are supplied on the command line with the -ext parameter.
+        <Parameter Type="System.String" Name="tableName" />
+      </Instance>
+    </Message>
+    <Message Id="RealTableMissingPrimaryKeyColumn" Number="225">
+      <Instance>
+        The table '{0}' does not contain any primary key columns.  At least one column must be marked as the primary key to ensure this table can be patched.
+        <Parameter Type="System.String" Name="tableName" />
+      </Instance>
+    </Message>
+    <Message Id="InvalidStringForCodepage" Number="311">
+      <Instance>
+        A string was provided with characters that are not available in the specified database code page '{0}'. Either change these characters to ones that exist in the database's code page, or update the database's code page by modifying one of the following attributes: Product/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.
+        <Parameter Type="System.String" Name="codepage" />
+      </Instance>
+    </Message>
+    <Message Id="TooManyColumnsInRealTable" Number="386" SourceLineNumbers="no">
+      <Instance>
+        The table '{0}' contains {1} columns which is not supported by Windows Installer.  Windows Installer supports a maximum of {2} columns.
+        <Parameter Type="System.String" Name="tableName" />
+        <Parameter Type="System.Int32" Name="columnCount" />
+        <Parameter Type="System.Int32" Name="supportedColumnCount" />
+      </Instance>
+    </Message>
+  </Class>
+</Messages>
