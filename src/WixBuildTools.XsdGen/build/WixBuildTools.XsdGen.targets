@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--Provide support for setting type (BuildAction) from VS-->
+    <AvailableItemName Include="XsdGenSource" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- <XsdGenPath Condition=" '$(XsdGenPath)'=='' and '$(MSBuildRuntimeType)'=='Core' ">$(MSBuildThisFileDirectory)..\tools\core\</XsdGenPath> -->
+    <XsdGenPath Condition=" '$(XsdGenPath)'=='' ">$(MSBuildThisFileDirectory)..\tools\full\</XsdGenPath>
+  </PropertyGroup>
+
+  <!--
+  ================================================================================================
+  XsdGen
+
+    Generates a .cs class file from an .xsd file.
+
+    [IN]
+    @(XsdGenSource) - The items to run through the XsdGen tool.
+
+    [OUT]
+    $(IntermediateOutputPath)%(Filename).cs - The generated .cs files to include in the compilation.
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <XsdGenDependsOn>
+    </XsdGenDependsOn>
+    <PrepareResourcesDependsOn>
+      XsdGen;
+      $(PrepareResourcesDependsOn)
+    </PrepareResourcesDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="XsdGen"
+    BeforeTargets="PrepareResources"
+    DependsOnTargets="$(XsdGenDependsOn)"
+    Condition=" '@(XsdGenSource)' != '' "
+    Inputs="$(MSBuildAllProjects);@(XsdGenSource)"
+    Outputs="$(IntermediateOutputPath)%(XsdGenSource.Filename).cs">
+
+    <PropertyGroup>
+      <XsdGenCsFile>$(IntermediateOutputPath)%(XsdGenSource.Filename).cs</XsdGenCsFile>
+      <XsdGenCommonNamespace>%(XsdGenSource.CommonNamespace)</XsdGenCommonNamespace>
+    </PropertyGroup>
+
+    <Exec Command="&quot;$(XsdGenPath)WixBuildTools.XsdGen.exe&quot; &quot;%(XsdGenSource.FullPath)&quot; &quot;$(XsdGenCsFile)&quot; %(XsdGenSource.Namespace) $(XsdGenCommonNamespace)"
+          Outputs="$(XsdGenCsFile)" />
+
+    <ItemGroup>
+      <!-- This will tell MSBuild to clean up the .cs file during a Clean build -->
+      <FileWrites Include="$(XsdGenCsFile)" />
+
+      <!-- Add the generated .cs file to the list of source files to compile -->
+      <Compile Include="$(XsdGenCsFile)">
+        <Link>%(XsdGenCsFile.Filename)%(XsdGenCsFile.Extension)</Link>
+      </Compile>
+    </ItemGroup>
+  </Target>
+
+</Project>

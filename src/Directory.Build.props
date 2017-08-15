@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\build\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)..\build\$(Configuration)\</OutputPath>
+
+    <Authors>Rob Mensching, Bob Arnson</Authors>
+    <Company>WiX Toolset</Company>
+    <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks> -->
+    <TargetFrameworks>net461</TargetFrameworks>
+    <IsTool>true</IsTool>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\WixBuildTools.XsdGen.targets" PackagePath="build\" />
+    <Content Include="buildCrossTargeting\WixBuildTools.XsdGen.targets" PackagePath="buildCrossTargeting\" />
+
+    <Content Include="$(OutputPath)net461\$(TargetFileName)" PackagePath="tools\full" />
+    <!-- <Content Include="$(OutputPath)netcoreapp2.0\$(TargetFileName)" PackagePath="tools\core" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.37-beta" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
