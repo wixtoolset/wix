@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <IsTool>true</IsTool>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\WixBuildTools.MsgGen.targets" PackagePath="build\" />
+    <Content Include="buildCrossTargeting\WixBuildTools.MsgGen.targets" PackagePath="buildCrossTargeting\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Xsd\messages.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.37-beta" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

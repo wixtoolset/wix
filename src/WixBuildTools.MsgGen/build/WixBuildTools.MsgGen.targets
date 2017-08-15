@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--Provide support for setting type (BuildAction) from VS-->
+    <AvailableItemName Include="MsgGenSource" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <MsgGenPath Condition=" '$(MsgGenPath)'=='' ">$(MSBuildThisFileDirectory)..\tools\</MsgGenPath>
+  </PropertyGroup>
+
+  <!--
+  ================================================================================================
+  MsgGen
+
+    Generates a .cs class file and a .resx file from an XML file.
+
+    [IN]
+    @(MsgGenSource) - The items to run through the MsgGen tool.
+
+    [OUT]
+    $(IntermediateOutputPath)%(Filename).cs - The generated .cs files to include in the compilation.
+    $(IntermediateOutputPath)%(MsgGenSource.ResourcesLogicalName) - The generated .resources file to embed in the assembly.
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <MsgGenDependsOn>
+      PrepareMsgGen
+    </MsgGenDependsOn>
+    <PrepareResourcesDependsOn>
+      MsgGen;
+      $(PrepareResourcesDependsOn)
+    </PrepareResourcesDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="MsgGen"
+    BeforeTargets="PrepareResources"
+    DependsOnTargets="$(MsgGenDependsOn)"
+    Condition=" '@(MsgGenSource)' != '' "
+    Inputs="@(MsgGenSource)"
+    Outputs="$(IntermediateOutputPath)%(MsgGenSource.Filename).cs;
+             $(IntermediateOutputPath)%(MsgGenSource.ResourcesLogicalName)">
+
+    <Exec Command="&quot;$(MsgGenPath)WixBuildTools.MsgGen.exe&quot; -nologo &quot;%(MsgGenSource.FullPath)&quot; &quot;$(MsgGenCsFile)&quot; &quot;$(MsgGenResourcesFile)&quot;"
+          Outputs="$(MsgGenCsFile);$(MsgGenResourcesFile)" />
+
+    <ItemGroup>
+      <!-- This will tell MSBuild to clean up the .cs and .resources file during a Clean build -->
+      <FileWrites Include="$(MsgGenCsFile);$(MsgGenResourcesFile)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+  ================================================================================================
+  PrepareMsgGen
+
+    Creates properties and Include items for MsgGen. This must be separate from the MsgGen target
+    to workaround an MSBuild bug: AdditionalMetadata is ignored when the target is up-to-date.
+
+  ================================================================================================
+  -->
+  <Target
+    Name="PrepareMsgGen"
+    Condition=" '@(MsgGenSource)' != '' ">
+
+    <CreateProperty Value="$(IntermediateOutputPath)%(MsgGenSource.Filename).cs">
+      <Output TaskParameter="Value" PropertyName="MsgGenCsFile" />
+    </CreateProperty>
+
+    <CreateProperty
+      Value="$(IntermediateOutputPath)%(MsgGenSource.ResourcesLogicalName)"
+      Condition=" '%(MsgGenSource.ResourcesLogicalName)' != '' ">
+
+      <Output TaskParameter="Value" PropertyName="MsgGenResourcesFile" />
+    </CreateProperty>
+
+    <!-- Add the generated .cs file to the list of source files to compile -->
+    <CreateItem
+      Include="$(MsgGenCsFile)"
+      AdditionalMetadata="Link=%(MsgGenCsFile.Filename)%(MsgGenCsFile.Extension)">
+
+      <Output TaskParameter="Include" ItemName="Compile" />
+    </CreateItem>
+
+    <!-- Add the generated .resources file to the list of resources to embed -->
+    <CreateItem
+      Include="$(MsgGenResourcesFile)"
+      AdditionalMetadata="Link=%(MsgGenResourcesFile.Filename)%(MsgGenResourcesFile.Extension);
+                          LogicalName=%(MsgGenSource.ResourcesLogicalName)"
+      Condition=" '$(MsgGenResourcesFile)' != '' ">
+
+      <Output TaskParameter="Include" ItemName="EmbeddedResource" />
+    </CreateItem>
+  </Target>
+
+</Project>
