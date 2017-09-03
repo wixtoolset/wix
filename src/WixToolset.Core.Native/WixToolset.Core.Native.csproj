@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <!-- <BeforePack>SetNuspecProperties</BeforePack> -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.37-beta" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- <ItemGroup>
+    <ProjectReference Include="..\winterop\winterop.vcxproj" ExcludeAssets="All" />
+  </ItemGroup> -->
+  <Target Name="SetNuspecProperties"
+          AfterTargets="Build">
+    <PropertyGroup>
+      <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+      <NuspecProperties>Configuration=$(Configuration);Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
+</Project>

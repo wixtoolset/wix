@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <licenseUrl>https://github.com/wixtoolset/Core.Native/blob/master/LICENSE.TXT</licenseUrl>
+    <projectUrl>https://github.com/wixtoolset/Core.Native</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+  </metadata>
+
+  <files>
+    <file src="winterop.dll" target="runtimes\win-$platform$\native" />
+    <file src="winterop.pdb" target="runtimes\win-$platform$\native" />
+  </files>
+</package>

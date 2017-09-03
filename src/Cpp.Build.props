@@ -3,6 +3,7 @@
 
 <Project>
   <PropertyGroup>
+    <Platform Condition=" '$(Platform)' == 'AnyCPU' ">Win32</Platform>
     <BaseOutputPath>$(OutputPath)</BaseOutputPath>
     <IntDir>$(BaseIntermediateOutputPath)$(Platform)\</IntDir>
     <OutDir>$(OutputPath)$(Platform)\</OutDir>
