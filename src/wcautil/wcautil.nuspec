@@ -10,6 +10,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
+    <dependencies>
+        <dependency id="WixToolset.DUtil" version="[4,5)" />
+    </dependencies>
   </metadata>
 
   <files>
