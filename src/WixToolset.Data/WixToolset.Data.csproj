@@ -10,6 +10,11 @@
     <Description></Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Data\actions.xml" />
+    <EmbeddedResource Include="Data\tables.xml" />
+  </ItemGroup>
+
 <!--
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
