@@ -9,7 +9,7 @@ environment:
   NUGET_XMLDOC_MODE: skip
 
 build_script:
-- dotnet pack
+  - appveyor.cmd
 
 pull_requests:
   do_not_increment_build_number: true
