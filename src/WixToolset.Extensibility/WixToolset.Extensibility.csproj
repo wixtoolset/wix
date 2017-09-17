@@ -9,9 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <ProjectOrPackageReference Include="$(WixToolsetRootFolder)Data\src\WixToolset.Data\WixToolset.Data.csproj" Version="4.0.*" /> -->
-    <!--<ProjectOrPackageReference Include="WixToolset.Data" Repo="Data" Version="1.0.*" />-->
     <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
     <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
   </ItemGroup>
 </Project>
