@@ -192,7 +192,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.37-beta" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
     <PackageReference Include="WixBuildTools.MsgGen" Version="4.0.*" PrivateAssets="all" />
     <PackageReference Include="WixBuildTools.XsdGen" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>

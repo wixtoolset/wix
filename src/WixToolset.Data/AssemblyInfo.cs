@@ -4,8 +4,6 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-//[assembly: AssemblyTitle("WiX Toolset Data")]
-//[assembly: AssemblyDescription("")]
 [assembly: AssemblyCulture("")]
 [assembly:CLSCompliant(true)]
 [assembly: ComVisible(false)]
