@@ -1,6 +1,8 @@
 @setlocal
 @pushd %~dp0
 
+nuget restore
+
 msbuild -p:Configuration=Release;Platform=Win32 -t:PackNativeNuget src\winterop\winterop.vcxproj
 msbuild -p:Configuration=Release;Platform=x64 -t:PackNativeNuget src\winterop\winterop.vcxproj
 
