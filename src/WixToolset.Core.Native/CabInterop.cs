@@ -33,8 +33,8 @@ namespace WixToolset.Core.Native
         /// <param name="file">Full path to file to add to cabinet.</param>
         /// <param name="token">Name of file in cabinet.</param>
         /// <param name="contextHandle">Handle to open cabinet.</param>
-        // [DllImport("winterop.dll", EntryPoint = "CreateCabAddFile", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        // public static extern void CreateCabAddFile(string file, string token, MsiInterop.MSIFILEHASHINFO fileHash, IntPtr contextHandle);
+        [DllImport("winterop.dll", EntryPoint = "CreateCabAddFile", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
+        public static extern void CreateCabAddFile(string file, string token, MsiInterop.MSIFILEHASHINFO fileHash, IntPtr contextHandle);
 
         /// <summary>
         /// Closes a cabinet.
