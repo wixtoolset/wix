@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Description></Description>
+    <Title>WiX Toolset Compiler</Title>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
+
+    <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
+
+    <ProjectReference Include="$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
+    <PackageReference Include="WixBuildTools.MsgGen" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixBuildTools.XsdGen" Version="4.0.*" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
