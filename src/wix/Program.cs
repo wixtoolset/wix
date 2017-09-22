@@ -24,9 +24,18 @@ namespace WixToolset.Core
         [MTAThread]
         public static int Main(string[] args)
         {
+            Messaging.Instance.InitializeAppName("WIX", "wix.exe");
+
+            Messaging.Instance.Display += DisplayMessage;
+
             var command = CommandLine.ParseStandardCommandLine(args);
 
             return command?.Execute() ?? 1;
+        }
+
+        private static void DisplayMessage(object sender, DisplayEventArgs e)
+        {
+            Console.WriteLine(e.Message);
         }
 
 #if false

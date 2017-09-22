@@ -121,7 +121,7 @@ namespace WixToolset
         /// <returns>Returns value for PID_APPNAME."</returns>
         public static string GetCreatingApplicationString()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
+            var assembly = Assembly.GetExecutingAssembly();
             return WixDistribution.ReplacePlaceholders("[AssemblyProduct] ([FileVersion])", assembly);
         }
 
@@ -130,8 +130,8 @@ namespace WixToolset
         /// </summary>
         public static void DisplayToolHeader()
         {
-            Assembly assembly = Assembly.GetCallingAssembly();
-            Console.WriteLine(WixDistribution.ReplacePlaceholders(WixDistributionSpecificStrings.ToolsetHelpHeader, assembly));
+            var assembly = Assembly.GetCallingAssembly();
+            Console.WriteLine(WixDistribution.ReplacePlaceholders("[AssemblyProduct] [AssemblyDescription] version [FileVersion]\r\n[AssemblyCopyright]", assembly));
         }
 
         /// <summary>
@@ -139,7 +139,8 @@ namespace WixToolset
         /// </summary>
         public static void DisplayToolFooter()
         {
-            Console.Write(WixDistribution.ReplacePlaceholders(WixDistributionSpecificStrings.ToolsetHelpFooter, null));
+            var assembly = Assembly.GetCallingAssembly();
+            Console.Write(WixDistribution.ReplacePlaceholders("\r\nFor more information see: [SupportUrl]", assembly));
         }
     }
 }
