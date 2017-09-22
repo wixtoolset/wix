@@ -119,6 +119,10 @@ _TeamCity*
 # DotCover is a Code Coverage Tool
 *.dotCover
 
+# AxoCover is a Code Coverage Tool
+.axoCover/*
+!.axoCover/settings.json
+
 # Visual Studio code coverage results
 *.coverage
 *.coveragexml
@@ -296,3 +300,6 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# OpenCover UI analysis results
+OpenCover/
