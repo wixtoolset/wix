@@ -12,10 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <WixTargetsPath>..\..\..\..\..\..\build\Debug\net462\wix.targets</WixTargetsPath>
-    <WixTargetsPath>..\..\..\..\..\..\build\Debug\netstandard2.0\wix.targets</WixTargetsPath>
-    <WixTargetsPath>..\..\..\..\..\..\build\publish\wix.targets</WixTargetsPath>
-    <WixTargetsPath>..\..\..\..\..\..\build\Debug\net462\wix.targets</WixTargetsPath>
+    <WixTargetsPath>..\..\..\..\..\..\build\Release\publish\wix.targets</WixTargetsPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <Description></Description>
     <Title>WiX Toolset MSBuild Tasks</Title>
   </PropertyGroup>
@@ -14,8 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="redirect.wix.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="redirect.wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="redirects\wix.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="redirects\wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="redirects\wix.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wix.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
@@ -32,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" PrivateAssets="all" Condition="'$(TargetFramework)'=='net462' " />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" PrivateAssets="all" Condition="'$(TargetFramework)'=='net461' " />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" PrivateAssets="all" Condition="'$(TargetFramework)'=='netstandard2.0' " />
   </ItemGroup>
 </Project>

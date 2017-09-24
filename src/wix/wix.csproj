@@ -13,9 +13,11 @@
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
+  <!--
   <ItemGroup>
     <Content Include="wix.cmd" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  -->
 
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
