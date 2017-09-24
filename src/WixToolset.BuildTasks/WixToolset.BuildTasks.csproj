@@ -16,7 +16,6 @@
   <ItemGroup>
     <Content Include="redirects\wix.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="redirects\wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="redirects\wix.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wix.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />

@@ -20,7 +20,7 @@
     <Error Text="Cannot pack $(MSBuildThisFileName) until all projects are published to: $(NuspecBasePath). Run appveyor.cmd to publish projects properly." Condition=" !Exists('$(NuspecBasePath)') " />
 
     <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);Version=$(Version)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Version=$(Version);ProjectFolder=$(MSBuildThisFileDirectory)</NuspecProperties>
     </PropertyGroup>
   </Target>
 </Project>
