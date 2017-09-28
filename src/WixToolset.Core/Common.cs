@@ -191,7 +191,7 @@ namespace WixToolset
                         return -1;
                     }
 
-                    encoding = Encoding.GetEncoding(codePage);
+                    encoding = CodePagesEncodingProvider.Instance.GetEncoding(codePage);
                 }
                 else
                 {

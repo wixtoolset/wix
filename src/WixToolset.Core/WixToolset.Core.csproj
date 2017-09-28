@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.4.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>

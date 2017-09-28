@@ -10781,7 +10781,7 @@ namespace WixToolset
         private void ParsePackageElement(XElement node, string productAuthor, string moduleId)
         {
             SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string codepage = "65001";
+            string codepage = "1252";
             string comments = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName);
             string keywords = "Installer";
             int msiVersion = 100; // lowest released version, really should be specified
@@ -11422,7 +11422,7 @@ namespace WixToolset
         private void ParsePatchInformationElement(XElement node)
         {
             SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string codepage = "65001";
+            string codepage = "1252";
             string comments = null;
             string keywords = "Installer,Patching,PCP,Database";
             int msiVersion = 1; // Should always be 1 for patches
