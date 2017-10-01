@@ -646,17 +646,17 @@
     @(_BindInputs);
     $(MSBuildAllProjects)"
     Outputs="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile);@(_BindBuiltOutputs)"
-    Condition=" '@(Compile)' != '' and ('$(OutputType)' == 'Bundle' or '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module')">
-
+    Condition=" '@(Compile)' != '' ">
 
     <PropertyGroup>
+      <OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)))</OutputFile>
       <PdbOutputFile>$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbName)</PdbOutputFile>
     </PropertyGroup>
 
     <DoIt
         SourceFiles="@(_CompileWithObjectPath)"
+        LibraryFiles="@(WixLibProjects);@(_ResolvedWixLibraryPaths)"
         LocalizationFiles="@(EmbeddedResource)"
-        ObjectFiles="@(CompileObjOutput);@(WixObject);@(WixLibProjects);@(_ResolvedWixLibraryPaths)"
 
         Cultures="%(CultureGroup.Identity)"
 
@@ -665,7 +665,8 @@
 
         IntermediateDirectory="$(IntermediateOutputPath)"
 
-        OutputFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)"
+        OutputFile="$(OutputFile)"
+        OutputType="$(OutputType)"
         PdbOutputFile="$(PdbOutputFile)"
 
         AdditionalOptions="$(CompilerAdditionalOptions) $(LinkerAdditionalOptions)"
@@ -1029,8 +1030,7 @@
   ================================================================================================
   -->
   <Target
-    Name="ReadPreviousBindInputsAndBuiltOutputs"
-    Condition=" '$(OutputType)' == 'Bundle' or '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module' ">
+    Name="ReadPreviousBindInputsAndBuiltOutputs">
 
     <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)">
       <Output TaskParameter="Lines" ItemName="_BindInputs" />
@@ -1169,17 +1169,16 @@
   ================================================================================================
   -->
   <Target
-      Name="UpdateLinkFileWrites"
-      Condition=" '$(OutputType)' == 'Bundle' or '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module' ">
+      Name="UpdateLinkFileWrites">
 
     <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)">
       <Output TaskParameter="Lines" ItemName="FileWrites"/>
     </ReadLinesFromFile>
 
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)" />
-      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)" />
-      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)" />
+      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)') " />
+      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)') " />
+      <FileWrites Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)" Condition=" Exists('$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)') " />
     </ItemGroup>
 
     <Message Importance="low" Text="Build files after link: @(FileWrites)" />
@@ -1302,7 +1301,7 @@
     </ReadLinesFromFile>
 
     <ItemGroup>
-      <_FullPathToCopy Include="$(TargetPath)" Condition=" '@(_FullPathToCopy)'=='' " />
+      <_FullPathToCopy Include="$(OutputFile)" Condition=" '@(_FullPathToCopy)'=='' " />
       <_RelativePath Include="$([MSBuild]::MakeRelative($(FullIntermediateOutputPath), %(_FullPathToCopy.Identity)))" />
     </ItemGroup>
 

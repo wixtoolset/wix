@@ -3,7 +3,6 @@
 namespace WixToolset
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -17,34 +16,27 @@ namespace WixToolset
     /// </summary>
     public sealed class WixVariableResolver
     {
-        private Localizer localizer;
         private Dictionary<string, string> wixVariables;
 
         /// <summary>
         /// Instantiate a new WixVariableResolver.
         /// </summary>
-        public WixVariableResolver()
+        public WixVariableResolver(Localizer localizer = null)
         {
             this.wixVariables = new Dictionary<string, string>();
+            this.Localizer = localizer;
         }
 
         /// <summary>
         /// Gets or sets the localizer.
         /// </summary>
         /// <value>The localizer.</value>
-        public Localizer Localizer
-        {
-            get { return this.localizer; }
-            set { this.localizer = value; }
-        }
+        public Localizer Localizer { get; private set; }
 
         /// <summary>
         /// Gets the count of variables added to the resolver.
         /// </summary>
-        public int VariableCount
-        {
-            get { return this.wixVariables.Count; }
-        }
+        public int VariableCount => this.wixVariables.Count;
 
         /// <summary>
         /// Add a variable.
@@ -198,9 +190,9 @@ namespace WixToolset
                                 Messaging.Instance.OnMessage(WixWarnings.DeprecatedLocalizationVariablePrefix(sourceLineNumbers, variableId));
                             }
 
-                            if (null != this.localizer)
+                            if (null != this.Localizer)
                             {
-                                resolvedValue = this.localizer.GetLocalizedValue(variableId);
+                                resolvedValue = this.Localizer.GetLocalizedValue(variableId);
                             }
                         }
                         else if (!localizationOnly && "wix" == variableNamespace)

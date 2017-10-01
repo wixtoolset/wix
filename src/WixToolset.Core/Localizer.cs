@@ -23,11 +23,32 @@ namespace WixToolset
         /// <summary>
         /// Instantiate a new Localizer.
         /// </summary>
-        public Localizer()
+        public Localizer(IEnumerable<Localization> localizations)
         {
             this.Codepage = -1;
-            this.variables = new Dictionary<string,WixVariableRow>();
+            this.variables = new Dictionary<string, WixVariableRow>();
             this.localizedControls = new Dictionary<string, LocalizedControl>();
+
+            foreach (var localization in localizations)
+            {
+                if (-1 == this.Codepage)
+                {
+                    this.Codepage = localization.Codepage;
+                }
+
+                foreach (WixVariableRow wixVariableRow in localization.Variables)
+                {
+                    Localizer.AddWixVariable(this.variables, wixVariableRow);
+                }
+
+                foreach (KeyValuePair<string, LocalizedControl> localizedControl in localization.LocalizedControls)
+                {
+                    if (!this.localizedControls.ContainsKey(localizedControl.Key))
+                    {
+                        this.localizedControls.Add(localizedControl.Key, localizedControl.Value);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -76,39 +97,13 @@ namespace WixToolset
         }
 
         /// <summary>
-        /// Add a localization file.
-        /// </summary>
-        /// <param name="localization">The localization file to add.</param>
-        public void AddLocalization(Localization localization)
-        {
-            if (-1 == this.Codepage)
-            {
-                this.Codepage = localization.Codepage;
-            }
-
-            foreach (WixVariableRow wixVariableRow in localization.Variables)
-            {
-                Localizer.AddWixVariable(this.variables, wixVariableRow);
-            }
-
-            foreach (KeyValuePair<string, LocalizedControl> localizedControl in localization.LocalizedControls)
-            {
-                if (!this.localizedControls.ContainsKey(localizedControl.Key))
-                {
-                    this.localizedControls.Add(localizedControl.Key, localizedControl.Value);
-                }
-            }
-        }
-
-        /// <summary>
         /// Get a localized data value.
         /// </summary>
         /// <param name="id">The name of the localization variable.</param>
         /// <returns>The localized data value or null if it wasn't found.</returns>
         public string GetLocalizedValue(string id)
         {
-            WixVariableRow wixVariableRow;
-            return this.variables.TryGetValue(id, out wixVariableRow) ? wixVariableRow.Value : null;
+            return this.variables.TryGetValue(id, out var wixVariableRow) ? wixVariableRow.Value : null;
         }
 
         /// <summary>

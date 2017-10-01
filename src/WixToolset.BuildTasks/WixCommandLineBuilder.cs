@@ -49,7 +49,7 @@ namespace WixToolset.BuildTasks
         /// </summary>
         /// <param name="switchName">Switch to append.</param>
         /// <param name="values">Values specified by the user.</param>
-        public void AppendArrayIfNotNull(string switchName, ITaskItem[] values)
+        public void AppendArrayIfNotNull(string switchName, IEnumerable<ITaskItem> values)
         {
             if (values != null)
             {
@@ -65,7 +65,7 @@ namespace WixToolset.BuildTasks
         /// </summary>
         /// <param name="switchName">Switch to append.</param>
         /// <param name="values">Values specified by the user.</param>
-        public void AppendArrayIfNotNull(string switchName, string[] values)
+        public void AppendArrayIfNotNull(string switchName, IEnumerable<string> values)
         {
             if (values != null)
             {
@@ -77,9 +77,9 @@ namespace WixToolset.BuildTasks
         }
 
         /// <summary>
-        /// Build the extensions argument. Each extension is searched in the current folder, user defined search 
+        /// Build the extensions argument. Each extension is searched in the current folder, user defined search
         /// directories (ReferencePath), HintPath, and under Wix Extension Directory in that order.
-        /// The order of precednce is based off of that described in Microsoft.Common.Targets's SearchPaths
+        /// The order of precedence is based off of that described in Microsoft.Common.Targets's SearchPaths
         /// property for the ResolveAssemblyReferences task.
         /// </summary>
         /// <param name="extensions">The list of extensions to include.</param>
@@ -92,21 +92,19 @@ namespace WixToolset.BuildTasks
                 return;
             }
 
-            string resolvedPath;
-
             foreach (ITaskItem extension in extensions)
             {
                 string className = extension.GetMetadata("Class");
 
                 string fileName = Path.GetFileName(extension.ItemSpec);
 
-                if (Path.GetExtension(fileName).Length == 0)
+                if (String.IsNullOrEmpty(Path.GetExtension(fileName)))
                 {
                     fileName += ".dll";
                 }
 
                 // First try reference paths
-                resolvedPath = FileSearchHelperMethods.SearchFilePaths(referencePaths, fileName);
+                var resolvedPath = FileSearchHelperMethods.SearchFilePaths(referencePaths, fileName);
 
                 if (String.IsNullOrEmpty(resolvedPath))
                 {
@@ -118,7 +116,7 @@ namespace WixToolset.BuildTasks
                         // Now try the item itself
                         resolvedPath = extension.ItemSpec;
 
-                        if (Path.GetExtension(resolvedPath).Length == 0)
+                        if (String.IsNullOrEmpty(Path.GetExtension(resolvedPath)))
                         {
                             resolvedPath += ".dll";
                         }

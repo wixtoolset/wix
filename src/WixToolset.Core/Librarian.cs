@@ -4,8 +4,8 @@ namespace WixToolset
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
     using WixToolset.Link;
 
     /// <summary>
@@ -14,69 +14,26 @@ namespace WixToolset
     public sealed class Librarian
     {
         /// <summary>
-        /// Instantiate a new Librarian class.
-        /// </summary>
-        public Librarian()
-        {
-            this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
-        }
-
-        /// <summary>
-        /// Gets table definitions used by this librarian.
-        /// </summary>
-        /// <value>Table definitions.</value>
-        public TableDefinitionCollection TableDefinitions { get; private set; }
-
-        /// <summary>
-        /// Adds an extension's data.
-        /// </summary>
-        /// <param name="extension">The extension data to add.</param>
-        public void AddExtensionData(IExtensionData extension)
-        {
-            if (null != extension.TableDefinitions)
-            {
-                foreach (TableDefinition tableDefinition in extension.TableDefinitions)
-                {
-                    try
-                    {
-                        this.TableDefinitions.Add(tableDefinition);
-                    }
-                    catch (ArgumentException)
-                    {
-                        Messaging.Instance.OnMessage(WixErrors.DuplicateExtensionTable(extension.GetType().ToString(), tableDefinition.Name));
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Create a library by combining several intermediates (objects).
         /// </summary>
         /// <param name="sections">The sections to combine into a library.</param>
         /// <returns>Returns the new library.</returns>
-        public Library Combine(IEnumerable<Section> sections)
+        public Library Combine(IEnumerable<Section> sections, IEnumerable<Localization> localizations, ILibraryBinaryFileResolver resolver)
         {
-            Library library = new Library(sections);
+            var localizationsByCulture = CollateLocalizations(localizations);
 
-            this.Validate(library);
+            var embedFilePaths = ResolveFilePathsToEmbed(sections, resolver);
 
-            return (Messaging.Instance.EncounteredError ? null : library);
-        }
+            var library = new Library(sections, localizationsByCulture, embedFilePaths);
 
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
+            return this.Validate(library);
         }
 
         /// <summary>
         /// Validate that a library contains one entry section and no duplicate symbols.
         /// </summary>
         /// <param name="library">Library to validate.</param>
-        private void Validate(Library library)
+        private Library Validate(Library library)
         {
             FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(library.Sections);
             find.Execute();
@@ -90,6 +47,66 @@ namespace WixToolset
             //     ReportDuplicateResolvedSymbolErrorsCommand reportDupes = new ReportDuplicateResolvedSymbolErrorsCommand(find.SymbolsWithDuplicates, resolve.ResolvedSections);
             //     reportDupes.Execute();
             // }
+
+            return (Messaging.Instance.EncounteredError ? null : library);
+        }
+
+        private static Dictionary<string, Localization> CollateLocalizations(IEnumerable<Localization> localizations)
+        {
+            var localizationsByCulture = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var localization in localizations)
+            {
+                if (localizationsByCulture.TryGetValue(localization.Culture, out var existingCulture))
+                {
+                    existingCulture.Merge(localization);
+                }
+                else
+                {
+                    localizationsByCulture.Add(localization.Culture, localization);
+                }
+            }
+
+            return localizationsByCulture;
+        }
+
+        private static List<string> ResolveFilePathsToEmbed(IEnumerable<Section> sections, ILibraryBinaryFileResolver resolver)
+        {
+            var embedFilePaths = new List<string>();
+
+            // Resolve paths to files that are to be embedded in the library.
+            if (null != resolver)
+            {
+                foreach (Table table in sections.SelectMany(s => s.Tables))
+                {
+                    foreach (Row row in table.Rows)
+                    {
+                        foreach (ObjectField objectField in row.Fields.OfType<ObjectField>())
+                        {
+                            if (null != objectField.Data)
+                            {
+                                string file = resolver.Resolve(row.SourceLineNumbers, table.Name, (string)objectField.Data);
+                                if (!String.IsNullOrEmpty(file))
+                                {
+                                    // File was successfully resolved so track the embedded index as the embedded file index.
+                                    objectField.EmbeddedFileIndex = embedFilePaths.Count;
+                                    embedFilePaths.Add(file);
+                                }
+                                else
+                                {
+                                    Messaging.Instance.OnMessage(WixDataErrors.FileNotFound(row.SourceLineNumbers, (string)objectField.Data, table.Name));
+                                }
+                            }
+                            else // clear out embedded file id in case there was one there before.
+                            {
+                                objectField.EmbeddedFileIndex = null;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return embedFilePaths;
         }
     }
 }

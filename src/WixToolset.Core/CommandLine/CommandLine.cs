@@ -57,13 +57,19 @@ namespace WixToolset.Core
             var showVersion = false;
             var outputFolder = String.Empty;
             var outputFile = String.Empty;
-            var sourceFile = String.Empty;
+            var outputType = String.Empty;
             var verbose = false;
             var files = new List<string>();
             var defines = new List<string>();
             var includePaths = new List<string>();
             var locFiles = new List<string>();
+            var libraryFiles = new List<string>();
             var suppressedWarnings = new List<int>();
+
+            var bindFiles = false;
+            var bindPaths = new List<string>();
+
+            var intermediateFolder = String.Empty;
 
             var cultures = new List<string>();
             var contentsFile = String.Empty;
@@ -82,6 +88,14 @@ namespace WixToolset.Core
                         case "h":
                         case "help":
                             cmdline.ShowHelp = true;
+                            return true;
+
+                        case "bindfiles":
+                            bindFiles = true;
+                            return true;
+
+                        case "bindpath":
+                            cmdline.GetNextArgumentOrError(bindPaths);
                             return true;
 
                         case "cultures":
@@ -110,13 +124,25 @@ namespace WixToolset.Core
                             cmdline.GetNextArgumentOrError(includePaths);
                             return true;
 
+                        case "intermediatefolder":
+                            cmdline.GetNextArgumentOrError(ref intermediateFolder);
+                            return true;
+
                         case "loc":
                             cmdline.GetNextArgumentAsFilePathOrError(locFiles, "localization files");
+                            return true;
+
+                        case "lib":
+                            cmdline.GetNextArgumentAsFilePathOrError(libraryFiles, "library files");
                             return true;
 
                         case "o":
                         case "out":
                             cmdline.GetNextArgumentOrError(ref outputFile);
+                            return true;
+
+                        case "outputtype":
+                            cmdline.GetNextArgumentOrError(ref outputType);
                             return true;
 
                         case "nologo":
@@ -143,6 +169,8 @@ namespace WixToolset.Core
                 }
             });
 
+            Messaging.Instance.ShowVerboseMessages = verbose;
+
             if (showVersion)
             {
                 return new VersionCommand();
@@ -164,8 +192,10 @@ namespace WixToolset.Core
                     {
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = GatherPreprocessorVariables(defines);
+                        var bindPathList = GatherBindPaths(bindPaths);
                         var extensions = cli.ExtensionManager;
-                        return new BuildCommand(sourceFiles, variables, locFiles, outputFile, cultures, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
+                        var type = CalculateOutputType(outputType, outputFile);
+                        return new BuildCommand(sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
                     }
 
                 case Commands.Compile:
@@ -177,6 +207,46 @@ namespace WixToolset.Core
             }
 
             return null;
+        }
+
+        private static OutputType CalculateOutputType(string outputType, string outputFile)
+        {
+            if (String.IsNullOrEmpty(outputType))
+            {
+                outputType = Path.GetExtension(outputFile);
+            }
+
+            switch (outputType.ToLowerInvariant())
+            {
+                case "bundle":
+                case ".exe":
+                    return OutputType.Bundle;
+
+                case "library":
+                case ".wixlib":
+                    return OutputType.Library;
+
+                case "module":
+                case ".msm":
+                    return OutputType.Module;
+
+                case "patch":
+                case ".msp":
+                    return OutputType.Patch;
+
+                case ".pcp":
+                    return OutputType.PatchCreation;
+
+                case "product":
+                case ".msi":
+                    return OutputType.Product;
+
+                case "transform":
+                case ".mst":
+                    return OutputType.Transform;
+            }
+
+            return OutputType.Unknown;
         }
 
         private static CommandLine Parse(string commandLineString, Func<CommandLine, string, bool> parseArgument)
@@ -239,6 +309,26 @@ namespace WixToolset.Core
             return variables;
         }
 
+        private static IEnumerable<BindPath> GatherBindPaths(IEnumerable<string> bindPaths)
+        {
+            var result = new List<BindPath>();
+
+            foreach (var bindPath in bindPaths)
+            {
+                BindPath bp = BindPath.Parse(bindPath);
+
+                if (Directory.Exists(bp.Path))
+                {
+                    result.Add(bp);
+                }
+                else if (File.Exists(bp.Path))
+                {
+                    Messaging.Instance.OnMessage(WixErrors.ExpectedDirectoryGotFile("-bindpath", bp.Path));
+                }
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Get a set of files that possibly have a search pattern in the path (such as '*').
@@ -361,7 +451,7 @@ namespace WixToolset.Core
 
         private static bool TryDequeue(Queue<string> q, out string arg)
         {
-            if (q.Count> 0)
+            if (q.Count > 0)
             {
                 arg = q.Dequeue();
                 return true;
@@ -469,11 +559,6 @@ namespace WixToolset.Core
             return false;
         }
 
-        /// <summary>
-        /// Parses a response file.
-        /// </summary>
-        /// <param name="responseFile">The file to parse.</param>
-        /// <returns>The array of arguments.</returns>
         private static List<string> ParseResponseFile(string responseFile)
         {
             string arguments;
@@ -486,11 +571,6 @@ namespace WixToolset.Core
             return CommandLine.ParseArgumentsToArray(arguments);
         }
 
-        /// <summary>
-        /// Parses an argument string into an argument array based on whitespace and quoting.
-        /// </summary>
-        /// <param name="arguments">Argument string.</param>
-        /// <returns>Argument array.</returns>
         private static List<string> ParseArgumentsToArray(string arguments)
         {
             // Scan and parse the arguments string, dividing up the arguments based on whitespace.
@@ -526,7 +606,7 @@ namespace WixToolset.Core
                     // Add the argument to the list if it's not empty.
                     if (arg.Length > 0)
                     {
-                        argsList.Add(CommandLine.ExpandEnvVars(arg.ToString()));
+                        argsList.Add(CommandLine.ExpandEnvironmentVariables(arg.ToString()));
                         arg.Length = 0;
                     }
                 }
@@ -557,12 +637,7 @@ namespace WixToolset.Core
             return argsList;
         }
 
-        /// <summary>
-        /// Expand enxironment variables contained in the passed string
-        /// </summary>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
-        private static string ExpandEnvVars(string arguments)
+        private static string ExpandEnvironmentVariables(string arguments)
         {
             var id = Environment.GetEnvironmentVariables();
 

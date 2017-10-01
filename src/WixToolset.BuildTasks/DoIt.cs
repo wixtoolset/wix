@@ -2,6 +2,9 @@
 
 namespace WixToolset.BuildTasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using WixToolset.Core;
@@ -40,11 +43,13 @@ namespace WixToolset.BuildTasks
 
         public bool NoLogo { get; set; }
 
-        public ITaskItem[] ObjectFiles { get; set; }
+        public ITaskItem[] LibraryFiles { get; set; }
 
         [Output]
         [Required]
         public ITaskItem OutputFile { get; set; }
+
+        public string OutputType { get; set; }
 
         public string PdbOutputFile { get; set; }
 
@@ -84,7 +89,7 @@ namespace WixToolset.BuildTasks
 
         public ITaskItem[] BindInputPaths { get; set; }
         public bool BindFiles { get; set; }
-        public ITaskItem BindContentsFile{ get; set; }
+        public ITaskItem BindContentsFile { get; set; }
         public ITaskItem BindOutputsFile { get; set; }
         public ITaskItem BindBuiltOutputsFile { get; set; }
 
@@ -102,21 +107,20 @@ namespace WixToolset.BuildTasks
         public string[] SuppressIces { get; set; }
         public string AdditionalCub { get; set; }
 
-
-
         public override bool Execute()
         {
             try
             {
                 this.ExecuteCore();
             }
-            catch (BuildException e)
+            catch (Exception e)
             {
                 this.Log.LogErrorFromException(e);
-            }
-            catch (WixException e)
-            {
-                this.Log.LogErrorFromException(e);
+
+                if (e is NullReferenceException || e is SEHException)
+                {
+                    throw;
+                }
             }
 
             return !this.Log.HasLoggedErrors;
@@ -129,27 +133,31 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendTextUnquoted("build");
 
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
+            commandLineBuilder.AppendSwitchIfNotNull("-outputType ", this.OutputType);
+            commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
             commandLineBuilder.AppendSwitchIfNotNull("-cultures ", this.Cultures);
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
             commandLineBuilder.AppendArrayIfNotNull("-I ", this.IncludeSearchPaths);
             commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);
-            commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
             commandLineBuilder.AppendIfTrue("-sval", this.SuppressValidation);
             commandLineBuilder.AppendArrayIfNotNull("-sice ", this.SuppressIces);
             commandLineBuilder.AppendSwitchIfNotNull("-usf ", this.UnreferencedSymbolsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
+            commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
             commandLineBuilder.AppendSwitchIfNotNull("-contentsfile ", this.BindContentsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-outputsfile ", this.BindOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-builtoutputsfile ", this.BindBuiltOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-wixprojectfile ", this.WixProjectFile);
             commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
 
+            commandLineBuilder.AppendArrayIfNotNull("-bindPath ", this.CalculateBindPathStrings());
             commandLineBuilder.AppendArrayIfNotNull("-loc ", this.LocalizationFiles);
+            commandLineBuilder.AppendArrayIfNotNull("-lib ", this.LibraryFiles);
             commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
 
             var commandLineString = commandLineBuilder.ToString();
 
-            this.Log.LogMessage(MessageImportance.Normal, commandLineString);
+            this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
 
             var command = CommandLine.ParseStandardCommandLine(commandLineString);
             command?.Execute();
@@ -158,6 +166,27 @@ namespace WixToolset.BuildTasks
         private void DisplayMessage(object sender, DisplayEventArgs e)
         {
             this.Log.LogMessageFromText(e.Message, MessageImportance.Normal);
+        }
+
+        private IEnumerable<string> CalculateBindPathStrings()
+        {
+            if (null != this.BindInputPaths)
+            {
+                foreach (var item in this.BindInputPaths)
+                {
+                    var path = item.GetMetadata("FullPath");
+
+                    var bindName = item.GetMetadata("BindName");
+                    if (!String.IsNullOrEmpty(bindName))
+                    {
+                        yield return String.Concat(bindName, "=", path);
+                    }
+                    else
+                    {
+                        yield return path;
+                    }
+                }
+            }
         }
 
         ///// <summary>
