@@ -13,6 +13,9 @@ namespace WixToolset.Data
         /// <summary>Bundle output type.</summary>
         Bundle,
 
+        /// <summary>Library output type.</summary>
+        Library,
+
         /// <summary>Module output type.</summary>
         Module,
 

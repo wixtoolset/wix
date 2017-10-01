@@ -5,7 +5,6 @@ namespace WixToolset.Data
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Xml;
 
     /// <summary>
@@ -17,6 +16,7 @@ namespace WixToolset.Data
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
 
         private string id;
+        private List<string> embedFilePaths;
         private Dictionary<string, Localization> localizations;
         private List<Section> sections;
 
@@ -25,6 +25,7 @@ namespace WixToolset.Data
         /// </summary>
         private Library()
         {
+            this.embedFilePaths = new List<string>();
             this.localizations = new Dictionary<string, Localization>();
             this.sections = new List<Section>();
         }
@@ -33,12 +34,14 @@ namespace WixToolset.Data
         /// Instantiate a new library populated with sections.
         /// </summary>
         /// <param name="sections">Sections to add to the library.</param>
-        public Library(IEnumerable<Section> sections)
+        /// <param name="localizationsByCulture"></param>
+        public Library(IEnumerable<Section> sections, IDictionary<string, Localization> localizationsByCulture, IEnumerable<string> embedFilePaths)
         {
-            this.localizations = new Dictionary<string, Localization>();
+            this.id = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
+            this.embedFilePaths = new List<string>(embedFilePaths);
+            this.localizations = new Dictionary<string, Localization>(localizationsByCulture);
             this.sections = new List<Section>(sections);
 
-            this.id = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
             foreach (Section section in this.sections)
             {
                 section.LibraryId = this.id;
@@ -49,24 +52,7 @@ namespace WixToolset.Data
         /// Get the sections contained in this library.
         /// </summary>
         /// <value>Sections contained in this library.</value>
-        public IEnumerable<Section> Sections { get { return this.sections; } }
-
-        /// <summary>
-        /// Add a localization file to this library.
-        /// </summary>
-        /// <param name="localization">The localization file to add.</param>
-        public void AddLocalization(Localization localization)
-        {
-            Localization existingCulture;
-            if (this.localizations.TryGetValue(localization.Culture, out existingCulture))
-            {
-                existingCulture.Merge(localization);
-            }
-            else
-            {
-                this.localizations.Add(localization.Culture, localization);
-            }
-        }
+        public IEnumerable<Section> Sections => this.sections;
 
         /// <summary>
         /// Gets localization files from this library that match the cultures passed in, in the order of the array of cultures.
@@ -77,8 +63,7 @@ namespace WixToolset.Data
         {
             foreach (string culture in cultures ?? new string[0])
             {
-                Localization localization;
-                if (this.localizations.TryGetValue(culture, out localization))
+                if (this.localizations.TryGetValue(culture, out var localization))
                 {
                     yield return localization;
                 }
@@ -137,49 +122,8 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="path">Path to save library file to on disk.</param>
         /// <param name="resolver">The WiX path resolver.</param>
-        public void Save(string path, ILibraryBinaryFileResolver resolver)
+        public void Save(string path)
         {
-            List<string> embedFilePaths = new List<string>();
-
-            // Resolve paths to files that are to be embedded in the library.
-            if (null != resolver)
-            {
-                foreach (Table table in this.sections.SelectMany(s => s.Tables))
-                {
-                    foreach (Row row in table.Rows)
-                    {
-                        foreach (ObjectField objectField in row.Fields.Where(f => f is ObjectField))
-                        {
-                            if (null != objectField.Data)
-                            {
-                                string file = resolver.Resolve(row.SourceLineNumbers, table.Name, (string)objectField.Data);
-                                if (!String.IsNullOrEmpty(file))
-                                {
-                                    // File was successfully resolved so track the embedded index as the embedded file index.
-                                    objectField.EmbeddedFileIndex = embedFilePaths.Count;
-                                    embedFilePaths.Add(file);
-                                }
-                                else
-                                {
-                                    Messaging.Instance.OnMessage(WixDataErrors.FileNotFound(row.SourceLineNumbers, (string)objectField.Data, table.Name));
-                                }
-                            }
-                            else // clear out embedded file id in case there was one there before.
-                            {
-                                objectField.EmbeddedFileIndex = null;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Do not save the library if errors were found while resolving object paths.
-            if (Messaging.Instance.EncounteredError)
-            {
-                return;
-            }
-
-            // Ensure the location to output the library exists and write it out.
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
 
             using (FileStream stream = File.Create(path))
