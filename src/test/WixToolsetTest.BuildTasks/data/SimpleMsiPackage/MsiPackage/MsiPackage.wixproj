@@ -33,13 +33,20 @@
     <PlatformName>$(Platform)</PlatformName>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="Package.wxs" />
     <Compile Include="PackageComponents.wxs" />
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Package.en-us.wxl" />
   </ItemGroup>
+
+  <ItemGroup>
+    <BindInputPaths Include="data" />
+  </ItemGroup>
+
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets') " />
   <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
