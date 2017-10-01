@@ -131,7 +131,7 @@ namespace WixToolset.Msi
         /// <exception cref="MsiException">Another error occured while importing the IDT file.</exception>
         public void Import(string idtPath)
         {
-            string folderPath = Path.GetDirectoryName(idtPath);
+            string folderPath = Path.GetFullPath(Path.GetDirectoryName(idtPath));
             string fileName = Path.GetFileName(idtPath);
 
             int error = MsiInterop.MsiDatabaseImport(this.Handle, folderPath, fileName);
