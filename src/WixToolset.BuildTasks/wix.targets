@@ -441,9 +441,9 @@
       <Output TaskParameter="TargetOutputs" ItemName="_BuiltProjectReferencePaths" />
     </MSBuild>
 
-    <!-- 
+    <!--
     VC project references must build GetNativeTargetPath because neither GetTargetPath nor the return of the default build
-    target return the output for a native .vcxproj. 
+    target return the output for a native .vcxproj.
     -->
     <MSBuild
       Projects="@(_MSBuildProjectReferenceExistent)"
@@ -485,7 +485,7 @@
 
     [IN]
     @(WixLibrary) - The list of .wixlib files.
-    
+
     [OUT]
     @(_ResolvedWixLibraryPaths) - Item group with full paths to libraries
   ================================================================================================
@@ -629,10 +629,10 @@
       AfterCompile
     </DoItDependsOn>
   </PropertyGroup>
-  <Target 
+  <Target
     Name="DoIt"
     DependsOnTargets="$(DoItDependsOn)" />
-    
+
   <Target
     Name="ActuallyDoIt"
 
@@ -692,7 +692,7 @@
 
         UnreferencedSymbolsFile="$(UnreferencedSymbolsFile)"
         WixProjectFile="$(ProjectPath)"
-        WixVariables="$(WixVariables)" 
+        WixVariables="$(WixVariables)"
 
         SuppressValidation="$(SuppressValidation)"
         SuppressIces="$(SuppressIces)"
@@ -945,21 +945,21 @@
   AssignCultures
 
     Determines the final list of culture groups to build based on either the Cultures property or
-    those specified in .wxl files. 
+    those specified in .wxl files.
 
-      Culture groups specified in the Cultures property must be specified as a semi-colon 
-      delimited  list of groups, with comma-delimited cultures within a group.  
+      Culture groups specified in the Cultures property must be specified as a semi-colon
+      delimited  list of groups, with comma-delimited cultures within a group.
       For example:
         <Cultures>en-US,en;en-GB,en</Cultures>
       This will build 2 targets, outputing to en-US and en-GB sub-folders.  Light will first look
       for strings in the first culture (en-US or en-GB) then the second (en).
 
-      Cultures of .wxl files will be used when the Culture property is not set.  The culture of a 
+      Cultures of .wxl files will be used when the Culture property is not set.  The culture of a
       .wxl file is determined by the Culture attribute in the WixLocalization element in the file
 
-    Sets the OutputFolder metadata on each culture group.  In most cases this is the same as the 
-    first culture in the culture group.  When the Culture's property is unspecified and no .wxl 
-    files are provided this is the same as the output directory.  When the Culture's property 
+    Sets the OutputFolder metadata on each culture group.  In most cases this is the same as the
+    first culture in the culture group.  When the Culture's property is unspecified and no .wxl
+    files are provided this is the same as the output directory.  When the Culture's property
     specifies a single culture group and no .wxl files are provided this is the same as the output
     directory.
 
@@ -1206,7 +1206,7 @@
         SourceFilesProjectOutputGroup;
         ContentFilesProjectOutputGroup" />
 
-  <!-- 
+  <!--
   This is the key output for the BuiltProjectOutputGroup and is meant to be read directly from the IDE.
   Reading an item is faster than invoking a target.
   -->

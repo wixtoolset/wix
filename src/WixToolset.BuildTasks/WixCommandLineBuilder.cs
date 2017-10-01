@@ -3,10 +3,9 @@
 namespace WixToolset.BuildTasks
 {
     using System;
-    using System.Diagnostics;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Text;
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -17,7 +16,7 @@ namespace WixToolset.BuildTasks
     public class WixCommandLineBuilder : CommandLineBuilder
     {
         internal const int Unspecified = -1;
-        
+
         /// <summary>
         /// Append a switch to the command line if the value has been specified.
         /// </summary>
@@ -131,7 +130,7 @@ namespace WixToolset.BuildTasks
 
                             if (!File.Exists(resolvedPath))
                             {
-                                // Extesnion wasn't found, just set it to the extension name passed in
+                                // Extension wasn't found, just set it to the extension name passed in
                                 resolvedPath = extension.ItemSpec;
                             }
                         }

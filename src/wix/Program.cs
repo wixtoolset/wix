@@ -3,8 +3,6 @@
 namespace WixToolset.Core
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
     using WixToolset.Data;
 
     /// <summary>

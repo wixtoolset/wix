@@ -30,7 +30,6 @@ namespace WixToolset
         private List<InspectorExtension> inspectorExtensions;
         private bool sectionIdOnRows;
         private WixActionRowCollection standardActions;
-        private Localizer localizer;
         private Output activeOutput;
         private TableDefinitionCollection tableDefinitions;
 
@@ -52,11 +51,7 @@ namespace WixToolset
         /// Gets or sets the localizer.
         /// </summary>
         /// <value>The localizer.</value>
-        public Localizer Localizer
-        {
-            get { return this.localizer; }
-            set { this.localizer = value; }
-        }
+        public Localizer Localizer { get; set; }
 
         /// <summary>
         /// Gets or sets the path to output unreferenced symbols to. If null or empty, there is no output.
@@ -202,9 +197,9 @@ namespace WixToolset
                 // now that we know where we're starting from, create the output object
                 output = new Output(null);
                 output.EntrySection = find.EntrySection; // Note: this entry section will get added to the Output.Sections collection later
-                if (null != this.localizer && -1 != this.localizer.Codepage)
+                if (null != this.Localizer && -1 != this.Localizer.Codepage)
                 {
-                    output.Codepage = this.localizer.Codepage;
+                    output.Codepage = this.Localizer.Codepage;
                 }
                 this.activeOutput = output;
 
@@ -1707,7 +1702,7 @@ namespace WixToolset
             int localizedColumnCount = 0;
 
             // if there are localization strings, figure out which columns can be localized in this table
-            if (null != this.localizer)
+            if (null != this.Localizer)
             {
                 for (int i = 0; i < table.Definition.Columns.Count; i++)
                 {
