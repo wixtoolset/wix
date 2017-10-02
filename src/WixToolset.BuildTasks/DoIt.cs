@@ -88,9 +88,13 @@ namespace WixToolset.BuildTasks
 
 
         public ITaskItem[] BindInputPaths { get; set; }
+
         public bool BindFiles { get; set; }
+
         public ITaskItem BindContentsFile { get; set; }
+
         public ITaskItem BindOutputsFile { get; set; }
+
         public ITaskItem BindBuiltOutputsFile { get; set; }
 
         public string CabinetCachePath { get; set; }
@@ -148,11 +152,12 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-outputsfile ", this.BindOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-builtoutputsfile ", this.BindBuiltOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-wixprojectfile ", this.WixProjectFile);
-            commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
 
+            commandLineBuilder.AppendIfTrue("-bindFiles", this.BindFiles);
             commandLineBuilder.AppendArrayIfNotNull("-bindPath ", this.CalculateBindPathStrings());
             commandLineBuilder.AppendArrayIfNotNull("-loc ", this.LocalizationFiles);
             commandLineBuilder.AppendArrayIfNotNull("-lib ", this.LibraryFiles);
+            commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
             commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
 
             var commandLineString = commandLineBuilder.ToString();
