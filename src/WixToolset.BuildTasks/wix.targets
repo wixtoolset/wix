@@ -793,6 +793,10 @@
 
       <Output TaskParameter="DefineConstants" PropertyName="ProjectReferenceDefineConstants" />
     </CreateProjectReferenceDefineConstants>
+
+    <ItemGroup>
+      <LinkerBindInputPaths Include="%(_ResolvedProjectReferencePaths.RootDir)%(_ResolvedProjectReferencePaths.Directory)" />
+    </ItemGroup>
   </Target>
 
   <!--

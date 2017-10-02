@@ -145,6 +145,7 @@ namespace WixToolset.BuildTasks
             {
                 outputItems.Add(new TaskItem(String.Format(CultureInfo.InvariantCulture, "{0}={1}", define.Key, define.Value)));
             }
+
             this.defineConstants = outputItems.ToArray();
 
             return true;
