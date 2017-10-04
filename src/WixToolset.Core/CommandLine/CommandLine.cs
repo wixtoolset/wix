@@ -195,7 +195,7 @@ namespace WixToolset.Core
                         var bindPathList = GatherBindPaths(bindPaths);
                         var extensions = cli.ExtensionManager;
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
+                        return new BuildCommand(extensions, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
                     }
 
                 case Commands.Compile:

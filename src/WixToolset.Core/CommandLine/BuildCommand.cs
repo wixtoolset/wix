@@ -11,8 +11,9 @@ namespace WixToolset.Core
 
     internal class BuildCommand : ICommand
     {
-        public BuildCommand(IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
+        public BuildCommand(ExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
         {
+            this.Extensions = extensions;
             this.LocFiles = locFiles;
             this.LibraryFiles = libraryFiles;
             this.PreprocessorVariables = preprocessorVariables;
@@ -30,6 +31,8 @@ namespace WixToolset.Core
             this.BuiltOutputsFile = builtOutputsFile;
             this.WixProjectFile = wixProjectFile;
         }
+
+        public ExtensionManager Extensions { get; }
 
         public IEnumerable<string> LocFiles { get; }
 
@@ -145,6 +148,11 @@ namespace WixToolset.Core
             sections.AddRange(SectionsFromLibraries(tableDefinitions));
 
             var linker = new Linker();
+
+            foreach (var data in this.Extensions.Create<IExtensionData>())
+            {
+                linker.AddExtensionData(data);
+            }
 
             var output = linker.Link(sections, this.OutputType);
 
