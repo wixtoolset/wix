@@ -3,8 +3,6 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
-    <WixExtension Include="WixToolset.VS.wixext">
-      <HintPath>$(MSBuildThisFileDirectory)..\tools\WixToolset.VS.wixext.dll</HintPath>
-    </WixExtension>
+    <WixExtension Include="$(MSBuildThisFileDirectory)..\tools\WixToolset.VisualStudio.wixext.dll" />
   </ItemGroup>
 </Project>
