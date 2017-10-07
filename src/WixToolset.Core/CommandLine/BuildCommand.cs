@@ -9,7 +9,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
-    internal class BuildCommand : ICommand
+    internal class BuildCommand : ICommandLineCommand
     {
         public BuildCommand(ExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
         {

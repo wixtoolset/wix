@@ -6,7 +6,7 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using WixToolset.Data;
 
-    internal class CompileCommand : ICommand
+    internal class CompileCommand : ICommandLineCommand
     {
         public CompileCommand(IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables)
         {

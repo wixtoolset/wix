@@ -4,7 +4,7 @@ using System;
 
 namespace WixToolset.Core
 {
-    internal class VersionCommand : ICommand
+    internal class VersionCommand : ICommandLineCommand
     {
         public int Execute()
         {

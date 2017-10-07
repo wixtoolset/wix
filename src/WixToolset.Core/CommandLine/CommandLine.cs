@@ -41,14 +41,14 @@ namespace WixToolset.Core
 
         public bool ShowHelp { get; set; }
 
-        public static ICommand ParseStandardCommandLine(string commandLineString)
+        public static ICommandLineCommand ParseStandardCommandLine(string commandLineString)
         {
             var args = CommandLine.ParseArgumentsToArray(commandLineString).ToArray();
 
             return ParseStandardCommandLine(args);
         }
 
-        public static ICommand ParseStandardCommandLine(string[] args)
+        public static ICommandLineCommand ParseStandardCommandLine(string[] args)
         {
             var next = String.Empty;
 

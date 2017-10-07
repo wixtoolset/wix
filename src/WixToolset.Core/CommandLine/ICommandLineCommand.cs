@@ -2,7 +2,7 @@
 
 namespace WixToolset.Core
 {
-    public interface ICommand
+    public interface ICommandLineCommand
     {
         int Execute();
     }

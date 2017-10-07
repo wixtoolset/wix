@@ -4,7 +4,7 @@ namespace WixToolset.Core
 {
     using System;
 
-    internal class HelpCommand : ICommand
+    internal class HelpCommand : ICommandLineCommand
     {
         public HelpCommand(Commands command)
         {
