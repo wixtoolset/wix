@@ -102,11 +102,6 @@ namespace WixToolset
             return argsList.ToArray();
         }
 
-        /// <summary>
-        /// Expand enxironment variables contained in the passed string
-        /// </summary>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
         static private string ExpandEnvVars(string arguments)
         {
             IDictionary id = Environment.GetEnvironmentVariables();
