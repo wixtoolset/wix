@@ -11,11 +11,11 @@ namespace WixToolset
     using System.IO;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
+    using WixToolset.Core;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
-    using WixToolset.Msi;
-    using WixToolset.Core.Native;
     using Wix = WixToolset.Data.Serialize;
 
     /// <summary>
@@ -158,10 +158,7 @@ namespace WixToolset
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public Intermediate Compile(XDocument source)
         {
-            if (null == source)
-            {
-                throw new ArgumentNullException("source");
-            }
+            if (null == source) throw new ArgumentNullException(nameof(source));
 
             bool encounteredError = false;
 
@@ -220,9 +217,7 @@ namespace WixToolset
                                 {
                                     if (field.Data is string)
                                     {
-                                        bool isDefault = false;
-                                        bool delayedResolve = false;
-                                        field.Data = this.componentIdPlaceholdersResolver.ResolveVariables(row.SourceLineNumbers, (string)field.Data, false, false, ref isDefault, ref delayedResolve);
+                                        field.Data = this.componentIdPlaceholdersResolver.ResolveVariables(row.SourceLineNumbers, (string)field.Data, false, false, out var defaultIgnored, out var delayedIgnored);
                                     }
                                 }
                             }
@@ -470,7 +465,8 @@ namespace WixToolset
                         case "Advertise":
                             appIdAdvertise = this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
-                        case "Description": description = this.core.GetAttributeValue(sourceLineNumbers, attrib);
+                        case "Description":
+                            description = this.core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "DllSurrogate":
                             dllSurrogate = this.core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
@@ -9471,13 +9467,13 @@ namespace WixToolset
                             targetProductName = this.core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ApiPatchingSymbolNoImagehlpFlag":
-                            apiPatchingSymbolFlags |= (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchAPI.PatchInterop.PatchSymbolFlagsType.PATCH_SYMBOL_NO_IMAGEHLP : 0;
+                            apiPatchingSymbolFlags |= (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlagsType.PATCH_SYMBOL_NO_IMAGEHLP : 0;
                             break;
                         case "ApiPatchingSymbolNoFailuresFlag":
-                            apiPatchingSymbolFlags |= (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchAPI.PatchInterop.PatchSymbolFlagsType.PATCH_SYMBOL_NO_FAILURES : 0;
+                            apiPatchingSymbolFlags |= (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlagsType.PATCH_SYMBOL_NO_FAILURES : 0;
                             break;
                         case "ApiPatchingSymbolUndecoratedTooFlag":
-                            apiPatchingSymbolFlags |= (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchAPI.PatchInterop.PatchSymbolFlagsType.PATCH_SYMBOL_UNDECORATED_TOO : 0;
+                            apiPatchingSymbolFlags |= (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? (int)PatchSymbolFlagsType.PATCH_SYMBOL_UNDECORATED_TOO : 0;
                             break;
                         case "OptimizePatchSizeForLargeFiles":
                             optimizePatchSizeForLargeFiles = (YesNoType.Yes == this.core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
@@ -11802,7 +11798,7 @@ namespace WixToolset
         private void ParseProductElement(XElement node)
         {
             SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            int codepage = 0;
+            int codepage = 65001;
             string productCode = null;
             string upgradeCode = null;
             string manufacturer = null;

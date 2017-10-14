@@ -6,6 +6,7 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
@@ -71,6 +72,7 @@ namespace WixToolset.Core
 
             var intermediateFolder = String.Empty;
 
+            var cabCachePath = String.Empty;
             var cultures = new List<string>();
             var contentsFile = String.Empty;
             var outputsFile = String.Empty;
@@ -98,6 +100,10 @@ namespace WixToolset.Core
                             cmdline.GetNextArgumentOrError(bindPaths);
                             return true;
 
+                        case "cc":
+                            cmdline.GetNextArgumentOrError(ref cabCachePath);
+                            return true;
+                            
                         case "cultures":
                             cmdline.GetNextArgumentOrError(cultures);
                             return true;
@@ -190,12 +196,14 @@ namespace WixToolset.Core
             {
                 case Commands.Build:
                     {
+                        LoadStandardBackends(cli.ExtensionManager);
+
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = GatherPreprocessorVariables(defines);
                         var bindPathList = GatherBindPaths(bindPaths);
                         var extensions = cli.ExtensionManager;
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(extensions, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
+                        return new BuildCommand(extensions, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
                     }
 
                 case Commands.Compile:
@@ -207,6 +215,18 @@ namespace WixToolset.Core
             }
 
             return null;
+        }
+
+        private static void LoadStandardBackends(ExtensionManager extensionManager)
+        {
+            var folder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+
+            foreach (var backendAssemblyName in new[] { "WixToolset.Core.Burn.dll", "WixToolset.Core.WindowsInstaller.dll" })
+            {
+                var path = Path.Combine(folder, backendAssemblyName);
+
+                extensionManager.Load(path);
+            }
         }
 
         private static OutputType CalculateOutputType(string outputType, string outputFile)

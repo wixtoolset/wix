@@ -8,8 +8,9 @@ namespace WixToolset
     using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
 
-    public class ExtensionManager
+    public class ExtensionManager : IExtensionManager
     {
         private List<Assembly> extensionAssemblies = new List<Assembly>();
 
@@ -67,8 +68,7 @@ namespace WixToolset
         /// <returns>Extensions created of the specified type.</returns>
         public IEnumerable<T> Create<T>() where T : class
         {
-            var extensionType = typeof(T);
-            var types = this.extensionAssemblies.SelectMany(a => a.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && extensionType.IsAssignableFrom(t)));
+            var types = this.extensionAssemblies.SelectMany(a => a.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && typeof(T).IsAssignableFrom(t)));
             return types.Select(t => (T)Activator.CreateInstance(t)).ToList();
         }
 

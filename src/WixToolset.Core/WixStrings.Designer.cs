@@ -14,7 +14,7 @@ namespace WixToolset {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class WixStrings {
+    public class WixStrings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -127,7 +127,7 @@ namespace WixToolset {
         /// <summary>
         ///   Looks up a localized string similar to Could not determine ProductCode from transform summary information.
         /// </summary>
-        internal static string EXP_CouldnotDetermineProductCodeFromTransformSummaryInfo {
+        public static string EXP_CouldnotDetermineProductCodeFromTransformSummaryInfo {
             get {
                 return ResourceManager.GetString("EXP_CouldnotDetermineProductCodeFromTransformSummaryInfo", resourceCulture);
             }
@@ -226,7 +226,7 @@ namespace WixToolset {
         /// <summary>
         ///   Looks up a localized string similar to Transform authored into multiple Media &apos;{0}&apos; and &apos;{1}&apos;..
         /// </summary>
-        internal static string EXP_TransformAuthoredIntoMultipleMedia {
+        public static string EXP_TransformAuthoredIntoMultipleMedia {
             get {
                 return ResourceManager.GetString("EXP_TransformAuthoredIntoMultipleMedia", resourceCulture);
             }
@@ -253,7 +253,7 @@ namespace WixToolset {
         /// <summary>
         ///   Looks up a localized string similar to Encountered an unexpected error while merging &apos;{0}&apos;. More information about the merge and the failure can be found in the merge log: &apos;{1}&apos;.
         /// </summary>
-        internal static string EXP_UnexpectedMergerErrorInSourceFile {
+        public static string EXP_UnexpectedMergerErrorInSourceFile {
             get {
                 return ResourceManager.GetString("EXP_UnexpectedMergerErrorInSourceFile", resourceCulture);
             }
@@ -262,7 +262,7 @@ namespace WixToolset {
         /// <summary>
         ///   Looks up a localized string similar to Encountered an unexpected merge error of type &apos;{0}&apos; for which there is currently no error message to display.  More information about the merge and the failure can be found in the merge log: &apos;{1}&apos;.
         /// </summary>
-        internal static string EXP_UnexpectedMergerErrorWithType {
+        public static string EXP_UnexpectedMergerErrorWithType {
             get {
                 return ResourceManager.GetString("EXP_UnexpectedMergerErrorWithType", resourceCulture);
             }

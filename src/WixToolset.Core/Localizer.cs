@@ -8,11 +8,12 @@ namespace WixToolset
     using WixToolset.Data;
     using WixToolset.Data.Rows;
     using WixToolset.Core.Native;
+    using WixToolset.Extensibility;
 
     /// <summary>
     /// Parses localization files and localizes database values.
     /// </summary>
-    public sealed class Localizer
+    public sealed class Localizer : ILocalizer
     {
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
         private static string XmlElementName = "WixLocalization";
@@ -55,7 +56,28 @@ namespace WixToolset
         /// Gets the codepage.
         /// </summary>
         /// <value>The codepage.</value>
-        public int Codepage { get; private set; }
+        public int Codepage { get; }
+
+        /// <summary>
+        /// Get a localized data value.
+        /// </summary>
+        /// <param name="id">The name of the localization variable.</param>
+        /// <returns>The localized data value or null if it wasn't found.</returns>
+        public string GetLocalizedValue(string id)
+        {
+            return this.variables.TryGetValue(id, out var wixVariableRow) ? wixVariableRow.Value : null;
+        }
+
+        /// <summary>
+        /// Get a localized control.
+        /// </summary>
+        /// <param name="dialog">The optional id of the control's dialog.</param>
+        /// <param name="control">The id of the control.</param>
+        /// <returns>The localized control or null if it wasn't found.</returns>
+        public LocalizedControl GetLocalizedControl(string dialog, string control)
+        {
+            return this.localizedControls.TryGetValue(LocalizedControl.GetKey(dialog, control), out var localizedControl) ? localizedControl : null;
+        }
 
         /// <summary>
         /// Loads a localization file from a path on disk.
@@ -97,36 +119,13 @@ namespace WixToolset
         }
 
         /// <summary>
-        /// Get a localized data value.
-        /// </summary>
-        /// <param name="id">The name of the localization variable.</param>
-        /// <returns>The localized data value or null if it wasn't found.</returns>
-        public string GetLocalizedValue(string id)
-        {
-            return this.variables.TryGetValue(id, out var wixVariableRow) ? wixVariableRow.Value : null;
-        }
-
-        /// <summary>
-        /// Get a localized control.
-        /// </summary>
-        /// <param name="dialog">The optional id of the control's dialog.</param>
-        /// <param name="control">The id of the control.</param>
-        /// <returns>The localized control or null if it wasn't found.</returns>
-        public LocalizedControl GetLocalizedControl(string dialog, string control)
-        {
-            LocalizedControl localizedControl;
-            return this.localizedControls.TryGetValue(LocalizedControl.GetKey(dialog, control), out localizedControl) ? localizedControl : null;
-        }
-
-        /// <summary>
         /// Adds a WixVariableRow to a dictionary while performing the expected override checks.
         /// </summary>
         /// <param name="variables">Dictionary of variable rows.</param>
         /// <param name="wixVariableRow">Row to add to the variables dictionary.</param>
         private static void AddWixVariable(IDictionary<string, WixVariableRow> variables, WixVariableRow wixVariableRow)
         {
-            WixVariableRow existingWixVariableRow;
-            if (!variables.TryGetValue(wixVariableRow.Id, out existingWixVariableRow) || (existingWixVariableRow.Overridable && !wixVariableRow.Overridable))
+            if (!variables.TryGetValue(wixVariableRow.Id, out var existingWixVariableRow) || (existingWixVariableRow.Overridable && !wixVariableRow.Overridable))
             {
                 variables[wixVariableRow.Id] = wixVariableRow;
             }

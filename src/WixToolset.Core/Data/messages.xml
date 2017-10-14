@@ -957,12 +957,6 @@
                 <Parameter Type="System.String" Name="exceptionMessage" />
             </Instance>
         </Message>
-        <Message Id="InvalidFileName" Number="85">
-            <Instance>
-                Invalid file name '{0}'.
-                <Parameter Type="System.String" Name="fileName" />
-            </Instance>
-        </Message>
         <Message Id="ReferenceLoopDetected" Number="86">
             <Instance>
                 A circular reference of groups was detected. The infinite loop includes: {0}. Group references must form a directed acyclic graph.
@@ -2136,12 +2130,6 @@
         <Message Id="PatchNotRemovable" Number="261" SourceLineNumbers="no">
             <Instance>
                 This patch is not uninstallable. The 'Patch' element's attribute 'AllowRemoval' should be set to 'no'.
-            </Instance>
-        </Message>
-        <Message Id="PathTooLong" Number="262">
-            <Instance>
-                '{0}' is too long, the fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
-                <Parameter Type="System.String" Name="fileName" />
             </Instance>
         </Message>
         <Message Id="FileTooLarge" Number="263">

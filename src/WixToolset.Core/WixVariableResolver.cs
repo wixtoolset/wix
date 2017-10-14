@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Collections.Generic;
@@ -10,11 +10,12 @@ namespace WixToolset
     using System.Text.RegularExpressions;
     using WixToolset.Data;
     using WixToolset.Data.Rows;
+    using WixToolset.Extensibility;
 
     /// <summary>
     /// WiX variable resolver.
     /// </summary>
-    public sealed class WixVariableResolver
+    internal sealed class WixVariableResolver : IBindVariableResolver
     {
         private Dictionary<string, string> wixVariables;
 
@@ -31,7 +32,7 @@ namespace WixToolset
         /// Gets or sets the localizer.
         /// </summary>
         /// <value>The localizer.</value>
-        public Localizer Localizer { get; private set; }
+        private Localizer Localizer { get; }
 
         /// <summary>
         /// Gets the count of variables added to the resolver.
@@ -83,10 +84,7 @@ namespace WixToolset
         /// <returns>The resolved value.</returns>
         public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly)
         {
-            bool isDefault = false;
-            bool delayedResolve = false;
-
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, ref isDefault, ref delayedResolve);
+            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, out var defaultIgnored, out var delayedIgnored);
         }
 
         /// <summary>
@@ -97,11 +95,9 @@ namespace WixToolset
         /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
         /// <param name="isDefault">true if the resolved value was the default.</param>
         /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, ref bool isDefault)
+        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, out bool isDefault)
         {
-            bool delayedResolve = false;
-
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, ref isDefault, ref delayedResolve);
+            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, out isDefault, out var ignored);
         }
 
         /// <summary>
@@ -114,9 +110,9 @@ namespace WixToolset
         /// <param name="isDefault">true if the resolved value was the default.</param>
         /// <param name="delayedResolve">true if the value has variables that cannot yet be resolved.</param>
         /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, ref bool isDefault, ref bool delayedResolve)
+        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, out bool isDefault, out bool delayedResolve)
         {
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, true, ref isDefault, ref delayedResolve);
+            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, true, out isDefault, out delayedResolve);
         }
 
         /// <summary>
@@ -129,7 +125,7 @@ namespace WixToolset
         /// <param name="isDefault">true if the resolved value was the default.</param>
         /// <param name="delayedResolve">true if the value has variables that cannot yet be resolved.</param>
         /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown, ref bool isDefault, ref bool delayedResolve)
+        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown, out bool isDefault, out bool delayedResolve)
         {
             MatchCollection matches = Common.WixVariableRegex.Matches(value);
 
@@ -190,10 +186,7 @@ namespace WixToolset
                                 Messaging.Instance.OnMessage(WixWarnings.DeprecatedLocalizationVariablePrefix(sourceLineNumbers, variableId));
                             }
 
-                            if (null != this.Localizer)
-                            {
-                                resolvedValue = this.Localizer.GetLocalizedValue(variableId);
-                            }
+                            resolvedValue = this.Localizer?.GetLocalizedValue(variableId);
                         }
                         else if (!localizationOnly && "wix" == variableNamespace)
                         {
@@ -223,6 +216,7 @@ namespace WixToolset
                         }
                         else
                         {
+
                             // insert the resolved value if it was found or display an error
                             if (null != resolvedValue)
                             {
@@ -245,6 +239,19 @@ namespace WixToolset
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Try to find localization information for dialog and (optional) control.
+        /// </summary>
+        /// <param name="dialog">Dialog identifier.</param>
+        /// <param name="control">Optional control identifier.</param>
+        /// <param name="localizedControl">Found localization information.</param>
+        /// <returns>True if localized control was found, otherwise false.</returns>
+        public bool TryGetLocalizedControl(string dialog, string control, out LocalizedControl localizedControl)
+        {
+            localizedControl = this.Localizer?.GetLocalizedControl(dialog, control);
+            return localizedControl != null;
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ namespace WixToolset
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
 
     public class BinderFileManagerCore : IBinderFileManagerCore

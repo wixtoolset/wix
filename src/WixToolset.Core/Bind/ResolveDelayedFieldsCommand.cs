@@ -1,23 +1,22 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bind
+namespace WixToolset.Core.Bind
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
-    using System.Text;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
 
     /// <summary>
     /// Resolves the fields which had variables that needed to be resolved after the file information
     /// was loaded.
     /// </summary>
-    internal class ResolveDelayedFieldsCommand : ICommand
+    public class ResolveDelayedFieldsCommand : ICommand
     {
         public OutputType OutputType { private get; set;}
 
-        public IEnumerable<DelayedField> DelayedFields { private get; set;}
+        public IEnumerable<IDelayedField> DelayedFields { private get; set;}
 
         public IDictionary<string, string> VariableCache { private get; set; }
 
@@ -29,9 +28,9 @@ namespace WixToolset.Bind
         /// <param name="modularizationGuid">The modularization guid (used in case of a merge module).</param>
         public void Execute()
         {
-            List<DelayedField> deferredFields = new List<DelayedField>();
+            var deferredFields = new List<IDelayedField>();
 
-            foreach (DelayedField delayedField in this.DelayedFields)
+            foreach (IDelayedField delayedField in this.DelayedFields)
             {
                 try
                 {
@@ -43,7 +42,7 @@ namespace WixToolset.Bind
                         string value = WixVariableResolver.ResolveDelayedVariables(propertyRow.SourceLineNumbers, (string)delayedField.Field.Data, this.VariableCache);
 
                         // update the variable cache with the new value
-                        string key = String.Concat("property.", BindDatabaseCommand.Demodularize(this.OutputType, this.ModularizationGuid, (string)propertyRow[0]));
+                        string key = String.Concat("property.", Common.Demodularize(this.OutputType, this.ModularizationGuid, (string)propertyRow[0]));
                         this.VariableCache[key] = value;
 
                         // update the field data

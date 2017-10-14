@@ -1,35 +1,40 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bind
+namespace WixToolset.Core.Bind
 {
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
 
     /// <summary>
     /// Resolve source fields in the tables included in the output
     /// </summary>
-    internal class ResolveFieldsCommand : ICommand
+    internal class ResolveFieldsCommand
     {
-        public TableIndexedCollection Tables { private get; set; }
+        public bool BuildingPatch { private get; set; }
+
+        public IBindVariableResolver BindVariableResolver { private get; set; }
+
+        public IEnumerable<BindPath> BindPaths { private get; set; }
+
+        public IEnumerable<IBinderExtension> Extensions { private get; set; }
 
         public ExtractEmbeddedFiles FilesWithEmbeddedFiles { private get; set; }
 
-        public BinderFileManagerCore FileManagerCore { private get; set; }
+        public string IntermediateFolder { private get; set; }
 
-        public IEnumerable<IBinderFileManager> FileManagers { private get; set; }
+        public TableIndexedCollection Tables { private get; set; }
 
         public bool SupportDelayedResolution { private get; set; }
-
-        public string TempFilesLocation { private get; set; }
-
-        public WixVariableResolver WixVariableResolver { private get; set; }
 
         public IEnumerable<DelayedField> DelayedFields { get; private set; }
 
         public void Execute()
         {
             List<DelayedField> delayedFields = this.SupportDelayedResolution ? new List<DelayedField>() : null;
+
+            var fileResolver = new FileResolver(this.BindPaths, this.Extensions);
 
             foreach (Table table in this.Tables)
             {
@@ -46,7 +51,7 @@ namespace WixToolset.Bind
                             // resolve localization and wix variables
                             if (field.Data is string)
                             {
-                                field.Data = this.WixVariableResolver.ResolveVariables(row.SourceLineNumbers, field.AsString(), false, ref isDefault, ref delayedResolve);
+                                field.Data = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, field.AsString(), false, out isDefault, out delayedResolve);
                                 if (delayedResolve)
                                 {
                                     delayedFields.Add(new DelayedField(row, field));
@@ -74,7 +79,7 @@ namespace WixToolset.Bind
                             // File is embedded and path to it was not modified above.
                             if (objectField.EmbeddedFileIndex.HasValue && isDefault)
                             {
-                                string extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.BaseUri, objectField.EmbeddedFileIndex.Value, this.TempFilesLocation);
+                                string extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.BaseUri, objectField.EmbeddedFileIndex.Value, this.IntermediateFolder);
 
                                 // Set the path to the embedded file once where it will be extracted.
                                 objectField.Data = extractPath;
@@ -83,7 +88,7 @@ namespace WixToolset.Bind
                             {
                                 try
                                 {
-                                    if (OutputType.Patch != this.FileManagerCore.Output.Type) // Normal binding for non-Patch scenario such as link (light.exe)
+                                    if (!this.BuildingPatch) // Normal binding for non-Patch scenario such as link (light.exe)
                                     {
                                         // keep a copy of the un-resolved data for future replay. This will be saved into wixpdb file
                                         if (null == objectField.UnresolvedData)
@@ -92,12 +97,12 @@ namespace WixToolset.Bind
                                         }
 
                                         // resolve the path to the file
-                                        objectField.Data = this.ResolveFile((string)objectField.Data, table.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        objectField.Data = fileResolver.ResolveFile((string)objectField.Data, table.Name, row.SourceLineNumbers, BindStage.Normal);
                                     }
-                                    else if (!(this.FileManagerCore.RebaseTarget || this.FileManagerCore.RebaseUpdated)) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
+                                    else if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
                                     {
                                         // resolve the path to the file
-                                        objectField.Data = this.ResolveFile((string)objectField.Data, table.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        objectField.Data = fileResolver.ResolveFile((string)objectField.Data, table.Name, row.SourceLineNumbers, BindStage.Normal);
                                     }
                                     else // Re-base binding path scenario caused by pyro.exe -bt -bu
                                     {
@@ -106,7 +111,7 @@ namespace WixToolset.Bind
 
                                         // if -bu is used in pyro command, this condition holds true and the tool
                                         // will use pre-resolved source for new wixpdb file
-                                        if (this.FileManagerCore.RebaseUpdated)
+                                        if (fileResolver.RebaseUpdated)
                                         {
                                             // try to use the unResolved Source if it exists.
                                             // New version of wixpdb file keeps a copy of pre-resolved Source. i.e. !(bindpath.test)\foo.dll
@@ -117,7 +122,7 @@ namespace WixToolset.Bind
                                             }
                                         }
 
-                                        objectField.Data = this.ResolveFile(filePathToResolve, table.Name, row.SourceLineNumbers, BindStage.Updated);
+                                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, table.Name, row.SourceLineNumbers, BindStage.Updated);
                                     }
                                 }
                                 catch (WixFileNotFoundException)
@@ -127,10 +132,10 @@ namespace WixToolset.Bind
                                 }
                             }
 
-                            isDefault = true;
                             if (null != objectField.PreviousData)
                             {
-                                objectField.PreviousData = this.WixVariableResolver.ResolveVariables(row.SourceLineNumbers, objectField.PreviousData, false, ref isDefault);
+                                objectField.PreviousData = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, objectField.PreviousData, false, out isDefault);
+
                                 if (!Messaging.Instance.EncounteredError) // TODO: make this error handling more specific to just the failure to resolve variables in this field.
                                 {
                                     // file is compressed in a cabinet (and not modified above)
@@ -142,7 +147,7 @@ namespace WixToolset.Bind
                                             objectField.PreviousBaseUri = objectField.BaseUri;
                                         }
 
-                                        string extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.PreviousBaseUri, objectField.PreviousEmbeddedFileIndex.Value, this.TempFilesLocation);
+                                        string extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.PreviousBaseUri, objectField.PreviousEmbeddedFileIndex.Value, this.IntermediateFolder);
 
                                         // set the path to the file once its extracted from the cabinet
                                         objectField.PreviousData = extractPath;
@@ -151,14 +156,14 @@ namespace WixToolset.Bind
                                     {
                                         try
                                         {
-                                            if (!this.FileManagerCore.RebaseTarget && !this.FileManagerCore.RebaseUpdated)
+                                            if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated)
                                             {
                                                 // resolve the path to the file
-                                                objectField.PreviousData = this.ResolveFile((string)objectField.PreviousData, table.Name, row.SourceLineNumbers, BindStage.Normal);
+                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, table.Name, row.SourceLineNumbers, BindStage.Normal);
                                             }
                                             else
                                             {
-                                                if (this.FileManagerCore.RebaseTarget)
+                                                if (fileResolver.RebaseTarget)
                                                 {
                                                     // if -bt is used, it come here
                                                     // Try to use the original unresolved source from either target build or update build
@@ -172,7 +177,7 @@ namespace WixToolset.Bind
                                                 }
 
                                                 // resolve the path to the file
-                                                objectField.PreviousData = this.ResolveFile((string)objectField.PreviousData, table.Name, row.SourceLineNumbers, BindStage.Target);
+                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, table.Name, row.SourceLineNumbers, BindStage.Target);
 
                                             }
                                         }
@@ -192,24 +197,28 @@ namespace WixToolset.Bind
             this.DelayedFields = delayedFields;
         }
 
+#if false
         private string ResolveFile(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage = BindStage.Normal)
         {
             string path = null;
-            foreach (IBinderFileManager fileManager in this.FileManagers)
+            foreach (var extension in this.Extensions)
             {
-                path = fileManager.ResolveFile(source, type, sourceLineNumbers, bindStage);
+                path = extension.ResolveFile(source, type, sourceLineNumbers, bindStage);
                 if (null != path)
                 {
                     break;
                 }
             }
 
-            if (null == path)
-            {
-                throw new WixFileNotFoundException(sourceLineNumbers, source, type);
-            }
+            throw new NotImplementedException(); // need to do default binder stuff
 
-            return path;
+            //if (null == path)
+            //{
+            //    throw new WixFileNotFoundException(sourceLineNumbers, source, type);
+            //}
+
+            //return path;
         }
+#endif
     }
 }

@@ -12,6 +12,7 @@ namespace WixToolset
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
 
+#if false
     /// <summary>
     /// Base class for creating a binder file manager.
     /// </summary>
@@ -367,4 +368,5 @@ namespace WixToolset
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
     }
+#endif
 }

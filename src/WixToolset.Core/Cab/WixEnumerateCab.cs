@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Cab
+namespace WixToolset.Core.Cab
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace WixToolset.Cab
     /// <summary>
     /// Wrapper class around interop with wixcab.dll to enumerate files from a cabinet.
     /// </summary>
-    internal sealed class WixEnumerateCab : IDisposable
+    public sealed class WixEnumerateCab : IDisposable
     {
         private bool disposed;
         private List<CabinetFileInfo> fileInfoList;
@@ -38,7 +38,7 @@ namespace WixToolset.Cab
         /// </summary>
         /// <param name="cabinetFile">path to cabinet</param>
         /// <returns>list of CabinetFileInfo</returns>
-        internal List<CabinetFileInfo> Enumerate(string cabinetFile)
+        public List<CabinetFileInfo> Enumerate(string cabinetFile)
         {
             this.fileInfoList = new List<CabinetFileInfo>();
 

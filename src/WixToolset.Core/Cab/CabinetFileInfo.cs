@@ -1,19 +1,12 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core.Cab
 {
-    using System;
-
     /// <summary>
     /// Properties of a file in a cabinet.
     /// </summary>
-    internal sealed class CabinetFileInfo
+    public sealed class CabinetFileInfo
     {
-        private string fileId;
-        private ushort date;
-        private ushort time;
-        private int size;
-
         /// <summary>
         /// Constructs CabinetFileInfo
         /// </summary>
@@ -22,43 +15,31 @@ namespace WixToolset
         /// <param name="time">Last modified time (MS-DOS time)</param>
         public CabinetFileInfo(string fileId, ushort date, ushort time, int size)
         {
-            this.fileId = fileId;
-            this.date = date;
-            this.time = time;
-            this.size = size;
+            this.FileId = fileId;
+            this.Date = date;
+            this.Time = time;
+            this.Size = size;
         }
 
         /// <summary>
         /// Gets the file Id of the file.
         /// </summary>
         /// <value>file Id</value>
-        public string FileId
-        {
-            get { return this.fileId; }
-        }
+        public string FileId { get; }
 
         /// <summary>
         /// Gets modified date (DOS format).
         /// </summary>
-        public ushort Date
-        {
-            get { return this.date; }
-        }
+        public ushort Date { get; }
 
         /// <summary>
         /// Gets modified time (DOS format).
         /// </summary>
-        public ushort Time
-        {
-            get { return this.time; }
-        }
+        public ushort Time { get; }
 
         /// <summary>
         /// Gets the size of the file in bytes.
         /// </summary>
-        public int Size
-        {
-            get { return this.size; }
-        }
+        public int Size { get; }
     }
 }

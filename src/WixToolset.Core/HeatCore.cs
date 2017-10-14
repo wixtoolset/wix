@@ -2,11 +2,8 @@
 
 namespace WixToolset.Tools
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
-    using WixToolset.Extensibilty;
-    using Wix = WixToolset.Data.Serialize;
+    using WixToolset.Extensibility;
 
     /// <summary>
     /// The WiX Toolset Harvester application core.

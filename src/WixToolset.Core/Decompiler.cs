@@ -3,7 +3,6 @@
 namespace WixToolset
 {
     using System;
-    using System.CodeDom.Compiler;
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Specialized;
@@ -15,9 +14,9 @@ namespace WixToolset
     using WixToolset.Data;
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
-    using WixToolset.Msi;
     using WixToolset.Core.Native;
     using Wix = WixToolset.Data.Serialize;
+    using WixToolset.Core;
 
     /// <summary>
     /// Decompiles an msi database into WiX source.
@@ -5201,7 +5200,7 @@ namespace WixToolset
 
                 directory.Id = Convert.ToString(row[0]);
 
-                string[] names = Installer.GetNames(Convert.ToString(row[2]));
+                string[] names = Common.GetNames(Convert.ToString(row[2]));
 
                 if (String.Equals(directory.Id, "TARGETDIR", StringComparison.Ordinal) && !String.Equals(names[0], "SourceDir", StringComparison.Ordinal))
                 {
@@ -5319,7 +5318,7 @@ namespace WixToolset
 
                 if (null != row[3])
                 {
-                    string[] names = Installer.GetNames(Convert.ToString(row[3]));
+                    string[] names = Common.GetNames(Convert.ToString(row[3]));
                     if (null != names[0] && null != names[1])
                     {
                         copyFile.DestinationShortName = names[0];
@@ -5788,7 +5787,7 @@ namespace WixToolset
 
                 file.Id = fileRow.File;
 
-                string[] names = Installer.GetNames(fileRow.FileName);
+                string[] names = Common.GetNames(fileRow.FileName);
                 if (null != names[0] && null != names[1])
                 {
                     file.ShortName = names[0];
@@ -5974,7 +5973,7 @@ namespace WixToolset
 
                 iniFile.Id = Convert.ToString(row[0]);
 
-                string[] names = Installer.GetNames(Convert.ToString(row[1]));
+                string[] names = Common.GetNames(Convert.ToString(row[1]));
 
                 if (null != names[0])
                 {
@@ -6044,7 +6043,7 @@ namespace WixToolset
 
                 iniFileSearch.Id = Convert.ToString(row[0]);
 
-                string[] names = Installer.GetNames(Convert.ToString(row[1]));
+                string[] names = Common.GetNames(Convert.ToString(row[1]));
                 if (null != names[0] && null != names[1])
                 {
                     iniFileSearch.ShortName = names[0];
@@ -6681,7 +6680,7 @@ namespace WixToolset
 
                 if (null != row[3])
                 {
-                    string[] names = Installer.GetNames(Convert.ToString(row[3]));
+                    string[] names = Common.GetNames(Convert.ToString(row[3]));
                     if (null != names[0] && null != names[1])
                     {
                         copyFile.DestinationShortName = names[0];
@@ -8007,7 +8006,7 @@ namespace WixToolset
 
                     removeFile.Id = Convert.ToString(row[0]);
 
-                    string[] names = Installer.GetNames(Convert.ToString(row[2]));
+                    string[] names = Common.GetNames(Convert.ToString(row[2]));
                     if (null != names[0] && null != names[1])
                     {
                         removeFile.ShortName = names[0];
@@ -8062,7 +8061,7 @@ namespace WixToolset
 
                 iniFile.Id = Convert.ToString(row[0]);
 
-                string[] names = Installer.GetNames(Convert.ToString(row[1]));
+                string[] names = Common.GetNames(Convert.ToString(row[1]));
                 if (null != names[0] && null != names[1])
                 {
                     iniFile.ShortName = names[0];
@@ -8531,7 +8530,7 @@ namespace WixToolset
 
                 shortcut.Directory = Convert.ToString(row[1]);
 
-                string[] names = Installer.GetNames(Convert.ToString(row[2]));
+                string[] names = Common.GetNames(Convert.ToString(row[2]));
                 if (null != names[0] && null != names[1])
                 {
                     shortcut.ShortName = names[0];
@@ -8654,7 +8653,7 @@ namespace WixToolset
 
                 fileSearch.Id = Convert.ToString(row[0]);
 
-                string[] names = Installer.GetNames(Convert.ToString(row[1]));
+                string[] names = Common.GetNames(Convert.ToString(row[1]));
                 if (null != names[0])
                 {
                     // it is permissable to just have a long name

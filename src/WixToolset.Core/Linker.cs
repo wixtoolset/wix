@@ -78,7 +78,7 @@ namespace WixToolset
         /// Gets or sets the Wix variable resolver.
         /// </summary>
         /// <value>The Wix variable resolver.</value>
-        public WixVariableResolver WixVariableResolver { get; set; }
+        internal IBindVariableResolver WixVariableResolver { get; set; }
 
         /// <summary>
         /// Adds an extension.

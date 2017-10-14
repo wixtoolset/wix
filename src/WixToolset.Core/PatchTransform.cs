@@ -155,7 +155,7 @@ namespace WixToolset
                             if (!deletedComponent.ContainsKey(componentId))
                             {
                                 bool foundRemoveFileEntry = false;
-                                string filename = Msi.Installer.GetName((string)row[2], false, true);
+                                string filename = Common.GetName((string)row[2], false, true);
 
                                 Table removeFileTable = this.Transform.Tables["RemoveFile"];
                                 if (null != removeFileTable)
@@ -172,7 +172,7 @@ namespace WixToolset
                                             // Check if there is a RemoveFile entry for this file
                                             if (null != removeFileRow[2])
                                             {
-                                                string removeFileName = Msi.Installer.GetName((string)removeFileRow[2], false, true);
+                                                string removeFileName = Common.GetName((string)removeFileRow[2], false, true);
 
                                                 // Convert the MSI format for a wildcard string to Regex format.
                                                 removeFileName = removeFileName.Replace('.', '|').Replace('?', '.').Replace("*", ".*").Replace("|", "\\.");

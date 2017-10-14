@@ -1,10 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Link;
 
@@ -13,20 +14,41 @@ namespace WixToolset
     /// </summary>
     public sealed class Librarian
     {
+        public Librarian(LibraryContext context)
+        {
+            this.Context = context;
+        }
+
+        private LibraryContext Context { get; }
+
         /// <summary>
         /// Create a library by combining several intermediates (objects).
         /// </summary>
         /// <param name="sections">The sections to combine into a library.</param>
         /// <returns>Returns the new library.</returns>
-        public Library Combine(IEnumerable<Section> sections, IEnumerable<Localization> localizations, ILibraryBinaryFileResolver resolver)
+        public Library Combine()
         {
-            var localizationsByCulture = CollateLocalizations(localizations);
+            foreach (var extension in this.Context.Extensions)
+            {
+                extension.PreCombine(this.Context);
+            }
 
-            var embedFilePaths = ResolveFilePathsToEmbed(sections, resolver);
+            var fileResolver = new FileResolver(this.Context.BindPaths, this.Context.Extensions);
 
-            var library = new Library(sections, localizationsByCulture, embedFilePaths);
+            var localizationsByCulture = CollateLocalizations(this.Context.Localizations);
 
-            return this.Validate(library);
+            var embedFilePaths = ResolveFilePathsToEmbed(this.Context.Sections, fileResolver);
+
+            var library = new Library(this.Context.Sections, localizationsByCulture, embedFilePaths);
+
+            this.Validate(library);
+
+            foreach (var extension in this.Context.Extensions)
+            {
+                extension.PostCombine(library);
+            }
+
+            return library;
         }
 
         /// <summary>
@@ -70,12 +92,12 @@ namespace WixToolset
             return localizationsByCulture;
         }
 
-        private static List<string> ResolveFilePathsToEmbed(IEnumerable<Section> sections, ILibraryBinaryFileResolver resolver)
+        private List<string> ResolveFilePathsToEmbed(IEnumerable<Section> sections, FileResolver fileResolver)
         {
             var embedFilePaths = new List<string>();
 
             // Resolve paths to files that are to be embedded in the library.
-            if (null != resolver)
+            if (this.Context.BindFiles)
             {
                 foreach (Table table in sections.SelectMany(s => s.Tables))
                 {
@@ -85,7 +107,10 @@ namespace WixToolset
                         {
                             if (null != objectField.Data)
                             {
-                                string file = resolver.Resolve(row.SourceLineNumbers, table.Name, (string)objectField.Data);
+                                string resolvedPath = this.Context.WixVariableResolver.ResolveVariables(row.SourceLineNumbers, (string)objectField.Data, false);
+
+                                string file = fileResolver.Resolve(row.SourceLineNumbers, table.Name, resolvedPath);
+
                                 if (!String.IsNullOrEmpty(file))
                                 {
                                     // File was successfully resolved so track the embedded index as the embedded file index.

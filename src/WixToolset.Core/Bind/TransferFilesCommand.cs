@@ -1,29 +1,37 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bind
+namespace WixToolset.Core.Bind
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Security.AccessControl;
     using WixToolset.Data;
+    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
 
-    internal class TransferFilesCommand : ICommand
+    internal class TransferFilesCommand
     {
-        public IEnumerable<IBinderFileManager> FileManagers { private get; set; }
+        public TransferFilesCommand(IEnumerable<BindPath> bindPaths, IEnumerable<IBinderExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
+        {
+            this.FileResolver = new FileResolver(bindPaths, extensions);
+            this.FileTransfers = fileTransfers;
+            this.SuppressAclReset = suppressAclReset;
+        }
 
-        public IEnumerable<FileTransfer> FileTransfers { private get; set; }
+        private FileResolver FileResolver { get; }
 
-        public bool SuppressAclReset { private get; set; }
+        private IEnumerable<FileTransfer> FileTransfers { get; }
+
+        private bool SuppressAclReset { get; }
 
         public void Execute()
         {
             List<string> destinationFiles = new List<string>();
 
-            foreach (FileTransfer fileTransfer in this.FileTransfers)
+            foreach (var fileTransfer in this.FileTransfers)
             {
-                string fileSource = this.ResolveFile(fileTransfer.Source, fileTransfer.Type, fileTransfer.SourceLineNumbers, BindStage.Normal);
+                string fileSource = this.FileResolver.ResolveFile(fileTransfer.Source, fileTransfer.Type, fileTransfer.SourceLineNumbers, BindStage.Normal);
 
                 // If the source and destination are identical, then there's nothing to do here
                 if (0 == String.Compare(fileSource, fileTransfer.Destination, StringComparison.OrdinalIgnoreCase))
@@ -165,44 +173,17 @@ namespace WixToolset.Bind
             }
         }
 
-        private string ResolveFile(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage)
-        {
-            string path = null;
-            foreach (IBinderFileManager fileManager in this.FileManagers)
-            {
-                path = fileManager.ResolveFile(source, type, sourceLineNumbers, bindStage);
-                if (null != path)
-                {
-                    break;
-                }
-            }
-
-            if (null == path)
-            {
-                throw new WixFileNotFoundException(sourceLineNumbers, source, type);
-            }
-
-            return path;
-        }
-
         private void TransferFile(bool move, string source, string destination)
         {
             bool complete = false;
-            foreach (IBinderFileManager fileManager in this.FileManagers)
-            {
-                if (move)
-                {
-                    complete = fileManager.MoveFile(source, destination, true);
-                }
-                else
-                {
-                    complete = fileManager.CopyFile(source, destination, true);
-                }
 
-                if (complete)
-                {
-                    break;
-                }
+            if (move)
+            {
+                complete = this.FileResolver.MoveFile(source, destination, true);
+            }
+            else
+            {
+                complete = this.FileResolver.CopyFile(source, destination, true);
             }
 
             if (!complete)

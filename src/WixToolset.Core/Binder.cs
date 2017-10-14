@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Collections;
@@ -11,105 +11,72 @@ namespace WixToolset
     using System.Linq;
     using System.Reflection;
     using WixToolset.Bind;
+    using WixToolset.Core.Bind;
     using WixToolset.Data;
+    using WixToolset.Data.Bind;
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
-    using WixToolset.Msi;
-
-    // TODO: (4.0) Refactor so that these don't need to be copied.
-    // Copied verbatim from ext\UtilExtension\wixext\UtilCompiler.cs
-    [Flags]
-    internal enum WixFileSearchAttributes
-    {
-        Default = 0x001,
-        MinVersionInclusive = 0x002,
-        MaxVersionInclusive = 0x004,
-        MinSizeInclusive = 0x008,
-        MaxSizeInclusive = 0x010,
-        MinDateInclusive = 0x020,
-        MaxDateInclusive = 0x040,
-        WantVersion = 0x080,
-        WantExists = 0x100,
-        IsDirectory = 0x200,
-    }
-
-    [Flags]
-    internal enum WixRegistrySearchAttributes
-    {
-        Raw = 0x01,
-        Compatible = 0x02,
-        ExpandEnvironmentVariables = 0x04,
-        WantValue = 0x08,
-        WantExists = 0x10,
-        Win64 = 0x20,
-    }
-
-    internal enum WixComponentSearchAttributes
-    {
-        KeyPath = 0x1,
-        State = 0x2,
-        WantDirectory = 0x4,
-    }
-
-    [Flags]
-    internal enum WixProductSearchAttributes
-    {
-        Version = 0x1,
-        Language = 0x2,
-        State = 0x4,
-        Assignment = 0x8,
-        UpgradeCode = 0x10,
-    }
 
     /// <summary>
     /// Binder of the WiX toolset.
     /// </summary>
     public sealed class Binder
     {
-        private BinderCore core;
-        private BinderFileManagerCore fileManagerCore;
-        private List<IBinderExtension> extensions;
-        private List<IBinderFileManager> fileManagers;
-        private List<InspectorExtension> inspectorExtensions;
+        //private BinderCore core;
+        //private List<IBinderExtension> extensions;
+        //private List<IBinderFileManager> fileManagers;
 
         public Binder()
         {
-            this.DefaultCompressionLevel = CompressionLevel.High;
+            //this.DefaultCompressionLevel = CompressionLevel.High;
 
-            this.BindPaths = new List<BindPath>();
-            this.TargetBindPaths = new List<BindPath>();
-            this.UpdatedBindPaths = new List<BindPath>();
+            //this.BindPaths = new List<BindPath>();
+            //this.TargetBindPaths = new List<BindPath>();
+            //this.UpdatedBindPaths = new List<BindPath>();
 
-            this.extensions = new List<IBinderExtension>();
-            this.fileManagers = new List<IBinderFileManager>();
-            this.inspectorExtensions = new List<InspectorExtension>();
+            //this.extensions = new List<IBinderExtension>();
+            //this.fileManagers = new List<IBinderFileManager>();
+            //this.inspectorExtensions = new List<InspectorExtension>();
 
-            this.Ices = new List<string>();
-            this.SuppressIces = new List<string>();
+            //this.Ices = new List<string>();
+            //this.SuppressIces = new List<string>();
         }
 
-        public string ContentsFile { private get; set; }
+        public Binder(BindContext context)
+        {
+            this.Context = context;
 
-        public string OutputsFile { private get; set; }
+            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
+        }
 
-        public string BuiltOutputsFile { private get; set; }
+        private BindContext Context { get; }
 
-        public string WixprojectFile { private get; set; }
+        private TableDefinitionCollection TableDefinitions { get; }
+
+        //public IEnumerable<IBackendFactory> BackendFactories { get; set; }
+
+        //public string ContentsFile { private get; set; }
+
+        //public string OutputsFile { private get; set; }
+
+        //public string BuiltOutputsFile { private get; set; }
+
+        //public string WixprojectFile { private get; set; }
 
         /// <summary>
         /// Gets the list of bindpaths.
         /// </summary>
-        public List<BindPath> BindPaths { get; private set; }
+        //public List<BindPath> BindPaths { get; private set; }
 
         /// <summary>
         /// Gets the list of target bindpaths.
         /// </summary>
-        public List<BindPath> TargetBindPaths { get; private set; }
+        //public List<BindPath> TargetBindPaths { get; private set; }
 
         /// <summary>
         /// Gets the list of updated bindpaths.
         /// </summary>
-        public List<BindPath> UpdatedBindPaths { get; private set; }
+        //public List<BindPath> UpdatedBindPaths { get; private set; }
 
         /// <summary>
         /// Gets or sets the option to enable building binary delta patches.
@@ -132,17 +99,17 @@ namespace WixToolset
         /// Gets or sets the default compression level to use for cabinets
         /// that don't have their compression level explicitly set.
         /// </summary>
-        public CompressionLevel DefaultCompressionLevel { get; set; }
+        //public CompressionLevel DefaultCompressionLevel { get; set; }
 
         /// <summary>
         /// Gets and sets the location to save the WixPdb.
         /// </summary>
         /// <value>The location in which to save the WixPdb. Null if the the WixPdb should not be output.</value>
-        public string PdbFile { get; set; }
+        //public string PdbFile { get; set; }
 
-        public List<string> Ices { get; private set; }
+        //public List<string> Ices { get; private set; }
 
-        public List<string> SuppressIces { get; private set; }
+        //public List<string> SuppressIces { get; private set; }
 
         /// <summary>
         /// Gets and sets the option to suppress resetting ACLs by the binder.
@@ -185,24 +152,164 @@ namespace WixToolset
         /// Gets or sets the Wix variable resolver.
         /// </summary>
         /// <value>The Wix variable resolver.</value>
-        public WixVariableResolver WixVariableResolver { get; set; }
+        internal WixVariableResolver WixVariableResolver { get; set; }
 
         /// <summary>
         /// Add a binder extension.
         /// </summary>
         /// <param name="extension">New extension.</param>
-        public void AddExtension(IBinderExtension extension)
-        {
-            this.extensions.Add(extension);
-        }
+        //public void AddExtension(IBinderExtension extension)
+        //{
+        //    this.extensions.Add(extension);
+        //}
 
         /// <summary>
         /// Add a file manager extension.
         /// </summary>
         /// <param name="extension">New file manager.</param>
-        public void AddExtension(IBinderFileManager extension)
+        //public void AddExtension(IBinderFileManager extension)
+        //{
+        //    this.fileManagers.Add(extension);
+        //}
+
+        public bool Bind()
         {
-            this.fileManagers.Add(extension);
+            //if (!String.IsNullOrEmpty(this.Context.FileManagerCore.CabCachePath))
+            //{
+            //    Directory.CreateDirectory(this.Context.FileManagerCore.CabCachePath);
+            //}
+
+            //this.core = new BinderCore();
+            //this.core.FileManagerCore = this.Context.FileManagerCore;
+
+            this.WriteBuildInfoTable(this.Context.IntermediateRepresentation, this.Context.OutputPath);
+
+            // Prebind.
+            //
+            this.Context.Extensions = this.Context.ExtensionManager.Create<IBinderExtension>();
+
+            foreach (IBinderExtension extension in this.Context.Extensions)
+            {
+                extension.PreBind(this.Context);
+            }
+
+            // Resolve.
+            //
+            var resolveResult = this.Resolve();
+
+            this.Context.DelayedFields = resolveResult.DelayedFields;
+
+            this.Context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
+
+            // Backend.
+            //
+            var bindResult = this.BackendBind();
+
+            if (bindResult != null)
+            {
+                // Postbind.
+                //
+                foreach (IBinderExtension extension in this.Context.Extensions)
+                {
+                    extension.PostBind(bindResult);
+                }
+
+                // Layout.
+                //
+                this.Layout(bindResult);
+            }
+
+            return Messaging.Instance.EncounteredError;
+        }
+
+        private ResolveResult Resolve()
+        {
+            var buildingPatch = (this.Context.IntermediateRepresentation.Type == OutputType.Patch);
+
+            var filesWithEmbeddedFiles = new ExtractEmbeddedFiles();
+
+            IEnumerable<DelayedField> delayedFields;
+            {
+                var command = new ResolveFieldsCommand();
+                command.BuildingPatch = buildingPatch;
+                command.BindVariableResolver = this.Context.WixVariableResolver;
+                command.BindPaths = this.Context.BindPaths;
+                command.Extensions = this.Context.Extensions;
+                command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
+                command.IntermediateFolder = this.Context.IntermediateFolder;
+                command.Tables = this.Context.IntermediateRepresentation.Tables;
+                command.SupportDelayedResolution = true;
+                command.Execute();
+
+                delayedFields = command.DelayedFields;
+            }
+
+            if (this.Context.IntermediateRepresentation.SubStorages != null)
+            {
+                foreach (SubStorage transform in this.Context.IntermediateRepresentation.SubStorages)
+                {
+                    var command = new ResolveFieldsCommand();
+                    command.BuildingPatch = buildingPatch;
+                    command.BindVariableResolver = this.Context.WixVariableResolver;
+                    command.BindPaths = this.Context.BindPaths;
+                    command.Extensions = this.Context.Extensions;
+                    command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
+                    command.IntermediateFolder = this.Context.IntermediateFolder;
+                    command.Tables = transform.Data.Tables;
+                    command.SupportDelayedResolution = false;
+                    command.Execute();
+                }
+            }
+
+            var expectedEmbeddedFiles = filesWithEmbeddedFiles.GetExpectedEmbeddedFiles();
+
+            return new ResolveResult
+            {
+                ExpectedEmbeddedFiles = expectedEmbeddedFiles,
+                DelayedFields = delayedFields,
+            };
+        }
+
+        private BindResult BackendBind()
+        {
+            var backendFactories = this.Context.ExtensionManager.Create<IBackendFactory>();
+
+            foreach (var factory in backendFactories)
+            {
+                if (factory.TryCreateBackend(this.Context.IntermediateRepresentation.Type.ToString(), this.Context.OutputPath, null, out var backend))
+                {
+                    var result = backend.Bind(this.Context);
+                    return result;
+                }
+            }
+
+            // TODO: messaging that a backend could not be found to bind the output type?
+
+            return null;
+        }
+        private void Layout(BindResult result)
+        {
+            try
+            {
+                this.LayoutMedia(result.FileTransfers);
+            }
+            finally
+            {
+                if (!String.IsNullOrEmpty(this.Context.ContentsFile) && result.ContentFilePaths != null)
+                {
+                    this.CreateContentsFile(this.Context.ContentsFile, result.ContentFilePaths);
+                }
+
+                if (!String.IsNullOrEmpty(this.Context.OutputsFile) && result.FileTransfers != null)
+                {
+                    this.CreateOutputsFile(this.Context.OutputsFile, result.FileTransfers, this.Context.OutputPdbPath);
+                }
+
+                if (!String.IsNullOrEmpty(this.Context.BuiltOutputsFile) && result.FileTransfers != null)
+                {
+                    this.CreateBuiltOutputsFile(this.Context.BuiltOutputsFile, result.FileTransfers, this.Context.OutputPdbPath);
+                }
+            }
         }
 
         /// <summary>
@@ -212,6 +319,7 @@ namespace WixToolset
         /// <param name="file">The Windows Installer file to create.</param>
         /// <remarks>The Binder.DeleteTempFiles method should be called after calling this method.</remarks>
         /// <returns>true if binding completed successfully; false otherwise</returns>
+#if false
         public bool Bind(Output output, string file)
         {
             // Ensure the cabinet cache path exists if we are going to use it.
@@ -220,20 +328,20 @@ namespace WixToolset
                 Directory.CreateDirectory(this.CabCachePath);
             }
 
-            this.fileManagerCore = new BinderFileManagerCore();
-            this.fileManagerCore.CabCachePath = this.CabCachePath;
-            this.fileManagerCore.Output = output;
-            this.fileManagerCore.TempFilesLocation = this.TempFilesLocation;
-            this.fileManagerCore.AddBindPaths(this.BindPaths, BindStage.Normal);
-            this.fileManagerCore.AddBindPaths(this.TargetBindPaths, BindStage.Target);
-            this.fileManagerCore.AddBindPaths(this.UpdatedBindPaths, BindStage.Updated);
-            foreach (IBinderFileManager fileManager in this.fileManagers)
-            {
-                fileManager.Core = this.fileManagerCore;
-            }
+            //var fileManagerCore = new BinderFileManagerCore();
+            //fileManagerCore.CabCachePath = this.CabCachePath;
+            //fileManagerCore.Output = output;
+            //fileManagerCore.TempFilesLocation = this.TempFilesLocation;
+            //fileManagerCore.AddBindPaths(this.BindPaths, BindStage.Normal);
+            //fileManagerCore.AddBindPaths(this.TargetBindPaths, BindStage.Target);
+            //fileManagerCore.AddBindPaths(this.UpdatedBindPaths, BindStage.Updated);
+            //foreach (IBinderFileManager fileManager in this.fileManagers)
+            //{
+            //    fileManager.Core = fileManagerCore;
+            //}
 
             this.core = new BinderCore();
-            this.core.FileManagerCore = this.fileManagerCore;
+            this.core.FileManagerCore = fileManagerCore;
 
             this.WriteBuildInfoTable(output, file);
 
@@ -246,54 +354,69 @@ namespace WixToolset
             }
 
             // Gather all the wix variables.
-            Table wixVariableTable = output.Tables["WixVariable"];
-            if (null != wixVariableTable)
+            //Table wixVariableTable = output.Tables["WixVariable"];
+            //if (null != wixVariableTable)
+            //{
+            //    foreach (WixVariableRow wixVariableRow in wixVariableTable.Rows)
+            //    {
+            //        this.WixVariableResolver.AddVariable(wixVariableRow);
+            //    }
+            //}
+
+            //BindContext context = new BindContext();
+            //context.CabbingThreadCount = this.CabbingThreadCount;
+            //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
+            //context.Extensions = this.extensions;
+            //context.FileManagerCore = fileManagerCore;
+            //context.FileManagers = this.fileManagers;
+            //context.Ices = this.Ices;
+            //context.IntermediateFolder = this.TempFilesLocation;
+            //context.IntermediateRepresentation = output;
+            //context.Localizer = this.Localizer;
+            //context.OutputPath = file;
+            //context.OutputPdbPath = this.PdbFile;
+            //context.SuppressIces = this.SuppressIces;
+            //context.SuppressValidation = this.SuppressValidation;
+            //context.WixVariableResolver = this.WixVariableResolver;
+
+            BindResult result = null;
+
+            foreach (var factory in this.BackendFactories)
             {
-                foreach (WixVariableRow wixVariableRow in wixVariableTable.Rows)
+                if (factory.TryCreateBackend(output.Type.ToString(), file, null, out var backend))
                 {
-                    this.WixVariableResolver.AddVariable(wixVariableRow);
+                    result = backend.Bind(context);
+                    break;
                 }
             }
 
-            IEnumerable<FileTransfer> fileTransfers = null;
-            IEnumerable<string> contentPaths = null;
-
-            switch (output.Type)
+            if (result == null)
             {
-                case OutputType.Bundle:
-                    this.BindBundle(output, file, out fileTransfers, out contentPaths);
-                    break;
+                // TODO: messaging that a backend could not be found to bind the output type?
 
-                case OutputType.Transform:
-                    this.BindTransform(output, file);
-                    break;
-
-                default:
-                    this.BindDatabase(output, file, out fileTransfers, out contentPaths);
-                    break;
+                return false;
             }
-
 
             // Layout media
             try
             {
-                this.LayoutMedia(fileTransfers);
+                this.LayoutMedia(result.FileTransfers);
             }
             finally
             {
-                if (!String.IsNullOrEmpty(this.ContentsFile) && contentPaths != null)
+                if (!String.IsNullOrEmpty(this.ContentsFile) && result.ContentFilePaths != null)
                 {
-                    this.CreateContentsFile(this.ContentsFile, contentPaths);
+                    this.CreateContentsFile(this.ContentsFile, result.ContentFilePaths);
                 }
 
-                if (!String.IsNullOrEmpty(this.OutputsFile) && fileTransfers != null)
+                if (!String.IsNullOrEmpty(this.OutputsFile) && result.FileTransfers != null)
                 {
-                    this.CreateOutputsFile(this.OutputsFile, fileTransfers, this.PdbFile);
+                    this.CreateOutputsFile(this.OutputsFile, result.FileTransfers, this.PdbFile);
                 }
 
-                if (!String.IsNullOrEmpty(this.BuiltOutputsFile) && fileTransfers != null)
+                if (!String.IsNullOrEmpty(this.BuiltOutputsFile) && result.FileTransfers != null)
                 {
-                    this.CreateBuiltOutputsFile(this.BuiltOutputsFile, fileTransfers, this.PdbFile);
+                    this.CreateBuiltOutputsFile(this.BuiltOutputsFile, result.FileTransfers, this.PdbFile);
                 }
             }
 
@@ -301,6 +424,7 @@ namespace WixToolset
 
             return Messaging.Instance.EncounteredError;
         }
+#endif
 
         /// <summary>
         /// Does any housekeeping after Bind.
@@ -312,12 +436,12 @@ namespace WixToolset
             {
                 if (!this.DeleteTempFiles())
                 {
-                    this.core.OnMessage(WixWarnings.FailedToDeleteTempDir(this.TempFilesLocation));
+                    this.Context.Messaging.OnMessage(WixWarnings.FailedToDeleteTempDir(this.TempFilesLocation));
                 }
             }
             else
             {
-                this.core.OnMessage(WixVerboses.BinderTempDirLocatedAt(this.TempFilesLocation));
+                this.Context.Messaging.OnMessage(WixVerboses.BinderTempDirLocatedAt(this.TempFilesLocation));
             }
         }
 
@@ -327,7 +451,7 @@ namespace WixToolset
         /// <returns>True if all files were deleted, false otherwise.</returns>
         private bool DeleteTempFiles()
         {
-            bool deleted = Common.DeleteTempFiles(this.TempFilesLocation, this.core);
+            bool deleted = Common.DeleteTempFiles(this.TempFilesLocation, this.Context.Messaging);
             return deleted;
         }
 
@@ -338,7 +462,7 @@ namespace WixToolset
         /// <param name="databaseFile">The output file if OutputFile not set.</param>
         private void WriteBuildInfoTable(Output output, string outputFile)
         {
-            Table buildInfoTable = output.EnsureTable(this.core.TableDefinitions["WixBuildInfo"]);
+            Table buildInfoTable = output.EnsureTable(this.TableDefinitions["WixBuildInfo"]);
             Row buildInfoRow = buildInfoTable.CreateRow(null);
 
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
@@ -346,17 +470,18 @@ namespace WixToolset
             buildInfoRow[0] = fileVersion.FileVersion;
             buildInfoRow[1] = outputFile;
 
-            if (!String.IsNullOrEmpty(this.WixprojectFile))
+            if (!String.IsNullOrEmpty(this.Context.WixprojectFile))
             {
-                buildInfoRow[2] = this.WixprojectFile;
+                buildInfoRow[2] = this.Context.WixprojectFile;
             }
 
-            if (!String.IsNullOrEmpty(this.PdbFile))
+            if (!String.IsNullOrEmpty(this.Context.OutputPdbPath))
             {
-                buildInfoRow[3] = this.PdbFile;
+                buildInfoRow[3] = this.Context.OutputPdbPath;
             }
         }
 
+#if DELETE_THIS_CODE
         /// <summary>
         /// Binds a bundle.
         /// </summary>
@@ -454,6 +579,7 @@ namespace WixToolset
             command.OutputPath = outputPath;
             command.Execute();
         }
+#endif
 
         /// <summary>
         /// Final step in binding that transfers (moves/copies) all files generated into the appropriate
@@ -464,12 +590,9 @@ namespace WixToolset
         {
             if (null != transfers && transfers.Any())
             {
-                this.core.OnMessage(WixVerboses.LayingOutMedia());
+                this.Context.Messaging.OnMessage(WixVerboses.LayingOutMedia());
 
-                TransferFilesCommand command = new TransferFilesCommand();
-                command.FileManagers = this.fileManagers;
-                command.FileTransfers = transfers;
-                command.SuppressAclReset = this.SuppressAclReset;
+                var command = new TransferFilesCommand(this.Context.BindPaths, this.Context.Extensions, transfers, this.Context.SuppressAclReset);
                 command.Execute();
             }
         }
@@ -482,7 +605,7 @@ namespace WixToolset
         /// <param name="directory">Directory identifier.</param>
         /// <param name="canonicalize">Canonicalize the path for standard directories.</param>
         /// <returns>Source path of a directory.</returns>
-        internal static string GetDirectoryPath(Hashtable directories, Hashtable componentIdGenSeeds, string directory, bool canonicalize)
+        public static string GetDirectoryPath(Hashtable directories, Hashtable componentIdGenSeeds, string directory, bool canonicalize)
         {
             if (!directories.Contains(directory))
             {
@@ -543,9 +666,9 @@ namespace WixToolset
         /// <param name="compressed">Specifies the package is compressed.</param>
         /// <param name="useLongName">Specifies the package uses long file names.</param>
         /// <returns>Source path of file relative to package directory.</returns>
-        internal static string GetFileSourcePath(Hashtable directories, string directoryId, string fileName, bool compressed, bool useLongName)
+        public static string GetFileSourcePath(Hashtable directories, string directoryId, string fileName, bool compressed, bool useLongName)
         {
-            string fileSourcePath = Installer.GetName(fileName, true, useLongName);
+            string fileSourcePath = Common.GetName(fileName, true, useLongName);
 
             if (compressed)
             {

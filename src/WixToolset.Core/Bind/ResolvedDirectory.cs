@@ -5,7 +5,7 @@ namespace WixToolset.Bind
     /// <summary>
     /// Structure used for resolved directory information.
     /// </summary>
-    internal struct ResolvedDirectory
+    public struct ResolvedDirectory
     {
         /// <summary>The directory parent.</summary>
         public string DirectoryParent;

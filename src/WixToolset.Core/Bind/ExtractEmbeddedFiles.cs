@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bind
+namespace WixToolset.Core.Bind
 {
     using System;
     using System.Collections.Generic;
@@ -13,11 +13,11 @@ namespace WixToolset.Bind
     /// <summary>
     /// Internal helper class used to extract embedded files.
     /// </summary>
-    internal sealed class ExtractEmbeddedFiles
+    internal class ExtractEmbeddedFiles
     {
         private Dictionary<Uri, SortedList<int, string>> filesWithEmbeddedFiles = new Dictionary<Uri, SortedList<int, string>>();
 
-        public IEnumerable<Uri> Uris { get { return this.filesWithEmbeddedFiles.Keys; } }
+        public IEnumerable<Uri> Uris => this.filesWithEmbeddedFiles.Keys;
 
         /// <summary>
         /// Adds an embedded file index to track and returns the path where the embedded file will be extracted. Duplicates will return the same extract path.
@@ -53,15 +53,30 @@ namespace WixToolset.Bind
             return extractPath;
         }
 
-        public IEnumerable<ExtractFile> GetExtractFilesForUri(Uri uri)
+        public IEnumerable<ExpectedExtractFile> GetExpectedEmbeddedFiles()
         {
-            SortedList<int, string> extracts;
-            if (!filesWithEmbeddedFiles.TryGetValue(uri, out extracts))
+            foreach (var uriWithExtracts in filesWithEmbeddedFiles)
+            {
+                foreach (var extracts in uriWithExtracts.Value)
+                {
+                    yield return new ExpectedExtractFile
+                    {
+                        Uri = uriWithExtracts.Key,
+                        EmbeddedFileIndex = extracts.Key,
+                        OutputPath = extracts.Value,
+                    };
+                }
+            }
+        }
+
+        public IEnumerable<ExpectedExtractFile> GetExtractFilesForUri(Uri uri)
+        {
+            if (!filesWithEmbeddedFiles.TryGetValue(uri, out var extracts))
             {
                 extracts = new SortedList<int, string>();
             }
 
-            return extracts.Select(e => new ExtractFile() { EmbeddedFileIndex = e.Key, OutputPath = e.Value });
+            return extracts.Select(e => new ExpectedExtractFile() { Uri = uri, EmbeddedFileIndex = e.Key, OutputPath = e.Value });
         }
 
         private string HashUri(string uri)
@@ -71,13 +86,6 @@ namespace WixToolset.Bind
                 byte[] hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(uri));
                 return Convert.ToBase64String(hash).TrimEnd('=').Replace('+', '-').Replace('/', '_');
             }
-        }
-
-        internal struct ExtractFile
-        {
-            public int EmbeddedFileIndex { get; set; }
-
-            public string OutputPath { get; set; }
         }
     }
 }

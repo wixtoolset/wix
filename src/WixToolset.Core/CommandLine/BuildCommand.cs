@@ -7,13 +7,14 @@ namespace WixToolset.Core
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(ExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
+        public BuildCommand(ExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
         {
-            this.Extensions = extensions;
+            this.ExtensionManager = extensions;
             this.LocFiles = locFiles;
             this.LibraryFiles = libraryFiles;
             this.PreprocessorVariables = preprocessorVariables;
@@ -21,6 +22,7 @@ namespace WixToolset.Core
             this.OutputPath = outputPath;
             this.OutputType = outputType;
 
+            this.CabCachePath = cabCachePath;
             this.Cultures = cultures;
             this.BindFiles = bindFiles;
             this.BindPaths = bindPaths;
@@ -32,7 +34,7 @@ namespace WixToolset.Core
             this.WixProjectFile = wixProjectFile;
         }
 
-        public ExtensionManager Extensions { get; }
+        public ExtensionManager ExtensionManager { get; }
 
         public IEnumerable<string> LocFiles { get; }
 
@@ -45,6 +47,8 @@ namespace WixToolset.Core
         private string OutputPath { get; }
 
         private OutputType OutputType { get; }
+
+        public string CabCachePath { get; }
 
         public IEnumerable<string> Cultures { get; }
 
@@ -70,7 +74,9 @@ namespace WixToolset.Core
 
             if (this.OutputType == OutputType.Library)
             {
-                this.LibraryPhase(intermediates, tableDefinitions);
+                var library = this.LibraryPhase(intermediates, tableDefinitions);
+
+                library?.Save(this.OutputPath);
             }
             else
             {
@@ -105,51 +111,40 @@ namespace WixToolset.Core
             return intermediates;
         }
 
-        private void LibraryPhase(IEnumerable<Intermediate> intermediates, TableDefinitionCollection tableDefinitions)
+        private Library LibraryPhase(IEnumerable<Intermediate> intermediates, TableDefinitionCollection tableDefinitions)
         {
             var localizations = this.LoadLocalizationFiles(tableDefinitions).ToList();
 
             // If there was an error adding localization files, then bail.
             if (Messaging.Instance.EncounteredError)
             {
-                return;
+                return null;
             }
 
-            var sections = intermediates.SelectMany(i => i.Sections).ToList();
+            var resolver = CreateWixResolverWithVariables(null, null);
 
-            LibraryBinaryFileResolver resolver = null;
+            var context = new LibraryContext();
+            context.BindFiles = this.BindFiles;
+            context.BindPaths = this.BindPaths;
+            context.Extensions = this.ExtensionManager.Create<ILibrarianExtension>();
+            context.Localizations = localizations;
+            context.Sections = intermediates.SelectMany(i => i.Sections).ToList();
+            context.WixVariableResolver = resolver;
 
-            if (this.BindFiles)
-            {
-                resolver = new LibraryBinaryFileResolver();
-                resolver.FileManagers = new List<IBinderFileManager> { new BinderFileManager() }; ;
-                resolver.VariableResolver = new WixVariableResolver();
+            var librarian = new Librarian(context);
 
-                BinderFileManagerCore core = new BinderFileManagerCore();
-                core.AddBindPaths(this.BindPaths, BindStage.Normal);
-
-                foreach (var fileManager in resolver.FileManagers)
-                {
-                    fileManager.Core = core;
-                }
-            }
-
-            var librarian = new Librarian();
-
-            var library = librarian.Combine(sections, localizations, resolver);
-
-            library?.Save(this.OutputPath);
+            return librarian.Combine();
         }
 
         private Output LinkPhase(IEnumerable<Intermediate> intermediates, TableDefinitionCollection tableDefinitions)
         {
             var sections = intermediates.SelectMany(i => i.Sections).ToList();
 
-            sections.AddRange(SectionsFromLibraries(tableDefinitions));
+            sections.AddRange(this.SectionsFromLibraries(tableDefinitions));
 
             var linker = new Linker();
 
-            foreach (var data in this.Extensions.Create<IExtensionData>())
+            foreach (var data in this.ExtensionManager.Create<IExtensionData>())
             {
                 linker.AddExtensionData(data);
             }
@@ -157,6 +152,40 @@ namespace WixToolset.Core
             var output = linker.Link(sections, this.OutputType);
 
             return output;
+        }
+
+        private void BindPhase(Output output, TableDefinitionCollection tableDefinitions)
+        {
+            var localizations = this.LoadLocalizationFiles(tableDefinitions).ToList();
+
+            var localizer = new Localizer(localizations);
+
+            var resolver = CreateWixResolverWithVariables(localizer, output);
+
+            var context = new BindContext();
+            context.Messaging = Messaging.Instance;
+            context.ExtensionManager = this.ExtensionManager;
+            context.BindPaths = this.BindPaths ?? Array.Empty<BindPath>();
+            //context.CabbingThreadCount = this.CabbingThreadCount;
+            context.CabCachePath = this.CabCachePath;
+            context.Codepage = localizer.Codepage;
+            //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
+            //context.Ices = this.Ices;
+            context.IntermediateFolder = this.IntermediateFolder;
+            context.IntermediateRepresentation = output;
+            context.OutputPath = this.OutputPath;
+            context.OutputPdbPath = Path.ChangeExtension(this.OutputPath, ".wixpdb");
+            //context.SuppressIces = this.SuppressIces;
+            context.SuppressValidation = true;
+            //context.SuppressValidation = this.SuppressValidation;
+            context.WixVariableResolver = resolver;
+            context.ContentsFile = this.ContentsFile;
+            context.OutputsFile = this.OutputsFile;
+            context.BuiltOutputsFile = this.BuiltOutputsFile;
+            context.WixprojectFile = this.WixProjectFile;
+
+            var binder = new Binder(context);
+            binder.Bind();
         }
 
         private IEnumerable<Section> SectionsFromLibraries(TableDefinitionCollection tableDefinitions)
@@ -187,34 +216,6 @@ namespace WixToolset.Core
             return sections;
         }
 
-        private void BindPhase(Output output, TableDefinitionCollection tableDefinitions)
-        {
-            var localizations = this.LoadLocalizationFiles(tableDefinitions).ToList();
-
-            var localizer = new Localizer(localizations);
-
-            var resolver = new WixVariableResolver(localizer);
-
-            var binder = new Binder();
-            binder.TempFilesLocation = this.IntermediateFolder;
-            binder.WixVariableResolver = resolver;
-            binder.SuppressValidation = true;
-
-            binder.ContentsFile = this.ContentsFile;
-            binder.OutputsFile = this.OutputsFile;
-            binder.BuiltOutputsFile = this.BuiltOutputsFile;
-            binder.WixprojectFile = this.WixProjectFile;
-
-            if (this.BindPaths != null)
-            {
-                binder.BindPaths.AddRange(this.BindPaths);
-            }
-
-            binder.AddExtension(new BinderFileManager());
-
-            binder.Bind(output, this.OutputPath);
-        }
-
         private IEnumerable<Localization> LoadLocalizationFiles(TableDefinitionCollection tableDefinitions)
         {
             foreach (var loc in this.LocFiles)
@@ -225,30 +226,21 @@ namespace WixToolset.Core
             }
         }
 
-        /// <summary>
-        /// File resolution mechanism to create binary library.
-        /// </summary>
-        private class LibraryBinaryFileResolver : ILibraryBinaryFileResolver
+        private static WixVariableResolver CreateWixResolverWithVariables(Localizer localizer, Output output)
         {
-            public IEnumerable<IBinderFileManager> FileManagers { get; set; }
+            var resolver = new WixVariableResolver(localizer);
 
-            public WixVariableResolver VariableResolver { get; set; }
-
-            public string Resolve(SourceLineNumber sourceLineNumber, string table, string path)
+            // Gather all the wix variables.
+            Table wixVariableTable = output?.Tables["WixVariable"];
+            if (null != wixVariableTable)
             {
-                string resolvedPath = this.VariableResolver.ResolveVariables(sourceLineNumber, path, false);
-
-                foreach (IBinderFileManager fileManager in this.FileManagers)
+                foreach (WixVariableRow wixVariableRow in wixVariableTable.Rows)
                 {
-                    string finalPath = fileManager.ResolveFile(resolvedPath, table, sourceLineNumber, BindStage.Normal);
-                    if (!String.IsNullOrEmpty(finalPath))
-                    {
-                        return finalPath;
-                    }
+                    resolver.AddVariable(wixVariableRow);
                 }
-
-                return null;
             }
+
+            return resolver;
         }
     }
 }

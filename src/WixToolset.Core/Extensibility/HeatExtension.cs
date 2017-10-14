@@ -3,14 +3,10 @@
 namespace WixToolset.Extensibility
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
-    using WixToolset;
     using WixToolset.Data;
-    using WixToolset.Extensibilty;
     using WixToolset.Tools;
-    using Wix = WixToolset.Data.Serialize;
 
     /// <summary>
     /// A command line option.

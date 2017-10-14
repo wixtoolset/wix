@@ -1,19 +1,26 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bind
+namespace WixToolset.Core.Bind
 {
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
 
-    internal class ExtractEmbeddedFilesCommand : ICommand
+    public class ExtractEmbeddedFilesCommand
     {
-        public ExtractEmbeddedFiles FilesWithEmbeddedFiles { private get; set; }
+        public IEnumerable<IExpectedExtractFile> FilesWithEmbeddedFiles { private get; set; }
 
         public void Execute()
         {
-            foreach (var baseUri in this.FilesWithEmbeddedFiles.Uris)
+            var group = this.FilesWithEmbeddedFiles.GroupBy(e => e.Uri);
+
+            foreach (var expectedEmbeddedFileByUri in group)
             {
+                var baseUri = expectedEmbeddedFileByUri.Key;
+
                 Stream stream = null;
                 try
                 {
@@ -34,18 +41,20 @@ namespace WixToolset.Bind
 
                     using (FileStructure fs = FileStructure.Read(stream))
                     {
-                        foreach (var embeddedFile in this.FilesWithEmbeddedFiles.GetExtractFilesForUri(baseUri))
+                        var uniqueIndicies = new SortedSet<int>();
+
+                        foreach (var embeddedFile in expectedEmbeddedFileByUri)
                         {
-                            fs.ExtractEmbeddedFile(embeddedFile.EmbeddedFileIndex, embeddedFile.OutputPath);
+                            if (uniqueIndicies.Add(embeddedFile.EmbeddedFileIndex))
+                            {
+                                fs.ExtractEmbeddedFile(embeddedFile.EmbeddedFileIndex, embeddedFile.OutputPath);
+                            }
                         }
                     }
                 }
                 finally
                 {
-                    if (null != stream)
-                    {
-                        stream.Close();
-                    }
+                    stream?.Close();
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace WixToolset
     /// <summary>
     /// Common Wix utility methods and types.
     /// </summary>
-    internal static class Common
+    public static class Common
     {
         //-------------------------------------------------------------------------------------------------
         // Layout of an Access Mask (from http://technet.microsoft.com/en-us/library/cc783530(WS.10).aspx)
@@ -89,9 +89,7 @@ namespace WixToolset
         // FILE_ALL_ACCESS           (STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0x1FF)
         internal static readonly string[] FilePermissions = { "Read", "Write", "Append", "ReadExtendedAttributes", "WriteExtendedAttributes", "Execute", "FileAllRights", "ReadAttributes", "WriteAttributes" };
 
-        internal static readonly string[] ReservedFileNames = { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
-
-        internal static readonly Regex WixVariableRegex = new Regex(@"(\!|\$)\((?<namespace>loc|wix|bind|bindpath)\.(?<fullname>(?<name>[_A-Za-z][0-9A-Za-z_]+)(\.(?<scope>[_A-Za-z][0-9A-Za-z_\.]*))?)(\=(?<value>.+?))?\)", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+        public static readonly Regex WixVariableRegex = new Regex(@"(\!|\$)\((?<namespace>loc|wix|bind|bindpath)\.(?<fullname>(?<name>[_A-Za-z][0-9A-Za-z_]+)(\.(?<scope>[_A-Za-z][0-9A-Za-z_\.]*))?)(\=(?<value>.+?))?\)", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
         internal const char CustomRowFieldSeparator = '\x85';
 
@@ -170,15 +168,14 @@ namespace WixToolset
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
         /// <exception cref="NotSupportedException">The value doesn't not represent a valid code page name or integer value.</exception>
         /// <exception cref="WixException">The code page is invalid for summary information.</exception>
-        internal static int GetValidCodePage(string value, bool allowNoChange = false, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null)
+        public static int GetValidCodePage(string value, bool allowNoChange = false, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null)
         {
-            int codePage;
-            Encoding encoding;
-
             try
             {
+                Encoding encoding;
+
                 // check if a integer as a string was passed
-                if (Int32.TryParse(value, out codePage))
+                if (Int32.TryParse(value, out int codePage))
                 {
                     if (0 == codePage)
                     {
@@ -366,9 +363,9 @@ namespace WixToolset
         /// Generate a new Windows Installer-friendly guid.
         /// </summary>
         /// <returns>A new guid.</returns>
-        internal static string GenerateGuid()
+        public static string GenerateGuid()
         {
-            return Guid.NewGuid().ToString("B").ToUpper(CultureInfo.InvariantCulture);
+            return Guid.NewGuid().ToString("B").ToUpperInvariant();
         }
 
         /// <summary>
@@ -465,7 +462,7 @@ namespace WixToolset
             }
         }
 
-        internal static string GetFileHash(string path)
+        public static string GetFileHash(string path)
         {
             using (SHA1Managed managed = new SHA1Managed())
             {
@@ -474,6 +471,147 @@ namespace WixToolset
                     byte[] hash = managed.ComputeHash(stream);
                     return BitConverter.ToString(hash).Replace("-", String.Empty);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Takes an id, and demodularizes it (if possible).
+        /// </summary>
+        /// <remarks>
+        /// If the output type is a module, returns a demodularized version of an id. Otherwise, returns the id.
+        /// </remarks>
+        /// <param name="outputType">The type of the output to bind.</param>
+        /// <param name="modularizationGuid">The modularization GUID.</param>
+        /// <param name="id">The id to demodularize.</param>
+        /// <returns>The demodularized id.</returns>
+        public static string Demodularize(OutputType outputType, string modularizationGuid, string id)
+        {
+            if (OutputType.Module == outputType && id.EndsWith(String.Concat(".", modularizationGuid), StringComparison.Ordinal))
+            {
+                id = id.Substring(0, id.Length - 37);
+            }
+
+            return id;
+        }
+
+        /// <summary>
+        /// Get the source/target and short/long file names from an MSI Filename column.
+        /// </summary>
+        /// <param name="value">The Filename value.</param>
+        /// <returns>An array of strings of length 4.  The contents are: short target, long target, short source, and long source.</returns>
+        /// <remarks>
+        /// If any particular file name part is not parsed, its set to null in the appropriate location of the returned array of strings.
+        /// However, the returned array will always be of length 4.
+        /// </remarks>
+        public static string[] GetNames(string value)
+        {
+            string[] names = new string[4];
+            int targetSeparator = value.IndexOf(":", StringComparison.Ordinal);
+
+            // split source and target
+            string sourceName = null;
+            string targetName = value;
+            if (0 <= targetSeparator)
+            {
+                sourceName = value.Substring(targetSeparator + 1);
+                targetName = value.Substring(0, targetSeparator);
+            }
+
+            // split the source short and long names
+            string sourceLongName = null;
+            if (null != sourceName)
+            {
+                int sourceLongNameSeparator = sourceName.IndexOf("|", StringComparison.Ordinal);
+                if (0 <= sourceLongNameSeparator)
+                {
+                    sourceLongName = sourceName.Substring(sourceLongNameSeparator + 1);
+                    sourceName = sourceName.Substring(0, sourceLongNameSeparator);
+                }
+            }
+
+            // split the target short and long names
+            int targetLongNameSeparator = targetName.IndexOf("|", StringComparison.Ordinal);
+            string targetLongName = null;
+            if (0 <= targetLongNameSeparator)
+            {
+                targetLongName = targetName.Substring(targetLongNameSeparator + 1);
+                targetName = targetName.Substring(0, targetLongNameSeparator);
+            }
+
+            // remove the long source name when its identical to the long source name
+            if (null != sourceName && sourceName == sourceLongName)
+            {
+                sourceLongName = null;
+            }
+
+            // remove the long target name when its identical to the long target name
+            if (null != targetName && targetName == targetLongName)
+            {
+                targetLongName = null;
+            }
+
+            // remove the source names when they are identical to the target names
+            if (sourceName == targetName && sourceLongName == targetLongName)
+            {
+                sourceName = null;
+                sourceLongName = null;
+            }
+
+            // target name(s)
+            if ("." != targetName)
+            {
+                names[0] = targetName;
+            }
+
+            if (null != targetLongName && "." != targetLongName)
+            {
+                names[1] = targetLongName;
+            }
+
+            // source name(s)
+            if (null != sourceName)
+            {
+                names[2] = sourceName;
+            }
+
+            if (null != sourceLongName && "." != sourceLongName)
+            {
+                names[3] = sourceLongName;
+            }
+
+            return names;
+        }
+
+        /// <summary>
+        /// Get a source/target and short/long file name from an MSI Filename column.
+        /// </summary>
+        /// <param name="value">The Filename value.</param>
+        /// <param name="source">true to get a source name; false to get a target name</param>
+        /// <param name="longName">true to get a long name; false to get a short name</param>
+        /// <returns>The name.</returns>
+        public static string GetName(string value, bool source, bool longName)
+        {
+            string[] names = GetNames(value);
+
+            if (source)
+            {
+                if (longName && null != names[3])
+                {
+                    return names[3];
+                }
+                else if (null != names[2])
+                {
+                    return names[2];
+                }
+            }
+
+            if (longName && null != names[1])
+            {
+                return names[1];
+            }
+            else
+            {
+                return names[0];
             }
         }
 
