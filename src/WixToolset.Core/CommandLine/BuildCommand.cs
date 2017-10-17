@@ -70,6 +70,11 @@ namespace WixToolset.Core
         {
             var intermediates = this.CompilePhase();
 
+            if (!intermediates.Any())
+            {
+                return 1;
+            }
+
             var tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
 
             if (this.OutputType == OutputType.Library)
@@ -162,6 +167,12 @@ namespace WixToolset.Core
 
             var resolver = CreateWixResolverWithVariables(localizer, output);
 
+            var intermediateFolder = this.IntermediateFolder;
+            if (String.IsNullOrEmpty(intermediateFolder))
+            {
+                intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            }
+
             var context = new BindContext();
             context.Messaging = Messaging.Instance;
             context.ExtensionManager = this.ExtensionManager;
@@ -171,7 +182,7 @@ namespace WixToolset.Core
             context.Codepage = localizer.Codepage;
             //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
             //context.Ices = this.Ices;
-            context.IntermediateFolder = this.IntermediateFolder;
+            context.IntermediateFolder = intermediateFolder;
             context.IntermediateRepresentation = output;
             context.OutputPath = this.OutputPath;
             context.OutputPdbPath = Path.ChangeExtension(this.OutputPath, ".wixpdb");

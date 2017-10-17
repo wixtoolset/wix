@@ -19,11 +19,15 @@ namespace WixToolset.Core
         public static int Main(string[] args)
         {
             Messaging.Instance.InitializeAppName("WIX", "wix.exe");
-
             Messaging.Instance.Display += DisplayMessage;
 
-            var command = CommandLine.ParseStandardCommandLine(args);
+            var program = new Program();
+            return program.Run(args);
+        }
 
+        public int Run(string[] args)
+        {
+            var command = CommandLine.ParseStandardCommandLine(args);
             return command?.Execute() ?? 1;
         }
 
