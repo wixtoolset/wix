@@ -20,7 +20,7 @@ namespace WixToolsetTest.CoreIntegrationFixture
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new[] { "build", "Package.wxs", "PackageComponents.wxs", "-loc", "Package.en-us.wxl", "-bindpath", "data", "-intermediateFolder", intermediateFolder, "-o", $@"{intermediateFolder}\bin\test.msi" });
+                var result = program.Run(new WixToolsetServiceProvider(), new[] { "build", "Package.wxs", "PackageComponents.wxs", "-loc", "Package.en-us.wxl", "-bindpath", "data", "-intermediateFolder", intermediateFolder, "-o", $@"{intermediateFolder}\bin\test.msi" });
 
                 Assert.Equal(0, result);
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));

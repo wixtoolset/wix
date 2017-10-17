@@ -9,11 +9,13 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(ExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
+        public BuildCommand(IServiceProvider serviceProvider, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
         {
+            this.ServiceProvider = serviceProvider;
             this.ExtensionManager = extensions;
             this.LocFiles = locFiles;
             this.LibraryFiles = libraryFiles;
@@ -34,7 +36,9 @@ namespace WixToolset.Core
             this.WixProjectFile = wixProjectFile;
         }
 
-        public ExtensionManager ExtensionManager { get; }
+        public IServiceProvider ServiceProvider { get; }
+
+        public IExtensionManager ExtensionManager { get; }
 
         public IEnumerable<string> LocFiles { get; }
 
@@ -173,7 +177,7 @@ namespace WixToolset.Core
                 intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             }
 
-            var context = new BindContext();
+            var context = this.ServiceProvider.GetService<IBindContext>();
             context.Messaging = Messaging.Instance;
             context.ExtensionManager = this.ExtensionManager;
             context.BindPaths = this.BindPaths ?? Array.Empty<BindPath>();

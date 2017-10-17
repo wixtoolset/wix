@@ -4,6 +4,7 @@ namespace WixToolset.Core
 {
     using System;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Wix Toolset Command-Line Interface.
@@ -21,14 +22,39 @@ namespace WixToolset.Core
             Messaging.Instance.InitializeAppName("WIX", "wix.exe");
             Messaging.Instance.Display += DisplayMessage;
 
+            var serviceProvider = new WixToolsetServiceProvider();
             var program = new Program();
-            return program.Run(args);
+            return program.Run(serviceProvider, args);
         }
 
-        public int Run(string[] args)
+        /// <summary>
+        /// Executes the wix command-line interface.
+        /// </summary>
+        /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
+        /// <param name="args">Command-line arguments to execute.</param>
+        /// <returns>Returns the application error code.</returns>
+        public int Run(IServiceProvider serviceProvider, string[] args)
         {
-            var command = CommandLine.ParseStandardCommandLine(args);
+            var context = serviceProvider.GetService<ICommandLineContext>();
+            context.Messaging = Messaging.Instance;
+            context.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider);
+            context.ParsedArguments = args;
+
+            var commandLine = serviceProvider.GetService<ICommandLine>();
+            var command = commandLine.ParseStandardCommandLine(context);
             return command?.Execute() ?? 1;
+        }
+
+        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider)
+        {
+            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+
+            foreach (var type in new[] { typeof(WixToolset.Core.Burn.StandardBackend), typeof(WixToolset.Core.WindowsInstaller.StandardBackend) })
+            {
+                extensionManager.Add(type.Assembly);
+            }
+
+            return extensionManager;
         }
 
         private static void DisplayMessage(object sender, DisplayEventArgs e)

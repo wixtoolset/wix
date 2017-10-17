@@ -9,6 +9,7 @@ namespace WixToolset.Core.Burn
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class BundleBackend : IBackend
     {

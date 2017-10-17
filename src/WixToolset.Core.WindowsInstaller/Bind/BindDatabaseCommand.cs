@@ -16,6 +16,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.Bind;
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     /// <summary>

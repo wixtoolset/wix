@@ -2,9 +2,8 @@
 
 namespace WixToolset.Core
 {
-    using System;
     using System.Collections.Generic;
-    using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class CompileCommand : ICommandLineCommand
     {

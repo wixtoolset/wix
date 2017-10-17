@@ -9,6 +9,7 @@ namespace WixToolset.BuildTasks
     using Microsoft.Build.Utilities;
     using WixToolset.Core;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// An MSBuild task to run the WiX compiler.
@@ -164,8 +165,28 @@ namespace WixToolset.BuildTasks
 
             this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
 
-            var command = CommandLine.ParseStandardCommandLine(commandLineString);
+            var serviceProvider = new WixToolsetServiceProvider();
+
+            var context = serviceProvider.GetService<ICommandLineContext>();
+            context.Messaging = Messaging.Instance;
+            context.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider);
+            context.Arguments = commandLineString;
+
+            var commandLine = serviceProvider.GetService<ICommandLine>();
+            var command = commandLine.ParseStandardCommandLine(context);
             command?.Execute();
+        }
+
+        private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider)
+        {
+            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+
+            foreach (var type in new[] { typeof(WixToolset.Core.Burn.StandardBackend), typeof(WixToolset.Core.WindowsInstaller.StandardBackend) })
+            {
+                extensionManager.Add(type.Assembly);
+            }
+
+            return extensionManager;
         }
 
         private void DisplayMessage(object sender, DisplayEventArgs e)

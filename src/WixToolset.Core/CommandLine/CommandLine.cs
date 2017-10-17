@@ -6,11 +6,11 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal enum Commands
     {
@@ -22,11 +22,13 @@ namespace WixToolset.Core
         Bind,
     }
 
-    public class CommandLine
+    internal class CommandLine : ICommandLine
     {
-        private CommandLine()
+        public CommandLine()
         {
         }
+
+        private IServiceProvider ServiceProvider { get; set; }
 
         public static string ExpectedArgument { get; } = "expected argument";
 
@@ -36,20 +38,29 @@ namespace WixToolset.Core
 
         public Queue<string> RemainingArguments { get; } = new Queue<string>();
 
-        public ExtensionManager ExtensionManager { get; } = new ExtensionManager();
+        public IExtensionManager ExtensionManager { get; private set; }
 
         public string ErrorArgument { get; set; }
 
         public bool ShowHelp { get; set; }
 
-        public static ICommandLineCommand ParseStandardCommandLine(string commandLineString)
+        public ICommandLineCommand ParseStandardCommandLine(ICommandLineContext context)
         {
-            var args = CommandLine.ParseArgumentsToArray(commandLineString).ToArray();
+            this.ServiceProvider = context.ServiceProvider;
 
-            return ParseStandardCommandLine(args);
+            this.ExtensionManager = context.ExtensionManager ?? this.ServiceProvider.GetService<IExtensionManager>();
+
+            var args = context.ParsedArguments ?? Array.Empty<string>();
+
+            if (!String.IsNullOrEmpty(context.Arguments))
+            {
+                args = CommandLine.ParseArgumentsToArray(context.Arguments).Union(args).ToArray();
+            }
+
+            return this.ParseStandardCommandLine(args);
         }
 
-        public static ICommandLineCommand ParseStandardCommandLine(string[] args)
+        private ICommandLineCommand ParseStandardCommandLine(string[] args)
         {
             var next = String.Empty;
 
@@ -79,7 +90,7 @@ namespace WixToolset.Core
             var builtOutputsFile = String.Empty;
             var wixProjectFile = String.Empty;
 
-            var cli = CommandLine.Parse(args, (cmdline, arg) => Enum.TryParse(arg, true, out command), (cmdline, arg) =>
+            this.Parse(args, (cmdline, arg) => Enum.TryParse(arg, true, out command), (cmdline, arg) =>
             {
                 if (cmdline.IsSwitch(arg))
                 {
@@ -103,7 +114,7 @@ namespace WixToolset.Core
                         case "cc":
                             cmdline.GetNextArgumentOrError(ref cabCachePath);
                             return true;
-                            
+
                         case "cultures":
                             cmdline.GetNextArgumentOrError(cultures);
                             return true;
@@ -187,7 +198,7 @@ namespace WixToolset.Core
                 AppCommon.DisplayToolHeader();
             }
 
-            if (cli.ShowHelp)
+            if (this.ShowHelp)
             {
                 return new HelpCommand(command);
             }
@@ -196,14 +207,11 @@ namespace WixToolset.Core
             {
                 case Commands.Build:
                     {
-                        LoadStandardBackends(cli.ExtensionManager);
-
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = GatherPreprocessorVariables(defines);
                         var bindPathList = GatherBindPaths(bindPaths);
-                        var extensions = cli.ExtensionManager;
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(extensions, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
+                        return new BuildCommand(this.ServiceProvider, this.ExtensionManager, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
                     }
 
                 case Commands.Compile:
@@ -215,18 +223,6 @@ namespace WixToolset.Core
             }
 
             return null;
-        }
-
-        private static void LoadStandardBackends(ExtensionManager extensionManager)
-        {
-            var folder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
-
-            foreach (var backendAssemblyName in new[] { "WixToolset.Core.Burn.dll", "WixToolset.Core.WindowsInstaller.dll" })
-            {
-                var path = Path.Combine(folder, backendAssemblyName);
-
-                extensionManager.Load(path);
-            }
         }
 
         private static OutputType CalculateOutputType(string outputType, string outputFile)
@@ -269,6 +265,7 @@ namespace WixToolset.Core
             return OutputType.Unknown;
         }
 
+#if UNUSED
         private static CommandLine Parse(string commandLineString, Func<CommandLine, string, bool> parseArgument)
         {
             var arguments = CommandLine.ParseArgumentsToArray(commandLineString).ToArray();
@@ -280,18 +277,17 @@ namespace WixToolset.Core
         {
             return CommandLine.Parse(commandLineArguments, null, parseArgument);
         }
+#endif
 
-        private static CommandLine Parse(string[] commandLineArguments, Func<CommandLine, string, bool> parseCommand, Func<CommandLine, string, bool> parseArgument)
+        private ICommandLine Parse(string[] commandLineArguments, Func<CommandLine, string, bool> parseCommand, Func<CommandLine, string, bool> parseArgument)
         {
-            var cmdline = new CommandLine();
+            this.FlattenArgumentsWithResponseFilesIntoOriginalArguments(commandLineArguments);
 
-            cmdline.FlattenArgumentsWithResponseFilesIntoOriginalArguments(commandLineArguments);
+            this.QueueArgumentsAndLoadExtensions(this.OriginalArguments);
 
-            cmdline.QueueArgumentsAndLoadExtensions(cmdline.OriginalArguments);
+            this.ProcessRemainingArguments(parseArgument, parseCommand);
 
-            cmdline.ProcessRemainingArguments(parseArgument, parseCommand);
-
-            return cmdline;
+            return this;
         }
 
         private static IEnumerable<SourceFile> GatherSourceFiles(IEnumerable<string> sourceFiles, string intermediateDirectory)

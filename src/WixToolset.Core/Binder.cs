@@ -16,6 +16,7 @@ namespace WixToolset.Core
     using WixToolset.Data.Bind;
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Binder of the WiX toolset.
@@ -42,14 +43,14 @@ namespace WixToolset.Core
             //this.SuppressIces = new List<string>();
         }
 
-        public Binder(BindContext context)
+        public Binder(IBindContext context)
         {
             this.Context = context;
 
             this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
         }
 
-        private BindContext Context { get; }
+        private IBindContext Context { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 

@@ -2,12 +2,21 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     public class BindContext : IBindContext
     {
+        internal BindContext(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        public IServiceProvider ServiceProvider { get; }
+
         public Messaging Messaging { get; set; }
 
         public IEnumerable<BindPath> BindPaths { get; set; }

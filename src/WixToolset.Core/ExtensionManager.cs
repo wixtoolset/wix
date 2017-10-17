@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Collections.Generic;
@@ -8,11 +8,22 @@ namespace WixToolset
     using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     public class ExtensionManager : IExtensionManager
     {
         private List<Assembly> extensionAssemblies = new List<Assembly>();
+
+        /// <summary>
+        /// Adds an assembly.
+        /// </summary>
+        /// <param name="assembly">Assembly to add to the extension manager.</param>
+        /// <returns>The assembly added.</returns>
+        public Assembly Add(Assembly assembly)
+        {
+            this.extensionAssemblies.Add(assembly);
+            return assembly;
+        }
 
         /// <summary>
         /// Loads an assembly from a type description string.
@@ -57,8 +68,7 @@ namespace WixToolset
                 assembly = ExtensionManager.ExtensionLoadFrom(assemblyName);
             }
 
-            this.extensionAssemblies.Add(assembly);
-            return assembly;
+            return this.Add(assembly);
         }
 
         /// <summary>

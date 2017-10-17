@@ -10,6 +10,7 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
     using WixToolset.Ole32;
 

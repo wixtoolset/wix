@@ -5,6 +5,7 @@ namespace WixToolset.Core.Burn
     using System;
     using System.IO;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class BackendFactory : IBackendFactory
     {

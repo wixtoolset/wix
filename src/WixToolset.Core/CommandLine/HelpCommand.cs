@@ -3,6 +3,7 @@
 namespace WixToolset.Core
 {
     using System;
+    using WixToolset.Extensibility.Services;
 
     internal class HelpCommand : ICommandLineCommand
     {

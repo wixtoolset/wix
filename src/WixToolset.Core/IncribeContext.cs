@@ -2,11 +2,19 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
     internal class InscribeContext : IInscribeContext
     {
+        public InscribeContext(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        public IServiceProvider ServiceProvider { get; }
+
         public Messaging Messaging { get; } = Messaging.Instance;
 
         public string IntermediateFolder { get; set; }

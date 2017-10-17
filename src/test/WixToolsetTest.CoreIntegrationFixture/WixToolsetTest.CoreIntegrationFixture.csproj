@@ -12,34 +12,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestData\SingleFile\data\test.txt" />
-    <None Remove="TestData\SingleFile\Package.en-us.wxl" />
-    <None Remove="TestData\SingleFile\Package.wxs" />
-    <None Remove="TestData\SingleFile\PackageComponents.wxs" />
+    <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFile\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="TestData\SingleFile\data\test.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SingleFile\Package.en-us.wxl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SingleFile\Package.wxs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SingleFile\PackageComponents.wxs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\..\wix\wix.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\wix\wix.csproj" />
   </ItemGroup>
 </Project>
