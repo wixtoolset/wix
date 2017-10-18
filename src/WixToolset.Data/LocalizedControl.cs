@@ -18,30 +18,27 @@ namespace WixToolset.Data
             this.Text = text;
         }
 
-        public string Dialog { get; set; }
+        public string Dialog { get; }
 
-        public string Control { get; set; }
+        public string Control { get; }
 
-        public int X { get; private set; }
+        public int X { get; }
 
-        public int Y { get; private set; }
+        public int Y { get; }
 
-        public int Width { get; private set; }
+        public int Width { get; }
 
-        public int Height { get; private set; }
+        public int Height { get; }
 
-        public int Attributes { get; private set; }
+        public int Attributes { get; }
 
-        public string Text { get; private set; }
+        public string Text { get; }
 
         /// <summary>
         /// Get key for a localized control.
         /// </summary>
         /// <returns>The localized control id.</returns>
-        public string GetKey()
-        {
-            return LocalizedControl.GetKey(this.Dialog, this.Control);
-        }
+        public string GetKey() => LocalizedControl.GetKey(this.Dialog, this.Control);
 
         /// <summary>
         /// Get key for a localized control.
@@ -49,9 +46,6 @@ namespace WixToolset.Data
         /// <param name="dialog">The optional id of the control's dialog.</param>
         /// <param name="control">The id of the control.</param>
         /// <returns>The localized control id.</returns>
-        public static string GetKey(string dialog, string control)
-        {
-            return String.Concat(String.IsNullOrEmpty(dialog) ? String.Empty : dialog, "/", String.IsNullOrEmpty(control) ? String.Empty : control);
-        }
+        public static string GetKey(string dialog, string control) => String.Concat(dialog, "/", control);
     }
 }
