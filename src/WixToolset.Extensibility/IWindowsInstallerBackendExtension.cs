@@ -2,36 +2,28 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data;
+    using System.Collections.Generic;
+    using WixToolset.Data.Rows;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Interface all binder extensions implement.
     /// </summary>
-    public interface IBinderExtension
+    public interface IWindowsInstallerBackendExtension
     {
         /// <summary>
         /// Called before binding occurs.
         /// </summary>
-        void PreBind(IBindContext context);
+        void PreBackendBind(IBindContext context);
 
-        /// <summary>
-        /// Called after variable resolution occurs.
-        /// </summary>
-        void AfterResolvedFields(Output output);
+        ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<BindFileWithPath> files);
 
-        string ResolveFile(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage);
-
-        bool? CompareFiles(string targetFile, string updatedFile);
-
-        bool CopyFile(string source, string destination, bool overwrite);
-
-        bool MoveFile(string source, string destination, bool overwrite);
+        string ResolveMedia(MediaRow mediaRow, string mediaLayoutDirectory, string layoutDirectory);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
         /// </summary>
-        void PostBind(BindResult result);
+        void PostBackendBind(BindResult result);
     }
 }

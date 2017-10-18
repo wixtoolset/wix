@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Data.Bind;
 
     public interface IBinderFileManagerCore : IMessageHandler
     {
