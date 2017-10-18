@@ -19,6 +19,12 @@
         <Parameter Type="System.String" Name="format" />
       </Instance>
     </Message>
+    <Message Id="InvalidFileName" Number="85">
+      <Instance>
+        Invalid file name '{0}'.
+        <Parameter Type="System.String" Name="fileName" />
+      </Instance>
+    </Message>
     <Message Id="DuplicateLocalizationIdentifier" Number="100">
       <Instance>
         The localization identifier '{0}' has been duplicated in multiple locations.  Please resolve the conflict.
@@ -75,6 +81,12 @@
       <Instance>
         The table '{0}' does not contain any primary key columns.  At least one column must be marked as the primary key to ensure this table can be patched.
         <Parameter Type="System.String" Name="tableName" />
+      </Instance>
+    </Message>
+    <Message Id="PathTooLong" Number="262">
+      <Instance>
+        '{0}' is too long, the fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
+        <Parameter Type="System.String" Name="fileName" />
       </Instance>
     </Message>
     <Message Id="InvalidStringForCodepage" Number="311">
