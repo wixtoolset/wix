@@ -17,12 +17,14 @@ namespace WixToolset.Core.Burn
             this.Id = id;
         }
 
+#if TODO
         public void AddWixSearchRowInfo(Row row)
         {
             Debug.Assert((string)row[0] == Id);
             Variable = (string)row[1];
             Condition = (string)row[2];
         }
+#endif
 
         public string Id { get; private set; }
         public string Variable { get; private set; }

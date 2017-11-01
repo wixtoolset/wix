@@ -69,7 +69,7 @@ namespace WixToolset.Core.Burn
     {
         public BindBundleCommand(IBindContext context)
         {
-            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
+            //this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
 
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
@@ -87,13 +87,13 @@ namespace WixToolset.Core.Burn
 
         public IEnumerable<IBinderExtension> Extensions { private get; set; }
 
-        public Output Output { private get; set; }
+        public Intermediate Output { private get; set; }
 
         public string OutputPath { private get; set; }
 
         public string PdbFile { private get; set; }
 
-        public TableDefinitionCollection TableDefinitions { private get; set; }
+        //public TableDefinitionCollection TableDefinitions { private get; set; }
 
         public string IntermediateFolder { private get; set; }
 
@@ -105,6 +105,8 @@ namespace WixToolset.Core.Burn
 
         public void Execute()
         {
+            throw new NotImplementedException();
+#if TODO
             this.FileTransfers = Enumerable.Empty<FileTransfer>();
             this.ContentFilePaths = Enumerable.Empty<string>();
 
@@ -822,7 +824,7 @@ namespace WixToolset.Core.Burn
             resources.Save(bundleTempPath);
         }
 
-        #region DependencyExtension
+//#region DependencyExtension
         /// <summary>
         /// Imports authored dependency providers for each package in the manifest,
         /// and generates dependency providers for certain package types that do not
@@ -936,7 +938,7 @@ namespace WixToolset.Core.Burn
             }
 
             // Defaults to the bundle ID as the provider key.
+#endif
         }
-        #endregion
     }
 }

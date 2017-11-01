@@ -42,7 +42,7 @@ namespace WixToolset.Core.Burn
             }
         }
 
-        public Output Unbind(IUnbindContext context)
+        public Intermediate Unbind(IUnbindContext context)
         {
             string uxExtractPath = Path.Combine(context.ExportBasePath, "UX");
             string acExtractPath = Path.Combine(context.ExportBasePath, "AttachedContainer");

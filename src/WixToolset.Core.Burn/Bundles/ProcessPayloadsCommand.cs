@@ -16,6 +16,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class ProcessPayloadsCommand
     {
+#if TODO
         private static readonly Version EmptyVersion = new Version(0, 0, 0, 0);
 
         public IEnumerable<WixBundlePayloadRow> Payloads { private get; set; }
@@ -157,5 +158,6 @@ namespace WixToolset.Core.Burn.Bundles
                 payload.DisplayName = versionInfo.ProductName;
             }
         }
+#endif
     }
 }

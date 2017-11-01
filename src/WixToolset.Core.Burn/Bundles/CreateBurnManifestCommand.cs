@@ -15,6 +15,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
+#if TODO
         public IEnumerable<IBurnBackendExtension> BackendExtensions { private get; set; }
 
         public Output Output { private get; set; }
@@ -682,5 +683,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             return resolved;
         }
+#endif
     }
 }

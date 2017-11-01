@@ -304,7 +304,8 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                                 throw new InvalidOperationException("Failed to fetch a File row from the database that was merged in from a module.");
                             }
 
-                            recordUpdate.SetInteger(1, file.File.Sequence);
+                            //recordUpdate.SetInteger(1, file.File.Sequence);
+                            throw new NotImplementedException();
 
                             // update the file attributes to match the compression specified
                             // on the Merge element or on the Package element
@@ -316,25 +317,24 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                                 attributes = recordUpdate.GetInteger(2);
                             }
 
-                            if (YesNoType.Yes == file.File.Compressed)
+                            // not specified
+                            if (!file.File.Compressed.HasValue)
+                            {
+                                // clear any compression bits
+                                attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
+                                attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                            }
+                            else if (file.File.Compressed.Value)
                             {
                                 // these are mutually exclusive
                                 attributes |= MsiInterop.MsidbFileAttributesCompressed;
                                 attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
                             }
-                            else if (YesNoType.No == file.File.Compressed)
+                            else if (!file.File.Compressed.Value)
                             {
                                 // these are mutually exclusive
                                 attributes |= MsiInterop.MsidbFileAttributesNoncompressed;
                                 attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
-                            }
-                            else // not specified
-                            {
-                                Debug.Assert(YesNoType.NotSet == file.File.Compressed);
-
-                                // clear any compression bits
-                                attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
-                                attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
                             }
 
                             recordUpdate.SetInteger(2, attributes);

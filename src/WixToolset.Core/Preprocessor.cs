@@ -38,7 +38,6 @@ namespace WixToolset
 
         private List<IPreprocessorExtension> extensions;
         private Dictionary<string, IPreprocessorExtension> extensionsByPrefix;
-        private List<InspectorExtension> inspectorExtensions;
 
         private SourceLineNumber currentLineNumber;
         private Stack<SourceLineNumber> sourceStack;
@@ -60,7 +59,6 @@ namespace WixToolset
 
             this.extensions = new List<IPreprocessorExtension>();
             this.extensionsByPrefix = new Dictionary<string, IPreprocessorExtension>();
-            this.inspectorExtensions = new List<InspectorExtension>();
 
             this.sourceStack = new Stack<SourceLineNumber>();
 
@@ -201,27 +199,9 @@ namespace WixToolset
         public XDocument Process(string sourceFile, IDictionary<string, string> variables)
         {
             using (Stream sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (XmlReader reader = XmlReader.Create(sourceFile, DocumentXmlReaderSettings))
             {
-                InspectorCore inspectorCore = new InspectorCore();
-                foreach (InspectorExtension inspectorExtension in this.inspectorExtensions)
-                {
-                    inspectorExtension.Core = inspectorCore;
-                    inspectorExtension.InspectSource(sourceStream);
-
-                    // reset
-                    inspectorExtension.Core = null;
-                    sourceStream.Position = 0;
-                }
-
-                if (inspectorCore.EncounteredError)
-                {
-                    return null;
-                }
-
-                using (XmlReader reader = XmlReader.Create(sourceFile, DocumentXmlReaderSettings))
-                {
-                    return Process(reader, variables, sourceFile);
-                }
+                return Process(reader, variables, sourceFile);
             }
         }
 

@@ -14,7 +14,7 @@ namespace WixToolset.Core
     using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
@@ -43,16 +43,9 @@ namespace WixToolset.Core
             //this.SuppressIces = new List<string>();
         }
 
-        public Binder(IBindContext context)
-        {
-            this.Context = context;
+        private IBindContext Context { get; set; }
 
-            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
-        }
-
-        private IBindContext Context { get; }
-
-        private TableDefinitionCollection TableDefinitions { get; }
+        //private TableDefinitionCollection TableDefinitions { get; }
 
         //public IEnumerable<IBackendFactory> BackendFactories { get; set; }
 
@@ -173,8 +166,10 @@ namespace WixToolset.Core
         //    this.fileManagers.Add(extension);
         //}
 
-        public bool Bind()
+        public bool Bind(IBindContext context)
         {
+            this.Context = context;
+
             //if (!String.IsNullOrEmpty(this.Context.FileManagerCore.CabCachePath))
             //{
             //    Directory.CreateDirectory(this.Context.FileManagerCore.CabCachePath);
@@ -225,7 +220,7 @@ namespace WixToolset.Core
 
         private ResolveResult Resolve()
         {
-            var buildingPatch = (this.Context.IntermediateRepresentation.Type == OutputType.Patch);
+            var buildingPatch = this.Context.IntermediateRepresentation.Sections.Any(s => s.Type == SectionType.Patch);
 
             var filesWithEmbeddedFiles = new ExtractEmbeddedFiles();
 
@@ -238,13 +233,14 @@ namespace WixToolset.Core
                 command.Extensions = this.Context.Extensions;
                 command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
                 command.IntermediateFolder = this.Context.IntermediateFolder;
-                command.Tables = this.Context.IntermediateRepresentation.Tables;
+                command.Intermediate = this.Context.IntermediateRepresentation;
                 command.SupportDelayedResolution = true;
                 command.Execute();
 
                 delayedFields = command.DelayedFields;
             }
 
+#if REVISIT_FOR_PATCHING
             if (this.Context.IntermediateRepresentation.SubStorages != null)
             {
                 foreach (SubStorage transform in this.Context.IntermediateRepresentation.SubStorages)
@@ -256,11 +252,12 @@ namespace WixToolset.Core
                     command.Extensions = this.Context.Extensions;
                     command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
                     command.IntermediateFolder = this.Context.IntermediateFolder;
-                    command.Tables = transform.Data.Tables;
+                    command.Intermediate = this.Context.IntermediateRepresentation;
                     command.SupportDelayedResolution = false;
                     command.Execute();
                 }
             }
+#endif
 
             var expectedEmbeddedFiles = filesWithEmbeddedFiles.GetExpectedEmbeddedFiles();
 
@@ -275,9 +272,11 @@ namespace WixToolset.Core
         {
             var backendFactories = this.Context.ExtensionManager.Create<IBackendFactory>();
 
+            var entrySection = this.Context.IntermediateRepresentation.Sections[0];
+
             foreach (var factory in backendFactories)
             {
-                if (factory.TryCreateBackend(this.Context.IntermediateRepresentation.Type.ToString(), this.Context.OutputPath, null, out var backend))
+                if (factory.TryCreateBackend(entrySection.Type.ToString(), this.Context.OutputPath, null, out var backend))
                 {
                     var result = backend.Bind(this.Context);
                     return result;
@@ -288,6 +287,7 @@ namespace WixToolset.Core
 
             return null;
         }
+
         private void Layout(BindResult result)
         {
             try
@@ -461,25 +461,28 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="output">The output.</param>
         /// <param name="databaseFile">The output file if OutputFile not set.</param>
-        private void WriteBuildInfoTable(Output output, string outputFile)
+        private void WriteBuildInfoTable(Intermediate output, string outputFile)
         {
-            Table buildInfoTable = output.EnsureTable(this.TableDefinitions["WixBuildInfo"]);
-            Row buildInfoRow = buildInfoTable.CreateRow(null);
+            var entrySection = output.Sections.First(s => s.Type != SectionType.Fragment);
 
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
-            buildInfoRow[0] = fileVersion.FileVersion;
-            buildInfoRow[1] = outputFile;
+
+            var buildInfoRow = new WixBuildInfoTuple();
+            buildInfoRow.WixVersion = fileVersion.FileVersion;
+            buildInfoRow.WixOutputFile = outputFile;
 
             if (!String.IsNullOrEmpty(this.Context.WixprojectFile))
             {
-                buildInfoRow[2] = this.Context.WixprojectFile;
+                buildInfoRow.WixProjectFile = this.Context.WixprojectFile;
             }
 
             if (!String.IsNullOrEmpty(this.Context.OutputPdbPath))
             {
-                buildInfoRow[3] = this.Context.OutputPdbPath;
+                buildInfoRow.WixPdbFile = this.Context.OutputPdbPath;
             }
+
+            entrySection.Tuples.Add(buildInfoRow);
         }
 
 #if DELETE_THIS_CODE
@@ -720,7 +723,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="payloads">Collection of payloads whose source will be written to file.</param>
-        private void CreateContentsFile(string path, IEnumerable<WixBundlePayloadRow> payloads)
+        private void CreateContentsFile(string path, IEnumerable<WixBundlePayloadTuple> payloads)
         {
             string directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))
@@ -730,11 +733,12 @@ namespace WixToolset.Core
 
             using (StreamWriter contents = new StreamWriter(path, false))
             {
-                foreach (WixBundlePayloadRow payload in payloads)
+                foreach (var payload in payloads)
                 {
                     if (payload.ContentFile)
                     {
-                        contents.WriteLine(payload.FullFileName);
+                        var fullPath = Path.GetFullPath(payload.SourceFile);
+                        contents.WriteLine(fullPath);
                     }
                 }
             }

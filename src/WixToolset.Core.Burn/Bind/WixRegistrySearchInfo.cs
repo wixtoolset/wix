@@ -11,10 +11,12 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal class WixRegistrySearchInfo : WixSearchInfo
     {
+#if TODO
         public WixRegistrySearchInfo(Row row)
             : this((string)row[0], (int)row[1], (string)row[2], (string)row[3], (int)row[4])
         {
         }
+#endif
 
         public WixRegistrySearchInfo(string id, int root, string key, string value, int attributes)
             : base(id)
@@ -88,5 +90,4 @@ namespace WixToolset.Core.Burn
             writer.WriteEndElement();
         }
     }
-
 }

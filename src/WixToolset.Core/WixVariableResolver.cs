@@ -9,7 +9,7 @@ namespace WixToolset.Core
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -60,17 +60,17 @@ namespace WixToolset.Core
         /// Add a variable.
         /// </summary>
         /// <param name="wixVariableRow">The WixVariableRow to add.</param>
-        public void AddVariable(WixVariableRow wixVariableRow)
+        public void AddVariable(WixVariableTuple wixVariableRow)
         {
             try
             {
-                this.wixVariables.Add(wixVariableRow.Id, wixVariableRow.Value);
+                this.wixVariables.Add(wixVariableRow.WixVariable, wixVariableRow.Value);
             }
             catch (ArgumentException)
             {
                 if (!wixVariableRow.Overridable) // collision
                 {
-                    Messaging.Instance.OnMessage(WixErrors.WixVariableCollision(wixVariableRow.SourceLineNumbers, wixVariableRow.Id));
+                    Messaging.Instance.OnMessage(WixErrors.WixVariableCollision(wixVariableRow.SourceLineNumbers, wixVariableRow.WixVariable));
                 }
             }
         }

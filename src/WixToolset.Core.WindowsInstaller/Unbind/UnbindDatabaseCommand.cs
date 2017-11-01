@@ -83,7 +83,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 using (SummaryInformation summaryInformation = new SummaryInformation(this.Database))
                 {
-                    Table table = new Table(null, this.TableDefinitions["_SummaryInformation"]);
+                    Table table = new Table(this.TableDefinitions["_SummaryInformation"]);
 
                     for (int i = 1; 19 >= i; i++)
                     {
@@ -277,7 +277,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     tableDefinition = this.TableDefinitions[tableName];
                                 }
 
-                                Table table = new Table(null, tableDefinition);
+                                Table table = new Table(tableDefinition);
 
                                 while (true)
                                 {

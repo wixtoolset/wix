@@ -11,7 +11,8 @@ namespace WixToolset.Core.Burn.Bundles
     /// </summary>
     internal class ProcessMsuPackageCommand
     {
-        public RowDictionary<WixBundlePayloadRow> AuthoredPayloads { private get; set; }
+#if TODO
+        public RowDictionary<WixBundlePayload> AuthoredPayloads { private get; set; }
 
         public PackageFacade Facade { private get; set; }
 
@@ -26,5 +27,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Facade.Package.PerMachine = YesNoDefaultType.Yes; // MSUs are always per-machine.
         }
+#endif
     }
 }

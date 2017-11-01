@@ -13,7 +13,7 @@ namespace WixToolset
     public class PatchTransform : IMessageHandler
     {
         private string baseline;
-        private Output transform;
+        private Intermediate transform;
         private string transformPath;
 
         public string Baseline
@@ -21,13 +21,13 @@ namespace WixToolset
             get { return this.baseline; }
         }
 
-        public Output Transform
+        public Intermediate Transform
         {
             get
             {
                 if (null == this.transform)
                 {
-                    this.transform = Output.Load(this.transformPath, false);
+                    this.transform = Intermediate.Load(this.transformPath, false);
                 }
 
                 return this.transform;
@@ -50,6 +50,7 @@ namespace WixToolset
         /// </summary>
         public void Validate()
         {
+#if REVISIT_FOR_PATCHING
             // Changing the ProdocutCode in a patch transform is not recommended.
             Table propertyTable = this.Transform.Tables["Property"];
             if (null != propertyTable)
@@ -260,6 +261,8 @@ namespace WixToolset
                     }
                 }
             }
+#endif
+            throw new NotImplementedException();
         }
 
         /// <summary>

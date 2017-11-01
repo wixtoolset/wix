@@ -24,6 +24,8 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
         public void Execute()
         {
+            throw new NotImplementedException();
+#if TODO
             List<FileFacade> facades = new List<FileFacade>(this.FileTable.Rows.Count);
 
             RowDictionary<WixFileRow> wixFiles = new RowDictionary<WixFileRow>(this.WixFileTable);
@@ -44,6 +46,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             }
 
             this.FileFacades = facades;
+#endif
         }
 
         /// <summary>
@@ -66,7 +69,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     case SymbolPathType.Component:
                         if (null == filesByComponent)
                         {
-                            filesByComponent = facades.ToLookup(f => f.File.Component);
+                            filesByComponent = facades.ToLookup(f => f.File.Component_);
                         }
 
                         foreach (FileFacade facade in filesByComponent[row.Id])
@@ -78,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     case SymbolPathType.Directory:
                         if (null == filesByDirectory)
                         {
-                            filesByDirectory = facades.ToLookup(f => f.WixFile.Directory);
+                            filesByDirectory = facades.ToLookup(f => f.WixFile.Directory_);
                         }
 
                         foreach (FileFacade facade in filesByDirectory[row.Id])

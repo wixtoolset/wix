@@ -11,10 +11,12 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal class WixProductSearchInfo : WixSearchInfo
     {
+#if TODO
         public WixProductSearchInfo(Row row)
             : this((string)row[0], (string)row[1], (int)row[2])
         {
         }
+#endif
 
         public WixProductSearchInfo(string id, string guid, int attributes)
             : base(id)

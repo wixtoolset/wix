@@ -8,6 +8,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class GetPackageFacadesCommand
     {
+#if TODO
         public Table PackageTable { private get; set; }
 
         public Table ExePackageTable { private get; set; }
@@ -58,5 +59,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.PackageFacades = facades;
         }
+#endif
     }
 }

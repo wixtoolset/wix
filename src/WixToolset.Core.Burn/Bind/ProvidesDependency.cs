@@ -11,6 +11,7 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal sealed class ProvidesDependency
     {
+#if TODO
         /// <summary>
         /// Creates a new instance of the <see cref="ProviderDependency"/> class from a <see cref="Row"/>.
         /// </summary>
@@ -19,6 +20,7 @@ namespace WixToolset.Core.Burn
             : this((string)row[2], (string)row[3], (string)row[4], (int?)row[5])
         {
         }
+#endif
 
         /// <summary>
         /// Creates a new instance of the <see cref="ProviderDependency"/> class.

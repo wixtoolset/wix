@@ -218,7 +218,7 @@ namespace WixToolset.Core
                     {
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = GatherPreprocessorVariables(defines);
-                        return new CompileCommand(sourceFiles, variables);
+                        return new CompileCommand(this.ServiceProvider, this.ExtensionManager, sourceFiles, variables);
                     }
             }
 

@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.Bind
 {
+    using System;
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
@@ -24,7 +25,7 @@ namespace WixToolset.Core.Bind
 
         public string IntermediateFolder { private get; set; }
 
-        public TableIndexedCollection Tables { private get; set; }
+        public Intermediate Intermediate { private get; set; }
 
         public bool SupportDelayedResolution { private get; set; }
 
@@ -36,25 +37,39 @@ namespace WixToolset.Core.Bind
 
             var fileResolver = new FileResolver(this.BindPaths, this.Extensions);
 
-            foreach (Table table in this.Tables)
+            foreach (var sections in this.Intermediate.Sections)
             {
-                foreach (Row row in table.Rows)
+                foreach (var row in sections.Tuples)
                 {
-                    foreach (Field field in row.Fields)
+                    foreach (var field in row.Fields)
                     {
-                        bool isDefault = true;
-                        bool delayedResolve = false;
+                        if (field == null)
+                        {
+                            continue;
+                        }
+
+                        var isDefault = true;
+                        var delayedResolve = false;
 
                         // Check to make sure we're in a scenario where we can handle variable resolution.
                         if (null != delayedFields)
                         {
                             // resolve localization and wix variables
-                            if (field.Data is string)
+                            if (field.Type == IntermediateFieldType.String)
                             {
-                                field.Data = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, field.AsString(), false, out isDefault, out delayedResolve);
-                                if (delayedResolve)
+                                var original = field.AsString();
+                                if (!String.IsNullOrEmpty(original))
                                 {
-                                    delayedFields.Add(new DelayedField(row, field));
+                                    var value = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, original, false, out isDefault, out delayedResolve);
+                                    if (original != value)
+                                    {
+                                        field.Set(value);
+                                    }
+
+                                    if (delayedResolve)
+                                    {
+                                        delayedFields.Add(new DelayedField(row, field));
+                                    }
                                 }
                             }
                         }
@@ -66,44 +81,51 @@ namespace WixToolset.Core.Bind
                         }
 
                         // Resolve file paths
-                        if (ColumnType.Object == field.Column.Type)
+                        if (field.Type == IntermediateFieldType.Path)
                         {
-                            ObjectField objectField = (ObjectField)field;
+                            var objectField = field.AsPath();
 
+#if REVISIT_FOR_PATCHING
                             // Skip file resolution if the file is to be deleted.
                             if (RowOperation.Delete == row.Operation)
                             {
                                 continue;
                             }
+#endif
 
                             // File is embedded and path to it was not modified above.
                             if (objectField.EmbeddedFileIndex.HasValue && isDefault)
                             {
-                                string extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.BaseUri, objectField.EmbeddedFileIndex.Value, this.IntermediateFolder);
+                                var extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.BaseUri, objectField.EmbeddedFileIndex.Value, this.IntermediateFolder);
 
                                 // Set the path to the embedded file once where it will be extracted.
-                                objectField.Data = extractPath;
+                                field.Set(extractPath);
                             }
-                            else if (null != objectField.Data) // non-compressed file (or localized value)
+                            else if (null != objectField.Path) // non-compressed file (or localized value)
                             {
                                 try
                                 {
                                     if (!this.BuildingPatch) // Normal binding for non-Patch scenario such as link (light.exe)
                                     {
+#if REVISIT_FOR_PATCHING
                                         // keep a copy of the un-resolved data for future replay. This will be saved into wixpdb file
                                         if (null == objectField.UnresolvedData)
                                         {
                                             objectField.UnresolvedData = (string)objectField.Data;
                                         }
+#endif
 
                                         // resolve the path to the file
-                                        objectField.Data = fileResolver.ResolveFile((string)objectField.Data, table.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        var value = fileResolver.ResolveFile(objectField.Path, row.Definition.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        field.Set(value);
                                     }
                                     else if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
                                     {
                                         // resolve the path to the file
-                                        objectField.Data = fileResolver.ResolveFile((string)objectField.Data, table.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        var value = fileResolver.ResolveFile(objectField.Path, row.Definition.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        field.Set(value);
                                     }
+#if REVISIT_FOR_PATCHING
                                     else // Re-base binding path scenario caused by pyro.exe -bt -bu
                                     {
                                         // by default, use the resolved Data for file lookup
@@ -122,16 +144,18 @@ namespace WixToolset.Core.Bind
                                             }
                                         }
 
-                                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, table.Name, row.SourceLineNumbers, BindStage.Updated);
+                                        objectField.Data = fileResolver.ResolveFile(filePathToResolve, row.Definition.Name, row.SourceLineNumbers, BindStage.Updated);
                                     }
+#endif
                                 }
                                 catch (WixFileNotFoundException)
                                 {
                                     // display the error with source line information
-                                    Messaging.Instance.OnMessage(WixErrors.FileNotFound(row.SourceLineNumbers, (string)objectField.Data));
+                                    Messaging.Instance.OnMessage(WixErrors.FileNotFound(row.SourceLineNumbers, objectField.Path));
                                 }
                             }
 
+#if REVISIT_FOR_PATCHING
                             if (null != objectField.PreviousData)
                             {
                                 objectField.PreviousData = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, objectField.PreviousData, false, out isDefault);
@@ -159,7 +183,7 @@ namespace WixToolset.Core.Bind
                                             if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated)
                                             {
                                                 // resolve the path to the file
-                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, table.Name, row.SourceLineNumbers, BindStage.Normal);
+                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, row.Definition.Name, row.SourceLineNumbers, BindStage.Normal);
                                             }
                                             else
                                             {
@@ -177,7 +201,7 @@ namespace WixToolset.Core.Bind
                                                 }
 
                                                 // resolve the path to the file
-                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, table.Name, row.SourceLineNumbers, BindStage.Target);
+                                                objectField.PreviousData = fileResolver.ResolveFile((string)objectField.PreviousData, row.Definition.Name, row.SourceLineNumbers, BindStage.Target);
 
                                             }
                                         }
@@ -189,6 +213,7 @@ namespace WixToolset.Core.Bind
                                     }
                                 }
                             }
+#endif
                         }
                     }
                 }

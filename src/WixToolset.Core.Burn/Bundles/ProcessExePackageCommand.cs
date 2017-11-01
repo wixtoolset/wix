@@ -11,6 +11,7 @@ namespace WixToolset.Core.Burn.Bundles
     /// </summary>
     internal class ProcessExePackageCommand
     {
+#if TODO
         public RowDictionary<WixBundlePayloadRow> AuthoredPayloads { private get; set; }
 
         public PackageFacade Facade { private get; set; }
@@ -29,5 +30,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Facade.Package.Version = packagePayload.Version;
         }
+#endif
     }
 }

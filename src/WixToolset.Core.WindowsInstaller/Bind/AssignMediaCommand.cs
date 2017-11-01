@@ -66,7 +66,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             // When building merge module, all the files go to "#MergeModule.CABinet".
             if (OutputType.Module == this.Output.Type)
             {
-                Table mergeModuleMediaTable = new Table(null, this.TableDefinitions["Media"]);
+                Table mergeModuleMediaTable = new Table(this.TableDefinitions["Media"]);
                 mergeModuleMediaRow = (MediaRow)mergeModuleMediaTable.CreateRow(null);
                 mergeModuleMediaRow.Cabinet = "#MergeModule.CABinet";
 
@@ -150,8 +150,8 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                 // When building a product, if the current file is not to be compressed or if
                 // the package set not to be compressed, don't cab it.
                 if (OutputType.Product == this.Output.Type &&
-                    (YesNoType.No == facade.File.Compressed ||
-                    (YesNoType.NotSet == facade.File.Compressed && !this.FilesCompressed)))
+                    (!facade.File.Compressed.Value ||
+                    (!facade.File.Compressed.HasValue && !this.FilesCompressed)))
                 {
                     uncompressedFiles.Add(facade);
                     continue;
@@ -270,8 +270,8 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     // When building a product, if the current file is not to be compressed or if
                     // the package set not to be compressed, don't cab it.
                     if (OutputType.Product == this.Output.Type &&
-                        (YesNoType.No == facade.File.Compressed ||
-                        (YesNoType.NotSet == facade.File.Compressed && !this.FilesCompressed)))
+                        (!facade.File.Compressed.Value ||
+                        (!facade.File.Compressed.HasValue && !this.FilesCompressed)))
                     {
                         uncompressedFiles.Add(facade);
                     }

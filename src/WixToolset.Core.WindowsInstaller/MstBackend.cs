@@ -14,6 +14,7 @@ namespace WixToolset.Core.WindowsInstaller
     {
         public BindResult Bind(IBindContext context)
         {
+#if REVISIT_FOR_PATCHING
             var command = new BindTransformCommand();
             command.Extensions = context.Extensions;
             command.TempFilesLocation = context.IntermediateFolder;
@@ -22,6 +23,8 @@ namespace WixToolset.Core.WindowsInstaller
             command.Execute();
 
             return new BindResult(Array.Empty<FileTransfer>(), Array.Empty<string>());
+#endif
+            throw new NotImplementedException();
         }
 
         public bool Inscribe(IInscribeContext context)
@@ -29,7 +32,7 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
-        public Output Unbind(IUnbindContext context)
+        public Intermediate Unbind(IUnbindContext context)
         {
             var command = new UnbindMsiOrMsmCommand(context);
             return command.Execute();

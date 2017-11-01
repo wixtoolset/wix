@@ -10,14 +10,6 @@ namespace WixToolset
     /// </summary>
     public sealed class Inscriber : IMessageHandler
     {
-        // private TempFileCollection tempFiles;
-        private TableDefinitionCollection tableDefinitions;
-
-        public Inscriber()
-        {
-            this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
-        }
-
         /// <summary>
         /// Gets or sets the temp files collection.
         /// </summary>

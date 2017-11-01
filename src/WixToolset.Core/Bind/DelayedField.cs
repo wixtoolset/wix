@@ -16,7 +16,7 @@ namespace WixToolset.Core.Bind
         /// </summary>
         /// <param name="row">Row for the field.</param>
         /// <param name="field">Field needing further resolution.</param>
-        public DelayedField(Row row, Field field)
+        public DelayedField(IntermediateTuple row, IntermediateField field)
         {
             this.Row = row;
             this.Field = field;
@@ -25,11 +25,11 @@ namespace WixToolset.Core.Bind
         /// <summary>
         /// The row containing the field.
         /// </summary>
-        public Row Row { get; }
+        public IntermediateTuple Row { get; }
 
         /// <summary>
         /// The field needing further resolving.
         /// </summary>
-        public Field Field { get; }
+        public IntermediateField Field { get; }
     }
 }

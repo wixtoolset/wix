@@ -18,7 +18,7 @@ namespace WixToolset
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
         private static string XmlElementName = "WixLocalization";
 
-        private Dictionary<string, WixVariableRow> variables;
+        private Dictionary<string, BindVariable> variables;
         private Dictionary<string, LocalizedControl> localizedControls;
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace WixToolset
         public Localizer(IEnumerable<Localization> localizations)
         {
             this.Codepage = -1;
-            this.variables = new Dictionary<string, WixVariableRow>();
+            this.variables = new Dictionary<string, BindVariable>();
             this.localizedControls = new Dictionary<string, LocalizedControl>();
 
             foreach (var localization in localizations)
@@ -37,9 +37,9 @@ namespace WixToolset
                     this.Codepage = localization.Codepage;
                 }
 
-                foreach (WixVariableRow wixVariableRow in localization.Variables)
+                foreach (var variable in localization.Variables)
                 {
-                    Localizer.AddWixVariable(this.variables, wixVariableRow);
+                    Localizer.AddWixVariable(this.variables, variable);
                 }
 
                 foreach (KeyValuePair<string, LocalizedControl> localizedControl in localization.LocalizedControls)
@@ -86,7 +86,7 @@ namespace WixToolset
         /// <param name="tableDefinitions">Collection containing TableDefinitions to use when loading the localization file.</param>
         /// <param name="suppressSchema">Suppress xml schema validation while loading.</param>
         /// <returns>Returns the loaded localization file.</returns>
-        public static Localization ParseLocalizationFile(string path, TableDefinitionCollection tableDefinitions)
+        public static Localization ParseLocalizationFile(string path)
         {
             XElement root = XDocument.Load(path).Root;
             Localization localization = null;
@@ -96,7 +96,7 @@ namespace WixToolset
             {
                 if (Localizer.WxlNamespace == root.Name.Namespace)
                 {
-                    localization = ParseWixLocalizationElement(root, tableDefinitions);
+                    localization = ParseWixLocalizationElement(root);
                 }
                 else // invalid or missing namespace
                 {
@@ -123,7 +123,7 @@ namespace WixToolset
         /// </summary>
         /// <param name="variables">Dictionary of variable rows.</param>
         /// <param name="wixVariableRow">Row to add to the variables dictionary.</param>
-        private static void AddWixVariable(IDictionary<string, WixVariableRow> variables, WixVariableRow wixVariableRow)
+        private static void AddWixVariable(IDictionary<string, BindVariable> variables, BindVariable wixVariableRow)
         {
             if (!variables.TryGetValue(wixVariableRow.Id, out var existingWixVariableRow) || (existingWixVariableRow.Overridable && !wixVariableRow.Overridable))
             {
@@ -139,7 +139,7 @@ namespace WixToolset
         /// Parses the WixLocalization element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        private static Localization ParseWixLocalizationElement(XElement node, TableDefinitionCollection tableDefinitions)
+        private static Localization ParseWixLocalizationElement(XElement node)
         {
             int codepage = -1;
             string culture = null;
@@ -171,7 +171,7 @@ namespace WixToolset
                 }
             }
 
-            Dictionary<string, WixVariableRow> variables = new Dictionary<string,WixVariableRow>();
+            Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
             Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
 
             foreach (XElement child in node.Elements())
@@ -181,7 +181,7 @@ namespace WixToolset
                     switch (child.Name.LocalName)
                     {
                         case "String":
-                            Localizer.ParseString(child, variables, tableDefinitions);
+                            Localizer.ParseString(child, variables);
                             break;
 
                         case "UI":
@@ -206,7 +206,7 @@ namespace WixToolset
         /// Parse a localization string into a WixVariableRow.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        private static void ParseString(XElement node, IDictionary<string, WixVariableRow> variables, TableDefinitionCollection tableDefinitions)
+        private static void ParseString(XElement node, IDictionary<string, BindVariable> variables)
         {
             string id = null;
             bool overridable = false;
@@ -251,12 +251,15 @@ namespace WixToolset
 
             if (!Messaging.Instance.EncounteredError)
             {
-                WixVariableRow wixVariableRow = new WixVariableRow(sourceLineNumbers, tableDefinitions["WixVariable"]);
-                wixVariableRow.Id = id;
-                wixVariableRow.Overridable = overridable;
-                wixVariableRow.Value = value;
+                var variable = new BindVariable
+                {
+                    SourceLineNumbers = sourceLineNumbers,
+                    Id = id,
+                    Overridable = overridable,
+                    Value = value,
+                };
 
-                Localizer.AddWixVariable(variables, wixVariableRow);
+                Localizer.AddWixVariable(variables, variable);
             }
         }
 

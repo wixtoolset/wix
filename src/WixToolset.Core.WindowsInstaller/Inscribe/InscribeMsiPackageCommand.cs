@@ -47,8 +47,8 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                 Dictionary<string, string> certificates = new Dictionary<string, string>();
 
                 // Reset the in-memory tables for this new database
-                Table digitalSignatureTable = new Table(null, this.TableDefinitions["MsiDigitalSignature"]);
-                Table digitalCertificateTable = new Table(null, this.TableDefinitions["MsiDigitalCertificate"]);
+                Table digitalSignatureTable = new Table(this.TableDefinitions["MsiDigitalSignature"]);
+                Table digitalCertificateTable = new Table(this.TableDefinitions["MsiDigitalCertificate"]);
 
                 // If any digital signature records exist that are not of the media type, preserve them
                 if (database.TableExists("MsiDigitalSignature"))

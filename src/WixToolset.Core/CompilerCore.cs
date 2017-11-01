@@ -15,7 +15,7 @@ namespace WixToolset
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using Wix = WixToolset.Data.Serialize;
 
@@ -40,7 +40,7 @@ namespace WixToolset
     /// <summary>
     /// Core class for the compiler.
     /// </summary>
-    internal sealed class CompilerCore : ICompilerCore
+    internal sealed class CompilerCore //: ICompilerCore
     {
         internal static readonly XNamespace W3SchemaPrefix = "http://www.w3.org/";
         internal static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
@@ -140,10 +140,9 @@ namespace WixToolset
                 "REMOVE"
             });
 
-        private TableDefinitionCollection tableDefinitions;
         private Dictionary<XNamespace, ICompilerExtension> extensions;
+        private ITupleDefinitionCreator creator;
         private Intermediate intermediate;
-        private bool showPedanticMessages;
 
         private HashSet<string> activeSectionInlinedDirectoryIds;
         private HashSet<string> activeSectionSimpleReferences;
@@ -152,12 +151,11 @@ namespace WixToolset
         /// Constructor for all compiler core.
         /// </summary>
         /// <param name="intermediate">The Intermediate object representing compiled source document.</param>
-        /// <param name="tableDefinitions">The loaded table definition collection.</param>
         /// <param name="extensions">The WiX extensions collection.</param>
-        internal CompilerCore(Intermediate intermediate, TableDefinitionCollection tableDefinitions, Dictionary<XNamespace, ICompilerExtension> extensions)
+        internal CompilerCore(Intermediate intermediate, ITupleDefinitionCreator creator, Dictionary<XNamespace, ICompilerExtension> extensions)
         {
-            this.tableDefinitions = tableDefinitions;
             this.extensions = extensions;
+            this.creator = creator;
             this.intermediate = intermediate;
         }
 
@@ -165,7 +163,7 @@ namespace WixToolset
         /// Gets the section the compiler is currently emitting symbols into.
         /// </summary>
         /// <value>The section the compiler is currently emitting symbols into.</value>
-        public Section ActiveSection { get; private set; }
+        public IntermediateSection ActiveSection { get; private set; }
 
         /// <summary>
         /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
@@ -177,29 +175,13 @@ namespace WixToolset
         /// Gets whether the compiler core encountered an error while processing.
         /// </summary>
         /// <value>Flag if core encountered an error during processing.</value>
-        public bool EncounteredError
-        {
-            get { return Messaging.Instance.EncounteredError; }
-        }
+        public bool EncounteredError => Messaging.Instance.EncounteredError;
 
         /// <summary>
         /// Gets or sets the option to show pedantic messages.
         /// </summary>
         /// <value>The option to show pedantic messages.</value>
-        public bool ShowPedanticMessages
-        {
-            get { return this.showPedanticMessages; }
-            set { this.showPedanticMessages = value; }
-        }
-
-        /// <summary>
-        /// Gets the table definitions used by the compiler core.
-        /// </summary>
-        /// <value>Table definition collection.</value>
-        public TableDefinitionCollection TableDefinitions
-        {
-            get { return this.tableDefinitions; }
-        }
+        public bool ShowPedanticMessages { get; set; }
 
         /// <summary>
         /// Convert a bit array into an int value.
@@ -483,31 +465,38 @@ namespace WixToolset
         /// Creates a row in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tableName">Name of table to create row in.</param>
+        /// <param name="tupleType">Name of table to create row in.</param>
         /// <returns>New row.</returns>
-        public Row CreateRow(SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
+        public IntermediateTuple CreateRow(SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
         {
-            return this.CreateRow(sourceLineNumbers, tableName, this.ActiveSection, identifier);
+            return this.CreateRow(sourceLineNumbers, tupleType, this.ActiveSection, identifier);
         }
 
         /// <summary>
         /// Creates a row in the active given <paramref name="section"/>.
         /// </summary>
         /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tableName">Name of table to create row in.</param>
+        /// <param name="tupleType">Name of table to create row in.</param>
         /// <param name="section">The section to which the row is added. If null, the row is added to the active section.</param>
         /// <returns>New row.</returns>
-        internal Row CreateRow(SourceLineNumber sourceLineNumbers, string tableName, Section section, Identifier identifier = null)
+        internal IntermediateTuple CreateRow(SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, IntermediateSection section, Identifier identifier = null)
         {
-            TableDefinition tableDefinition = this.tableDefinitions[tableName];
-            Table table = section.EnsureTable(tableDefinition);
-            Row row = table.CreateRow(sourceLineNumbers);
+            var tupleDefinition = TupleDefinitions.ByType(tupleType);
+            var row = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
 
             if (null != identifier)
             {
-                row.Access = identifier.Access;
-                row[0] = identifier.Id;
+                if (row.Definition.FieldDefinitions[0].Type == IntermediateFieldType.Number)
+                {
+                    row.Set(0, Convert.ToInt32(identifier.Id));
+                }
+                else
+                {
+                    row.Set(0, identifier.Id);
+                }
             }
+
+            section.Tuples.Add(row);
 
             return row;
         }
@@ -572,9 +561,9 @@ namespace WixToolset
         /// <returns>New row.</returns>
         public void CreatePatchFamilyChildReference(SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys)
         {
-            Row patchReferenceRow = this.CreateRow(sourceLineNumbers, "WixPatchRef");
-            patchReferenceRow[0] = tableName;
-            patchReferenceRow[1] = String.Join("/", primaryKeys);
+            var patchReferenceRow = this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixPatchRef);
+            patchReferenceRow.Set(0, tableName);
+            patchReferenceRow.Set(1, String.Join("/", primaryKeys));
         }
 
         /// <summary>
@@ -615,12 +604,13 @@ namespace WixToolset
                 }
 
                 id = this.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
-                Row row = this.CreateRow(sourceLineNumbers, "Registry", id);
-                row[1] = root;
-                row[2] = key;
-                row[3] = name;
-                row[4] = value;
-                row[5] = componentId;
+
+                var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.Registry, id);
+                row.Set(1, root);
+                row.Set(2, key);
+                row.Set(3, name);
+                row.Set(4, value);
+                row.Set(5, componentId);
             }
 
             return id;
@@ -656,8 +646,8 @@ namespace WixToolset
                 // If this simple reference hasn't been added to the active section already, add it.
                 if (this.activeSectionSimpleReferences.Add(id))
                 {
-                    WixSimpleReferenceRow wixSimpleReferenceRow = (WixSimpleReferenceRow)this.CreateRow(sourceLineNumbers, "WixSimpleReference");
-                    wixSimpleReferenceRow.TableName = tableName;
+                    var wixSimpleReferenceRow = (WixSimpleReferenceTuple)this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSimpleReference);
+                    wixSimpleReferenceRow.Table = tableName;
                     wixSimpleReferenceRow.PrimaryKeys = joinedKeys;
                 }
             }
@@ -685,11 +675,11 @@ namespace WixToolset
                     throw new ArgumentNullException("childId");
                 }
 
-                WixGroupRow WixGroupRow = (WixGroupRow)this.CreateRow(sourceLineNumbers, "WixGroup");
-                WixGroupRow.ParentId = parentId;
-                WixGroupRow.ParentType = parentType;
-                WixGroupRow.ChildId = childId;
-                WixGroupRow.ChildType = childType;
+                var row = (WixGroupTuple)this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixGroup);
+                row.ParentId = parentId;
+                row.ParentType = parentType;
+                row.ChildId = childId;
+                row.ChildType = childType;
             }
         }
 
@@ -703,13 +693,13 @@ namespace WixToolset
         {
             if (!this.EncounteredError)
             {
-                Row row = this.CreateRow(sourceLineNumbers, "WixEnsureTable");
-                row[0] = tableName;
+                var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixEnsureTable);
+                row.Set(0, tableName);
 
                 // We don't add custom table definitions to the tableDefinitions collection,
                 // so if it's not in there, it better be a custom table. If the Id is just wrong,
                 // instead of a custom table, we get an unresolved reference at link time.
-                if (!this.tableDefinitions.Contains(tableName))
+                if (!this.creator.TryGetTupleDefinitionByName(tableName, out var ignored))
                 {
                     this.CreateSimpleReference(sourceLineNumbers, "WixCustomTable", tableName);
                 }
@@ -1016,7 +1006,7 @@ namespace WixToolset
 
                     string uppercaseGuid = guid.ToString().ToUpper(CultureInfo.InvariantCulture);
 
-                    if (this.showPedanticMessages)
+                    if (this.ShowPedanticMessages)
                     {
                         if (uppercaseGuid != value)
                         {
@@ -1505,8 +1495,7 @@ namespace WixToolset
                 return;
             }
 
-            ICompilerExtension extension;
-            if (this.TryFindExtension(attribute.Name.NamespaceName, out extension))
+            if (this.TryFindExtension(attribute.Name.NamespaceName, out var extension))
             {
                 extension.ParseAttribute(element, attribute, context);
             }
@@ -1525,8 +1514,7 @@ namespace WixToolset
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         public void ParseExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context = null)
         {
-            ICompilerExtension extension;
-            if (this.TryFindExtension(element.Name.Namespace, out extension))
+            if (this.TryFindExtension(element.Name.Namespace, out var extension))
             {
                 SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(parentElement);
                 extension.ParseElement(parentElement, element, context);
@@ -1651,9 +1639,9 @@ namespace WixToolset
         /// <param name="type">Type of section to create.</param>
         /// <param name="codepage">Codepage for the resulting database for this ection.</param>
         /// <returns>New section.</returns>
-        internal Section CreateActiveSection(string id, SectionType type, int codepage)
+        internal IntermediateSection CreateActiveSection(string id, SectionType type, int codepage, string compilationId)
         {
-            this.ActiveSection = this.CreateSection(id, type, codepage);
+            this.ActiveSection = this.CreateSection(id, type, codepage, compilationId);
 
             this.activeSectionInlinedDirectoryIds = new HashSet<string>();
             this.activeSectionSimpleReferences = new HashSet<string>();
@@ -1668,12 +1656,14 @@ namespace WixToolset
         /// <param name="type">Type of section to create.</param>
         /// <param name="codepage">Codepage for the resulting database for this ection.</param>
         /// <returns>New section.</returns>
-        internal Section CreateSection(string id, SectionType type, int codepage)
+        internal IntermediateSection CreateSection(string id, SectionType type, int codepage, string compilationId)
         {
-            Section newSection = new Section(id, type, codepage);
-            this.intermediate.AddSection(newSection);
+            var section = new IntermediateSection(id, type, codepage);
+            section.CompilationId = compilationId;
 
-            return newSection;
+            this.intermediate.Sections.Add(section);
+
+            return section;
         }
 
         /// <summary>
@@ -1690,11 +1680,11 @@ namespace WixToolset
         {
             if (!this.EncounteredError)
             {
-                WixComplexReferenceRow wixComplexReferenceRow = (WixComplexReferenceRow)this.CreateRow(sourceLineNumbers, "WixComplexReference");
-                wixComplexReferenceRow.ParentId = parentId;
+                var wixComplexReferenceRow = (WixComplexReferenceTuple)this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixComplexReference);
+                wixComplexReferenceRow.Parent = parentId;
                 wixComplexReferenceRow.ParentType = parentType;
                 wixComplexReferenceRow.ParentLanguage = parentLanguage;
-                wixComplexReferenceRow.ChildId = childId;
+                wixComplexReferenceRow.Child = childId;
                 wixComplexReferenceRow.ChildType = childType;
                 wixComplexReferenceRow.IsPrimary = isPrimary;
             }
@@ -1775,9 +1765,9 @@ namespace WixToolset
                 }
             }
 
-            Row row = this.CreateRow(sourceLineNumbers, "Directory", id);
-            row[1] = parentId;
-            row[2] = defaultDir;
+            var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.Directory, id);
+            row.Set(1, parentId);
+            row.Set(2, defaultDir);
             return id;
         }
 

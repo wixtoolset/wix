@@ -34,13 +34,13 @@ namespace WixToolset
         /// Gets or sets the active subStorage used for binding.
         /// </summary>
         /// <value>The subStorage object.</value>
-        public SubStorage ActiveSubStorage { get; set; }
+        //public SubStorage ActiveSubStorage { get; set; }
 
         /// <summary>
         /// Gets or sets the output object used for binding.
         /// </summary>
         /// <value>The output object.</value>
-        public Output Output { get; set; }
+        public Intermediate Intermediate { get; set; }
 
         /// <summary>
         /// Gets or sets the path to the temp files location.

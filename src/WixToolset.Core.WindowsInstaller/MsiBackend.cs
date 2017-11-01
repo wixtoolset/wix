@@ -28,7 +28,7 @@ namespace WixToolset.Core.WindowsInstaller
             return command.Execute();
         }
 
-        public Output Unbind(IUnbindContext context)
+        public Intermediate Unbind(IUnbindContext context)
         {
             var command = new UnbindMsiOrMsmCommand(context);
             return command.Execute();

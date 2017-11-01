@@ -11,10 +11,12 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal class WixComponentSearchInfo : WixSearchInfo
     {
+#if TODO
         public WixComponentSearchInfo(Row row)
             : this((string)row[0], (string)row[1], (string)row[2], (int)row[3])
         {
         }
+#endif
 
         public WixComponentSearchInfo(string id, string guid, string productCode, int attributes)
             : base(id)
@@ -60,5 +62,4 @@ namespace WixToolset.Core.Burn
             writer.WriteEndElement();
         }
     }
-
 }

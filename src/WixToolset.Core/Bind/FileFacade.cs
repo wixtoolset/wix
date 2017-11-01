@@ -3,19 +3,18 @@
 namespace WixToolset.Core.Bind
 {
     using System.Collections.Generic;
-    using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
 
     public class FileFacade
     {
-        public FileFacade(FileRow file, WixFileRow wixFile, WixDeltaPatchFileRow deltaPatchFile)
+        public FileFacade(FileTuple file, WixFileTuple wixFile, WixDeltaPatchFileTuple deltaPatchFile)
         {
             this.File = file;
             this.WixFile = wixFile;
             this.DeltaPatchFile = deltaPatchFile;
         }
 
-        public FileFacade(bool fromModule, FileRow file, WixFileRow wixFile)
+        public FileFacade(bool fromModule, FileTuple file, WixFileTuple wixFile)
         {
             this.FromModule = fromModule;
             this.File = file;
@@ -24,21 +23,21 @@ namespace WixToolset.Core.Bind
 
         public bool FromModule { get; private set; }
 
-        public FileRow File { get; private set; }
+        public FileTuple File { get; private set; }
 
-        public WixFileRow WixFile { get; private set; }
+        public WixFileTuple WixFile { get; private set; }
 
-        public WixDeltaPatchFileRow DeltaPatchFile { get; private set; }
+        public WixDeltaPatchFileTuple DeltaPatchFile { get; private set; }
 
         /// <summary>
         /// Gets the set of MsiAssemblyName rows created for this file.
         /// </summary>
         /// <value>RowCollection of MsiAssemblyName table.</value>
-        public List<Row> AssemblyNames { get; set; }
+        public List<MsiAssemblyNameTuple> AssemblyNames { get; set; }
 
         /// <summary>
         /// Gets or sets the MsiFileHash row for this file.
         /// </summary>
-        public Row Hash { get; set; }
+        public MsiFileHashTuple Hash { get; set; }
     }
 }

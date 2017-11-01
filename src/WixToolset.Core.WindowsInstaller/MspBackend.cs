@@ -26,8 +26,9 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
-        public Output Unbind(IUnbindContext context)
+        public Intermediate Unbind(IUnbindContext context)
         {
+#if REVISIT_FOR_PATCHING
             Output patch;
 
             // patch files are essentially database files (use a special flag to let the API know its a patch file)
@@ -65,7 +66,7 @@ namespace WixToolset.Core.WindowsInstaller
                             string transformFile = Path.Combine(context.IntermediateFolder, String.Concat("Transform", Path.DirectorySeparatorChar, subStorageName, ".mst"));
 
                             // ensure the parent directory exists
-                            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(transformFile));
+                            Directory.CreateDirectory(Path.GetDirectoryName(transformFile));
 
                             // copy the substorage to a new storage for the transform file
                             using (Storage subStorage = storage.OpenStorage(subStorageName))
@@ -107,6 +108,8 @@ namespace WixToolset.Core.WindowsInstaller
             }
 
             return patch;
+#endif
+            throw new NotImplementedException();
         }
     }
 }

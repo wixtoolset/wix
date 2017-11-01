@@ -19,6 +19,7 @@ namespace WixToolset
     /// </summary>
     public sealed class Melter
     {
+#if TODO
         private MelterCore core;
         private Decompiler decompiler;
 
@@ -394,5 +395,6 @@ namespace WixToolset
                 }
             }
         }
+#endif
     }
 }

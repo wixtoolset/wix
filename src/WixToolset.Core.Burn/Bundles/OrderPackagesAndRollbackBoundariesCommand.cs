@@ -9,6 +9,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class OrderPackagesAndRollbackBoundariesCommand
     {
+#if TODO
         public Table WixGroupTable { private get; set; }
 
         public RowDictionary<WixBundleRollbackBoundaryRow> Boundaries { private get; set; }
@@ -141,5 +142,6 @@ namespace WixToolset.Core.Burn.Bundles
             this.OrderedPackageFacades = orderedFacades;
             this.UsedRollbackBoundaries = usedBoundaries;
         }
+#endif
     }
 }

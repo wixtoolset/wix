@@ -122,7 +122,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                         {
                             if (ColumnType.Object == columnDefinition.Type)
                             {
-                                importTable = new Table(table.Section, table.Definition);
+                                importTable = new Table(table.Definition);
                                 hasBinaryColumn = true;
                                 break;
                             }

@@ -10,14 +10,6 @@ namespace WixToolset
     /// </summary>
     internal class BinderCore : IBinderCore
     {
-        /// <summary>
-        /// Constructor for binder core.
-        /// </summary>
-        internal BinderCore()
-        {
-            this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
-        }
-
         public IBinderFileManagerCore FileManagerCore { get; set; }
 
         /// <summary>
@@ -28,12 +20,6 @@ namespace WixToolset
         {
             get { return Messaging.Instance.EncounteredError; }
         }
-
-        /// <summary>
-        /// Gets the table definitions used by the Binder.
-        /// </summary>
-        /// <value>Table definitions used by the binder.</value>
-        public TableDefinitionCollection TableDefinitions { get; private set; }
 
         /// <summary>
         /// Generate an identifier by hashing data from the row.

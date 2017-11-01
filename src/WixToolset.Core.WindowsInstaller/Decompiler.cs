@@ -24,7 +24,7 @@ namespace WixToolset
     public class Decompiler
     {
         private static readonly Regex NullSplitter = new Regex(@"\[~]");
-
+#if TODO
         private int codepage;
         private bool compressed;
         private bool shortNames;
@@ -334,7 +334,7 @@ namespace WixToolset
 
                 return deleted;
             }
-#endif 
+#endif
             return true;
         }
 
@@ -9352,5 +9352,6 @@ namespace WixToolset
                 return Wix.MajorUpgrade.ScheduleType.afterInstallFinalize;
             }
         }
+#endif
     }
 }

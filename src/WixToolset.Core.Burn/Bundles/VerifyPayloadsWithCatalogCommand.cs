@@ -13,6 +13,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class VerifyPayloadsWithCatalogCommand
     {
+#if TODO
         public IEnumerable<WixBundleCatalogRow> Catalogs { private get; set; }
 
         public IEnumerable<WixBundlePayloadRow> Payloads { private get; set; }
@@ -144,5 +145,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             public string FullPath { get; set; }
         }
+#endif
     }
 }

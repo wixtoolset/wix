@@ -3,18 +3,30 @@
 namespace WixToolset.Core
 {
     using System;
+    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     public class WixToolsetServiceProvider : IServiceProvider
     {
         private ExtensionManager extensionManager;
+        private TupleDefinitionCreator tupleDefinitionCreator;
 
         public object GetService(Type serviceType)
         {
             if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));
 
             // Transients.
+            if (serviceType == typeof(ICompileContext))
+            {
+                return new CompileContext(this);
+            }
+
+            if (serviceType == typeof(ILinkContext))
+            {
+                return new LinkContext(this);
+            }
+
             if (serviceType == typeof(IBindContext))
             {
                 return new BindContext(this);
@@ -38,7 +50,12 @@ namespace WixToolset.Core
             // Singletons.
             if (serviceType == typeof(IExtensionManager))
             {
-                return extensionManager = extensionManager ?? new ExtensionManager();
+                return this.extensionManager = this.extensionManager ?? new ExtensionManager();
+            }
+
+            if (serviceType == typeof(ITupleDefinitionCreator))
+            {
+                return this.tupleDefinitionCreator = this.tupleDefinitionCreator ?? new TupleDefinitionCreator(this);
             }
 
             throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));

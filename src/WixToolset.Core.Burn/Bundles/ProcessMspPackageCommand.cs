@@ -18,6 +18,7 @@ namespace WixToolset.Core.Burn.Bundles
     /// </summary>
     internal class ProcessMspPackageCommand
     {
+#if TODO
         private const string PatchMetadataFormat = "SELECT `Value` FROM `MsiPatchMetadata` WHERE `Property` = '{0}'";
         private static readonly Encoding XmlOutputEncoding = new UTF8Encoding(false);
 
@@ -185,5 +186,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             return false;
         }
+#endif
     }
 }

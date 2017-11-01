@@ -13,19 +13,6 @@ namespace WixToolset.Core
     /// </summary>
     public sealed class Unbinder
     {
-        private TableDefinitionCollection tableDefinitions;
-        private ArrayList unbinderExtensions;
-        // private TempFileCollection tempFiles;
-
-        /// <summary>
-        /// Creates a new unbinder object with a default set of table definitions.
-        /// </summary>
-        public Unbinder()
-        {
-            this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
-            this.unbinderExtensions = new ArrayList();
-        }
-
         public IEnumerable<IBackendFactory> BackendFactories { get; }
 
         /// <summary>
@@ -54,44 +41,13 @@ namespace WixToolset.Core
         public string TempFilesLocation => Path.GetTempPath();
 
         /// <summary>
-        /// Adds extension data.
-        /// </summary>
-        /// <param name="data">The extension data to add.</param>
-        public void AddExtensionData(IExtensionData data)
-        {
-            if (null != data.TableDefinitions)
-            {
-                foreach (TableDefinition tableDefinition in data.TableDefinitions)
-                {
-                    if (!this.tableDefinitions.Contains(tableDefinition.Name))
-                    {
-                        this.tableDefinitions.Add(tableDefinition);
-                    }
-                    else
-                    {
-                        Messaging.Instance.OnMessage(WixErrors.DuplicateExtensionTable(data.GetType().ToString(), tableDefinition.Name));
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds an extension.
-        /// </summary>
-        /// <param name="extension">The extension to add.</param>
-        public void AddExtension(IUnbinderExtension extension)
-        {
-            this.unbinderExtensions.Add(extension);
-        }
-
-        /// <summary>
         /// Unbind a Windows Installer file.
         /// </summary>
         /// <param name="file">The Windows Installer file.</param>
         /// <param name="outputType">The type of output to create.</param>
         /// <param name="exportBasePath">The path where files should be exported.</param>
         /// <returns>The output representing the database.</returns>
-        public Output Unbind(string file, OutputType outputType, string exportBasePath)
+        public Intermediate Unbind(string file, OutputType outputType, string exportBasePath)
         {
             if (!File.Exists(file))
             {

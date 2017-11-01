@@ -18,8 +18,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public IUnbindContext Context { get; }
 
-        public Output Execute()
+        public Intermediate Execute()
         {
+#if REVISIT_FOR_PATCHING
             Output output;
 
             try
@@ -48,6 +49,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             return output;
+#endif
+            throw new NotImplementedException();
         }
     }
 }

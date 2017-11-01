@@ -11,10 +11,12 @@ namespace WixToolset.Core.Burn
     /// </summary>
     internal class WixFileSearchInfo : WixSearchInfo
     {
+#if TODO
         public WixFileSearchInfo(Row row)
             : this((string)row[0], (string)row[1], (int)row[9])
         {
         }
+#endif
 
         public WixFileSearchInfo(string id, string path, int attributes)
             : base(id)

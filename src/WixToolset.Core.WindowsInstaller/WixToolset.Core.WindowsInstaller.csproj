@@ -22,6 +22,8 @@
     <ProjectReference Include="$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
 
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
+
+    <ProjectReference Include="..\WixToolset.Data.WindowsInstaller\WixToolset.Data.WindowsInstaller.csproj" />
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
   </ItemGroup>
 

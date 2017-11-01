@@ -41,7 +41,7 @@ namespace WixToolset.Core
 
         public string IntermediateFolder { get; set; }
 
-        public Output IntermediateRepresentation { get; set; }
+        public Intermediate IntermediateRepresentation { get; set; }
 
         public string OutputPath { get; set; }
 

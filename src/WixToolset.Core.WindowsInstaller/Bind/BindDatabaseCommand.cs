@@ -39,7 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
             this.Extensions = context.Extensions;
-            this.Output = context.IntermediateRepresentation;
+            this.Intermediate = context.IntermediateRepresentation;
             this.OutputPath = context.OutputPath;
             this.PdbFile = context.OutputPdbPath;
             this.IntermediateFolder = context.IntermediateFolder;
@@ -69,9 +69,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<IBinderExtension> Extensions { get; }
 
-        private IEnumerable<InspectorExtension> InspectorExtensions { get; }
-
         private string PdbFile { get; }
+
+        private Intermediate Intermediate { get; }
 
         private Output Output { get; }
 
@@ -95,6 +95,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
+            this.Intermediate.Save(this.OutputPath);
+#if FINISH
             List<FileTransfer> fileTransfers = new List<FileTransfer>();
 
             HashSet<string> suppressedTableNames = new HashSet<string>();
@@ -107,6 +109,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             this.LocalizeUI(this.Output.Tables);
+
+            this.Output = CreateOutputFromIR(this.Intermediate);
 
             // Process the summary information table before the other tables.
             bool compressed;
@@ -1278,6 +1282,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.TempFilesLocation = this.IntermediateFolder;
             command.Codepage = this.Codepage;
             command.Execute();
+#endif
         }
     }
 }

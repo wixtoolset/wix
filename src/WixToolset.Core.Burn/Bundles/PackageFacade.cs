@@ -6,6 +6,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class PackageFacade
     {
+#if TODO
         private PackageFacade(WixBundlePackageRow package)
         {
             this.Package = package;
@@ -54,5 +55,6 @@ namespace WixToolset.Core.Burn.Bundles
         /// the relationship with the extension makes it much trickier to pull off.
         /// </remarks>
         public ProvidesDependencyCollection Provides { get; private set; }
+#endif
     }
 }

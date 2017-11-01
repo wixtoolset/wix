@@ -11,6 +11,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class AutomaticallySlipstreamPatchesCommand
     {
+#if TODO
         public IEnumerable<PackageFacade> PackageFacades { private get; set; }
 
         public Table WixBundlePatchTargetCodeTable { private get; set; }
@@ -108,5 +109,6 @@ namespace WixToolset.Core.Burn.Bundles
                 }
             }
         }
+#endif
     }
 }

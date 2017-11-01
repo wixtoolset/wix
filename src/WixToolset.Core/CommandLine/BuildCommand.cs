@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
@@ -79,21 +79,19 @@ namespace WixToolset.Core
                 return 1;
             }
 
-            var tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
-
             if (this.OutputType == OutputType.Library)
             {
-                var library = this.LibraryPhase(intermediates, tableDefinitions);
+                var library = this.LibraryPhase(intermediates);
 
                 library?.Save(this.OutputPath);
             }
             else
             {
-                var output = this.LinkPhase(intermediates, tableDefinitions);
+                var output = this.LinkPhase(intermediates);
 
                 if (!Messaging.Instance.EncounteredError)
                 {
-                    this.BindPhase(output, tableDefinitions);
+                    this.BindPhase(output);
                 }
             }
 
@@ -104,15 +102,26 @@ namespace WixToolset.Core
         {
             var intermediates = new List<Intermediate>();
 
-            var preprocessor = new Preprocessor();
-
-            var compiler = new Compiler();
 
             foreach (var sourceFile in this.SourceFiles)
             {
+                //var preprocessContext = this.ServiceProvider.GetService<IPreprocessContext>();
+                //preprocessContext.SourcePath = sourceFile.SourcePath;
+                //preprocessContext.Variables = this.PreprocessorVariables;
+
+                var preprocessor = new Preprocessor();
                 var document = preprocessor.Process(sourceFile.SourcePath, this.PreprocessorVariables);
 
-                var intermediate = compiler.Compile(document);
+                var compileContext = this.ServiceProvider.GetService<ICompileContext>();
+                compileContext.Messaging = Messaging.Instance;
+                compileContext.CompilationId = Guid.NewGuid().ToString("N");
+                compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
+                compileContext.OutputPath = sourceFile.OutputPath;
+                compileContext.Platform = Platform.X86; // TODO: set this correctly
+                compileContext.Source = document;
+
+                var compiler = new Compiler();
+                var intermediate = compiler.Compile(compileContext);
 
                 intermediates.Add(intermediate);
             }
@@ -120,9 +129,9 @@ namespace WixToolset.Core
             return intermediates;
         }
 
-        private Library LibraryPhase(IEnumerable<Intermediate> intermediates, TableDefinitionCollection tableDefinitions)
+        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates)
         {
-            var localizations = this.LoadLocalizationFiles(tableDefinitions).ToList();
+            var localizations = this.LoadLocalizationFiles().ToList();
 
             // If there was an error adding localization files, then bail.
             if (Messaging.Instance.EncounteredError)
@@ -137,35 +146,34 @@ namespace WixToolset.Core
             context.BindPaths = this.BindPaths;
             context.Extensions = this.ExtensionManager.Create<ILibrarianExtension>();
             context.Localizations = localizations;
-            context.Sections = intermediates.SelectMany(i => i.Sections).ToList();
+            context.LibraryId = Guid.NewGuid().ToString("N");
+            context.Intermediates = intermediates;
             context.WixVariableResolver = resolver;
 
-            var librarian = new Librarian(context);
-
-            return librarian.Combine();
+            var librarian = new Librarian();
+            return librarian.Combine(context);
         }
 
-        private Output LinkPhase(IEnumerable<Intermediate> intermediates, TableDefinitionCollection tableDefinitions)
+        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates)
         {
-            var sections = intermediates.SelectMany(i => i.Sections).ToList();
+            var creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
 
-            sections.AddRange(this.SectionsFromLibraries(tableDefinitions));
+            var libraries = this.LoadLibraries(creator);
+
+            var context = this.ServiceProvider.GetService<ILinkContext>();
+            context.Messaging = Messaging.Instance;
+            context.Extensions = this.ExtensionManager.Create<ILinkerExtension>();
+            context.Intermediates = intermediates.Union(libraries).ToList();
+            context.ExpectedOutputType = this.OutputType;
 
             var linker = new Linker();
-
-            foreach (var data in this.ExtensionManager.Create<IExtensionData>())
-            {
-                linker.AddExtensionData(data);
-            }
-
-            var output = linker.Link(sections, this.OutputType);
-
+            var output = linker.Link(context);
             return output;
         }
 
-        private void BindPhase(Output output, TableDefinitionCollection tableDefinitions)
+        private void BindPhase(Intermediate output)
         {
-            var localizations = this.LoadLocalizationFiles(tableDefinitions).ToList();
+            var localizations = this.LoadLocalizationFiles().ToList();
 
             var localizer = new Localizer(localizations);
 
@@ -199,13 +207,13 @@ namespace WixToolset.Core
             context.BuiltOutputsFile = this.BuiltOutputsFile;
             context.WixprojectFile = this.WixProjectFile;
 
-            var binder = new Binder(context);
-            binder.Bind();
+            var binder = new Binder();
+            binder.Bind(context);
         }
 
-        private IEnumerable<Section> SectionsFromLibraries(TableDefinitionCollection tableDefinitions)
+        private IEnumerable<Intermediate> LoadLibraries(ITupleDefinitionCreator creator)
         {
-            var sections = new List<Section>();
+            var libraries = new List<Intermediate>();
 
             if (this.LibraryFiles != null)
             {
@@ -213,9 +221,9 @@ namespace WixToolset.Core
                 {
                     try
                     {
-                        var library = Library.Load(libraryFile, tableDefinitions, false);
+                        var library = Intermediate.Load(libraryFile, creator);
 
-                        sections.AddRange(library.Sections);
+                        libraries.Add(library);
                     }
                     catch (WixCorruptFileException e)
                     {
@@ -228,28 +236,28 @@ namespace WixToolset.Core
                 }
             }
 
-            return sections;
+            return libraries;
         }
 
-        private IEnumerable<Localization> LoadLocalizationFiles(TableDefinitionCollection tableDefinitions)
+        private IEnumerable<Localization> LoadLocalizationFiles()
         {
             foreach (var loc in this.LocFiles)
             {
-                var localization = Localizer.ParseLocalizationFile(loc, tableDefinitions);
+                var localization = Localizer.ParseLocalizationFile(loc);
 
                 yield return localization;
             }
         }
 
-        private static WixVariableResolver CreateWixResolverWithVariables(Localizer localizer, Output output)
+        private static WixVariableResolver CreateWixResolverWithVariables(Localizer localizer, Intermediate output)
         {
             var resolver = new WixVariableResolver(localizer);
 
             // Gather all the wix variables.
-            Table wixVariableTable = output?.Tables["WixVariable"];
-            if (null != wixVariableTable)
+            var wixVariables = output?.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
+            if (wixVariables != null)
             {
-                foreach (WixVariableRow wixVariableRow in wixVariableTable.Rows)
+                foreach (var wixVariableRow in wixVariables)
                 {
                     resolver.AddVariable(wixVariableRow);
                 }

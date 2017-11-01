@@ -23,6 +23,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
         public void Execute()
         {
+#if REVISIT_FOR_PATCHING
             bool optimizePatchSizeForLargeFiles = false;
             PatchSymbolFlagsType apiPatchingSymbolFlags = 0;
 
@@ -82,6 +83,8 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     }
                 }
             }
+#endif 
+            throw new NotImplementedException();
         }
     }
 }

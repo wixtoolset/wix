@@ -22,6 +22,7 @@ namespace WixToolset.Core.Burn.Bundles
     /// </summary>
     internal class ProcessMsiPackageCommand
     {
+#if TODO
         private const string PropertySqlFormat = "SELECT `Value` FROM `Property` WHERE `Property` = '{0}'";
 
         public RowDictionary<WixBundlePayloadRow> AuthoredPayloads { private get; set; }
@@ -572,5 +573,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             return String.Format(CultureInfo.InvariantCulture, ProcessMsiPackageCommand.PropertySqlFormat, property);
         }
+#endif
     }
 }

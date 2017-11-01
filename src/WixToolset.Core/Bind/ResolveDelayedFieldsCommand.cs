@@ -34,19 +34,19 @@ namespace WixToolset.Core.Bind
             {
                 try
                 {
-                    Row propertyRow = delayedField.Row;
+                    var propertyRow = delayedField.Row;
 
                     // process properties first in case they refer to other binder variables
-                    if ("Property" == propertyRow.Table.Name)
+                    if (delayedField.Row.Definition.Type == TupleDefinitionType.Property)
                     {
-                        string value = WixVariableResolver.ResolveDelayedVariables(propertyRow.SourceLineNumbers, (string)delayedField.Field.Data, this.VariableCache);
+                        var value = WixVariableResolver.ResolveDelayedVariables(propertyRow.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
 
                         // update the variable cache with the new value
-                        string key = String.Concat("property.", Common.Demodularize(this.OutputType, this.ModularizationGuid, (string)propertyRow[0]));
+                        var key = String.Concat("property.", Common.Demodularize(this.OutputType, this.ModularizationGuid, (string)propertyRow[0]));
                         this.VariableCache[key] = value;
 
                         // update the field data
-                        delayedField.Field.Data = value;
+                        delayedField.Field.Set(value);
                     }
                     else
                     {
@@ -103,11 +103,12 @@ namespace WixToolset.Core.Bind
             }
 
             // process the remaining fields in case they refer to property binder variables
-            foreach (DelayedField delayedField in deferredFields)
+            foreach (var delayedField in deferredFields)
             {
                 try
                 {
-                    delayedField.Field.Data = WixVariableResolver.ResolveDelayedVariables(delayedField.Row.SourceLineNumbers, (string)delayedField.Field.Data, this.VariableCache);
+                    var value = WixVariableResolver.ResolveDelayedVariables(delayedField.Row.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
+                    delayedField.Field.Set(value);
                 }
                 catch (WixException we)
                 {

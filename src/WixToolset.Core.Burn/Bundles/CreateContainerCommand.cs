@@ -16,6 +16,7 @@ namespace WixToolset.Core.Burn.Bundles
     /// </summary>
     internal class CreateContainerCommand
     {
+#if TODO
         public CompressionLevel DefaultCompressionLevel { private get; set; }
 
         public IEnumerable<WixBundlePayloadRow> Payloads { private get; set; }
@@ -64,5 +65,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             this.Size = fileInfo.Length;
         }
+#endif
     }
 }

@@ -8,6 +8,7 @@ namespace WixToolset
     using WixToolset.Extensibility;
     using Wix = WixToolset.Data.Serialize;
 
+#if TODO
     /// <summary>
     /// The base of the decompiler. Holds some variables used by the decompiler and extensions,
     /// as well as some utility methods.
@@ -149,4 +150,5 @@ namespace WixToolset
             Messaging.Instance.OnMessage(e);
         }
     }
+#endif
 }

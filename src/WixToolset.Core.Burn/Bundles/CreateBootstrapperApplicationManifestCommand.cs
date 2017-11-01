@@ -14,6 +14,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
+#if TODO
         public WixBundleRow BundleRow { private get; set; }
 
         public IEnumerable<PackageFacade> ChainPackages { private get; set; }
@@ -237,5 +238,6 @@ namespace WixToolset.Core.Burn.Bundles
 
             return row;
         }
+#endif
     }
 }
