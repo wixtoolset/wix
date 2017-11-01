@@ -8,6 +8,7 @@ namespace WixToolset.Extensibility
     using System.Xml;
     using WixToolset.Data;
 
+#if BRING_BACK_LATER
     public abstract class ExtensionData : IExtensionData
     {
         /// <summary>
@@ -72,4 +73,5 @@ namespace WixToolset.Extensibility
             }
         }
     }
+#endif
 }

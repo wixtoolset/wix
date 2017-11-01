@@ -22,7 +22,7 @@ namespace WixToolset.Extensibility
         /// Gets the table definitions used by the Binder.
         /// </summary>
         /// <value>Table definitions used by the binder.</value>
-        TableDefinitionCollection TableDefinitions { get; }
+        //TableDefinitionCollection TableDefinitions { get; }
 
         /// <summary>
         /// Generate an identifier by hashing data from the row.

@@ -10,6 +10,6 @@ namespace WixToolset.Extensibility
 
         string Resolve(SourceLineNumber sourceLineNumber, string table, string path);
 
-        void PostCombine(Library library);
+        void PostCombine(Intermediate library);
     }
 }

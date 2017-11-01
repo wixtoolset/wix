@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
     using System.Xml.Linq;
+    using WixToolset.Data;
 
     /// <summary>
     /// Base class for creating a compiler extension.
@@ -25,7 +26,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the beginning of the compilation of a source file.
         /// </summary>
-        public virtual void Initialize()
+        public virtual void PreCompile(ICompileContext context)
         {
         }
 
@@ -67,7 +68,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the end of the compilation of a source file.
         /// </summary>
-        public virtual void Finish()
+        public virtual void PostCompile(Intermediate intermediate)
         {
         }
     }

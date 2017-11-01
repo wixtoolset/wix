@@ -13,6 +13,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called during the generation of sectionIds for an admin image.
         /// </summary>
-        void GenerateSectionIds(Output output);
+        void GenerateSectionIds(Intermediate output);
     }
 }

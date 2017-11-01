@@ -46,7 +46,7 @@ namespace WixToolset.Extensibility
         /// transforms are the primary transforms you'll typically want to inspect
         /// and contain your changes to target products.
         /// </remarks>
-        void InspectOutput(Output output);
+        void InspectOutput(Intermediate output);
 
         /// <summary>
         /// Inspect the final output after binding.
@@ -54,6 +54,6 @@ namespace WixToolset.Extensibility
         /// <param name="filePath">The file path to the final bound output.</param>
         /// <param name="pdb">The <see cref="Pdb"/> that contains source line numbers
         /// for the database and all rows.</param>
-        void InspectDatabase(string filePath, Pdb pdb);
+        void InspectDatabase(string filePath, Intermediate pdb);
     }
 }

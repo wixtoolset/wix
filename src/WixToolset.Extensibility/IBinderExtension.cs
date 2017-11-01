@@ -19,7 +19,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after variable resolution occurs.
         /// </summary>
-        void AfterResolvedFields(Output output);
+        void AfterResolvedFields(Intermediate intermediate);
 
         string ResolveFile(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage);
 

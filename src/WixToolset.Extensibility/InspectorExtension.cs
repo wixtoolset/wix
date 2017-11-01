@@ -6,6 +6,7 @@ namespace WixToolset.Extensibility
     using System.IO;
     using WixToolset.Data;
 
+#if BRING_THIS_BACK
     /// <summary>
     /// Opitonal base class for inspector extensions.
     /// </summary>
@@ -58,4 +59,5 @@ namespace WixToolset.Extensibility
         {
         }
     }
+#endif
 }

@@ -21,7 +21,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after variable resolution occurs.
         /// </summary>
-        public virtual void AfterResolvedFields(Output output)
+        public virtual void AfterResolvedFields(Intermediate intermediate)
         {
         }
 

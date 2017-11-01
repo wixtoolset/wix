@@ -62,7 +62,7 @@ namespace WixToolset.Extensibility
         /// <param name="tableName">Name of table to create row in.</param>
         /// <param name="identifier">Optional identifier for the row.</param>
         /// <returns>New row.</returns>
-        Row CreateRow(SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
+        IntermediateTuple CreateRow(SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
 
         /// <summary>
         /// Creates directories using the inline directory syntax.

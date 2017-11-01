@@ -4,6 +4,7 @@ namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
 
+#if BRING_BACK_LATER
     /// <summary>
     /// Base class for creating a decompiler extension.
     /// </summary>
@@ -56,4 +57,5 @@ namespace WixToolset.Extensibility
         {
         }
     }
+#endif
 }

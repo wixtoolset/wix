@@ -10,6 +10,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
+#if BRING_BACK_LATER
     /// <summary>
     /// The main class for a WiX extension.
     /// </summary>
@@ -50,4 +51,5 @@ namespace WixToolset.Extensibility
             }
         }
     }
+#endif
 }

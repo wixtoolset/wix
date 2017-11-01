@@ -3,8 +3,8 @@
 namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
-    using WixToolset.Data.Rows;
     using WixToolset.Data.Bind;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -19,7 +19,7 @@ namespace WixToolset.Extensibility
 
         ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<BindFileWithPath> files);
 
-        string ResolveMedia(MediaRow mediaRow, string mediaLayoutDirectory, string layoutDirectory);
+        string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.

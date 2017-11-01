@@ -10,22 +10,24 @@ namespace WixToolset.Extensibility
     public interface IExtensionData
     {
         /// <summary>
-        /// Gets the table definitions for this extension.
-        /// </summary>
-        /// <value>Table definisions for this extension or null if there are no table definitions.</value>
-        TableDefinitionCollection TableDefinitions { get; }
-
-        /// <summary>
         /// Gets the optional default culture.
         /// </summary>
         /// <value>The optional default culture.</value>
         string DefaultCulture { get; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tupleDefinition"></param>
+        /// <returns>True </returns>
+        bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition);
+
+        /// <summary>
         /// Gets the library associated with this extension.
         /// </summary>
         /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
         /// <returns>The library for this extension or null if there is no library.</returns>
-        Library GetLibrary(TableDefinitionCollection tableDefinitions);
+        Library GetLibrary(ITupleDefinitionCreator tupleDefinitions);
     }
 }

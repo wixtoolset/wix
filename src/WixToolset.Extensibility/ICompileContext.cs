@@ -4,26 +4,23 @@ namespace WixToolset.Extensibility
 {
     using System;
     using System.Collections.Generic;
+    using System.Xml.Linq;
     using WixToolset.Data;
 
-    public interface ILibraryContext
+    public interface ICompileContext
     {
         IServiceProvider ServiceProvider { get; }
 
         Messaging Messaging { get; set; }
 
-        bool BindFiles { get; set; }
+        string CompilationId { get; set; }
 
-        IEnumerable<BindPath> BindPaths { get; set; }
+        IEnumerable<ICompilerExtension> Extensions { get; set; }
 
-        IEnumerable<ILibrarianExtension> Extensions { get; set; }
+        string OutputPath { get; set; }
 
-        string LibraryId { get; set; }
+        Platform Platform { get; set; }
 
-        IEnumerable<Localization> Localizations { get; set; }
-
-        IEnumerable<Intermediate> Intermediates { get; set; }
-
-        IBindVariableResolver WixVariableResolver { get; set; }
+        XDocument Source { get; set; }
     }
 }

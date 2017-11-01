@@ -3,7 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
 
     public interface IBindVariableResolver
     {
@@ -11,7 +11,7 @@ namespace WixToolset.Extensibility
 
         void AddVariable(string name, string value);
 
-        void AddVariable(WixVariableRow wixVariableRow);
+        void AddVariable(WixVariableTuple wixVariableRow);
 
         string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly);
 

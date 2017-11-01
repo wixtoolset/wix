@@ -34,7 +34,7 @@ namespace WixToolset.Extensibility.Services
 
         string IntermediateFolder { get; set; }
 
-        Output IntermediateRepresentation { get; set; }
+        Intermediate IntermediateRepresentation { get; set; }
 
         string OutputPath { get; set; }
 

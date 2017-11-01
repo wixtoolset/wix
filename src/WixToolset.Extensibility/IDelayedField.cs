@@ -6,8 +6,8 @@ namespace WixToolset.Extensibility
 
     public interface IDelayedField
     {
-        Field Field { get; }
+        IntermediateField Field { get; }
 
-        Row Row { get; }
+        IntermediateTuple Row { get; }
     }
 }

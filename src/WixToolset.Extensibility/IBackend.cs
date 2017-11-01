@@ -10,7 +10,7 @@ namespace WixToolset.Extensibility
     {
         BindResult Bind(IBindContext context);
 
-        Output Unbind(IUnbindContext context);
+        Intermediate Unbind(IUnbindContext context);
 
         bool Inscribe(IInscribeContext context);
     }

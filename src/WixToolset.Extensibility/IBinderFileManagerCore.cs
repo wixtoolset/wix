@@ -18,13 +18,13 @@ namespace WixToolset.Extensibility
         /// Gets or sets the active subStorage used for binding.
         /// </summary>
         /// <value>The subStorage object.</value>
-        SubStorage ActiveSubStorage { get; }
+        //SubStorage ActiveSubStorage { get; }
 
         /// <summary>
         /// Gets or sets the output object used for binding.
         /// </summary>
         /// <value>The output object.</value>
-        Output Output { get; }
+        Intermediate Intermediate { get; }
 
         /// <summary>
         /// Gets or sets the path to the temp files location.

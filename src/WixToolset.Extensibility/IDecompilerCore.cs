@@ -47,7 +47,7 @@ namespace WixToolset.Extensibility
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <returns>The indexed element.</returns>
-        Wix.ISchemaElement GetIndexedElement(Row row);
+        Wix.ISchemaElement GetIndexedElement(IntermediateTuple row);
 
         /// <summary>
         /// Gets the element corresponding to the primary key of the given table.
@@ -62,12 +62,12 @@ namespace WixToolset.Extensibility
         /// </summary>
         /// <param name="row">The row corresponding to the element.</param>
         /// <param name="element">The element to index.</param>
-        void IndexElement(Row row, Wix.ISchemaElement element);
+        void IndexElement(IntermediateTuple row, Wix.ISchemaElement element);
 
-            /// <summary>
+        /// <summary>
         /// Indicates the decompiler encountered and unexpected table to decompile.
         /// </summary>
         /// <param name="table">Unknown decompiled table.</param>
-        void UnexpectedTable(Table table);
+        void UnexpectedTable(string table);
 }
 }
