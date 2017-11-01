@@ -14,7 +14,7 @@ namespace WixToolset.Data {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class WixDataStrings {
+    public class WixDataStrings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -64,7 +64,7 @@ namespace WixToolset.Data {
         /// <summary>
         ///   Looks up a localized string similar to The value &apos;{0}&apos; is not a legal identifier and therefore cannot be modularized..
         /// </summary>
-        internal static string EXP_CannotModularizeIllegalID {
+        public static string EXP_CannotModularizeIllegalID {
             get {
                 return ResourceManager.GetString("EXP_CannotModularizeIllegalID", resourceCulture);
             }
@@ -73,7 +73,7 @@ namespace WixToolset.Data {
         /// <summary>
         ///   Looks up a localized string similar to A Merge table FileCompression column cannot be set to the invalid value &apos;{0}&apos;..
         /// </summary>
-        internal static string EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue {
+        public static string EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue {
             get {
                 return ResourceManager.GetString("EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue", resourceCulture);
             }
@@ -154,7 +154,7 @@ namespace WixToolset.Data {
         /// <summary>
         ///   Looks up a localized string similar to A Merge table FileCompression column contains an invalid value &apos;{0}&apos;..
         /// </summary>
-        internal static string EXP_MergeTableFileCompressionColumnContainsInvalidValue {
+        public static string EXP_MergeTableFileCompressionColumnContainsInvalidValue {
             get {
                 return ResourceManager.GetString("EXP_MergeTableFileCompressionColumnContainsInvalidValue", resourceCulture);
             }
@@ -190,7 +190,7 @@ namespace WixToolset.Data {
         /// <summary>
         ///   Looks up a localized string similar to Unexpected entry section type: {0}.
         /// </summary>
-        internal static string EXP_UnexpectedEntrySectionType {
+        public static string EXP_UnexpectedEntrySectionType {
             get {
                 return ResourceManager.GetString("EXP_UnexpectedEntrySectionType", resourceCulture);
             }
@@ -199,7 +199,7 @@ namespace WixToolset.Data {
         /// <summary>
         ///   Looks up a localized string similar to Unknown column type: {0}.
         /// </summary>
-        internal static string EXP_UnknownColumnType {
+        public static string EXP_UnknownColumnType {
             get {
                 return ResourceManager.GetString("EXP_UnknownColumnType", resourceCulture);
             }
@@ -217,7 +217,7 @@ namespace WixToolset.Data {
         /// <summary>
         ///   Looks up a localized string similar to The table {0} is not supported..
         /// </summary>
-        internal static string EXP_UnsupportedTable {
+        public static string EXP_UnsupportedTable {
             get {
                 return ResourceManager.GetString("EXP_UnsupportedTable", resourceCulture);
             }

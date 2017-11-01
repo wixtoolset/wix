@@ -10,11 +10,6 @@
     <Description></Description>
   </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Data\actions.xml" />
-    <EmbeddedResource Include="Data\tables.xml" />
-  </ItemGroup>
-
   <!--
   <ItemGroup>
     <MsgGenSource Include="Data\messages.xml">

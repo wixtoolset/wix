@@ -2,6 +2,7 @@
 
 namespace WixToolset.Data
 {
+#if false
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -237,4 +238,5 @@ namespace WixToolset.Data
             writer.WriteEndElement();
         }
     }
+#endif
 }

@@ -2,9 +2,13 @@
 
 namespace WixToolset.Data
 {
+    using System;
+    using System.Diagnostics;
+
     /// <summary>
     /// Class to define the identifier and access for a row.
     /// </summary>
+    [DebuggerDisplay("{Access} {Id,nq}")]
     public class Identifier
     {
         public static Identifier Invalid = new Identifier(null, AccessModifier.Private);
@@ -12,6 +16,12 @@ namespace WixToolset.Data
         public Identifier(string id, AccessModifier access)
         {
             this.Id = id;
+            this.Access = access;
+        }
+
+        public Identifier(int id, AccessModifier access)
+        {
+            this.Id = id.ToString();
             this.Access = access;
         }
 

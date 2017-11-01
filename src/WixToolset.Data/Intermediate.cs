@@ -5,7 +5,7 @@ namespace WixToolset.Data
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Xml;
+    using SimpleJson;
 
     /// <summary>
     /// Container class for an intermediate object.
@@ -15,34 +15,192 @@ namespace WixToolset.Data
         public const string XmlNamespaceUri = "http://wixtoolset.org/schemas/v4/wixobj";
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
 
-        private string id;
-        private List<Section> sections;
+        private Dictionary<string, Localization> localizationsByCulture;
 
         /// <summary>
         /// Instantiate a new Intermediate.
         /// </summary>
         public Intermediate()
         {
-            this.id = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
-            this.sections = new List<Section>();
+            this.Id = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
+            this.EmbedFilePaths = new List<string>();
+            this.localizationsByCulture = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
+            this.Sections = new List<IntermediateSection>();
         }
+
+        public Intermediate(string id, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture, IEnumerable<string> embedFilePaths)
+        {
+            this.Id = id;
+            this.EmbedFilePaths = (embedFilePaths != null) ? new List<string>(embedFilePaths) : new List<string>();
+            this.localizationsByCulture = (localizationsByCulture != null) ? new Dictionary<string, Localization>(localizationsByCulture, StringComparer.OrdinalIgnoreCase) : new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
+            this.Sections = (sections != null) ? new List<IntermediateSection>(sections) : new List<IntermediateSection>();
+        }
+
+        /// <summary>
+        /// Get the id for the intermediate.
+        /// </summary>
+        public string Id { get; }
+
+        /// <summary>
+        /// Get the embed file paths in this intermediate.
+        /// </summary>
+        public IList<string> EmbedFilePaths { get; }
+
+        /// <summary>
+        /// Get the localizations contained in this intermediate.
+        /// </summary>
+        public IEnumerable<Localization> Localizations => this.localizationsByCulture.Values;
 
         /// <summary>
         /// Get the sections contained in this intermediate.
         /// </summary>
-        /// <value>Sections contained in this intermediate.</value>
-        public IEnumerable<Section> Sections { get { return this.sections; } }
+        public IList<IntermediateSection> Sections { get; }
 
         /// <summary>
-        /// Adds a section to the intermediate.
+        /// Adds a localization to the intermediate.
         /// </summary>
-        /// <param name="section">Section to add to the intermediate.</param>
-        public void AddSection(Section section)
+        /// <param name="localization">Localization to add to the intermediate.</param>
+        public void AddLocalization(Localization localization)
         {
-            section.IntermediateId = this.id;
-            this.sections.Add(section);
+            if (this.localizationsByCulture.TryGetValue(localization.Culture, out var existingCulture))
+            {
+                existingCulture.Merge(localization);
+            }
+            else
+            {
+                this.localizationsByCulture.Add(localization.Culture, localization);
+            }
         }
 
+        /// <summary>
+        /// Gets localization files from this library that match the cultures passed in, in the order of the array of cultures.
+        /// </summary>
+        /// <param name="cultures">The list of cultures to get localizations for.</param>
+        /// <returns>All localizations contained in this library that match the set of cultures provided, in the same order.</returns>
+        public IEnumerable<Localization> GetLocalizationsForCultures(IEnumerable<string> cultures)
+        {
+            foreach (string culture in cultures ?? Array.Empty<string>())
+            {
+                if (this.localizationsByCulture.TryGetValue(culture, out var localization))
+                {
+                    yield return localization;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads an intermediate from a path on disk.
+        /// </summary>
+        /// <param name="path">Path to intermediate file saved on disk.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediate.</returns>
+        public static Intermediate Load(string path, bool suppressVersionCheck = false)
+        {
+            var creator = new SimpleTupleDefinitionCreator();
+            return Intermediate.Load(path, creator, suppressVersionCheck);
+        }
+
+        /// <summary>
+        /// Loads an intermediate from a path on disk.
+        /// </summary>
+        /// <param name="path">Path to intermediate file saved on disk.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediate.</returns>
+        public static Intermediate Load(string path, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        {
+            JsonObject jsonObject;
+
+            using (FileStream stream = File.OpenRead(path))
+            using (FileStructure fs = FileStructure.Read(stream))
+            {
+                if (FileFormat.WixIR != fs.FileFormat)
+                {
+                    throw new WixUnexpectedFileFormatException(path, FileFormat.WixIR, fs.FileFormat);
+                }
+
+                var json = fs.GetData();
+                jsonObject = SimpleJson.DeserializeObject(json) as JsonObject;
+            }
+
+            if (!suppressVersionCheck)
+            {
+                var versionJson = jsonObject.GetValueOrDefault<string>("version");
+
+                if (!Version.TryParse(versionJson, out var version) || !Intermediate.CurrentVersion.Equals(version))
+                {
+                    throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(path), "intermediate", versionJson, Intermediate.CurrentVersion.ToString()));
+                }
+            }
+
+            var id = jsonObject.GetValueOrDefault<string>("id");
+
+            var sections = new List<IntermediateSection>();
+
+            var sectionsJson = jsonObject.GetValueOrDefault<JsonArray>("sections");
+            foreach (JsonObject sectionJson in sectionsJson)
+            {
+                var section = IntermediateSection.Deserialize(creator, sectionJson);
+                sections.Add(section);
+            }
+
+            var localizations = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
+
+            //var localizationsJson = jsonObject.GetValueOrDefault<JsonArray>("localizations") ?? new JsonArray();
+            //foreach (JsonObject localizationJson in localizationsJson)
+            //{
+            //    var localization = Localization.Deserialize(localizationJson);
+            //    localizations.Add(localization.Culture, localization);
+            //}
+
+            return new Intermediate(id, sections, localizations, null);
+        }
+
+        /// <summary>
+        /// Saves an intermediate to a path on disk.
+        /// </summary>
+        /// <param name="path">Path to save intermediate file to disk.</param>
+        public void Save(string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
+
+            using (var stream = File.Create(path))
+            using (var fs = FileStructure.Create(stream, FileFormat.WixIR, this.EmbedFilePaths))
+            using (var writer = new StreamWriter(fs.GetDataStream()))
+            {
+                var jsonObject = new JsonObject
+                {
+                    { "id", this.Id },
+                    { "version", Intermediate.CurrentVersion.ToString() }
+                };
+
+                var sectionsJson = new JsonArray(this.Sections.Count);
+                foreach (var section in this.Sections)
+                {
+                    var sectionJson = section.Serialize();
+                    sectionsJson.Add(sectionJson);
+                }
+
+                jsonObject.Add("sections", sectionsJson);
+
+                //if (this.Localizations.Any())
+                //{
+                //    var localizationsJson = new JsonArray();
+                //    foreach (var localization in this.Localizations)
+                //    {
+                //        var localizationJson = localization.Serialize();
+                //        localizationsJson.Add(localizationJson);
+                //    }
+
+                //    jsonObject.Add("localizations", localizationsJson);
+                //}
+
+                var json = SimpleJson.SerializeObject(jsonObject);
+                writer.Write(json);
+            }
+        }
+
+#if false
         /// <summary>
         /// Loads an intermediate from a path on disk.
         /// </summary>
@@ -84,9 +242,9 @@ namespace WixToolset.Data
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
 
-            using (FileStream stream = File.Create(path))
-            using (FileStructure fs = FileStructure.Create(stream, FileFormat.Wixobj, null))
-            using (XmlWriter writer = XmlWriter.Create(fs.GetDataStream()))
+            using (var stream = File.Create(path))
+            using (var fs = FileStructure.Create(stream, FileFormat.Wixobj, null))
+            using (var writer = XmlWriter.Create(fs.GetDataStream()))
             {
                 writer.WriteStartDocument();
                 this.Write(writer);
@@ -185,5 +343,6 @@ namespace WixToolset.Data
 
             writer.WriteEndElement();
         }
+#endif
     }
 }

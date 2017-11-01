@@ -1,0 +1,3604 @@
+[
+    {
+        "_Streams": [
+            {
+                "Name": "string"
+            },
+            {
+                "Data": "path"
+            }
+        ]
+    },
+    {
+        "_SummaryInformation": [
+            {
+                "PropertyId": "number"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "_TransformView": [
+            {
+                "Table": "string"
+            },
+            {
+                "Column": "string"
+            },
+            {
+                "Row": "string"
+            },
+            {
+                "Data": "string"
+            },
+            {
+                "Current": "string"
+            }
+        ]
+    },
+    {
+        "_Validation": [
+            {
+                "Table": "string"
+            },
+            {
+                "Column": "string"
+            },
+            {
+                "Nullable": "string"
+            },
+            {
+                "MinValue": "number"
+            },
+            {
+                "MaxValue": "number"
+            },
+            {
+                "KeyTable": "string"
+            },
+            {
+                "KeyColumn": "number"
+            },
+            {
+                "Category": "string"
+            },
+            {
+                "Set": "string"
+            },
+            {
+                "Description": "string"
+            }
+        ]
+    },
+    {
+        "ActionText": [
+            {
+                "Action": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Template": "string"
+            }
+        ]
+    },
+    {
+        "AdminExecuteSequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "AdminUISequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "AdvtExecuteSequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "AdvtUISequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "AppId": [
+            {
+                "AppId": "string"
+            },
+            {
+                "RemoteServerName": "string"
+            },
+            {
+                "LocalService": "string"
+            },
+            {
+                "ServiceParameters": "string"
+            },
+            {
+                "DllSurrogate": "string"
+            },
+            {
+                "ActivateAtStorage": "number"
+            },
+            {
+                "RunAsInteractiveUser": "number"
+            }
+        ]
+    },
+    {
+        "AppSearch": [
+            {
+                "Property": "string"
+            },
+            {
+                "Signature_": "string"
+            }
+        ]
+    },
+    {
+        "BBControl": [
+            {
+                "Billboard_": "string"
+            },
+            {
+                "BBControl": "string"
+            },
+            {
+                "Type": "string"
+            },
+            {
+                "X": "number"
+            },
+            {
+                "Y": "number"
+            },
+            {
+                "Width": "number"
+            },
+            {
+                "Height": "number"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Text": "string"
+            }
+        ]
+    },
+    {
+        "Billboard": [
+            {
+                "Billboard": "string"
+            },
+            {
+                "Feature_": "string"
+            },
+            {
+                "Action": "string"
+            },
+            {
+                "Ordering": "number"
+            }
+        ]
+    },
+    {
+        "Binary": [
+            {
+                "Name": "string"
+            },
+            {
+                "Data": "path"
+            }
+        ]
+    },
+    {
+        "BindImage": [
+            {
+                "File_": "string"
+            },
+            {
+                "Path": "string"
+            }
+        ]
+    },
+    {
+        "CCPSearch": [
+            {
+                "Signature_": "string"
+            }
+        ]
+    },
+    {
+        "CheckBox": [
+            {
+                "Property": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "Class": [
+            {
+                "CLSID": "string"
+            },
+            {
+                "Context": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "ProgId_Default": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "AppId_": "string"
+            },
+            {
+                "FileTypeMask": "string"
+            },
+            {
+                "Icon_": "string"
+            },
+            {
+                "IconIndex": "number"
+            },
+            {
+                "DefInprocHandler": "string"
+            },
+            {
+                "Argument": "string"
+            },
+            {
+                "Feature_": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "ComboBox": [
+            {
+                "Property": "string"
+            },
+            {
+                "Order": "number"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Text": "string"
+            }
+        ]
+    },
+    {
+        "CompLocator": [
+            {
+                "Signature_": "string"
+            },
+            {
+                "ComponentId": "string"
+            },
+            {
+                "Type": "number"
+            }
+        ]
+    },
+    {
+        "Complus": [
+            {
+                "Component_": "string"
+            },
+            {
+                "ExpType": "number"
+            }
+        ]
+    },
+    {
+        "Component": [
+            {
+                "Component": "string"
+            },
+            {
+                "ComponentId": "string"
+            },
+            {
+                "Directory_": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "KeyPath": "string"
+            }
+        ]
+    },
+    {
+        "Condition": [
+            {
+                "Feature_": "string"
+            },
+            {
+                "Level": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "Control": [
+            {
+                "Dialog_": "string"
+            },
+            {
+                "Control": "string"
+            },
+            {
+                "Type": "string"
+            },
+            {
+                "X": "number"
+            },
+            {
+                "Y": "number"
+            },
+            {
+                "Width": "number"
+            },
+            {
+                "Height": "number"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Property": "string"
+            },
+            {
+                "Text": "string"
+            },
+            {
+                "Control_Next": "string"
+            },
+            {
+                "Help": "string"
+            }
+        ]
+    },
+    {
+        "ControlCondition": [
+            {
+                "Dialog_": "string"
+            },
+            {
+                "Control_": "string"
+            },
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ControlEvent": [
+            {
+                "Dialog_": "string"
+            },
+            {
+                "Control_": "string"
+            },
+            {
+                "Event": "string"
+            },
+            {
+                "Argument": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Ordering": "number"
+            }
+        ]
+    },
+    {
+        "CreateFolder": [
+            {
+                "Directory_": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "CustomAction": [
+            {
+                "Action": "string"
+            },
+            {
+                "Type": "number"
+            },
+            {
+                "Source": "string"
+            },
+            {
+                "Target": "string"
+            },
+            {
+                "ExtendedType": "number"
+            }
+        ]
+    },
+    {
+        "Dialog": [
+            {
+                "Dialog": "string"
+            },
+            {
+                "HCentering": "number"
+            },
+            {
+                "VCentering": "number"
+            },
+            {
+                "Width": "number"
+            },
+            {
+                "Height": "number"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Title": "string"
+            },
+            {
+                "Control_First": "string"
+            },
+            {
+                "Control_Default": "string"
+            },
+            {
+                "Control_Cancel": "string"
+            }
+        ]
+    },
+    {
+        "Directory": [
+            {
+                "Directory": "string"
+            },
+            {
+                "Directory_Parent": "string"
+            },
+            {
+                "DefaultDir": "string"
+            }
+        ]
+    },
+    {
+        "DrLocator": [
+            {
+                "Signature_": "string"
+            },
+            {
+                "Parent": "string"
+            },
+            {
+                "Path": "string"
+            },
+            {
+                "Depth": "number"
+            }
+        ]
+    },
+    {
+        "DuplicateFile": [
+            {
+                "FileKey": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "File_": "string"
+            },
+            {
+                "DestName": "string"
+            },
+            {
+                "DestFolder": "string"
+            }
+        ]
+    },
+    {
+        "Environment": [
+            {
+                "Environment": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "Error": [
+            {
+                "Error": "number"
+            },
+            {
+                "Message": "string"
+            }
+        ]
+    },
+    {
+        "EventMapping": [
+            {
+                "Dialog_": "string"
+            },
+            {
+                "Control_": "string"
+            },
+            {
+                "Event": "string"
+            },
+            {
+                "Attribute": "string"
+            }
+        ]
+    },
+    {
+        "Extension": [
+            {
+                "Extension": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "ProgId_": "string"
+            },
+            {
+                "MIME_": "string"
+            },
+            {
+                "Feature_": "string"
+            }
+        ]
+    },
+    {
+        "ExternalFiles": [
+            {
+                "Family": "string"
+            },
+            {
+                "FTK": "string"
+            },
+            {
+                "FilePath": "string"
+            },
+            {
+                "SymbolPaths": "string"
+            },
+            {
+                "IgnoreOffsets": "string"
+            },
+            {
+                "IgnoreLengths": "string"
+            },
+            {
+                "RetainOffsets": "string"
+            },
+            {
+                "Order": "number"
+            }
+        ]
+    },
+    {
+        "FamilyFileRanges": [
+            {
+                "Family": "string"
+            },
+            {
+                "FTK": "string"
+            },
+            {
+                "RetainOffsets": "string"
+            },
+            {
+                "RetainLengths": "string"
+            }
+        ]
+    },
+    {
+        "Feature": [
+            {
+                "Feature": "string"
+            },
+            {
+                "Feature_Parent": "string"
+            },
+            {
+                "Title": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Display": "number"
+            },
+            {
+                "Level": "number"
+            },
+            {
+                "Directory_": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "FeatureComponents": [
+            {
+                "Feature_": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "File": [
+            {
+                "File": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "FileSize": "number"
+            },
+            {
+                "Version": "string"
+            },
+            {
+                "Language": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "FileSFPCatalog": [
+            {
+                "File_": "string"
+            },
+            {
+                "SFPCatalog_": "string"
+            }
+        ]
+    },
+    {
+        "Font": [
+            {
+                "File_": "string"
+            },
+            {
+                "FontTitle": "string"
+            }
+        ]
+    },
+    {
+        "Icon": [
+            {
+                "Name": "string"
+            },
+            {
+                "Data": "path"
+            }
+        ]
+    },
+    {
+        "ImageFamilies": [
+            {
+                "Family": "string"
+            },
+            {
+                "MediaSrcPropName": "string"
+            },
+            {
+                "MediaDiskId": "number"
+            },
+            {
+                "FileSequenceStart": "number"
+            },
+            {
+                "DiskPrompt": "string"
+            },
+            {
+                "VolumeLabel": "string"
+            }
+        ]
+    },
+    {
+        "IniFile": [
+            {
+                "IniFile": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "DirProperty": "string"
+            },
+            {
+                "Section": "string"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Action": "number"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "IniLocator": [
+            {
+                "Signature_": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "Section": "string"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Field": "number"
+            },
+            {
+                "Type": "number"
+            }
+        ]
+    },
+    {
+        "InstallExecuteSequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "InstallUISequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            }
+        ]
+    },
+    {
+        "IsolatedComponent": [
+            {
+                "Component_Shared": "string"
+            },
+            {
+                "Component_Application": "string"
+            }
+        ]
+    },
+    {
+        "LaunchCondition": [
+            {
+                "Condition": "string"
+            },
+            {
+                "Description": "string"
+            }
+        ]
+    },
+    {
+        "ListBox": [
+            {
+                "Property": "string"
+            },
+            {
+                "Order": "number"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Text": "string"
+            }
+        ]
+    },
+    {
+        "ListView": [
+            {
+                "Property": "string"
+            },
+            {
+                "Order": "number"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Text": "string"
+            },
+            {
+                "Binary_": "string"
+            }
+        ]
+    },
+    {
+        "LockPermissions": [
+            {
+                "LockObject": "string"
+            },
+            {
+                "Table": "string"
+            },
+            {
+                "Domain": "string"
+            },
+            {
+                "User": "string"
+            },
+            {
+                "Permission": "number"
+            }
+        ]
+    },
+    {
+        "Media": [
+            {
+                "DiskId": "number"
+            },
+            {
+                "LastSequence": "number"
+            },
+            {
+                "DiskPrompt": "string"
+            },
+            {
+                "Cabinet": "string"
+            },
+            {
+                "VolumeLabel": "string"
+            },
+            {
+                "Source": "string"
+            }
+        ]
+    },
+    {
+        "MIME": [
+            {
+                "ContentType": "string"
+            },
+            {
+                "Extension_": "string"
+            },
+            {
+                "CLSID": "string"
+            }
+        ]
+    },
+    {
+        "ModuleAdminExecuteSequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "BaseAction": "string"
+            },
+            {
+                "After": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ModuleAdminUISequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "BaseAction": "string"
+            },
+            {
+                "After": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ModuleAdvtExecuteSequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "BaseAction": "string"
+            },
+            {
+                "After": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ModuleAdvtUISequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "BaseAction": "string"
+            },
+            {
+                "After": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ModuleComponents": [
+            {
+                "Component": "string"
+            },
+            {
+                "ModuleID": "string"
+            },
+            {
+                "Language": "number"
+            }
+        ]
+    },
+    {
+        "ModuleConfiguration": [
+            {
+                "Name": "string"
+            },
+            {
+                "Format": "number"
+            },
+            {
+                "Type": "string"
+            },
+            {
+                "ContextData": "string"
+            },
+            {
+                "DefaultValue": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "DisplayName": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "HelpLocation": "string"
+            },
+            {
+                "HelpKeyword": "string"
+            }
+        ]
+    },
+    {
+        "ModuleDependency": [
+            {
+                "ModuleID": "string"
+            },
+            {
+                "ModuleLanguage": "number"
+            },
+            {
+                "RequiredID": "string"
+            },
+            {
+                "RequiredLanguage": "number"
+            },
+            {
+                "RequiredVersion": "string"
+            }
+        ]
+    },
+    {
+        "ModuleExclusion": [
+            {
+                "ModuleID": "string"
+            },
+            {
+                "ModuleLanguage": "number"
+            },
+            {
+                "ExcludedID": "string"
+            },
+            {
+                "ExcludedLanguage": "number"
+            },
+            {
+                "ExcludedMinVersion": "string"
+            },
+            {
+                "ExcludedMaxVersion": "string"
+            }
+        ]
+    },
+    {
+        "ModuleIgnoreTable": [
+            {
+                "Table": "string"
+            }
+        ]
+    },
+    {
+        "ModuleInstallExecuteSequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "BaseAction": "string"
+            },
+            {
+                "After": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ModuleInstallUISequence": [
+            {
+                "Action": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "BaseAction": "string"
+            },
+            {
+                "After": "number"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "ModuleSignature": [
+            {
+                "ModuleID": "string"
+            },
+            {
+                "Language": "number"
+            },
+            {
+                "Version": "string"
+            }
+        ]
+    },
+    {
+        "ModuleSubstitution": [
+            {
+                "Table": "string"
+            },
+            {
+                "Row": "string"
+            },
+            {
+                "Column": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "MoveFile": [
+            {
+                "FileKey": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "SourceName": "string"
+            },
+            {
+                "DestName": "string"
+            },
+            {
+                "SourceFolder": "string"
+            },
+            {
+                "DestFolder": "string"
+            },
+            {
+                "Options": "number"
+            }
+        ]
+    },
+    {
+        "MsiAssembly": [
+            {
+                "Component_": "string"
+            },
+            {
+                "Feature_": "string"
+            },
+            {
+                "File_Manifest": "string"
+            },
+            {
+                "File_Application": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "MsiAssemblyName": [
+            {
+                "Component_": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "MsiDigitalCertificate": [
+            {
+                "DigitalCertificate": "string"
+            },
+            {
+                "CertData": "path"
+            }
+        ]
+    },
+    {
+        "MsiDigitalSignature": [
+            {
+                "Table": "string"
+            },
+            {
+                "SignObject": "string"
+            },
+            {
+                "DigitalCertificate_": "string"
+            },
+            {
+                "Hash": "path"
+            }
+        ]
+    },
+    {
+        "MsiEmbeddedChainer": [
+            {
+                "MsiEmbeddedChainer": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "CommandLine": "string"
+            },
+            {
+                "Source": "string"
+            },
+            {
+                "Type": "number"
+            }
+        ]
+    },
+    {
+        "MsiEmbeddedUI": [
+            {
+                "MsiEmbeddedUI": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "MessageFilter": "number"
+            },
+            {
+                "Data": "path"
+            }
+        ]
+    },
+    {
+        "MsiFileHash": [
+            {
+                "File_": "string"
+            },
+            {
+                "Options": "number"
+            },
+            {
+                "HashPart1": "number"
+            },
+            {
+                "HashPart2": "number"
+            },
+            {
+                "HashPart3": "number"
+            },
+            {
+                "HashPart4": "number"
+            }
+        ]
+    },
+    {
+        "MsiLockPermissionsEx": [
+            {
+                "MsiLockPermissionsEx": "string"
+            },
+            {
+                "LockObject": "string"
+            },
+            {
+                "Table": "string"
+            },
+            {
+                "SDDLText": "string"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "MsiPackageCertificate": [
+            {
+                "PackageCertificate": "string"
+            },
+            {
+                "DigitalCertificate_": "string"
+            }
+        ]
+    },
+    {
+        "MsiPatchCertificate": [
+            {
+                "PatchCertificate": "string"
+            },
+            {
+                "DigitalCertificate_": "string"
+            }
+        ]
+    },
+    {
+        "MsiPatchHeaders": [
+            {
+                "StreamRef": "string"
+            },
+            {
+                "Header": "path"
+            }
+        ]
+    },
+    {
+        "MsiPatchMetadata": [
+            {
+                "Company": "string"
+            },
+            {
+                "Property": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "MsiPatchOldAssemblyFile": [
+            {
+                "File_": "string"
+            },
+            {
+                "Assembly_": "string"
+            }
+        ]
+    },
+    {
+        "MsiPatchOldAssemblyName": [
+            {
+                "Assembly": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "MsiPatchSequence": [
+            {
+                "PatchFamily": "string"
+            },
+            {
+                "ProductCode": "string"
+            },
+            {
+                "Sequence": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "MsiServiceConfig": [
+            {
+                "MsiServiceConfig": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Event": "number"
+            },
+            {
+                "ConfigType": "number"
+            },
+            {
+                "Argument": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "MsiServiceConfigFailureActions": [
+            {
+                "MsiServiceConfigFailureActions": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Event": "number"
+            },
+            {
+                "ResetPeriod": "number"
+            },
+            {
+                "RebootMessage": "string"
+            },
+            {
+                "Command": "string"
+            },
+            {
+                "Actions": "string"
+            },
+            {
+                "DelayActions": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "MsiShortcutProperty": [
+            {
+                "MsiShortcutProperty": "string"
+            },
+            {
+                "Shortcut_": "string"
+            },
+            {
+                "PropertyKey": "string"
+            },
+            {
+                "PropVariantValue": "string"
+            }
+        ]
+    },
+    {
+        "ODBCAttribute": [
+            {
+                "Driver_": "string"
+            },
+            {
+                "Attribute": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "ODBCDataSource": [
+            {
+                "DataSource": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "DriverDescription": "string"
+            },
+            {
+                "Registration": "number"
+            }
+        ]
+    },
+    {
+        "ODBCDriver": [
+            {
+                "Driver": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "File_": "string"
+            },
+            {
+                "File_Setup": "string"
+            }
+        ]
+    },
+    {
+        "ODBCSourceAttribute": [
+            {
+                "DataSource_": "string"
+            },
+            {
+                "Attribute": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "ODBCTranslator": [
+            {
+                "Translator": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "File_": "string"
+            },
+            {
+                "File_Setup": "string"
+            }
+        ]
+    },
+    {
+        "Patch": [
+            {
+                "File_": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "PatchSize": "number"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Header": "path"
+            },
+            {
+                "StreamRef_": "string"
+            }
+        ]
+    },
+    {
+        "PatchMetadata": [
+            {
+                "Company": "string"
+            },
+            {
+                "Property": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "PatchPackage": [
+            {
+                "PatchId": "string"
+            },
+            {
+                "Media_": "number"
+            }
+        ]
+    },
+    {
+        "PatchSequence": [
+            {
+                "PatchFamily": "string"
+            },
+            {
+                "Target": "string"
+            },
+            {
+                "Sequence": "string"
+            },
+            {
+                "Supersede": "number"
+            }
+        ]
+    },
+    {
+        "ProgId": [
+            {
+                "ProgId": "string"
+            },
+            {
+                "ProgId_Parent": "string"
+            },
+            {
+                "Class_": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Icon_": "string"
+            },
+            {
+                "IconIndex": "number"
+            }
+        ]
+    },
+    {
+        "Properties": [
+            {
+                "Name": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "Property": [
+            {
+                "Property": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "PublishComponent": [
+            {
+                "ComponentId": "string"
+            },
+            {
+                "Qualifier": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "AppData": "string"
+            },
+            {
+                "Feature_": "string"
+            }
+        ]
+    },
+    {
+        "RadioButton": [
+            {
+                "Property": "string"
+            },
+            {
+                "Order": "number"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "X": "number"
+            },
+            {
+                "Y": "number"
+            },
+            {
+                "Width": "number"
+            },
+            {
+                "Height": "number"
+            },
+            {
+                "Text": "string"
+            },
+            {
+                "Help": "string"
+            }
+        ]
+    },
+    {
+        "Registry": [
+            {
+                "Registry": "string"
+            },
+            {
+                "Root": "number"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "RegLocator": [
+            {
+                "Signature_": "string"
+            },
+            {
+                "Root": "number"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Type": "number"
+            }
+        ]
+    },
+    {
+        "RemoveFile": [
+            {
+                "FileKey": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "DirProperty": "string"
+            },
+            {
+                "InstallMode": "number"
+            }
+        ]
+    },
+    {
+        "RemoveIniFile": [
+            {
+                "RemoveIniFile": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "DirProperty": "string"
+            },
+            {
+                "Section": "string"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Action": "number"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "RemoveRegistry": [
+            {
+                "RemoveRegistry": "string"
+            },
+            {
+                "Root": "number"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "ReserveCost": [
+            {
+                "ReserveKey": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "ReserveFolder": "string"
+            },
+            {
+                "ReserveLocal": "number"
+            },
+            {
+                "ReserveSource": "number"
+            }
+        ]
+    },
+    {
+        "SelfReg": [
+            {
+                "File_": "string"
+            },
+            {
+                "Cost": "number"
+            }
+        ]
+    },
+    {
+        "ServiceControl": [
+            {
+                "ServiceControl": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Event": "number"
+            },
+            {
+                "Arguments": "string"
+            },
+            {
+                "Wait": "number"
+            },
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "ServiceInstall": [
+            {
+                "ServiceInstall": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "DisplayName": "string"
+            },
+            {
+                "ServiceType": "number"
+            },
+            {
+                "StartType": "number"
+            },
+            {
+                "ErrorControl": "number"
+            },
+            {
+                "LoadOrderGroup": "string"
+            },
+            {
+                "Dependencies": "string"
+            },
+            {
+                "StartName": "string"
+            },
+            {
+                "Password": "string"
+            },
+            {
+                "Arguments": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "Description": "string"
+            }
+        ]
+    },
+    {
+        "SFPCatalog": [
+            {
+                "SFPCatalog": "string"
+            },
+            {
+                "Catalog": "path"
+            },
+            {
+                "Dependency": "string"
+            }
+        ]
+    },
+    {
+        "Shortcut": [
+            {
+                "Shortcut": "string"
+            },
+            {
+                "Directory_": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "Target": "string"
+            },
+            {
+                "Arguments": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Hotkey": "number"
+            },
+            {
+                "Icon_": "string"
+            },
+            {
+                "IconIndex": "number"
+            },
+            {
+                "ShowCmd": "number"
+            },
+            {
+                "WkDir": "string"
+            },
+            {
+                "DisplayResourceDLL": "string"
+            },
+            {
+                "DisplayResourceId": "number"
+            },
+            {
+                "DescriptionResourceDLL": "string"
+            },
+            {
+                "DescriptionResourceId": "number"
+            }
+        ]
+    },
+    {
+        "Signature": [
+            {
+                "Signature": "string"
+            },
+            {
+                "FileName": "string"
+            },
+            {
+                "MinVersion": "string"
+            },
+            {
+                "MaxVersion": "string"
+            },
+            {
+                "MinSize": "number"
+            },
+            {
+                "MaxSize": "number"
+            },
+            {
+                "MinDate": "number"
+            },
+            {
+                "MaxDate": "number"
+            },
+            {
+                "Languages": "string"
+            }
+        ]
+    },
+    {
+        "TargetFiles_OptionalData": [
+            {
+                "Target": "string"
+            },
+            {
+                "FTK": "string"
+            },
+            {
+                "SymbolPaths": "string"
+            },
+            {
+                "IgnoreOffsets": "string"
+            },
+            {
+                "IgnoreLengths": "string"
+            },
+            {
+                "RetainOffsets": "string"
+            }
+        ]
+    },
+    {
+        "TargetImages": [
+            {
+                "Target": "string"
+            },
+            {
+                "MsiPath": "string"
+            },
+            {
+                "SymbolPaths": "string"
+            },
+            {
+                "Upgraded": "string"
+            },
+            {
+                "Order": "number"
+            },
+            {
+                "ProductValidateFlags": "string"
+            },
+            {
+                "IgnoreMissingSrcFiles": "number"
+            }
+        ]
+    },
+    {
+        "TextStyle": [
+            {
+                "TextStyle": "string"
+            },
+            {
+                "FaceName": "string"
+            },
+            {
+                "Size": "number"
+            },
+            {
+                "Color": "number"
+            },
+            {
+                "StyleBits": "number"
+            }
+        ]
+    },
+    {
+        "TypeLib": [
+            {
+                "LibID": "string"
+            },
+            {
+                "Language": "number"
+            },
+            {
+                "Component_": "string"
+            },
+            {
+                "Version": "number"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Directory_": "string"
+            },
+            {
+                "Feature_": "string"
+            },
+            {
+                "Cost": "number"
+            }
+        ]
+    },
+    {
+        "UIText": [
+            {
+                "Key": "string"
+            },
+            {
+                "Text": "string"
+            }
+        ]
+    },
+    {
+        "Upgrade": [
+            {
+                "UpgradeCode": "string"
+            },
+            {
+                "VersionMin": "string"
+            },
+            {
+                "VersionMax": "string"
+            },
+            {
+                "Language": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "Remove": "string"
+            },
+            {
+                "ActionProperty": "string"
+            }
+        ]
+    },
+    {
+        "UpgradedFiles_OptionalData": [
+            {
+                "Upgraded": "string"
+            },
+            {
+                "FTK": "string"
+            },
+            {
+                "SymbolPaths": "string"
+            },
+            {
+                "AllowIgnoreOnPatchError": "number"
+            },
+            {
+                "IncludeWholeFile": "number"
+            }
+        ]
+    },
+    {
+        "UpgradedFilesToIgnore": [
+            {
+                "Upgraded": "string"
+            },
+            {
+                "FTK": "string"
+            }
+        ]
+    },
+    {
+        "UpgradedImages": [
+            {
+                "Upgraded": "string"
+            },
+            {
+                "MsiPath": "string"
+            },
+            {
+                "PatchMsiPath": "string"
+            },
+            {
+                "SymbolPaths": "string"
+            },
+            {
+                "Family": "string"
+            }
+        ]
+    },
+    {
+        "Verb": [
+            {
+                "Extension_": "string"
+            },
+            {
+                "Verb": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "Command": "string"
+            },
+            {
+                "Argument": "string"
+            }
+        ]
+    },
+    {
+        "WixAction": [
+            {
+                "SequenceTable": "string"
+            },
+            {
+                "Action": "string"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Sequence": "number"
+            },
+            {
+                "Before": "string"
+            },
+            {
+                "After": "string"
+            },
+            {
+                "Overridable": "number"
+            }
+        ]
+    },
+    {
+        "WixApprovedExeForElevation": [
+            {
+                "Id": "string"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixBBControl": [
+            {
+                "Billboard_": "string"
+            },
+            {
+                "BBControl_": "string"
+            },
+            {
+                "SourceFile": "path"
+            }
+        ]
+    },
+    {
+        "WixBindUpdatedFiles": [
+            {
+                "File_": "string"
+            }
+        ]
+    },
+    {
+        "WixBootstrapperApplication": [
+            {
+                "Id": "string"
+            }
+        ]
+    },
+    {
+        "WixBuildInfo": [
+            {
+                "WixVersion": "string"
+            },
+            {
+                "WixOutputFile": "string"
+            },
+            {
+                "WixProjectFile": "string"
+            },
+            {
+                "WixPdbFile": "string"
+            }
+        ]
+    },
+    {
+        "WixBundle": [
+            {
+                "Version": "string"
+            },
+            {
+                "Copyright": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "AboutUrl": "string"
+            },
+            {
+                "DisableModify": "number"
+            },
+            {
+                "DisableRemove": "number"
+            },
+            {
+                "DisableRepair": "number"
+            },
+            {
+                "HelpTelephone": "string"
+            },
+            {
+                "HelpUrl": "string"
+            },
+            {
+                "Manufacturer": "string"
+            },
+            {
+                "UpdateUrl": "string"
+            },
+            {
+                "Compressed": "number"
+            },
+            {
+                "LogPrefixAndExtension": "string"
+            },
+            {
+                "IconSourceFile": "path"
+            },
+            {
+                "SplashScreenSourceFile": "path"
+            },
+            {
+                "Condition": "string"
+            },
+            {
+                "Tag": "string"
+            },
+            {
+                "Platform": "string"
+            },
+            {
+                "ParentName": "string"
+            },
+            {
+                "UpgradeCode": "string"
+            },
+            {
+                "BundleId": "string"
+            },
+            {
+                "ProviderKey": "string"
+            },
+            {
+                "PerMachine": "number"
+            }
+        ]
+    },
+    {
+        "WixBundleCatalog": [
+            {
+                "WixBundleCatalog": "string"
+            },
+            {
+                "Payload_": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleContainer": [
+            {
+                "WixBundleContainer": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Type": "number"
+            },
+            {
+                "DownloadUrl": "string"
+            },
+            {
+                "Size": "number"
+            },
+            {
+                "Hash": "string"
+            },
+            {
+                "AttachedContainerIndex": "number"
+            },
+            {
+                "WorkingPath": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleExePackage": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "DetectCondition": "string"
+            },
+            {
+                "InstallCommand": "string"
+            },
+            {
+                "RepairCommand": "string"
+            },
+            {
+                "UninstallCommand": "string"
+            },
+            {
+                "ExeProtocol": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleMsiFeature": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Size": "number"
+            },
+            {
+                "Parent": "string"
+            },
+            {
+                "Title": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Display": "number"
+            },
+            {
+                "Level": "number"
+            },
+            {
+                "Directory": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixBundleMsiPackage": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "ProductCode": "string"
+            },
+            {
+                "UpgradeCode": "string"
+            },
+            {
+                "ProductVersion": "string"
+            },
+            {
+                "ProductLanguage": "number"
+            },
+            {
+                "ProductName": "string"
+            },
+            {
+                "Manufacturer": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleMsiProperty": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleMspPackage": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "PatchCode": "string"
+            },
+            {
+                "Manufacturer": "string"
+            },
+            {
+                "PatchXml": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleMsuPackage": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "DetectCondition": "string"
+            },
+            {
+                "MsuKB": "string"
+            }
+        ]
+    },
+    {
+        "WixBundlePackage": [
+            {
+                "WixChainItem_": "string"
+            },
+            {
+                "Type": "number"
+            },
+            {
+                "Payload_": "string"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "InstallCondition": "string"
+            },
+            {
+                "Cache": "number"
+            },
+            {
+                "CacheId": "string"
+            },
+            {
+                "Vital": "number"
+            },
+            {
+                "PerMachine": "number"
+            },
+            {
+                "LogPathVariable": "string"
+            },
+            {
+                "RollbackLogPathVariable": "string"
+            },
+            {
+                "Size": "number"
+            },
+            {
+                "InstallSize": "number"
+            },
+            {
+                "Version": "string"
+            },
+            {
+                "Language": "number"
+            },
+            {
+                "DisplayName": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "RollbackBoundary_": "string"
+            },
+            {
+                "RollbackBoundaryBackward_": "string"
+            },
+            {
+                "x64": "number"
+            }
+        ]
+    },
+    {
+        "WixBundlePackageCommandLine": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "InstallArgument": "string"
+            },
+            {
+                "UninstallArgument": "string"
+            },
+            {
+                "RepairArgument": "string"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "WixBundlePackageExitCode": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Code": "number"
+            },
+            {
+                "Behavior": "number"
+            }
+        ]
+    },
+    {
+        "WixBundlePackageGroup": [
+            {
+                "WixBundlePackageGroup": "string"
+            }
+        ]
+    },
+    {
+        "WixBundlePatchTargetCode": [
+            {
+                "PackageId": "string"
+            },
+            {
+                "TargetCode": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixBundlePayload": [
+            {
+                "WixBundlePayload": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "SourceFile": "path"
+            },
+            {
+                "DownloadUrl": "string"
+            },
+            {
+                "Compressed": "number"
+            },
+            {
+                "UnresolvedSourceFile": "string"
+            },
+            {
+                "DisplayName": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "EnableSignatureValidation": "number"
+            },
+            {
+                "FileSize": "number"
+            },
+            {
+                "Version": "string"
+            },
+            {
+                "Hash": "string"
+            },
+            {
+                "PublicKey": "string"
+            },
+            {
+                "Thumbprint": "string"
+            },
+            {
+                "Catalog_": "string"
+            },
+            {
+                "Container_": "string"
+            },
+            {
+                "Package": "string"
+            },
+            {
+                "ContentFile": "number"
+            },
+            {
+                "EmbeddedId": "string"
+            },
+            {
+                "LayoutOnly": "number"
+            },
+            {
+                "Packaging": "number"
+            },
+            {
+                "ParentPackagePayload_": "string"
+            }
+        ]
+    },
+    {
+        "WixBundlePayloadGroup": [
+            {
+                "WixBundlePayloadGroup": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleProperties": [
+            {
+                "DisplayName": "string"
+            },
+            {
+                "LogPathVariable": "string"
+            },
+            {
+                "Compressed": "string"
+            },
+            {
+                "Id": "string"
+            },
+            {
+                "UpgradeCode": "string"
+            },
+            {
+                "PerMachine": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleRelatedPackage": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "Id": "string"
+            },
+            {
+                "MinVersion": "string"
+            },
+            {
+                "MaxVersion": "string"
+            },
+            {
+                "Languages": "string"
+            },
+            {
+                "MinInclusive": "number"
+            },
+            {
+                "MaxInclusive": "number"
+            },
+            {
+                "LangInclusive": "number"
+            },
+            {
+                "OnlyDetect": "number"
+            }
+        ]
+    },
+    {
+        "WixBundleRollbackBoundary": [
+            {
+                "WixChainItem_": "string"
+            },
+            {
+                "Vital": "number"
+            },
+            {
+                "Transaction": "number"
+            }
+        ]
+    },
+    {
+        "WixBundleSlipstreamMsp": [
+            {
+                "WixBundlePackage_": "string"
+            },
+            {
+                "WixBundlePackage_Msp": "string"
+            }
+        ]
+    },
+    {
+        "WixBundleUpdate": [
+            {
+                "Location": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixBundleVariable": [
+            {
+                "WixBundleVariable": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Type": "string"
+            },
+            {
+                "Hidden": "number"
+            },
+            {
+                "Persisted": "number"
+            }
+        ]
+    },
+    {
+        "WixChain": [
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixChainItem": [
+            {
+                "Id": "string"
+            }
+        ]
+    },
+    {
+        "WixComplexReference": [
+            {
+                "Parent": "string"
+            },
+            {
+                "ParentAttributes": "number"
+            },
+            {
+                "ParentLanguage": "string"
+            },
+            {
+                "Child": "string"
+            },
+            {
+                "ChildAttributes": "number"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixComponentGroup": [
+            {
+                "WixComponentGroup": "string"
+            }
+        ]
+    },
+    {
+        "WixComponentSearch": [
+            {
+                "WixSearch_": "string"
+            },
+            {
+                "Guid": "string"
+            },
+            {
+                "ProductCode": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixControl": [
+            {
+                "Dialog_": "string"
+            },
+            {
+                "Control_": "string"
+            },
+            {
+                "SourceFile": "path"
+            }
+        ]
+    },
+    {
+        "WixCustomRow": [
+            {
+                "Table": "string"
+            },
+            {
+                "FieldData": "string"
+            }
+        ]
+    },
+    {
+        "WixCustomTable": [
+            {
+                "Table": "string"
+            },
+            {
+                "ColumnCount": "number"
+            },
+            {
+                "ColumnNames": "string"
+            },
+            {
+                "ColumnTypes": "string"
+            },
+            {
+                "PrimaryKeys": "string"
+            },
+            {
+                "MinValues": "string"
+            },
+            {
+                "MaxValues": "string"
+            },
+            {
+                "KeyTables": "string"
+            },
+            {
+                "KeyColumns": "string"
+            },
+            {
+                "Categories": "string"
+            },
+            {
+                "Sets": "string"
+            },
+            {
+                "Descriptions": "string"
+            },
+            {
+                "Modularizations": "string"
+            },
+            {
+                "BootstrapperApplicationData": "number"
+            }
+        ]
+    },
+    {
+        "WixDeltaPatchFile": [
+            {
+                "File_": "string"
+            },
+            {
+                "RetainLengths": "preserved"
+            },
+            {
+                "IgnoreOffsets": "preserved"
+            },
+            {
+                "IgnoreLengths": "preserved"
+            },
+            {
+                "RetainOffsets": "preserved"
+            },
+            {
+                "SymbolPaths": "preserved"
+            }
+        ]
+    },
+    {
+        "WixDeltaPatchSymbolPaths": [
+            {
+                "Id": "string"
+            },
+            {
+                "Type": "number"
+            },
+            {
+                "SymbolPaths": "preserved"
+            }
+        ]
+    },
+    {
+        "WixDirectory": [
+            {
+                "Directory_": "string"
+            },
+            {
+                "ComponentGuidGenerationSeed": "string"
+            }
+        ]
+    },
+    {
+        "WixEnsureTable": [
+            {
+                "Table": "string"
+            }
+        ]
+    },
+    {
+        "WixFeatureGroup": [
+            {
+                "WixFeatureGroup": "string"
+            }
+        ]
+    },
+    {
+        "WixFeatureModules": [
+            {
+                "Feature_": "string"
+            },
+            {
+                "WixMerge_": "string"
+            }
+        ]
+    },
+    {
+        "WixFile": [
+            {
+                "File_": "string"
+            },
+            {
+                "AssemblyType": "number"
+            },
+            {
+                "File_AssemblyManifest": "string"
+            },
+            {
+                "File_AssemblyApplication": "string"
+            },
+            {
+                "Directory_": "string"
+            },
+            {
+                "DiskId": "number"
+            },
+            {
+                "Source": "path"
+            },
+            {
+                "ProcessorArchitecture": "string"
+            },
+            {
+                "PatchGroup": "number"
+            },
+            {
+                "Attributes": "number"
+            },
+            {
+                "PatchAttributes": "number"
+            },
+            {
+                "DeltaPatchHeaderSource": "string"
+            }
+        ]
+    },
+    {
+        "WixFileSearch": [
+            {
+                "WixSearch_": "string"
+            },
+            {
+                "Path": "string"
+            },
+            {
+                "MinVersion": "string"
+            },
+            {
+                "MaxVersion": "string"
+            },
+            {
+                "MinSize": "number"
+            },
+            {
+                "MaxSize": "number"
+            },
+            {
+                "MinDate": "number"
+            },
+            {
+                "MaxDate": "number"
+            },
+            {
+                "Languages": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixFragment": [
+            {
+                "WixFragment": "string"
+            }
+        ]
+    },
+    {
+        "WixGroup": [
+            {
+                "ParentId": "string"
+            },
+            {
+                "ParentType": "string"
+            },
+            {
+                "ChildId": "string"
+            },
+            {
+                "ChildType": "string"
+            }
+        ]
+    },
+    {
+        "WixInstanceComponent": [
+            {
+                "Component_": "string"
+            }
+        ]
+    },
+    {
+        "WixInstanceTransforms": [
+            {
+                "Id": "string"
+            },
+            {
+                "PropertyId": "string"
+            },
+            {
+                "ProductCode": "string"
+            },
+            {
+                "ProductName": "string"
+            },
+            {
+                "UpgradeCode": "string"
+            }
+        ]
+    },
+    {
+        "WixMedia": [
+            {
+                "DiskId_": "number"
+            },
+            {
+                "CompressionLevel": "number"
+            },
+            {
+                "Layout": "string"
+            }
+        ]
+    },
+    {
+        "WixMediaTemplate": [
+            {
+                "CabinetTemplate": "string"
+            },
+            {
+                "CompressionLevel": "number"
+            },
+            {
+                "DiskPrompt": "string"
+            },
+            {
+                "VolumeLabel": "string"
+            },
+            {
+                "MaximumUncompressedMediaSize": "number"
+            },
+            {
+                "MaximumCabinetSizeForLargeFileSplitting": "number"
+            }
+        ]
+    },
+    {
+        "WixMerge": [
+            {
+                "WixMerge": "string"
+            },
+            {
+                "Language": "number"
+            },
+            {
+                "Directory_": "string"
+            },
+            {
+                "SourceFile": "path"
+            },
+            {
+                "DiskId": "number"
+            },
+            {
+                "FileCompression": "number"
+            },
+            {
+                "ConfigurationData": "string"
+            },
+            {
+                "Feature_": "string"
+            }
+        ]
+    },
+    {
+        "WixOrdering": [
+            {
+                "ItemType": "string"
+            },
+            {
+                "ItemId_": "string"
+            },
+            {
+                "DependsOnType": "string"
+            },
+            {
+                "DependsOnId_": "string"
+            }
+        ]
+    },
+    {
+        "WixPackageFeatureInfo": [
+            {
+                "Package": "string"
+            },
+            {
+                "Feature": "string"
+            },
+            {
+                "Size": "string"
+            },
+            {
+                "Parent": "string"
+            },
+            {
+                "Title": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "Display": "string"
+            },
+            {
+                "Level": "string"
+            },
+            {
+                "Directory": "string"
+            },
+            {
+                "Attributes": "string"
+            }
+        ]
+    },
+    {
+        "WixPackageProperties": [
+            {
+                "Package": "string"
+            },
+            {
+                "Vital": "string"
+            },
+            {
+                "DisplayName": "string"
+            },
+            {
+                "Description": "string"
+            },
+            {
+                "DownloadSize": "string"
+            },
+            {
+                "PackageSize": "string"
+            },
+            {
+                "InstalledSize": "string"
+            },
+            {
+                "PackageType": "string"
+            },
+            {
+                "Permanent": "string"
+            },
+            {
+                "LogPathVariable": "string"
+            },
+            {
+                "RollbackLogPathVariable": "string"
+            },
+            {
+                "Compressed": "string"
+            },
+            {
+                "DisplayInternalUI": "string"
+            },
+            {
+                "ProductCode": "string"
+            },
+            {
+                "UpgradeCode": "string"
+            },
+            {
+                "Version": "string"
+            },
+            {
+                "InstallCondition": "string"
+            },
+            {
+                "Cache": "string"
+            }
+        ]
+    },
+    {
+        "WixPatchBaseline": [
+            {
+                "WixPatchBaseline": "string"
+            },
+            {
+                "DiskId": "number"
+            },
+            {
+                "ValidationFlags": "number"
+            }
+        ]
+    },
+    {
+        "WixPatchFamilyGroup": [
+            {
+                "WixPatchFamilyGroup": "string"
+            }
+        ]
+    },
+    {
+        "WixPatchId": [
+            {
+                "ProductCode": "string"
+            },
+            {
+                "ClientPatchId": "string"
+            },
+            {
+                "OptimizePatchSizeForLargeFiles": "number"
+            },
+            {
+                "ApiPatchingSymbolFlags": "number"
+            }
+        ]
+    },
+    {
+        "WixPatchMetadata": [
+            {
+                "Property": "string"
+            },
+            {
+                "Value": "string"
+            }
+        ]
+    },
+    {
+        "WixPatchRef": [
+            {
+                "Table": "string"
+            },
+            {
+                "PrimaryKeys": "string"
+            }
+        ]
+    },
+    {
+        "WixPatchTarget": [
+            {
+                "ProductCode": "string"
+            }
+        ]
+    },
+    {
+        "WixPayloadProperties": [
+            {
+                "Payload": "string"
+            },
+            {
+                "Package": "string"
+            },
+            {
+                "Container": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Size": "string"
+            },
+            {
+                "DownloadUrl": "string"
+            },
+            {
+                "LayoutOnly": "string"
+            }
+        ]
+    },
+    {
+        "WixProductSearch": [
+            {
+                "WixSearch_": "string"
+            },
+            {
+                "Guid": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixProperty": [
+            {
+                "Property_": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixRegistrySearch": [
+            {
+                "WixSearch_": "string"
+            },
+            {
+                "Root": "number"
+            },
+            {
+                "Key": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixRelatedBundle": [
+            {
+                "Id": "string"
+            },
+            {
+                "Action": "number"
+            }
+        ]
+    },
+    {
+        "WixSearch": [
+            {
+                "WixSearch": "string"
+            },
+            {
+                "Variable": "string"
+            },
+            {
+                "Condition": "string"
+            }
+        ]
+    },
+    {
+        "WixSearchRelation": [
+            {
+                "WixSearch_": "string"
+            },
+            {
+                "ParentId_": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    },
+    {
+        "WixSimpleReference": [
+            {
+                "Table": "string"
+            },
+            {
+                "PrimaryKeys": "string"
+            }
+        ]
+    },
+    {
+        "WixSuppressAction": [
+            {
+                "SequenceTable": "string"
+            },
+            {
+                "Action": "string"
+            }
+        ]
+    },
+    {
+        "WixSuppressModularization": [
+            {
+                "WixSuppressModularization": "string"
+            }
+        ]
+    },
+    {
+        "WixUI": [
+            {
+                "WixUI": "string"
+            }
+        ]
+    },
+    {
+        "WixUpdateRegistration": [
+            {
+                "Manufacturer": "string"
+            },
+            {
+                "Department": "string"
+            },
+            {
+                "ProductFamily": "string"
+            },
+            {
+                "Name": "string"
+            },
+            {
+                "Classification": "string"
+            }
+        ]
+    },
+    {
+        "WixVariable": [
+            {
+                "WixVariable": "string"
+            },
+            {
+                "Value": "string"
+            },
+            {
+                "Attributes": "number"
+            }
+        ]
+    }
+]

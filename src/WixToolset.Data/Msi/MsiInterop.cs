@@ -2,25 +2,25 @@
 
 namespace WixToolset.Data.Msi
 {
-    class MsiInterop
+    public class MsiInterop
     {
         // Patching constants
         internal const int MsiMaxStreamNameLength = 62; // http://msdn2.microsoft.com/library/aa370551.aspx
 
         // Component.Attributes
-        internal const int MsidbComponentAttributesLocalOnly = 0;
-        internal const int MsidbComponentAttributesSourceOnly = 1;
-        internal const int MsidbComponentAttributesOptional = 2;
-        internal const int MsidbComponentAttributesRegistryKeyPath = 4;
-        internal const int MsidbComponentAttributesSharedDllRefCount = 8;
-        internal const int MsidbComponentAttributesPermanent = 16;
-        internal const int MsidbComponentAttributesODBCDataSource = 32;
-        internal const int MsidbComponentAttributesTransitive = 64;
-        internal const int MsidbComponentAttributesNeverOverwrite = 128;
-        internal const int MsidbComponentAttributes64bit = 256;
-        internal const int MsidbComponentAttributesDisableRegistryReflection = 512;
-        internal const int MsidbComponentAttributesUninstallOnSupersedence = 1024;
-        internal const int MsidbComponentAttributesShared = 2048;
+        public const int MsidbComponentAttributesLocalOnly = 0;
+        public const int MsidbComponentAttributesSourceOnly = 1;
+        public const int MsidbComponentAttributesOptional = 2;
+        public const int MsidbComponentAttributesRegistryKeyPath = 4;
+        public const int MsidbComponentAttributesSharedDllRefCount = 8;
+        public const int MsidbComponentAttributesPermanent = 16;
+        public const int MsidbComponentAttributesODBCDataSource = 32;
+        public const int MsidbComponentAttributesTransitive = 64;
+        public const int MsidbComponentAttributesNeverOverwrite = 128;
+        public const int MsidbComponentAttributes64bit = 256;
+        public const int MsidbComponentAttributesDisableRegistryReflection = 512;
+        public const int MsidbComponentAttributesUninstallOnSupersedence = 1024;
+        public const int MsidbComponentAttributesShared = 2048;
 
         // BBControl.Attributes & Control.Attributes
         internal const int MsidbControlAttributesVisible = 0x00000001;
@@ -141,14 +141,14 @@ namespace WixToolset.Data.Msi
         internal const int MsidbFeatureAttributesNoUnsupportedAdvertise = 32;
 
         // File.Attributes
-        internal const int MsidbFileAttributesReadOnly = 1;
-        internal const int MsidbFileAttributesHidden = 2;
-        internal const int MsidbFileAttributesSystem = 4;
-        internal const int MsidbFileAttributesVital = 512;
-        internal const int MsidbFileAttributesChecksum = 1024;
-        internal const int MsidbFileAttributesPatchAdded = 4096;
-        internal const int MsidbFileAttributesNoncompressed = 8192;
-        internal const int MsidbFileAttributesCompressed = 16384;
+        public const int MsidbFileAttributesReadOnly = 1;
+        public const int MsidbFileAttributesHidden = 2;
+        public const int MsidbFileAttributesSystem = 4;
+        public const int MsidbFileAttributesVital = 512;
+        public const int MsidbFileAttributesChecksum = 1024;
+        public const int MsidbFileAttributesPatchAdded = 4096;
+        public const int MsidbFileAttributesNoncompressed = 8192;
+        public const int MsidbFileAttributesCompressed = 16384;
 
         // IniFile.Action & RemoveIniFile.Action
         internal const int MsidbIniFileActionAddLine = 0;

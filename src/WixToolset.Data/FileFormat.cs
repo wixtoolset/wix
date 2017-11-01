@@ -13,5 +13,7 @@ namespace WixToolset.Data
         Wixout,
 
         Wixpdb,
+
+        WixIR,
     }
 }

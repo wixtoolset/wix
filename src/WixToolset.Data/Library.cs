@@ -15,6 +15,7 @@ namespace WixToolset.Data
         public const string XmlNamespaceUri = "http://wixtoolset.org/schemas/v4/wixlib";
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
 
+#if false
         private string id;
         private List<string> embedFilePaths;
         private Dictionary<string, Localization> localizations;
@@ -186,7 +187,7 @@ namespace WixToolset.Data
                             switch (reader.LocalName)
                             {
                                 case "localization":
-                                    Localization localization = Localization.Read(reader, tableDefinitions);
+                                    Localization localization = Localization.Read(reader);
                                     library.localizations.Add(localization.Culture, localization);
                                     break;
                                 case "section":
@@ -237,5 +238,6 @@ namespace WixToolset.Data
 
             writer.WriteEndElement();
         }
+#endif
     }
 }

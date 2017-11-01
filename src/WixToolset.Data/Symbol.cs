@@ -18,17 +18,18 @@ namespace WixToolset.Data
         /// Creates a symbol for a row.
         /// </summary>
         /// <param name="row">Row for the symbol</param>
-        public Symbol(Row row)
+        public Symbol(IntermediateSection section, IntermediateTuple tuple)
         {
-            this.Row = row;
-            this.Name = String.Concat(this.Row.TableDefinition.Name, ":", this.Row.GetPrimaryKey());
+            this.Row = tuple;
+            this.Section = section;
+            this.Name = String.Concat(this.Row.Definition.Name, ":", this.Row.Id.Id);
         }
 
         /// <summary>
         /// Gets the accessibility of the symbol which is a direct reflection of the accessibility of the row's accessibility.
         /// </summary>
         /// <value>Accessbility of the symbol.</value>
-        public AccessModifier Access { get { return this.Row.Access; } }
+        public AccessModifier Access { get { return this.Row.Id.Access; } }
 
         /// <summary>
         /// Gets the name of the symbol.
@@ -40,13 +41,13 @@ namespace WixToolset.Data
         /// Gets the row for this symbol.
         /// </summary>
         /// <value>Row for this symbol.</value>
-        public Row Row { get; private set; }
+        public IntermediateTuple Row { get; private set; }
 
         /// <summary>
         /// Gets the section for the symbol.
         /// </summary>
         /// <value>Section for the symbol.</value>
-        public Section Section { get { return this.Row.Section; } }
+        public IntermediateSection Section { get; private set; } //{ get { return this.Row.Section; } }
 
         /// <summary>
         /// Gets any duplicates of this symbol that are possible conflicts.

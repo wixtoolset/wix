@@ -7,6 +7,7 @@ namespace WixToolset.Data
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text;
 
     /// <summary>
     /// Class that understands the standard file structures in the WiX toolset.
@@ -20,6 +21,8 @@ namespace WixToolset.Data
 
         private static readonly Dictionary<string, FileFormat> SupportedFileFormats = new Dictionary<string, FileFormat>()
         {
+            { "wir", FileFormat.WixIR },
+            { "wixirf", FileFormat.WixIR },
             { "wixobj", FileFormat.Wixobj },
             { "wixlib", FileFormat.Wixlib },
             { "wixout", FileFormat.Wixout },
@@ -36,7 +39,7 @@ namespace WixToolset.Data
         /// <summary>
         /// Count of embedded files in the file structure.
         /// </summary>
-        public int EmbeddedFileCount { get { return this.embeddedFileSizes.Length; } }
+        public int EmbeddedFileCount => this.embeddedFileSizes.Length;
 
         /// <summary>
         /// File format of the file structure.
@@ -50,15 +53,15 @@ namespace WixToolset.Data
         /// <param name="fileFormat">File format for the file structure.</param>
         /// <param name="embedFilePaths">Paths to files to embedd in the file structure.</param>
         /// <returns>Newly created file structure.</returns>
-        public static FileStructure Create(Stream stream, FileFormat fileFormat, List<string> embedFilePaths)
+        public static FileStructure Create(Stream stream, FileFormat fileFormat, IEnumerable<string> embedFilePaths)
         {
-            FileStructure fs = new FileStructure();
-            using (NonClosingStreamWrapper wrapper = new NonClosingStreamWrapper(stream))
-            using (BinaryWriter writer = new BinaryWriter(wrapper))
+            var fs = new FileStructure();
+
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8, true))
             {
                 fs.WriteType(writer, fileFormat);
 
-                fs.WriteEmbeddedFiles(writer, embedFilePaths ?? new List<string>());
+                fs.WriteEmbeddedFiles(writer, embedFilePaths.ToArray());
 
                 // Remember the data stream offset, which is right after the embedded files have been written.
                 fs.dataStreamOffset = stream.Position;
@@ -76,13 +79,13 @@ namespace WixToolset.Data
         /// <returns>File structure populated from the stream.</returns>
         public static FileStructure Read(Stream stream)
         {
-            FileStructure fs = new FileStructure();
-            using (NonClosingStreamWrapper wrapper = new NonClosingStreamWrapper(stream))
-            using (BinaryReader reader = new BinaryReader(wrapper))
+            var fs = new FileStructure();
+
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
             {
                 fs.FileFormat = FileStructure.ReadFileFormat(reader);
 
-                if (FileFormat.Unknown != fs.FileFormat)
+                if (fs.FileFormat != FileFormat.Unknown)
                 {
                     fs.embeddedFileSizes = FileStructure.ReadEmbeddedFileSizes(reader);
 
@@ -107,8 +110,7 @@ namespace WixToolset.Data
         /// <returns>Best guess at file format.</returns>
         public static FileFormat GuessFileFormatFromExtension(string extension)
         {
-            FileFormat format;
-            return FileStructure.SupportedFileFormats.TryGetValue(extension.TrimStart('.').ToLowerInvariant(), out format) ? format : FileFormat.Unknown;
+            return FileStructure.SupportedFileFormats.TryGetValue(extension.TrimStart('.').ToLowerInvariant(), out var format) ? format : FileFormat.Unknown;
         }
 
         /// <summary>
@@ -124,8 +126,7 @@ namespace WixToolset.Data
 
             try
             {
-                using (NonClosingStreamWrapper wrapper = new NonClosingStreamWrapper(stream))
-                using (BinaryReader reader = new BinaryReader(wrapper))
+                using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
                 {
                     format = FileStructure.ReadFileFormat(reader);
                 }
@@ -182,7 +183,21 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Disposes of the internsl state of the file structure.
+        /// Gets the data of the file as a string.
+        /// </summary>
+        /// <returns>String contents data of the file.</returns>
+        public string GetData()
+        {
+            var bytes = new byte[this.stream.Length - this.dataStreamOffset];
+
+            this.stream.Seek(this.dataStreamOffset, SeekOrigin.Begin);
+            this.stream.Read(bytes, 0, bytes.Length);
+
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        /// <summary>
+        /// Disposes of the internal state of the file structure.
         /// </summary>
         public void Dispose()
         {
@@ -217,7 +232,13 @@ namespace WixToolset.Data
         {
             FileFormat format = FileFormat.Unknown;
 
-            string type = new string(reader.ReadChars(6));
+            string type = new string(reader.ReadChars(3));
+            if (FileStructure.SupportedFileFormats.TryGetValue(type, out format))
+            {
+                return format;
+            }
+
+            type += new string(reader.ReadChars(3));
             FileStructure.SupportedFileFormats.TryGetValue(type, out format);
 
             return format;
@@ -256,21 +277,21 @@ namespace WixToolset.Data
 
             this.FileFormat = fileFormat;
 
-            Debug.Assert(6 == type.ToCharArray().Length);
+            Debug.Assert(3 == type.ToCharArray().Length || 6 == type.ToCharArray().Length);
             writer.Write(type.ToCharArray());
             return writer;
         }
 
-        private BinaryWriter WriteEmbeddedFiles(BinaryWriter writer, List<string> embedFilePaths)
+        private BinaryWriter WriteEmbeddedFiles(BinaryWriter writer, string[] embedFilePaths)
         {
             // First write the count of embedded files as a Uint32;
-            writer.Write((uint)embedFilePaths.Count);
+            writer.Write((uint)embedFilePaths.Length);
 
-            this.embeddedFileSizes = new long[embedFilePaths.Count];
+            this.embeddedFileSizes = new long[embedFilePaths.Length];
 
             // Next write out the size of each file as a Uint64 in order.
-            FileInfo[] files = new FileInfo[embedFilePaths.Count];
-            for (int i = 0; i < embedFilePaths.Count; ++i)
+            FileInfo[] files = new FileInfo[embedFilePaths.Length];
+            for (int i = 0; i < embedFilePaths.Length; ++i)
             {
                 files[i] = new FileInfo(embedFilePaths[i]);
 

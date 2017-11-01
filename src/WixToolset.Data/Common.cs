@@ -11,13 +11,11 @@ namespace WixToolset.Data
 
     internal static class Common
     {
-        public const int IntegerNotSet = int.MinValue;
+        public const int IntegerNotSet = Int32.MinValue;
 
         internal static readonly XNamespace W3SchemaPrefix = "http://www.w3.org/";
 
         internal static readonly string[] ReservedFileNames = { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
-
-        private static readonly Regex LegalIdentifierCharacters = new Regex(@"^[_A-Za-z][0-9A-Za-z_\.]*$", RegexOptions.Compiled);
 
         internal static string GetFileHash(FileInfo fileInfo)
         {
@@ -37,19 +35,6 @@ namespace WixToolset.Data
             }
 
             return sb.ToString();
-        }
-
-        public static bool IsIdentifier(string value)
-        {
-            if (!String.IsNullOrEmpty(value))
-            {
-                if (LegalIdentifierCharacters.IsMatch(value))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

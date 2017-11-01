@@ -3,17 +3,10 @@
 namespace WixToolset.Data
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
     using System.Xml;
-    using System.Xml.Linq;
-    using System.Xml.Schema;
     using WixToolset.Data.Msi;
     using WixToolset.Data.Rows;
 
@@ -24,17 +17,17 @@ namespace WixToolset.Data
     {
         private static string XmlElementName = "localization";
 
-        private Dictionary<string, WixVariableRow> variables = new Dictionary<string, WixVariableRow>();
+        private Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
         private Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
 
         /// <summary>
         /// Instantiates a new localization object.
         /// </summary>
-        public Localization(int codepage, string culture, IDictionary<string, WixVariableRow> variables, IDictionary<string, LocalizedControl> localizedControls)
+        public Localization(int codepage, string culture, IDictionary<string, BindVariable> variables, IDictionary<string, LocalizedControl> localizedControls)
         {
             this.Codepage = codepage;
             this.Culture = String.IsNullOrEmpty(culture) ? String.Empty : culture.ToLowerInvariant();
-            this.variables = new Dictionary<string, WixVariableRow>(variables);
+            this.variables = new Dictionary<string, BindVariable>(variables);
             this.localizedControls = new Dictionary<string, LocalizedControl>(localizedControls);
         }
 
@@ -54,19 +47,13 @@ namespace WixToolset.Data
         /// Gets the variables.
         /// </summary>
         /// <value>The variables.</value>
-        public ICollection<WixVariableRow> Variables
-        {
-            get { return this.variables.Values; }
-        }
+        public ICollection<BindVariable> Variables => this.variables.Values;
 
         /// <summary>
         /// Gets the localized controls.
         /// </summary>
         /// <value>The localized controls.</value>
-        public ICollection<KeyValuePair<string, LocalizedControl>> LocalizedControls
-        {
-            get { return this.localizedControls; }
-        }
+        public ICollection<KeyValuePair<string, LocalizedControl>> LocalizedControls => this.localizedControls;
 
         /// <summary>
         /// Merge the information from another localization object into this one.
@@ -74,10 +61,9 @@ namespace WixToolset.Data
         /// <param name="localization">The localization object to be merged into this one.</param>
         public void Merge(Localization localization)
         {
-            foreach (WixVariableRow wixVariableRow in localization.Variables)
+            foreach (BindVariable wixVariableRow in localization.Variables)
             {
-                WixVariableRow existingWixVariableRow;
-                if (!this.variables.TryGetValue(wixVariableRow.Id, out existingWixVariableRow) || (existingWixVariableRow.Overridable && !wixVariableRow.Overridable))
+                if (!this.variables.TryGetValue(wixVariableRow.Id, out BindVariable existingWixVariableRow) || (existingWixVariableRow.Overridable && !wixVariableRow.Overridable))
                 {
                     variables[wixVariableRow.Id] = wixVariableRow;
                 }
@@ -94,7 +80,7 @@ namespace WixToolset.Data
         /// <param name="reader">XmlReader where the intermediate is persisted.</param>
         /// <param name="tableDefinitions">Collection containing TableDefinitions to use when loading the localization file.</param>
         /// <returns>Returns the loaded localization.</returns>
-        internal static Localization Read(XmlReader reader, TableDefinitionCollection tableDefinitions)
+        internal static Localization Read(XmlReader reader)
         {
             Debug.Assert("localization" == reader.LocalName);
 
@@ -115,8 +101,7 @@ namespace WixToolset.Data
                 }
             }
 
-            TableDefinition wixVariableTable = tableDefinitions["WixVariable"];
-            Dictionary<string, WixVariableRow> variables = new Dictionary<string, WixVariableRow>();
+            Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
             Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
 
             if (!empty)
@@ -131,7 +116,7 @@ namespace WixToolset.Data
                             switch (reader.LocalName)
                             {
                                 case "string":
-                                    WixVariableRow row = Localization.ReadString(reader, wixVariableTable);
+                                    BindVariable row = Localization.ReadString(reader);
                                     variables.Add(row.Id, row);
                                     break;
 
@@ -177,7 +162,7 @@ namespace WixToolset.Data
                 writer.WriteAttributeString("culture", this.Culture);
             }
 
-            foreach (WixVariableRow wixVariableRow in this.variables.Values)
+            foreach (BindVariable wixVariableRow in this.variables.Values)
             {
                 writer.WriteStartElement("string", Library.XmlNamespaceUri);
 
@@ -265,7 +250,7 @@ namespace WixToolset.Data
         /// <param name="reader">XmlReader where the intermediate is persisted.</param>
         /// <param name="tableDefinitions">Collection containing TableDefinitions to use when loading the localization file.</param>
         /// <returns>Returns the loaded localization.</returns>
-        private static WixVariableRow ReadString(XmlReader reader, TableDefinition wixVariableTable)
+        private static BindVariable ReadString(XmlReader reader)
         {
             Debug.Assert("string" == reader.LocalName);
 
@@ -302,7 +287,8 @@ namespace WixToolset.Data
                 }
             }
 
-            WixVariableRow wixVariableRow = new WixVariableRow(SourceLineNumber.CreateFromUri(reader.BaseURI), wixVariableTable);
+            BindVariable wixVariableRow = new BindVariable();
+            wixVariableRow.SourceLineNumbers = SourceLineNumber.CreateFromUri(reader.BaseURI);
             wixVariableRow.Id = id;
             wixVariableRow.Overridable = overridable;
             wixVariableRow.Value = value;

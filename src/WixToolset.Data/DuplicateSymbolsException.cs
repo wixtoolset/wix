@@ -5,6 +5,7 @@ namespace WixToolset.Data
     using System;
     using System.Collections;
 
+#if false
     /// <summary>
     /// Duplicate symbols exception.
     /// </summary>
@@ -32,4 +33,5 @@ namespace WixToolset.Data
             return this.duplicateSymbols;
         }
     }
+#endif
 }
