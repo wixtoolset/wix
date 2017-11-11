@@ -7,10 +7,34 @@ namespace WixToolset.Extensibility.Services
 
     public interface IExtensionManager
     {
-        Assembly Add(Assembly assembly);
+        /// <summary>
+        /// Adds an extension assembly directly to the manager.
+        /// </summary>
+        /// <param name="extensionAssembly">Extension assembly.</param>
+        void Add(Assembly extensionAssembly);
 
-        Assembly Load(string extension);
+        /// <summary>
+        /// Loads an extension assembly from a type description string.
+        /// </summary>
+        /// <param name="extension">The assembly type description string.</param>
+        /// <returns>The loaded assembly. This assembly can be ignored since the extension manager maintains the list of loaded assemblies internally.</returns>
+        /// <remarks>
+        /// <paramref name="extension"/> can be in several different forms:
+        /// <list type="number">
+        /// <item><term>AssemblyName (MyAssembly, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b17a5c561934e089)</term></item>
+        /// <item><term>Absolute path to an assembly (C:\MyExtensions\ExtensionAssembly.dll)</term></item>
+        /// <item><term>Filename of an assembly in the application directory (ExtensionAssembly.dll)</term></item>
+        /// <item><term>Relative path to an assembly (..\..\MyExtensions\ExtensionAssembly.dll)</term></item>
+        /// </list>
+        /// </remarks>
+        void Load(string extensionPath);
 
+
+        /// <summary>
+        /// Creates extension of specified type from factories loaded into the extension manager.
+        /// </summary>
+        /// <typeparam name="T">Type of extension to create.</typeparam>
+        /// <returns>Extensions created of the specified type.</returns>
         IEnumerable<T> Create<T>() where T : class;
     }
 }
