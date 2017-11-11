@@ -7,6 +7,7 @@ namespace WixToolset.Data
     using System.Text;
     using System.Xml;
     using System.Xml.Linq;
+    using SimpleJson;
 
     /// <summary>
     /// Represents file name and line number for source file
@@ -60,6 +61,38 @@ namespace WixToolset.Data
             {
                 return this.LineNumber.HasValue ? String.Concat(this.FileName, "*", this.LineNumber) : this.FileName;
             }
+        }
+
+        internal static SourceLineNumber Deserialize(JsonObject jsonObject)
+        {
+            var fileName = jsonObject.GetValueOrDefault<string>("file");
+            var lineNumber = jsonObject.GetValueOrDefault("line", null);
+
+            var parentJson = jsonObject.GetValueOrDefault<JsonObject>("parent");
+            var parent = (parentJson == null) ? null : SourceLineNumber.Deserialize(parentJson);
+
+            return new SourceLineNumber(fileName)
+            {
+                LineNumber = lineNumber,
+                Parent = parent
+            };
+        }
+
+        internal JsonObject Serialize()
+        {
+            var jsonObject = new JsonObject
+            {
+                { "file", this.FileName },
+                { "line", this.LineNumber }
+            };
+
+            if (this.Parent != null)
+            {
+                var parentJson = this.Parent.Serialize();
+                jsonObject.Add("parent", parentJson);
+            }
+
+            return jsonObject;
         }
 
         /// <summary>

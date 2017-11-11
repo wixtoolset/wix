@@ -15,7 +15,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Directory_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.SourceFile), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.DiskId), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.FileCompression), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.FileCompression), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.ConfigurationData), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Feature_), IntermediateFieldType.String),
             },
@@ -79,9 +79,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixMergeTupleFields.DiskId, value);
         }
 
-        public int FileCompression
+        public bool? FileCompression
         {
-            get => (int)this.Fields[(int)WixMergeTupleFields.FileCompression]?.Value;
+            get => (bool?)this.Fields[(int)WixMergeTupleFields.FileCompression]?.Value;
             set => this.Set((int)WixMergeTupleFields.FileCompression, value);
         }
 

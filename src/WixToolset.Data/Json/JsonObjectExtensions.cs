@@ -12,6 +12,11 @@ namespace WixToolset.Data
             return jsonObject.TryGetValue(key, out var value) ? Convert.ToInt32(value) : defaultValue;
         }
 
+        public static int? GetValueOrDefault(this JsonObject jsonObject, string key, int? defaultValue)
+        {
+            return jsonObject.TryGetValue(key, out var value) ? Convert.ToInt32(value) : defaultValue;
+        }
+
         public static T GetValueOrDefault<T>(this JsonObject jsonObject, string key, T defaultValue = default(T)) where T : class
         {
             return jsonObject.TryGetValue(key, out var value) ? value as T: defaultValue;

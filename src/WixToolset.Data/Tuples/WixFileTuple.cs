@@ -133,7 +133,7 @@ namespace WixToolset.Data.Tuples
 
         public string Source
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.Source]?.Value;
+            get => this.Fields[(int)WixFileTupleFields.Source].AsPath()?.Path;
             set => this.Set((int)WixFileTupleFields.Source, value);
         }
 

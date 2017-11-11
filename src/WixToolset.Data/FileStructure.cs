@@ -61,7 +61,7 @@ namespace WixToolset.Data
             {
                 fs.WriteType(writer, fileFormat);
 
-                fs.WriteEmbeddedFiles(writer, embedFilePaths.ToArray());
+                fs.WriteEmbeddedFiles(writer, embedFilePaths?.ToArray() ?? Array.Empty<string>());
 
                 // Remember the data stream offset, which is right after the embedded files have been written.
                 fs.dataStreamOffset = stream.Position;

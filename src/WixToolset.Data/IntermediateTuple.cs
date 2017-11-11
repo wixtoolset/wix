@@ -30,11 +30,16 @@ namespace WixToolset.Data
 
         internal static IntermediateTuple Deserialize(ITupleDefinitionCreator creator, JsonObject jsonObject)
         {
-            var definitionName = jsonObject.GetValueOrDefault<string>("def");
+            var definitionName = jsonObject.GetValueOrDefault<string>("type");
+            var idJson = jsonObject.GetValueOrDefault<JsonObject>("id");
+            var sourceLineNumbersJson = jsonObject.GetValueOrDefault<JsonObject>("ln");
             var fieldsJson = jsonObject.GetValueOrDefault<JsonArray>("fields");
 
             creator.TryGetTupleDefinitionByName(definitionName, out var definition); // TODO: this isn't sufficient.
             var tuple = definition.CreateTuple();
+
+            tuple.Id = (idJson == null) ? null : Identifier.Deserialize(idJson);
+            tuple.SourceLineNumbers = (sourceLineNumbersJson == null) ? null : SourceLineNumber.Deserialize(sourceLineNumbersJson);
 
             for (var i = 0; i < fieldsJson.Count; ++i)
             {
@@ -51,8 +56,20 @@ namespace WixToolset.Data
         {
             var jsonObject = new JsonObject
             {
-                { "def", this.Definition.Name }
+                { "type", this.Definition.Name }
             };
+
+            var idJson = this.Id?.Serialize();
+            if (idJson != null)
+            {
+                jsonObject.Add("id", idJson);
+            }
+
+            var lnJson = this.SourceLineNumbers?.Serialize();
+            if (lnJson != null)
+            {
+                jsonObject.Add("ln", lnJson);
+            }
 
             var fieldsJson = new JsonArray(this.Fields.Length);
 

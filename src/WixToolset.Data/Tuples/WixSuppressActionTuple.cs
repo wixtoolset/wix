@@ -19,6 +19,8 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixSuppressActionTupleFields
     {
         SequenceTable,
@@ -37,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixSuppressActionTupleFields index] => this.Fields[(int)index];
 
-        public string SequenceTable
+        public SequenceTable SequenceTable
         {
-            get => (string)this.Fields[(int)WixSuppressActionTupleFields.SequenceTable]?.Value;
-            set => this.Set((int)WixSuppressActionTupleFields.SequenceTable, value);
+            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixSuppressActionTupleFields.SequenceTable]?.Value);
+            set => this.Set((int)WixSuppressActionTupleFields.SequenceTable, value.ToString());
         }
 
         public string Action

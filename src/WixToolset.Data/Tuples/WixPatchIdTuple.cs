@@ -12,7 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ClientPatchId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ApiPatchingSymbolFlags), IntermediateFieldType.Number),
             },
             typeof(WixPatchIdTuple));
@@ -53,9 +53,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixPatchIdTupleFields.ClientPatchId, value);
         }
 
-        public int OptimizePatchSizeForLargeFiles
+        public bool OptimizePatchSizeForLargeFiles
         {
-            get => (int)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles]?.Value;
+            get => (bool)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles]?.Value;
             set => this.Set((int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles, value);
         }
 
