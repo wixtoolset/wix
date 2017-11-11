@@ -1,20 +1,13 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.ComponentModel;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
-    using System.Xml;
-    using System.Xml.XPath;
-    using WixToolset.Clr.Interop;
     using WixToolset.Data;
     using WixToolset.Data.Rows;
     using WixToolset.MergeMod;
@@ -35,12 +28,10 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
         public IEnumerable<string> SuppressedTableNames { private get; set; }
 
-        public string TempFilesLocation { private get; set; }
+        public string IntermediateFolder { private get; set; }
 
         public void Execute()
         {
-            Debug.Assert(OutputType.Product == this.Output.Type);
-
             Table wixMergeTable = this.Output.Tables["WixMerge"];
             Table wixFeatureModulesTable = this.Output.Tables["WixFeatureModules"];
 
@@ -59,7 +50,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             {
                 merge = MsmInterop.GetMsmMerge();
 
-                logPath = Path.Combine(this.TempFilesLocation, "merge.log");
+                logPath = Path.Combine(this.IntermediateFolder, "merge.log");
                 merge.OpenLog(logPath);
                 logOpen = true;
 
@@ -79,7 +70,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                         {
                             mergeLanguage = Convert.ToInt16(wixMergeRow.Language, CultureInfo.InvariantCulture);
                         }
-                        catch (System.FormatException)
+                        catch (FormatException)
                         {
                             Messaging.Instance.OnMessage(WixErrors.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, wixMergeRow.Language));
                             continue;
@@ -284,7 +275,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                 Messaging.Instance.OnMessage(WixVerboses.ResequencingMergeModuleFiles());
                 using (View view = db.OpenView("SELECT `Sequence`, `Attributes` FROM `File` WHERE `File`=?"))
                 {
-                    foreach (FileFacade file in this.FileFacades)
+                    foreach (var file in this.FileFacades)
                     {
                         if (!file.FromModule)
                         {
@@ -307,32 +298,29 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                             //recordUpdate.SetInteger(1, file.File.Sequence);
                             throw new NotImplementedException();
 
-                            // update the file attributes to match the compression specified
-                            // on the Merge element or on the Package element
-                            int attributes = 0;
+                            // Update the file attributes to match the compression specified
+                            // on the Merge element or on the Package element.
+                            var attributes = 0;
 
-                            // get the current value if its not null
+                            // Get the current value if its not null.
                             if (!recordUpdate.IsNull(2))
                             {
                                 attributes = recordUpdate.GetInteger(2);
                             }
 
-                            // not specified
                             if (!file.File.Compressed.HasValue)
                             {
-                                // clear any compression bits
+                                // Clear all compression bits.
                                 attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
                                 attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
                             }
                             else if (file.File.Compressed.Value)
                             {
-                                // these are mutually exclusive
                                 attributes |= MsiInterop.MsidbFileAttributesCompressed;
                                 attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
                             }
                             else if (!file.File.Compressed.Value)
                             {
-                                // these are mutually exclusive
                                 attributes |= MsiInterop.MsidbFileAttributesNoncompressed;
                                 attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
                             }

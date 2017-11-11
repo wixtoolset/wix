@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
         public InscribeMsiPackageCommand(IInscribeContext context)
         {
             this.Context = context;
-            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
+            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
         }
 
         private IInscribeContext Context { get; }

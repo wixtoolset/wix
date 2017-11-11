@@ -4,16 +4,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 {
     using System;
     using System.Collections;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using WixToolset.Core.Native;
-    using WixToolset.Core.WindowsInstaller.Databases;
+    using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Msi;
 
@@ -26,7 +23,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.ExportBasePath = exportBasePath;
             this.IntermediateFolder = intermediateFolder;
 
-            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
+            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
         }
 
         private Messaging Messaging { get; }

@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
@@ -10,6 +10,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
     using WixToolset.Extensibility;
     using WixToolset.Core.Native;
     using WixToolset.Core.Bind;
+    using WixToolset.Data.Tuples;
 
     internal class CopyTransformDataCommand
     {
@@ -29,7 +30,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
             List<FileFacade> allFileRows = this.CopyOutFileRows ? new List<FileFacade>() : null;
 
-#if false // TODO: Fix this patching related code to work correctly with FileFacades.
+#if REVISIT_FOR_PATCHING // TODO: Fix this patching related code to work correctly with FileFacades.
             bool copyToPatch = (allFileRows != null);
             bool copyFromPatch = !copyToPatch;
 
@@ -454,7 +455,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                 }
 
                 Row patchAction = iesTable.CreateRow(null);
-                WixActionRow wixPatchAction = WindowsInstallerStandard.GetStandardActions()[table, "PatchFiles"];
+                WixActionRow wixPatchAction = WindowsInstallerStandardInternal.GetStandardActionRows()[table, "PatchFiles"];
                 int sequence = wixPatchAction.Sequence;
                 // Test for default sequence value's appropriateness
                 if (seqInstallFiles >= sequence || (0 != seqDuplicateFiles && seqDuplicateFiles <= sequence))

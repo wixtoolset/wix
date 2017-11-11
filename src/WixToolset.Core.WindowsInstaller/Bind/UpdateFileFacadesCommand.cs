@@ -1,10 +1,9 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
@@ -14,7 +13,6 @@ namespace WixToolset.Core.WindowsInstaller.Databases
     using WixToolset.Clr.Interop;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Data.Tuples;
     using WixToolset.Msi;
 
@@ -23,13 +21,16 @@ namespace WixToolset.Core.WindowsInstaller.Databases
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
+        public UpdateFileFacadesCommand(IntermediateSection section)
+        {
+            this.Section = section;
+        }
+
+        private IntermediateSection Section { get; }
+
         public IEnumerable<FileFacade> FileFacades { private get; set; }
 
         public IEnumerable<FileFacade> UpdateFileFacades { private get; set; }
-
-        public string ModularizationGuid { private get; set; }
-
-        public Output Output { private get; set; }
 
         public bool OverwriteHash { private get; set; }
 
@@ -47,6 +48,12 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
         private void UpdateFileFacade(FileFacade file)
         {
+            var assemblyNameTuples = new Dictionary<string, MsiAssemblyNameTuple>();
+            foreach (var assemblyTuple in this.Section.Tuples.OfType<MsiAssemblyNameTuple>())
+            {
+                assemblyNameTuples.Add(assemblyTuple.Component_ + "/" + assemblyTuple.Name, assemblyTuple);
+            }
+
             FileInfo fileInfo = null;
             try
             {
@@ -149,9 +156,8 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
                     if (null == file.Hash)
                     {
-                        //Table msiFileHashTable = this.Output.EnsureTable(this.TableDefinitions["MsiFileHash"]);
-                        //file.Hash = msiFileHashTable.CreateRow(file.File.SourceLineNumbers);
-                        throw new NotImplementedException();
+                        file.Hash = new MsiFileHashTuple(file.File.SourceLineNumbers, file.File.Id);
+                        this.Section.Tuples.Add(file.Hash);
                     }
 
                     file.Hash.File_ = file.File.File;
@@ -198,13 +204,13 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                 {
                     if (!String.IsNullOrEmpty(file.File.Version))
                     {
-                        string key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", Common.Demodularize(this.Output.Type, this.ModularizationGuid, file.File.File));
+                        var key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", file.File.File);
                         this.VariableCache[key] = file.File.Version;
                     }
 
                     if (!String.IsNullOrEmpty(file.File.Language))
                     {
-                        string key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", Common.Demodularize(this.Output.Type, ModularizationGuid, file.File.File));
+                        var key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", file.File.File);
                         this.VariableCache[key] = file.File.Language;
                     }
                 }
@@ -214,14 +220,13 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             if (FileAssemblyType.DotNetAssembly == file.WixFile.AssemblyType)
             {
                 bool targetNetfx1 = false;
-                StringDictionary assemblyNameValues = new StringDictionary();
+                var assemblyNameValues = new Dictionary<string, string>();
 
-                ClrInterop.IReferenceIdentity referenceIdentity = null;
                 Guid referenceIdentityGuid = ClrInterop.ReferenceIdentityGuid;
-                uint result = ClrInterop.GetAssemblyIdentityFromFile(fileInfo.FullName, ref referenceIdentityGuid, out referenceIdentity);
+                var result = ClrInterop.GetAssemblyIdentityFromFile(fileInfo.FullName, ref referenceIdentityGuid, out var referenceIdentity);
                 if (0 == result && null != referenceIdentity)
                 {
-                    string imageRuntimeVersion = referenceIdentity.GetAttribute(null, "ImageRuntimeVersion");
+                    var imageRuntimeVersion = referenceIdentity.GetAttribute(null, "ImageRuntimeVersion");
                     if (null != imageRuntimeVersion)
                     {
                         targetNetfx1 = imageRuntimeVersion.StartsWith("v1", StringComparison.OrdinalIgnoreCase);
@@ -269,15 +274,14 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     return;
                 }
 
-                Table assemblyNameTable = this.Output.EnsureTable(this.TableDefinitions["MsiAssemblyName"]);
-                if (assemblyNameValues.ContainsKey("name"))
+                if (assemblyNameValues.TryGetValue("name", out var value))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "name", assemblyNameValues["name"]);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "name", value);
                 }
 
                 if (!String.IsNullOrEmpty(version))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "fileVersion", version);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "fileVersion", version);
                 }
 
                 if (assemblyNameValues.ContainsKey("version"))
@@ -303,33 +307,33 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                         }
                     }
 
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "version", assemblyVersion);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "version", assemblyVersion);
                 }
 
                 if (assemblyNameValues.ContainsKey("culture"))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "culture", assemblyNameValues["culture"]);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "culture", assemblyNameValues["culture"]);
                 }
 
                 if (assemblyNameValues.ContainsKey("publicKeyToken"))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "publicKeyToken", assemblyNameValues["publicKeyToken"]);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "publicKeyToken", assemblyNameValues["publicKeyToken"]);
                 }
 
                 if (!String.IsNullOrEmpty(file.WixFile.ProcessorArchitecture))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "processorArchitecture", file.WixFile.ProcessorArchitecture);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "processorArchitecture", file.WixFile.ProcessorArchitecture);
                 }
 
                 if (assemblyNameValues.ContainsKey("processorArchitecture"))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "processorArchitecture", assemblyNameValues["processorArchitecture"]);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "processorArchitecture", assemblyNameValues["processorArchitecture"]);
                 }
 
                 // add the assembly name to the information cache
                 if (null != this.VariableCache)
                 {
-                    string fileId = Common.Demodularize(this.Output.Type, this.ModularizationGuid, file.File.File);
+                    string fileId = file.File.File;
                     string key = String.Concat("assemblyfullname.", fileId);
                     string assemblyName = String.Concat(assemblyNameValues["name"], ", version=", assemblyNameValues["version"], ", culture=", assemblyNameValues["culture"], ", publicKeyToken=", String.IsNullOrEmpty(assemblyNameValues["publicKeyToken"]) ? "null" : assemblyNameValues["publicKeyToken"]);
                     if (assemblyNameValues.ContainsKey("processorArchitecture"))
@@ -437,30 +441,29 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     Messaging.Instance.OnMessage(WixErrors.InvalidXml(new SourceLineNumber(fileManifest.WixFile.Source), "manifest", xe.Message));
                 }
 
-                Table assemblyNameTable = this.Output.EnsureTable(this.TableDefinitions["MsiAssemblyName"]);
                 if (!String.IsNullOrEmpty(win32Name))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "name", win32Name);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "name", win32Name);
                 }
 
                 if (!String.IsNullOrEmpty(win32Version))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "version", win32Version);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "version", win32Version);
                 }
 
                 if (!String.IsNullOrEmpty(win32Type))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "type", win32Type);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "type", win32Type);
                 }
 
                 if (!String.IsNullOrEmpty(win32ProcessorArchitecture))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "processorArchitecture", win32ProcessorArchitecture);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "processorArchitecture", win32ProcessorArchitecture);
                 }
 
                 if (!String.IsNullOrEmpty(win32PublicKeyToken))
                 {
-                    this.SetMsiAssemblyName(assemblyNameTable, file, "publicKeyToken", win32PublicKeyToken);
+                    this.SetMsiAssemblyName(assemblyNameTuples, file, "publicKeyToken", win32PublicKeyToken);
                 }
             }
         }
@@ -469,11 +472,11 @@ namespace WixToolset.Core.WindowsInstaller.Databases
         /// Set an MsiAssemblyName row.  If it was directly authored, override the value, otherwise
         /// create a new row.
         /// </summary>
-        /// <param name="assemblyNameTable">MsiAssemblyName table.</param>
+        /// <param name="assemblyNameTuples">MsiAssemblyName table.</param>
         /// <param name="file">FileFacade containing the assembly read for the MsiAssemblyName row.</param>
         /// <param name="name">MsiAssemblyName name.</param>
         /// <param name="value">MsiAssemblyName value.</param>
-        private void SetMsiAssemblyName(Table assemblyNameTable, FileFacade file, string name, string value)
+        private void SetMsiAssemblyName(Dictionary<string, MsiAssemblyNameTuple> assemblyNameTuples, FileFacade file, string name, string value)
         {
             // check for null value (this can occur when grabbing the file version from an assembly without one)
             if (String.IsNullOrEmpty(value))
@@ -482,18 +485,6 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             }
             else
             {
-                Row assemblyNameRow = null;
-
-                // override directly authored value
-                foreach (Row row in assemblyNameTable.Rows)
-                {
-                    if ((string)row[0] == file.File.Component_ && (string)row[1] == name)
-                    {
-                        assemblyNameRow = row;
-                        break;
-                    }
-                }
-
                 // if the assembly will be GAC'd and the name in the file table doesn't match the name in the MsiAssemblyName table, error because the install will fail.
                 if ("name" == name && FileAssemblyType.DotNetAssembly == file.WixFile.AssemblyType &&
                     String.IsNullOrEmpty(file.WixFile.File_AssemblyApplication) &&
@@ -502,17 +493,14 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     Messaging.Instance.OnMessage(WixErrors.GACAssemblyIdentityWarning(file.File.SourceLineNumbers, Path.GetFileNameWithoutExtension(file.File.LongFileName), value));
                 }
 
-                if (null == assemblyNameRow)
+                // override directly authored value
+                var lookup = String.Concat(file.File.Component_, "/", name);
+                if (assemblyNameTuples.TryGetValue(lookup, out var assemblyNameRow))
                 {
-                    throw new NotImplementedException();
-#if TODO
-                    assemblyNameRow = assemblyNameTable.CreateRow(file.File.SourceLineNumbers);
-                    assemblyNameRow[0] = file.File.Component_;
-                    assemblyNameRow[1] = name;
-                    assemblyNameRow[2] = value;
-
-                    // put the MsiAssemblyName row in the same section as the related File row
-                    assemblyNameRow.SectionId = file.File.SectionId;
+                    assemblyNameRow = new MsiAssemblyNameTuple(file.File.SourceLineNumbers);
+                    assemblyNameRow.Component_ = file.File.Component_;
+                    assemblyNameRow.Name = name;
+                    assemblyNameRow.Value = value;
 
                     if (null == file.AssemblyNames)
                     {
@@ -520,17 +508,15 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     }
 
                     file.AssemblyNames.Add(assemblyNameRow);
-#endif
+                    this.Section.Tuples.Add(assemblyNameRow);
                 }
-                else
-                {
-                    assemblyNameRow[2] = value;
-                }
+
+                assemblyNameRow.Value = value;
 
                 if (this.VariableCache != null)
                 {
-                    string key = String.Format(CultureInfo.InvariantCulture, "assembly{0}.{1}", name, Common.Demodularize(this.Output.Type, this.ModularizationGuid, file.File.File)).ToLowerInvariant();
-                    this.VariableCache[key] = (string)assemblyNameRow[2];
+                    var key = String.Format(CultureInfo.InvariantCulture, "assembly{0}.{1}", name, file.File.File).ToLowerInvariant();
+                    this.VariableCache[key] = value;
                 }
             }
         }

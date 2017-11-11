@@ -1,67 +1,72 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
 
     internal class CreateSpecialPropertiesCommand
     {
-        public Table PropertyTable { private get; set; }
+        public CreateSpecialPropertiesCommand(IntermediateSection section)
+        {
+            this.Section = section;
+        }
 
-        public Table WixPropertyTable { private get; set; }
+        private IntermediateSection Section { get; }
 
         public void Execute()
         {
-            // Create the special properties.
-            if (null != this.WixPropertyTable)
+            // Create lists of the properties that contribute to the special lists of properties.
+            SortedSet<string> adminProperties = new SortedSet<string>();
+            SortedSet<string> secureProperties = new SortedSet<string>();
+            SortedSet<string> hiddenProperties = new SortedSet<string>();
+
+            foreach (var wixPropertyRow in this.Section.Tuples.OfType<WixPropertyTuple>())
             {
-                // Create lists of the properties that contribute to the special lists of properties.
-                SortedSet<string> adminProperties = new SortedSet<string>();
-                SortedSet<string> secureProperties = new SortedSet<string>();
-                SortedSet<string> hiddenProperties = new SortedSet<string>();
-
-                foreach (WixPropertyRow wixPropertyRow in this.WixPropertyTable.Rows)
+                if (wixPropertyRow.Admin)
                 {
-                    if (wixPropertyRow.Admin)
-                    {
-                        adminProperties.Add(wixPropertyRow.Id);
-                    }
-
-                    if (wixPropertyRow.Hidden)
-                    {
-                        hiddenProperties.Add(wixPropertyRow.Id);
-                    }
-
-                    if (wixPropertyRow.Secure)
-                    {
-                        secureProperties.Add(wixPropertyRow.Id);
-                    }
+                    adminProperties.Add(wixPropertyRow.Property_);
                 }
 
-                Table propertyTable = this.PropertyTable;
-                if (0 < adminProperties.Count)
+                if (wixPropertyRow.Hidden)
                 {
-                    PropertyRow row = (PropertyRow)propertyTable.CreateRow(null);
-                    row.Property = "AdminProperties";
-                    row.Value = String.Join(";", adminProperties);
+                    hiddenProperties.Add(wixPropertyRow.Property_);
                 }
 
-                if (0 < secureProperties.Count)
+                if (wixPropertyRow.Secure)
                 {
-                    PropertyRow row = (PropertyRow)propertyTable.CreateRow(null);
-                    row.Property = "SecureCustomProperties";
-                    row.Value = String.Join(";", secureProperties);
+                    secureProperties.Add(wixPropertyRow.Property_);
                 }
+            }
 
-                if (0 < hiddenProperties.Count)
-                {
-                    PropertyRow row = (PropertyRow)propertyTable.CreateRow(null);
-                    row.Property = "MsiHiddenProperties";
-                    row.Value = String.Join(";", hiddenProperties);
-                }
+            if (0 < adminProperties.Count)
+            {
+                var tuple = new PropertyTuple(null, new Identifier("AdminProperties", AccessModifier.Private));
+                tuple.Property = "AdminProperties";
+                tuple.Value = String.Join(";", adminProperties);
+
+                this.Section.Tuples.Add(tuple);
+            }
+
+            if (0 < secureProperties.Count)
+            {
+                var tuple = new PropertyTuple(null, new Identifier("SecureCustomProperties", AccessModifier.Private));
+                tuple.Property = "SecureCustomProperties";
+                tuple.Value = String.Join(";", secureProperties);
+
+                this.Section.Tuples.Add(tuple);
+            }
+
+            if (0 < hiddenProperties.Count)
+            {
+                var tuple = new PropertyTuple(null, new Identifier("MsiHiddenProperties", AccessModifier.Private));
+                tuple.Property = "MsiHiddenProperties";
+                tuple.Value = String.Join(";", hiddenProperties);
+
+                this.Section.Tuples.Add(tuple);
             }
         }
     }

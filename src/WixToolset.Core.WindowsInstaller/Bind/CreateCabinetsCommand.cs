@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
@@ -10,10 +10,10 @@ namespace WixToolset.Core.WindowsInstaller.Databases
     using System.Runtime.InteropServices;
     using System.Threading;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
 
     /// <summary>
@@ -60,9 +60,9 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
         public bool Compressed { private get; set; }
 
-        public Dictionary<MediaRow, IEnumerable<FileFacade>> FileRowsByCabinet { private get; set; }
+        public Dictionary<MediaTuple, IEnumerable<FileFacade>> FileRowsByCabinet { private get; set; }
 
-        public Func<MediaRow, string, string, string> ResolveMedia { private get; set; }
+        public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
@@ -77,7 +77,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
         /// <returns>The uncompressed file rows.</returns>
         public void Execute()
         {
-            RowDictionary<WixMediaRow> wixMediaRows = new RowDictionary<WixMediaRow>(this.WixMediaTable);
+            var wixMediaRows = new RowDictionary<WixMediaRow>(this.WixMediaTable);
 
             this.lastCabinetAddedToMediaTable = new Dictionary<string, string>();
 
@@ -87,22 +87,19 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             CabinetBuilder cabinetBuilder = new CabinetBuilder(this.CabbingThreadCount, Marshal.GetFunctionPointerForDelegate(this.newCabNamesCallBack));
 
             // Supply Compile MediaTemplate Attributes to Cabinet Builder
-            int MaximumCabinetSizeForLargeFileSplitting;
-            int MaximumUncompressedMediaSize;
-            this.GetMediaTemplateAttributes(out MaximumCabinetSizeForLargeFileSplitting, out MaximumUncompressedMediaSize);
+            this.GetMediaTemplateAttributes(out var MaximumCabinetSizeForLargeFileSplitting, out var MaximumUncompressedMediaSize);
             cabinetBuilder.MaximumCabinetSizeForLargeFileSplitting = MaximumCabinetSizeForLargeFileSplitting;
             cabinetBuilder.MaximumUncompressedMediaSize = MaximumUncompressedMediaSize;
 
             foreach (var entry in this.FileRowsByCabinet)
             {
-                MediaRow mediaRow = entry.Key;
+                var mediaRow = entry.Key;
                 IEnumerable<FileFacade> files = entry.Value;
                 CompressionLevel compressionLevel = this.DefaultCompressionLevel;
 
-                WixMediaRow wixMediaRow = null;
                 string mediaLayoutFolder = null;
 
-                if (wixMediaRows.TryGetValue(mediaRow.GetKey(), out wixMediaRow))
+                if (wixMediaRows.TryGetValue(mediaRow.Id.Id, out var wixMediaRow))
                 {
                     mediaLayoutFolder = wixMediaRow.Layout;
 
@@ -185,7 +182,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <param name="fileTransfers">Array of files to be transfered.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaRow mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades, List<FileTransfer> fileTransfers)
+        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades, List<FileTransfer> fileTransfers)
         {
             CabinetWorkItem cabinetWorkItem = null;
             string tempCabinetFileX = Path.Combine(this.TempFilesLocation, mediaRow.Cabinet);
@@ -254,8 +251,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
             else
             {
                 string destinationPath = Path.Combine(cabinetDir, mediaRow.Cabinet);
-                FileTransfer transfer;
-                if (FileTransfer.TryCreate(resolvedCabinet.Path, destinationPath, CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption, "Cabinet", mediaRow.SourceLineNumbers, out transfer))
+                if (FileTransfer.TryCreate(resolvedCabinet.Path, destinationPath, CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption, "Cabinet", mediaRow.SourceLineNumbers, out var transfer))
                 {
                     transfer.Built = true;
                     fileTransfers.Add(transfer);

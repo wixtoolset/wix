@@ -163,7 +163,7 @@ namespace WixToolset {
         /// <summary>
         ///   Looks up a localized string similar to Found an ActionRow with a non-existent {0} action: {1}..
         /// </summary>
-        internal static string EXP_FoundActionRowWinNonExistentAction {
+        public static string EXP_FoundActionRowWinNonExistentAction {
             get {
                 return ResourceManager.GetString("EXP_FoundActionRowWinNonExistentAction", resourceCulture);
             }
@@ -172,7 +172,7 @@ namespace WixToolset {
         /// <summary>
         ///   Looks up a localized string similar to Found an ActionRow with no Sequence, Before, or After column set..
         /// </summary>
-        internal static string EXP_FoundActionRowWithNoSequenceBeforeOrAfterColumnSet {
+        public static string EXP_FoundActionRowWithNoSequenceBeforeOrAfterColumnSet {
             get {
                 return ResourceManager.GetString("EXP_FoundActionRowWithNoSequenceBeforeOrAfterColumnSet", resourceCulture);
             }

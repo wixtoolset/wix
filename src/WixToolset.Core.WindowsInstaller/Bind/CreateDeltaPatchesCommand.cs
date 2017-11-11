@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
@@ -9,49 +9,40 @@ namespace WixToolset.Core.WindowsInstaller.Databases
     using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
 
     /// <summary>
     /// Creates delta patches and updates the appropriate rows to point to the newly generated patches.
     /// </summary>
     internal class CreateDeltaPatchesCommand
     {
-        public IEnumerable<FileFacade> FileFacades { private get; set; }
+        public CreateDeltaPatchesCommand(List<FileFacade> fileFacades, string intermediateFolder, WixPatchIdTuple wixPatchId)
+        {
+            this.FileFacades = fileFacades;
+            this.IntermediateFolder = intermediateFolder;
+            this.WixPatchId = wixPatchId;
+        }
 
-        public Table WixPatchIdTable { private get; set; }
+        private IEnumerable<FileFacade> FileFacades { get; }
 
-        public string TempFilesLocation { private get; set; }
+        private WixPatchIdTuple WixPatchId { get; }
+
+        private string IntermediateFolder { get; }
 
         public void Execute()
         {
+            var optimizePatchSizeForLargeFiles = this.WixPatchId?.OptimizePatchSizeForLargeFiles ?? false;
+            var apiPatchingSymbolFlags = (PatchSymbolFlagsType)(this.WixPatchId?.ApiPatchingSymbolFlags ?? 0);
+
 #if REVISIT_FOR_PATCHING
-            bool optimizePatchSizeForLargeFiles = false;
-            PatchSymbolFlagsType apiPatchingSymbolFlags = 0;
-
-            if (null != this.WixPatchIdTable)
-            {
-                Row row = this.WixPatchIdTable.Rows[0];
-                if (null != row)
-                {
-                    if (null != row[2])
-                    {
-                        optimizePatchSizeForLargeFiles = (1 == Convert.ToUInt32(row[2], CultureInfo.InvariantCulture));
-                    }
-
-                    if (null != row[3])
-                    {
-                        apiPatchingSymbolFlags = (PatchSymbolFlagsType)Convert.ToUInt32(row[3], CultureInfo.InvariantCulture);
-                    }
-                }
-            }
-
             foreach (FileFacade facade in this.FileFacades)
             {
                 if (RowOperation.Modify == facade.File.Operation &&
                     0 != (facade.WixFile.PatchAttributes & PatchAttributeType.IncludeWholeFile))
                 {
                     string deltaBase = String.Concat("delta_", facade.File.File);
-                    string deltaFile = Path.Combine(this.TempFilesLocation, String.Concat(deltaBase, ".dpf"));
-                    string headerFile = Path.Combine(this.TempFilesLocation, String.Concat(deltaBase, ".phd"));
+                    string deltaFile = Path.Combine(this.IntermediateFolder, String.Concat(deltaBase, ".dpf"));
+                    string headerFile = Path.Combine(this.IntermediateFolder, String.Concat(deltaBase, ".phd"));
 
                     bool retainRangeWarning = false;
 
@@ -84,6 +75,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                 }
             }
 #endif 
+
             throw new NotImplementedException();
         }
     }

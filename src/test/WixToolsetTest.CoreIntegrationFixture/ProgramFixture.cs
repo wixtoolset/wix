@@ -26,18 +26,17 @@ namespace WixToolsetTest.CoreIntegrationFixture
                 var result = program.Run(new WixToolsetServiceProvider(), new[] { "build", "Package.wxs", "PackageComponents.wxs", "-loc", "Package.en-us.wxl", "-bindpath", "data", "-intermediateFolder", intermediateFolder, "-o", $@"{intermediateFolder}\bin\test.msi" });
 
                 Assert.Equal(0, result);
-#if FIXED_MSI_BACKEND
+
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
-#else
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.msi"));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
                 Assert.Single(intermediate.Sections);
 
                 var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
                 Assert.Equal(@"data\test.txt", wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
-#endif
             }
         }
     }

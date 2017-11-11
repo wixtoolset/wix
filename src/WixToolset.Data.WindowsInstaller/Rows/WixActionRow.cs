@@ -8,27 +8,28 @@ namespace WixToolset.Data.Rows
     using System.Globalization;
     using System.Xml;
     using System.Xml.Schema;
+    using WixToolset.Data.Tuples;
 
     /// <summary>
     /// The Sequence tables that actions may belong to.
     /// </summary>
-    public enum SequenceTable
-    {
-        /// <summary>AdminUISequence</summary>
-        AdminUISequence,
+    //public enum SequenceTable
+    //{
+    //    /// <summary>AdminUISequence</summary>
+    //    AdminUISequence,
 
-        /// <summary>AdminExecuteSequence</summary>
-        AdminExecuteSequence,
+    //    /// <summary>AdminExecuteSequence</summary>
+    //    AdminExecuteSequence,
 
-        /// <summary>AdvtExecuteSequence</summary>
-        AdvtExecuteSequence,
+    //    /// <summary>AdvtExecuteSequence</summary>
+    //    AdvtExecuteSequence,
 
-        /// <summary>InstallUISequence</summary>
-        InstallUISequence,
+    //    /// <summary>InstallUISequence</summary>
+    //    InstallUISequence,
 
-        /// <summary>InstallExecuteSequence</summary>
-        InstallExecuteSequence
-    }
+    //    /// <summary>InstallExecuteSequence</summary>
+    //    InstallExecuteSequence
+    //}
 
     /// <summary>
     /// Specialization of a row for the sequence tables.
@@ -55,15 +56,15 @@ namespace WixToolset.Data.Rows
         /// <param name="action">The name of the standard action.</param>
         /// <param name="condition">The condition of the standard action.</param>
         /// <param name="sequence">The suggested sequence number of the standard action.</param>
-        private WixActionRow(SequenceTable sequenceTable, string action, string condition, int sequence) :
-            base(null, WindowsInstallerStandard.GetTableDefinitions()["WixAction"])
-        {
-            this.SequenceTable = sequenceTable;
-            this.Action = action;
-            this.Condition = condition;
-            this.Sequence = sequence;
-            this.Overridable = true; // all standard actions are overridable by default
-        }
+        //private WixActionRow(SequenceTable sequenceTable, string action, string condition, int sequence) :
+        //    base(null, WindowsInstallerStandard.GetTableDefinitions()["WixAction"])
+        //{
+        //    this.SequenceTable = sequenceTable;
+        //    this.Action = action;
+        //    this.Condition = condition;
+        //    this.Sequence = sequence;
+        //    this.Overridable = true; // all standard actions are overridable by default
+        //}
 
         /// <summary>
         /// Instantiates an ActionRow by copying data from another ActionRow.
@@ -296,13 +297,15 @@ namespace WixToolset.Data.Rows
             WixActionRow[] actionRows = new WixActionRow[sequenceCount];
             for (int i = 0; i < sequenceCount; i++)
             {
-                WixActionRow actionRow = new WixActionRow(sequenceTables[i], id, condition, sequence);
-                actionRows[i] = actionRow;
+                //WixActionRow actionRow = new WixActionRow(sequenceTables[i], id, condition, sequence);
+                //actionRows[i] = actionRow;
+                throw new NotImplementedException();
             }
 
             return actionRows;
         }
 
+#if DEAD_CODE
         /// <summary>
         /// Determines whether this ActionRow contains the specified ActionRow as a child in its dependency tree.
         /// </summary>
@@ -370,5 +373,6 @@ namespace WixToolset.Data.Rows
                 }
             }
         }
+#endif
     }
 }

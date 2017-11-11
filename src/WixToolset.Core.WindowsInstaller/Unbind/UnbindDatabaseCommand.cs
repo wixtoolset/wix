@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.SuppressDemodularization = suppressDemodularization;
             this.SkipSummaryInfo = skipSummaryInfo;
 
-            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
+            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
         }
 
         public Messaging Messaging { get; }

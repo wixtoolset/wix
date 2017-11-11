@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
@@ -8,57 +8,50 @@ namespace WixToolset.Core.WindowsInstaller.Databases
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
 
     internal class GetFileFacadesCommand
     {
-        public Table FileTable { private get; set; }
+        public GetFileFacadesCommand(IntermediateSection section)
+        {
+            this.Section = section;
+        }
 
-        public Table WixFileTable { private get; set; }
-
-        public Table WixDeltaPatchFileTable { private get; set; }
-
-        public Table WixDeltaPatchSymbolPathsTable { private get; set; }
+        private IntermediateSection Section { get; }
 
         public List<FileFacade> FileFacades { get; private set; }
 
         public void Execute()
         {
-            throw new NotImplementedException();
-#if TODO
-            List<FileFacade> facades = new List<FileFacade>(this.FileTable.Rows.Count);
+            var facades = new List<FileFacade>();
 
-            RowDictionary<WixFileRow> wixFiles = new RowDictionary<WixFileRow>(this.WixFileTable);
-            RowDictionary<WixDeltaPatchFileRow> deltaPatchFiles = new RowDictionary<WixDeltaPatchFileRow>(this.WixDeltaPatchFileTable);
+            var wixFiles = this.Section.Tuples.OfType<WixFileTuple>().ToDictionary(t => t.File_);
+            var deltaPatchFiles = this.Section.Tuples.OfType<WixDeltaPatchFileTuple>().ToDictionary(t => t.File_);
 
-            foreach (FileRow file in this.FileTable.Rows)
+            foreach (var file in this.Section.Tuples.OfType<FileTuple>())
             {
-                WixDeltaPatchFileRow deltaPatchFile = null;
+                var wixFile = wixFiles[file.File];
 
-                deltaPatchFiles.TryGetValue(file.File, out deltaPatchFile);
+                deltaPatchFiles.TryGetValue(file.File, out var deltaPatchFile);
 
-                facades.Add(new FileFacade(file, wixFiles[file.File], deltaPatchFile));
+                facades.Add(new FileFacade(file, wixFile, deltaPatchFile));
             }
 
-            if (null != this.WixDeltaPatchSymbolPathsTable)
-            {
-                this.ResolveDeltaPatchSymbolPaths(deltaPatchFiles, facades);
-            }
+            this.ResolveDeltaPatchSymbolPaths(deltaPatchFiles, facades);
 
             this.FileFacades = facades;
-#endif
         }
 
         /// <summary>
         /// Merge data from the WixPatchSymbolPaths rows into the WixDeltaPatchFile rows.
         /// </summary>
-        public RowDictionary<WixDeltaPatchFileRow> ResolveDeltaPatchSymbolPaths(RowDictionary<WixDeltaPatchFileRow> deltaPatchFiles, IEnumerable<FileFacade> facades)
+        public void ResolveDeltaPatchSymbolPaths(Dictionary<string, WixDeltaPatchFileTuple> deltaPatchFiles, IEnumerable<FileFacade> facades)
         {
             ILookup<string, FileFacade> filesByComponent = null;
             ILookup<string, FileFacade> filesByDirectory = null;
             ILookup<string, FileFacade> filesByDiskId = null;
 
-            foreach (WixDeltaPatchSymbolPathsRow row in this.WixDeltaPatchSymbolPathsTable.RowsAs<WixDeltaPatchSymbolPathsRow>().OrderBy(r => r.Type))
+            foreach (var row in this.Section.Tuples.OfType<WixDeltaPatchSymbolPathsTuple>().OrderBy(r => r.Type))
             {
                 switch (row.Type)
                 {
@@ -72,7 +65,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                             filesByComponent = facades.ToLookup(f => f.File.Component_);
                         }
 
-                        foreach (FileFacade facade in filesByComponent[row.Id])
+                        foreach (var facade in filesByComponent[row.Id])
                         {
                             this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.File]);
                         }
@@ -84,7 +77,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                             filesByDirectory = facades.ToLookup(f => f.WixFile.Directory_);
                         }
 
-                        foreach (FileFacade facade in filesByDirectory[row.Id])
+                        foreach (var facade in filesByDirectory[row.Id])
                         {
                             this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.File]);
                         }
@@ -96,14 +89,14 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                             filesByDiskId = facades.ToLookup(f => f.WixFile.DiskId.ToString(CultureInfo.InvariantCulture));
                         }
 
-                        foreach (FileFacade facade in filesByDiskId[row.Id])
+                        foreach (var facade in filesByDiskId[row.Id])
                         {
                             this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.File]);
                         }
                         break;
 
                     case SymbolPathType.Product:
-                        foreach (WixDeltaPatchFileRow fileRow in deltaPatchFiles.Values)
+                        foreach (var fileRow in deltaPatchFiles.Values)
                         {
                             this.MergeSymbolPaths(row, fileRow);
                         }
@@ -114,8 +107,6 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                         break;
                 }
             }
-
-            return deltaPatchFiles;
         }
 
         /// <summary>
@@ -124,17 +115,18 @@ namespace WixToolset.Core.WindowsInstaller.Databases
         /// <param name="row">Row from the WixPatchSymbolsPaths table.</param>
         /// <param name="file">FileRow into which to set symbol information.</param>
         /// <comment>This includes PreviousData as well.</comment>
-        private void MergeSymbolPaths(WixDeltaPatchSymbolPathsRow row, WixDeltaPatchFileRow file)
+        private void MergeSymbolPaths(WixDeltaPatchSymbolPathsTuple row, WixDeltaPatchFileTuple file)
         {
-            if (null == file.Symbols)
+            if (file.SymbolPaths is null)
             {
-                file.Symbols = row.SymbolPaths;
+                file.SymbolPaths = row.SymbolPaths;
             }
             else
             {
-                file.Symbols = String.Concat(file.Symbols, ";", row.SymbolPaths);
+                file.SymbolPaths = String.Concat(file.SymbolPaths, ";", row.SymbolPaths);
             }
 
+#if REVISIT_FOR_PATCHING
             Field field = row.Fields[2];
             if (null != field.PreviousData)
             {
@@ -147,6 +139,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                     file.PreviousSymbols = String.Concat(file.PreviousSymbols, ";", field.PreviousData);
                 }
             }
+#endif
         }
     }
 }

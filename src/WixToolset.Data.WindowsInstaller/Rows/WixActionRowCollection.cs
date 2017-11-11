@@ -6,6 +6,7 @@ namespace WixToolset.Data.Rows
     using System.Collections;
     using System.Diagnostics;
     using System.Xml;
+    using WixToolset.Data.Tuples;
 
     /// <summary>
     /// A collection of action rows sorted by their sequence table and action name.

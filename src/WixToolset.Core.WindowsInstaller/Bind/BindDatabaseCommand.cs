@@ -3,21 +3,15 @@
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
-    using WixToolset.Bind;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.WindowsInstaller.Databases;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     /// <summary>
     /// Binds a databse.
@@ -25,11 +19,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     internal class BindDatabaseCommand
     {
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
-        private static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
+        internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
         public BindDatabaseCommand(IBindContext context, Validator validator)
         {
-            this.TableDefinitions = WindowsInstallerStandard.GetTableDefinitions();
+            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
             this.BindPaths = context.BindPaths;
             this.CabbingThreadCount = context.CabbingThreadCount;
@@ -73,8 +67,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Intermediate Intermediate { get; }
 
-        private Output Output { get; }
-
         private string OutputPath { get; }
 
         private bool SuppressAddingValidationRows { get; }
@@ -95,22 +87,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            this.Intermediate.Save(this.OutputPath);
-#if FINISH
-            List<FileTransfer> fileTransfers = new List<FileTransfer>();
+            var section = this.Intermediate.Sections.Single();
 
-            HashSet<string> suppressedTableNames = new HashSet<string>();
+            var fileTransfers = new List<FileTransfer>();
+
+            var suppressedTableNames = new HashSet<string>();
 
             // If there are any fields to resolve later, create the cache to populate during bind.
-            IDictionary<string, string> variableCache = null;
-            if (this.DelayedFields.Any())
-            {
-                variableCache = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-            }
+            var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
 
-            this.LocalizeUI(this.Output.Tables);
-
-            this.Output = CreateOutputFromIR(this.Intermediate);
+            this.LocalizeUI(section);
 
             // Process the summary information table before the other tables.
             bool compressed;
@@ -118,8 +104,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             int installerVersion;
             string modularizationGuid;
             {
-                BindSummaryInfoCommand command = new BindSummaryInfoCommand();
-                command.Output = this.Output;
+                var command = new BindSummaryInfoCommand(section);
                 command.Execute();
 
                 compressed = command.Compressed;
@@ -128,85 +113,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 modularizationGuid = command.ModularizationGuid;
             }
 
-            // Stop processing if an error previously occurred.
-            if (Messaging.Instance.EncounteredError)
-            {
-                return;
-            }
-
-            // Modularize identifiers and add tables with real streams to the import tables.
-            if (OutputType.Module == this.Output.Type)
-            {
-                // Gather all the suppress modularization identifiers
-                HashSet<string> suppressModularizationIdentifiers = null;
-                Table wixSuppressModularizationTable = this.Output.Tables["WixSuppressModularization"];
-                if (null != wixSuppressModularizationTable)
-                {
-                    suppressModularizationIdentifiers = new HashSet<string>(wixSuppressModularizationTable.Rows.Select(row => (string)row[0]));
-                }
-
-                foreach (Table table in this.Output.Tables)
-                {
-                    table.Modularize(modularizationGuid, suppressModularizationIdentifiers);
-                }
-            }
-
-            // This must occur after all variables and source paths have been resolved and after modularization.
-            List<FileFacade> fileFacades;
-            {
-                GetFileFacadesCommand command = new GetFileFacadesCommand();
-                command.FileTable = this.Output.Tables["File"];
-                command.WixFileTable = this.Output.Tables["WixFile"];
-                command.WixDeltaPatchFileTable = this.Output.Tables["WixDeltaPatchFile"];
-                command.WixDeltaPatchSymbolPathsTable = this.Output.Tables["WixDeltaPatchSymbolPaths"];
-                command.Execute();
-
-                fileFacades = command.FileFacades;
-            }
-
-            ////if (OutputType.Patch == this.Output.Type)
-            ////{
-            ////    foreach (SubStorage substorage in this.Output.SubStorages)
-            ////    {
-            ////        Output transform = substorage.Data;
-
-            ////        ResolveFieldsCommand command = new ResolveFieldsCommand();
-            ////        command.Tables = transform.Tables;
-            ////        command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
-            ////        command.FileManagerCore = this.FileManagerCore;
-            ////        command.FileManagers = this.FileManagers;
-            ////        command.SupportDelayedResolution = false;
-            ////        command.TempFilesLocation = this.TempFilesLocation;
-            ////        command.WixVariableResolver = this.WixVariableResolver;
-            ////        command.Execute();
-
-            ////        this.MergeUnrealTables(transform.Tables);
-            ////    }
-            ////}
-
-            {
-                CreateSpecialPropertiesCommand command = new CreateSpecialPropertiesCommand();
-                command.PropertyTable = this.Output.Tables["Property"];
-                command.WixPropertyTable = this.Output.Tables["WixProperty"];
-                command.Execute();
-            }
-
-            if (Messaging.Instance.EncounteredError)
-            {
-                return;
-            }
-
             // Add binder variables for all properties.
-            Table propertyTable = this.Output.Tables["Property"];
-            if (null != propertyTable)
+            if (SectionType.Product == section.Type || variableCache != null)
             {
-                foreach (PropertyRow propertyRow in propertyTable.Rows)
+                foreach (var propertyRow in section.Tuples.OfType<PropertyTuple>())
                 {
                     // Set the ProductCode if it is to be generated.
-                    if (OutputType.Product == this.Output.Type && "ProductCode".Equals(propertyRow.Property, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
+                    if ("ProductCode".Equals(propertyRow.Property, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
                     {
                         propertyRow.Value = Common.GenerateGuid();
 
+#if TODO_FIX_INSTANCE_TRANSFORM
                         // Update the target ProductCode in any instance transforms.
                         foreach (SubStorage subStorage in this.Output.SubStorages)
                         {
@@ -226,53 +143,52 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 }
                             }
                         }
+#endif
                     }
 
                     // Add the property name and value to the variableCache.
-                    if (null != variableCache)
+                    if (variableCache != null)
                     {
-                        string key = String.Concat("property.", Common.Demodularize(this.Output.Type, modularizationGuid, propertyRow.Property));
+                        var key = String.Concat("property.", propertyRow.Property);
                         variableCache[key] = propertyRow.Value;
                     }
                 }
             }
 
-            // Extract files that come from cabinet files (this does not extract files from merge modules).
+            // Sequence all the actions.
             {
-                ExtractEmbeddedFilesCommand command = new ExtractEmbeddedFilesCommand();
-                command.FilesWithEmbeddedFiles = this.ExpectedEmbeddedFiles;
+                var command = new SequenceActionsCommand(section);
+                command.Messaging = Messaging.Instance;
                 command.Execute();
             }
 
-            if (OutputType.Product == this.Output.Type)
             {
-                // Retrieve files and their information from merge modules.
-                Table wixMergeTable = this.Output.Tables["WixMerge"];
-
-                if (null != wixMergeTable)
-                {
-                    ExtractMergeModuleFilesCommand command = new ExtractMergeModuleFilesCommand();
-                    command.FileFacades = fileFacades;
-                    command.FileTable = this.Output.Tables["File"];
-                    command.WixFileTable = this.Output.Tables["WixFile"];
-                    command.WixMergeTable = wixMergeTable;
-                    command.OutputInstallerVersion = installerVersion;
-                    command.SuppressLayout = this.SuppressLayout;
-                    command.TempFilesLocation = this.IntermediateFolder;
-                    command.Execute();
-
-                    fileFacades.AddRange(command.MergeModulesFileFacades);
-                }
-            }
-            else if (OutputType.Patch == this.Output.Type)
-            {
-                // Merge transform data into the output object.
-                IEnumerable<FileFacade> filesFromTransform = this.CopyFromTransformData(this.Output);
-
-                fileFacades.AddRange(filesFromTransform);
+                var command = new CreateSpecialPropertiesCommand(section);
+                command.Execute();
             }
 
-            // stop processing if an error previously occurred
+#if TODO_FINISH_PATCH
+            ////if (OutputType.Patch == this.Output.Type)
+            ////{
+            ////    foreach (SubStorage substorage in this.Output.SubStorages)
+            ////    {
+            ////        Output transform = substorage.Data;
+
+            ////        ResolveFieldsCommand command = new ResolveFieldsCommand();
+            ////        command.Tables = transform.Tables;
+            ////        command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
+            ////        command.FileManagerCore = this.FileManagerCore;
+            ////        command.FileManagers = this.FileManagers;
+            ////        command.SupportDelayedResolution = false;
+            ////        command.TempFilesLocation = this.TempFilesLocation;
+            ////        command.WixVariableResolver = this.WixVariableResolver;
+            ////        command.Execute();
+
+            ////        this.MergeUnrealTables(transform.Tables);
+            ////    }
+            ////}
+#endif
+
             if (Messaging.Instance.EncounteredError)
             {
                 return;
@@ -280,58 +196,71 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             Messaging.Instance.OnMessage(WixVerboses.UpdatingFileInformation());
 
+            // This must occur after all variables and source paths have been resolved.
+            List<FileFacade> fileFacades;
+            {
+                var command = new GetFileFacadesCommand(section);
+                command.Execute();
+
+                fileFacades = command.FileFacades;
+            }
+
+            // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
+            {
+                var command = new ExtractEmbeddedFilesCommand(this.ExpectedEmbeddedFiles);
+                command.Execute();
+            }
+
             // Gather information about files that did not come from merge modules (i.e. rows with a reference to the File table).
             {
-                UpdateFileFacadesCommand command = new UpdateFileFacadesCommand();
+                var command = new UpdateFileFacadesCommand(section);
                 command.FileFacades = fileFacades;
                 command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
-                command.ModularizationGuid = modularizationGuid;
-                command.Output = this.Output;
                 command.OverwriteHash = true;
                 command.TableDefinitions = this.TableDefinitions;
                 command.VariableCache = variableCache;
                 command.Execute();
             }
 
-            // Set generated component guids.
-            this.SetComponentGuids(this.Output);
-
-            // With the Component Guids set now we can create instance transforms.
-            this.CreateInstanceTransforms(this.Output);
-
-            this.ValidateComponentGuids(this.Output);
-
-            this.UpdateControlText(this.Output);
-
+            // Now that the variable cache is populated, resolve any delayed fields.
             if (this.DelayedFields.Any())
             {
-                ResolveDelayedFieldsCommand command = new ResolveDelayedFieldsCommand();
-                command.OutputType = this.Output.Type;
-                command.DelayedFields = this.DelayedFields;
-                command.ModularizationGuid = null;
-                command.VariableCache = variableCache;
+                var command = new ResolveDelayedFieldsCommand(this.DelayedFields, variableCache);
                 command.Execute();
             }
 
-            // Assign files to media.
-            RowDictionary<MediaRow> assignedMediaRows;
-            Dictionary<MediaRow, IEnumerable<FileFacade>> filesByCabinetMedia;
-            IEnumerable<FileFacade> uncompressedFiles;
+            // Set generated component guids.
             {
-                AssignMediaCommand command = new AssignMediaCommand();
-                command.FilesCompressed = compressed;
-                command.FileFacades = fileFacades;
-                command.Output = this.Output;
-                command.TableDefinitions = this.TableDefinitions;
+                var command = new CalculateComponentGuids(section);
                 command.Execute();
-
-                assignedMediaRows = command.MediaRows;
-                filesByCabinetMedia = command.FileFacadesByCabinetMedia;
-                uncompressedFiles = command.UncompressedFileFacades;
             }
 
-            // Update file sequence.
-            this.UpdateMediaSequences(this.Output.Type, fileFacades, assignedMediaRows);
+            if (SectionType.Product == section.Type)
+            {
+                // Retrieve files and their information from merge modules.
+                var wixMergeTuples = section.Tuples.OfType<WixMergeTuple>().ToList();
+
+                if (wixMergeTuples.Any())
+                {
+                    var command = new ExtractMergeModuleFilesCommand(section, wixMergeTuples);
+                    command.FileFacades = fileFacades;
+                    command.OutputInstallerVersion = installerVersion;
+                    command.SuppressLayout = this.SuppressLayout;
+                    command.IntermediateFolder = this.IntermediateFolder;
+                    command.Execute();
+
+                    fileFacades.AddRange(command.MergeModulesFileFacades);
+                }
+            }
+#if TODO_FINISH_PATCH
+            else if (OutputType.Patch == this.Output.Type)
+            {
+                // Merge transform data into the output object.
+                IEnumerable<FileFacade> filesFromTransform = this.CopyFromTransformData(this.Output);
+
+                fileFacades.AddRange(filesFromTransform);
+            }
+#endif
 
             // stop processing if an error previously occurred
             if (Messaging.Instance.EncounteredError)
@@ -339,6 +268,60 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
+#if TODO_FIX_INSTANCE_TRANSFORM
+            // With the Component Guids set now we can create instance transforms.
+            this.CreateInstanceTransforms(this.Output);
+#endif
+
+            // Assign files to media.
+            Dictionary<int, MediaTuple> assignedMediaRows;
+            Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
+            IEnumerable<FileFacade> uncompressedFiles;
+            {
+                var command = new AssignMediaCommand(section);
+                command.FileFacades = fileFacades;
+                command.FilesCompressed = compressed;
+                command.Execute();
+
+                assignedMediaRows = command.MediaRows;
+                filesByCabinetMedia = command.FileFacadesByCabinetMedia;
+                uncompressedFiles = command.UncompressedFileFacades;
+            }
+
+            // stop processing if an error previously occurred
+            if (Messaging.Instance.EncounteredError)
+            {
+                return;
+            }
+
+            // Try to put as much above here as possible, updating the IR is better.
+            Output output;
+            {
+                var command = new CreateOutputFromIRCommand(section, this.TableDefinitions);
+                command.Execute();
+
+                output = command.Output;
+            }
+
+            // Update file sequence.
+            {
+                var command = new UpdateMediaSequencesCommand(output, fileFacades, assignedMediaRows);
+                command.Execute();
+            }
+
+            // Modularize identifiers and add tables with real streams to the import tables.
+            if (OutputType.Module == output.Type)
+            {
+                // Gather all the suppress modularization identifiers
+                var suppressModularizationIdentifiers = new HashSet<string>(section.Tuples.OfType<WixSuppressModularizationTuple>().Select(s => s.WixSuppressModularization));
+
+                foreach (var table in output.Tables)
+                {
+                    table.Modularize(modularizationGuid, suppressModularizationIdentifiers);
+                }
+            }
+
+#if TODO_FINISH_UPDATE
             // Extended binder extensions can be called now that fields are resolved.
             {
                 Table updatedFiles = this.Output.EnsureTable(this.TableDefinitions["WixBindUpdatedFiles"]);
@@ -372,27 +355,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     command.Execute();
                 }
             }
+#endif
 
-            // stop processing if an error previously occurred
+            // Stop processing if an error previously occurred.
             if (Messaging.Instance.EncounteredError)
             {
                 return;
             }
 
+            // Ensure the intermediate folder is created since delta patches will be
+            // created there.
             Directory.CreateDirectory(this.IntermediateFolder);
 
-            if (OutputType.Patch == this.Output.Type && this.DeltaBinaryPatch)
+            if (SectionType.Patch == section.Type && this.DeltaBinaryPatch)
             {
-                CreateDeltaPatchesCommand command = new CreateDeltaPatchesCommand();
-                command.FileFacades = fileFacades;
-                command.WixPatchIdTable = this.Output.Tables["WixPatchId"];
-                command.TempFilesLocation = this.IntermediateFolder;
+                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Tuples.OfType<WixPatchIdTuple>().FirstOrDefault());
                 command.Execute();
             }
 
             // create cabinet files and process uncompressed files
             string layoutDirectory = Path.GetDirectoryName(this.OutputPath);
-            if (!this.SuppressLayout || OutputType.Module == this.Output.Type)
+            if (!this.SuppressLayout || OutputType.Module == output.Type)
             {
                 Messaging.Instance.OnMessage(WixVerboses.CreatingCabinetFiles());
 
@@ -400,7 +383,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
-                command.Output = this.Output;
+                command.Output = output;
                 command.BackendExtensions = this.BackendExtensions;
                 command.LayoutDirectory = layoutDirectory;
                 command.Compressed = compressed;
@@ -408,39 +391,35 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.ResolveMedia = this.ResolveMedia;
                 command.TableDefinitions = this.TableDefinitions;
                 command.TempFilesLocation = this.IntermediateFolder;
-                command.WixMediaTable = this.Output.Tables["WixMedia"];
+                command.WixMediaTable = output.Tables["WixMedia"];
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
             }
 
+#if TODO_FINISH_PATCH
             if (OutputType.Patch == this.Output.Type)
             {
                 // copy output data back into the transforms
                 this.CopyToTransformData(this.Output);
             }
+#endif
 
-            // stop processing if an error previously occurred
-            if (Messaging.Instance.EncounteredError)
+            // Add back suppressed tables which must be present prior to merging in modules.
+            if (OutputType.Product == output.Type)
             {
-                return;
-            }
-
-            // add back suppressed tables which must be present prior to merging in modules
-            if (OutputType.Product == this.Output.Type)
-            {
-                Table wixMergeTable = this.Output.Tables["WixMerge"];
+                Table wixMergeTable = output.Tables["WixMerge"];
 
                 if (null != wixMergeTable && 0 < wixMergeTable.Rows.Count)
                 {
                     foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
                     {
                         string sequenceTableName = sequence.ToString();
-                        Table sequenceTable = this.Output.Tables[sequenceTableName];
+                        Table sequenceTable = output.Tables[sequenceTableName];
 
                         if (null == sequenceTable)
                         {
-                            sequenceTable = this.Output.EnsureTable(this.TableDefinitions[sequenceTableName]);
+                            sequenceTable = output.EnsureTable(this.TableDefinitions[sequenceTableName]);
                         }
 
                         if (0 == sequenceTable.Rows.Count)
@@ -456,17 +435,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             //    extension.PostBind(this.Context);
             //}
 
-            // generate database file
-            Messaging.Instance.OnMessage(WixVerboses.GeneratingDatabase());
-            string tempDatabaseFile = Path.Combine(this.IntermediateFolder, Path.GetFileName(this.OutputPath));
-            this.GenerateDatabase(this.Output, tempDatabaseFile, false, false);
-
-            FileTransfer transfer;
-            if (FileTransfer.TryCreate(tempDatabaseFile, this.OutputPath, true, this.Output.Type.ToString(), null, out transfer)) // note where this database needs to move in the future
-            {
-                transfer.Built = true;
-                fileTransfers.Add(transfer);
-            }
+            this.ValidateComponentGuids(output);
 
             // stop processing if an error previously occurred
             if (Messaging.Instance.EncounteredError)
@@ -474,49 +443,51 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            // Output the output to a file
+            // Generate database file.
+            Messaging.Instance.OnMessage(WixVerboses.GeneratingDatabase());
+            string tempDatabaseFile = Path.Combine(this.IntermediateFolder, Path.GetFileName(this.OutputPath));
+            this.GenerateDatabase(output, tempDatabaseFile, false, false);
+
+            if (FileTransfer.TryCreate(tempDatabaseFile, this.OutputPath, true, output.Type.ToString(), null, out var transfer)) // note where this database needs to move in the future
+            {
+                transfer.Built = true;
+                fileTransfers.Add(transfer);
+            }
+
+            // Stop processing if an error previously occurred.
+            if (Messaging.Instance.EncounteredError)
+            {
+                return;
+            }
+
+            // Output the output to a file.
             Pdb pdb = new Pdb();
-            pdb.Output = this.Output;
+            pdb.Output = output;
             if (!String.IsNullOrEmpty(this.PdbFile))
             {
                 pdb.Save(this.PdbFile);
             }
 
             // Merge modules.
-            if (OutputType.Product == this.Output.Type)
+            if (OutputType.Product == output.Type)
             {
                 Messaging.Instance.OnMessage(WixVerboses.MergingModules());
 
-                MergeModulesCommand command = new MergeModulesCommand();
+                var command = new MergeModulesCommand();
                 command.FileFacades = fileFacades;
-                command.Output = this.Output;
+                command.Output = output;
                 command.OutputPath = tempDatabaseFile;
                 command.SuppressedTableNames = suppressedTableNames;
                 command.Execute();
-
-                // stop processing if an error previously occurred
-                if (Messaging.Instance.EncounteredError)
-                {
-                    return;
-                }
             }
-
-            // inspect the MSI prior to running ICEs
-            //InspectorCore inspectorCore = new InspectorCore();
-            //foreach (InspectorExtension inspectorExtension in this.InspectorExtensions)
-            //{
-            //    inspectorExtension.Core = inspectorCore;
-            //    inspectorExtension.InspectDatabase(tempDatabaseFile, pdb);
-
-            //    inspectorExtension.Core = null; // reset.
-            //}
 
             if (Messaging.Instance.EncounteredError)
             {
                 return;
             }
 
-            // validate the output if there is an MSI validator
+#if TODO_FINISH_VALIDATION
+            // Validate the output if there is an MSI validator.
             if (null != this.Validator)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
@@ -537,19 +508,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     return;
                 }
             }
+#endif
 
             // Process uncompressed files.
             if (!Messaging.Instance.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
             {
-                var command = new ProcessUncompressedFilesCommand();
+                var command = new ProcessUncompressedFilesCommand(section);
                 command.Compressed = compressed;
                 command.FileFacades = uncompressedFiles;
                 command.LayoutDirectory = layoutDirectory;
                 command.LongNamesInImage = longNames;
-                command.MediaRows = assignedMediaRows;
                 command.ResolveMedia = this.ResolveMedia;
                 command.DatabasePath = tempDatabaseFile;
-                command.WixMediaTable = this.Output.Tables["WixMedia"];
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -557,94 +527,92 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.FileTransfers = fileTransfers;
             this.ContentFilePaths = fileFacades.Select(r => r.WixFile.Source).ToList();
+
+            // TODO: Eventually this gets removed
+            var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase), this.Intermediate.EmbedFilePaths);
+            intermediate.Save(Path.ChangeExtension(this.OutputPath, "wir"));
         }
 
         /// <summary>
         /// Localize dialogs and controls.
         /// </summary>
         /// <param name="tables">The tables to localize.</param>
-        private void LocalizeUI(TableIndexedCollection tables)
+        private void LocalizeUI(IntermediateSection section)
         {
-            Table dialogTable = tables["Dialog"];
-            if (null != dialogTable)
+            foreach (var row in section.Tuples.OfType<DialogTuple>())
             {
-                foreach (Row row in dialogTable.Rows)
+                string dialog = row.Dialog;
+
+                if (this.WixVariableResolver.TryGetLocalizedControl(dialog, null, out LocalizedControl localizedControl))
                 {
-                    string dialog = (string)row[0];
-
-                    if (this.WixVariableResolver.TryGetLocalizedControl(dialog, null, out LocalizedControl localizedControl))
+                    if (CompilerConstants.IntegerNotSet != localizedControl.X)
                     {
-                        if (CompilerConstants.IntegerNotSet != localizedControl.X)
-                        {
-                            row[1] = localizedControl.X;
-                        }
+                        row.HCentering = localizedControl.X;
+                    }
 
-                        if (CompilerConstants.IntegerNotSet != localizedControl.Y)
-                        {
-                            row[2] = localizedControl.Y;
-                        }
+                    if (CompilerConstants.IntegerNotSet != localizedControl.Y)
+                    {
+                        row.VCentering = localizedControl.Y;
+                    }
 
-                        if (CompilerConstants.IntegerNotSet != localizedControl.Width)
-                        {
-                            row[3] = localizedControl.Width;
-                        }
+                    if (CompilerConstants.IntegerNotSet != localizedControl.Width)
+                    {
+                        row.Width = localizedControl.Width;
+                    }
 
-                        if (CompilerConstants.IntegerNotSet != localizedControl.Height)
-                        {
-                            row[4] = localizedControl.Height;
-                        }
+                    if (CompilerConstants.IntegerNotSet != localizedControl.Height)
+                    {
+                        row.Height = localizedControl.Height;
+                    }
 
-                        row[5] = (int)row[5] | localizedControl.Attributes;
+                    row.Attributes = row.Attributes | localizedControl.Attributes;
 
-                        if (!String.IsNullOrEmpty(localizedControl.Text))
-                        {
-                            row[6] = localizedControl.Text;
-                        }
+                    if (!String.IsNullOrEmpty(localizedControl.Text))
+                    {
+                        row.Title = localizedControl.Text;
                     }
                 }
             }
 
-            Table controlTable = tables["Control"];
-            if (null != controlTable)
+
+            foreach (var row in section.Tuples.OfType<ControlTuple>())
             {
-                foreach (Row row in controlTable.Rows)
+                string dialog = row.Dialog_;
+                string control = row.Control;
+
+                if (this.WixVariableResolver.TryGetLocalizedControl(dialog, control, out LocalizedControl localizedControl))
                 {
-                    string dialog = (string)row[0];
-                    string control = (string)row[1];
-
-                    if (this.WixVariableResolver.TryGetLocalizedControl(dialog, control, out LocalizedControl localizedControl))
+                    if (CompilerConstants.IntegerNotSet != localizedControl.X)
                     {
-                        if (CompilerConstants.IntegerNotSet != localizedControl.X)
-                        {
-                            row[3] = localizedControl.X.ToString();
-                        }
+                        row.X = localizedControl.X;
+                    }
 
-                        if (CompilerConstants.IntegerNotSet != localizedControl.Y)
-                        {
-                            row[4] = localizedControl.Y.ToString();
-                        }
+                    if (CompilerConstants.IntegerNotSet != localizedControl.Y)
+                    {
+                        row.Y = localizedControl.Y;
+                    }
 
-                        if (CompilerConstants.IntegerNotSet != localizedControl.Width)
-                        {
-                            row[5] = localizedControl.Width.ToString();
-                        }
+                    if (CompilerConstants.IntegerNotSet != localizedControl.Width)
+                    {
+                        row.Width = localizedControl.Width;
+                    }
 
-                        if (CompilerConstants.IntegerNotSet != localizedControl.Height)
-                        {
-                            row[6] = localizedControl.Height.ToString();
-                        }
+                    if (CompilerConstants.IntegerNotSet != localizedControl.Height)
+                    {
+                        row.Height = localizedControl.Height;
+                    }
 
-                        row[7] = (int)row[7] | localizedControl.Attributes;
+                    row.Attributes = row.Attributes | localizedControl.Attributes;
 
-                        if (!String.IsNullOrEmpty(localizedControl.Text))
-                        {
-                            row[9] = localizedControl.Text;
-                        }
+                    if (!String.IsNullOrEmpty(localizedControl.Text))
+                    {
+                        row.Text = localizedControl.Text;
                     }
                 }
             }
         }
 
+#if TODO_FINISH_PATCH
         /// <summary>
         /// Copy file data between transform substorages and the patch output object
         /// </summary>
@@ -674,269 +642,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.TableDefinitions = this.TableDefinitions;
             command.Execute();
         }
+#endif
 
-        private void UpdateMediaSequences(OutputType outputType, IEnumerable<FileFacade> fileFacades, RowDictionary<MediaRow> mediaRows)
-        {
-            // Calculate sequence numbers and media disk id layout for all file media information objects.
-            if (OutputType.Module == outputType)
-            {
-                int lastSequence = 0;
-                foreach (FileFacade facade in fileFacades) // TODO: Sort these rows directory path and component id and maybe file size or file extension and other creative ideas to get optimal install speed out of MSI.
-                {
-                    facade.File.Sequence = ++lastSequence;
-                }
-            }
-            else
-            {
-                int lastSequence = 0;
-                MediaRow mediaRow = null;
-                Dictionary<int, List<FileFacade>> patchGroups = new Dictionary<int, List<FileFacade>>();
 
-                // sequence the non-patch-added files
-                foreach (FileFacade facade in fileFacades) // TODO: Sort these rows directory path and component id and maybe file size or file extension and other creative ideas to get optimal install speed out of MSI.
-                {
-                    if (null == mediaRow)
-                    {
-                        mediaRow = mediaRows.Get(facade.WixFile.DiskId);
-                        if (OutputType.Patch == outputType)
-                        {
-                            // patch Media cannot start at zero
-                            lastSequence = mediaRow.LastSequence;
-                        }
-                    }
-                    else if (mediaRow.DiskId != facade.WixFile.DiskId)
-                    {
-                        mediaRow.LastSequence = lastSequence;
-                        mediaRow = mediaRows.Get(facade.WixFile.DiskId);
-                    }
-
-                    if (0 < facade.WixFile.PatchGroup)
-                    {
-                        List<FileFacade> patchGroup = patchGroups[facade.WixFile.PatchGroup];
-
-                        if (null == patchGroup)
-                        {
-                            patchGroup = new List<FileFacade>();
-                            patchGroups.Add(facade.WixFile.PatchGroup, patchGroup);
-                        }
-
-                        patchGroup.Add(facade);
-                    }
-                    else
-                    {
-                        facade.File.Sequence = ++lastSequence;
-                    }
-                }
-
-                if (null != mediaRow)
-                {
-                    mediaRow.LastSequence = lastSequence;
-                    mediaRow = null;
-                }
-
-                // sequence the patch-added files
-                foreach (List<FileFacade> patchGroup in patchGroups.Values)
-                {
-                    foreach (FileFacade facade in patchGroup)
-                    {
-                        if (null == mediaRow)
-                        {
-                            mediaRow = mediaRows.Get(facade.WixFile.DiskId);
-                        }
-                        else if (mediaRow.DiskId != facade.WixFile.DiskId)
-                        {
-                            mediaRow.LastSequence = lastSequence;
-                            mediaRow = mediaRows.Get(facade.WixFile.DiskId);
-                        }
-
-                        facade.File.Sequence = ++lastSequence;
-                    }
-                }
-
-                if (null != mediaRow)
-                {
-                    mediaRow.LastSequence = lastSequence;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Set the guids for components with generatable guids.
-        /// </summary>
-        /// <param name="output">Internal representation of the database to operate on.</param>
-        private void SetComponentGuids(Output output)
-        {
-            Table componentTable = output.Tables["Component"];
-            if (null != componentTable)
-            {
-                Hashtable registryKeyRows = null;
-                Hashtable directories = null;
-                Hashtable componentIdGenSeeds = null;
-                Dictionary<string, List<FileRow>> fileRows = null;
-
-                // find components with generatable guids
-                foreach (ComponentRow componentRow in componentTable.Rows)
-                {
-                    // component guid will be generated
-                    if ("*" == componentRow.Guid)
-                    {
-                        if (null == componentRow.KeyPath || componentRow.IsOdbcDataSourceKeyPath)
-                        {
-                            Messaging.Instance.OnMessage(WixErrors.IllegalComponentWithAutoGeneratedGuid(componentRow.SourceLineNumbers));
-                        }
-                        else if (componentRow.IsRegistryKeyPath)
-                        {
-                            if (null == registryKeyRows)
-                            {
-                                Table registryTable = output.Tables["Registry"];
-
-                                registryKeyRows = new Hashtable(registryTable.Rows.Count);
-
-                                foreach (Row registryRow in registryTable.Rows)
-                                {
-                                    registryKeyRows.Add((string)registryRow[0], registryRow);
-                                }
-                            }
-
-                            Row foundRow = registryKeyRows[componentRow.KeyPath] as Row;
-
-                            string bitness = componentRow.Is64Bit ? "64" : String.Empty;
-                            if (null != foundRow)
-                            {
-                                string regkey = String.Concat(bitness, foundRow[1], "\\", foundRow[2], "\\", foundRow[3]);
-                                componentRow.Guid = Uuid.NewUuid(BindDatabaseCommand.WixComponentGuidNamespace, regkey.ToLowerInvariant()).ToString("B").ToUpperInvariant();
-                            }
-                        }
-                        else // must be a File KeyPath
-                        {
-                            // if the directory table hasn't been loaded into an indexed hash
-                            // of directory ids to target names do that now.
-                            if (null == directories)
-                            {
-                                Table directoryTable = output.Tables["Directory"];
-
-                                int numDirectoryTableRows = (null != directoryTable) ? directoryTable.Rows.Count : 0;
-
-                                directories = new Hashtable(numDirectoryTableRows);
-
-                                // get the target paths for all directories
-                                if (null != directoryTable)
-                                {
-                                    foreach (Row row in directoryTable.Rows)
-                                    {
-                                        // if the directory Id already exists, we will skip it here since
-                                        // checking for duplicate primary keys is done later when importing tables
-                                        // into database
-                                        if (directories.ContainsKey(row[0]))
-                                        {
-                                            continue;
-                                        }
-
-                                        string targetName = Common.GetName((string)row[2], false, true);
-                                        directories.Add(row[0], new ResolvedDirectory((string)row[1], targetName));
-                                    }
-                                }
-                            }
-
-                            // if the component id generation seeds have not been indexed
-                            // from the WixDirectory table do that now.
-                            if (null == componentIdGenSeeds)
-                            {
-                                Table wixDirectoryTable = output.Tables["WixDirectory"];
-
-                                int numWixDirectoryRows = (null != wixDirectoryTable) ? wixDirectoryTable.Rows.Count : 0;
-
-                                componentIdGenSeeds = new Hashtable(numWixDirectoryRows);
-
-                                // if there are any WixDirectory rows, build up the Component Guid
-                                // generation seeds indexed by Directory/@Id.
-                                if (null != wixDirectoryTable)
-                                {
-                                    foreach (Row row in wixDirectoryTable.Rows)
-                                    {
-                                        componentIdGenSeeds.Add(row[0], (string)row[1]);
-                                    }
-                                }
-                            }
-
-                            // if the file rows have not been indexed by File.Component yet
-                            // then do that now
-                            if (null == fileRows)
-                            {
-                                Table fileTable = output.Tables["File"];
-
-                                int numFileRows = (null != fileTable) ? fileTable.Rows.Count : 0;
-
-                                fileRows = new Dictionary<string, List<FileRow>>(numFileRows);
-
-                                if (null != fileTable)
-                                {
-                                    foreach (FileRow file in fileTable.Rows)
-                                    {
-                                        List<FileRow> files;
-                                        if (!fileRows.TryGetValue(file.Component, out files))
-                                        {
-                                            files = new List<FileRow>();
-                                            fileRows.Add(file.Component, files);
-                                        }
-
-                                        files.Add(file);
-                                    }
-                                }
-                            }
-
-                            // validate component meets all the conditions to have a generated guid
-                            List<FileRow> currentComponentFiles = fileRows[componentRow.Component];
-                            int numFilesInComponent = currentComponentFiles.Count;
-                            string path = null;
-
-                            foreach (FileRow fileRow in currentComponentFiles)
-                            {
-                                if (fileRow.File == componentRow.KeyPath)
-                                {
-                                    // calculate the key file's canonical target path
-                                    string directoryPath = Binder.GetDirectoryPath(directories, componentIdGenSeeds, componentRow.Directory, true);
-                                    string fileName = Common.GetName(fileRow.FileName, false, true).ToLower(CultureInfo.InvariantCulture);
-                                    path = Path.Combine(directoryPath, fileName);
-
-                                    // find paths that are not canonicalized
-                                    if (path.StartsWith(@"PersonalFolder\my pictures", StringComparison.Ordinal) ||
-                                        path.StartsWith(@"ProgramFilesFolder\common files", StringComparison.Ordinal) ||
-                                        path.StartsWith(@"ProgramMenuFolder\startup", StringComparison.Ordinal) ||
-                                        path.StartsWith("TARGETDIR", StringComparison.Ordinal) ||
-                                        path.StartsWith(@"StartMenuFolder\programs", StringComparison.Ordinal) ||
-                                        path.StartsWith(@"WindowsFolder\fonts", StringComparison.Ordinal))
-                                    {
-                                        Messaging.Instance.OnMessage(WixErrors.IllegalPathForGeneratedComponentGuid(componentRow.SourceLineNumbers, fileRow.Component, path));
-                                    }
-
-                                    // if component has more than one file, the key path must be versioned
-                                    if (1 < numFilesInComponent && String.IsNullOrEmpty(fileRow.Version))
-                                    {
-                                        Messaging.Instance.OnMessage(WixErrors.IllegalGeneratedGuidComponentUnversionedKeypath(componentRow.SourceLineNumbers));
-                                    }
-                                }
-                                else
-                                {
-                                    // not a key path, so it must be an unversioned file if component has more than one file
-                                    if (1 < numFilesInComponent && !String.IsNullOrEmpty(fileRow.Version))
-                                    {
-                                        Messaging.Instance.OnMessage(WixErrors.IllegalGeneratedGuidComponentVersionedNonkeypath(componentRow.SourceLineNumbers));
-                                    }
-                                }
-                            }
-
-                            // if the rules were followed, reward with a generated guid
-                            if (!Messaging.Instance.EncounteredError)
-                            {
-                                componentRow.Guid = Uuid.NewUuid(BindDatabaseCommand.WixComponentGuidNamespace, path).ToString("B").ToUpperInvariant();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+#if TODO_FIX_INSTANCE_TRANSFORM
         /// <summary>
         /// Creates instance transform substorages in the output.
         /// </summary>
@@ -1171,6 +880,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
         }
+#endif
 
         /// <summary>
         /// Validate that there are no duplicate GUIDs in the output.
@@ -1186,7 +896,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 Dictionary<string, bool> componentGuidConditions = new Dictionary<string, bool>(componentTable.Rows.Count);
 
-                foreach (ComponentRow row in componentTable.Rows)
+                foreach (Data.Rows.ComponentRow row in componentTable.Rows)
                 {
                     // we don't care about unmanaged components and if there's a * GUID remaining,
                     // there's already an error that prevented it from being replaced with a real GUID.
@@ -1221,7 +931,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="output">Internal representation of the msi database to operate upon.</param>
         private void UpdateControlText(Output output)
         {
-            UpdateControlTextCommand command = new UpdateControlTextCommand();
+            var command = new UpdateControlTextCommand();
             command.BBControlTable = output.Tables["BBControl"];
             command.WixBBControlTable = output.Tables["WixBBControl"];
             command.ControlTable = output.Tables["Control"];
@@ -1229,7 +939,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.Execute();
         }
 
-        private string ResolveMedia(MediaRow mediaRow, string mediaLayoutDirectory, string layoutDirectory)
+        private string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory)
         {
             string layout = null;
 
@@ -1282,7 +992,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.TempFilesLocation = this.IntermediateFolder;
             command.Codepage = this.Codepage;
             command.Execute();
-#endif
         }
     }
 }

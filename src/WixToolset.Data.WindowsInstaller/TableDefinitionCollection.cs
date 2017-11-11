@@ -69,6 +69,17 @@ namespace WixToolset.Data
         }
 
         /// <summary>
+        /// Tries to get a table definition by name.
+        /// </summary>
+        /// <param name="tableName">Name of table to locate.</param>
+        /// <param name="table">Table definition if found.</param>
+        /// <returns>True if table definition was found otherwise false.</returns>
+        public bool TryGet(string tableName, out TableDefinition table)
+        {
+            return this.collection.TryGetValue(tableName, out table);
+        }
+
+        /// <summary>
         /// Load a table definition collection from an XmlReader.
         /// </summary>
         /// <param name="reader">Reader to get data from.</param>

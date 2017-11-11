@@ -29,7 +29,7 @@ namespace WixToolset.Data
         public Patch()
         {
             this.inspectorExtensions = new List<IInspectorExtension>();
-            this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandard.GetTableDefinitions());
+            this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandardInternal.GetTableDefinitions());
         }
 
         /// <summary>

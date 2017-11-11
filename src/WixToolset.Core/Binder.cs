@@ -609,9 +609,9 @@ namespace WixToolset.Core
         /// <param name="directory">Directory identifier.</param>
         /// <param name="canonicalize">Canonicalize the path for standard directories.</param>
         /// <returns>Source path of a directory.</returns>
-        public static string GetDirectoryPath(Hashtable directories, Hashtable componentIdGenSeeds, string directory, bool canonicalize)
+        public static string GetDirectoryPath(Dictionary<string, ResolvedDirectory> directories, Dictionary<string, string> componentIdGenSeeds, string directory, bool canonicalize)
         {
-            if (!directories.Contains(directory))
+            if (!directories.ContainsKey(directory))
             {
                 throw new WixException(WixErrors.ExpectedDirectory(directory));
             }
@@ -620,7 +620,7 @@ namespace WixToolset.Core
 
             if (null == resolvedDirectory.Path)
             {
-                if (null != componentIdGenSeeds && componentIdGenSeeds.Contains(directory))
+                if (null != componentIdGenSeeds && componentIdGenSeeds.ContainsKey(directory))
                 {
                     resolvedDirectory.Path = (string)componentIdGenSeeds[directory];
                 }
@@ -670,7 +670,7 @@ namespace WixToolset.Core
         /// <param name="compressed">Specifies the package is compressed.</param>
         /// <param name="useLongName">Specifies the package uses long file names.</param>
         /// <returns>Source path of file relative to package directory.</returns>
-        public static string GetFileSourcePath(Hashtable directories, string directoryId, string fileName, bool compressed, bool useLongName)
+        public static string GetFileSourcePath(Dictionary<string, ResolvedDirectory> directories, string directoryId, string fileName, bool compressed, bool useLongName)
         {
             string fileSourcePath = Common.GetName(fileName, true, useLongName);
 

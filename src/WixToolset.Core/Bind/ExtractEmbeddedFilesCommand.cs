@@ -11,7 +11,12 @@ namespace WixToolset.Core.Bind
 
     public class ExtractEmbeddedFilesCommand
     {
-        public IEnumerable<IExpectedExtractFile> FilesWithEmbeddedFiles { private get; set; }
+        public ExtractEmbeddedFilesCommand(IEnumerable<IExpectedExtractFile> embeddedFiles)
+        {
+            this.FilesWithEmbeddedFiles = embeddedFiles;
+        }
+
+        private IEnumerable<IExpectedExtractFile> FilesWithEmbeddedFiles { get; }
 
         public void Execute()
         {
@@ -28,10 +33,10 @@ namespace WixToolset.Core.Bind
                     // a .wixlib embedded in a WixExtension).
                     if ("embeddedresource" == baseUri.Scheme)
                     {
-                        string assemblyPath = Path.GetFullPath(baseUri.LocalPath);
-                        string resourceName = baseUri.Fragment.TrimStart('#');
+                        var assemblyPath = Path.GetFullPath(baseUri.LocalPath);
+                        var resourceName = baseUri.Fragment.TrimStart('#');
 
-                        Assembly assembly = Assembly.LoadFile(assemblyPath);
+                        var assembly = Assembly.LoadFile(assemblyPath);
                         stream = assembly.GetManifestResourceStream(resourceName);
                     }
                     else // normal file (usually a binary .wixlib on disk).
@@ -39,7 +44,7 @@ namespace WixToolset.Core.Bind
                         stream = File.OpenRead(baseUri.LocalPath);
                     }
 
-                    using (FileStructure fs = FileStructure.Read(stream))
+                    using (var fs = FileStructure.Read(stream))
                     {
                         var uniqueIndicies = new SortedSet<int>();
 

@@ -1,29 +1,34 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core.WindowsInstaller.Databases
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.IO;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Msi;
     using WixToolset.Core.Native;
     using WixToolset.Bind;
     using WixToolset.Core.Bind;
     using WixToolset.Data.Bind;
+    using WixToolset.Data.Tuples;
+    using System.Linq;
 
     /// <summary>
     /// Defines the file transfers necessary to layout the uncompressed files.
     /// </summary>
     internal class ProcessUncompressedFilesCommand
     {
+        public ProcessUncompressedFilesCommand(IntermediateSection section)
+        {
+            this.Section = section;
+        }
+
+        private IntermediateSection Section { get; }
+
         public string DatabasePath { private get; set; }
 
         public IEnumerable<FileFacade> FileFacades { private get; set; }
-
-        public RowDictionary<MediaRow> MediaRows { private get; set; }
 
         public string LayoutDirectory { private get; set; }
 
@@ -31,9 +36,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
         public bool LongNamesInImage { private get; set; }
 
-        public Func<MediaRow, string, string, string> ResolveMedia { private get; set; }
-
-        public Table WixMediaTable { private get; set; }
+        public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
 
         public IEnumerable<FileTransfer> FileTransfers { get; private set; }
 
@@ -41,9 +44,11 @@ namespace WixToolset.Core.WindowsInstaller.Databases
         {
             List<FileTransfer> fileTransfers = new List<FileTransfer>();
 
-            Hashtable directories = new Hashtable();
+            var directories = new Dictionary<string, ResolvedDirectory>();
 
-            RowDictionary<WixMediaRow> wixMediaRows = new RowDictionary<WixMediaRow>(this.WixMediaTable);
+            var mediaRows = this.Section.Tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
+
+            var wixMediaRows = this.Section.Tuples.OfType<WixMediaTuple>().ToDictionary(t => t.DiskId_);
 
             using (Database db = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
             {
@@ -72,18 +77,16 @@ namespace WixToolset.Core.WindowsInstaller.Databases
                         // for each file in the array of uncompressed files
                         foreach (FileFacade facade in this.FileFacades)
                         {
-                            MediaRow mediaRow = this.MediaRows.Get(facade.WixFile.DiskId);
+                            var mediaTuple = mediaRows[facade.WixFile.DiskId];
                             string relativeFileLayoutPath = null;
-
-                            WixMediaRow wixMediaRow = null;
                             string mediaLayoutFolder = null;
 
-                            if (wixMediaRows.TryGetValue(mediaRow.GetKey(), out wixMediaRow))
+                            if (wixMediaRows.TryGetValue(facade.WixFile.DiskId, out var wixMediaRow))
                             {
                                 mediaLayoutFolder = wixMediaRow.Layout;
                             }
 
-                            string mediaLayoutDirectory = this.ResolveMedia(mediaRow, mediaLayoutFolder, this.LayoutDirectory);
+                            var mediaLayoutDirectory = this.ResolveMedia(mediaTuple, mediaLayoutFolder, this.LayoutDirectory);
 
                             // setup up the query record and find the appropriate file in the
                             // previously executed file view
@@ -102,8 +105,7 @@ namespace WixToolset.Core.WindowsInstaller.Databases
 
                             // finally put together the base media layout path and the relative file layout path
                             string fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
-                            FileTransfer transfer;
-                            if (FileTransfer.TryCreate(facade.WixFile.Source, fileLayoutPath, false, "File", facade.File.SourceLineNumbers, out transfer))
+                            if (FileTransfer.TryCreate(facade.WixFile.Source, fileLayoutPath, false, "File", facade.File.SourceLineNumbers, out var transfer))
                             {
                                 fileTransfers.Add(transfer);
                             }

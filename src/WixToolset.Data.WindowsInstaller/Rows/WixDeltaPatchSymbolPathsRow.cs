@@ -2,6 +2,8 @@
 
 namespace WixToolset.Data.Rows
 {
+    using WixToolset.Data.Tuples;
+
     /// <summary>
     /// Specialization of a row for the WixDeltaPatchSymbolPaths table.
     /// </summary>

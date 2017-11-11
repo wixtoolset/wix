@@ -3,7 +3,6 @@
 namespace WixToolset.Core.WindowsInstaller
 {
     using System;
-    using WixToolset.Core.WindowsInstaller.Databases;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
     using WixToolset.Data.Bind;

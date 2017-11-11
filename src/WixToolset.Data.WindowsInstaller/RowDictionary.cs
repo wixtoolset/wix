@@ -77,8 +77,7 @@ namespace WixToolset.Data
         /// <returns>Row or null if key is not found.</returns>
         public T Get(string key)
         {
-            T result;
-            return this.TryGetValue(key, out result) ? result : null;
+            return this.TryGetValue(key, out var result) ? result : null;
         }
     }
 }

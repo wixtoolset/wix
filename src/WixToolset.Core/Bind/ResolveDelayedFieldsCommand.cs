@@ -12,25 +12,28 @@ namespace WixToolset.Core.Bind
     /// Resolves the fields which had variables that needed to be resolved after the file information
     /// was loaded.
     /// </summary>
-    public class ResolveDelayedFieldsCommand : ICommand
+    public class ResolveDelayedFieldsCommand
     {
-        public OutputType OutputType { private get; set;}
-
-        public IEnumerable<IDelayedField> DelayedFields { private get; set;}
-
-        public IDictionary<string, string> VariableCache { private get; set; }
-
-        public string ModularizationGuid { private get; set; }
-
-        /// <param name="output">Internal representation of the msi database to operate upon.</param>
+        /// <summary>
+        /// Resolve delayed fields.
+        /// </summary>
         /// <param name="delayedFields">The fields which had resolution delayed.</param>
         /// <param name="variableCache">The file information to use when resolving variables.</param>
-        /// <param name="modularizationGuid">The modularization guid (used in case of a merge module).</param>
+        public ResolveDelayedFieldsCommand(IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)
+        {
+            this.DelayedFields = delayedFields;
+            this.VariableCache = variableCache;
+        }
+
+        private IEnumerable<IDelayedField> DelayedFields { get;}
+
+        private IDictionary<string, string> VariableCache { get; }
+
         public void Execute()
         {
             var deferredFields = new List<IDelayedField>();
 
-            foreach (IDelayedField delayedField in this.DelayedFields)
+            foreach (var delayedField in this.DelayedFields)
             {
                 try
                 {
@@ -42,7 +45,7 @@ namespace WixToolset.Core.Bind
                         var value = WixVariableResolver.ResolveDelayedVariables(propertyRow.SourceLineNumbers, delayedField.Field.AsString(), this.VariableCache);
 
                         // update the variable cache with the new value
-                        var key = String.Concat("property.", Common.Demodularize(this.OutputType, this.ModularizationGuid, (string)propertyRow[0]));
+                        var key = String.Concat("property.", propertyRow.AsString(0));
                         this.VariableCache[key] = value;
 
                         // update the field data
@@ -62,43 +65,31 @@ namespace WixToolset.Core.Bind
 
             // add specialization for ProductVersion fields
             string keyProductVersion = "property.ProductVersion";
-            if (this.VariableCache.ContainsKey(keyProductVersion))
+            if (this.VariableCache.TryGetValue(keyProductVersion, out var versionValue) && Version.TryParse(versionValue, out Version productVersion))
             {
-                string value = this.VariableCache[keyProductVersion];
-                Version productVersion = null;
-
-                try
+                // Don't add the variable if it already exists (developer defined a property with the same name).
+                string fieldKey = String.Concat(keyProductVersion, ".Major");
+                if (!this.VariableCache.ContainsKey(fieldKey))
                 {
-                    productVersion = new Version(value);
-
-                    // Don't add the variable if it already exists (developer defined a property with the same name).
-                    string fieldKey = String.Concat(keyProductVersion, ".Major");
-                    if (!this.VariableCache.ContainsKey(fieldKey))
-                    {
-                        this.VariableCache[fieldKey] = productVersion.Major.ToString(CultureInfo.InvariantCulture);
-                    }
-
-                    fieldKey = String.Concat(keyProductVersion, ".Minor");
-                    if (!this.VariableCache.ContainsKey(fieldKey))
-                    {
-                        this.VariableCache[fieldKey] = productVersion.Minor.ToString(CultureInfo.InvariantCulture);
-                    }
-
-                    fieldKey = String.Concat(keyProductVersion, ".Build");
-                    if (!this.VariableCache.ContainsKey(fieldKey))
-                    {
-                        this.VariableCache[fieldKey] = productVersion.Build.ToString(CultureInfo.InvariantCulture);
-                    }
-
-                    fieldKey = String.Concat(keyProductVersion, ".Revision");
-                    if (!this.VariableCache.ContainsKey(fieldKey))
-                    {
-                        this.VariableCache[fieldKey] = productVersion.Revision.ToString(CultureInfo.InvariantCulture);
-                    }
+                    this.VariableCache[fieldKey] = productVersion.Major.ToString(CultureInfo.InvariantCulture);
                 }
-                catch
+
+                fieldKey = String.Concat(keyProductVersion, ".Minor");
+                if (!this.VariableCache.ContainsKey(fieldKey))
                 {
-                    // Ignore the error introduced by new behavior.
+                    this.VariableCache[fieldKey] = productVersion.Minor.ToString(CultureInfo.InvariantCulture);
+                }
+
+                fieldKey = String.Concat(keyProductVersion, ".Build");
+                if (!this.VariableCache.ContainsKey(fieldKey))
+                {
+                    this.VariableCache[fieldKey] = productVersion.Build.ToString(CultureInfo.InvariantCulture);
+                }
+
+                fieldKey = String.Concat(keyProductVersion, ".Revision");
+                if (!this.VariableCache.ContainsKey(fieldKey))
+                {
+                    this.VariableCache[fieldKey] = productVersion.Revision.ToString(CultureInfo.InvariantCulture);
                 }
             }
 
@@ -113,7 +104,6 @@ namespace WixToolset.Core.Bind
                 catch (WixException we)
                 {
                     Messaging.Instance.OnMessage(we.Error);
-                    continue;
                 }
             }
         }

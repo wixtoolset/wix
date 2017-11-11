@@ -7,15 +7,6 @@ namespace WixToolset.Bind
     /// </summary>
     public struct ResolvedDirectory
     {
-        /// <summary>The directory parent.</summary>
-        public string DirectoryParent;
-
-        /// <summary>The name of this directory.</summary>
-        public string Name;
-
-        /// <summary>The path of this directory.</summary>
-        public string Path;
-
         /// <summary>
         /// Constructor for ResolvedDirectory.
         /// </summary>
@@ -27,5 +18,14 @@ namespace WixToolset.Bind
             this.Name = name;
             this.Path = null;
         }
+
+        /// <summary>The directory parent.</summary>
+        public string DirectoryParent { get; set; }
+
+        /// <summary>The name of this directory.</summary>
+        public string Name { get; set; }
+
+        /// <summary>The path of this directory.</summary>
+        public string Path { get; set; }
     }
 }

@@ -7137,7 +7137,7 @@ namespace WixToolset
                 }
 
                 // finally, schedule RemoveExistingProducts
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction);
+                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction, new Identifier("InstallExecuteSequence/RemoveExistingProducts", AccessModifier.Public));
                 row.Set(0, "InstallExecuteSequence");
                 row.Set(1, "RemoveExistingProducts");
                 // row.Set(2, condition);
@@ -7641,11 +7641,11 @@ namespace WixToolset
                 row.Set(4, diskId);
                 if (YesNoType.Yes == fileCompression)
                 {
-                    row.Set(5, 1);
+                    row.Set(5, true);
                 }
                 else if (YesNoType.No == fileCompression)
                 {
-                    row.Set(5, 0);
+                    row.Set(5, false);
                 }
                 else // YesNoType.NotSet == fileCompression
                 {
@@ -9525,7 +9525,7 @@ namespace WixToolset
                 var patchIdRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixPatchId);
                 patchIdRow.Set(0, patchId);
                 patchIdRow.Set(1, clientPatchId);
-                patchIdRow.Set(2, optimizePatchSizeForLargeFiles ? 1 : 0);
+                patchIdRow.Set(2, optimizePatchSizeForLargeFiles);
                 patchIdRow.Set(3, apiPatchingSymbolFlags);
 
                 if (allowRemoval)
