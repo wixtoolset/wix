@@ -7,7 +7,7 @@ namespace WixToolset.Core.Burn
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    internal class BackendFactory : IBackendFactory
+    internal class BurnBackendFactory : IBackendFactory
     {
         public bool TryCreateBackend(string outputType, string outputFile, IBindContext context, out IBackend backend)
         {

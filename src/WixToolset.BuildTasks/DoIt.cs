@@ -181,7 +181,7 @@ namespace WixToolset.BuildTasks
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 
-            foreach (var type in new[] { typeof(WixToolset.Core.Burn.StandardBackend), typeof(WixToolset.Core.WindowsInstaller.StandardBackend) })
+            foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
             {
                 extensionManager.Add(type.Assembly);
             }

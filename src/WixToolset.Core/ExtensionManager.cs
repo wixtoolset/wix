@@ -8,53 +8,36 @@ namespace WixToolset.Core
     using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    public class ExtensionManager : IExtensionManager
+    internal class ExtensionManager : IExtensionManager
     {
-        private List<Assembly> extensionAssemblies = new List<Assembly>();
+        private List<IExtensionFactory> extensionFactories = new List<IExtensionFactory>();
 
-        /// <summary>
-        /// Adds an assembly.
-        /// </summary>
-        /// <param name="assembly">Assembly to add to the extension manager.</param>
-        /// <returns>The assembly added.</returns>
-        public Assembly Add(Assembly assembly)
+        public void Add(Assembly extensionAssembly)
         {
-            this.extensionAssemblies.Add(assembly);
-            return assembly;
+            var types = extensionAssembly.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && typeof(IExtensionFactory).IsAssignableFrom(t));
+            var factories = types.Select(t => (IExtensionFactory)Activator.CreateInstance(t)).ToList();
+
+            this.extensionFactories.AddRange(factories);
         }
 
-        /// <summary>
-        /// Loads an assembly from a type description string.
-        /// </summary>
-        /// <param name="extension">The assembly type description string.</param>
-        /// <returns>The loaded assembly. This assembly can be ignored since the extension manager maintains the list of loaded assemblies internally.</returns>
-        /// <remarks>
-        /// <paramref name="extension"/> can be in several different forms:
-        /// <list type="number">
-        /// <item><term>AssemblyName (MyAssembly, Version=1.3.0.0, Culture=neutral, PublicKeyToken=b17a5c561934e089)</term></item>
-        /// <item><term>Absolute path to an assembly (C:\MyExtensions\ExtensionAssembly.dll)</term></item>
-        /// <item><term>Filename of an assembly in the application directory (ExtensionAssembly.dll)</term></item>
-        /// <item><term>Relative path to an assembly (..\..\MyExtensions\ExtensionAssembly.dll)</term></item>
-        /// </list>
-        /// </remarks>
-        public Assembly Load(string extension)
+        public void Load(string extensionPath)
         {
-            string assemblyName = extension;
             Assembly assembly;
 
             // Absolute path to an assembly which means only "load from" will work even though we'd prefer to
             // use Assembly.Load (see the documentation for Assembly.LoadFrom why).
-            if (Path.IsPathRooted(assemblyName))
+            if (Path.IsPathRooted(extensionPath))
             {
-                assembly = ExtensionManager.ExtensionLoadFrom(assemblyName);
+                assembly = ExtensionManager.ExtensionLoadFrom(extensionPath);
             }
-            else if (ExtensionManager.TryExtensionLoad(assemblyName, out assembly))
+            else if (ExtensionManager.TryExtensionLoad(extensionPath, out assembly))
             {
                 // Loaded the assembly by name from the probing path.
             }
-            else if (ExtensionManager.TryExtensionLoad(Path.GetFileNameWithoutExtension(assemblyName), out assembly))
+            else if (ExtensionManager.TryExtensionLoad(Path.GetFileNameWithoutExtension(extensionPath), out assembly))
             {
                 // Loaded the assembly by filename alone along the probing path.
             }
@@ -65,21 +48,25 @@ namespace WixToolset.Core
                 // path, so we should try Assembly.LoadFrom one last time. We could have detected a directory
                 // separator character and used Assembly.LoadFrom directly, but dealing with path canonicalization
                 // issues is something we don't want to deal with if we don't have to.
-                assembly = ExtensionManager.ExtensionLoadFrom(assemblyName);
+                assembly = ExtensionManager.ExtensionLoadFrom(extensionPath);
             }
 
-            return this.Add(assembly);
+            this.Add(assembly);
         }
 
-        /// <summary>
-        /// Creates extension of specified type from assemblies loaded into the extension manager.
-        /// </summary>
-        /// <typeparam name="T">Type of extension to create.</typeparam>
-        /// <returns>Extensions created of the specified type.</returns>
         public IEnumerable<T> Create<T>() where T : class
         {
-            var types = this.extensionAssemblies.SelectMany(a => a.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && typeof(T).IsAssignableFrom(t)));
-            return types.Select(t => (T)Activator.CreateInstance(t)).ToList();
+            var extensions = new List<T>();
+
+            foreach (var factory in this.extensionFactories)
+            {
+                if (factory.TryCreateExtension(typeof(T), out var obj) && obj is T extension)
+                {
+                    extensions.Add(extension);
+                }
+            }
+
+            return extensions;
         }
 
         private static Assembly ExtensionLoadFrom(string assemblyName)
