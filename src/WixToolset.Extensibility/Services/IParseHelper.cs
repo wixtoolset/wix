@@ -1,9 +1,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensibility
+namespace WixToolset.Extensibility.Services
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -11,20 +10,8 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Core interface provided by the compiler.
     /// </summary>
-    public interface ICompilerCore : IMessageHandler
+    public interface IParseHelper
     {
-        /// <summary>
-        /// Gets whether the compiler core encountered an error while processing.
-        /// </summary>
-        /// <value>Flag if core encountered an error during processing.</value>
-        bool EncounteredError { get; }
-
-        /// <summary>
-        /// Gets the platform which the compiler will use when defaulting 64-bit attributes and elements.
-        /// </summary>
-        /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
-        Platform CurrentPlatform { get; }
-
         /// <summary>
         /// Creates a version 3 name-based UUID.
         /// </summary>
@@ -49,20 +36,38 @@ namespace WixToolset.Extensibility
         Identifier CreateIdentifierFromFilename(string filename);
 
         /// <summary>
-        /// Convert a bit array into an int value.
+        /// Creates a row in the section.
         /// </summary>
-        /// <param name="bits">The bit array to convert.</param>
-        /// <returns>The converted int value.</returns>
-        int CreateIntegerFromBitArray(BitArray bits);
-
-        /// <summary>
-        /// Creates a row in the active section.
-        /// </summary>
+        /// <param name="section">Section to add the new tuple to.</param>
         /// <param name="sourceLineNumbers">Source and line number of current row.</param>
         /// <param name="tableName">Name of table to create row in.</param>
         /// <param name="identifier">Optional identifier for the row.</param>
         /// <returns>New row.</returns>
-        IntermediateTuple CreateRow(SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
+        IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
+
+        /// <summary>
+        /// Creates a row in the section.
+        /// </summary>
+        /// <param name="section">Section to add the new tuple to.</param>
+        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
+        /// <param name="tupleType">Type of tuple to create.</param>
+        /// <param name="identifier">Optional identifier for the row.</param>
+        /// <returns>New row.</returns>
+        IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null);
+
+        /// <summary>
+        /// Creates a directory row from a name.
+        /// </summary>
+        /// <param name="section">Section to add the new tuple to.</param>
+        /// <param name="sourceLineNumbers">Source line information.</param>
+        /// <param name="id">Optional identifier for the new row.</param>
+        /// <param name="parentId">Optional identifier for the parent row.</param>
+        /// <param name="name">Long name of the directory.</param>
+        /// <param name="shortName">Optional short name of the directory.</param>
+        /// <param name="sourceName">Optional source name for the directory.</param>
+        /// <param name="shortSourceName">Optional short source name for the directory.</param>
+        /// <returns>Identifier for the newly created row.</returns>
+        Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null, ISet<string> sectionInlinedDirectoryIds = null);
 
         /// <summary>
         /// Creates directories using the inline directory syntax.
@@ -71,7 +76,7 @@ namespace WixToolset.Extensibility
         /// <param name="attribute">The attribute to parse.</param>
         /// <param name="parentId">Optional identifier of parent directory.</param>
         /// <returns>Identifier of the leaf directory created.</returns>
-        string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId);
+        string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId);
 
         /// <summary>
         /// Creates a Registry row in the active section.
@@ -83,7 +88,7 @@ namespace WixToolset.Extensibility
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
-        Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId, bool escapeLeadingHash = false);
+        Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId, bool escapeLeadingHash);
 
         /// <summary>
         /// Creates a short file/directory name using an identifier and long file/directory name as input.
@@ -101,7 +106,7 @@ namespace WixToolset.Extensibility
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="tableName">The table name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys);
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys);
 
         /// <summary>
         /// Creates WixComplexReference and WixGroup rows in the active section.
@@ -113,16 +118,17 @@ namespace WixToolset.Extensibility
         /// <param name="childType">The child type.</param>
         /// <param name="childId">The child id.</param>
         /// <param name="isPrimary">Whether the child is primary.</param>
-        void CreateComplexReference(SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary);
+        void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary);
 
         /// <summary>
-        /// Creates a patch resource reference to the list of resoures to be filtered when producing a patch. This method should only be used when processing children of a patch family.
+        /// A row in the WixGroup table is added for this child node and its parent node.
         /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tableName">Name of table to create row in.</param>
-        /// <param name="primaryKeys">Array of keys that make up the primary key of the table.</param>
-        /// <returns>New row.</returns>
-        void CreatePatchFamilyChildReference(SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys);
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="parentType">Type of child's complex reference parent.</param>
+        /// <param name="parentId">Id of the parenet node.</param>
+        /// <param name="childType">Complex reference type of child</param>
+        /// <param name="childId">Id of the Child Node.</param>
+        void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
 
         /// <summary>
         /// Checks if the string contains a property (i.e. "foo[Property]bar")
@@ -136,7 +142,7 @@ namespace WixToolset.Extensibility
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="tableName">Name of the table to ensure existance of.</param>
-        void EnsureTable(SourceLineNumber sourceLineNumbers, string tableName);
+        void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName);
 
         /// <summary>
         /// Get an attribute value and displays an error if the value is empty by default.
@@ -146,14 +152,6 @@ namespace WixToolset.Extensibility
         /// <param name="emptyRule">A rule for the contents of the value. If the contents do not follow the rule, an error is thrown.</param>
         /// <returns>The attribute's value.</returns>
         string GetAttributeValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule = EmptyRule.CanBeWhitespaceOnly);
-
-        /// <summary>
-        /// Gets a Bundle variable value and displays an error for an illegal value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <returns>The attribute's value.</returns>
-        string GetAttributeBundleVariableValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
 
         /// <summary>
         /// Get a guid attribute value and displays an error for an illegal guid value.
@@ -180,6 +178,15 @@ namespace WixToolset.Extensibility
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
         string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
+
+        /// <summary>
+        /// Gets the attribute value as inline directory syntax.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information.</param>
+        /// <param name="attribute">Attribute containing the value to get.</param>
+        /// <param name="resultUsedToCreateReference">Flag indicates whether the inline directory syntax should be processed to create a directory row or to create a directory reference.</param>
+        /// <returns>Inline directory syntax split into array of strings or null if the syntax did not parse.</returns>
+        string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference);
 
         /// <summary>
         /// Get an integer attribute value and displays an error for an illegal integer value.
@@ -210,15 +217,6 @@ namespace WixToolset.Extensibility
         /// <param name="allowRelative">true if relative paths are allowed in the filename.</param>
         /// <returns>The attribute's long filename value.</returns>
         string GetAttributeLongFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards = false, bool allowRelative = false);
-
-        /// <summary>
-        /// Gets a RegistryRoot as a MsiInterop.MsidbRegistryRoot value and displays an error for an illegal value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <param name="allowHkmu">Whether HKMU is returned as -1 (true), or treated as an error (false).</param>
-        /// <returns>The attribute's RegisitryRootType value.</returns>
-        int GetAttributeMsidbRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu);
 
         /// <summary>
         /// Gets a version value or possibly a binder variable and displays an error for an illegal version value.
@@ -295,7 +293,7 @@ namespace WixToolset.Extensibility
         /// <param name="element">Element containing attribute to be parsed.</param>
         /// <param name="attribute">Attribute to be parsed.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
-        void ParseExtensionAttribute(XElement element, XAttribute attribute, IDictionary<string, string> context = null);
+        void ParseExtensionAttribute(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element, XAttribute attribute, IDictionary<string, string> context = null);
 
         /// <summary>
         /// Attempts to use an extension to parse the element.
@@ -303,24 +301,21 @@ namespace WixToolset.Extensibility
         /// <param name="parentElement">Element containing element to be parsed.</param>
         /// <param name="element">Element to be parsed.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        void ParseExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context = null);
+        void ParseExtensionElement(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context = null);
+
+        /// <summary>
+        /// Attempts to use an extension to parse the element, with support for setting component keypath.
+        /// </summary>
+        /// <param name="parentElement">Element containing element to be parsed.</param>
+        /// <param name="element">Element to be parsed.</param>
+        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
+        ComponentKeyPath ParsePossibleKeyPathExtensionElement(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context);
 
         /// <summary>
         /// Process all children of the element looking for extensions and erroring on the unexpected.
         /// </summary>
         /// <param name="element">Element to parse children.</param>
-        void ParseForExtensionElements(XElement element);
-
-        /// <summary>
-        /// Sets a bit in a bit array based on the index at which an attribute name was found in a string array.
-        /// </summary>
-        /// <param name="attributeNames">Array of attributes that map to bits.</param>
-        /// <param name="attributeName">Name of attribute to check.</param>
-        /// <param name="attributeValue">Value of attribute to check.</param>
-        /// <param name="bits">The bit array in which the bit will be set if found.</param>
-        /// <param name="offset">The offset into the bit array.</param>
-        /// <returns>true if the bit was set; false otherwise.</returns>
-        bool TrySetBitFromName(string[] attributeNames, string attributeName, YesNoType attributeValue, BitArray bits, int offset);
+        void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element);
 
         /// <summary>
         /// Called when the compiler encounters an unexpected attribute.

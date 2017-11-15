@@ -5,17 +5,17 @@ namespace WixToolset.Extensibility
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Base class for creating a compiler extension.
     /// </summary>
-    public abstract class CompilerExtension : ICompilerExtension
+    public abstract class BaseCompilerExtension : ICompilerExtension
     {
         /// <summary>
-        /// Gets or sets the compiler core for the extension.
+        /// ParserHelper for use by the extension.
         /// </summary>
-        /// <value>Compiler core for the extension.</value>
-        public ICompilerCore Core { get; set; }
+        protected IParseHelper ParseHelper { get; private set; }
 
         /// <summary>
         /// Gets the schema namespace for this extension.
@@ -28,6 +28,7 @@ namespace WixToolset.Extensibility
         /// </summary>
         public virtual void PreCompile(ICompileContext context)
         {
+            this.ParseHelper = context.ServiceProvider.GetService<IParseHelper>();
         }
 
         /// <summary>
@@ -36,9 +37,9 @@ namespace WixToolset.Extensibility
         /// <param name="parentElement">Parent element of attribute.</param>
         /// <param name="attribute">Attribute to process.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
-        public virtual void ParseAttribute(XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
+        public virtual void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
-            this.Core.UnexpectedAttribute(parentElement, attribute);
+            this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
         }
 
         /// <summary>
@@ -47,9 +48,9 @@ namespace WixToolset.Extensibility
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public virtual void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public virtual void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            this.Core.UnexpectedElement(parentElement, element);
+            this.ParseHelper.UnexpectedElement(parentElement, element);
         }
 
         /// <summary>
@@ -59,9 +60,9 @@ namespace WixToolset.Extensibility
         /// <param name="element">Element to process.</param>
         /// <param name="keyPath">Explicit key path.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public virtual ComponentKeyPath ParsePossibleKeyPathElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public virtual ComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            this.ParseElement(parentElement, element, context);
+            this.ParseElement(intermediate, section, parentElement, element, context);
             return null;
         }
 

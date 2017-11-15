@@ -19,6 +19,10 @@ namespace WixToolset.Extensibility
 
         string OutputPath { get; set; }
 
+        /// <summary>
+        /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
+        /// </summary>
+        /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
         Platform Platform { get; set; }
 
         XDocument Source { get; set; }

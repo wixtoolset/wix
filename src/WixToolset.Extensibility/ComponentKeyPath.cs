@@ -2,8 +2,6 @@
 
 namespace WixToolset.Extensibility
 {
-    using System;
-
     public enum ComponentKeyPathType
     {
         /// <summary>
