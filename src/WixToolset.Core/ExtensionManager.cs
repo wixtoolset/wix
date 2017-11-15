@@ -14,6 +14,7 @@ namespace WixToolset.Core
     internal class ExtensionManager : IExtensionManager
     {
         private List<IExtensionFactory> extensionFactories = new List<IExtensionFactory>();
+        private Dictionary<Type, List<object>> loadedExtensionsByType = new Dictionary<Type, List<object>>();
 
         public void Add(Assembly extensionAssembly)
         {
@@ -56,17 +57,22 @@ namespace WixToolset.Core
 
         public IEnumerable<T> Create<T>() where T : class
         {
-            var extensions = new List<T>();
-
-            foreach (var factory in this.extensionFactories)
+            if (!this.loadedExtensionsByType.TryGetValue(typeof(T), out var extensions))
             {
-                if (factory.TryCreateExtension(typeof(T), out var obj) && obj is T extension)
+                extensions = new List<object>();
+
+                foreach (var factory in this.extensionFactories)
                 {
-                    extensions.Add(extension);
+                    if (factory.TryCreateExtension(typeof(T), out var obj) && obj is T extension)
+                    {
+                        extensions.Add(extension);
+                    }
                 }
+
+                this.loadedExtensionsByType.Add(typeof(T), extensions);
             }
 
-            return extensions;
+            return extensions.Cast<T>().ToList();
         }
 
         private static Assembly ExtensionLoadFrom(string assemblyName)
