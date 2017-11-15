@@ -3,6 +3,7 @@
 namespace WixToolset.Core
 {
     using System;
+    using WixToolset.Core.ExtensibilityServices;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
@@ -10,6 +11,7 @@ namespace WixToolset.Core
     public class WixToolsetServiceProvider : IServiceProvider
     {
         private ExtensionManager extensionManager;
+        private ParseHelper parseHelper;
         private TupleDefinitionCreator tupleDefinitionCreator;
 
         public object GetService(Type serviceType)
@@ -56,6 +58,11 @@ namespace WixToolset.Core
             if (serviceType == typeof(ITupleDefinitionCreator))
             {
                 return this.tupleDefinitionCreator = this.tupleDefinitionCreator ?? new TupleDefinitionCreator(this);
+            }
+
+            if (serviceType == typeof(IParseHelper))
+            {
+                return this.parseHelper = this.parseHelper ?? new ParseHelper(this);
             }
 
             throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));

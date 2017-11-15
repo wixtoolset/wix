@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Collections;
@@ -11,7 +11,6 @@ namespace WixToolset
     using System.IO;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
-    using WixToolset.Core;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
@@ -22,7 +21,6 @@ namespace WixToolset
     /// <summary>
     /// Compiler of the WiX toolset.
     /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1724:TypeNamesShouldNotMatchNamespaces")]
     public sealed class Compiler
     {
         public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
@@ -40,7 +38,7 @@ namespace WixToolset
         private const string BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER = "WixBundleOriginalSourceFolder";
         private const string BURN_BUNDLE_LAST_USED_SOURCE = "WixBundleLastUsedSource";
 
-        // if these are true you know you are building a module or product
+        // If these are true you know you are building a module or product
         // but if they are false you cannot not be sure they will not end
         // up a product or module.  Use these flags carefully.
         private bool compilingModule;
@@ -123,16 +121,15 @@ namespace WixToolset
             // Try to compile it.
             try
             {
-                var creator = context.ServiceProvider.GetService<ITupleDefinitionCreator>();
+                var parseHelper = context.ServiceProvider.GetService<IParseHelper>();
 
-                this.Core = new CompilerCore(target, creator, extensionsByNamespace);
-                this.Core.CurrentPlatform = this.Context.Platform;
+                this.Core = new CompilerCore(target, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
                 this.componentIdPlaceholdersResolver = new WixVariableResolver();
 
                 // parse the document
                 var source = context.Source;
-                SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(source.Root);
+                var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(source.Root);
                 if ("Wix" == source.Root.Name.LocalName)
                 {
                     if (CompilerCore.WixNamespace == source.Root.Name.Namespace)

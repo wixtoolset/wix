@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Collections;
@@ -17,6 +17,7 @@ namespace WixToolset
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using Wix = WixToolset.Data.Serialize;
 
     internal enum ValueListKind
@@ -40,7 +41,7 @@ namespace WixToolset
     /// <summary>
     /// Core class for the compiler.
     /// </summary>
-    internal sealed class CompilerCore //: ICompilerCore
+    internal sealed class CompilerCore
     {
         internal static readonly XNamespace W3SchemaPrefix = "http://www.w3.org/";
         internal static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
@@ -49,19 +50,6 @@ namespace WixToolset
 
         private const string IllegalLongFilenameCharacters = @"[\\\?|><:/\*""]"; // illegal: \ ? | > < : / * "
         private static readonly Regex IllegalLongFilename = new Regex(IllegalLongFilenameCharacters, RegexOptions.Compiled);
-
-        private const string LegalLongFilenameCharacters = @"[^\\\?|><:/\*""]";  // opposite of illegal above.
-        private static readonly Regex LegalLongFilename = new Regex(String.Concat("^", LegalLongFilenameCharacters, @"{1,259}$"), RegexOptions.Compiled);
-
-        private const string LegalRelativeLongFilenameCharacters = @"[^\?|><:/\*""]"; // (like legal long, but we allow '\') illegal: ? | > < : / * "
-        private static readonly Regex LegalRelativeLongFilename = new Regex(String.Concat("^", LegalRelativeLongFilenameCharacters, @"{1,259}$"), RegexOptions.Compiled);
-
-        private const string LegalWildcardLongFilenameCharacters = @"[^\\|><:/""]"; // illegal: \ | > < : / "
-        private static readonly Regex LegalWildcardLongFilename = new Regex(String.Concat("^", LegalWildcardLongFilenameCharacters, @"{1,259}$"));
-
-        private static readonly Regex PutGuidHere = new Regex(@"PUT\-GUID\-(?:\d+\-)?HERE", RegexOptions.Singleline);
-
-        private static readonly Regex LegalIdentifierWithAccess = new Regex(@"^((?<access>public|internal|protected|private)\s+)?(?<id>[_A-Za-z][0-9A-Za-z_\.]*)$", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         public const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
         public const int MinValueOfMaxCabSizeForLargeFileSplitting = 20; // 20 MB
@@ -141,7 +129,7 @@ namespace WixToolset
             });
 
         private Dictionary<XNamespace, ICompilerExtension> extensions;
-        private ITupleDefinitionCreator creator;
+        private IParseHelper parseHelper;
         private Intermediate intermediate;
 
         private HashSet<string> activeSectionInlinedDirectoryIds;
@@ -152,10 +140,10 @@ namespace WixToolset
         /// </summary>
         /// <param name="intermediate">The Intermediate object representing compiled source document.</param>
         /// <param name="extensions">The WiX extensions collection.</param>
-        internal CompilerCore(Intermediate intermediate, ITupleDefinitionCreator creator, Dictionary<XNamespace, ICompilerExtension> extensions)
+        internal CompilerCore(Intermediate intermediate, IParseHelper parseHelper, Dictionary<XNamespace, ICompilerExtension> extensions)
         {
             this.extensions = extensions;
-            this.creator = creator;
+            this.parseHelper = parseHelper;
             this.intermediate = intermediate;
         }
 
@@ -164,12 +152,6 @@ namespace WixToolset
         /// </summary>
         /// <value>The section the compiler is currently emitting symbols into.</value>
         public IntermediateSection ActiveSection { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
-        /// </summary>
-        /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
-        public Platform CurrentPlatform { get; set; }
 
         /// <summary>
         /// Gets whether the compiler core encountered an error while processing.
@@ -231,12 +213,7 @@ namespace WixToolset
         /// <returns>true if the filename is ambiguous; false otherwise.</returns>
         public static bool IsAmbiguousFilename(string filename)
         {
-            if (null == filename || 0 == filename.Length)
-            {
-                return false;
-            }
-
-            return CompilerCore.AmbiguousFilename.IsMatch(filename);
+            return String.IsNullOrEmpty(filename) ? false : CompilerCore.AmbiguousFilename.IsMatch(filename);
         }
 
         /// <summary>
@@ -246,7 +223,7 @@ namespace WixToolset
         /// <returns>true if the value is an identifier; false otherwise.</returns>
         public bool IsValidIdentifier(string value)
         {
-            return Common.IsIdentifier(value);
+            return this.parseHelper.IsValidIdentifier(value);
         }
 
         /// <summary>
@@ -256,14 +233,7 @@ namespace WixToolset
         /// <returns>True if the identifier is a valid loc identifier.</returns>
         public bool IsValidLocIdentifier(string identifier)
         {
-            if (String.IsNullOrEmpty(identifier))
-            {
-                return false;
-            }
-
-            Match match = Common.WixVariableRegex.Match(identifier);
-
-            return (match.Success && "loc" == match.Groups["namespace"].Value && 0 == match.Index && identifier.Length == match.Length);
+            return this.parseHelper.IsValidIdentifier(identifier);
         }
 
         /// <summary>
@@ -275,34 +245,7 @@ namespace WixToolset
         /// <returns>True if the filename is a valid long filename</returns>
         public bool IsValidLongFilename(string filename, bool allowWildcards = false, bool allowRelative = false)
         {
-            if (String.IsNullOrEmpty(filename))
-            {
-                return false;
-            }
-
-            // check for a non-period character (all periods is not legal)
-            bool nonPeriodFound = false;
-            foreach (char character in filename)
-            {
-                if ('.' != character)
-                {
-                    nonPeriodFound = true;
-                    break;
-                }
-            }
-
-            if (allowWildcards)
-            {
-                return (nonPeriodFound && CompilerCore.LegalWildcardLongFilename.IsMatch(filename));
-            }
-            else if (allowRelative)
-            {
-                return (nonPeriodFound && CompilerCore.LegalRelativeLongFilename.IsMatch(filename));
-            }
-            else
-            {
-                return (nonPeriodFound && CompilerCore.LegalLongFilename.IsMatch(filename));
-            }
+            return this.parseHelper.IsValidLongFilename(filename, allowWildcards, allowRelative);
         }
 
         /// <summary>
@@ -313,7 +256,7 @@ namespace WixToolset
         /// <returns>True if the filename is a valid short filename</returns>
         public bool IsValidShortFilename(string filename, bool allowWildcards)
         {
-            return Common.IsValidShortFilename(filename, allowWildcards);
+            return this.parseHelper.IsValidShortFilename(filename, allowWildcards);
         }
 
         /// <summary>
@@ -337,52 +280,7 @@ namespace WixToolset
         /// <returns>The generated 8.3-compliant short file/directory name.</returns>
         public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
         {
-            // canonicalize the long name if its not a localization identifier (they are case-sensitive)
-            if (!this.IsValidLocIdentifier(longName))
-            {
-                longName = longName.ToLowerInvariant();
-            }
-
-            // collect all the data
-            List<string> strings = new List<string>(1 + args.Length);
-            strings.Add(longName);
-            strings.AddRange(args);
-
-            // prepare for hashing
-            string stringData = String.Join("|", strings);
-            byte[] data = Encoding.UTF8.GetBytes(stringData);
-
-            // hash the data
-            byte[] hash;
-            using (SHA1 sha1 = new SHA1CryptoServiceProvider())
-            {
-                hash = sha1.ComputeHash(data);
-            }
-
-            // generate the short file/directory name without an extension
-            StringBuilder shortName = new StringBuilder(Convert.ToBase64String(hash));
-            shortName.Remove(8, shortName.Length - 8).Replace('+', '-').Replace('/', '_');
-
-            if (keepExtension)
-            {
-                string extension = Path.GetExtension(longName);
-
-                if (4 < extension.Length)
-                {
-                    extension = extension.Substring(0, 4);
-                }
-
-                shortName.Append(extension);
-
-                // check the generated short name to ensure its still legal (the extension may not be legal)
-                if (!this.IsValidShortFilename(shortName.ToString(), allowWildcards))
-                {
-                    // remove the extension (by truncating the generated file name back to the generated characters)
-                    shortName.Length -= extension.Length;
-                }
-            }
-
-            return shortName.ToString().ToLowerInvariant();
+            return this.parseHelper.CreateShortName(longName, keepExtension, allowWildcards, args);
         }
 
         /// <summary>
@@ -422,8 +320,7 @@ namespace WixToolset
         /// <returns>The node's inner text trimmed.</returns>
         public string GetTrimmedInnerText(XElement element)
         {
-            string value = Common.GetInnerText(element);
-            return (null == value) ? null : value.Trim();
+            return this.parseHelper.GetTrimmedInnerText(element);
         }
 
         /// <summary>
@@ -431,23 +328,9 @@ namespace WixToolset
         /// </summary>
         /// <param name="element">The element to ensure inner text is a condition.</param>
         /// <returns>The value converted into a safe condition.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetConditionInnerText(XElement element)
         {
-            string value = element.Value;
-            if (0 < value.Length)
-            {
-                value = value.Trim();
-                value = value.Replace('\t', ' ');
-                value = value.Replace('\r', ' ');
-                value = value.Replace('\n', ' ');
-            }
-            else // return null for a non-existant condition
-            {
-                value = null;
-            }
-
-            return value;
+            return this.parseHelper.GetConditionInnerText(element);
         }
 
         /// <summary>
@@ -458,7 +341,7 @@ namespace WixToolset
         /// <returns>The generated GUID for the given namespace and value.</returns>
         public string CreateGuid(Guid namespaceGuid, string value)
         {
-            return Uuid.NewUuid(namespaceGuid, value).ToString("B").ToUpperInvariant();
+            return this.parseHelper.CreateGuid(namespaceGuid, value);
         }
 
         /// <summary>
@@ -510,46 +393,7 @@ namespace WixToolset
         /// <returns>Identifier of the leaf directory created.</returns>
         public string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId)
         {
-            string id = null;
-            string[] inlineSyntax = this.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, true);
-
-            if (null != inlineSyntax)
-            {
-                // Special case the single entry in the inline syntax since it is the most common case
-                // and needs no extra processing. It's just a reference to an existing directory.
-                if (1 == inlineSyntax.Length)
-                {
-                    id = inlineSyntax[0];
-                    this.CreateSimpleReference(sourceLineNumbers, "Directory", id);
-                }
-                else // start creating rows for the entries in the inline syntax
-                {
-                    id = parentId;
-
-                    int pathStartsAt = 0;
-                    if (inlineSyntax[0].EndsWith(":"))
-                    {
-                        // TODO: should overriding the parent identifier with a specific id be an error or a warning or just let it slide?
-                        //if (null != parentId)
-                        //{
-                        //    this.core.OnMessage(WixErrors.Xxx(sourceLineNumbers));
-                        //}
-
-                        id = inlineSyntax[0].TrimEnd(':');
-                        this.CreateSimpleReference(sourceLineNumbers, "Directory", id);
-
-                        pathStartsAt = 1;
-                    }
-
-                    for (int i = pathStartsAt; i < inlineSyntax.Length; ++i)
-                    {
-                        Identifier inlineId = this.CreateDirectoryRow(sourceLineNumbers, null, id, inlineSyntax[i]);
-                        id = inlineId.Id;
-                    }
-                }
-            }
-
-            return id;
+            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, attribute, parentId);
         }
 
         /// <summary>
@@ -575,59 +419,9 @@ namespace WixToolset
         /// <param name="name">The registry entry name.</param>
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
-        /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
-        public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId, bool escapeLeadingHash)
-        {
-            Identifier id = null;
-
-            if (!this.EncounteredError)
-            {
-                if (-1 > root || 3 < root)
-                {
-                    throw new ArgumentOutOfRangeException("root");
-                }
-
-                if (null == key)
-                {
-                    throw new ArgumentNullException("key");
-                }
-
-                if (null == componentId)
-                {
-                    throw new ArgumentNullException("componentId");
-                }
-
-                // escape the leading '#' character for string registry values
-                if (escapeLeadingHash && null != value && value.StartsWith("#", StringComparison.Ordinal))
-                {
-                    value = String.Concat("#", value);
-                }
-
-                id = this.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
-
-                var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.Registry, id);
-                row.Set(1, root);
-                row.Set(2, key);
-                row.Set(3, name);
-                row.Set(4, value);
-                row.Set(5, componentId);
-            }
-
-            return id;
-        }
-
-        /// <summary>
-        /// Creates a Registry row in the active section.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of the current row.</param>
-        /// <param name="root">The registry entry root.</param>
-        /// <param name="key">The registry entry key.</param>
-        /// <param name="name">The registry entry name.</param>
-        /// <param name="value">The registry entry value.</param>
-        /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId)
         {
-            return this.CreateRegistryRow(sourceLineNumbers, root, key, name, value, componentId, true);
+            return this.parseHelper.CreateRegistryRow(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
         }
 
         /// <summary>
@@ -646,9 +440,7 @@ namespace WixToolset
                 // If this simple reference hasn't been added to the active section already, add it.
                 if (this.activeSectionSimpleReferences.Add(id))
                 {
-                    var wixSimpleReferenceRow = (WixSimpleReferenceTuple)this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSimpleReference);
-                    wixSimpleReferenceRow.Table = tableName;
-                    wixSimpleReferenceRow.PrimaryKeys = joinedKeys;
+                    this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, tableName, primaryKeys);
                 }
             }
         }
@@ -665,21 +457,7 @@ namespace WixToolset
         {
             if (!this.EncounteredError)
             {
-                if (null == parentId || ComplexReferenceParentType.Unknown == parentType)
-                {
-                    return;
-                }
-
-                if (null == childId)
-                {
-                    throw new ArgumentNullException("childId");
-                }
-
-                var row = (WixGroupTuple)this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixGroup);
-                row.ParentId = parentId;
-                row.ParentType = parentType;
-                row.ChildId = childId;
-                row.ChildType = childType;
+                this.parseHelper.CreateWixGroupRow(this.ActiveSection, sourceLineNumbers, parentType, parentId, childType, childId);
             }
         }
 
@@ -693,16 +471,7 @@ namespace WixToolset
         {
             if (!this.EncounteredError)
             {
-                var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixEnsureTable);
-                row.Set(0, tableName);
-
-                // We don't add custom table definitions to the tableDefinitions collection,
-                // so if it's not in there, it better be a custom table. If the Id is just wrong,
-                // instead of a custom table, we get an unresolved reference at link time.
-                if (!this.creator.TryGetTupleDefinitionByName(tableName, out var ignored))
-                {
-                    this.CreateSimpleReference(sourceLineNumbers, "WixCustomTable", tableName);
-                }
+                this.parseHelper.EnsureTable(this.ActiveSection, sourceLineNumbers, tableName);
             }
         }
 
@@ -716,7 +485,7 @@ namespace WixToolset
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule = EmptyRule.CanBeWhitespaceOnly)
         {
-            return Common.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
+            return this.parseHelper.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
         }
 
         /// <summary>
@@ -800,7 +569,7 @@ namespace WixToolset
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public int GetAttributeIntegerValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, int minimum, int maximum)
         {
-            return Common.GetAttributeIntegerValue(sourceLineNumbers, attribute, minimum, maximum);
+            return this.parseHelper.GetAttributeIntegerValue(sourceLineNumbers, attribute, minimum, maximum);
         }
 
         /// <summary>
@@ -813,39 +582,7 @@ namespace WixToolset
         /// <returns>The attribute's long value or a special value if an error occurred during conversion.</returns>
         public long GetAttributeLongValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, long minimum, long maximum)
         {
-            Debug.Assert(minimum > CompilerConstants.LongNotSet && minimum > CompilerConstants.IllegalLong, "The legal values for this attribute collide with at least one sentinel used during parsing.");
-
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                try
-                {
-                    long longValue = Convert.ToInt64(value, CultureInfo.InvariantCulture.NumberFormat);
-
-                    if (CompilerConstants.LongNotSet == longValue || CompilerConstants.IllegalLong == longValue)
-                    {
-                        this.OnMessage(WixErrors.IntegralValueSentinelCollision(sourceLineNumbers, longValue));
-                    }
-                    else if (minimum > longValue || maximum < longValue)
-                    {
-                        this.OnMessage(WixErrors.IntegralValueOutOfRange(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, longValue, minimum, maximum));
-                        longValue = CompilerConstants.IllegalLong;
-                    }
-
-                    return longValue;
-                }
-                catch (FormatException)
-                {
-                    this.OnMessage(WixErrors.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-                catch (OverflowException)
-                {
-                    this.OnMessage(WixErrors.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-            }
-
-            return CompilerConstants.IllegalLong;
+            return this.parseHelper.GetAttributeLongValue(sourceLineNumbers, attribute, minimum, maximum);
         }
 
         /// <summary>
@@ -956,73 +693,9 @@ namespace WixToolset
         /// <param name="generatable">Determines whether the guid can be automatically generated.</param>
         /// <param name="canBeEmpty">If true, no error is raised on empty value. If false, an error is raised.</param>
         /// <returns>The attribute's guid value or a special value if an error occurred.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        [SuppressMessage("Microsoft.Performance", "CA1807:AvoidUnnecessaryStringCreation")]
         public string GetAttributeGuidValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool generatable = false, bool canBeEmpty = false)
         {
-            if (null == attribute)
-            {
-                throw new ArgumentNullException("attribute");
-            }
-
-            EmptyRule emptyRule = canBeEmpty ? EmptyRule.CanBeEmpty : EmptyRule.CanBeWhitespaceOnly;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
-
-            if (String.IsNullOrEmpty(value) && canBeEmpty)
-            {
-                return String.Empty;
-            }
-            else if (!String.IsNullOrEmpty(value))
-            {
-                // If the value starts and ends with braces or parenthesis, accept that and strip them off.
-                if ((value.StartsWith("{", StringComparison.Ordinal) && value.EndsWith("}", StringComparison.Ordinal))
-                    || (value.StartsWith("(", StringComparison.Ordinal) && value.EndsWith(")", StringComparison.Ordinal)))
-                {
-                    value = value.Substring(1, value.Length - 2);
-                }
-
-                try
-                {
-                    Guid guid;
-
-                    if (generatable && "*".Equals(value, StringComparison.Ordinal))
-                    {
-                        return value;
-                    }
-
-                    if (CompilerCore.PutGuidHere.IsMatch(value))
-                    {
-                        this.OnMessage(WixErrors.ExampleGuid(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                        return CompilerConstants.IllegalGuid;
-                    }
-                    else if (value.StartsWith("!(loc", StringComparison.Ordinal) || value.StartsWith("$(loc", StringComparison.Ordinal) || value.StartsWith("!(wix", StringComparison.Ordinal))
-                    {
-                        return value;
-                    }
-                    else
-                    {
-                        guid = new Guid(value);
-                    }
-
-                    string uppercaseGuid = guid.ToString().ToUpper(CultureInfo.InvariantCulture);
-
-                    if (this.ShowPedanticMessages)
-                    {
-                        if (uppercaseGuid != value)
-                        {
-                            this.OnMessage(WixErrors.GuidContainsLowercaseLetters(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                        }
-                    }
-
-                    return String.Concat("{", uppercaseGuid, "}");
-                }
-                catch (FormatException)
-                {
-                    this.OnMessage(WixErrors.IllegalGuidValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-            }
-
-            return CompilerConstants.IllegalGuid;
+            return this.parseHelper.GetAttributeGuidValue(sourceLineNumbers, attribute, generatable, canBeEmpty);
         }
 
         /// <summary>
@@ -1033,27 +706,7 @@ namespace WixToolset
         /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
         public Identifier GetAttributeIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = Common.GetAttributeValue(sourceLineNumbers, attribute, EmptyRule.CanBeEmpty);
-            AccessModifier access = AccessModifier.Public;
-
-            Match match = CompilerCore.LegalIdentifierWithAccess.Match(value);
-            if (!match.Success)
-            {
-                return null;
-            }
-            else if (match.Groups["access"].Success)
-            {
-                access = (AccessModifier)Enum.Parse(typeof(AccessModifier), match.Groups["access"].Value, true);
-            }
-
-            value = match.Groups["id"].Value;
-
-            if (Common.IsIdentifier(value) && 72 < value.Length)
-            {
-                this.OnMessage(WixWarnings.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-            }
-
-            return new Identifier(value, access);
+            return this.parseHelper.GetAttributeIdentifier(sourceLineNumbers, attribute);
         }
 
         /// <summary>
@@ -1064,7 +717,7 @@ namespace WixToolset
         /// <returns>The attribute's identifier value or a special value if an error occurred.</returns>
         public string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            return Common.GetAttributeIdentifierValue(sourceLineNumbers, attribute);
+            return this.parseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attribute);
         }
 
         /// <summary>
@@ -1075,23 +728,7 @@ namespace WixToolset
         /// <returns>The attribute's YesNoType value.</returns>
         public YesNoType GetAttributeYesNoValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            YesNoType result = YesNoType.IllegalValue;
-            if (value.Equals("yes") || value.Equals("true"))
-            {
-                result = YesNoType.Yes;
-            }
-            else if (value.Equals("no") || value.Equals("false"))
-            {
-                result = YesNoType.No;
-            }
-            else
-            {
-                this.OnMessage(WixErrors.IllegalYesNoValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-            }
-
-            return result;
+            return this.parseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute);
         }
 
         /// <summary>
@@ -1103,28 +740,7 @@ namespace WixToolset
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public YesNoDefaultType GetAttributeYesNoDefaultValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                switch (Wix.Enums.ParseYesNoDefaultType(value))
-                {
-                    case Wix.YesNoDefaultType.@default:
-                        return YesNoDefaultType.Default;
-                    case Wix.YesNoDefaultType.no:
-                        return YesNoDefaultType.No;
-                    case Wix.YesNoDefaultType.yes:
-                        return YesNoDefaultType.Yes;
-                    case Wix.YesNoDefaultType.NotSet:
-                        // Previous code never returned 'NotSet'!
-                        break;
-                    default:
-                        this.OnMessage(WixErrors.IllegalYesNoDefaultValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                        break;
-                }
-            }
-
-            return YesNoDefaultType.IllegalValue;
+            return this.parseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attribute);
         }
 
         /// <summary>
@@ -1202,41 +818,7 @@ namespace WixToolset
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public string GetAttributeLongFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards = false, bool allowRelative = false)
         {
-            if (null == attribute)
-            {
-                throw new ArgumentNullException("attribute");
-            }
-
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                if (!this.IsValidLongFilename(value, allowWildcards, allowRelative) && !this.IsValidLocIdentifier(value))
-                {
-                    if (allowRelative)
-                    {
-                        this.OnMessage(WixErrors.IllegalRelativeLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                    }
-                    else
-                    {
-                        this.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                    }
-                }
-                else if (allowRelative)
-                {
-                    string normalizedPath = value.Replace('\\', '/');
-                    if (normalizedPath.StartsWith("../", StringComparison.Ordinal) || normalizedPath.Contains("/../"))
-                    {
-                        this.OnMessage(WixErrors.PayloadMustBeRelativeToCache(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                    }
-                }
-                else if (CompilerCore.IsAmbiguousFilename(value))
-                {
-                    this.OnMessage(WixWarnings.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-            }
-
-            return value;
+            return this.parseHelper.GetAttributeLongFilename(sourceLineNumbers, attribute, allowWildcards, allowRelative);
         }
 
         /// <summary>
@@ -1247,31 +829,7 @@ namespace WixToolset
         /// <returns>The attribute's version value.</returns>
         public string GetAttributeVersionValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (!String.IsNullOrEmpty(value))
-            {
-                try
-                {
-                    return new Version(value).ToString();
-                }
-                catch (FormatException) // illegal integer in version
-                {
-                    // Allow versions to contain binder variables.
-                    if (Common.ContainsValidBinderVariable(value))
-                    {
-                        return value;
-                    }
-
-                    this.OnMessage(WixErrors.IllegalVersionValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-                catch (ArgumentException)
-                {
-                    this.OnMessage(WixErrors.IllegalVersionValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-            }
-
-            return null;
+            return this.parseHelper.GetAttributeVersionValue(sourceLineNumbers, attribute);
         }
 
         /// <summary>
@@ -1453,7 +1011,7 @@ namespace WixToolset
         /// <returns>True if a property is found in the string.</returns>
         public bool ContainsProperty(string possibleProperty)
         {
-            return Common.ContainsProperty(possibleProperty);
+            return this.parseHelper.ContainsProperty(possibleProperty);
         }
 
         /// <summary>
@@ -1465,8 +1023,7 @@ namespace WixToolset
         [SuppressMessage("Microsoft.Globalization", "CA1303:DoNotPassLiteralsAsLocalizedParameters", MessageId = "System.InvalidOperationException.#ctor(System.String)")]
         public Identifier CreateIdentifier(string prefix, params string[] args)
         {
-            string id = Common.GenerateIdentifier(prefix, args);
-            return new Identifier(id, AccessModifier.Private);
+            return this.parseHelper.CreateIdentifier(prefix, args);
         }
 
         /// <summary>
@@ -1476,8 +1033,7 @@ namespace WixToolset
         /// <returns></returns>
         public Identifier CreateIdentifierFromFilename(string filename)
         {
-            string id = Common.GetIdentifierFromName(filename);
-            return new Identifier(id, AccessModifier.Private);
+            return this.parseHelper.CreateIdentifierFromFilename(filename);
         }
 
         /// <summary>
@@ -1488,22 +1044,7 @@ namespace WixToolset
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         public void ParseExtensionAttribute(XElement element, XAttribute attribute, IDictionary<string, string> context = null)
         {
-            // Ignore attributes defined by the W3C because we'll assume they are always right.
-            if ((String.IsNullOrEmpty(attribute.Name.NamespaceName) && attribute.Name.LocalName.Equals("xmlns", StringComparison.Ordinal)) ||
-                attribute.Name.NamespaceName.StartsWith(CompilerCore.W3SchemaPrefix.NamespaceName, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            if (this.TryFindExtension(attribute.Name.NamespaceName, out var extension))
-            {
-                extension.ParseAttribute(element, attribute, context);
-            }
-            else
-            {
-                SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                this.OnMessage(WixErrors.UnhandledExtensionAttribute(sourceLineNumbers, element.Name.LocalName, attribute.Name.LocalName, attribute.Name.NamespaceName));
-            }
+            this.parseHelper.ParseExtensionAttribute(this.extensions.Values, this.intermediate, this.ActiveSection, element, attribute, context);
         }
 
         /// <summary>
@@ -1514,16 +1055,7 @@ namespace WixToolset
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         public void ParseExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context = null)
         {
-            if (this.TryFindExtension(element.Name.Namespace, out var extension))
-            {
-                SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(parentElement);
-                extension.ParseElement(parentElement, element, context);
-            }
-            else
-            {
-                SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                this.OnMessage(WixErrors.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
-            }
+            this.parseHelper.ParseExtensionElement(this.extensions.Values, this.intermediate, this.ActiveSection, parentElement, element, context);
         }
 
         /// <summary>
@@ -1532,17 +1064,7 @@ namespace WixToolset
         /// <param name="element">Element to parse children.</param>
         public void ParseForExtensionElements(XElement element)
         {
-            foreach (XElement child in element.Elements())
-            {
-                if (element.Name.Namespace == child.Name.Namespace)
-                {
-                    this.UnexpectedElement(element, child);
-                }
-                else
-                {
-                    this.ParseExtensionElement(element, child);
-                }
-            }
+            this.parseHelper.ParseForExtensionElements(this.extensions.Values, this.intermediate, this.ActiveSection, element);
         }
 
         /// <summary>
@@ -1553,20 +1075,7 @@ namespace WixToolset
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
         public ComponentKeyPath ParsePossibleKeyPathExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            ComponentKeyPath keyPath = null;
-
-            ICompilerExtension extension;
-            if (this.TryFindExtension(element.Name.Namespace, out extension))
-            {
-                keyPath = extension.ParsePossibleKeyPathElement(parentElement, element, context);
-            }
-            else
-            {
-                SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                this.OnMessage(WixErrors.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
-            }
-
-            return keyPath;
+            return this.parseHelper.ParsePossibleKeyPathExtensionElement(this.extensions.Values, this.intermediate, this.ActiveSection, parentElement, element, context);
         }
 
         /// <summary>
@@ -1576,8 +1085,7 @@ namespace WixToolset
         /// <param name="attribute">The unexpected attribute.</param>
         public void UnexpectedAttribute(XElement element, XAttribute attribute)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-            Common.UnexpectedAttribute(sourceLineNumbers, attribute);
+            this.parseHelper.UnexpectedAttribute(element, attribute);
         }
 
         /// <summary>
@@ -1587,9 +1095,7 @@ namespace WixToolset
         /// <param name="childElement">The unexpected child element.</param>
         public void UnexpectedElement(XElement parentElement, XElement childElement)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(childElement);
-
-            this.OnMessage(WixErrors.UnexpectedElement(sourceLineNumbers, parentElement.Name.LocalName, childElement.Name.LocalName));
+            this.parseHelper.UnexpectedElement(parentElement, childElement);
         }
 
         /// <summary>
@@ -1667,30 +1173,6 @@ namespace WixToolset
         }
 
         /// <summary>
-        /// Creates a WiX complex reference in the active section.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="parentType">The parent type.</param>
-        /// <param name="parentId">The parent id.</param>
-        /// <param name="parentLanguage">The parent language.</param>
-        /// <param name="childType">The child type.</param>
-        /// <param name="childId">The child id.</param>
-        /// <param name="isPrimary">Whether the child is primary.</param>
-        internal void CreateWixComplexReferenceRow(SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary)
-        {
-            if (!this.EncounteredError)
-            {
-                var wixComplexReferenceRow = (WixComplexReferenceTuple)this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixComplexReference);
-                wixComplexReferenceRow.Parent = parentId;
-                wixComplexReferenceRow.ParentType = parentType;
-                wixComplexReferenceRow.ParentLanguage = parentLanguage;
-                wixComplexReferenceRow.Child = childId;
-                wixComplexReferenceRow.ChildType = childType;
-                wixComplexReferenceRow.IsPrimary = isPrimary;
-            }
-        }
-
-        /// <summary>
         /// Creates WixComplexReference and WixGroup rows in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information.</param>
@@ -1702,8 +1184,7 @@ namespace WixToolset
         /// <param name="isPrimary">Whether the child is primary.</param>
         public void CreateComplexReference(SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary)
         {
-            this.CreateWixComplexReferenceRow(sourceLineNumbers, parentType, parentId, parentLanguage, childType, childId, isPrimary);
-            this.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, childType, childId);
+            this.parseHelper.CreateComplexReference(this.ActiveSection, sourceLineNumbers, parentType, parentId, parentLanguage, childType, childId, isPrimary);
         }
 
         /// <summary>
@@ -1719,56 +1200,57 @@ namespace WixToolset
         /// <returns>Identifier for the newly created row.</returns>
         internal Identifier CreateDirectoryRow(SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            string defaultDir = null;
+            //string defaultDir = null;
 
-            if (name.Equals("SourceDir") || this.IsValidShortFilename(name, false))
-            {
-                defaultDir = name;
-            }
-            else
-            {
-                if (String.IsNullOrEmpty(shortName))
-                {
-                    shortName = this.CreateShortName(name, false, false, "Directory", parentId);
-                }
+            //if (name.Equals("SourceDir") || this.IsValidShortFilename(name, false))
+            //{
+            //    defaultDir = name;
+            //}
+            //else
+            //{
+            //    if (String.IsNullOrEmpty(shortName))
+            //    {
+            //        shortName = this.CreateShortName(name, false, false, "Directory", parentId);
+            //    }
 
-                defaultDir = String.Concat(shortName, "|", name);
-            }
+            //    defaultDir = String.Concat(shortName, "|", name);
+            //}
 
-            if (!String.IsNullOrEmpty(sourceName))
-            {
-                if (this.IsValidShortFilename(sourceName, false))
-                {
-                    defaultDir = String.Concat(defaultDir, ":", sourceName);
-                }
-                else
-                {
-                    if (String.IsNullOrEmpty(shortSourceName))
-                    {
-                        shortSourceName = this.CreateShortName(sourceName, false, false, "Directory", parentId);
-                    }
+            //if (!String.IsNullOrEmpty(sourceName))
+            //{
+            //    if (this.IsValidShortFilename(sourceName, false))
+            //    {
+            //        defaultDir = String.Concat(defaultDir, ":", sourceName);
+            //    }
+            //    else
+            //    {
+            //        if (String.IsNullOrEmpty(shortSourceName))
+            //        {
+            //            shortSourceName = this.CreateShortName(sourceName, false, false, "Directory", parentId);
+            //        }
 
-                    defaultDir = String.Concat(defaultDir, ":", shortSourceName, "|", sourceName);
-                }
-            }
+            //        defaultDir = String.Concat(defaultDir, ":", shortSourceName, "|", sourceName);
+            //    }
+            //}
 
-            // For anonymous directories, create the identifier. If this identifier already exists in the
-            // active section, bail so we don't add duplicate anonymous directory rows (which are legal
-            // but bloat the intermediate and ultimately make the linker do "busy work").
-            if (null == id)
-            {
-                id = this.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
+            //// For anonymous directories, create the identifier. If this identifier already exists in the
+            //// active section, bail so we don't add duplicate anonymous directory rows (which are legal
+            //// but bloat the intermediate and ultimately make the linker do "busy work").
+            //if (null == id)
+            //{
+            //    id = this.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
 
-                if (!this.activeSectionInlinedDirectoryIds.Add(id.Id))
-                {
-                    return id;
-                }
-            }
+            //    if (!this.activeSectionInlinedDirectoryIds.Add(id.Id))
+            //    {
+            //        return id;
+            //    }
+            //}
 
-            var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.Directory, id);
-            row.Set(1, parentId);
-            row.Set(2, defaultDir);
-            return id;
+            //var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.Directory, id);
+            //row.Set(1, parentId);
+            //row.Set(2, defaultDir);
+            //return id;
+            return this.parseHelper.CreateDirectoryRow(this.ActiveSection, sourceLineNumbers, id, parentId, name, shortName, sourceName, shortSourceName, this.activeSectionInlinedDirectoryIds);
         }
 
         /// <summary>
@@ -1780,65 +1262,7 @@ namespace WixToolset
         /// <returns>Inline directory syntax split into array of strings or null if the syntax did not parse.</returns>
         internal string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference = false)
         {
-            string[] result = null;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (!String.IsNullOrEmpty(value))
-            {
-                int pathStartsAt = 0;
-                result = value.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-                if (result[0].EndsWith(":", StringComparison.Ordinal))
-                {
-                    string id = result[0].TrimEnd(':');
-                    if (1 == result.Length)
-                    {
-                        this.OnMessage(WixErrors.InlineDirectorySyntaxRequiresPath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
-                        return null;
-                    }
-                    else if (!this.IsValidIdentifier(id))
-                    {
-                        this.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
-                        return null;
-                    }
-
-                    pathStartsAt = 1;
-                }
-                else if (resultUsedToCreateReference && 1 == result.Length)
-                {
-                    if (value.EndsWith("\\"))
-                    {
-                        if (!this.IsValidLongFilename(result[0]))
-                        {
-                            this.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[0]));
-                            return null;
-                        }
-                    }
-                    else if (!this.IsValidIdentifier(result[0]))
-                    {
-                        this.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[0]));
-                        return null;
-                    }
-
-                    return result; // return early to avoid additional checks below.
-                }
-
-                // Check each part of the relative path to ensure that it is a valid directory name.
-                for (int i = pathStartsAt; i < result.Length; ++i)
-                {
-                    if (!this.IsValidLongFilename(result[i]))
-                    {
-                        this.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[i]));
-                        return null;
-                    }
-                }
-
-                if (1 < result.Length && !value.EndsWith("\\"))
-                {
-                    this.OnMessage(WixWarnings.BackslashTerminateInlineDirectorySyntax(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                }
-            }
-
-            return result;
+            return this.parseHelper.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, resultUsedToCreateReference);
         }
 
         /// <summary>

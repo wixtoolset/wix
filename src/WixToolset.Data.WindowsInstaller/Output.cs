@@ -186,7 +186,6 @@ namespace WixToolset.Data
 
             bool empty = reader.IsEmptyElement;
             Output output = new Output(SourceLineNumber.CreateFromUri(reader.BaseURI));
-            SectionType sectionType = SectionType.Unknown;
             Version version = null;
 
             while (reader.MoveToNextAttribute())
@@ -201,22 +200,18 @@ namespace WixToolset.Data
                         {
                             case "Bundle":
                                 output.Type = OutputType.Bundle;
-                                sectionType = SectionType.Bundle;
                                 break;
                             case "Module":
                                 output.Type = OutputType.Module;
-                                sectionType = SectionType.Module;
                                 break;
                             case "Patch":
                                 output.Type = OutputType.Patch;
                                 break;
                             case "PatchCreation":
                                 output.Type = OutputType.PatchCreation;
-                                sectionType = SectionType.PatchCreation;
                                 break;
                             case "Product":
                                 output.Type = OutputType.Product;
-                                sectionType = SectionType.Product;
                                 break;
                             case "Transform":
                                 output.Type = OutputType.Transform;

@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core
 {
     using System;
     using System.Diagnostics;
@@ -13,6 +13,7 @@ namespace WixToolset
     using System.Xml;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
 
     /// <summary>
     /// Common Wix utility methods and types.
@@ -766,8 +767,8 @@ namespace WixToolset
         /// <returns>The attribute's YesNoType value.</returns>
         internal static string GetInnerText(XElement node)
         {
-            XText text = node.Nodes().Where(n => XmlNodeType.Text == n.NodeType || XmlNodeType.CDATA == n.NodeType).Cast<XText>().FirstOrDefault();
-            return (null == text) ? null : text.Value;
+            var text = node.Nodes().Where(n => XmlNodeType.Text == n.NodeType || XmlNodeType.CDATA == n.NodeType).Cast<XText>().FirstOrDefault();
+            return text?.Value;
         }
 
         /// <summary>
