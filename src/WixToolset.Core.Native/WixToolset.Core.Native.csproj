@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <Description>Core Native</Description>
     <!-- <BeforePack>SetNuspecProperties</BeforePack> -->
   </PropertyGroup>
 
@@ -10,9 +11,26 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- <ItemGroup>
-    <ProjectReference Include="..\winterop\winterop.vcxproj" ExcludeAssets="All" />
-  </ItemGroup> -->
+  <Target Name="BuildWixNative"
+          BeforeTargets="GetCopyToOutputDirectoryItems">
+    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" />
+    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=x64" />
+
+    <ItemGroup>
+      <NativeProjectOutput Include="$(OutputPath)..\Win32\*.exe;$(OutputPath)..\Win32\*.pdb">
+        <TargetRelativeFolder>x86\</TargetRelativeFolder>
+      </NativeProjectOutput>
+      <NativeProjectOutput Include="$(OutputPath)..\x64\*.exe;$(OutputPath)..\x64\*.pdb">
+        <TargetRelativeFolder>x64\</TargetRelativeFolder>
+      </NativeProjectOutput>
+
+      <AllItemsFullPathWithTargetPath Include="@(NativeProjectOutput->'%(FullPath)')">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <TargetPath>%(TargetRelativeFolder)%(Filename)%(Extension)</TargetPath>
+      </AllItemsFullPathWithTargetPath>
+    </ItemGroup>
+  </Target>
+
   <Target Name="SetNuspecProperties"
           AfterTargets="Build">
     <PropertyGroup>
