@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core", "src\WixToolset.Core\WixToolset.Core.csproj", "{0B524850-5B9A-472B-85CC-D25920A1DFE1}"
 EndProject
@@ -11,6 +11,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.WindowsInstaller", "src\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj", "{5617F2A7-46A0-4D07-B9E0-E982D15641E4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.Burn", "src\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj", "{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.BuildTasks", "src\test\WixToolsetTest.BuildTasks\WixToolsetTest.BuildTasks.csproj", "{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.CoreIntegration", "src\test\WixToolsetTest.CoreIntegration\WixToolsetTest.CoreIntegration.csproj", "{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +86,30 @@ Global
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x64.Build.0 = Release|Any CPU
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x86.Build.0 = Release|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Debug|x64.Build.0 = Debug|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Debug|x86.Build.0 = Debug|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Release|x64.ActiveCfg = Release|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Release|x64.Build.0 = Release|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Release|x86.ActiveCfg = Release|Any CPU
+		{044F32F1-64E4-410A-9AA8-DCFCCDD363BB}.Release|x86.Build.0 = Release|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|x64.Build.0 = Debug|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|x86.Build.0 = Debug|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x64.ActiveCfg = Release|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x64.Build.0 = Release|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x86.ActiveCfg = Release|Any CPU
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

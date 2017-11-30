@@ -1,13 +1,13 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.CoreIntegrationFixture
+namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
     using System.Linq;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
-    using WixToolsetTest.CoreIntegrationFixture.Utility;
+    using WixToolsetTest.CoreIntegration.Utility;
     using Xunit;
 
     public class ProgramFixture

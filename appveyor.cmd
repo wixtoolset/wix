@@ -2,6 +2,9 @@
 @pushd %~dp0
 @set _P=%~dp0build\Release\publish
 
+dotnet build -c Release src\test\WixToolsetTest.BuildTasks
+dotnet build -c Release src\test\WixToolsetTest.CoreIntegration
+
 dotnet publish -c Release -o %_P% -r win-x86 src\wix
 dotnet publish -c Release -o %_P% -r win-x86 src\WixToolset.BuildTasks
 
