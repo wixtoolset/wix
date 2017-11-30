@@ -123,7 +123,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         propertyRow.Value = Common.GenerateGuid();
 
-#if TODO_FIX_INSTANCE_TRANSFORM
+#if TODO_FIX_INSTANCE_TRANSFORM // Is this still necessary?
+
                         // Update the target ProductCode in any instance transforms.
                         foreach (SubStorage subStorage in this.Output.SubStorages)
                         {
@@ -391,7 +392,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.ResolveMedia = this.ResolveMedia;
                 command.TableDefinitions = this.TableDefinitions;
                 command.TempFilesLocation = this.IntermediateFolder;
-                command.WixMediaTable = output.Tables["WixMedia"];
+                command.WixMediaTuples = section.Tuples.OfType<WixMediaTuple>();
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -526,7 +527,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             this.FileTransfers = fileTransfers;
-            this.ContentFilePaths = fileFacades.Select(r => r.WixFile.Source).ToList();
+            this.ContentFilePaths = fileFacades.Select(r => r.WixFile.Source.Path).ToList();
 
             // TODO: Eventually this gets removed
             var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase), this.Intermediate.EmbedFilePaths);

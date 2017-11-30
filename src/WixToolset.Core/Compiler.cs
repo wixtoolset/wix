@@ -5803,7 +5803,7 @@ namespace WixToolset.Core
                 wixFileRow.File_AssemblyApplication = assemblyApplication;
                 wixFileRow.Directory_ = directoryId;
                 wixFileRow.DiskId = (CompilerConstants.IntegerNotSet == diskId) ? 0 : diskId;
-                wixFileRow.Source = source;
+                wixFileRow.Source = new IntermediateFieldPathValue { Path = source };
                 wixFileRow.ProcessorArchitecture = procArch;
                 wixFileRow.PatchGroup = (CompilerConstants.IntegerNotSet != patchGroup ? patchGroup : -1);
                 wixFileRow.Attributes = (generatedShortFileName ? 0x1 : 0x0);

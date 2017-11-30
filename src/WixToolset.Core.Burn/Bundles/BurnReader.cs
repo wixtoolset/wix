@@ -7,7 +7,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
-    using WixToolset.Core.Cab;
+    using WixToolset.Core.Native;
 
     /// <summary>
     /// Burn PE reader for the WiX toolset.
@@ -101,10 +101,8 @@ namespace WixToolset.Core.Burn.Bundles
                 BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)this.UXSize);
             }
 
-            using (var extract = new WixExtractCab())
-            {
-                extract.Extract(tempCabPath, outputDirectory);
-            }
+            var cabinet = new Cabinet(tempCabPath);
+            cabinet.Extract(outputDirectory);
 
             Directory.CreateDirectory(Path.GetDirectoryName(manifestPath));
             File.Delete(manifestPath);
@@ -181,10 +179,8 @@ namespace WixToolset.Core.Burn.Bundles
                 BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)this.AttachedContainerSize);
             }
 
-            using (WixExtractCab extract = new WixExtractCab())
-            {
-                extract.Extract(tempCabPath, outputDirectory);
-            }
+            var cabinet = new Cabinet(tempCabPath);
+            cabinet.Extract(outputDirectory);
 
             foreach (DictionaryEntry entry in this.attachedContainerPayloadNames)
             {

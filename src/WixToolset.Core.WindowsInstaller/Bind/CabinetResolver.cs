@@ -6,8 +6,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Cab;
     using WixToolset.Core.Bind;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
@@ -26,7 +26,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<FileFacade> fileFacades)
         {
-            var filesWithPath = fileFacades.Select(f => new BindFileWithPath() { Id = f.File.File, Path = f.WixFile.Source }).ToList();
+            var filesWithPath = fileFacades.Select(f => new BindFileWithPath() { Id = f.File.File, Path = f.WixFile.Source.Path }).ToList();
 
             ResolvedCabinet resolved = null;
 
@@ -58,45 +58,39 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // 3. modified time changed
                     bool cabinetValid = true;
 
-                    // Need to force garbage collection of WixEnumerateCab to ensure the handle
-                    // associated with it is closed before it is reused.
-                    using (var wixEnumerateCab = new WixEnumerateCab())
-                    {
-                        List<CabinetFileInfo> fileList = wixEnumerateCab.Enumerate(resolved.Path);
+                    var cabinet = new Cabinet(resolved.Path);
+                    List<CabinetFileInfo> fileList = cabinet.Enumerate();
 
-                        if (filesWithPath.Count() != fileList.Count)
+                    if (filesWithPath.Count() != fileList.Count)
+                    {
+                        cabinetValid = false;
+                    }
+                    else
+                    {
+                        int i = 0;
+                        foreach (BindFileWithPath file in filesWithPath)
                         {
-                            cabinetValid = false;
-                        }
-                        else
-                        {
-                            int i = 0;
-                            foreach (BindFileWithPath file in filesWithPath)
+                            // First check that the file identifiers match because that is quick and easy.
+                            CabinetFileInfo cabFileInfo = fileList[i];
+                            cabinetValid = (cabFileInfo.FileId == file.Id);
+                            if (cabinetValid)
                             {
-                                // First check that the file identifiers match because that is quick and easy.
-                                CabinetFileInfo cabFileInfo = fileList[i];
-                                cabinetValid = (cabFileInfo.FileId == file.Id);
+                                // Still valid so ensure the file sizes are the same.
+                                FileInfo fileInfo = new FileInfo(file.Path);
+                                cabinetValid = (cabFileInfo.Size == fileInfo.Length);
                                 if (cabinetValid)
                                 {
-                                    // Still valid so ensure the file sizes are the same.
-                                    FileInfo fileInfo = new FileInfo(file.Path);
-                                    cabinetValid = (cabFileInfo.Size == fileInfo.Length);
-                                    if (cabinetValid)
-                                    {
-                                        // Still valid so ensure the source time stamp hasn't changed. Thus we need
-                                        // to convert the source file time stamp into a cabinet compatible data/time.
-                                        Native.CabInterop.DateTimeToCabDateAndTime(fileInfo.LastWriteTime, out var sourceCabDate, out var sourceCabTime);
-                                        cabinetValid = (cabFileInfo.Date == sourceCabDate && cabFileInfo.Time == sourceCabTime);
-                                    }
+                                    // Still valid so ensure the source time stamp hasn't changed.
+                                    cabinetValid = cabFileInfo.SameAsDateTime(fileInfo.LastWriteTime);
                                 }
-
-                                if (!cabinetValid)
-                                {
-                                    break;
-                                }
-
-                                i++;
                             }
+
+                            if (!cabinetValid)
+                            {
+                                break;
+                            }
+
+                            i++;
                         }
                     }
 

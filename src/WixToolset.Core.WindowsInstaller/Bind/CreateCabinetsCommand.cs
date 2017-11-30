@@ -66,7 +66,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
-        public Table WixMediaTable { private get; set; }
+        public IEnumerable<WixMediaTuple> WixMediaTuples { private get; set; }
 
         public IEnumerable<FileTransfer> FileTransfers => this.fileTransfers;
 
@@ -77,7 +77,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <returns>The uncompressed file rows.</returns>
         public void Execute()
         {
-            var wixMediaRows = new RowDictionary<WixMediaRow>(this.WixMediaTable);
+            var wixMediaTuples = this.WixMediaTuples.ToDictionary(t => t.DiskId_);
 
             this.lastCabinetAddedToMediaTable = new Dictionary<string, string>();
 
@@ -93,13 +93,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var entry in this.FileRowsByCabinet)
             {
-                var mediaRow = entry.Key;
+                var mediaTuple = entry.Key;
                 IEnumerable<FileFacade> files = entry.Value;
                 CompressionLevel compressionLevel = this.DefaultCompressionLevel;
 
                 string mediaLayoutFolder = null;
 
-                if (wixMediaRows.TryGetValue(mediaRow.Id.Id, out var wixMediaRow))
+                if (wixMediaTuples.TryGetValue(mediaTuple.DiskId, out var wixMediaRow))
                 {
                     mediaLayoutFolder = wixMediaRow.Layout;
 
@@ -109,9 +109,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
 
-                string cabinetDir = this.ResolveMedia(mediaRow, mediaLayoutFolder, this.LayoutDirectory);
+                string cabinetDir = this.ResolveMedia(mediaTuple, mediaLayoutFolder, this.LayoutDirectory);
 
-                CabinetWorkItem cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaRow, compressionLevel, files, this.fileTransfers);
+                CabinetWorkItem cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaTuple, compressionLevel, files, this.fileTransfers);
                 if (null != cabinetWorkItem)
                 {
                     cabinetBuilder.Enqueue(cabinetWorkItem);

@@ -13,7 +13,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Preprocess;
+    using WixToolset.Core.Preprocess;
 
     /// <summary>
     /// Preprocessor object

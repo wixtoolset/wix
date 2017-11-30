@@ -4,11 +4,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.Cab;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
 
     /// <summary>
@@ -137,7 +138,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             int maxCabinetSize = 0; // The value of 0 corresponds to default of 2GB which means no cabinet splitting
             ulong maxPreCompressedSizeInBytes = 0;
 
-            if (MaximumCabinetSizeForLargeFileSplitting != 0)
+            if (this.MaximumCabinetSizeForLargeFileSplitting != 0)
             {
                 // User Specified Max Cab Size for File Splitting, So Check if this cabinet has a single file larger than MaximumUncompressedFileSize
                 // If a file is larger than MaximumUncompressedFileSize, then the cabinet containing it will have only this file
@@ -152,26 +153,33 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if ((ulong)facade.File.FileSize >= maxPreCompressedSizeInBytes)
                         {
                             // If file is larger than MaximumUncompressedFileSize set Maximum Cabinet Size for Cabinet Splitting
-                            maxCabinetSize = MaximumCabinetSizeForLargeFileSplitting;
+                            maxCabinetSize = this.MaximumCabinetSizeForLargeFileSplitting;
                         }
                     }
                 }
             }
 
             // create the cabinet file
+            var cabinetPath = Path.GetFullPath(cabinetWorkItem.CabinetFile);
             string cabinetFileName = Path.GetFileName(cabinetWorkItem.CabinetFile);
             string cabinetDirectory = Path.GetDirectoryName(cabinetWorkItem.CabinetFile);
 
-            using (WixCreateCab cab = new WixCreateCab(cabinetFileName, cabinetDirectory, cabinetWorkItem.FileFacades.Count(), maxCabinetSize, cabinetWorkItem.MaxThreshold, cabinetWorkItem.CompressionLevel))
-            {
-                foreach (FileFacade facade in cabinetWorkItem.FileFacades)
-                {
-                    cab.AddFile(facade);
-                }
+            //using (WixCreateCab cab = new WixCreateCab(cabinetFileName, cabinetDirectory, cabinetWorkItem.FileFacades.Count(), maxCabinetSize, cabinetWorkItem.MaxThreshold, cabinetWorkItem.CompressionLevel))
+            //{
+            //    foreach (FileFacade facade in cabinetWorkItem.FileFacades)
+            //    {
+            //        cab.AddFile(facade);
+            //    }
 
-                cab.Complete(newCabNamesCallBackAddress);
-            }
+            //    cab.Complete(newCabNamesCallBackAddress);
+            //}
+
+            var files = cabinetWorkItem.FileFacades.Select(facade => new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.File, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4)).ToList();
+
+            var cabinetCompressionLevel = (CabinetCompressionLevel)cabinetWorkItem.CompressionLevel;
+
+            var cab = new Cabinet(cabinetPath);
+            cab.Compress(files, cabinetCompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
         }
     }
 }
-

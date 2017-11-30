@@ -7,11 +7,14 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
+    <Content Include="TestData\SimpleModule\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleModule\Module.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleModule\Module.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InstanceTransform\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InstanceTransform\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InstanceTransform\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\InstanceTransform\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

@@ -7,7 +7,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Cab;
     using WixToolset.Data;
     using WixToolset.Data.Rows;
 

@@ -62,7 +62,7 @@ namespace WixToolset.Link
             {
                 // If we're building a Merge Module, ignore all references to the Media table
                 // because Merge Modules don't have Media tables.
-                if (this.BuildingMergeModule && wixSimpleReferenceRow.Definition.Type == TupleDefinitionType.Media)
+                if (this.BuildingMergeModule && wixSimpleReferenceRow.Table== "Media")
                 {
                     continue;
                 }

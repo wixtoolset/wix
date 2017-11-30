@@ -14,7 +14,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Msi;
     using WixToolset.Core.Native;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.Cab;
     using WixToolset.Data.Tuples;
 
     /// <summary>
@@ -110,7 +109,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     wixFileRow.Directory_ = record[2];
                                     wixFileRow.DiskId = wixMergeRow.DiskId;
                                     wixFileRow.PatchGroup = -1;
-                                    wixFileRow.Source = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]);
+                                    wixFileRow.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
                                     //WixFileRow wixFileRow = (WixFileRow)this.WixFileTable.CreateRow(wixMergeRow.SourceLineNumbers, false);
                                     //wixFileRow.Directory = record[2];
                                     //wixFileRow.DiskId = wixMergeRow.DiskId;
@@ -204,20 +203,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 string mergeIdPath = Path.Combine(this.IntermediateFolder, mergeId);
                 Directory.CreateDirectory(mergeIdPath);
 
-                using (var extractCab = new WixExtractCab())
+                try
                 {
-                    try
-                    {
-                        extractCab.Extract(moduleCabPath, mergeIdPath);
-                    }
-                    catch (FileNotFoundException)
-                    {
-                        throw new WixException(WixErrors.CabFileDoesNotExist(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
-                    }
-                    catch
-                    {
-                        throw new WixException(WixErrors.CabExtractionFailed(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
-                    }
+                    var cabinet = new Cabinet(moduleCabPath);
+                    cabinet.Extract(mergeIdPath);
+                }
+                catch (FileNotFoundException)
+                {
+                    throw new WixException(WixErrors.CabFileDoesNotExist(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
+                }
+                catch
+                {
+                    throw new WixException(WixErrors.CabExtractionFailed(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
                 }
             }
             catch (COMException ce)

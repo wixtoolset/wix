@@ -7,7 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Collections.Specialized;
     using System.Globalization;
     using System.IO;
-    using WixToolset.Core.Cab;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Rows;
     using WixToolset.Msi;
@@ -88,9 +88,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                 string cabinetFile = Path.Combine(this.IntermediateFolder, String.Concat("Media", Path.DirectorySeparatorChar, diskId.ToString(CultureInfo.InvariantCulture), ".cab"));
 
                                 // ensure the parent directory exists
-                                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(cabinetFile));
+                                Directory.CreateDirectory(Path.GetDirectoryName(cabinetFile));
 
-                                using (FileStream fs = System.IO.File.Create(cabinetFile))
+                                using (FileStream fs = File.Create(cabinetFile))
                                 {
                                     int bytesRead;
                                     byte[] buffer = new byte[512];
@@ -128,16 +128,14 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                 foreach (string cabinetFile in cabinetFiles)
                 {
-                    using (var extractCab = new WixExtractCab())
+                    try
                     {
-                        try
-                        {
-                            extractCab.Extract(cabinetFile, fileDirectory);
-                        }
-                        catch (FileNotFoundException)
-                        {
-                            throw new WixException(WixErrors.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
-                        }
+                        var cabinet = new Cabinet(cabinetFile);
+                        cabinet.Extract(fileDirectory);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        throw new WixException(WixErrors.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
                     }
                 }
             }

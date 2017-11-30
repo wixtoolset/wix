@@ -57,27 +57,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             FileInfo fileInfo = null;
             try
             {
-                fileInfo = new FileInfo(file.WixFile.Source);
+                fileInfo = new FileInfo(file.WixFile.Source.Path);
             }
             catch (ArgumentException)
             {
-                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source));
+                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 return;
             }
             catch (PathTooLongException)
             {
-                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source));
+                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 return;
             }
             catch (NotSupportedException)
             {
-                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source));
+                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 return;
             }
 
             if (!fileInfo.Exists)
             {
-                Messaging.Instance.OnMessage(WixErrors.CannotFindFile(file.File.SourceLineNumbers, file.File.File, file.File.LongFileName, file.WixFile.Source));
+                Messaging.Instance.OnMessage(WixErrors.CannotFindFile(file.File.SourceLineNumbers, file.File.File, file.File.LongFileName, file.WixFile.Source.Path));
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (Int32.MaxValue < fileStream.Length)
                 {
-                    throw new WixException(WixErrors.FileTooLarge(file.File.SourceLineNumbers, file.WixFile.Source));
+                    throw new WixException(WixErrors.FileTooLarge(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 }
 
                 file.File.FileSize = Convert.ToInt32(fileStream.Length, CultureInfo.InvariantCulture);
@@ -372,7 +372,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Navigator is cheaper than dom.  Perhaps there is a cheaper API still.
                 try
                 {
-                    XPathDocument doc = new XPathDocument(fileManifest.WixFile.Source);
+                    XPathDocument doc = new XPathDocument(fileManifest.WixFile.Source.Path);
                     XPathNavigator nav = doc.CreateNavigator();
                     nav.MoveToRoot();
 
@@ -396,7 +396,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
                             if (!hasNextSibling)
                             {
-                                Messaging.Instance.OnMessage(WixErrors.InvalidManifestContent(file.File.SourceLineNumbers, fileManifest.WixFile.Source));
+                                Messaging.Instance.OnMessage(WixErrors.InvalidManifestContent(file.File.SourceLineNumbers, fileManifest.WixFile.Source.Path));
                                 return;
                             }
 
@@ -434,11 +434,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (FileNotFoundException fe)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.FileNotFound(new SourceLineNumber(fileManifest.WixFile.Source), fe.FileName, "AssemblyManifest"));
+                    Messaging.Instance.OnMessage(WixErrors.FileNotFound(new SourceLineNumber(fileManifest.WixFile.Source.Path), fe.FileName, "AssemblyManifest"));
                 }
                 catch (XmlException xe)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.InvalidXml(new SourceLineNumber(fileManifest.WixFile.Source), "manifest", xe.Message));
+                    Messaging.Instance.OnMessage(WixErrors.InvalidXml(new SourceLineNumber(fileManifest.WixFile.Source.Path), "manifest", xe.Message));
                 }
 
                 if (!String.IsNullOrEmpty(win32Name))

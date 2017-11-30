@@ -975,7 +975,8 @@ namespace WixToolset.Data
                 {
                     if (!(value is string))
                     {
-                        throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "Cannot set string column '{0}' with a value of type '{1}'.", this.name, value.GetType().ToString()));
+                        //throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "Cannot set string column '{0}' with a value of type '{1}'.", this.name, value.GetType().ToString()));
+                        return value.ToString();
                     }
                 }
             }

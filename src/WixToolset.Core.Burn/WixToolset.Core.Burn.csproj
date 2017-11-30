@@ -20,9 +20,9 @@
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
 
     <ProjectReference Include="$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
+    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
 
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
-    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
   </ItemGroup>
 
   <ItemGroup>

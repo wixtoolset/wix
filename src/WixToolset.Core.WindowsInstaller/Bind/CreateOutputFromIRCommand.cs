@@ -44,9 +44,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddFileTuple((FileTuple)tuple, output);
                         break;
 
+                    case TupleDefinitionType.Media:
+                        this.AddMediaTuple((MediaTuple)tuple, output);
+                        break;
+
+                    case TupleDefinitionType.Property:
+                        this.AddPropertyTuple((PropertyTuple)tuple, output);
+                        break;
+
                     case TupleDefinitionType.WixAction:
                         this.AddWixActionTuple((WixActionTuple)tuple, output);
-                        break; 
+                        break;
+
+                    case TupleDefinitionType.WixMedia:
+                        // Ignored.
+                        break;
 
                     default:
                         this.AddTupleDefaultly(tuple, output);
@@ -74,6 +86,34 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             attributes |= tuple.System ? MsiInterop.MsidbFileAttributesSystem : 0;
             attributes |= tuple.Vital ? MsiInterop.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
+        }
+
+        private void AddMediaTuple(MediaTuple tuple, Output output)
+        {
+            if (this.Section.Type != SectionType.Module)
+            {
+                var table = output.EnsureTable(this.TableDefinitions["Media"]);
+                var row = (MediaRow)table.CreateRow(tuple.SourceLineNumbers);
+                row.DiskId = tuple.DiskId;
+                row.LastSequence = tuple.LastSequence;
+                row.DiskPrompt = tuple.DiskPrompt;
+                row.Cabinet = tuple.Cabinet;
+                row.VolumeLabel = tuple.VolumeLabel;
+                row.Source = tuple.Source;
+            }
+        }
+
+        private void AddPropertyTuple(PropertyTuple tuple, Output output)
+        {
+            if (String.IsNullOrEmpty(tuple.Value))
+            {
+                return;
+            }
+
+            var table = output.EnsureTable(this.TableDefinitions["Property"]);
+            var row = (PropertyRow)table.CreateRow(tuple.SourceLineNumbers);
+            row.Property = tuple.Property;
+            row.Value = tuple.Value;
         }
 
         private void AddWixActionTuple(WixActionTuple actionRow, Output output)

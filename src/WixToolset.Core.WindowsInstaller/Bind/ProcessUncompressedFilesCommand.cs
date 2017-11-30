@@ -105,7 +105,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             // finally put together the base media layout path and the relative file layout path
                             string fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
-                            if (FileTransfer.TryCreate(facade.WixFile.Source, fileLayoutPath, false, "File", facade.File.SourceLineNumbers, out var transfer))
+                            if (FileTransfer.TryCreate(facade.WixFile.Source.Path, fileLayoutPath, false, "File", facade.File.SourceLineNumbers, out var transfer))
                             {
                                 fileTransfers.Add(transfer);
                             }
