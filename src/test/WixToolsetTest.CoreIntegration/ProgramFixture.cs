@@ -18,12 +18,20 @@ namespace WixToolsetTest.CoreIntegration
             var folder = TestData.Get(@"TestData\SingleFile");
 
             using (var fs = new DisposableFileSystem())
-            using (var pushd = new Pushd(folder))
             {
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[] { "build", "Package.wxs", "PackageComponents.wxs", "-loc", "Package.en-us.wxl", "-bindpath", "data", "-intermediateFolder", intermediateFolder, "-o", $@"{intermediateFolder}\bin\test.msi" });
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
 
                 Assert.Equal(0, result);
 
@@ -35,7 +43,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Single(intermediate.Sections);
 
                 var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
-                Assert.Equal(@"data\test.txt", wixFile[WixFileTupleFields.Source].AsPath().Path);
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
             }
         }
@@ -46,12 +54,19 @@ namespace WixToolsetTest.CoreIntegration
             var folder = TestData.Get(@"TestData\SimpleModule");
 
             using (var fs = new DisposableFileSystem())
-            using (var pushd = new Pushd(folder))
             {
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[] { "build", "Module.wxs", "-loc", "Module.en-us.wxl", "-bindpath", "data", "-intermediateFolder", intermediateFolder, "-o", $@"{intermediateFolder}\bin\test.msm" });
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Module.wxs"),
+                    "-loc", Path.Combine(folder, "Module.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msm")
+                });
 
                 Assert.Equal(0, result);
 
@@ -62,7 +77,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Single(intermediate.Sections);
 
                 var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
-                Assert.Equal(@"data\test.txt", wixFile[WixFileTupleFields.Source].AsPath().Path);
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
             }
         }
@@ -73,12 +88,20 @@ namespace WixToolsetTest.CoreIntegration
             var folder = TestData.Get(@"TestData\InstanceTransform");
 
             using (var fs = new DisposableFileSystem())
-            using (var pushd = new Pushd(folder))
             {
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[] { "build", "Package.wxs", "PackageComponents.wxs", "-loc", "Package.en-us.wxl", "-bindpath", "data", "-intermediateFolder", intermediateFolder, "-o", $@"{intermediateFolder}\bin\test.msi" });
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
 
                 Assert.Equal(0, result);
 
