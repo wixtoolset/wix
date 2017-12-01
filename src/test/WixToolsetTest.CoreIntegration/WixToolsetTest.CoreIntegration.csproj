@@ -15,6 +15,10 @@
     <Content Include="TestData\InstanceTransform\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InstanceTransform\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InstanceTransform\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ExampleExtension\data\example.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ExampleExtension\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ExampleExtension\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ExampleExtension\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -23,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\wix\wix.csproj" />
+    <ProjectReference Include="..\Example.Extension\Example.Extension.csproj" />
   </ItemGroup>
 
   <ItemGroup>

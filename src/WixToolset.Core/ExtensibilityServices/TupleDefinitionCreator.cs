@@ -19,8 +19,16 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IEnumerable<IExtensionData> ExtensionData { get; set; }
 
+        private Dictionary<string, IntermediateTupleDefinition> CustomDefinitionByName { get; } = new Dictionary<string, IntermediateTupleDefinition>();
+
+        public void AddCustomTupleDefinition(IntermediateTupleDefinition definition)
+        {
+            this.CustomDefinitionByName.Add(definition.Name, definition);
+        }
+
         public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
+            // First, look in the built-ins.
             tupleDefinition = TupleDefinitions.ByName(name);
 
             if (tupleDefinition == null)
@@ -30,12 +38,19 @@ namespace WixToolset.Core.ExtensibilityServices
                     this.LoadExtensionData();
                 }
 
+                // Second, look in the extensions.
                 foreach (var data in this.ExtensionData)
                 {
                     if (data.TryGetTupleDefinitionByName(name, out tupleDefinition))
                     {
                         break;
                     }
+                }
+
+                // Finally, look in the custom tuple definitions provided during an intermediate load.
+                if (tupleDefinition == null)
+                {
+                    this.CustomDefinitionByName.TryGetValue(name, out tupleDefinition);
                 }
             }
 

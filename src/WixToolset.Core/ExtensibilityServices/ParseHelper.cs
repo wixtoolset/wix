@@ -633,6 +633,11 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
+        public SourceLineNumber GetSourceLineNumbers(XElement element)
+        {
+            return Preprocessor.GetSourceLineNumbers(element);
+        }
+
         public string GetConditionInnerText(XElement element)
         {
             var value = Common.GetInnerText(element)?.Trim().Replace('\t', ' ').Replace('\r', ' ').Replace('\n', ' ');
