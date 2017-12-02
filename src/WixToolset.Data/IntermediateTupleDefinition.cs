@@ -3,6 +3,7 @@
 namespace WixToolset.Data
 {
     using System;
+    using SimpleJson;
 
     public class IntermediateTupleDefinition
     {
@@ -23,7 +24,7 @@ namespace WixToolset.Data
             this.FieldDefinitions = fieldDefinitions;
             this.StrongTupleType = strongTupleType ?? typeof(IntermediateTuple);
 #if DEBUG
-            if (!this.StrongTupleType.IsSubclassOf(typeof(IntermediateTuple))) throw new ArgumentException(nameof(strongTupleType));
+            if (this.StrongTupleType != typeof(IntermediateTuple) && !this.StrongTupleType.IsSubclassOf(typeof(IntermediateTuple))) throw new ArgumentException(nameof(strongTupleType));
 #endif
         }
 
@@ -42,6 +43,53 @@ namespace WixToolset.Data
             result.Id = id;
 
             return result;
+        }
+
+        internal static IntermediateTupleDefinition Deserialize(JsonObject jsonObject)
+        {
+            var name = jsonObject.GetValueOrDefault<string>("name");
+            var definitionsJson = jsonObject.GetValueOrDefault<JsonArray>("fields");
+
+            var fieldDefinitions = new IntermediateFieldDefinition[definitionsJson.Count];
+
+            for (var i = 0; i < definitionsJson.Count; ++i)
+            {
+                var definitionJson = (JsonObject)definitionsJson[i];
+                var fieldName = definitionJson.GetValueOrDefault<string>("name");
+                var fieldType = definitionJson.GetEnumOrDefault("type", IntermediateFieldType.String);
+                fieldDefinitions[i] = new IntermediateFieldDefinition(fieldName, fieldType);
+            }
+
+            return new IntermediateTupleDefinition(name, fieldDefinitions, null);
+        }
+
+        internal JsonObject Serialize()
+        {
+            var jsonObject = new JsonObject
+            {
+                { "name", this.Name }
+            };
+
+            var fieldsJson = new JsonArray(this.FieldDefinitions.Length);
+
+            foreach (var fieldDefinition in this.FieldDefinitions)
+            {
+                var fieldJson = new JsonObject
+                {
+                    { "name", fieldDefinition.Name },
+                };
+
+                if (fieldDefinition.Type != IntermediateFieldType.String)
+                {
+                    fieldJson.Add("type", fieldDefinition.Type.ToString().ToLowerInvariant());
+                }
+
+                fieldsJson.Add(fieldJson);
+            }
+
+            jsonObject.Add("fields", fieldsJson);
+
+            return jsonObject;
         }
     }
 }

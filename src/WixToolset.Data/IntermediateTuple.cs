@@ -6,9 +6,9 @@ namespace WixToolset.Data
 
     public class IntermediateTuple
     {
-        //public IntermediateTuple(IntermediateTupleDefinition definition) : this(definition, null, null)
-        //{
-        //}
+        public IntermediateTuple(IntermediateTupleDefinition definition) : this(definition, null, null)
+        {
+        }
 
         public IntermediateTuple(IntermediateTupleDefinition definition, SourceLineNumber sourceLineNumber, Identifier id = null)
         {
@@ -35,11 +35,11 @@ namespace WixToolset.Data
             var sourceLineNumbersJson = jsonObject.GetValueOrDefault<JsonObject>("ln");
             var fieldsJson = jsonObject.GetValueOrDefault<JsonArray>("fields");
 
-            creator.TryGetTupleDefinitionByName(definitionName, out var definition); // TODO: this isn't sufficient.
-            var tuple = definition.CreateTuple();
+            var id = (idJson == null) ? null : Identifier.Deserialize(idJson);
+            var sourceLineNumbers = (sourceLineNumbersJson == null) ? null : SourceLineNumber.Deserialize(sourceLineNumbersJson);
 
-            tuple.Id = (idJson == null) ? null : Identifier.Deserialize(idJson);
-            tuple.SourceLineNumbers = (sourceLineNumbersJson == null) ? null : SourceLineNumber.Deserialize(sourceLineNumbersJson);
+            creator.TryGetTupleDefinitionByName(definitionName, out var definition); // TODO: this isn't sufficient.
+            var tuple = definition.CreateTuple(sourceLineNumbers, id);
 
             for (var i = 0; i < fieldsJson.Count; ++i)
             {

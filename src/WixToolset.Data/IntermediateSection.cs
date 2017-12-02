@@ -66,7 +66,6 @@ namespace WixToolset.Data
             var codepage = jsonObject.GetValueOrDefault("codepage", 0);
             var id = jsonObject.GetValueOrDefault<string>("id");
             var type = jsonObject.GetEnumOrDefault("type", SectionType.Unknown);
-            var tuplesJson = jsonObject.GetValueOrDefault<JsonArray>("tuples");
 
             if (null == id && (SectionType.Unknown != type && SectionType.Fragment != type))
             {
@@ -79,6 +78,8 @@ namespace WixToolset.Data
             }
 
             var section = new IntermediateSection(id, type, codepage);
+
+            var tuplesJson = jsonObject.GetValueOrDefault<JsonArray>("tuples");
 
             foreach (JsonObject tupleJson in tuplesJson)
             {

@@ -8,7 +8,7 @@ namespace WixToolset.Data
         {
             var definition = tuple.Definition.FieldDefinitions[index];
 
-            var field = tuple.Fields[index].Set(definition, value); ;
+            var field = tuple.Fields[index].Set(definition, value);
 
             return tuple.Fields[index] = field;
         }

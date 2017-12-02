@@ -2,11 +2,26 @@
 
 namespace WixToolset.Data
 {
+    using System.Collections.Generic;
+
     internal class SimpleTupleDefinitionCreator : ITupleDefinitionCreator
     {
+        private Dictionary<string, IntermediateTupleDefinition> CustomDefinitionByName { get; } = new Dictionary<string, IntermediateTupleDefinition>();
+
+        public void AddCustomTupleDefinition(IntermediateTupleDefinition definition)
+        {
+            this.CustomDefinitionByName.Add(definition.Name, definition);
+        }
+
         public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
             tupleDefinition = TupleDefinitions.ByName(name);
+
+            if (tupleDefinition == null)
+            {
+                tupleDefinition = this.CustomDefinitionByName.GetValueOrDefault(name);
+            }
+
             return tupleDefinition != null;
         }
     }

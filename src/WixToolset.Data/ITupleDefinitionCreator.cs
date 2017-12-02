@@ -4,6 +4,8 @@ namespace WixToolset.Data
 {
     public interface ITupleDefinitionCreator
     {
+        void AddCustomTupleDefinition(IntermediateTupleDefinition definition);
+
         bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition);
     }
 }

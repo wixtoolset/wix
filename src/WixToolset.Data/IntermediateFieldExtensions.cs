@@ -11,6 +11,8 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateField field, object value)
         {
+            var data = value;
+
             if (field == null)
             {
                 throw new ArgumentNullException(nameof(field));
@@ -21,30 +23,72 @@ namespace WixToolset.Data
             }
             else if (field.Type == IntermediateFieldType.Bool && !(value is bool))
             {
-                throw new ArgumentException(nameof(value));
+                if (value is int)
+                {
+                    data = ((int)value) != 0;
+                }
+                else if (value is string str)
+                {
+                    if (str.Equals("yes", StringComparison.OrdinalIgnoreCase) || str.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        data = true;
+                    }
+                    else if (str.Equals("no", StringComparison.OrdinalIgnoreCase) || str.Equals("false", StringComparison.OrdinalIgnoreCase))
+                    {
+                        data = false;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(nameof(value));
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
             }
             else if (field.Type == IntermediateFieldType.Number && !(value is int))
             {
-                throw new ArgumentException(nameof(value));
+                if (value is string str && Int32.TryParse(str, out var number))
+                {
+                    data = number;
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
             }
             else if (field.Type == IntermediateFieldType.String && !(value is string))
             {
-                throw new ArgumentException(nameof(value));
+                if (value is int)
+                {
+                    data = value.ToString();
+                }
+                else if (value is bool b)
+                {
+                    data = b ? "true" : "false";
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
             }
-            else if (field.Type == IntermediateFieldType.Path && !(value is IntermediateFieldPathValue || value is string))
+            else if (field.Type == IntermediateFieldType.Path && !(value is IntermediateFieldPathValue))
             {
-                throw new ArgumentException(nameof(value));
-            }
-
-            if (field.Type == IntermediateFieldType.Path && value != null && value is string)
-            {
-                value = new IntermediateFieldPathValue { Path = (string)value };
+                if (value is string str)
+                {
+                    data = new IntermediateFieldPathValue { Path = str };
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
             }
 
             field.Value = new IntermediateFieldValue
             {
                 Context = valueContext,
-                Data = value,
+                Data = data,
                 PreviousValue = field.Value
             };
 
@@ -103,7 +147,7 @@ namespace WixToolset.Data
                     return field.Value.AsNumber() != 0;
 
                 case IntermediateFieldType.String:
-                    return !System.String.IsNullOrEmpty(field.Value.AsString());
+                    return !String.IsNullOrEmpty(field.Value.AsString());
 
                 default:
                     throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to boolean");

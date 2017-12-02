@@ -131,9 +131,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixFileTupleFields.DiskId, value);
         }
 
-        public string Source
+        public IntermediateFieldPathValue Source
         {
-            get => this.Fields[(int)WixFileTupleFields.Source].AsPath()?.Path;
+            get => this.Fields[(int)WixFileTupleFields.Source].AsPath();
             set => this.Set((int)WixFileTupleFields.Source, value);
         }
 
