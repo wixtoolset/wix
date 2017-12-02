@@ -10825,9 +10825,10 @@ namespace WixToolset.Core
                                 switch (installScopeType)
                                 {
                                     case Wix.Package.InstallScopeType.perMachine:
-                                        row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Property);
-                                        row.Set(0, "ALLUSERS");
-                                        row.Set(1, "1");
+                                        {
+                                            row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Property, new Identifier("ALLUSERS", AccessModifier.Public));
+                                            row.Set(1, "1");
+                                        }
                                         break;
                                     case Wix.Package.InstallScopeType.perUser:
                                         sourceBits = sourceBits | 8;

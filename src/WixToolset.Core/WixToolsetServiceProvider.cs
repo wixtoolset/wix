@@ -12,6 +12,7 @@ namespace WixToolset.Core
     {
         private ExtensionManager extensionManager;
         private ParseHelper parseHelper;
+        private PreprocessHelper preprocessHelper;
         private TupleDefinitionCreator tupleDefinitionCreator;
 
         public object GetService(Type serviceType)
@@ -19,6 +20,11 @@ namespace WixToolset.Core
             if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));
 
             // Transients.
+            if (serviceType == typeof(IPreprocessContext))
+            {
+                return new PreprocessContext(this);
+            }
+
             if (serviceType == typeof(ICompileContext))
             {
                 return new CompileContext(this);
@@ -63,6 +69,11 @@ namespace WixToolset.Core
             if (serviceType == typeof(IParseHelper))
             {
                 return this.parseHelper = this.parseHelper ?? new ParseHelper(this);
+            }
+
+            if (serviceType == typeof(IPreprocessHelper))
+            {
+                return this.preprocessHelper = this.preprocessHelper ?? new PreprocessHelper(this);
             }
 
             throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));

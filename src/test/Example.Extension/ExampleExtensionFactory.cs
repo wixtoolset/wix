@@ -7,11 +7,18 @@ namespace Example.Extension
 
     public class ExampleExtensionFactory : IExtensionFactory
     {
+        private ExamplePreprocessorExtensionAndCommandLine preprocessorExtension;
+
         public bool TryCreateExtension(Type extensionType, out object extension)
         {
-            if (extensionType == typeof(IPreprocessorExtension))
+            if (extensionType == typeof(IExtensionCommandLine) || extensionType == typeof(IPreprocessorExtension))
             {
-                extension = new ExamplePreprocessorExtension();
+                if (preprocessorExtension == null)
+                {
+                    preprocessorExtension = new ExamplePreprocessorExtensionAndCommandLine();
+                }
+
+                extension = preprocessorExtension;
             }
             else if (extensionType == typeof(ICompilerExtension))
             {

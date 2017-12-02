@@ -22,7 +22,7 @@ namespace WixToolset.Core
         Bind,
     }
 
-    internal class CommandLine : ICommandLine
+    internal class CommandLine : ICommandLine, IParseCommandLine
     {
         public CommandLine()
         {
@@ -57,10 +57,10 @@ namespace WixToolset.Core
                 args = CommandLine.ParseArgumentsToArray(context.Arguments).Union(args).ToArray();
             }
 
-            return this.ParseStandardCommandLine(args);
+            return this.ParseStandardCommandLine(context, args);
         }
 
-        private ICommandLineCommand ParseStandardCommandLine(string[] args)
+        private ICommandLineCommand ParseStandardCommandLine(ICommandLineContext context, string[] args)
         {
             var next = String.Empty;
 
@@ -90,7 +90,7 @@ namespace WixToolset.Core
             var builtOutputsFile = String.Empty;
             var wixProjectFile = String.Empty;
 
-            this.Parse(args, (cmdline, arg) => Enum.TryParse(arg, true, out command), (cmdline, arg) =>
+            this.Parse(context, args, (cmdline, arg) => Enum.TryParse(arg, true, out command), (cmdline, arg) =>
             {
                 if (cmdline.IsSwitch(arg))
                 {
@@ -279,13 +279,13 @@ namespace WixToolset.Core
         }
 #endif
 
-        private ICommandLine Parse(string[] commandLineArguments, Func<CommandLine, string, bool> parseCommand, Func<CommandLine, string, bool> parseArgument)
+        private ICommandLine Parse(ICommandLineContext context, string[] commandLineArguments, Func<CommandLine, string, bool> parseCommand, Func<CommandLine, string, bool> parseArgument)
         {
             this.FlattenArgumentsWithResponseFilesIntoOriginalArguments(commandLineArguments);
 
             this.QueueArgumentsAndLoadExtensions(this.OriginalArguments);
 
-            this.ProcessRemainingArguments(parseArgument, parseCommand);
+            this.ProcessRemainingArguments(context, parseArgument, parseCommand);
 
             return this;
         }
@@ -413,7 +413,7 @@ namespace WixToolset.Core
         /// <returns>True if a valid switch exists there, false if not.</returns>
         public bool IsSwitch(string arg)
         {
-            return arg != null && ('/' == arg[0] || '-' == arg[0]);
+            return arg != null && arg.Length > 1 && ('/' == arg[0] || '-' == arg[0]);
         }
 
         /// <summary>
@@ -522,9 +522,14 @@ namespace WixToolset.Core
             }
         }
 
-        private void ProcessRemainingArguments(Func<CommandLine, string, bool> parseArgument, Func<CommandLine, string, bool> parseCommand)
+        private void ProcessRemainingArguments(ICommandLineContext context, Func<CommandLine, string, bool> parseArgument, Func<CommandLine, string, bool> parseCommand)
         {
             var extensions = this.ExtensionManager.Create<IExtensionCommandLine>();
+
+            foreach (var extension in extensions)
+            {
+                extension.PreParse(context);
+            }
 
             while (!this.ShowHelp &&
                    String.IsNullOrEmpty(this.ErrorArgument) &&
@@ -566,10 +571,10 @@ namespace WixToolset.Core
         {
             foreach (var extension in extensions)
             {
-                //if (extension.ParseArgument(this, arg))
-                //{
-                //    return true;
-                //}
+                if (extension.TryParseArgument(this, arg))
+                {
+                    return true;
+                }
             }
 
             return false;

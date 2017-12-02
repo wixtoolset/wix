@@ -6,6 +6,8 @@
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
     <MediaTemplate />
 
+    <Property Id="ExampleProperty" Value="$(ex.Test)" />
+
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>

@@ -56,5 +56,48 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal("Bar", example[1].AsString());
             }
         }
+
+        [Fact]
+        public void CanParseCommandLineWithExtension()
+        {
+            var folder = TestData.Get(@"TestData\ExampleExtension");
+            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-ext", extensionPath,
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-example", "test",
+                    "-o", Path.Combine(intermediateFolder, @"bin\extest.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\example.txt")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wir"));
+                var section = intermediate.Sections.Single();
+
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\example.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
+                Assert.Equal(@"example.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+
+                var property = section.Tuples.OfType<PropertyTuple>().Where(p => p.Id.Id == "ExampleProperty").Single();
+                Assert.Equal("ExampleProperty", property.Property);
+                Assert.Equal("test", property.Value);
+            }
+        }
     }
 }

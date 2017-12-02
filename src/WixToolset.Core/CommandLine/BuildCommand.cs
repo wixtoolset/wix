@@ -40,6 +40,8 @@ namespace WixToolset.Core
 
         public IExtensionManager ExtensionManager { get; }
 
+        public IEnumerable<string> IncludeSearchPaths { get; }
+
         public IEnumerable<string> LocFiles { get; }
 
         public IEnumerable<string> LibraryFiles { get; }
@@ -102,15 +104,18 @@ namespace WixToolset.Core
         {
             var intermediates = new List<Intermediate>();
 
-
             foreach (var sourceFile in this.SourceFiles)
             {
-                //var preprocessContext = this.ServiceProvider.GetService<IPreprocessContext>();
-                //preprocessContext.SourcePath = sourceFile.SourcePath;
-                //preprocessContext.Variables = this.PreprocessorVariables;
+                var preprocessContext = this.ServiceProvider.GetService<IPreprocessContext>();
+                preprocessContext.Messaging = Messaging.Instance;
+                preprocessContext.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
+                preprocessContext.Platform = Platform.X86; // TODO: set this correctly
+                preprocessContext.IncludeSearchPaths = this.IncludeSearchPaths?.ToList() ?? new List<string>();
+                preprocessContext.SourceFile = sourceFile.SourcePath;
+                preprocessContext.Variables = new Dictionary<string, string>(this.PreprocessorVariables);
 
                 var preprocessor = new Preprocessor();
-                var document = preprocessor.Process(sourceFile.SourcePath, this.PreprocessorVariables);
+                var document = preprocessor.Process(preprocessContext);
 
                 var compileContext = this.ServiceProvider.GetService<ICompileContext>();
                 compileContext.Messaging = Messaging.Instance;
