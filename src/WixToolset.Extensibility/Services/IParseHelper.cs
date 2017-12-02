@@ -8,7 +8,7 @@ namespace WixToolset.Extensibility.Services
     using WixToolset.Data;
 
     /// <summary>
-    /// Core interface provided by the compiler.
+    /// Interface provided to help compiler extensions parse.
     /// </summary>
     public interface IParseHelper
     {
@@ -241,6 +241,13 @@ namespace WixToolset.Extensibility.Services
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <returns>The attribute's YesNoType value.</returns>
         YesNoDefaultType GetAttributeYesNoDefaultValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
+
+        /// <summary>
+        /// Gets a source line number for an element.
+        /// </summary>
+        /// <param name="element">Element to get source line number.</param>
+        /// <returns>Source line number.</returns>
+        SourceLineNumber GetSourceLineNumbers(XElement element);
 
         /// <summary>
         /// Gets node's inner text and ensure's it is safe for use in a condition by trimming any extra whitespace.

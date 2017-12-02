@@ -26,8 +26,8 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Gets the library associated with this extension.
         /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
+        /// <param name="tupleDefinitions">The tuple definitions to use while loading the library.</param>
         /// <returns>The library for this extension or null if there is no library.</returns>
-        Library GetLibrary(ITupleDefinitionCreator tupleDefinitions);
+        Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions);
     }
 }

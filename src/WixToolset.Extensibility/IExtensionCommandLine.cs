@@ -3,7 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
-    using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// A command line option.
@@ -21,22 +21,13 @@ namespace WixToolset.Extensibility
     public interface IExtensionCommandLine
     {
         /// <summary>
-        /// Sets the message handler for the extension.
-        /// </summary>
-        /// <value>Message handler for the extension.</value>
-        IMessageHandler MessageHandler { set; }
-
-        /// <summary>
         /// Gets the supported command line types for this extension.
         /// </summary>
         /// <value>The supported command line types for this extension.</value>
         IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches { get; }
 
-        /// <summary>
-        /// Parse the commandline arguments.
-        /// </summary>
-        /// <param name="args">Commandline arguments.</param>
-        /// <returns>Unparsed commandline arguments.</returns>
-        string[] ParseCommandLine(string[] args);
+        void PreParse(ICommandLineContext context);
+
+        bool TryParseArgument(IParseCommandLine parseCommandLine, string arg);
     }
 }

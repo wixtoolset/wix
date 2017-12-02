@@ -1,0 +1,31 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+namespace WixToolset.Extensibility
+{
+    using System;
+    using System.Collections.Generic;
+    using WixToolset.Data;
+
+    public interface IPreprocessContext
+    {
+        IServiceProvider ServiceProvider { get; }
+
+        Messaging Messaging { get; set; }
+
+        IEnumerable<IPreprocessorExtension> Extensions { get; set; }
+
+        /// <summary>
+        /// Gets the platform which the compiler will use when defaulting 64-bit attributes and elements.
+        /// </summary>
+        /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
+        Platform Platform { get; set; }
+
+        IList<string> IncludeSearchPaths { get; set; }
+
+        string SourceFile { get; set; }
+
+        IDictionary<string, string> Variables { get; set; }
+
+        SourceLineNumber CurrentSourceLineNumber { get; set; }
+    }
+}

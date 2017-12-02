@@ -3,33 +3,37 @@
 namespace WixToolset.Extensibility
 {
     using System.Xml.Linq;
-    using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Base class for creating a preprocessor extension.
     /// </summary>
-    public abstract class PreprocessorExtension : IPreprocessorExtension
+    public abstract class BasePreprocessorExtension : IPreprocessorExtension
     {
         /// <summary>
-        /// Gets or sets the preprocessor core for the extension.
+        /// Context for use by the extension.
         /// </summary>
-        /// <value>Preprocessor core for the extension.</value>
-        public IPreprocessorCore Core { get; set; }
+        protected IPreprocessContext Context { get; private set; }
+
+        /// <summary>
+        /// ParserHelper for use by the extension.
+        /// </summary>
+        protected IPreprocessHelper PreprocessHelper { get; private set; }
 
         /// <summary>
         /// Gets or sets the variable prefixes for the extension.
         /// </summary>
         /// <value>The variable prefixes for the extension.</value>
-        public virtual string[] Prefixes
-        {
-            get { return null; }
-        }
+        public string[] Prefixes { get; protected set; }
 
         /// <summary>
         /// Called at the beginning of the preprocessing of a source file.
         /// </summary>
-        public virtual void Initialize()
+        public virtual void PrePreprocess(IPreprocessContext context)
         {
+            this.Context = context;
+
+            this.PreprocessHelper = context.ServiceProvider.GetService<IPreprocessHelper>();
         }
 
         /// <summary>
@@ -65,34 +69,15 @@ namespace WixToolset.Extensibility
         /// <param name="parent">The parent node of the pragma.</param>
         /// <returns>false if the pragma is not defined.</returns>
         /// <comments>Don't return false for any condition except for unrecognized pragmas. Throw errors that are fatal to the compile. use core.OnMessage for warnings and messages.</comments>
-        public virtual bool ProcessPragma(SourceLineNumber sourceLineNumbers, string prefix, string pragma, string args, XContainer parent)
+        public virtual bool ProcessPragma(string prefix, string pragma, string args, XContainer parent)
         {
             return false;
         }
 
         /// <summary>
-        /// Preprocess a document after normal preprocessing has completed.
-        /// </summary>
-        /// <param name="document">The document to preprocess.</param>
-        public virtual void PreprocessDocument(XDocument document)
-        {
-        }
-
-        /// <summary>
-        /// Preprocesses a parameter.
-        /// </summary>
-        /// <param name="name">Name of parameter that matches extension.</param>
-        /// <returns>The value of the parameter after processing.</returns>
-        /// <remarks>By default this method will cause an error if its called.</remarks>
-        public virtual string PreprocessParameter(string name)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// Called at the end of the preprocessing of a source file.
         /// </summary>
-        public virtual void Finish()
+        public virtual void PostPreprocess(XDocument document)
         {
         }
     }

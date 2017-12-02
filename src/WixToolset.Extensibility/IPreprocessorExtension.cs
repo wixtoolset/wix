@@ -12,12 +12,6 @@ namespace WixToolset.Extensibility
     public interface IPreprocessorExtension
     {
         /// <summary>
-        /// Gets or sets the preprocessor core for the extension.
-        /// </summary>
-        /// <value>Preprocessor core for the extension.</value>
-        IPreprocessorCore Core { get; set; }
-
-        /// <summary>
         /// Gets the variable prefixes for the extension.
         /// </summary>
         /// <value>The variable prefixes for the extension.</value>
@@ -26,7 +20,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the beginning of the preprocessing of a source file.
         /// </summary>
-        void Initialize();
+        void PrePreprocess(IPreprocessContext context);
 
         /// <summary>
         /// Gets the value of a variable whose prefix matches the extension.
@@ -55,25 +49,11 @@ namespace WixToolset.Extensibility
         /// <param name="parent">The parent node of the pragma.</param>
         /// <returns>false if the pragma is not defined.</returns>
         /// <comments>Don't return false for any condition except for unrecognized pragmas. Use Core.OnMessage for errors, warnings and messages.</comments>
-        bool ProcessPragma(SourceLineNumber sourceLineNumbers, string prefix, string pragma, string args, XContainer parent);
-
-        /// <summary>
-        /// Preprocess a document after normal preprocessing has completed.
-        /// </summary>
-        /// <param name="document">The document to preprocess.</param>
-        void PreprocessDocument(XDocument document);
-
-        /// <summary>
-        /// Preprocesses a parameter.
-        /// </summary>
-        /// <param name="name">Name of parameter that matches extension.</param>
-        /// <returns>The value of the parameter after processing.</returns>
-        /// <remarks>By default this method will cause an error if its called.</remarks>
-        string PreprocessParameter(string name);
+        bool ProcessPragma(string prefix, string pragma, string args, XContainer parent);
 
         /// <summary>
         /// Called at the end of the preprocessing of a source file.
         /// </summary>
-        void Finish();
+        void PostPreprocess(XDocument document);
     }
 }

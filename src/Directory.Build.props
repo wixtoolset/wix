@@ -5,11 +5,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\build\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <OutputPath>$(MSBuildThisFileDirectory)..\build\$(Configuration)\</OutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\build\$(Configuration)\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)</OutputPath>
 
     <Authors>WiX Toolset Team</Authors>
     <Company>WiX Toolset</Company>
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
+    <Product>WiX Toolset</Product>
   </PropertyGroup>
 
   <PropertyGroup>
