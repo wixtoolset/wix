@@ -23,6 +23,10 @@
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFileCompressed\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFileCompressed\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFileCompressed\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFileCompressed\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

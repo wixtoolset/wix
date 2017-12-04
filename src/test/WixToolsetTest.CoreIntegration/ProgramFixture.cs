@@ -49,6 +49,42 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildSingleFileCompressed()
+        {
+            var folder = TestData.Get(@"TestData\SingleFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
+                Assert.Single(intermediate.Sections);
+
+                var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+            }
+        }
+
+        [Fact]
         public void CanBuildSimpleModule()
         {
             var folder = TestData.Get(@"TestData\SimpleModule");
