@@ -7361,8 +7361,7 @@ namespace WixToolset.Core
             // add the row to the section
             if (!this.Core.EncounteredError)
             {
-                var mediaRow = (MediaTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Media);
-                mediaRow.DiskId = id;
+                var mediaRow = (MediaTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Media, new Identifier(id, AccessModifier.Public));
                 mediaRow.LastSequence = 0; // this is set in the binder
                 mediaRow.DiskPrompt = diskPrompt;
                 mediaRow.Cabinet = cabinet;

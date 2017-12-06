@@ -40,9 +40,9 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
-                Assert.Single(intermediate.Sections);
+                var section = intermediate.Sections.Single();
 
-                var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
             }
@@ -72,13 +72,13 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(0, result);
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example.cab")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
-                Assert.Single(intermediate.Sections);
+                var section = intermediate.Sections.Single();
 
-                var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
             }
@@ -110,9 +110,9 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
-                Assert.Single(intermediate.Sections);
+                var section = intermediate.Sections.Single();
 
-                var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
             }

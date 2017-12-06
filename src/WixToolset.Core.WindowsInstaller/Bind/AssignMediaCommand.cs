@@ -58,7 +58,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var mediaTemplateTable = this.Section.Tuples.OfType<WixMediaTemplateTuple>().ToList();
 
             // If both tables are authored, it is an error.
-            if ((mediaTemplateTable != null && mediaTemplateTable.Count > 0) && (mediaTable != null && mediaTable.Count > 1))
+            if (mediaTemplateTable.Count > 0 && mediaTable.Count > 1)
             {
                 throw new WixException(WixErrors.MediaTableCollision(null));
             }
@@ -73,7 +73,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 filesByCabinetMedia.Add(mergeModuleMediaRow, new List<FileFacade>(this.FileFacades));
             }
-            else if (null == mediaTemplateTable)
+            else if (mediaTemplateTable.Count == 0)
             {
                 this.ManuallyAssignFiles(mediaTable, this.FileFacades, filesByCabinetMedia, mediaRows, uncompressedFiles);
             }
@@ -266,8 +266,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // When building a product, if the current file is not to be compressed or if
                 // the package set not to be compressed, don't cab it.
                 if (SectionType.Product == this.Section.Type &&
-                    (!facade.File.Compressed.Value ||
-                    (!facade.File.Compressed.HasValue && !this.FilesCompressed)))
+                    ((!facade.File.Compressed.HasValue && !this.FilesCompressed) ||
+                     (facade.File.Compressed.HasValue && !facade.File.Compressed.Value)))
                 {
                     uncompressedFiles.Add(facade);
                 }
