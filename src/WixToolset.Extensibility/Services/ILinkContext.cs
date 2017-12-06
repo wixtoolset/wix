@@ -14,8 +14,12 @@ namespace WixToolset.Extensibility.Services
 
         IEnumerable<ILinkerExtension> Extensions { get; set; }
 
+        IEnumerable<IExtensionData> ExtensionData { get; set; }
+
         OutputType ExpectedOutputType { get; set; }
 
         IEnumerable<Intermediate> Intermediates { get; set; }
+
+        ITupleDefinitionCreator TupleDefinitionCreator { get; set; }
     }
 }
