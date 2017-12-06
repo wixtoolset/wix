@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\wix\wix.csproj" />
-    <ProjectReference Include="..\Example.Extension\Example.Extension.csproj" />
+    <ProjectReference Include="..\TestData\Example.Extension\Example.Extension.csproj" />
   </ItemGroup>
 
   <ItemGroup>

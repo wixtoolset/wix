@@ -44,13 +44,13 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\example.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wir"));
-                Assert.Single(intermediate.Sections);
+                var section = intermediate.Sections.Single();
 
-                var wixFile = intermediate.Sections.SelectMany(s => s.Tuples).OfType<WixFileTuple>().Single();
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
                 Assert.Equal(Path.Combine(folder, @"data\example.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"example.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
 
-                var example = intermediate.Sections.SelectMany(s => s.Tuples).Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
+                var example = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
                 Assert.Equal("Foo", example.Id.Id);
                 Assert.Equal("Foo", example[0].AsString());
                 Assert.Equal("Bar", example[1].AsString());

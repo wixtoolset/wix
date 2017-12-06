@@ -168,8 +168,10 @@ namespace WixToolset.Core
             var context = this.ServiceProvider.GetService<ILinkContext>();
             context.Messaging = Messaging.Instance;
             context.Extensions = this.ExtensionManager.Create<ILinkerExtension>();
-            context.Intermediates = intermediates.Union(libraries).ToList();
+            context.ExtensionData = this.ExtensionManager.Create<IExtensionData>();
             context.ExpectedOutputType = this.OutputType;
+            context.Intermediates = intermediates.Union(libraries).ToList();
+            context.TupleDefinitionCreator = creator;
 
             var linker = new Linker();
             var output = linker.Link(context);

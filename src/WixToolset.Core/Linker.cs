@@ -56,32 +56,6 @@ namespace WixToolset.Core
         //internal IBindVariableResolver WixVariableResolver { get; set; }
 
         /// <summary>
-        /// Adds an extension.
-        /// </summary>
-        /// <param name="extension">The extension to add.</param>
-        //public void AddExtensionData(IExtensionData extension)
-        //{
-        //    if (null != extension.TableDefinitions)
-        //    {
-        //        foreach (TableDefinition tableDefinition in extension.TableDefinitions)
-        //        {
-        //            if (!this.tableDefinitions.Contains(tableDefinition.Name))
-        //            {
-        //                this.tableDefinitions.Add(tableDefinition);
-        //            }
-        //            else
-        //            {
-        //                throw new WixException(WixErrors.DuplicateExtensionTable(extension.GetType().ToString(), tableDefinition.Name));
-        //            }
-        //        }
-        //    }
-
-        //    // keep track of extension data so the libraries can be loaded from these later once all the table definitions
-        //    // are loaded; this will allow extensions to have cross table definition dependencies
-        //    this.extensionData.Add(extension);
-        //}
-
-        /// <summary>
         /// Links a collection of sections into an output.
         /// </summary>
         /// <param name="inputs">The collection of sections to link together.</param>
@@ -91,9 +65,18 @@ namespace WixToolset.Core
         {
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
 
-            //IEnumerable<Section> inputs, OutputType expectedOutputType
-
             var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
+
+            // Add sections from the extensions with data.
+            foreach (var data in context.ExtensionData)
+            {
+                var library = data.GetLibrary(context.TupleDefinitionCreator);
+
+                if (library != null)
+                {
+                    sections.AddRange(library.Sections);
+                }
+            }
 
 #if MOVE_TO_BACKEND
                 bool containsModuleSubstitution = false;
@@ -140,19 +123,6 @@ namespace WixToolset.Core
                                 // ignore missing table definitions - this error is caught in other places
                             }
                         }
-                    }
-                }
-#endif
-
-#if TODO
-                // Add sections from the extensions with data.
-                foreach (IExtensionData data in this.extensionData)
-                {
-                    Library library = data.GetLibrary(this.tableDefinitions);
-
-                    if (null != library)
-                    {
-                        sections.AddRange(library.Sections);
                     }
                 }
 #endif

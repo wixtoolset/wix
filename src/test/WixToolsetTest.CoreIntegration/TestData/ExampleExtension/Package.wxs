@@ -8,6 +8,8 @@
 
     <Property Id="ExampleProperty" Value="$(ex.Test)" />
 
+    <PropertyRef Id="PropertyFromExampleWir" />
+
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>

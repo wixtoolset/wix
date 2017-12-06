@@ -28,19 +28,16 @@ namespace WixToolset.Core.Bind
         /// <returns>The extract path for the embedded file.</returns>
         public string AddEmbeddedFileIndex(Uri uri, int embeddedFileIndex, string tempPath)
         {
-            string extractPath;
-            SortedList<int, string> extracts;
-
             // If the uri to the file that contains the embedded file does not already have embedded files
             // being extracted, create the dictionary to track that.
-            if (!filesWithEmbeddedFiles.TryGetValue(uri, out extracts))
+            if (!filesWithEmbeddedFiles.TryGetValue(uri, out var extracts))
             {
                 extracts = new SortedList<int, string>();
                 filesWithEmbeddedFiles.Add(uri, extracts);
             }
 
             // If the embedded file is not already tracked in the dictionary of extracts, add it.
-            if (!extracts.TryGetValue(embeddedFileIndex, out extractPath))
+            if (!extracts.TryGetValue(embeddedFileIndex, out var extractPath))
             {
                 string localFileNameWithoutExtension = Path.GetFileNameWithoutExtension(uri.LocalPath);
                 string unique = this.HashUri(uri.AbsoluteUri);
