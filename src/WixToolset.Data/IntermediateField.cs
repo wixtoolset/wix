@@ -2,6 +2,7 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using System.Diagnostics;
     using SimpleJson;
 
@@ -50,13 +51,13 @@ namespace WixToolset.Data
             return field.AsString();
         }
 
-        internal static IntermediateField Deserialize(IntermediateFieldDefinition definition, JsonObject jsonObject)
+        internal static IntermediateField Deserialize(IntermediateFieldDefinition definition, Uri baseUri, JsonObject jsonObject)
         {
             var field = new IntermediateField(definition);
 
             if (jsonObject != null)
             {
-                field.Value = IntermediateFieldValue.Deserialize(jsonObject);
+                field.Value = IntermediateFieldValue.Deserialize(jsonObject, baseUri, definition.Type);
             }
 
             return field;

@@ -2,6 +2,7 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using SimpleJson;
 
     public class IntermediateTuple
@@ -28,7 +29,7 @@ namespace WixToolset.Data
 
         public IntermediateField this[int index] => this.Fields[index];
 
-        internal static IntermediateTuple Deserialize(ITupleDefinitionCreator creator, JsonObject jsonObject)
+        internal static IntermediateTuple Deserialize(ITupleDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
         {
             var definitionName = jsonObject.GetValueOrDefault<string>("type");
             var idJson = jsonObject.GetValueOrDefault<JsonObject>("id");
@@ -45,7 +46,7 @@ namespace WixToolset.Data
             {
                 if (tuple.Fields.Length > i && fieldsJson[i] is JsonObject fieldJson)
                 {
-                    tuple.Fields[i] = IntermediateField.Deserialize(tuple.Definition.FieldDefinitions[i], fieldJson);
+                    tuple.Fields[i] = IntermediateField.Deserialize(tuple.Definition.FieldDefinitions[i], baseUri, fieldJson);
                 }
             }
 

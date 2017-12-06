@@ -45,7 +45,7 @@ namespace WixToolset.Data
             return value.AsString();
         }
 
-        internal static IntermediateFieldValue Deserialize(JsonObject jsonObject)
+        internal static IntermediateFieldValue Deserialize(JsonObject jsonObject, Uri baseUri, IntermediateFieldType type)
         {
             var context = jsonObject.GetValueOrDefault<string>("context");
             if (!jsonObject.TryGetValue("data", out var data))
@@ -55,26 +55,30 @@ namespace WixToolset.Data
 
             var value = data;
 
-            if (data is JsonObject jsonData)
+            if (data is string)
             {
-                Uri baseUri = null;
-
-                if (jsonData.TryGetValue("baseUri", out var baseUriValue) && baseUriValue is string)
+            }
+            else if (data is long)
+            {
+                if (type == IntermediateFieldType.Number)
                 {
-                    baseUri = new Uri((string)baseUriValue);
+                    value = Convert.ToInt32(data);
                 }
+            }
+            else if (data is JsonObject jsonData)
+            {
                 jsonData.TryGetValue("embeddedIndex", out var embeddedIndex);
 
                 value = new IntermediateFieldPathValue
                 {
-                    BaseUri = baseUri,
-                    EmbeddedFileIndex = (int?)embeddedIndex,
+                    BaseUri = (embeddedIndex == null) ? null : baseUri,
+                    EmbeddedFileIndex = (embeddedIndex == null) ? null : (int?)Convert.ToInt32(embeddedIndex),
                     Path = jsonData.GetValueOrDefault<string>("path"),
                 };
             }
 
             var previousValueJson = jsonObject.GetValueOrDefault<JsonObject>("prev");
-            var previousValue = (previousValueJson == null) ? null : IntermediateFieldValue.Deserialize(previousValueJson);
+            var previousValue = (previousValueJson == null) ? null : IntermediateFieldValue.Deserialize(previousValueJson, baseUri, type);
 
             return new IntermediateFieldValue
             {
@@ -97,10 +101,7 @@ namespace WixToolset.Data
             {
                 var jsonData = new JsonObject();
 
-                if (pathField.BaseUri != null)
-                {
-                    jsonData.Add("baseUri", pathField.BaseUri.AbsoluteUri);
-                }
+                // pathField.BaseUri is set during load, not saved.
 
                 if (pathField.EmbeddedFileIndex.HasValue)
                 {

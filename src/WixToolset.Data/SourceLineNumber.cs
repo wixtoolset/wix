@@ -146,7 +146,7 @@ namespace WixToolset.Data
             }
 
             // make the local path look like a normal local path
-            string localPath = new Uri(uri).LocalPath;
+            var localPath = new Uri(uri).LocalPath;
             localPath = localPath.TrimStart(Path.AltDirectorySeparatorChar).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
             return new SourceLineNumber(localPath);

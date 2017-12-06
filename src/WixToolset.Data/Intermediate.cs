@@ -4,8 +4,9 @@ namespace WixToolset.Data
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using SimpleJson;
 
     /// <summary>
@@ -99,21 +100,43 @@ namespace WixToolset.Data
         {
             using (var stream = File.OpenRead(path))
             {
+                var uri = new Uri(Path.GetFullPath(path));
                 var creator = new SimpleTupleDefinitionCreator();
-                return Intermediate.Load(stream, path, creator, suppressVersionCheck);
+                return Intermediate.Load(stream, uri, creator, suppressVersionCheck);
             }
         }
 
         /// <summary>
         /// Loads an intermediate from a stream.
         /// </summary>
-        /// <param name="stream">Stream to intermediate file.</param>
+        /// <param name="assembly">Assembly with intermediate embedded in resource stream.</param>
+        /// <param name="resourceName">Name of resource stream.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        public static Intermediate Load(Stream stream, bool suppressVersionCheck = false)
+        public static Intermediate Load(Assembly assembly, string resourceName, bool suppressVersionCheck = false)
         {
             var creator = new SimpleTupleDefinitionCreator();
-            return Intermediate.Load(stream, creator, suppressVersionCheck);
+            return Intermediate.Load(assembly, resourceName, creator, suppressVersionCheck);
+        }
+
+        /// <summary>
+        /// Loads an intermediate from a stream.
+        /// </summary>
+        /// <param name="assembly">Assembly with intermediate embedded in resource stream.</param>
+        /// <param name="resourceName">Name of resource stream.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediate.</returns>
+        public static Intermediate Load(Assembly assembly, string resourceName, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        {
+            using (Stream resourceStream = assembly.GetManifestResourceStream(resourceName))
+            {
+                var uriBuilder = new UriBuilder(assembly.CodeBase);
+                uriBuilder.Scheme = "embeddedresource";
+                uriBuilder.Fragment = resourceName;
+
+                return Intermediate.Load(resourceStream, uriBuilder.Uri, creator, suppressVersionCheck);
+            }
         }
 
         /// <summary>
@@ -127,20 +150,10 @@ namespace WixToolset.Data
         {
             using (var stream = File.OpenRead(path))
             {
-                return Intermediate.Load(stream, path, creator, suppressVersionCheck);
-            }
-        }
+                var uri = new Uri(Path.GetFullPath(path));
 
-        /// <summary>
-        /// Loads an intermediate from a path on disk.
-        /// </summary>
-        /// <param name="stream">Stream to intermediate file.</param>
-        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
-        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
-        /// <returns>Returns the loaded intermediate.</returns>
-        public static Intermediate Load(Stream stream, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
-        {
-            return Load(stream, "<unknown>", creator, suppressVersionCheck);
+                return Intermediate.Load(stream, uri, creator, suppressVersionCheck);
+            }
         }
 
         /// <summary>
@@ -206,11 +219,11 @@ namespace WixToolset.Data
         /// Loads an intermediate from a path on disk.
         /// </summary>
         /// <param name="stream">Stream to intermediate file.</param>
-        /// <param name="path">Path name of intermediate file.</param>
+        /// <param name="baseUri">Path name of intermediate file.</param>
         /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        internal static Intermediate Load(Stream stream, string path, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        internal static Intermediate Load(Stream stream, Uri baseUri, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             JsonObject jsonObject;
 
@@ -218,7 +231,7 @@ namespace WixToolset.Data
             {
                 if (FileFormat.WixIR != fs.FileFormat)
                 {
-                    throw new WixUnexpectedFileFormatException(path, FileFormat.WixIR, fs.FileFormat);
+                    throw new WixUnexpectedFileFormatException(baseUri.LocalPath, FileFormat.WixIR, fs.FileFormat);
                 }
 
                 var json = fs.GetData();
@@ -231,7 +244,7 @@ namespace WixToolset.Data
 
                 if (!Version.TryParse(versionJson, out var version) || !Intermediate.CurrentVersion.Equals(version))
                 {
-                    throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(path), "intermediate", versionJson, Intermediate.CurrentVersion.ToString()));
+                    throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(baseUri.AbsoluteUri), "intermediate", versionJson, Intermediate.CurrentVersion.ToString()));
                 }
             }
 
@@ -253,7 +266,7 @@ namespace WixToolset.Data
             var sectionsJson = jsonObject.GetValueOrDefault<JsonArray>("sections");
             foreach (JsonObject sectionJson in sectionsJson)
             {
-                var section = IntermediateSection.Deserialize(creator, sectionJson);
+                var section = IntermediateSection.Deserialize(creator, baseUri, sectionJson);
                 sections.Add(section);
             }
 

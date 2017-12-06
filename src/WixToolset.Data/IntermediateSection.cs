@@ -61,7 +61,7 @@ namespace WixToolset.Data
         /// <summary>
         /// Parse a section from the JSON data.
         /// </summary>
-        internal static IntermediateSection Deserialize(ITupleDefinitionCreator creator, JsonObject jsonObject)
+        internal static IntermediateSection Deserialize(ITupleDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
         {
             var codepage = jsonObject.GetValueOrDefault("codepage", 0);
             var id = jsonObject.GetValueOrDefault<string>("id");
@@ -83,7 +83,7 @@ namespace WixToolset.Data
 
             foreach (JsonObject tupleJson in tuplesJson)
             {
-                var tuple = IntermediateTuple.Deserialize(creator, tupleJson);
+                var tuple = IntermediateTuple.Deserialize(creator, baseUri, tupleJson);
                 section.Tuples.Add(tuple);
             }
 

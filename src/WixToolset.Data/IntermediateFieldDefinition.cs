@@ -7,6 +7,7 @@ namespace WixToolset.Data
         String,
         Bool,
         Number,
+        LargeNumber,
         Path,
     }
 

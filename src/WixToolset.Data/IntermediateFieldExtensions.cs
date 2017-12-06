@@ -21,6 +21,32 @@ namespace WixToolset.Data
             {
                 // Null is always allowed.
             }
+            else if (field.Type == IntermediateFieldType.String && !(value is string))
+            {
+                if (value is int)
+                {
+                    data = value.ToString();
+                }
+                else if (value is bool b)
+                {
+                    data = b ? "true" : "false";
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
+            }
+            else if (field.Type == IntermediateFieldType.Number && !(value is int))
+            {
+                if (value is string str && Int32.TryParse(str, out var number))
+                {
+                    data = number;
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
+            }
             else if (field.Type == IntermediateFieldType.Bool && !(value is bool))
             {
                 if (value is int)
@@ -47,37 +73,26 @@ namespace WixToolset.Data
                     throw new ArgumentException(nameof(value));
                 }
             }
-            else if (field.Type == IntermediateFieldType.Number && !(value is int))
-            {
-                if (value is string str && Int32.TryParse(str, out var number))
-                {
-                    data = number;
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-            else if (field.Type == IntermediateFieldType.String && !(value is string))
-            {
-                if (value is int)
-                {
-                    data = value.ToString();
-                }
-                else if (value is bool b)
-                {
-                    data = b ? "true" : "false";
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
             else if (field.Type == IntermediateFieldType.Path && !(value is IntermediateFieldPathValue))
             {
                 if (value is string str)
                 {
                     data = new IntermediateFieldPathValue { Path = str };
+                }
+                else
+                {
+                    throw new ArgumentException(nameof(value));
+                }
+            }
+            else if (field.Type == IntermediateFieldType.LargeNumber && !(value is long))
+            {
+                if (value is string str && Int64.TryParse(str, out var number))
+                {
+                    data = number;
+                }
+                else if (value is int i)
+                {
+                    data = (long)i;
                 }
                 else
                 {
