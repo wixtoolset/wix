@@ -9,7 +9,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.IO;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Msi;
 
     internal class ExtractCabinetsCommand

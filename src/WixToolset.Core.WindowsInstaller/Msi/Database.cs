@@ -3,13 +3,11 @@
 namespace WixToolset.Msi
 {
     using System;
-    using System.ComponentModel;
     using System.Globalization;
     using System.IO;
-    using System.Text;
     using System.Threading;
-    using WixToolset.Data;
     using WixToolset.Core.Native;
+    using WixToolset.Data;
 
     /// <summary>
     /// Wrapper class for managing MSI API database handles.
@@ -25,8 +23,7 @@ namespace WixToolset.Msi
         /// <param name="type">Persist mode to use when opening the database.</param>
         public Database(string path, OpenDatabase type)
         {
-            uint handle = 0;
-            int error = MsiInterop.MsiOpenDatabase(path, new IntPtr((int)type), out handle);
+            int error = MsiInterop.MsiOpenDatabase(path, new IntPtr((int)type), out var handle);
             if (0 != error)
             {
                 throw new MsiException(error);
@@ -153,9 +150,9 @@ namespace WixToolset.Msi
         /// <param name="fileName">Specifies the name of the exported table archive file.</param>
         public void Export(string tableName, string folderPath, string fileName)
         {
-            if (null == folderPath || 0 == folderPath.Length)
+            if (String.IsNullOrEmpty(folderPath))
             {
-                folderPath = System.Environment.CurrentDirectory;
+                folderPath = Environment.CurrentDirectory;
             }
 
             int error = MsiInterop.MsiDatabaseExport(this.Handle, tableName, folderPath, fileName);
@@ -241,63 +238,13 @@ namespace WixToolset.Msi
         /// primary key columns for a specified table.</returns>
         public Record PrimaryKeys(string tableName)
         {
-            uint recordHandle;
-            int error = MsiInterop.MsiDatabaseGetPrimaryKeys(this.Handle, tableName, out recordHandle);
-            if (0 != error)
+            var error = MsiInterop.MsiDatabaseGetPrimaryKeys(this.Handle, tableName, out var recordHandle);
+            if (error != 0)
             {
                 throw new MsiException(error);
             }
 
             return new Record(recordHandle);
-        }
-
-        /// <summary>
-        /// Imports a table into the database.
-        /// </summary>
-        /// <param name="codepage">Codepage of the database to import table to.</param>
-        /// <param name="table">Table to import into database.</param>
-        /// <param name="baseDirectory">The base directory where intermediate files are created.</param>
-        /// <param name="keepAddedColumns">Whether to keep columns added in a transform.</param>
-        public void ImportTable(int codepage, Table table, string baseDirectory, bool keepAddedColumns)
-        {
-            // write out the table to an IDT file
-            string idtPath = Path.Combine(baseDirectory, String.Concat(table.Name, ".idt"));
-            Encoding encoding;
-
-            // If UTF8 encoding, use the UTF8-specific constructor to avoid writing
-            // the byte order mark at the beginning of the file
-            if (Encoding.UTF8.CodePage == codepage)
-            {
-                encoding = new UTF8Encoding(false, true);
-            }
-            else
-            {
-                if (0 == codepage)
-                {
-                    codepage = Encoding.ASCII.CodePage;
-                }
-
-                encoding = Encoding.GetEncoding(codepage, new EncoderExceptionFallback(), new DecoderExceptionFallback());
-            }
-
-            using (StreamWriter idtWriter = new StreamWriter(idtPath, false, encoding))
-            {
-                table.ToIdtDefinition(idtWriter, keepAddedColumns);
-            }
-
-            // try to import the table into the MSI
-            try
-            {
-                this.Import(idtPath);
-            }
-            catch (WixInvalidIdtException)
-            {
-                table.ValidateRows();
-
-                // If ValidateRows finds anything it doesn't like, it throws. Otherwise, we'll
-                // throw WixInvalidIdtException here which is caught in light and turns off tidy.
-                throw new WixInvalidIdtException(idtPath, table.Name);
-            }
         }
     }
 }

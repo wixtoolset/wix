@@ -11,6 +11,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Msi;
 

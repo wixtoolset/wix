@@ -14,6 +14,7 @@ namespace WixToolset.Core
         private ParseHelper parseHelper;
         private PreprocessHelper preprocessHelper;
         private TupleDefinitionCreator tupleDefinitionCreator;
+        private WindowsInstallerBackendHelper windowsInstallerBackendHelper;
 
         public object GetService(Type serviceType)
         {
@@ -74,6 +75,11 @@ namespace WixToolset.Core
             if (serviceType == typeof(IPreprocessHelper))
             {
                 return this.preprocessHelper = this.preprocessHelper ?? new PreprocessHelper(this);
+            }
+
+            if (serviceType == typeof(IWindowsInstallerBackendHelper))
+            {
+                return this.windowsInstallerBackendHelper = this.windowsInstallerBackendHelper ?? new WindowsInstallerBackendHelper(this);
             }
 
             throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));

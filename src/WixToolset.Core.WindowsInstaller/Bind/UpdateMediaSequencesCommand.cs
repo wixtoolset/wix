@@ -2,13 +2,13 @@
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
 
     internal class UpdateMediaSequencesCommand
     {

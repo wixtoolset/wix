@@ -28,6 +28,10 @@ namespace Example.Extension
             {
                 extension = new ExampleExtensionData();
             }
+            else if (extensionType == typeof(IWindowsInstallerBackendExtension))
+            {
+                extension = new ExampleWindowsInstallerBackendExtension();
+            }
             else
             {
                 extension = null;

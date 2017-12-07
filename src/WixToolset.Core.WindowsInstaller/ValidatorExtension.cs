@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility
     using System;
     using System.Collections;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
     /// Base class for creating a validator extension. This default implementation

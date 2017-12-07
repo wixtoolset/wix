@@ -7,6 +7,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolsetTest.CoreIntegration.Utility;
     using Xunit;
 

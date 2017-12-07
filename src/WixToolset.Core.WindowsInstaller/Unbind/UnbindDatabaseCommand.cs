@@ -10,7 +10,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Text.RegularExpressions;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Msi;
 
     internal class UnbindDatabaseCommand
@@ -155,13 +156,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                         ColumnCategory columnCategory = ColumnCategory.Unknown;
                                         ColumnModularizeType columnModularizeType = ColumnModularizeType.None;
                                         bool primary = tablePrimaryKeys.Contains(columnName);
-                                        bool minValueSet = false;
-                                        int minValue = -1;
-                                        bool maxValueSet = false;
-                                        int maxValue = -1;
+                                        int? minValue = null;
+                                        int? maxValue = null;
                                         string keyTable = null;
-                                        bool keyColumnSet = false;
-                                        int keyColumn = -1;
+                                        int? keyColumn = null;
                                         string category = null;
                                         string set = null;
                                         string description = null;
@@ -205,16 +203,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 if (null != validationRecord)
                                                 {
                                                     string validationNullable = validationRecord.GetString(3);
-                                                    minValueSet = !validationRecord.IsNull(4);
-                                                    minValue = (minValueSet ? validationRecord.GetInteger(4) : -1);
-                                                    maxValueSet = !validationRecord.IsNull(5);
-                                                    maxValue = (maxValueSet ? validationRecord.GetInteger(5) : -1);
-                                                    keyTable = (!validationRecord.IsNull(6) ? validationRecord.GetString(6) : null);
-                                                    keyColumnSet = !validationRecord.IsNull(7);
-                                                    keyColumn = (keyColumnSet ? validationRecord.GetInteger(7) : -1);
-                                                    category = (!validationRecord.IsNull(8) ? validationRecord.GetString(8) : null);
-                                                    set = (!validationRecord.IsNull(9) ? validationRecord.GetString(9) : null);
-                                                    description = (!validationRecord.IsNull(10) ? validationRecord.GetString(10) : null);
+                                                    minValue = validationRecord.IsNull(4) ? null : (int?)validationRecord.GetInteger(4);
+                                                    maxValue = validationRecord.IsNull(5) ? null : (int?)validationRecord.GetInteger(5);
+                                                    keyTable = validationRecord.IsNull(6) ? null : validationRecord.GetString(6);
+                                                    keyColumn = validationRecord.IsNull(7) ? null : (int?)validationRecord.GetInteger(7);
+                                                    category = validationRecord.IsNull(8) ? null : validationRecord.GetString(8);
+                                                    set = validationRecord.IsNull(9) ? null : validationRecord.GetString(9);
+                                                    description = validationRecord.IsNull(10) ? null : validationRecord.GetString(10);
 
                                                     // check the validation nullable value against the column definition
                                                     if (null == validationNullable)
@@ -264,7 +259,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                             columnModularizeType = ColumnModularizeType.Column;
                                         }
 
-                                        columns.Add(new ColumnDefinition(columnName, columnType, length, primary, nullable, columnModularizeType, (ColumnType.Localized == columnType), minValueSet, minValue, maxValueSet, maxValue, keyTable, keyColumnSet, keyColumn, columnCategory, set, description, true, true));
+                                        columns.Add(new ColumnDefinition(columnName, columnType, length, primary, nullable, columnCategory, minValue, maxValue, keyTable, keyColumn, set, description, columnModularizeType, (ColumnType.Localized == columnType), true));
                                     }
                                 }
 

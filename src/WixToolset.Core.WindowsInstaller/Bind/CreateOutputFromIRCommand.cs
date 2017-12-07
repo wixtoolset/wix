@@ -3,19 +3,25 @@
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility;
 
     internal class CreateOutputFromIRCommand
     {
-        public CreateOutputFromIRCommand(IntermediateSection section, TableDefinitionCollection tableDefinitions)
+        public CreateOutputFromIRCommand(IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendExtension> backendExtensions)
         {
             this.Section = section;
             this.TableDefinitions = tableDefinitions;
+            this.BackendExtensions = backendExtensions;
         }
+
+        private IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 
@@ -58,6 +64,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     case TupleDefinitionType.WixMedia:
                         // Ignored.
+                        break;
+
+                    case TupleDefinitionType.MustBeFromAnExtension:
+                        this.AddTupleFromExtension(tuple, output);
                         break;
 
                     default:
@@ -203,6 +213,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 row[0] = actionRow.Action;
                 row[1] = actionRow.Condition;
                 row[2] = actionRow.Sequence;
+            }
+        }
+
+        private void AddTupleFromExtension(IntermediateTuple tuple, Output output)
+        {
+            foreach (var extension in this.BackendExtensions)
+            {
+                if (extension.TryAddTupleToOutput(tuple, output))
+                {
+                    break;
+                }
             }
         }
 

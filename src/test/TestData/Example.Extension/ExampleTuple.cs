@@ -12,11 +12,11 @@ namespace Example.Extension
 
     public class ExampleTuple : IntermediateTuple
     {
-        public ExampleTuple() : base(TupleDefinitions.Example, null, null)
+        public ExampleTuple() : base(ExampleTupleDefinitions.Example, null, null)
         {
         }
 
-        public ExampleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.Example, sourceLineNumber, id)
+        public ExampleTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(ExampleTupleDefinitions.Example, sourceLineNumber, id)
         {
         }
 

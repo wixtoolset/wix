@@ -10,6 +10,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
@@ -21,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, Validator validator)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
         {
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
@@ -40,7 +41,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Validator = validator;
             this.WixVariableResolver = context.WixVariableResolver;
 
-            this.BackendExtensions = context.ExtensionManager.Create<IWindowsInstallerBackendExtension>();
+            this.BackendExtensions = backendExtension;
         }
 
         private IEnumerable<BindPath> BindPaths { get; }
@@ -298,7 +299,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Try to put as much above here as possible, updating the IR is better.
             Output output;
             {
-                var command = new CreateOutputFromIRCommand(section, this.TableDefinitions);
+                var command = new CreateOutputFromIRCommand(section, this.TableDefinitions, this.BackendExtensions);
                 command.Execute();
 
                 output = command.Output;
@@ -313,13 +314,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Modularize identifiers and add tables with real streams to the import tables.
             if (OutputType.Module == output.Type)
             {
-                // Gather all the suppress modularization identifiers
-                var suppressModularizationIdentifiers = new HashSet<string>(section.Tuples.OfType<WixSuppressModularizationTuple>().Select(s => s.WixSuppressModularization));
-
-                foreach (var table in output.Tables)
-                {
-                    table.Modularize(modularizationGuid, suppressModularizationIdentifiers);
-                }
+                var command = new ModularaizeCommand(output, modularizationGuid, section.Tuples.OfType<WixSuppressModularizationTuple>());
+                command.Execute();
             }
 
 #if TODO_FINISH_UPDATE
@@ -897,7 +893,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 Dictionary<string, bool> componentGuidConditions = new Dictionary<string, bool>(componentTable.Rows.Count);
 
-                foreach (Data.Rows.ComponentRow row in componentTable.Rows)
+                foreach (Data.WindowsInstaller.Rows.ComponentRow row in componentTable.Rows)
                 {
                     // we don't care about unmanaged components and if there's a * GUID remaining,
                     // there's already an error that prevented it from being replaced with a real GUID.

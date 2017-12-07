@@ -1,17 +1,19 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Data.Rows
+namespace WixToolset.Core.WindowsInstaller.Rows
 {
     using System;
     using System.Collections;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Xml;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller.Rows;
 
     /// <summary>
     /// A collection of action rows sorted by their sequence table and action name.
     /// </summary>
-    public sealed class WixActionRowCollection : ICollection
+    internal sealed class WixActionRowCollection : ICollection
     {
         private SortedList collection;
 
@@ -172,7 +174,7 @@ namespace WixToolset.Data.Rows
                         switch (reader.LocalName)
                         {
                             case "action":
-                                WixActionRow[] parsedActionRows = WixActionRow.Parse(reader);
+                                WixActionRow[] parsedActionRows = ParseActions(reader);
 
                                 foreach (WixActionRow actionRow in parsedActionRows)
                                 {
@@ -218,6 +220,109 @@ namespace WixToolset.Data.Rows
         private static string GetKey(string sequenceTable, string action)
         {
             return String.Concat(sequenceTable, '/', action);
+        }
+
+        /// <summary>
+        /// Parses ActionRows from the Xml reader.
+        /// </summary>
+        /// <param name="reader">Xml reader that contains serialized ActionRows.</param>
+        /// <returns>The parsed ActionRows.</returns>
+        internal static WixActionRow[] ParseActions(XmlReader reader)
+        {
+            Debug.Assert("action" == reader.LocalName);
+
+            string id = null;
+            string condition = null;
+            bool empty = reader.IsEmptyElement;
+            int sequence = int.MinValue;
+            int sequenceCount = 0;
+            SequenceTable[] sequenceTables = new SequenceTable[Enum.GetValues(typeof(SequenceTable)).Length];
+
+            while (reader.MoveToNextAttribute())
+            {
+                switch (reader.Name)
+                {
+                    case "name":
+                        id = reader.Value;
+                        break;
+                    case "AdminExecuteSequence":
+                        if (reader.Value.Equals("yes"))
+                        {
+                            sequenceTables[sequenceCount] = SequenceTable.AdminExecuteSequence;
+                            ++sequenceCount;
+                        }
+                        break;
+                    case "AdminUISequence":
+                        if (reader.Value.Equals("yes"))
+                        {
+                            sequenceTables[sequenceCount] = SequenceTable.AdminUISequence;
+                            ++sequenceCount;
+                        }
+                        break;
+                    case "AdvtExecuteSequence":
+                        if (reader.Value.Equals("yes"))
+                        {
+                            sequenceTables[sequenceCount] = SequenceTable.AdvtExecuteSequence;
+                            ++sequenceCount;
+                        }
+                        break;
+                    case "condition":
+                        condition = reader.Value;
+                        break;
+                    case "InstallExecuteSequence":
+                        if (reader.Value.Equals("yes"))
+                        {
+                            sequenceTables[sequenceCount] = SequenceTable.InstallExecuteSequence;
+                            ++sequenceCount;
+                        }
+                        break;
+                    case "InstallUISequence":
+                        if (reader.Value.Equals("yes"))
+                        {
+                            sequenceTables[sequenceCount] = SequenceTable.InstallUISequence;
+                            ++sequenceCount;
+                        }
+                        break;
+                    case "sequence":
+                        sequence = Convert.ToInt32(reader.Value, CultureInfo.InvariantCulture);
+                        break;
+                }
+            }
+
+            if (null == id)
+            {
+                throw new XmlException();
+            }
+
+            if (int.MinValue == sequence)
+            {
+                throw new XmlException();
+            }
+            else if (1 > sequence)
+            {
+                throw new XmlException();
+            }
+
+            if (0 == sequenceCount)
+            {
+                throw new XmlException();
+            }
+
+            if (!empty && reader.Read() && XmlNodeType.EndElement != reader.MoveToContent())
+            {
+                throw new XmlException();
+            }
+
+            // create the actions
+            WixActionRow[] actionRows = new WixActionRow[sequenceCount];
+            for (int i = 0; i < sequenceCount; i++)
+            {
+                //WixActionRow actionRow = new WixActionRow(sequenceTables[i], id, condition, sequence);
+                //actionRows[i] = actionRow;
+                throw new NotImplementedException();
+            }
+
+            return actionRows;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Example.Extension
             switch (name)
             {
                 case "Example":
-                    tupleDefinition = TupleDefinitions.Example;
+                    tupleDefinition = ExampleTupleDefinitions.Example;
                     break;
 
                 default:

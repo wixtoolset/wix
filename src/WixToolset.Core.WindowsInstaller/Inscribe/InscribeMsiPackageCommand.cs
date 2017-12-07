@@ -9,7 +9,9 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
     using System.Runtime.InteropServices;
     using System.Security.Cryptography.X509Certificates;
     using WixToolset.Core.Native;
+    using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Msi;
 
@@ -250,13 +252,19 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
                 if (digitalCertificateTable.Rows.Count > 0)
                 {
-                    database.ImportTable(codepage, digitalCertificateTable, this.Context.IntermediateFolder, true);
+                    var command = new CreateIdtFileCommand(digitalCertificateTable, codepage, this.Context.IntermediateFolder, true);
+                    command.Execute();
+
+                    database.Import(command.IdtPath);
                     shouldCommit = true;
                 }
 
                 if (digitalSignatureTable.Rows.Count > 0)
                 {
-                    database.ImportTable(codepage, digitalSignatureTable, this.Context.IntermediateFolder, true);
+                    var command = new CreateIdtFileCommand(digitalSignatureTable, codepage, this.Context.IntermediateFolder, true);
+                    command.Execute();
+
+                    database.Import(command.IdtPath);
                     shouldCommit = true;
                 }
 

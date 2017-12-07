@@ -12,6 +12,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Extensibility;
     using WixToolset.Msi;
     using WixToolset.Core.Native;
+    using WixToolset.Data.WindowsInstaller;
 
     internal class GenerateDatabaseCommand 
     {
@@ -44,14 +45,56 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Add the _Validation rows.
             if (!this.SuppressAddingValidationRows)
             {
-                Table validationTable = this.Output.EnsureTable(this.TableDefinitions["_Validation"]);
+                var validationTable = this.Output.EnsureTable(this.TableDefinitions["_Validation"]);
 
-                foreach (Table table in this.Output.Tables)
+                foreach (var table in this.Output.Tables)
                 {
                     if (!table.Definition.Unreal)
                     {
                         // Add the validation rows for this table.
-                        table.Definition.AddValidationRows(validationTable);
+                        foreach (ColumnDefinition columnDef in table.Definition.Columns)
+                        {
+                            var row = validationTable.CreateRow(null);
+
+                            row[0] = table.Name;
+
+                            row[1] = columnDef.Name;
+
+                            if (columnDef.Nullable)
+                            {
+                                row[2] = "Y";
+                            }
+                            else
+                            {
+                                row[2] = "N";
+                            }
+
+                            if (columnDef.MinValue.HasValue)
+                            {
+                                row[3] = columnDef.MinValue.Value;
+                            }
+
+                            if (columnDef.MaxValue.HasValue)
+                            {
+                                row[4] = columnDef.MaxValue.Value;
+                            }
+
+                            row[5] = columnDef.KeyTable;
+
+                            if (columnDef.KeyColumn.HasValue)
+                            {
+                                row[6] = columnDef.KeyColumn.Value;
+                            }
+
+                            if (ColumnCategory.Unknown != columnDef.Category)
+                            {
+                                row[7] = columnDef.Category.ToString();
+                            }
+
+                            row[8] = columnDef.Possibilities;
+
+                            row[9] = columnDef.Description;
+                        }
                     }
                 }
             }
@@ -133,7 +176,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             try
                             {
-                                db.ImportTable(this.Output.Codepage, importTable, baseDirectory, this.KeepAddedColumns);
+                                //db.ImportTable(this.Output.Codepage, importTable, baseDirectory, this.KeepAddedColumns);
+                                var command = new CreateIdtFileCommand(importTable, this.Output.Codepage, baseDirectory, this.KeepAddedColumns);
+                                command.Execute();
+
+                                db.Import(command.IdtPath);
                             }
                             catch (WixInvalidIdtException)
                             {

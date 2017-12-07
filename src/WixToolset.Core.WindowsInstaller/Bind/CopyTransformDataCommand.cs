@@ -5,12 +5,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using WixToolset.Data;
-    using WixToolset.Data.Rows;
-    using WixToolset.Extensibility;
-    using WixToolset.Core.Native;
     using WixToolset.Core.Bind;
+    using WixToolset.Core.Native;
+    using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility;
 
     internal class CopyTransformDataCommand
     {

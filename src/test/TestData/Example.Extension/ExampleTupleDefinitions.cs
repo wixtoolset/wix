@@ -4,10 +4,12 @@ namespace Example.Extension
 {
     using WixToolset.Data;
 
-    public static class TupleDefinitions
+    public static class ExampleTupleDefinitions
     {
+        public const string ExampleName = "Example";
+
         public static readonly IntermediateTupleDefinition Example = new IntermediateTupleDefinition(
-            "Example",
+            ExampleName,
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ExampleTupleFields.Example), IntermediateFieldType.String),

@@ -3,14 +3,11 @@
 namespace WixToolset.Data
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using WixToolset.Data.Rows;
+    using WixToolset.Core.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
-    using WixToolset.Core.Native;
-    using WixToolset.Msi;
 
     /// <summary>
     /// Contains output tables and logic for building an MSP package.

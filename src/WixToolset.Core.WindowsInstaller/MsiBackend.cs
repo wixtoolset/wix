@@ -14,12 +14,26 @@ namespace WixToolset.Core.WindowsInstaller
     {
         public BindResult Bind(IBindContext context)
         {
+            var backendExtensions = context.ExtensionManager.Create<IWindowsInstallerBackendExtension>();
+
+            foreach (var extension in backendExtensions)
+            {
+                extension.PreBackendBind(context);
+            }
+
             var validator = Validator.CreateFromContext(context, "darice.cub");
 
-            var command = new BindDatabaseCommand(context, validator);
+            var command = new BindDatabaseCommand(context, backendExtensions, validator);
             command.Execute();
 
-            return new BindResult(command.FileTransfers, command.ContentFilePaths);
+            var result = new BindResult(command.FileTransfers, command.ContentFilePaths);
+
+            foreach (var extension in backendExtensions)
+            {
+                extension.PostBackendBind(result);
+            }
+
+            return result;
         }
 
         public bool Inscribe(IInscribeContext context)

@@ -10,6 +10,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Extensibility;
     using WixToolset.Msi;
     using WixToolset.Core.Native;
+    using WixToolset.Data.WindowsInstaller;
 
     internal class BindTransformCommand
     {

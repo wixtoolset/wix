@@ -1,14 +1,14 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core.WindowsInstaller
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
-    using WixToolset.Core;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Msi;
 

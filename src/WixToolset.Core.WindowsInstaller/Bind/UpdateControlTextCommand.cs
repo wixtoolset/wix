@@ -5,7 +5,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.IO;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data.WindowsInstaller.Rows;
 
     internal class UpdateControlTextCommand
     {
