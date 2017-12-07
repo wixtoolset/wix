@@ -2,9 +2,7 @@
 
 namespace WixToolset.Extensibility
 {
-    using System;
     using System.Xml.Linq;
-    using WixToolset.Data;
 
     /// <summary>
     /// Interface for extending the WiX toolset preprocessor.

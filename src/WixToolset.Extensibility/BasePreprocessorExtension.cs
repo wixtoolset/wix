@@ -16,7 +16,7 @@ namespace WixToolset.Extensibility
         protected IPreprocessContext Context { get; private set; }
 
         /// <summary>
-        /// ParserHelper for use by the extension.
+        /// PreprocessHelper for use by the extension.
         /// </summary>
         protected IPreprocessHelper PreprocessHelper { get; private set; }
 

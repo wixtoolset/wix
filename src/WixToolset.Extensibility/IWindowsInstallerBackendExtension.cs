@@ -3,8 +3,10 @@
 namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
+    using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -20,6 +22,8 @@ namespace WixToolset.Extensibility
         ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<BindFileWithPath> files);
 
         string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory);
+
+        bool TryAddTupleToOutput(IntermediateTuple tuple, Output output);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
