@@ -73,7 +73,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(0, result);
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));

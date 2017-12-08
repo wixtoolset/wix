@@ -66,6 +66,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // Ignored.
                         break;
 
+                    case TupleDefinitionType.WixMediaTemplate:
+                        this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple, output);
+                        break;
+
                     case TupleDefinitionType.MustBeFromAnExtension:
                         this.AddTupleFromExtension(tuple, output);
                         break;
@@ -126,11 +130,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.Value = tuple.Value;
         }
 
-        private void AddWixActionTuple(WixActionTuple actionRow, Output output)
+        private void AddWixActionTuple(WixActionTuple tuple, Output output)
         {
             // Get the table definition for the action (and ensure the proper table exists for a module).
             TableDefinition sequenceTableDefinition = null;
-            switch (actionRow.SequenceTable)
+            switch (tuple.SequenceTable)
             {
                 case SequenceTable.AdminExecuteSequence:
                     if (OutputType.Module == output.Type)
@@ -191,29 +195,41 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // create the action sequence row in the output
             var sequenceTable = output.EnsureTable(sequenceTableDefinition);
-            var row = sequenceTable.CreateRow(actionRow.SourceLineNumbers);
+            var row = sequenceTable.CreateRow(tuple.SourceLineNumbers);
 
             if (SectionType.Module == this.Section.Type)
             {
-                row[0] = actionRow.Action;
-                if (0 != actionRow.Sequence)
+                row[0] = tuple.Action;
+                if (0 != tuple.Sequence)
                 {
-                    row[1] = actionRow.Sequence;
+                    row[1] = tuple.Sequence;
                 }
                 else
                 {
-                    bool after = (null == actionRow.Before);
-                    row[2] = after ? actionRow.After : actionRow.Before;
+                    bool after = (null == tuple.Before);
+                    row[2] = after ? tuple.After : tuple.Before;
                     row[3] = after ? 1 : 0;
                 }
-                row[4] = actionRow.Condition;
+                row[4] = tuple.Condition;
             }
             else
             {
-                row[0] = actionRow.Action;
-                row[1] = actionRow.Condition;
-                row[2] = actionRow.Sequence;
+                row[0] = tuple.Action;
+                row[1] = tuple.Condition;
+                row[2] = tuple.Sequence;
             }
+        }
+
+        private void AddWixMediaTemplateTuple(WixMediaTemplateTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["WixMediaTemplate"]);
+            var row = (WixMediaTemplateRow)table.CreateRow(tuple.SourceLineNumbers);
+            row.CabinetTemplate = tuple.CabinetTemplate;
+            row.CompressionLevel = tuple.CompressionLevel;
+            row.DiskPrompt = tuple.DiskPrompt;
+            row.VolumeLabel = tuple.VolumeLabel;
+            row.MaximumUncompressedMediaSize = tuple.MaximumUncompressedMediaSize;
+            row.MaximumCabinetSizeForLargeFileSplitting = tuple.MaximumCabinetSizeForLargeFileSplitting;
         }
 
         private void AddTupleFromExtension(IntermediateTuple tuple, Output output)
