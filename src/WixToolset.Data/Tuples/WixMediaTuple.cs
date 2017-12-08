@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixMediaTupleFields.DiskId_), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMediaTupleFields.CompressionLevel), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMediaTupleFields.CompressionLevel), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMediaTupleFields.Layout), IntermediateFieldType.String),
             },
             typeof(WixMediaTuple));

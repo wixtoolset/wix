@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.CabinetTemplate), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.CompressionLevel), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.CompressionLevel), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.DiskPrompt), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.VolumeLabel), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMediaTemplateTupleFields.MaximumUncompressedMediaSize), IntermediateFieldType.Number),
@@ -53,10 +53,15 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixMediaTemplateTupleFields.CabinetTemplate, value);
         }
 
-        public CompressionLevel CompressionLevel
+        public CompressionLevel? CompressionLevel
         {
-            get => (CompressionLevel)Enum.Parse(typeof(CompressionLevel), (string)this.Fields[(int)WixMediaTupleFields.CompressionLevel]?.Value, true);
-            set => this.Set((int)WixMediaTupleFields.CompressionLevel, value.ToString());
+            get
+            {
+                var value = (string)this.Fields[(int)WixMediaTupleFields.CompressionLevel]?.Value;
+                return String.IsNullOrEmpty(value) ? null : (CompressionLevel?)Enum.Parse(typeof(CompressionLevel), value, true);
+            }
+
+            set => this.Set((int)WixMediaTupleFields.CompressionLevel, value?.ToString());
         }
 
         public string DiskPrompt
