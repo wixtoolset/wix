@@ -146,6 +146,36 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildMultipleFilesCompressed()
+        {
+            var folder = TestData.Get(@"TestData\MultiFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-d", "MediaTemplateCompressionLevel",
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
+            }
+        }
+
+        [Fact]
         public void CanBuildSimpleModule()
         {
             var folder = TestData.Get(@"TestData\SimpleModule");
