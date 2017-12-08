@@ -86,7 +86,7 @@ namespace WixToolset.Core.ExtensibilityServices
             // the use of open and closed parens inside variable names. Example: $(env.ProgramFiles(x86)) should resolve.
             if (result == null)
             {
-                result = this.GetVariableValue(context, function, false);
+                result = this.GetVariableValue(context, function, true);
             }
 
             return result;
@@ -403,7 +403,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     }
                     else
                     {
-                        result = this.GetVariableValue(context, subString, false);
+                        result = this.GetVariableValue(context, subString, true);
                     }
 
                     if (null == result)

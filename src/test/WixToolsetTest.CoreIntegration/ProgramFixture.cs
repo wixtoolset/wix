@@ -73,7 +73,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(0, result);
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example.cab")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
@@ -82,6 +82,66 @@ namespace WixToolsetTest.CoreIntegration
                 var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+            }
+        }
+
+        [Fact]
+        public void CanBuildSingleFileCompressedWithMediaTemplate()
+        {
+            var folder = TestData.Get(@"TestData\SingleFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-d", "MediaTemplateCompressionLevel",
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
+            }
+        }
+
+        [Fact]
+        public void CanBuildSingleFileCompressedWithMediaTemplateWithLowCompression()
+        {
+            var folder = TestData.Get(@"TestData\SingleFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-d", "MediaTemplateCompressionLevel=low",
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\lowcab1.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
             }
         }
 

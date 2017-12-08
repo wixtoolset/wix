@@ -4,10 +4,15 @@
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
-    <!--<MediaTemplate />-->
-    <MediaTemplate CompressionLevel="low" />
-    <!--<Media Id="1" Cabinet="example.cab" />-->
 
+    <?ifndef MediaTemplateCompressionLevel?>
+    <Media Id="1" Cabinet="example.cab" />
+    <?elseif $(MediaTemplateCompressionLevel) = ""?>
+    <MediaTemplate />
+    <?else?>
+    <MediaTemplate CabinetTemplate="lowcab{0}.cab" CompressionLevel="$(MediaTemplateCompressionLevel)" />
+    <?endif?>
+    
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
