@@ -209,6 +209,42 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildManualUpgrade()
+        {
+            var folder = TestData.Get(@"TestData\ManualUpgrade");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
+                Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+            }
+        }
+
         [Fact(Skip = "Not implemented yet.")]
         public void CanBuildInstanceTransform()
         {
