@@ -13462,7 +13462,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixAction);
+                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixAction, new Identifier($"{sequenceTable}/{actionName}", AccessModifier.Public));
                         row.Set(0, sequenceTable);
                         row.Set(1, actionName);
                         row.Set(2, condition);

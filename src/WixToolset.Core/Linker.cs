@@ -139,16 +139,12 @@ namespace WixToolset.Core
                 throw new WixException(WixErrors.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
             }
 
-            // Now that we know where we're starting from, create the section to hold the linked content.
-            var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
-            var allSymbols = find.Symbols;
-
             // Add the missing standard action symbols.
-            this.LoadStandardActionSymbols(resolvedSection, allSymbols);
+            this.LoadStandardActionSymbols(find.EntrySection, find.Symbols);
 
             // Resolve the symbol references to find the set of sections we care about for linking.
             // Of course, we start with the entry section (that's how it got its name after all).
-            var resolve = new ResolveReferencesCommand(find.EntrySection, allSymbols);
+            var resolve = new ResolveReferencesCommand(find.EntrySection, find.Symbols);
             resolve.BuildingMergeModule = (SectionType.Module == find.EntrySection.Type);
 
             resolve.Execute();
@@ -174,7 +170,7 @@ namespace WixToolset.Core
             var componentsToFeatures = new ConnectToFeatureCollection();
             var featuresToFeatures = new ConnectToFeatureCollection();
             var modulesToFeatures = new ConnectToFeatureCollection();
-            this.ProcessComplexReferences(resolvedSection, sections, referencedComponents, componentsToFeatures, featuresToFeatures, modulesToFeatures);
+            this.ProcessComplexReferences(find.EntrySection, sections, referencedComponents, componentsToFeatures, featuresToFeatures, modulesToFeatures);
 
             if (Messaging.Instance.EncounteredError)
             {
@@ -200,17 +196,21 @@ namespace WixToolset.Core
             }
 
             // resolve the feature to feature connects
-            this.ResolveFeatureToFeatureConnects(featuresToFeatures, allSymbols);
+            this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.Symbols);
 
             // start generating OutputTables and OutputRows for all the sections in the output
             var ensureTableRows = new List<IntermediateTuple>();
 
-            int sectionCount = 0;
+            // Create the section to hold the linked content.
+            var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
+
+            var sectionCount = 0;
+
             foreach (var section in sections)
             {
                 sectionCount++;
 
-                string sectionId = section.Id;
+                var sectionId = section.Id;
                 if (null == sectionId && this.sectionIdOnRows)
                 {
                     sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
