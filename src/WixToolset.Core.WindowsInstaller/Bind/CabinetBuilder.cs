@@ -164,22 +164,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             string cabinetFileName = Path.GetFileName(cabinetWorkItem.CabinetFile);
             string cabinetDirectory = Path.GetDirectoryName(cabinetWorkItem.CabinetFile);
 
-            //using (WixCreateCab cab = new WixCreateCab(cabinetFileName, cabinetDirectory, cabinetWorkItem.FileFacades.Count(), maxCabinetSize, cabinetWorkItem.MaxThreshold, cabinetWorkItem.CompressionLevel))
-            //{
-            //    foreach (FileFacade facade in cabinetWorkItem.FileFacades)
-            //    {
-            //        cab.AddFile(facade);
-            //    }
-
-            //    cab.Complete(newCabNamesCallBackAddress);
-            //}
-
-            var files = cabinetWorkItem.FileFacades.Select(facade => new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.File, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4)).ToList();
+            var files = cabinetWorkItem.FileFacades
+                .Select(facade => facade.Hash == null ?
+                    new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.File) :
+                    new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.File, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
+                .ToList();
 
             var cabinetCompressionLevel = (CabinetCompressionLevel)cabinetWorkItem.CompressionLevel;
 
             var cab = new Cabinet(cabinetPath);
             cab.Compress(files, cabinetCompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
+
+            // TODO: Handle newCabNamesCallBackAddress from compression.
         }
     }
 }
