@@ -15,7 +15,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Messaging for use by the extension.
         /// </summary>
-        protected Messaging Messaging { get; private set; }
+        protected IMessaging Messaging { get; private set; }
 
         /// <summary>
         /// ParserHelper for use by the extension.

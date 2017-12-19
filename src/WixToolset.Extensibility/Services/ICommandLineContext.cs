@@ -3,13 +3,12 @@
 namespace WixToolset.Extensibility.Services
 {
     using System;
-    using WixToolset.Data;
 
     public interface ICommandLineContext
     {
         IServiceProvider ServiceProvider { get; }
 
-        Messaging Messaging { get; set; }
+        IMessaging Messaging { get; set; }
 
         IExtensionManager ExtensionManager { get; set; }
 

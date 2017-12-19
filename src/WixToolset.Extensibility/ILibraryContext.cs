@@ -5,12 +5,13 @@ namespace WixToolset.Extensibility
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface ILibraryContext
     {
         IServiceProvider ServiceProvider { get; }
 
-        Messaging Messaging { get; set; }
+        IMessaging Messaging { get; set; }
 
         bool BindFiles { get; set; }
 

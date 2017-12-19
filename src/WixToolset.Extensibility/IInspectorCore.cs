@@ -2,12 +2,10 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data;
-
     /// <summary>
     /// Core facilities for inspector extensions.
     /// </summary>
-    public interface IInspectorCore : IMessageHandler
+    public interface IInspectorCore
     {
         /// <summary>
         /// Gets whether an error occured.

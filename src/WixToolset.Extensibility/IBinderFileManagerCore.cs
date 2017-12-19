@@ -6,7 +6,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Data.Bind;
 
-    public interface IBinderFileManagerCore : IMessageHandler
+    public interface IBinderFileManagerCore
     {
         /// <summary>
         /// Gets or sets the path to cabinet cache.

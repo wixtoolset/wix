@@ -3,17 +3,17 @@
 namespace WixToolset.Extensibility
 {
     using System;
-    using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface IInscribeContext
     {
         IServiceProvider ServiceProvider { get; }
 
+        IMessaging Messaging { get; set; }
+
         string InputFilePath { get; set; }
 
         string IntermediateFolder { get; set; }
-
-        Messaging Messaging { get; }
 
         string OutputFile { get; set; }
 

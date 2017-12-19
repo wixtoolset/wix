@@ -6,7 +6,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using Wix = WixToolset.Data.Serialize;
 
-    public interface IDecompilerCore : IMessageHandler
+    public interface IDecompilerCore
     {
 
         /// <summary>

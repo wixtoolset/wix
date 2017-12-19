@@ -5,12 +5,13 @@ namespace WixToolset.Extensibility
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface IPreprocessContext
     {
         IServiceProvider ServiceProvider { get; }
 
-        Messaging Messaging { get; set; }
+        IMessaging Messaging { get; set; }
 
         IEnumerable<IPreprocessorExtension> Extensions { get; set; }
 

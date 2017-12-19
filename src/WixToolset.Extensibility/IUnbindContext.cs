@@ -2,10 +2,15 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data;
+    using System;
+    using WixToolset.Extensibility.Services;
 
     public interface IUnbindContext
     {
+        IServiceProvider ServiceProvider { get; }
+
+        IMessaging Messaging { get; set; }
+
         string ExportBasePath { get; set; }
 
         string InputFilePath { get; set; }
@@ -13,8 +18,6 @@ namespace WixToolset.Extensibility
         string IntermediateFolder { get; set; }
 
         bool IsAdminImage { get; set; }
-
-        Messaging Messaging { get; }
 
         bool SuppressDemodularization { get; set; }
 

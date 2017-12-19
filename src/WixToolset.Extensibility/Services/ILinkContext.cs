@@ -10,7 +10,7 @@ namespace WixToolset.Extensibility.Services
     {
         IServiceProvider ServiceProvider { get; }
 
-        Messaging Messaging { get; set; }
+        IMessaging Messaging { get; set; }
 
         IEnumerable<ILinkerExtension> Extensions { get; set; }
 

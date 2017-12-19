@@ -6,12 +6,13 @@ namespace WixToolset.Extensibility
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface ICompileContext
     {
         IServiceProvider ServiceProvider { get; }
 
-        Messaging Messaging { get; set; }
+        IMessaging Messaging { get; set; }
 
         string CompilationId { get; set; }
 
