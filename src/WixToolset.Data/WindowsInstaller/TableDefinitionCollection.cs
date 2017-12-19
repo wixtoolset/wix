@@ -59,7 +59,7 @@ namespace WixToolset.Data.WindowsInstaller
             {
                 if (!this.collection.TryGetValue(tableName, out var table))
                 {
-                    throw new WixMissingTableDefinitionException(WixDataErrors.MissingTableDefinition(tableName));
+                    throw new WixMissingTableDefinitionException(ErrorMessages.MissingTableDefinition(tableName));
                 }
 
                 return table;

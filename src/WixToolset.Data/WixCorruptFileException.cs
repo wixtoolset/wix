@@ -10,7 +10,7 @@ namespace WixToolset.Data
     public class WixCorruptFileException : WixException
     {
         public WixCorruptFileException(string path, FileFormat format, Exception innerException = null)
-            : base(WixDataErrors.CorruptFileFormat(path, format.ToString().ToLowerInvariant()), innerException)
+            : base(ErrorMessages.CorruptFileFormat(path, format), innerException)
         {
             this.Path = path;
             this.FileFormat = format;
@@ -19,11 +19,11 @@ namespace WixToolset.Data
         /// <summary>
         /// Gets the actual file format found in the file.
         /// </summary>
-        public FileFormat FileFormat { get; private set; }
+        public FileFormat FileFormat { get; }
 
         /// <summary>
         /// Gets the path to the file with unexpected format.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; }
     }
 }

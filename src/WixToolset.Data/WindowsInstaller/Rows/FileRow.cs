@@ -179,7 +179,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
 
                 if (compressedFlag && noncompressedFlag)
                 {
-                    throw new WixException(WixDataErrors.IllegalFileCompressionAttributes(this.SourceLineNumbers));
+                    throw new WixException(ErrorMessages.IllegalFileCompressionAttributes(this.SourceLineNumbers));
                 }
                 else if (compressedFlag)
                 {

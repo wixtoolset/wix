@@ -10,13 +10,11 @@ namespace WixToolset.Data
     [Serializable]
     public class WixException : Exception
     {
-        private MessageEventArgs error;
-
         /// <summary>
         /// Instantiate a new WixException with a given WixError.
         /// </summary>
         /// <param name="error">The localized error information.</param>
-        public WixException(MessageEventArgs error)
+        public WixException(Message error)
             : this(error, null)
         {
         }
@@ -26,19 +24,16 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="error">The localized error information.</param>
         /// <param name="exception">Original exception.</param>
-        public WixException(MessageEventArgs error, Exception exception) :
-            base(error.GenerateMessageString(), exception)
+        public WixException(Message error, Exception exception) :
+            base(error.ToString(), exception)
         {
-            this.error = error;
+            this.Error = error;
         }
 
         /// <summary>
         /// Gets the error message.
         /// </summary>
         /// <value>The error message.</value>
-        public MessageEventArgs Error
-        {
-            get { return this.error; }
-        }
+        public Message Error { get; }
     }
 }

@@ -29,25 +29,25 @@ namespace WixToolset.Data
         /// Gets the accessibility of the symbol which is a direct reflection of the accessibility of the row's accessibility.
         /// </summary>
         /// <value>Accessbility of the symbol.</value>
-        public AccessModifier Access { get { return this.Row.Id.Access; } }
+        public AccessModifier Access => this.Row.Id.Access;
 
         /// <summary>
         /// Gets the name of the symbol.
         /// </summary>
         /// <value>Name of the symbol.</value>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the row for this symbol.
         /// </summary>
         /// <value>Row for this symbol.</value>
-        public IntermediateTuple Row { get; private set; }
+        public IntermediateTuple Row { get; }
 
         /// <summary>
         /// Gets the section for the symbol.
         /// </summary>
         /// <value>Section for the symbol.</value>
-        public IntermediateSection Section { get; private set; } //{ get { return this.Row.Section; } }
+        public IntermediateSection Section { get; }
 
         /// <summary>
         /// Gets any duplicates of this symbol that are possible conflicts.

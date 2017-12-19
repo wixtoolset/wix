@@ -117,62 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="EXP_UnexpectedEntrySectionType" xml:space="preserve">
-    <value>Unexpected entry section type: {0}</value>
-  </data>
   <data name="EXP_UnsupportedTable" xml:space="preserve">
     <value>The table {0} is not supported.</value>
   </data>
   <data name="EXP_MergeTableFileCompressionColumnContainsInvalidValue" xml:space="preserve">
     <value>A Merge table FileCompression column contains an invalid value '{0}'.</value>
   </data>
-  <data name="EXP_OtherObjectIsNotFileRow" xml:space="preserve">
-    <value>The other object is not a FileRow.</value>
-  </data>
-  <data name="EXP_CannotIndexIntoFileRowCollection" xml:space="preserve">
-    <value>Cannot index into a FileRowCollection that allows duplicate FileIds</value>
-  </data>
   <data name="EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue" xml:space="preserve">
     <value>A Merge table FileCompression column cannot be set to the invalid value '{0}'.</value>
-  </data>
-  <data name="EXP_ExpectedComplexReferenceType" xml:space="preserve">
-    <value>Expected ComplexReference type.</value>
   </data>
   <data name="EXP_CannotModularizeIllegalID" xml:space="preserve">
     <value>The value '{0}' is not a legal identifier and therefore cannot be modularized.</value>
   </data>
-  <data name="EXP_DidnotFindDuplicateSymbol" xml:space="preserve">
-    <value>Didn't find duplicated symbol.</value>
-  </data>
   <data name="EXP_UnknownColumnType" xml:space="preserve">
     <value>Unknown column type: {0}</value>
-  </data>
-  <data name="EXP_UnknownCompressionLevelType" xml:space="preserve">
-    <value>Unknown compression level type: {0}</value>
-  </data>
-  <data name="Format_FirstLineNumber" xml:space="preserve">
-    <value>{0}({1})</value>
-  </data>
-  <data name="Format_InfoMessage" xml:space="preserve">
-    <value>{0}</value>
-  </data>
-  <data name="Format_LineNumber" xml:space="preserve">
-    <value>{0}: line {1}</value>
-  </data>
-  <data name="Format_NonInfoMessage" xml:space="preserve">
-    <value>{0} : {1} {2}{3:0000} : {4}</value>
-  </data>
-  <data name="INF_SourceTrace" xml:space="preserve">
-    <value>Source trace:{0}</value>
-  </data>
-  <data name="INF_SourceTraceLocation" xml:space="preserve">
-    <value>at {0}{1}</value>
-  </data>
-  <data name="MessageType_Error" xml:space="preserve">
-    <value>error</value>
-  </data>
-  <data name="MessageType_Warning" xml:space="preserve">
-    <value>warning</value>
   </data>
   <data name="EXP_MultipleRootElementsFoundInFile" xml:space="preserve">
     <value>Multiple root elements found in file.</value>

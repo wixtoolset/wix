@@ -53,15 +53,6 @@ namespace WixToolset.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot index into a FileRowCollection that allows duplicate FileIds.
-        /// </summary>
-        internal static string EXP_CannotIndexIntoFileRowCollection {
-            get {
-                return ResourceManager.GetString("EXP_CannotIndexIntoFileRowCollection", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The value &apos;{0}&apos; is not a legal identifier and therefore cannot be modularized..
         /// </summary>
         public static string EXP_CannotModularizeIllegalID {
@@ -89,15 +80,6 @@ namespace WixToolset.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Didn&apos;t find duplicated symbol..
-        /// </summary>
-        internal static string EXP_DidnotFindDuplicateSymbol {
-            get {
-                return ResourceManager.GetString("EXP_DidnotFindDuplicateSymbol", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Element must be a subclass of {0}, but was of type {1}..
         /// </summary>
         internal static string EXP_ElementIsSubclassOfDifferentType {
@@ -121,15 +103,6 @@ namespace WixToolset.Data {
         internal static string EXP_ElementOfTypeIsNotValidForThisCollection {
             get {
                 return ResourceManager.GetString("EXP_ElementOfTypeIsNotValidForThisCollection", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Expected ComplexReference type..
-        /// </summary>
-        internal static string EXP_ExpectedComplexReferenceType {
-            get {
-                return ResourceManager.GetString("EXP_ExpectedComplexReferenceType", resourceCulture);
             }
         }
         
@@ -170,15 +143,6 @@ namespace WixToolset.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The other object is not a FileRow..
-        /// </summary>
-        internal static string EXP_OtherObjectIsNotFileRow {
-            get {
-                return ResourceManager.GetString("EXP_OtherObjectIsNotFileRow", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Type {0} is not valid for this collection..
         /// </summary>
         internal static string EXP_TypeIsNotValidForThisCollection {
@@ -188,29 +152,11 @@ namespace WixToolset.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected entry section type: {0}.
-        /// </summary>
-        public static string EXP_UnexpectedEntrySectionType {
-            get {
-                return ResourceManager.GetString("EXP_UnexpectedEntrySectionType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Unknown column type: {0}.
         /// </summary>
         public static string EXP_UnknownColumnType {
             get {
                 return ResourceManager.GetString("EXP_UnknownColumnType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown compression level type: {0}.
-        /// </summary>
-        internal static string EXP_UnknownCompressionLevelType {
-            get {
-                return ResourceManager.GetString("EXP_UnknownCompressionLevelType", resourceCulture);
             }
         }
         
@@ -229,78 +175,6 @@ namespace WixToolset.Data {
         internal static string EXP_XmlElementDoesnotHaveISchemaElement {
             get {
                 return ResourceManager.GetString("EXP_XmlElementDoesnotHaveISchemaElement", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0}({1}).
-        /// </summary>
-        internal static string Format_FirstLineNumber {
-            get {
-                return ResourceManager.GetString("Format_FirstLineNumber", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0}.
-        /// </summary>
-        internal static string Format_InfoMessage {
-            get {
-                return ResourceManager.GetString("Format_InfoMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0}: line {1}.
-        /// </summary>
-        internal static string Format_LineNumber {
-            get {
-                return ResourceManager.GetString("Format_LineNumber", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} : {1} {2}{3:0000} : {4}.
-        /// </summary>
-        internal static string Format_NonInfoMessage {
-            get {
-                return ResourceManager.GetString("Format_NonInfoMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Source trace:{0}.
-        /// </summary>
-        internal static string INF_SourceTrace {
-            get {
-                return ResourceManager.GetString("INF_SourceTrace", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to at {0}{1}.
-        /// </summary>
-        internal static string INF_SourceTraceLocation {
-            get {
-                return ResourceManager.GetString("INF_SourceTraceLocation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to error.
-        /// </summary>
-        internal static string MessageType_Error {
-            get {
-                return ResourceManager.GetString("MessageType_Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to warning.
-        /// </summary>
-        internal static string MessageType_Warning {
-            get {
-                return ResourceManager.GetString("MessageType_Warning", resourceCulture);
             }
         }
     }

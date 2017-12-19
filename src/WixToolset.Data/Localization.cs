@@ -69,7 +69,7 @@ namespace WixToolset.Data
                 }
                 else if (!wixVariableRow.Overridable)
                 {
-                    throw new WixException(WixDataErrors.DuplicateLocalizationIdentifier(wixVariableRow.SourceLineNumbers, wixVariableRow.Id));
+                    throw new WixException(ErrorMessages.DuplicateLocalizationIdentifier(wixVariableRow.SourceLineNumbers, wixVariableRow.Id));
                 }
             }
         }

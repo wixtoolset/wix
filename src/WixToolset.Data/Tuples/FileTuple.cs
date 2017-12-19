@@ -17,12 +17,12 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(FileTupleFields.FileSize), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Language), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFieldsOriginal.ReadOnly), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFieldsOriginal.Hidden), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFieldsOriginal.System), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFieldsOriginal.Vital), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFieldsOriginal.Checksum), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFieldsOriginal.Compressed), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.ReadOnly), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Hidden), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.System), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Vital), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Checksum), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Compressed), IntermediateFieldType.Bool),
             },
             typeof(FileTuple));
     }

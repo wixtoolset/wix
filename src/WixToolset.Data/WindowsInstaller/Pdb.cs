@@ -107,7 +107,7 @@ namespace WixToolset.Data.WindowsInstaller
 
             if (!suppressVersionCheck && null != version && !Pdb.CurrentVersion.Equals(version))
             {
-                throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(reader.BaseURI), "wixPdb", version.ToString(), Pdb.CurrentVersion.ToString()));
+                throw new WixException(ErrorMessages.VersionMismatch(SourceLineNumber.CreateFromUri(reader.BaseURI), "wixPdb", version.ToString(), Pdb.CurrentVersion.ToString()));
             }
 
             // loop through the rest of the pdb building up the Output object

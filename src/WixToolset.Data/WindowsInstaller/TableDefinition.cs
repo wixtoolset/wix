@@ -175,7 +175,7 @@ namespace WixToolset.Data.WindowsInstaller
 
                 if (!unreal && !bootstrapperApplicationData && !hasPrimaryKeyColumn)
                 {
-                    throw new WixException(WixDataErrors.RealTableMissingPrimaryKeyColumn(SourceLineNumber.CreateFromUri(reader.BaseURI), name));
+                    throw new WixException(ErrorMessages.RealTableMissingPrimaryKeyColumn(SourceLineNumber.CreateFromUri(reader.BaseURI), name));
                 }
 
                 if (!done)

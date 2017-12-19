@@ -86,23 +86,23 @@ namespace WixToolset.Data.Bind
             {
                 result = Path.GetFullPath(path);
 
-                string filename = Path.GetFileName(result);
+                var filename = Path.GetFileName(result);
 
-                foreach (string reservedName in Common.ReservedFileNames)
+                foreach (var reservedName in Common.ReservedFileNames)
                 {
                     if (reservedName.Equals(filename, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new WixException(WixDataErrors.InvalidFileName(sourceLineNumbers, path));
+                        throw new WixException(ErrorMessages.InvalidFileName(sourceLineNumbers, path));
                     }
                 }
             }
-            catch (System.ArgumentException)
+            catch (ArgumentException)
             {
-                throw new WixException(WixDataErrors.InvalidFileName(sourceLineNumbers, path));
+                throw new WixException(ErrorMessages.InvalidFileName(sourceLineNumbers, path));
             }
-            catch (System.IO.PathTooLongException)
+            catch (PathTooLongException)
             {
-                throw new WixException(WixDataErrors.PathTooLong(sourceLineNumbers, path));
+                throw new WixException(ErrorMessages.PathTooLong(sourceLineNumbers, path));
             }
 
             return result;

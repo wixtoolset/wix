@@ -244,7 +244,7 @@ namespace WixToolset.Data
 
                 if (!Version.TryParse(versionJson, out var version) || !Intermediate.CurrentVersion.Equals(version))
                 {
-                    throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(baseUri.AbsoluteUri), "intermediate", versionJson, Intermediate.CurrentVersion.ToString()));
+                    throw new WixException(ErrorMessages.VersionMismatch(SourceLineNumber.CreateFromUri(baseUri.AbsoluteUri), "intermediate", versionJson, Intermediate.CurrentVersion.ToString()));
                 }
             }
 

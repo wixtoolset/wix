@@ -14,7 +14,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// Instantiate new WixMissingTableDefinitionException.
         /// </summary>
         /// <param name="error">Localized error information.</param>
-        public WixMissingTableDefinitionException(MessageEventArgs error)
+        public WixMissingTableDefinitionException(Message error)
             : base(error)
         {
         }

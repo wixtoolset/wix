@@ -323,7 +323,7 @@ namespace WixToolset.Data.WindowsInstaller
 
                 if (primaryKeys.TryGetValue(primaryKey, out var collisionSourceLineNumber))
                 {
-                    throw new WixException(WixDataErrors.DuplicatePrimaryKey(collisionSourceLineNumber, primaryKey, this.Definition.Name));
+                    throw new WixException(ErrorMessages.DuplicatePrimaryKey(collisionSourceLineNumber, primaryKey, this.Definition.Name));
                 }
 
                 primaryKeys.Add(primaryKey, row.SourceLineNumbers);

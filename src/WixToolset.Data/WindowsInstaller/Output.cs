@@ -165,7 +165,7 @@ namespace WixToolset.Data.WindowsInstaller
 
             if (!suppressVersionCheck && null != version && !Output.CurrentVersion.Equals(version))
             {
-                throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(reader.BaseURI), "wixOutput", version.ToString(), Output.CurrentVersion.ToString()));
+                throw new WixException(ErrorMessages.VersionMismatch(SourceLineNumber.CreateFromUri(reader.BaseURI), "wixOutput", version.ToString(), Output.CurrentVersion.ToString()));
             }
 
             // loop through the rest of the xml building up the Output object
