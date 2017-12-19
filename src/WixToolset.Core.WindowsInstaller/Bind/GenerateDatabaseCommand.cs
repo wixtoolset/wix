@@ -13,6 +13,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Msi;
     using WixToolset.Core.Native;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Services;
 
     internal class GenerateDatabaseCommand 
     {
@@ -24,6 +25,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Whether to keep columns added in a transform.
         /// </summary>
         public bool KeepAddedColumns { private get; set; }
+
+        public IMessaging Messaging { private get; set; }
 
         public Output Output { private get; set; }
 
@@ -177,7 +180,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             try
                             {
                                 //db.ImportTable(this.Output.Codepage, importTable, baseDirectory, this.KeepAddedColumns);
-                                var command = new CreateIdtFileCommand(importTable, this.Output.Codepage, baseDirectory, this.KeepAddedColumns);
+                                var command = new CreateIdtFileCommand(this.Messaging, importTable, this.Output.Codepage, baseDirectory, this.KeepAddedColumns);
                                 command.Execute();
 
                                 db.Import(command.IdtPath);
@@ -262,11 +265,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                                         {
                                                             if (0xA1 == e.NativeErrorCode) // ERROR_BAD_PATHNAME
                                                             {
-                                                                throw new WixException(WixErrors.FileNotFound(row.SourceLineNumbers, (string)row[i]));
+                                                                throw new WixException(ErrorMessages.FileNotFound(row.SourceLineNumbers, (string)row[i]));
                                                             }
                                                             else
                                                             {
-                                                                throw new WixException(WixErrors.Win32Exception(e.NativeErrorCode, e.Message));
+                                                                throw new WixException(ErrorMessages.Win32Exception(e.NativeErrorCode, e.Message));
                                                             }
                                                         }
                                                     }
@@ -279,7 +282,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                         // check for a stream name that is more than 62 characters long (the maximum allowed length)
                                         if (needStream && MsiInterop.MsiMaxStreamNameLength < streamName.Length)
                                         {
-                                            Messaging.Instance.OnMessage(WixErrors.StreamNameTooLong(row.SourceLineNumbers, table.Name, streamName.ToString(), streamName.Length));
+                                            this.Messaging.Write(ErrorMessages.StreamNameTooLong(row.SourceLineNumbers, table.Name, streamName.ToString(), streamName.Length));
                                         }
                                         else // add the row to the database
                                         {
@@ -309,7 +312,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 // Bind the transform.
                                 this.BindTransform(subStorage.Data, transformFile);
 
-                                if (Messaging.Instance.EncounteredError)
+                                if (this.Messaging.EncounteredError)
                                 {
                                     continue;
                                 }
@@ -338,7 +341,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void BindTransform(Output transform, string outputPath)
         {
-            BindTransformCommand command = new BindTransformCommand();
+            var command = new BindTransformCommand();
+            command.Messaging = this.Messaging;
             command.Extensions = this.Extensions;
             command.TempFilesLocation = this.TempFilesLocation;
             command.Transform = transform;
@@ -372,7 +376,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             catch (WixInvalidIdtException)
             {
                 // the IDT should be valid, so an invalid code page was given
-                throw new WixException(WixErrors.IllegalCodepage(codepage));
+                throw new WixException(ErrorMessages.IllegalCodepage(codepage));
             }
         }
     }

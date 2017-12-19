@@ -2,19 +2,11 @@
 
 namespace WixToolset.Core.Extensibility
 {
-    using WixToolset.Data;
-
     /// <summary>
     /// The WiX Toolset Harvester application core.
     /// </summary>
     public interface IHeatCore
     {
-        /// <summary>
-        /// Gets whether the mutator core encountered an error while processing.
-        /// </summary>
-        /// <value>Flag if core encountered an error during processing.</value>
-        bool EncounteredError { get; }
-
         /// <summary>
         /// Gets the harvester.
         /// </summary>
@@ -26,11 +18,5 @@ namespace WixToolset.Core.Extensibility
         /// </summary>
         /// <value>The mutator.</value>
         Mutator Mutator { get; }
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        void OnMessage(MessageEventArgs mea);
     }
 }

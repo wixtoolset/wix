@@ -34,9 +34,13 @@ namespace WixToolset.Core.ExtensibilityServices
         public ParseHelper(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private ITupleDefinitionCreator Creator { get; set; }
 
@@ -136,7 +140,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         // TODO: should overriding the parent identifier with a specific id be an error or a warning or just let it slide?
                         //if (null != parentId)
                         //{
-                        //    this.core.OnMessage(WixErrors.Xxx(sourceLineNumbers));
+                        //    this.core.Write(WixErrors.Xxx(sourceLineNumbers));
                         //}
 
                         id = inlineSyntax[0].TrimEnd(':');
@@ -360,7 +364,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 if (ParseHelper.PutGuidHere.IsMatch(value))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.ExampleGuid(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(ErrorMessages.ExampleGuid(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     return CompilerConstants.IllegalGuid;
                 }
                 else if (value.StartsWith("!(loc", StringComparison.Ordinal) || value.StartsWith("$(loc", StringComparison.Ordinal) || value.StartsWith("!(wix", StringComparison.Ordinal))
@@ -374,14 +378,14 @@ namespace WixToolset.Core.ExtensibilityServices
                     // TODO: This used to be a pedantic error, what should it be now?
                     //if (uppercaseGuid != value)
                     //{
-                    //    Messaging.Instance.OnMessage(WixErrors.GuidContainsLowercaseLetters(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    //    this.Messaging.Write(WixErrors.GuidContainsLowercaseLetters(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     //}
 
                     return String.Concat("{", uppercaseGuid, "}");
                 }
                 else
                 {
-                    Messaging.Instance.OnMessage(WixErrors.IllegalGuidValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -391,7 +395,7 @@ namespace WixToolset.Core.ExtensibilityServices
         public Identifier GetAttributeIdentifier(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             var access = AccessModifier.Public;
-            var value = Common.GetAttributeValue(sourceLineNumbers, attribute, EmptyRule.CanBeEmpty);
+            var value = Common.GetAttributeValue(this.Messaging, sourceLineNumbers, attribute, EmptyRule.CanBeEmpty);
 
             var match = ParseHelper.LegalIdentifierWithAccess.Match(value);
             if (!match.Success)
@@ -407,7 +411,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (Common.IsIdentifier(value) && 72 < value.Length)
             {
-                Messaging.Instance.OnMessage(WixWarnings.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                this.Messaging.Write(WarningMessages.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
             }
 
             return new Identifier(value, access);
@@ -415,7 +419,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            return Common.GetAttributeIdentifierValue(sourceLineNumbers, attribute);
+            return Common.GetAttributeIdentifierValue(this.Messaging, sourceLineNumbers, attribute);
         }
 
         public string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference = false)
@@ -432,12 +436,12 @@ namespace WixToolset.Core.ExtensibilityServices
                     string id = result[0].TrimEnd(':');
                     if (1 == result.Length)
                     {
-                        Messaging.Instance.OnMessage(WixErrors.InlineDirectorySyntaxRequiresPath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
+                        this.Messaging.Write(ErrorMessages.InlineDirectorySyntaxRequiresPath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
                         return null;
                     }
                     else if (!this.IsValidIdentifier(id))
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
+                        this.Messaging.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
                         return null;
                     }
 
@@ -449,13 +453,13 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (!this.IsValidLongFilename(result[0], false, false))
                         {
-                            Messaging.Instance.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[0]));
+                            this.Messaging.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[0]));
                             return null;
                         }
                     }
                     else if (!this.IsValidIdentifier(result[0]))
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[0]));
+                        this.Messaging.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[0]));
                         return null;
                     }
 
@@ -467,14 +471,14 @@ namespace WixToolset.Core.ExtensibilityServices
                 {
                     if (!this.IsValidLongFilename(result[i], false, false))
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[i]));
+                        this.Messaging.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, result[i]));
                         return null;
                     }
                 }
 
                 if (1 < result.Length && !value.EndsWith("\\"))
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.BackslashTerminateInlineDirectorySyntax(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(WarningMessages.BackslashTerminateInlineDirectorySyntax(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -483,7 +487,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public int GetAttributeIntegerValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, int minimum, int maximum)
         {
-            return Common.GetAttributeIntegerValue(sourceLineNumbers, attribute, minimum, maximum);
+            return Common.GetAttributeIntegerValue(this.Messaging, sourceLineNumbers, attribute, minimum, maximum);
         }
 
         public string GetAttributeLongFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards, bool allowRelative)
@@ -501,11 +505,11 @@ namespace WixToolset.Core.ExtensibilityServices
                 {
                     if (allowRelative)
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IllegalRelativeLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Messaging.Write(ErrorMessages.IllegalRelativeLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     }
                     else
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Messaging.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     }
                 }
                 else if (allowRelative)
@@ -513,12 +517,12 @@ namespace WixToolset.Core.ExtensibilityServices
                     string normalizedPath = value.Replace('\\', '/');
                     if (normalizedPath.StartsWith("../", StringComparison.Ordinal) || normalizedPath.Contains("/../"))
                     {
-                        Messaging.Instance.OnMessage(WixErrors.PayloadMustBeRelativeToCache(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     }
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(WarningMessages.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -539,11 +543,11 @@ namespace WixToolset.Core.ExtensibilityServices
 
                     if (CompilerConstants.LongNotSet == longValue || CompilerConstants.IllegalLong == longValue)
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IntegralValueSentinelCollision(sourceLineNumbers, longValue));
+                        this.Messaging.Write(ErrorMessages.IntegralValueSentinelCollision(sourceLineNumbers, longValue));
                     }
                     else if (minimum > longValue || maximum < longValue)
                     {
-                        Messaging.Instance.OnMessage(WixErrors.IntegralValueOutOfRange(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, longValue, minimum, maximum));
+                        this.Messaging.Write(ErrorMessages.IntegralValueOutOfRange(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, longValue, minimum, maximum));
                         longValue = CompilerConstants.IllegalLong;
                     }
 
@@ -551,11 +555,11 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 catch (FormatException)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(ErrorMessages.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 catch (OverflowException)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(ErrorMessages.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -564,7 +568,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public string GetAttributeValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, EmptyRule emptyRule = EmptyRule.CanBeWhitespaceOnly)
         {
-            return Common.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
+            return Common.GetAttributeValue(this.Messaging, sourceLineNumbers, attribute, emptyRule);
         }
 
         public string GetAttributeVersionValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
@@ -584,7 +588,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     return value;
                 }
 
-                Messaging.Instance.OnMessage(WixErrors.IllegalVersionValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                this.Messaging.Write(ErrorMessages.IllegalVersionValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
             }
 
             return null;
@@ -608,7 +612,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     return YesNoDefaultType.Default;
 
                 default:
-                    Messaging.Instance.OnMessage(WixErrors.IllegalYesNoDefaultValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(ErrorMessages.IllegalYesNoDefaultValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     return YesNoDefaultType.IllegalValue;
             }
         }
@@ -628,7 +632,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     return YesNoType.No;
 
                 default:
-                    Messaging.Instance.OnMessage(WixErrors.IllegalYesNoValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(ErrorMessages.IllegalYesNoValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     return YesNoType.IllegalValue;
             }
         }
@@ -722,7 +726,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else
             {
                 var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                Messaging.Instance.OnMessage(WixErrors.UnhandledExtensionAttribute(sourceLineNumbers, element.Name.LocalName, attribute.Name.LocalName, attribute.Name.NamespaceName));
+                this.Messaging.Write(ErrorMessages.UnhandledExtensionAttribute(sourceLineNumbers, element.Name.LocalName, attribute.Name.LocalName, attribute.Name.NamespaceName));
             }
         }
 
@@ -736,7 +740,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                Messaging.Instance.OnMessage(WixErrors.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
+                this.Messaging.Write(ErrorMessages.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
             }
         }
 
@@ -751,7 +755,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                Messaging.Instance.OnMessage(WixErrors.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
+                this.Messaging.Write(ErrorMessages.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
             }
 
             return keyPath;
@@ -775,13 +779,13 @@ namespace WixToolset.Core.ExtensibilityServices
         public void UnexpectedAttribute(XElement element, XAttribute attribute)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-            Common.UnexpectedAttribute(sourceLineNumbers, attribute);
+            Common.UnexpectedAttribute(this.Messaging, sourceLineNumbers, attribute);
         }
 
         public void UnexpectedElement(XElement parentElement, XElement childElement)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(childElement);
-            Messaging.Instance.OnMessage(WixErrors.UnexpectedElement(sourceLineNumbers, parentElement.Name.LocalName, childElement.Name.LocalName));
+            this.Messaging.Write(ErrorMessages.UnexpectedElement(sourceLineNumbers, parentElement.Name.LocalName, childElement.Name.LocalName));
         }
 
         private void CreateTupleDefinitionCreator()

@@ -37,126 +37,13 @@ namespace WixToolset {
                 return resourceMan;
             }
         }
-        
-        /// <summary>
-        ///   Overrides the current thread's CurrentUICulture property for all
-        ///   resource lookups using this strongly typed resource class.
-        /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
-                return resourceCulture;
-            }
-            set {
-                resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot index into a FileRowCollection that allows duplicate FileIds.
-        /// </summary>
-        internal static string EXP_CannotIndexIntoFileRowCollection {
-            get {
-                return ResourceManager.GetString("EXP_CannotIndexIntoFileRowCollection", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The value &apos;{0}&apos; is not a legal identifier and therefore cannot be modularized..
-        /// </summary>
-        internal static string EXP_CannotModularizeIllegalID {
-            get {
-                return ResourceManager.GetString("EXP_CannotModularizeIllegalID", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set column &apos;{0}&apos; with value {1} because it is greater than the maximum allowed value for this column, {2}..
-        /// </summary>
-        internal static string EXP_CannotSetColumnWithValueGreaterThanMaxValue {
-            get {
-                return ResourceManager.GetString("EXP_CannotSetColumnWithValueGreaterThanMaxValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set column &apos;{0}&apos; with value {1} because it is less than the minimum allowed value for this column, {2}..
-        /// </summary>
-        internal static string EXP_CannotSetColumnWithValueLessThanMinValue {
-            get {
-                return ResourceManager.GetString("EXP_CannotSetColumnWithValueLessThanMinValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A Merge table FileCompression column cannot be set to the invalid value &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue {
-            get {
-                return ResourceManager.GetString("EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set column &apos;{0}&apos; with a null value because this is a required field..
-        /// </summary>
-        internal static string EXP_CannotSetNullOnRequiredField {
-            get {
-                return ResourceManager.GetString("EXP_CannotSetNullOnRequiredField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set number column &apos;{0}&apos; with a value of type &apos;{1}&apos;..
-        /// </summary>
-        internal static string EXP_CannotSetNumberColumnWithValueOfType {
-            get {
-                return ResourceManager.GetString("EXP_CannotSetNumberColumnWithValueOfType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set string column &apos;{0}&apos; with a value of type &apos;{1}&apos;..
-        /// </summary>
-        internal static string EXP_CannotSetStringColumnWithValueOfType {
-            get {
-                return ResourceManager.GetString("EXP_CannotSetStringColumnWithValueOfType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not determine ProductCode from transform summary information.
-        /// </summary>
-        public static string EXP_CouldnotDetermineProductCodeFromTransformSummaryInfo {
-            get {
-                return ResourceManager.GetString("EXP_CouldnotDetermineProductCodeFromTransformSummaryInfo", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find a unique identifier for the given resource name..
         /// </summary>
         internal static string EXP_CouldnotFileUniqueIDForResourceName {
             get {
                 return ResourceManager.GetString("EXP_CouldnotFileUniqueIDForResourceName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Didn&apos;t find duplicated symbol..
-        /// </summary>
-        internal static string EXP_DidnotFindDuplicateSymbol {
-            get {
-                return ResourceManager.GetString("EXP_DidnotFindDuplicateSymbol", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Expected ComplexReference type..
-        /// </summary>
-        internal static string EXP_ExpectedComplexReferenceType {
-            get {
-                return ResourceManager.GetString("EXP_ExpectedComplexReferenceType", resourceCulture);
             }
         }
         
@@ -179,56 +66,11 @@ namespace WixToolset {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Illegal arguments passed..
-        /// </summary>
-        internal static string EXP_IllegalArgumentsPassed {
-            get {
-                return ResourceManager.GetString("EXP_IllegalArgumentsPassed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid table name passed into GenerateIdentifier..
-        /// </summary>
-        internal static string EXP_InvalidTableNamePassed {
-            get {
-                return ResourceManager.GetString("EXP_InvalidTableNamePassed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A Merge table FileCompression column contains an invalid value &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_MergeTableFileCompressionColumnContainsInvalidValue {
-            get {
-                return ResourceManager.GetString("EXP_MergeTableFileCompressionColumnContainsInvalidValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Multiple harvester extensions specified..
         /// </summary>
         internal static string EXP_MultipleHarvesterExtensionsSpecified {
             get {
                 return ResourceManager.GetString("EXP_MultipleHarvesterExtensionsSpecified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The other object is not a FileRow..
-        /// </summary>
-        internal static string EXP_OtherObjectIsNotFileRow {
-            get {
-                return ResourceManager.GetString("EXP_OtherObjectIsNotFileRow", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Transform authored into multiple Media &apos;{0}&apos; and &apos;{1}&apos;..
-        /// </summary>
-        public static string EXP_TransformAuthoredIntoMultipleMedia {
-            get {
-                return ResourceManager.GetString("EXP_TransformAuthoredIntoMultipleMedia", resourceCulture);
             }
         }
         
@@ -269,101 +111,11 @@ namespace WixToolset {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown control attribute: &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_UnknowControlAttribute {
-            get {
-                return ResourceManager.GetString("EXP_UnknowControlAttribute", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown column type: {0}.
-        /// </summary>
-        internal static string EXP_UnknownColumnType {
-            get {
-                return ResourceManager.GetString("EXP_UnknownColumnType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown compression level type: {0}.
-        /// </summary>
-        internal static string EXP_UnknownCompressionLevelType {
-            get {
-                return ResourceManager.GetString("EXP_UnknownCompressionLevelType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown custom column category &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_UnknownCustomColumnCategory {
-            get {
-                return ResourceManager.GetString("EXP_UnknownCustomColumnCategory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown custom column modularization type &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_UnknownCustomColumnModularizationType {
-            get {
-                return ResourceManager.GetString("EXP_UnknownCustomColumnModularizationType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown custom column type &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_UnknownCustomColumnType {
-            get {
-                return ResourceManager.GetString("EXP_UnknownCustomColumnType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown output type..
-        /// </summary>
-        internal static string EXP_UnknownOutputType {
-            get {
-                return ResourceManager.GetString("EXP_UnknownOutputType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown permission attribute &apos;{0}&apos;..
-        /// </summary>
-        internal static string EXP_UnknownPermissionAttribute {
-            get {
-                return ResourceManager.GetString("EXP_UnknownPermissionAttribute", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Unknown platform enumeration &apos;{0}&apos; encountered..
         /// </summary>
         internal static string EXP_UnknownPlatformEnum {
             get {
                 return ResourceManager.GetString("EXP_UnknownPlatformEnum", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown sequence table..
-        /// </summary>
-        internal static string EXP_UnknowSequenceTable {
-            get {
-                return ResourceManager.GetString("EXP_UnknowSequenceTable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The table {0} is not supported..
-        /// </summary>
-        internal static string EXP_UnsupportedTable {
-            get {
-                return ResourceManager.GetString("EXP_UnsupportedTable", resourceCulture);
             }
         }
         

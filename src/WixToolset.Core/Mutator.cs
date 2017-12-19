@@ -71,7 +71,7 @@ namespace WixToolset.Core
             }
             finally
             {
-                encounteredError = this.Core.EncounteredError;
+                encounteredError = this.Core.Messaging.EncounteredError;
             }
 
             // return the Wix document element only if mutation completed successfully
@@ -98,7 +98,7 @@ namespace WixToolset.Core
 
                     wixString = mutatorExtension.Mutate(wixString);
 
-                    if (String.IsNullOrEmpty(wixString) || this.Core.EncounteredError)
+                    if (String.IsNullOrEmpty(wixString) || this.Core.Messaging.EncounteredError)
                     {
                         break;
                     }
@@ -106,7 +106,7 @@ namespace WixToolset.Core
             }
             finally
             {
-                encounteredError = this.Core.EncounteredError;
+                encounteredError = this.Core.Messaging.EncounteredError;
             }
 
             return encounteredError ? null : wixString;

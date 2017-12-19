@@ -9,17 +9,21 @@ namespace WixToolset.Core.Bind
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IEnumerable<BindPath> bindPaths, IEnumerable<IBinderExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
+        public TransferFilesCommand(IMessaging messaging, IEnumerable<BindPath> bindPaths, IEnumerable<IBinderExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
         {
             this.FileResolver = new FileResolver(bindPaths, extensions);
+            this.Messaging = messaging;
             this.FileTransfers = fileTransfers;
             this.SuppressAclReset = suppressAclReset;
         }
 
         private FileResolver FileResolver { get; }
+
+        private IMessaging Messaging { get; }
 
         private IEnumerable<FileTransfer> FileTransfers { get; }
 
@@ -47,12 +51,12 @@ namespace WixToolset.Core.Bind
                     {
                         if (fileTransfer.Move)
                         {
-                            Messaging.Instance.OnMessage(WixVerboses.MoveFile(fileSource, fileTransfer.Destination));
+                            this.Messaging.Write(VerboseMessages.MoveFile(fileSource, fileTransfer.Destination));
                             this.TransferFile(true, fileSource, fileTransfer.Destination);
                         }
                         else
                         {
-                            Messaging.Instance.OnMessage(WixVerboses.CopyFile(fileSource, fileTransfer.Destination));
+                            this.Messaging.Write(VerboseMessages.CopyFile(fileSource, fileTransfer.Destination));
                             this.TransferFile(false, fileSource, fileTransfer.Destination);
                         }
 
@@ -61,7 +65,7 @@ namespace WixToolset.Core.Bind
                     }
                     catch (FileNotFoundException e)
                     {
-                        throw new WixFileNotFoundException(e.FileName);
+                        throw new WixFileNotFoundException(fileTransfer.SourceLineNumbers, e.FileName);
                     }
                     catch (DirectoryNotFoundException)
                     {
@@ -72,7 +76,7 @@ namespace WixToolset.Core.Bind
                         }
 
                         string directory = Path.GetDirectoryName(fileTransfer.Destination);
-                        Messaging.Instance.OnMessage(WixVerboses.CreateDirectory(directory));
+                        this.Messaging.Write(VerboseMessages.CreateDirectory(directory));
                         Directory.CreateDirectory(directory);
                         retry = true;
                     }
@@ -86,7 +90,7 @@ namespace WixToolset.Core.Bind
 
                         if (File.Exists(fileTransfer.Destination))
                         {
-                            Messaging.Instance.OnMessage(WixVerboses.RemoveDestinationFile(fileTransfer.Destination));
+                            this.Messaging.Write(VerboseMessages.RemoveDestinationFile(fileTransfer.Destination));
 
                             // try to ensure the file is not read-only
                             FileAttributes attributes = File.GetAttributes(fileTransfer.Destination);
@@ -96,7 +100,7 @@ namespace WixToolset.Core.Bind
                             }
                             catch (ArgumentException) // thrown for unauthorized access errors
                             {
-                                throw new WixException(WixErrors.UnauthorizedAccess(fileTransfer.Destination));
+                                throw new WixException(ErrorMessages.UnauthorizedAccess(fileTransfer.Destination));
                             }
 
                             // try to delete the file
@@ -106,7 +110,7 @@ namespace WixToolset.Core.Bind
                             }
                             catch (IOException)
                             {
-                                throw new WixException(WixErrors.FileInUse(null, fileTransfer.Destination));
+                                throw new WixException(ErrorMessages.FileInUse(null, fileTransfer.Destination));
                             }
 
                             retry = true;
@@ -126,7 +130,7 @@ namespace WixToolset.Core.Bind
 
                         if (File.Exists(fileTransfer.Destination))
                         {
-                            Messaging.Instance.OnMessage(WixVerboses.RemoveDestinationFile(fileTransfer.Destination));
+                            this.Messaging.Write(VerboseMessages.RemoveDestinationFile(fileTransfer.Destination));
 
                             // ensure the file is not read-only, then delete it
                             FileAttributes attributes = File.GetAttributes(fileTransfer.Destination);
@@ -137,7 +141,7 @@ namespace WixToolset.Core.Bind
                             }
                             catch (IOException)
                             {
-                                throw new WixException(WixErrors.FileInUse(null, fileTransfer.Destination));
+                                throw new WixException(ErrorMessages.FileInUse(null, fileTransfer.Destination));
                             }
 
                             retry = true;
@@ -168,7 +172,7 @@ namespace WixToolset.Core.Bind
                 }
                 catch
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.UnableToResetAcls());
+                    this.Messaging.Write(WarningMessages.UnableToResetAcls());
                 }
             }
         }

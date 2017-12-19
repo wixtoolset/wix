@@ -109,7 +109,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (ArgumentException)
             {
-                throw new WixException(WixErrors.IllegalCharactersInPath(path));
+                throw new WixException(ErrorMessages.IllegalCharactersInPath(path));
             }
         }
     }

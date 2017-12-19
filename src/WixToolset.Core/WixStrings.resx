@@ -117,38 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="EXP_CannotIndexIntoFileRowCollection" xml:space="preserve">
-    <value>Cannot index into a FileRowCollection that allows duplicate FileIds</value>
-  </data>
-  <data name="EXP_CannotModularizeIllegalID" xml:space="preserve">
-    <value>The value '{0}' is not a legal identifier and therefore cannot be modularized.</value>
-  </data>
-  <data name="EXP_CannotSetColumnWithValueGreaterThanMaxValue" xml:space="preserve">
-    <value>Cannot set column '{0}' with value {1} because it is greater than the maximum allowed value for this column, {2}.</value>
-  </data>
-  <data name="EXP_CannotSetColumnWithValueLessThanMinValue" xml:space="preserve">
-    <value>Cannot set column '{0}' with value {1} because it is less than the minimum allowed value for this column, {2}.</value>
-  </data>
-  <data name="EXP_CannotSetMergeTableFileCompressionColumnToInvalidValue" xml:space="preserve">
-    <value>A Merge table FileCompression column cannot be set to the invalid value '{0}'.</value>
-  </data>
-  <data name="EXP_CannotSetNullOnRequiredField" xml:space="preserve">
-    <value>Cannot set column '{0}' with a null value because this is a required field.</value>
-  </data>
-  <data name="EXP_CannotSetNumberColumnWithValueOfType" xml:space="preserve">
-    <value>Cannot set number column '{0}' with a value of type '{1}'.</value>
-  </data>
-  <data name="EXP_CannotSetStringColumnWithValueOfType" xml:space="preserve">
-    <value>Cannot set string column '{0}' with a value of type '{1}'.</value>
-  </data>
-  <data name="EXP_CouldnotDetermineProductCodeFromTransformSummaryInfo" xml:space="preserve">
-    <value>Could not determine ProductCode from transform summary information</value>
-  </data>
   <data name="EXP_CouldnotFileUniqueIDForResourceName" xml:space="preserve">
     <value>Could not find a unique identifier for the given resource name.</value>
-  </data>
-  <data name="EXP_DidnotFindDuplicateSymbol" xml:space="preserve">
-    <value>Didn't find duplicated symbol.</value>
   </data>
   <data name="EXP_ExpectedComplexReferenceType" xml:space="preserve">
     <value>Expected ComplexReference type.</value>
@@ -159,23 +129,8 @@
   <data name="EXP_FoundActionRowWithNoSequenceBeforeOrAfterColumnSet" xml:space="preserve">
     <value>Found an ActionRow with no Sequence, Before, or After column set.</value>
   </data>
-  <data name="EXP_IllegalArgumentsPassed" xml:space="preserve">
-    <value>Illegal arguments passed.</value>
-  </data>
-  <data name="EXP_InvalidTableNamePassed" xml:space="preserve">
-    <value>Invalid table name passed into GenerateIdentifier.</value>
-  </data>
-  <data name="EXP_MergeTableFileCompressionColumnContainsInvalidValue" xml:space="preserve">
-    <value>A Merge table FileCompression column contains an invalid value '{0}'.</value>
-  </data>
   <data name="EXP_MultipleHarvesterExtensionsSpecified" xml:space="preserve">
     <value>Multiple harvester extensions specified.</value>
-  </data>
-  <data name="EXP_OtherObjectIsNotFileRow" xml:space="preserve">
-    <value>The other object is not a FileRow.</value>
-  </data>
-  <data name="EXP_TransformAuthoredIntoMultipleMedia" xml:space="preserve">
-    <value>Transform authored into multiple Media '{0}' and '{1}'.</value>
   </data>
   <data name="EXP_UnexpectedComplexReferenceChildType" xml:space="preserve">
     <value>Unexpected complex reference child type: {0}</value>
@@ -189,38 +144,8 @@
   <data name="EXP_UnexpectedMergerErrorWithType" xml:space="preserve">
     <value>Encountered an unexpected merge error of type '{0}' for which there is currently no error message to display.  More information about the merge and the failure can be found in the merge log: '{1}'</value>
   </data>
-  <data name="EXP_UnknowControlAttribute" xml:space="preserve">
-    <value>Unknown control attribute: '{0}'.</value>
-  </data>
-  <data name="EXP_UnknownColumnType" xml:space="preserve">
-    <value>Unknown column type: {0}</value>
-  </data>
-  <data name="EXP_UnknownCompressionLevelType" xml:space="preserve">
-    <value>Unknown compression level type: {0}</value>
-  </data>
-  <data name="EXP_UnknownCustomColumnCategory" xml:space="preserve">
-    <value>Unknown custom column category '{0}'.</value>
-  </data>
-  <data name="EXP_UnknownCustomColumnModularizationType" xml:space="preserve">
-    <value>Unknown custom column modularization type '{0}'.</value>
-  </data>
-  <data name="EXP_UnknownCustomColumnType" xml:space="preserve">
-    <value>Unknown custom column type '{0}'.</value>
-  </data>
-  <data name="EXP_UnknownOutputType" xml:space="preserve">
-    <value>Unknown output type.</value>
-  </data>
-  <data name="EXP_UnknownPermissionAttribute" xml:space="preserve">
-    <value>Unknown permission attribute '{0}'.</value>
-  </data>
-  <data name="EXP_UnknowSequenceTable" xml:space="preserve">
-    <value>Unknown sequence table.</value>
-  </data>
   <data name="EXP_UnknownPlatformEnum" xml:space="preserve">
     <value>Unknown platform enumeration '{0}' encountered.</value>
-  </data>
-  <data name="EXP_UnsupportedTable" xml:space="preserve">
-    <value>The table {0} is not supported.</value>
   </data>
   <data name="Format_FirstLineNumber" xml:space="preserve">
     <value>{0}({1})</value>

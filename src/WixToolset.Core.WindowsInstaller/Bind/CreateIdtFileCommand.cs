@@ -8,16 +8,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Text;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Services;
 
     internal class CreateIdtFileCommand
     {
-        public CreateIdtFileCommand(Table table, int codepage, string intermediateFolder, bool keepAddedColumns)
+        public CreateIdtFileCommand(IMessaging messaging, Table table, int codepage, string intermediateFolder, bool keepAddedColumns)
         {
+            this.Messaging = messaging;
             this.Table = table;
             this.Codepage = codepage;
             this.IntermediateFolder = intermediateFolder;
             this.KeepAddedColumns = keepAddedColumns;
         }
+
+        private IMessaging Messaging { get; }
 
         private Table Table { get; }
 
@@ -67,7 +71,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (TableDefinition.MaxColumnsInRealTable < table.Definition.Columns.Count)
             {
-                throw new WixException(WixDataErrors.TooManyColumnsInRealTable(table.Definition.Name, table.Definition.Columns.Count, TableDefinition.MaxColumnsInRealTable));
+                throw new WixException(ErrorMessages.TooManyColumnsInRealTable(table.Definition.Name, table.Definition.Columns.Count, TableDefinition.MaxColumnsInRealTable));
             }
 
             // Tack on the table header, and flush before we start writing bytes directly to the stream.
@@ -98,7 +102,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     catch (EncoderFallbackException)
                     {
-                        Messaging.Instance.OnMessage(WixDataErrors.InvalidStringForCodepage(row.SourceLineNumbers, Convert.ToString(writer.Encoding.WindowsCodePage, CultureInfo.InvariantCulture)));
+                        this.Messaging.Write(ErrorMessages.InvalidStringForCodepage(row.SourceLineNumbers, Convert.ToString(writer.Encoding.WindowsCodePage, CultureInfo.InvariantCulture)));
 
                         rowBytes = convertEncoding.GetBytes(rowString);
                     }

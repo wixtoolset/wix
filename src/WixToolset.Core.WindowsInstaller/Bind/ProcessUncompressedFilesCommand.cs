@@ -97,7 +97,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             {
                                 if (null == fileRecord)
                                 {
-                                    throw new WixException(WixErrors.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.File));
+                                    throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.File));
                                 }
 
                                 relativeFileLayoutPath = Binder.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);

@@ -17,7 +17,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public Messaging Messaging { get; set; }
+        public IMessaging Messaging { get; set; }
 
         public IEnumerable<ILinkerExtension> Extensions { get; set; }
 

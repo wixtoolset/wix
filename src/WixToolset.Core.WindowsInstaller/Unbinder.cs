@@ -53,11 +53,11 @@ namespace WixToolset.Core
             {
                 if (OutputType.Transform == outputType)
                 {
-                    throw new WixException(WixErrors.FileNotFound(null, file, "Transform"));
+                    throw new WixException(ErrorMessages.FileNotFound(null, file, "Transform"));
                 }
                 else
                 {
-                    throw new WixException(WixErrors.FileNotFound(null, file, "Database"));
+                    throw new WixException(ErrorMessages.FileNotFound(null, file, "Database"));
                 }
             }
 

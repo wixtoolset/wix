@@ -11,6 +11,7 @@ namespace WixToolset.Core
     public class WixToolsetServiceProvider : IServiceProvider
     {
         private ExtensionManager extensionManager;
+        private Messaging messaging;
         private ParseHelper parseHelper;
         private PreprocessHelper preprocessHelper;
         private TupleDefinitionCreator tupleDefinitionCreator;
@@ -60,6 +61,11 @@ namespace WixToolset.Core
             if (serviceType == typeof(IExtensionManager))
             {
                 return this.extensionManager = this.extensionManager ?? new ExtensionManager();
+            }
+
+            if (serviceType == typeof(IMessaging))
+            {
+                return this.messaging = this.messaging ?? new Messaging();
             }
 
             if (serviceType == typeof(ITupleDefinitionCreator))

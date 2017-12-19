@@ -215,7 +215,7 @@ namespace WixToolset.Core
                 this.Layout(bindResult);
             }
 
-            return Messaging.Instance.EncounteredError;
+            return this.Context.Messaging.EncounteredError;
         }
 
         private ResolveResult Resolve()
@@ -227,6 +227,7 @@ namespace WixToolset.Core
             IEnumerable<DelayedField> delayedFields;
             {
                 var command = new ResolveFieldsCommand();
+                command.Messaging = this.Context.Messaging;
                 command.BuildingPatch = buildingPatch;
                 command.BindVariableResolver = this.Context.WixVariableResolver;
                 command.BindPaths = this.Context.BindPaths;
@@ -437,12 +438,12 @@ namespace WixToolset.Core
             {
                 if (!this.DeleteTempFiles())
                 {
-                    this.Context.Messaging.OnMessage(WixWarnings.FailedToDeleteTempDir(this.TempFilesLocation));
+                    this.Context.Messaging.Write(WarningMessages.FailedToDeleteTempDir(this.TempFilesLocation));
                 }
             }
             else
             {
-                this.Context.Messaging.OnMessage(WixVerboses.BinderTempDirLocatedAt(this.TempFilesLocation));
+                this.Context.Messaging.Write(VerboseMessages.BinderTempDirLocatedAt(this.TempFilesLocation));
             }
         }
 
@@ -594,9 +595,9 @@ namespace WixToolset.Core
         {
             if (null != transfers && transfers.Any())
             {
-                this.Context.Messaging.OnMessage(WixVerboses.LayingOutMedia());
+                this.Context.Messaging.Write(VerboseMessages.LayingOutMedia());
 
-                var command = new TransferFilesCommand(this.Context.BindPaths, this.Context.Extensions, transfers, this.Context.SuppressAclReset);
+                var command = new TransferFilesCommand(this.Context.Messaging, this.Context.BindPaths, this.Context.Extensions, transfers, this.Context.SuppressAclReset);
                 command.Execute();
             }
         }
@@ -613,7 +614,7 @@ namespace WixToolset.Core
         {
             if (!directories.ContainsKey(directory))
             {
-                throw new WixException(WixErrors.ExpectedDirectory(directory));
+                throw new WixException(ErrorMessages.ExpectedDirectory(directory));
             }
 
             ResolvedDirectory resolvedDirectory = (ResolvedDirectory)directories[directory];

@@ -6,6 +6,7 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// The preprocessor core.
@@ -19,7 +20,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public Messaging Messaging { get; set; }
+        public IMessaging Messaging { get; set; }
 
         public IEnumerable<IPreprocessorExtension> Extensions { get; set; }
 

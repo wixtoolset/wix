@@ -15,17 +15,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Core.Bind;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Retrieve files information and extract them from merge modules.
     /// </summary>
     internal class ExtractMergeModuleFilesCommand
     {
-        public ExtractMergeModuleFilesCommand(IntermediateSection section, List<WixMergeTuple> wixMergeTuples)
+        public ExtractMergeModuleFilesCommand(IMessaging messaging, IntermediateSection section, List<WixMergeTuple> wixMergeTuples)
         {
+            this.Messaging = messaging;
             this.Section = section;
             this.WixMergeTuples = wixMergeTuples;
         }
+
+        private IMessaging Messaging { get; }
 
         private IntermediateSection Section { get; }
 
@@ -121,11 +125,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     // If case-sensitive collision with another merge module or a user-authored file identifier.
                                     if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.File.File, out var collidingFacade))
                                     {
-                                        Messaging.Instance.OnMessage(WixErrors.DuplicateModuleFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, collidingFacade.File.File));
+                                        this.Messaging.Write(ErrorMessages.DuplicateModuleFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, collidingFacade.File.File));
                                     }
                                     else if (uniqueModuleFileIdentifiers.TryGetValue(mergeModuleFileFacade.File.File, out collidingFacade)) // case-insensitive collision with another file identifier in the same merge module
                                     {
-                                        Messaging.Instance.OnMessage(WixErrors.DuplicateModuleCaseInsensitiveFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, mergeModuleFileFacade.File.File, collidingFacade.File.File));
+                                        this.Messaging.Write(ErrorMessages.DuplicateModuleCaseInsensitiveFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, mergeModuleFileFacade.File.File, collidingFacade.File.File));
                                     }
                                     else // no collision
                                     {
@@ -152,23 +156,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             int moduleInstallerVersion = Convert.ToInt32(moduleInstallerVersionString, CultureInfo.InvariantCulture);
                             if (moduleInstallerVersion > this.OutputInstallerVersion)
                             {
-                                Messaging.Instance.OnMessage(WixWarnings.InvalidHigherInstallerVersionInModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleInstallerVersion, this.OutputInstallerVersion));
+                                this.Messaging.Write(WarningMessages.InvalidHigherInstallerVersionInModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleInstallerVersion, this.OutputInstallerVersion));
                             }
                         }
                         catch (FormatException)
                         {
-                            throw new WixException(WixErrors.MissingOrInvalidModuleInstallerVersion(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.SourceFile, moduleInstallerVersionString));
+                            throw new WixException(ErrorMessages.MissingOrInvalidModuleInstallerVersion(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.SourceFile, moduleInstallerVersionString));
                         }
                     }
                 }
             }
             catch (FileNotFoundException)
             {
-                throw new WixException(WixErrors.FileNotFound(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
+                throw new WixException(ErrorMessages.FileNotFound(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
             }
             catch (Win32Exception)
             {
-                throw new WixException(WixErrors.CannotOpenMergeModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.SourceFile));
+                throw new WixException(ErrorMessages.CannotOpenMergeModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.SourceFile));
             }
 
             return containsFiles;
@@ -187,7 +191,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (FormatException)
             {
-                Messaging.Instance.OnMessage(WixErrors.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, mergeId, wixMergeRow.Language.ToString()));
+                this.Messaging.Write(ErrorMessages.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, mergeId, wixMergeRow.Language.ToString()));
                 return;
             }
 
@@ -210,16 +214,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (FileNotFoundException)
                 {
-                    throw new WixException(WixErrors.CabFileDoesNotExist(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
+                    throw new WixException(ErrorMessages.CabFileDoesNotExist(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
                 }
                 catch
                 {
-                    throw new WixException(WixErrors.CabExtractionFailed(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
+                    throw new WixException(ErrorMessages.CabExtractionFailed(moduleCabPath, wixMergeRow.SourceFile, mergeIdPath));
                 }
             }
             catch (COMException ce)
             {
-                throw new WixException(WixErrors.UnableToOpenModule(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile, ce.Message));
+                throw new WixException(ErrorMessages.UnableToOpenModule(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile, ce.Message));
             }
             finally
             {

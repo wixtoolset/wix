@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core
+namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
     using System.Collections.Generic;
@@ -83,7 +83,7 @@ namespace WixToolset.Core
             }
             catch (Exception e)
             {
-                throw new WixException(WixErrors.InvalidExtension(assemblyName, e.Message), e);
+                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, e.Message), e);
             }
         }
 
@@ -102,11 +102,11 @@ namespace WixToolset.Core
                     return false;
                 }
 
-                throw new WixException(WixErrors.InvalidExtension(assemblyName, innerE.Message), innerE);
+                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, innerE.Message), innerE);
             }
             catch (Exception e)
             {
-                throw new WixException(WixErrors.InvalidExtension(assemblyName, e.Message), e);
+                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, e.Message), e);
             }
         }
     }

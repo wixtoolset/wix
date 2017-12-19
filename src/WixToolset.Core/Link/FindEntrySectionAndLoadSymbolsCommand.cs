@@ -6,13 +6,17 @@ namespace WixToolset.Core.Link
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
-    internal class FindEntrySectionAndLoadSymbolsCommand : ICommand
+    internal class FindEntrySectionAndLoadSymbolsCommand
     {
-        public FindEntrySectionAndLoadSymbolsCommand(IEnumerable<IntermediateSection> sections)
+        public FindEntrySectionAndLoadSymbolsCommand(IMessaging messaging, IEnumerable<IntermediateSection> sections)
         {
+            this.Messaging = messaging;
             this.Sections = sections;
         }
+
+        private IMessaging Messaging { get; }
 
         private IEnumerable<IntermediateSection> Sections { get; }
 
@@ -55,7 +59,7 @@ namespace WixToolset.Core.Link
                     //if (SectionType.Unknown != expectedEntrySectionType && section.Type != expectedEntrySectionType)
                     //{
                     //    string outputExtension = Output.GetExtension(this.ExpectedOutputType);
-                    //    Messaging.Instance.OnMessage(WixWarnings.UnexpectedEntrySection(section.SourceLineNumbers, section.Type.ToString(), expectedEntrySectionType.ToString(), outputExtension));
+                    //    this.Messaging.Write(WixWarnings.UnexpectedEntrySection(section.SourceLineNumbers, section.Type.ToString(), expectedEntrySectionType.ToString(), outputExtension));
                     //}
 
                     if (null == this.EntrySection)
@@ -64,8 +68,8 @@ namespace WixToolset.Core.Link
                     }
                     else
                     {
-                        Messaging.Instance.OnMessage(WixErrors.MultipleEntrySections(this.EntrySection.Tuples.FirstOrDefault()?.SourceLineNumbers, this.EntrySection.Id, section.Id));
-                        Messaging.Instance.OnMessage(WixErrors.MultipleEntrySections2(section.Tuples.FirstOrDefault()?.SourceLineNumbers));
+                        this.Messaging.Write(ErrorMessages.MultipleEntrySections(this.EntrySection.Tuples.FirstOrDefault()?.SourceLineNumbers, this.EntrySection.Id, section.Id));
+                        this.Messaging.Write(ErrorMessages.MultipleEntrySections2(section.Tuples.FirstOrDefault()?.SourceLineNumbers));
                     }
                 }
 

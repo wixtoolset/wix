@@ -13,6 +13,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Services;
     using WixToolset.MergeMod;
     using WixToolset.Msi;
 
@@ -22,6 +23,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     internal class MergeModulesCommand
     {
         public IEnumerable<FileFacade> FileFacades { private get; set; }
+
+        public IMessaging Messaging { private get; set; }
 
         public Output Output { private get; set; }
 
@@ -73,11 +76,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         catch (FormatException)
                         {
-                            Messaging.Instance.OnMessage(WixErrors.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, wixMergeRow.Language));
+                            this.Messaging.Write(ErrorMessages.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, wixMergeRow.Language));
                             continue;
                         }
 
-                        Messaging.Instance.OnMessage(WixVerboses.OpeningMergeModule(wixMergeRow.SourceFile, mergeLanguage));
+                        this.Messaging.Write(VerboseMessages.OpeningMergeModule(wixMergeRow.SourceFile, mergeLanguage));
                         merge.OpenModule(wixMergeRow.SourceFile, mergeLanguage);
                         moduleOpen = true;
 
@@ -89,7 +92,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
 
                         // merge the module into the database that's being built
-                        Messaging.Instance.OnMessage(WixVerboses.MergingMergeModule(wixMergeRow.SourceFile));
+                        this.Messaging.Write(VerboseMessages.MergingMergeModule(wixMergeRow.SourceFile));
                         merge.MergeEx(wixMergeRow.Feature, wixMergeRow.Directory, callback);
 
                         // connect any non-primary features
@@ -99,7 +102,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             {
                                 if (wixMergeRow.Id == (string)row[1])
                                 {
-                                    Messaging.Instance.OnMessage(WixVerboses.ConnectingMergeModule(wixMergeRow.SourceFile, (string)row[0]));
+                                    this.Messaging.Write(VerboseMessages.ConnectingMergeModule(wixMergeRow.SourceFile, (string)row[0]));
                                     merge.Connect((string)row[0]);
                                 }
                             }
@@ -144,38 +147,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             switch (mergeError.Type)
                             {
                                 case MsmErrorType.msmErrorExclusion:
-                                    Messaging.Instance.OnMessage(WixErrors.MergeExcludedModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, moduleKeys.ToString()));
+                                    this.Messaging.Write(ErrorMessages.MergeExcludedModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, moduleKeys.ToString()));
                                     break;
                                 case MsmErrorType.msmErrorFeatureRequired:
-                                    Messaging.Instance.OnMessage(WixErrors.MergeFeatureRequired(wixMergeRow.SourceLineNumbers, mergeError.ModuleTable, moduleKeys.ToString(), wixMergeRow.SourceFile, wixMergeRow.Id));
+                                    this.Messaging.Write(ErrorMessages.MergeFeatureRequired(wixMergeRow.SourceLineNumbers, mergeError.ModuleTable, moduleKeys.ToString(), wixMergeRow.SourceFile, wixMergeRow.Id));
                                     break;
                                 case MsmErrorType.msmErrorLanguageFailed:
-                                    Messaging.Instance.OnMessage(WixErrors.MergeLanguageFailed(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
+                                    this.Messaging.Write(ErrorMessages.MergeLanguageFailed(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorLanguageUnsupported:
-                                    Messaging.Instance.OnMessage(WixErrors.MergeLanguageUnsupported(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
+                                    this.Messaging.Write(ErrorMessages.MergeLanguageUnsupported(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorResequenceMerge:
-                                    Messaging.Instance.OnMessage(WixWarnings.MergeRescheduledAction(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
+                                    this.Messaging.Write(WarningMessages.MergeRescheduledAction(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorTableMerge:
                                     if ("_Validation" != mergeError.DatabaseTable) // ignore merge errors in the _Validation table
                                     {
-                                        Messaging.Instance.OnMessage(WixWarnings.MergeTableFailed(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
+                                        this.Messaging.Write(WarningMessages.MergeTableFailed(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
                                     }
                                     break;
                                 case MsmErrorType.msmErrorPlatformMismatch:
-                                    Messaging.Instance.OnMessage(WixErrors.MergePlatformMismatch(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
+                                    this.Messaging.Write(ErrorMessages.MergePlatformMismatch(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
                                     break;
                                 default:
-                                    Messaging.Instance.OnMessage(WixErrors.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedMergerErrorWithType, Enum.GetName(typeof(MsmErrorType), mergeError.Type), logPath), "InvalidOperationException", Environment.StackTrace));
+                                    this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedMergerErrorWithType, Enum.GetName(typeof(MsmErrorType), mergeError.Type), logPath), "InvalidOperationException", Environment.StackTrace));
                                     break;
                             }
                         }
 
                         if (0 >= mergeErrors.Count && !commit)
                         {
-                            Messaging.Instance.OnMessage(WixErrors.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedMergerErrorInSourceFile, wixMergeRow.SourceFile, logPath), "InvalidOperationException", Environment.StackTrace));
+                            this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedMergerErrorInSourceFile, wixMergeRow.SourceFile, logPath), "InvalidOperationException", Environment.StackTrace));
                         }
 
                         if (moduleOpen)
@@ -199,7 +202,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // stop processing if an error previously occurred
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -223,7 +226,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 {
                                     if (null != record)
                                     {
-                                        Messaging.Instance.OnMessage(WixWarnings.SuppressMergedAction((string)row[1], row[0].ToString()));
+                                        this.Messaging.Write(WarningMessages.SuppressMergedAction((string)row[1], row[0].ToString()));
                                         view.Modify(ModifyView.Delete, record);
                                     }
                                 }
@@ -251,7 +254,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     break;
                                 }
 
-                                Messaging.Instance.OnMessage(WixWarnings.SuppressMergedAction(resultRecord.GetString(1), tableName));
+                                this.Messaging.Write(WarningMessages.SuppressMergedAction(resultRecord.GetString(1), tableName));
                             }
                         }
                     }
@@ -273,7 +276,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // now update the Attributes column for the files from the Merge Modules
-                Messaging.Instance.OnMessage(WixVerboses.ResequencingMergeModuleFiles());
+                this.Messaging.Write(VerboseMessages.ResequencingMergeModuleFiles());
                 using (View view = db.OpenView("SELECT `Sequence`, `Attributes` FROM `File` WHERE `File`=?"))
                 {
                     foreach (var file in this.FileFacades)

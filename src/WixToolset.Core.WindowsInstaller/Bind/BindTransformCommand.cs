@@ -6,11 +6,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Msi;
     using WixToolset.Core.Native;
+    using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
+    using WixToolset.Msi;
 
     internal class BindTransformCommand
     {
@@ -21,6 +22,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public string TempFilesLocation { private get; set; }
 
         public Output Transform { private get; set; }
+
+        public IMessaging Messaging { private get; set; }
 
         public string OutputPath { private get; set; }
 
@@ -197,7 +200,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (((int)TransformFlags.ValidateUpgradeCode & transformFlags) != 0 &&
                 (String.IsNullOrEmpty(targetUpgradeCode) || String.IsNullOrEmpty(updatedUpgradeCode)))
             {
-                Messaging.Instance.OnMessage(WixErrors.BothUpgradeCodesRequired());
+                this.Messaging.Write(ErrorMessages.BothUpgradeCodesRequired());
             }
 
             string emptyFile = null;
@@ -276,7 +279,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             {
                                 if (RowOperation.Add == fileRow.Operation)
                                 {
-                                    Messaging.Instance.OnMessage(WixErrors.InvalidAddedFileRowWithoutSequence(fileRow.SourceLineNumbers, (string)fileRow[0]));
+                                    this.Messaging.Write(ErrorMessages.InvalidAddedFileRowWithoutSequence(fileRow.SourceLineNumbers, (string)fileRow[0]));
                                     break;
                                 }
 
@@ -384,7 +387,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             //}
 
             // Any errors encountered up to this point can cause errors during generation.
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -419,7 +422,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            Messaging.Instance.OnMessage(WixErrors.NoDifferencesInTransform(this.Transform.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.NoDifferencesInTransform(this.Transform.SourceLineNumbers));
                         }
                     }
                 }

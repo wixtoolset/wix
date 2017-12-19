@@ -35,6 +35,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
             this.Extensions = context.Extensions;
             this.Intermediate = context.IntermediateRepresentation;
+            this.Messaging = context.Messaging;
             this.OutputPath = context.OutputPath;
             this.PdbFile = context.OutputPdbPath;
             this.IntermediateFolder = context.IntermediateFolder;
@@ -67,6 +68,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private string PdbFile { get; }
 
         private Intermediate Intermediate { get; }
+
+        private IMessaging Messaging { get; }
 
         private string OutputPath { get; }
 
@@ -160,7 +163,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Sequence all the actions.
             {
                 var command = new SequenceActionsCommand(section);
-                command.Messaging = Messaging.Instance;
+                command.Messaging = this.Messaging;
                 command.Execute();
             }
 
@@ -191,12 +194,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             ////}
 #endif
 
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
 
-            Messaging.Instance.OnMessage(WixVerboses.UpdatingFileInformation());
+            this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
 
             // This must occur after all variables and source paths have been resolved.
             List<FileFacade> fileFacades;
@@ -215,7 +218,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Gather information about files that did not come from merge modules (i.e. rows with a reference to the File table).
             {
-                var command = new UpdateFileFacadesCommand(section);
+                var command = new UpdateFileFacadesCommand(this.Messaging, section);
                 command.FileFacades = fileFacades;
                 command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
                 command.OverwriteHash = true;
@@ -227,13 +230,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Now that the variable cache is populated, resolve any delayed fields.
             if (this.DelayedFields.Any())
             {
-                var command = new ResolveDelayedFieldsCommand(this.DelayedFields, variableCache);
+                var command = new ResolveDelayedFieldsCommand(this.Messaging, this.DelayedFields, variableCache);
                 command.Execute();
             }
 
             // Set generated component guids.
             {
-                var command = new CalculateComponentGuids(section);
+                var command = new CalculateComponentGuids(this.Messaging, section);
                 command.Execute();
             }
 
@@ -244,7 +247,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (wixMergeTuples.Any())
                 {
-                    var command = new ExtractMergeModuleFilesCommand(section, wixMergeTuples);
+                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, section, wixMergeTuples);
                     command.FileFacades = fileFacades;
                     command.OutputInstallerVersion = installerVersion;
                     command.SuppressLayout = this.SuppressLayout;
@@ -265,7 +268,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 #endif
 
             // stop processing if an error previously occurred
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -280,7 +283,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
             IEnumerable<FileFacade> uncompressedFiles;
             {
-                var command = new AssignMediaCommand(section);
+                var command = new AssignMediaCommand(section, this.Messaging);
                 command.FileFacades = fileFacades;
                 command.FilesCompressed = compressed;
                 command.Execute();
@@ -291,7 +294,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // stop processing if an error previously occurred
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -355,7 +358,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 #endif
 
             // Stop processing if an error previously occurred.
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -374,13 +377,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             string layoutDirectory = Path.GetDirectoryName(this.OutputPath);
             if (!this.SuppressLayout || OutputType.Module == output.Type)
             {
-                Messaging.Instance.OnMessage(WixVerboses.CreatingCabinetFiles());
+                this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
                 var command = new CreateCabinetsCommand();
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
                 command.Output = output;
+                command.Messaging = this.Messaging;
                 command.BackendExtensions = this.BackendExtensions;
                 command.LayoutDirectory = layoutDirectory;
                 command.Compressed = compressed;
@@ -435,13 +439,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ValidateComponentGuids(output);
 
             // stop processing if an error previously occurred
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
 
             // Generate database file.
-            Messaging.Instance.OnMessage(WixVerboses.GeneratingDatabase());
+            this.Messaging.Write(VerboseMessages.GeneratingDatabase());
             string tempDatabaseFile = Path.Combine(this.IntermediateFolder, Path.GetFileName(this.OutputPath));
             this.GenerateDatabase(output, tempDatabaseFile, false, false);
 
@@ -452,7 +456,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Stop processing if an error previously occurred.
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -468,7 +472,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Merge modules.
             if (OutputType.Product == output.Type)
             {
-                Messaging.Instance.OnMessage(WixVerboses.MergingModules());
+                this.Messaging.Write(VerboseMessages.MergingModules());
 
                 var command = new MergeModulesCommand();
                 command.FileFacades = fileFacades;
@@ -478,7 +482,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -492,12 +496,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // set the output file for source line information
                 this.Validator.Output = this.Output;
 
-                Messaging.Instance.OnMessage(WixVerboses.ValidatingDatabase());
+                Messaging.Instance.Write(WixVerboses.ValidatingDatabase());
 
                 this.Validator.Validate(tempDatabaseFile);
 
                 stopwatch.Stop();
-                Messaging.Instance.OnMessage(WixVerboses.ValidatedDatabase(stopwatch.ElapsedMilliseconds));
+                Messaging.Instance.Write(WixVerboses.ValidatedDatabase(stopwatch.ElapsedMilliseconds));
 
                 // Stop processing if an error occurred.
                 if (Messaging.Instance.EncounteredError)
@@ -508,7 +512,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 #endif
 
             // Process uncompressed files.
-            if (!Messaging.Instance.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
+            if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
             {
                 var command = new ProcessUncompressedFilesCommand(section);
                 command.Compressed = compressed;
@@ -908,11 +912,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             if (allComponentsHaveConditions)
                             {
-                                Messaging.Instance.OnMessage(WixWarnings.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(row.SourceLineNumbers, row.Component, row.Guid));
+                                this.Messaging.Write(WarningMessages.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(row.SourceLineNumbers, row.Component, row.Guid));
                             }
                             else
                             {
-                                Messaging.Instance.OnMessage(WixErrors.DuplicateComponentGuids(row.SourceLineNumbers, row.Component, row.Guid));
+                                this.Messaging.Write(ErrorMessages.DuplicateComponentGuids(row.SourceLineNumbers, row.Component, row.Guid));
                             }
                         }
 
@@ -929,6 +933,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private void UpdateControlText(Output output)
         {
             var command = new UpdateControlTextCommand();
+            command.Messaging = this.Messaging;
             command.BBControlTable = output.Tables["BBControl"];
             command.WixBBControlTable = output.Tables["WixBBControl"];
             command.ControlTable = output.Tables["Control"];

@@ -96,14 +96,5 @@ namespace WixToolset
 
             return Enumerable.Empty<string>();
         }
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="e">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
-        }
     }
 }

@@ -11,6 +11,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// WiX variable resolver.
@@ -22,16 +23,15 @@ namespace WixToolset.Core
         /// <summary>
         /// Instantiate a new WixVariableResolver.
         /// </summary>
-        public WixVariableResolver(Localizer localizer = null)
+        public WixVariableResolver(IMessaging messaging, Localizer localizer = null)
         {
             this.wixVariables = new Dictionary<string, string>();
+            this.Messaging = messaging;
             this.Localizer = localizer;
         }
 
-        /// <summary>
-        /// Gets or sets the localizer.
-        /// </summary>
-        /// <value>The localizer.</value>
+        private IMessaging Messaging { get; }
+
         private Localizer Localizer { get; }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace WixToolset.Core
             }
             catch (ArgumentException)
             {
-                Messaging.Instance.OnMessage(WixErrors.WixVariableCollision(null, name));
+                this.Messaging.Write(ErrorMessages.WixVariableCollision(null, name));
             }
         }
 
@@ -70,7 +70,7 @@ namespace WixToolset.Core
             {
                 if (!wixVariableRow.Overridable) // collision
                 {
-                    Messaging.Instance.OnMessage(WixErrors.WixVariableCollision(wixVariableRow.SourceLineNumbers, wixVariableRow.WixVariable));
+                    this.Messaging.Write(ErrorMessages.WixVariableCollision(wixVariableRow.SourceLineNumbers, wixVariableRow.WixVariable));
                 }
             }
         }
@@ -153,7 +153,7 @@ namespace WixToolset.Core
                         // localization variables to not support inline default values
                         if ("loc" == variableNamespace)
                         {
-                            Messaging.Instance.OnMessage(WixErrors.IllegalInlineLocVariable(sourceLineNumbers, variableId, variableDefaultValue));
+                            this.Messaging.Write(ErrorMessages.IllegalInlineLocVariable(sourceLineNumbers, variableId, variableDefaultValue));
                         }
                     }
 
@@ -183,7 +183,7 @@ namespace WixToolset.Core
                             // warn about deprecated syntax of $(loc.var)
                             if ('$' == sb[matches[i].Index])
                             {
-                                Messaging.Instance.OnMessage(WixWarnings.DeprecatedLocalizationVariablePrefix(sourceLineNumbers, variableId));
+                                this.Messaging.Write(WarningMessages.DeprecatedLocalizationVariablePrefix(sourceLineNumbers, variableId));
                             }
 
                             resolvedValue = this.Localizer?.GetLocalizedValue(variableId);
@@ -193,7 +193,7 @@ namespace WixToolset.Core
                             // illegal syntax of $(wix.var)
                             if ('$' == sb[matches[i].Index])
                             {
-                                Messaging.Instance.OnMessage(WixErrors.IllegalWixVariablePrefix(sourceLineNumbers, variableId));
+                                this.Messaging.Write(ErrorMessages.IllegalWixVariablePrefix(sourceLineNumbers, variableId));
                             }
                             else
                             {
@@ -225,11 +225,11 @@ namespace WixToolset.Core
                             }
                             else if ("loc" == variableNamespace && errorOnUnknown) // unresolved loc variable
                             {
-                                Messaging.Instance.OnMessage(WixErrors.LocalizationVariableUnknown(sourceLineNumbers, variableId));
+                                this.Messaging.Write(ErrorMessages.LocalizationVariableUnknown(sourceLineNumbers, variableId));
                             }
                             else if (!localizationOnly && "wix" == variableNamespace && errorOnUnknown) // unresolved wix variable
                             {
-                                Messaging.Instance.OnMessage(WixErrors.WixVariableUnknown(sourceLineNumbers, variableId));
+                                this.Messaging.Write(ErrorMessages.WixVariableUnknown(sourceLineNumbers, variableId));
                             }
                         }
                     }
@@ -321,7 +321,7 @@ namespace WixToolset.Core
                             }
                             else
                             {
-                                throw new WixException(WixErrors.UnresolvedBindReference(sourceLineNumbers, value));
+                                throw new WixException(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
                             }
                         }
                     }

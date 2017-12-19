@@ -2,12 +2,15 @@
 
 namespace WixToolset.Core
 {
-    using WixToolset.Data;
+    using System;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class UnbindContext : IUnbindContext
     {
-        public Messaging Messaging { get; } = Messaging.Instance;
+        public IServiceProvider ServiceProvider { get; }
+
+        public IMessaging Messaging { get; set; }
 
         public string ExportBasePath { get; set; }
 

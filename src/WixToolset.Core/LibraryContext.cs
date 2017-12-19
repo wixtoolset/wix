@@ -6,12 +6,13 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     public class LibraryContext : ILibraryContext
     {
         public IServiceProvider ServiceProvider { get; }
 
-        public Messaging Messaging { get; set; }
+        public IMessaging Messaging { get; set; }
 
         public bool BindFiles { get; set; }
 

@@ -7,9 +7,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Services;
 
     internal class UpdateControlTextCommand
     {
+        public IMessaging Messaging { private get; set; }
+
         public Table BBControlTable { private get; set; }
 
         public Table WixBBControlTable { private get; set; }
@@ -60,19 +63,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (DirectoryNotFoundException e)
             {
-                Messaging.Instance.OnMessage(WixErrors.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
+                this.Messaging.Write(ErrorMessages.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
             }
             catch (FileNotFoundException e)
             {
-                Messaging.Instance.OnMessage(WixErrors.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
+                this.Messaging.Write(ErrorMessages.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
             }
             catch (IOException e)
             {
-                Messaging.Instance.OnMessage(WixErrors.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
+                this.Messaging.Write(ErrorMessages.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
             }
             catch (NotSupportedException)
             {
-                Messaging.Instance.OnMessage(WixErrors.FileNotFound(sourceLineNumbers, source));
+                this.Messaging.Write(ErrorMessages.FileNotFound(sourceLineNumbers, source));
             }
 
             return text;

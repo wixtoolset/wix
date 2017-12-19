@@ -12,11 +12,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     internal class UnbindDatabaseCommand
     {
-        public UnbindDatabaseCommand(Messaging messaging, Database database, string databasePath, OutputType outputType, string exportBasePath, string intermediateFolder, bool isAdminImage, bool suppressDemodularization, bool skipSummaryInfo)
+        public UnbindDatabaseCommand(IMessaging messaging, Database database, string databasePath, OutputType outputType, string exportBasePath, string intermediateFolder, bool isAdminImage, bool suppressDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
             this.Database = database;
@@ -31,7 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
         }
 
-        public Messaging Messaging { get; }
+        public IMessaging Messaging { get; }
 
         public Database Database { get; }
 
@@ -316,7 +317,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                                                         if (!success)
                                                         {
-                                                            this.Messaging.OnMessage(WixWarnings.BadColumnDataIgnored(row.SourceLineNumbers, Convert.ToString(intValue, CultureInfo.InvariantCulture), tableName, row.Fields[i].Column.Name));
+                                                            this.Messaging.Write(WarningMessages.BadColumnDataIgnored(row.SourceLineNumbers, Convert.ToString(intValue, CultureInfo.InvariantCulture), tableName, row.Fields[i].Column.Name));
                                                         }
                                                         break;
                                                     case ColumnType.Object:
@@ -480,7 +481,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                 if (!File.Exists(wixFileRow.Source))
                 {
-                    throw new WixException(WixErrors.WixFileNotFound(wixFileRow.Source));
+                    throw new WixException(ErrorMessages.WixFileNotFound(wixFileRow.Source));
                 }
 
                 wixFileTable.Rows.Add(wixFileRow);

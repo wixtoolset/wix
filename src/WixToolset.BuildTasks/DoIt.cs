@@ -9,6 +9,7 @@ namespace WixToolset.BuildTasks
     using Microsoft.Build.Utilities;
     using WixToolset.Core;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -16,11 +17,13 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public sealed class DoIt : Task
     {
-        public DoIt()
+        public DoIt() : this(null)
         {
-            Messaging.Instance.InitializeAppName("WIX", "wix.exe");
+        }
 
-            Messaging.Instance.Display += this.DisplayMessage;
+        public DoIt(IMessageListener listener)
+        {
+            this.Listener = listener ?? new MsbuildMessageListener(this.Log, "WIX", "wix.exe");
         }
 
         public string AdditionalOptions { get; set; }
@@ -112,6 +115,8 @@ namespace WixToolset.BuildTasks
         public string[] SuppressIces { get; set; }
         public string AdditionalCub { get; set; }
 
+        private IMessageListener Listener { get; }
+
         public override bool Execute()
         {
             try
@@ -168,7 +173,11 @@ namespace WixToolset.BuildTasks
             var serviceProvider = new WixToolsetServiceProvider();
 
             var context = serviceProvider.GetService<ICommandLineContext>();
-            context.Messaging = Messaging.Instance;
+
+            var messaging = serviceProvider.GetService<IMessaging>();
+            messaging.SetListener(this.Listener);
+
+            context.Messaging = messaging;
             context.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider);
             context.Arguments = commandLineString;
 
@@ -284,5 +293,53 @@ namespace WixToolset.BuildTasks
         //        commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
         //    }
         //}
+
+        private class MsbuildMessageListener : IMessageListener
+        {
+            public MsbuildMessageListener(TaskLoggingHelper logger, string longName, string shortName)
+            {
+                this.Logger = logger;
+                this.LongAppName = longName;
+                this.ShortAppName = shortName;
+            }
+
+            public string ShortAppName { get; }
+
+            public string LongAppName { get; }
+
+            private TaskLoggingHelper Logger { get; }
+
+            public void Write(Message message)
+            {
+                switch (message.Level)
+                {
+                    case MessageLevel.Error:
+                        this.Logger.LogError(null, this.ShortAppName + message.Id.ToString(), null, message.SourceLineNumbers?.FileName ?? this.LongAppName, message.SourceLineNumbers?.LineNumber ?? 0, 0, 0, 0, message.ResourceNameOrFormat, message.MessageArgs);
+                        break;
+
+                    case MessageLevel.Warning:
+                        this.Logger.LogWarning(null, this.ShortAppName + message.Id.ToString(), null, message.SourceLineNumbers?.FileName ?? this.LongAppName, message.SourceLineNumbers?.LineNumber ?? 0, 0, 0, 0, message.ResourceNameOrFormat, message.MessageArgs);
+                        break;
+
+                    default:
+                        // TODO: Revisit this because something is going horribly awry. The commented out LogMessage call is crashing saying that the "message" parameter is null. When you look at the call stack, the code
+                        //       is in the wrong LogMessage override and the "null" subcategory was passed in as the message. Not clear why it is picking the wrong overload.
+                        //if (message.Id > 0)
+                        //{
+                        //    this.Logger.LogMessage(null, code, null, message.SourceLineNumber?.FileName, message.SourceLineNumber?.LineNumber ?? 0, 0, 0, 0, MessageImportance.Normal, message.Format, message.FormatData);
+                        //}
+                        //else
+                        //{
+                        this.Logger.LogMessage(MessageImportance.Normal, message.ResourceNameOrFormat, message.MessageArgs);
+                        //}
+                        break;
+                }
+            }
+
+            public void Write(string message)
+            {
+                this.Logger.LogMessage(MessageImportance.Low, message);
+            }
+        }
     }
 }

@@ -8,14 +8,11 @@ namespace WixToolset.Core
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.IO;
     using System.Reflection;
-    using System.Security.Cryptography;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
     using Wix = WixToolset.Data.Serialize;
@@ -128,10 +125,10 @@ namespace WixToolset.Core
                 "REMOVE"
             });
 
-        private Dictionary<XNamespace, ICompilerExtension> extensions;
-        private IParseHelper parseHelper;
-        private Intermediate intermediate;
-
+        private readonly Dictionary<XNamespace, ICompilerExtension> extensions;
+        private readonly IParseHelper parseHelper;
+        private readonly Intermediate intermediate;
+        private readonly IMessaging messaging;
         private HashSet<string> activeSectionInlinedDirectoryIds;
         private HashSet<string> activeSectionSimpleReferences;
 
@@ -140,11 +137,12 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="intermediate">The Intermediate object representing compiled source document.</param>
         /// <param name="extensions">The WiX extensions collection.</param>
-        internal CompilerCore(Intermediate intermediate, IParseHelper parseHelper, Dictionary<XNamespace, ICompilerExtension> extensions)
+        internal CompilerCore(Intermediate intermediate, IMessaging messaging, IParseHelper parseHelper, Dictionary<XNamespace, ICompilerExtension> extensions)
         {
             this.extensions = extensions;
             this.parseHelper = parseHelper;
             this.intermediate = intermediate;
+            this.messaging = messaging;
         }
 
         /// <summary>
@@ -157,7 +155,7 @@ namespace WixToolset.Core
         /// Gets whether the compiler core encountered an error while processing.
         /// </summary>
         /// <value>Flag if core encountered an error during processing.</value>
-        public bool EncounteredError => Messaging.Instance.EncounteredError;
+        public bool EncounteredError => this.messaging.EncounteredError;
 
         /// <summary>
         /// Gets or sets the option to show pedantic messages.
@@ -511,7 +509,7 @@ namespace WixToolset.Core
             }
             catch (NotSupportedException)
             {
-                this.OnMessage(WixErrors.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
+                this.Write(ErrorMessages.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
             }
 
             return CompilerConstants.IllegalInteger;
@@ -548,11 +546,11 @@ namespace WixToolset.Core
             catch (NotSupportedException)
             {
                 // not a valid windows code page
-                this.OnMessage(WixErrors.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
+                this.Write(ErrorMessages.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
             }
             catch (WixException e)
             {
-                this.OnMessage(e.Error);
+                this.messaging.Write(e.Error);
             }
 
             return null;
@@ -612,15 +610,15 @@ namespace WixToolset.Core
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    this.OnMessage(WixErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 catch (FormatException)
                 {
-                    this.OnMessage(WixErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 catch (OverflowException)
                 {
-                    this.OnMessage(WixErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -661,11 +659,11 @@ namespace WixToolset.Core
 
                         if (CompilerConstants.IntegerNotSet == integer || CompilerConstants.IllegalInteger == integer)
                         {
-                            this.OnMessage(WixErrors.IntegralValueSentinelCollision(sourceLineNumbers, integer));
+                            this.Write(ErrorMessages.IntegralValueSentinelCollision(sourceLineNumbers, integer));
                         }
                         else if (minimum > integer || maximum < integer)
                         {
-                            this.OnMessage(WixErrors.IntegralValueOutOfRange(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, integer, minimum, maximum));
+                            this.Write(ErrorMessages.IntegralValueOutOfRange(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, integer, minimum, maximum));
                             integer = CompilerConstants.IllegalInteger;
                         }
 
@@ -673,11 +671,11 @@ namespace WixToolset.Core
                     }
                     catch (FormatException)
                     {
-                        this.OnMessage(WixErrors.IllegalIntegerValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Write(ErrorMessages.IllegalIntegerValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     }
                     catch (OverflowException)
                     {
-                        this.OnMessage(WixErrors.IllegalIntegerValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Write(ErrorMessages.IllegalIntegerValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     }
                 }
             }
@@ -768,7 +766,7 @@ namespace WixToolset.Core
                         // Previous code never returned 'NotSet'!
                         break;
                     default:
-                        this.OnMessage(WixErrors.IllegalYesNoAlwaysValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Write(ErrorMessages.IllegalYesNoAlwaysValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                         break;
                 }
             }
@@ -796,11 +794,11 @@ namespace WixToolset.Core
             {
                 if (!this.IsValidShortFilename(value, allowWildcards) && !this.IsValidLocIdentifier(value))
                 {
-                    this.OnMessage(WixErrors.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(ErrorMessages.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
-                    this.OnMessage(WixWarnings.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(WarningMessages.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -854,12 +852,12 @@ namespace WixToolset.Core
                     // TODO: Find a way to expose the valid values programatically!
                     if (allowHkmu)
                     {
-                        this.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
+                        this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
                             "HKMU", "HKCR", "HKCU", "HKLM", "HKU"));
                     }
                     else
                     {
-                        this.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
+                        this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
                             "HKCR", "HKCU", "HKLM", "HKU"));
                     }
                 }
@@ -926,7 +924,7 @@ namespace WixToolset.Core
                 if (Wix.InstallUninstallType.IllegalValue == installUninstall)
                 {
                     // TODO: Find a way to expose the valid values programatically!
-                    this.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
+                    this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
                          "install", "uninstall", "both"));
                 }
             }
@@ -951,7 +949,7 @@ namespace WixToolset.Core
                 result = Wix.ExitType.IllegalValue;
 
                 // TODO: Find a way to expose the valid values programatically!
-                this.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
+                this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
                      "success", "cancel", "error", "suspend"));
             }
 
@@ -974,7 +972,7 @@ namespace WixToolset.Core
                 if (CompilerCore.BuiltinBundleVariables.Contains(value))
                 {
                     string illegalValues = CompilerCore.CreateValueList(ValueListKind.Or, CompilerCore.BuiltinBundleVariables);
-                    this.OnMessage(WixErrors.IllegalAttributeValueWithIllegalList(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, illegalValues));
+                    this.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, illegalValues));
                 }
             }
 
@@ -997,7 +995,7 @@ namespace WixToolset.Core
                 if (CompilerCore.DisallowedMsiProperties.Contains(value))
                 {
                     string illegalValues = CompilerCore.CreateValueList(ValueListKind.Or, CompilerCore.DisallowedMsiProperties);
-                    this.OnMessage(WixErrors.DisallowedMsiProperty(sourceLineNumbers, value, illegalValues));
+                    this.Write(ErrorMessages.DisallowedMsiProperty(sourceLineNumbers, value, illegalValues));
                 }
             }
 
@@ -1099,12 +1097,12 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Sends a message to the message delegate if there is one.
+        /// Sends a message.
         /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
+        /// <param name="message">Message to write.</param>
+        public void Write(Message message)
         {
-            Messaging.Instance.OnMessage(e);
+            this.messaging.Write(message);
         }
 
         /// <summary>
@@ -1128,11 +1126,11 @@ namespace WixToolset.Core
                 {
                     if (this.GetType().Assembly.Equals(caller))
                     {
-                        this.OnMessage(WixErrors.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired));
+                        this.Write(ErrorMessages.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired));
                     }
                     else
                     {
-                        this.OnMessage(WixErrors.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired, name.Name));
+                        this.Write(ErrorMessages.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired, name.Name));
                     }
                 }
             }

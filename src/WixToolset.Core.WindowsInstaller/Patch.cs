@@ -1232,14 +1232,5 @@ namespace WixToolset.Data
 #endif
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs mea)
-        {
-            Messaging.Instance.OnMessage(mea);
-        }
     }
 }

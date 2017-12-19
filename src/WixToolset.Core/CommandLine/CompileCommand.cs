@@ -11,15 +11,18 @@ namespace WixToolset.Core
 
     internal class CompileCommand : ICommandLineCommand
     {
-        public CompileCommand(IServiceProvider serviceProvider, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables)
+        public CompileCommand(IServiceProvider serviceProvider, IMessaging messaging, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables)
         {
             this.PreprocessorVariables = preprocessorVariables;
             this.ServiceProvider = serviceProvider;
+            this.Messaging = messaging;
             this.ExtensionManager = extensions;
             this.SourceFiles = sources;
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private IExtensionManager ExtensionManager { get; }
 
@@ -34,7 +37,7 @@ namespace WixToolset.Core
             foreach (var sourceFile in this.SourceFiles)
             {
                 var preprocessContext = this.ServiceProvider.GetService<IPreprocessContext>();
-                preprocessContext.Messaging = Messaging.Instance;
+                preprocessContext.Messaging = this.Messaging;
                 preprocessContext.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
                 preprocessContext.Platform = Platform.X86; // TODO: set this correctly
                 preprocessContext.IncludeSearchPaths = this.IncludeSearchPaths?.ToList() ?? new List<string>();
@@ -45,7 +48,7 @@ namespace WixToolset.Core
                 var document = preprocessor.Process(preprocessContext);
 
                 var compileContext = this.ServiceProvider.GetService<ICompileContext>();
-                compileContext.Messaging = Messaging.Instance;
+                compileContext.Messaging = this.Messaging;
                 compileContext.CompilationId = Guid.NewGuid().ToString("N");
                 compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
                 compileContext.OutputPath = sourceFile.OutputPath;

@@ -11,13 +11,14 @@ namespace WixToolset.Core.Link
     using System.Text;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Grouping and Ordering class of the WiX toolset.
     /// </summary>
-    internal sealed class WixGroupingOrdering : IMessageHandler
+    internal sealed class WixGroupingOrdering
     {
-        private IMessageHandler messageHandler;
+        private IMessaging messageHandler;
         private List<string> groupTypes;
         private List<string> itemTypes;
         private ItemCollection items;
@@ -32,7 +33,7 @@ namespace WixToolset.Core.Link
         /// <param name="messageHandler">Handler for any error messages.</param>
         /// <param name="groupTypes">Group types to include.</param>
         /// <param name="itemTypes">Item types to include.</param>
-        public WixGroupingOrdering(IntermediateSection entrySections, IMessageHandler messageHandler)
+        public WixGroupingOrdering(IntermediateSection entrySections, IMessaging messageHandler)
         {
             this.EntrySection = entrySections;
             this.messageHandler = messageHandler;
@@ -56,29 +57,6 @@ namespace WixToolset.Core.Link
 
             this.items = new ItemCollection();
             this.loaded = false;
-        }
-
-        /// <summary>
-        /// Sends a message to the message handler if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            WixErrorEventArgs errorEventArgs = e as WixErrorEventArgs;
-
-            if (null != errorEventArgs || MessageLevel.Error == e.Level)
-            {
-                this.encounteredError = true;
-            }
-
-            if (null != this.messageHandler)
-            {
-                this.messageHandler.OnMessage(e);
-            }
-            else if (null != errorEventArgs)
-            {
-                throw new WixException(errorEventArgs);
-            }
         }
 
         /// <summary>
@@ -156,7 +134,7 @@ namespace WixToolset.Core.Link
             Item parentItem;
             if (!this.items.TryGetValue(parentType, parentId, out parentItem))
             {
-                this.OnMessage(WixErrors.IdentifierNotFound(parentType, parentId));
+                this.messageHandler.Write(ErrorMessages.IdentifierNotFound(parentType, parentId));
                 return;
             }
 
@@ -257,7 +235,7 @@ namespace WixToolset.Core.Link
             //if (null == wixGroupTable || 0 == wixGroupTable.Rows.Count)
             //{
             //    // TODO: Change message name to make it *not* Bundle specific?
-            //    this.OnMessage(WixErrors.MissingBundleInformation("WixGroup"));
+            //    this.Write(WixErrors.MissingBundleInformation("WixGroup"));
             //}
 
             // Collect all of the groups
@@ -326,7 +304,7 @@ namespace WixToolset.Core.Link
                 if (this.FindCircularGroupReference(item, item, itemsSeen, out circularReference))
                 {
                     itemsInKnownLoops.Add(itemsSeen);
-                    this.OnMessage(WixErrors.ReferenceLoopDetected(item.Row.SourceLineNumbers, circularReference));
+                    this.messageHandler.Write(ErrorMessages.ReferenceLoopDetected(item.Row.SourceLineNumbers, circularReference));
                 }
             }
         }
@@ -398,12 +376,12 @@ namespace WixToolset.Core.Link
 
                 if (!this.items.TryGetValue(rowItemType, rowItemName, out var item))
                 {
-                    this.OnMessage(WixErrors.IdentifierNotFound(rowItemType, rowItemName));
+                    this.messageHandler.Write(ErrorMessages.IdentifierNotFound(rowItemType, rowItemName));
                 }
 
                 if (!this.items.TryGetValue(rowDependsOnType, rowDependsOnName, out var dependsOn))
                 {
-                    this.OnMessage(WixErrors.IdentifierNotFound(rowDependsOnType, rowDependsOnName));
+                    this.messageHandler.Write(ErrorMessages.IdentifierNotFound(rowDependsOnType, rowDependsOnName));
                 }
 
                 if (null == item || null == dependsOn)
@@ -411,7 +389,7 @@ namespace WixToolset.Core.Link
                     continue;
                 }
 
-                item.AddAfter(dependsOn, this);
+                item.AddAfter(dependsOn, this.messageHandler);
             }
         }
 
@@ -426,12 +404,12 @@ namespace WixToolset.Core.Link
             // ordering.
             foreach (Item item in this.items)
             {
-                item.PropagateAfterToChildItems(this);
+                item.PropagateAfterToChildItems(this.messageHandler);
             }
 
             foreach (Item item in this.items)
             {
-                item.FlattenAfters(this);
+                item.FlattenAfters(this.messageHandler);
             }
         }
 
@@ -595,7 +573,7 @@ namespace WixToolset.Core.Link
             /// </summary>
             /// <param name="items">List of items to add.</param>
             /// <param name="messageHandler">Message handler in case a circular ordering reference is found.</param>
-            public void AddAfter(ItemCollection items, IMessageHandler messageHandler)
+            public void AddAfter(ItemCollection items, IMessaging messageHandler)
             {
                 foreach (Item item in items)
                 {
@@ -608,7 +586,7 @@ namespace WixToolset.Core.Link
             /// </summary>
             /// <param name="item">Items to add.</param>
             /// <param name="messageHandler">Message handler in case a circular ordering reference is found.</param>
-            public void AddAfter(Item after, IMessageHandler messageHandler)
+            public void AddAfter(Item after, IMessaging messageHandler)
             {
                 if (this.beforeItems.Contains(after))
                 {
@@ -617,7 +595,7 @@ namespace WixToolset.Core.Link
                     // have lost some distinction between authored and propagated ordering.
                     string circularReference = String.Format(CultureInfo.InvariantCulture, "{0}:{1} -> {2}:{3} -> {0}:{1}",
                         this.Type, this.Id, after.Type, after.Id);
-                    messageHandler.OnMessage(WixErrors.OrderingReferenceLoopDetected(after.Row.SourceLineNumbers, circularReference));
+                    messageHandler.Write(ErrorMessages.OrderingReferenceLoopDetected(after.Row.SourceLineNumbers, circularReference));
                     return;
                 }
 
@@ -632,7 +610,7 @@ namespace WixToolset.Core.Link
             /// <remarks>Because items don't know about their parent groups (and can, in fact, be in more
             /// than one group at a time), we need to propagate the 'afters' from each parent item to its children
             /// before we attempt to flatten the ordering.</remarks>
-            public void PropagateAfterToChildItems(IMessageHandler messageHandler)
+            public void PropagateAfterToChildItems(IMessaging messageHandler)
             {
                 if (this.ShouldItemPropagateChildOrdering())
                 {
@@ -647,7 +625,7 @@ namespace WixToolset.Core.Link
             /// Flattens the ordering dependency for this item.
             /// </summary>
             /// <param name="messageHandler">Message handler in case a circular ordering reference is found.</param>
-            public void FlattenAfters(IMessageHandler messageHandler)
+            public void FlattenAfters(IMessaging messageHandler)
             {
                 if (this.flattenedAfterItems)
                 {

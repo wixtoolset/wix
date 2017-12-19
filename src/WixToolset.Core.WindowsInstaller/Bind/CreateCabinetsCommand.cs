@@ -16,6 +16,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Creates cabinet files.
@@ -44,6 +45,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public int CabbingThreadCount { private get; set; }
 
         public string CabCachePath { private get; set; }
+
+        public IMessaging Messaging { private get; set; }
 
         public string TempFilesLocation { private get; set; }
 
@@ -85,7 +88,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.SetCabbingThreadCount();
 
             // Send Binder object to Facilitate NewCabNamesCallBack Callback
-            CabinetBuilder cabinetBuilder = new CabinetBuilder(this.CabbingThreadCount, Marshal.GetFunctionPointerForDelegate(this.newCabNamesCallBack));
+            CabinetBuilder cabinetBuilder = new CabinetBuilder(this.Messaging, this.CabbingThreadCount, Marshal.GetFunctionPointerForDelegate(this.newCabNamesCallBack));
 
             // Supply Compile MediaTemplate Attributes to Cabinet Builder
             this.GetMediaTemplateAttributes(out var MaximumCabinetSizeForLargeFileSplitting, out var MaximumUncompressedMediaSize);
@@ -120,14 +123,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // stop processing if an error previously occurred
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
 
             // create queued cabinets with multiple threads
             cabinetBuilder.CreateQueuedCabinets();
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -152,7 +155,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         if (0 >= this.CabbingThreadCount)
                         {
-                            throw new WixException(WixErrors.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
+                            throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
                         }
                     }
                     else // default to 1 if the environment variable is not set
@@ -160,15 +163,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.CabbingThreadCount = 1;
                     }
 
-                    Messaging.Instance.OnMessage(WixVerboses.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
+                    this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
                 }
                 catch (ArgumentException)
                 {
-                    throw new WixException(WixErrors.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
+                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
                 }
                 catch (FormatException)
                 {
-                    throw new WixException(WixErrors.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
+                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
                 }
             }
         }
@@ -202,11 +205,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // If building a patch, remind them to run -p for torch.
                 if (OutputType.Patch == output.Type)
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.EmptyCabinet(mediaRow.SourceLineNumbers, cabinetName, true));
+                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaRow.SourceLineNumbers, cabinetName, true));
                 }
                 else
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.EmptyCabinet(mediaRow.SourceLineNumbers, cabinetName));
+                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaRow.SourceLineNumbers, cabinetName));
                 }
             }
 
@@ -223,7 +226,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else // reuse the cabinet from the cabinet cache.
             {
-                Messaging.Instance.OnMessage(WixVerboses.ReusingCabCache(mediaRow.SourceLineNumbers, mediaRow.Cabinet, resolvedCabinet.Path));
+                this.Messaging.Write(VerboseMessages.ReusingCabCache(mediaRow.SourceLineNumbers, mediaRow.Cabinet, resolvedCabinet.Path));
 
                 try
                 {
@@ -237,7 +240,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (Exception e)
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.CannotUpdateCabCache(mediaRow.SourceLineNumbers, resolvedCabinet.Path, e.Message));
+                    this.Messaging.Write(WarningMessages.CannotUpdateCabCache(mediaRow.SourceLineNumbers, resolvedCabinet.Path, e.Message));
                 }
             }
 
@@ -303,7 +306,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (!mutex.WaitOne(0, false)) // Check if you can get the lock
                 {
                     // Cound not get the Lock
-                    Messaging.Instance.OnMessage(WixVerboses.CabinetsSplitInParallel());
+                    this.Messaging.Write(VerboseMessages.CabinetsSplitInParallel());
                     mutex.WaitOne(); // Wait on other thread
                 }
 
@@ -333,7 +336,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Check if File Transfer was added
                 if (!transferAdded)
                 {
-                    throw new WixException(WixErrors.SplitCabinetCopyRegistrationFailed(newCabinetName, firstCabinetName));
+                    throw new WixException(ErrorMessages.SplitCabinetCopyRegistrationFailed(newCabinetName, firstCabinetName));
                 }
 
                 // Add the new Cabinets to media table using LastSequence of Base Cabinet
@@ -365,14 +368,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     if (newCabinetName.Equals(mediaRow.Cabinet, StringComparison.InvariantCultureIgnoreCase))
                     {
                         // Name Collision of generated Split Cabinet Name and user Specified Cab name for current row
-                        throw new WixException(WixErrors.SplitCabinetNameCollision(newCabinetName, firstCabinetName));
+                        throw new WixException(ErrorMessages.SplitCabinetNameCollision(newCabinetName, firstCabinetName));
                     }
                 }
 
                 // Check if the last Split Cabinet was found in the Media Table
                 if (!lastSplitCabinetFound)
                 {
-                    throw new WixException(WixErrors.SplitCabinetInsertionFailed(newCabinetName, firstCabinetName, lastCabinetOfThisSequence));
+                    throw new WixException(ErrorMessages.SplitCabinetInsertionFailed(newCabinetName, firstCabinetName, lastCabinetOfThisSequence));
                 }
 
                 // The new Row has to be inserted just after the last cab in this cabinet split chain according to DiskID Sort
@@ -454,11 +457,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (FormatException)
                 {
-                    throw new WixException(WixErrors.IllegalEnvironmentVariable("WIX_MCSLFS", mcslfsString));
+                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable("WIX_MCSLFS", mcslfsString));
                 }
                 catch (OverflowException)
                 {
-                    throw new WixException(WixErrors.MaximumCabinetSizeForLargeFileSplittingTooLarge(null, maxCabSizeForLargeFileInMB, MaxValueOfMaxCabSizeForLargeFileSplitting));
+                    throw new WixException(ErrorMessages.MaximumCabinetSizeForLargeFileSplittingTooLarge(null, maxCabSizeForLargeFileInMB, MaxValueOfMaxCabSizeForLargeFileSplitting));
                 }
 
                 try
@@ -476,11 +479,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (FormatException)
                 {
-                    throw new WixException(WixErrors.IllegalEnvironmentVariable("WIX_MUMS", mumsString));
+                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable("WIX_MUMS", mumsString));
                 }
                 catch (OverflowException)
                 {
-                    throw new WixException(WixErrors.MaximumUncompressedMediaSizeTooLarge(null, maxPreCompressedSizeInMB));
+                    throw new WixException(ErrorMessages.MaximumUncompressedMediaSizeTooLarge(null, maxPreCompressedSizeInMB));
                 }
 
                 maxCabSizeForLargeFileSplitting = maxCabSizeForLargeFileInMB;

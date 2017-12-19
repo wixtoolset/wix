@@ -29,7 +29,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 {
                     reader.Stream.Seek(reader.AttachedContainerAddress, SeekOrigin.Begin);
 
-                    using (BurnWriter writer = BurnWriter.Open(tempFile))
+                    using (BurnWriter writer = BurnWriter.Open(this.Context.Messaging, tempFile))
                     {
                         writer.RememberThenResetSignature();
                         writer.AppendContainer(reader.Stream, reader.AttachedContainerSize, BurnCommon.Container.Attached);

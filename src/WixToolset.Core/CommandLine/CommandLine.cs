@@ -24,11 +24,9 @@ namespace WixToolset.Core
 
     internal class CommandLine : ICommandLine, IParseCommandLine
     {
-        public CommandLine()
-        {
-        }
-
         private IServiceProvider ServiceProvider { get; set; }
+
+        private IMessaging Messaging { get; set; }
 
         public static string ExpectedArgument { get; } = "expected argument";
 
@@ -47,6 +45,8 @@ namespace WixToolset.Core
         public ICommandLineCommand ParseStandardCommandLine(ICommandLineContext context)
         {
             this.ServiceProvider = context.ServiceProvider;
+
+            this.Messaging = context.Messaging ?? this.ServiceProvider.GetService<IMessaging>();
 
             this.ExtensionManager = context.ExtensionManager ?? this.ServiceProvider.GetService<IExtensionManager>();
 
@@ -186,7 +186,7 @@ namespace WixToolset.Core
                 }
             });
 
-            Messaging.Instance.ShowVerboseMessages = verbose;
+            this.Messaging.ShowVerboseMessages = verbose;
 
             if (showVersion)
             {
@@ -208,17 +208,17 @@ namespace WixToolset.Core
                 case Commands.Build:
                     {
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
-                        var variables = GatherPreprocessorVariables(defines);
-                        var bindPathList = GatherBindPaths(bindPaths);
+                        var variables = this.GatherPreprocessorVariables(defines);
+                        var bindPathList = this.GatherBindPaths(bindPaths);
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(this.ServiceProvider, this.ExtensionManager, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
+                        return new BuildCommand(this.ServiceProvider, this.Messaging, this.ExtensionManager, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
                     }
 
                 case Commands.Compile:
                     {
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = GatherPreprocessorVariables(defines);
-                        return new CompileCommand(this.ServiceProvider, this.ExtensionManager, sourceFiles, variables);
+                        return new CompileCommand(this.ServiceProvider, this.Messaging, this.ExtensionManager, sourceFiles, variables);
                     }
             }
 
@@ -305,7 +305,7 @@ namespace WixToolset.Core
             return files;
         }
 
-        private static IDictionary<string, string> GatherPreprocessorVariables(IEnumerable<string> defineConstants)
+        private IDictionary<string, string> GatherPreprocessorVariables(IEnumerable<string> defineConstants)
         {
             var variables = new Dictionary<string, string>();
 
@@ -315,7 +315,7 @@ namespace WixToolset.Core
 
                 if (variables.ContainsKey(value[0]))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.DuplicateVariableDefinition(value[0], (1 == value.Length) ? String.Empty : value[1], variables[value[0]]));
+                    this.Messaging.Write(ErrorMessages.DuplicateVariableDefinition(value[0], (1 == value.Length) ? String.Empty : value[1], variables[value[0]]));
                     continue;
                 }
 
@@ -325,7 +325,7 @@ namespace WixToolset.Core
             return variables;
         }
 
-        private static IEnumerable<BindPath> GatherBindPaths(IEnumerable<string> bindPaths)
+        private  IEnumerable<BindPath> GatherBindPaths(IEnumerable<string> bindPaths)
         {
             var result = new List<BindPath>();
 
@@ -339,7 +339,7 @@ namespace WixToolset.Core
                 }
                 else if (File.Exists(bp.Path))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.ExpectedDirectoryGotFile("-bindpath", bp.Path));
+                    this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile("-bindpath", bp.Path));
                 }
             }
 

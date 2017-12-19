@@ -4,13 +4,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using WixToolset.Core.Bind;
     using WixToolset.Core.Native;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Builds cabinets using multiple threads. This implements a thread pool that generates cabinets with multiple
@@ -25,16 +25,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // Address of Binder's callback function for Cabinet Splitting
         private IntPtr newCabNamesCallBackAddress;
 
-        public int MaximumCabinetSizeForLargeFileSplitting { get; set; }
-
-        public int MaximumUncompressedMediaSize { get; set; }
-
         /// <summary>
         /// Instantiate a new CabinetBuilder.
         /// </summary>
         /// <param name="threadCount">number of threads to use</param>
         /// <param name="newCabNamesCallBackAddress">Address of Binder's callback function for Cabinet Splitting</param>
-        public CabinetBuilder(int threadCount, IntPtr newCabNamesCallBackAddress)
+        public CabinetBuilder(IMessaging messaging, int threadCount, IntPtr newCabNamesCallBackAddress)
         {
             if (0 >= threadCount)
             {
@@ -43,12 +39,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.cabinetWorkItems = new Queue();
             this.lockObject = new object();
-
+            this.Messaging = messaging;
             this.threadCount = threadCount;
 
             // Set Address of Binder's callback function for Cabinet Splitting
             this.newCabNamesCallBackAddress = newCabNamesCallBackAddress;
         }
+
+        private IMessaging Messaging { get; }
+
+        public int MaximumCabinetSizeForLargeFileSplitting { get; set; }
+
+        public int MaximumUncompressedMediaSize { get; set; }
 
         /// <summary>
         /// Enqueues a CabinetWorkItem to the queue.
@@ -119,11 +121,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (WixException we)
             {
-                Messaging.Instance.OnMessage(we.Error);
+                this.Messaging.Write(we.Error);
             }
             catch (Exception e)
             {
-                Messaging.Instance.OnMessage(WixErrors.UnexpectedException(e.Message, e.GetType().ToString(), e.StackTrace));
+                this.Messaging.Write(ErrorMessages.UnexpectedException(e.Message, e.GetType().ToString(), e.StackTrace));
             }
         }
 
@@ -133,7 +135,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="cabinetWorkItem">CabinetWorkItem containing information about the cabinet to create.</param>
         private void CreateCabinet(CabinetWorkItem cabinetWorkItem)
         {
-            Messaging.Instance.OnMessage(WixVerboses.CreateCabinet(cabinetWorkItem.CabinetFile));
+            this.Messaging.Write(VerboseMessages.CreateCabinet(cabinetWorkItem.CabinetFile));
 
             int maxCabinetSize = 0; // The value of 0 corresponds to default of 2GB which means no cabinet splitting
             ulong maxPreCompressedSizeInBytes = 0;

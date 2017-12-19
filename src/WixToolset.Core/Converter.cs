@@ -10,6 +10,7 @@ namespace WixToolset.Core
     using System.Xml;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// WiX source code converter.
@@ -64,7 +65,7 @@ namespace WixToolset.Core
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="errorsAsWarnings">Test errors to display as warnings.</param>
         /// <param name="ignoreErrors">Test errors to ignore.</param>
-        public Converter(int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
+        public Converter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>()
             {
@@ -76,6 +77,8 @@ namespace WixToolset.Core
                 { PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace },
             };
+
+            this.Messaging = messaging;
 
             this.IndentationAmount = indentationAmount;
 
@@ -89,6 +92,8 @@ namespace WixToolset.Core
         private HashSet<ConverterTestType> ErrorsAsWarnings { get; set; }
 
         private HashSet<ConverterTestType> IgnoreErrors { get; set; }
+
+        private IMessaging Messaging { get; }
 
         private int IndentationAmount { get; set; }
 
@@ -528,9 +533,9 @@ namespace WixToolset.Core
             bool warning = this.ErrorsAsWarnings.Contains(converterTestType);
             string display = String.Format(CultureInfo.CurrentCulture, message, args);
 
-            WixGenericMessageEventArgs ea = new WixGenericMessageEventArgs(sourceLine, (int)converterTestType, warning ? MessageLevel.Warning : MessageLevel.Error, "{0} ({1})", display, converterTestType.ToString());
+            var msg = new Message(sourceLine, warning ? MessageLevel.Warning : MessageLevel.Error, (int)converterTestType, "{0} ({1})", display, converterTestType.ToString());
 
-            Messaging.Instance.OnMessage(ea);
+            this.Messaging.Write(msg);
 
             return true;
         }

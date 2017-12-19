@@ -13,9 +13,10 @@ namespace WixToolset.Core
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(IServiceProvider serviceProvider, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
+        public BuildCommand(IServiceProvider serviceProvider, IMessaging messaging, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
         {
             this.ServiceProvider = serviceProvider;
+            this.Messaging = messaging;
             this.ExtensionManager = extensions;
             this.LocFiles = locFiles;
             this.LibraryFiles = libraryFiles;
@@ -37,6 +38,8 @@ namespace WixToolset.Core
         }
 
         public IServiceProvider ServiceProvider { get; }
+
+        public IMessaging Messaging { get; }
 
         public IExtensionManager ExtensionManager { get; }
 
@@ -91,13 +94,13 @@ namespace WixToolset.Core
             {
                 var output = this.LinkPhase(intermediates);
 
-                if (!Messaging.Instance.EncounteredError)
+                if (!this.Messaging.EncounteredError)
                 {
                     this.BindPhase(output);
                 }
             }
 
-            return Messaging.Instance.LastErrorNumber;
+            return this.Messaging.LastErrorNumber;
         }
 
         private IEnumerable<Intermediate> CompilePhase()
@@ -107,7 +110,7 @@ namespace WixToolset.Core
             foreach (var sourceFile in this.SourceFiles)
             {
                 var preprocessContext = this.ServiceProvider.GetService<IPreprocessContext>();
-                preprocessContext.Messaging = Messaging.Instance;
+                preprocessContext.Messaging = this.Messaging;
                 preprocessContext.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
                 preprocessContext.Platform = Platform.X86; // TODO: set this correctly
                 preprocessContext.IncludeSearchPaths = this.IncludeSearchPaths?.ToList() ?? new List<string>();
@@ -117,18 +120,24 @@ namespace WixToolset.Core
                 var preprocessor = new Preprocessor();
                 var document = preprocessor.Process(preprocessContext);
 
-                var compileContext = this.ServiceProvider.GetService<ICompileContext>();
-                compileContext.Messaging = Messaging.Instance;
-                compileContext.CompilationId = Guid.NewGuid().ToString("N");
-                compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
-                compileContext.OutputPath = sourceFile.OutputPath;
-                compileContext.Platform = Platform.X86; // TODO: set this correctly
-                compileContext.Source = document;
+                if (!this.Messaging.EncounteredError)
+                {
+                    var compileContext = this.ServiceProvider.GetService<ICompileContext>();
+                    compileContext.Messaging = this.Messaging;
+                    compileContext.CompilationId = Guid.NewGuid().ToString("N");
+                    compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
+                    compileContext.OutputPath = sourceFile.OutputPath;
+                    compileContext.Platform = Platform.X86; // TODO: set this correctly
+                    compileContext.Source = document;
 
-                var compiler = new Compiler();
-                var intermediate = compiler.Compile(compileContext);
+                    var compiler = new Compiler();
+                    var intermediate = compiler.Compile(compileContext);
 
-                intermediates.Add(intermediate);
+                    if (!this.Messaging.EncounteredError)
+                    {
+                        intermediates.Add(intermediate);
+                    }
+                }
             }
 
             return intermediates;
@@ -139,7 +148,7 @@ namespace WixToolset.Core
             var localizations = this.LoadLocalizationFiles().ToList();
 
             // If there was an error adding localization files, then bail.
-            if (Messaging.Instance.EncounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return null;
             }
@@ -166,7 +175,7 @@ namespace WixToolset.Core
             var libraries = this.LoadLibraries(creator);
 
             var context = this.ServiceProvider.GetService<ILinkContext>();
-            context.Messaging = Messaging.Instance;
+            context.Messaging = this.Messaging;
             context.Extensions = this.ExtensionManager.Create<ILinkerExtension>();
             context.ExtensionData = this.ExtensionManager.Create<IExtensionData>();
             context.ExpectedOutputType = this.OutputType;
@@ -182,7 +191,7 @@ namespace WixToolset.Core
         {
             var localizations = this.LoadLocalizationFiles().ToList();
 
-            var localizer = new Localizer(localizations);
+            var localizer = new Localizer(this.Messaging, localizations);
 
             var resolver = CreateWixResolverWithVariables(localizer, output);
 
@@ -193,7 +202,7 @@ namespace WixToolset.Core
             }
 
             var context = this.ServiceProvider.GetService<IBindContext>();
-            context.Messaging = Messaging.Instance;
+            context.Messaging = this.Messaging;
             context.ExtensionManager = this.ExtensionManager;
             context.BindPaths = this.BindPaths ?? Array.Empty<BindPath>();
             //context.CabbingThreadCount = this.CabbingThreadCount;
@@ -234,11 +243,11 @@ namespace WixToolset.Core
                     }
                     catch (WixCorruptFileException e)
                     {
-                        Messaging.Instance.OnMessage(e.Error);
+                        this.Messaging.Write(e.Error);
                     }
                     catch (WixUnexpectedFileFormatException e)
                     {
-                        Messaging.Instance.OnMessage(e.Error);
+                        this.Messaging.Write(e.Error);
                     }
                 }
             }
@@ -250,15 +259,15 @@ namespace WixToolset.Core
         {
             foreach (var loc in this.LocFiles)
             {
-                var localization = Localizer.ParseLocalizationFile(loc);
+                var localization = Localizer.ParseLocalizationFile(this.Messaging, loc);
 
                 yield return localization;
             }
         }
 
-        private static WixVariableResolver CreateWixResolverWithVariables(Localizer localizer, Intermediate output)
+        private WixVariableResolver CreateWixResolverWithVariables(Localizer localizer, Intermediate output)
         {
-            var resolver = new WixVariableResolver(localizer);
+            var resolver = new WixVariableResolver(this.Messaging, localizer);
 
             // Gather all the wix variables.
             var wixVariables = output?.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();

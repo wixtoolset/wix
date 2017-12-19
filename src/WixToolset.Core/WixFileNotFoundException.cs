@@ -14,18 +14,10 @@ namespace WixToolset
         /// <summary>
         /// Instantiate a new WixFileNotFoundException.
         /// </summary>
-        /// <param name="file">The file that could not be found.</param>
-        public WixFileNotFoundException(string file) : this(null, file, null)
-        {
-        }
-
-        /// <summary>
-        /// Instantiate a new WixFileNotFoundException.
-        /// </summary>
         /// <param name="sourceLineNumbers">Source line information pertaining to the file that cannot be found.</param>
         /// <param name="file">The file that could not be found.</param>
         public WixFileNotFoundException(SourceLineNumber sourceLineNumbers, string file) :
-            base(WixErrors.FileNotFound(sourceLineNumbers, file))
+            base(ErrorMessages.FileNotFound(sourceLineNumbers, file))
         {
         }
 
@@ -45,7 +37,7 @@ namespace WixToolset
         /// <param name="file">The file that could not be found.</param>
         /// <param name="fileType">The type of file that cannot be found.</param>
         public WixFileNotFoundException(SourceLineNumber sourceLineNumbers, string file, string fileType) :
-            base(WixErrors.FileNotFound(sourceLineNumbers, file, fileType))
+            base(ErrorMessages.FileNotFound(sourceLineNumbers, file, fileType))
         {
         }
     }

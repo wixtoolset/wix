@@ -10,15 +10,8 @@ namespace WixToolset
     /// <summary>
     /// Implementation of RFC 4122 - A Universally Unique Identifier (UUID) URN Namespace.
     /// </summary>
-    public sealed class Uuid
+    public static class Uuid
     {
-        /// <summary>
-        /// Protect the constructor.
-        /// </summary>
-        private Uuid()
-        {
-        }
-
         /// <summary>
         /// Creates a version 3 name-based UUID.
         /// </summary>

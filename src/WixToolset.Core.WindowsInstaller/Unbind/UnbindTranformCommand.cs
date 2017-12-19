@@ -13,11 +13,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     internal class UnbindTransformCommand
     {
-        public UnbindTransformCommand(Messaging messaging, string transformFile, string exportBasePath, string intermediateFolder)
+        public UnbindTransformCommand(IMessaging messaging, string transformFile, string exportBasePath, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.TransformFile = transformFile;
@@ -27,7 +28,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
         }
 
-        private Messaging Messaging { get; }
+        private IMessaging Messaging { get; }
 
         private string TransformFile { get; }
 
@@ -152,7 +153,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         // this commonly happens when the transform was built
                         // against a database schema different from the internal
                         // table definitions
-                        throw new WixException(WixErrors.TransformSchemaMismatch());
+                        throw new WixException(ErrorMessages.TransformSchemaMismatch());
                     }
                 }
 

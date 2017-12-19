@@ -10,7 +10,7 @@ namespace WixToolset
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
-    public class PatchTransform : IMessageHandler
+    public class PatchTransform
     {
         private string baseline;
         private Intermediate transform;
@@ -263,15 +263,6 @@ namespace WixToolset
             }
 #endif
             throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
         }
     }
 }

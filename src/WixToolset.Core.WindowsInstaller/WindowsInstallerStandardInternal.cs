@@ -16,7 +16,9 @@ namespace WixToolset.Core.WindowsInstaller
         private static readonly object lockObject = new object();
 
         private static TableDefinitionCollection tableDefinitions;
+#if REVISIT_FOR_PATCHING
         private static WixActionRowCollection standardActions;
+#endif
 
         /// <summary>
         /// Gets the table definitions stored in this assembly.
@@ -57,7 +59,7 @@ namespace WixToolset.Core.WindowsInstaller
             }
 
             return WindowsInstallerStandardInternal.standardActions;
-#endif 
+#endif
             throw new NotImplementedException();
         }
     }

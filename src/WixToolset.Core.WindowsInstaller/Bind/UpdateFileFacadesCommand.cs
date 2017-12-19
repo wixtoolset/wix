@@ -15,6 +15,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     /// <summary>
@@ -22,10 +23,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
-        public UpdateFileFacadesCommand(IntermediateSection section)
+        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section)
         {
+            this.Messaging = messaging;
             this.Section = section;
         }
+
+        private IMessaging Messaging { get; }
 
         private IntermediateSection Section { get; }
 
@@ -62,23 +66,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (ArgumentException)
             {
-                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 return;
             }
             catch (PathTooLongException)
             {
-                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 return;
             }
             catch (NotSupportedException)
             {
-                Messaging.Instance.OnMessage(WixDataErrors.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 return;
             }
 
             if (!fileInfo.Exists)
             {
-                Messaging.Instance.OnMessage(WixErrors.CannotFindFile(file.File.SourceLineNumbers, file.File.File, file.File.LongFileName, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.CannotFindFile(file.File.SourceLineNumbers, file.File.File, file.File.LongFileName, file.WixFile.Source.Path));
                 return;
             }
 
@@ -86,7 +90,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (Int32.MaxValue < fileStream.Length)
                 {
-                    throw new WixException(WixErrors.FileTooLarge(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                    throw new WixException(ErrorMessages.FileTooLarge(file.File.SourceLineNumbers, file.WixFile.Source.Path));
                 }
 
                 file.File.FileSize = Convert.ToInt32(fileStream.Length, CultureInfo.InvariantCulture);
@@ -102,11 +106,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (0x2 == e.NativeErrorCode) // ERROR_FILE_NOT_FOUND
                 {
-                    throw new WixException(WixErrors.FileNotFound(file.File.SourceLineNumbers, fileInfo.FullName));
+                    throw new WixException(ErrorMessages.FileNotFound(file.File.SourceLineNumbers, fileInfo.FullName));
                 }
                 else
                 {
-                    throw new WixException(WixErrors.Win32Exception(e.NativeErrorCode, e.Message));
+                    throw new WixException(ErrorMessages.Win32Exception(e.NativeErrorCode, e.Message));
                 }
             }
 
@@ -128,14 +132,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // for unversioned file. That's allowed but generally a dangerous thing to do so let's point that out to the user.
                     if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.File, StringComparison.Ordinal)))
                     {
-                        Messaging.Instance.OnMessage(WixWarnings.DefaultVersionUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Version, file.File.File));
+                        this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Version, file.File.File));
                     }
                 }
                 else
                 {
                     if (null != file.File.Language)
                     {
-                        Messaging.Instance.OnMessage(WixWarnings.DefaultLanguageUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.File));
+                        this.Messaging.Write(WarningMessages.DefaultLanguageUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.File));
                     }
 
                     int[] hash;
@@ -147,11 +151,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (0x2 == e.NativeErrorCode) // ERROR_FILE_NOT_FOUND
                         {
-                            throw new WixException(WixErrors.FileNotFound(file.File.SourceLineNumbers, fileInfo.FullName));
+                            throw new WixException(ErrorMessages.FileNotFound(file.File.SourceLineNumbers, fileInfo.FullName));
                         }
                         else
                         {
-                            throw new WixException(WixErrors.Win32Exception(e.NativeErrorCode, fileInfo.FullName, e.Message));
+                            throw new WixException(ErrorMessages.Win32Exception(e.NativeErrorCode, fileInfo.FullName, e.Message));
                         }
                     }
 
@@ -193,7 +197,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (!String.IsNullOrEmpty(file.File.Language) && String.IsNullOrEmpty(language))
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.DefaultLanguageUsedForVersionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.File));
+                    this.Messaging.Write(WarningMessages.DefaultLanguageUsedForVersionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.File));
                 }
                 else // override the default provided by the user (usually nothing) with the actual language from the file itself.
                 {
@@ -260,7 +264,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else if (file.WixFile.File_AssemblyApplication == null)
                     {
-                        throw new WixException(WixErrors.GacAssemblyNoStrongName(file.File.SourceLineNumbers, fileInfo.FullName, file.File.Component_));
+                        throw new WixException(ErrorMessages.GacAssemblyNoStrongName(file.File.SourceLineNumbers, fileInfo.FullName, file.File.Component_));
                     }
 
                     string assemblyVersion = referenceIdentity.GetAttribute(null, "Version");
@@ -271,7 +275,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    Messaging.Instance.OnMessage(WixErrors.InvalidAssemblyFile(file.File.SourceLineNumbers, fileInfo.FullName, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", result)));
+                    this.Messaging.Write(ErrorMessages.InvalidAssemblyFile(file.File.SourceLineNumbers, fileInfo.FullName, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", result)));
                     return;
                 }
 
@@ -360,7 +364,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 FileFacade fileManifest = this.FileFacades.SingleOrDefault(r => r.File.File.Equals(file.WixFile.File_AssemblyManifest, StringComparison.Ordinal));
                 if (null == fileManifest)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.File, file.WixFile.File_AssemblyManifest));
+                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.File, file.WixFile.File_AssemblyManifest));
                 }
 
                 string win32Type = null;
@@ -397,7 +401,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
                             if (!hasNextSibling)
                             {
-                                Messaging.Instance.OnMessage(WixErrors.InvalidManifestContent(file.File.SourceLineNumbers, fileManifest.WixFile.Source.Path));
+                                this.Messaging.Write(ErrorMessages.InvalidManifestContent(file.File.SourceLineNumbers, fileManifest.WixFile.Source.Path));
                                 return;
                             }
 
@@ -435,11 +439,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (FileNotFoundException fe)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.FileNotFound(new SourceLineNumber(fileManifest.WixFile.Source.Path), fe.FileName, "AssemblyManifest"));
+                    this.Messaging.Write(ErrorMessages.FileNotFound(new SourceLineNumber(fileManifest.WixFile.Source.Path), fe.FileName, "AssemblyManifest"));
                 }
                 catch (XmlException xe)
                 {
-                    Messaging.Instance.OnMessage(WixErrors.InvalidXml(new SourceLineNumber(fileManifest.WixFile.Source.Path), "manifest", xe.Message));
+                    this.Messaging.Write(ErrorMessages.InvalidXml(new SourceLineNumber(fileManifest.WixFile.Source.Path), "manifest", xe.Message));
                 }
 
                 if (!String.IsNullOrEmpty(win32Name))
@@ -482,7 +486,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // check for null value (this can occur when grabbing the file version from an assembly without one)
             if (String.IsNullOrEmpty(value))
             {
-                Messaging.Instance.OnMessage(WixWarnings.NullMsiAssemblyNameValue(file.File.SourceLineNumbers, file.File.Component_, name));
+                this.Messaging.Write(WarningMessages.NullMsiAssemblyNameValue(file.File.SourceLineNumbers, file.File.Component_, name));
             }
             else
             {
@@ -491,7 +495,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     String.IsNullOrEmpty(file.WixFile.File_AssemblyApplication) &&
                     !String.Equals(Path.GetFileNameWithoutExtension(file.File.LongFileName), value, StringComparison.OrdinalIgnoreCase))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.GACAssemblyIdentityWarning(file.File.SourceLineNumbers, Path.GetFileNameWithoutExtension(file.File.LongFileName), value));
+                    this.Messaging.Write(ErrorMessages.GACAssemblyIdentityWarning(file.File.SourceLineNumbers, Path.GetFileNameWithoutExtension(file.File.LongFileName), value));
                 }
 
                 // override directly authored value

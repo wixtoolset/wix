@@ -67,7 +67,7 @@ namespace WixToolset.Core
         /// <param name="library">Library to validate.</param>
         private Intermediate Validate(Intermediate library)
         {
-            FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(library.Sections);
+            FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(this.Context.Messaging, library.Sections);
             find.Execute();
 
             // TODO: Consider bringing this sort of verification back.
@@ -80,7 +80,7 @@ namespace WixToolset.Core
             //     reportDupes.Execute();
             // }
 
-            return (Messaging.Instance.EncounteredError ? null : library);
+            return (this.Context.Messaging.EncounteredError ? null : library);
         }
 
         private static Dictionary<string, Localization> CollateLocalizations(IEnumerable<Localization> localizations)
@@ -130,7 +130,7 @@ namespace WixToolset.Core
                             }
                             else
                             {
-                                this.Context.Messaging.OnMessage(WixDataErrors.FileNotFound(tuple.SourceLineNumbers, pathField.Path, tuple.Definition.Name));
+                                this.Context.Messaging.Write(ErrorMessages.FileNotFound(tuple.SourceLineNumbers, pathField.Path, tuple.Definition.Name));
                             }
                         }
                     }

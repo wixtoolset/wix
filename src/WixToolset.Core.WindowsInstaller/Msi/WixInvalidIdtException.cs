@@ -16,7 +16,7 @@ namespace WixToolset.Msi
         /// </summary>
         /// <param name="idtFile">The invalid idt file.</param>
         public WixInvalidIdtException(string idtFile) :
-            base(WixDataErrors.InvalidIdt(new SourceLineNumber(idtFile), idtFile))
+            base(ErrorMessages.InvalidIdt(new SourceLineNumber(idtFile), idtFile))
         {
         }
 
@@ -26,7 +26,7 @@ namespace WixToolset.Msi
         /// <param name="idtFile">The invalid idt file.</param>
         /// <param name="tableName">The table name of the invalid idt file.</param>
         public WixInvalidIdtException(string idtFile, string tableName) :
-            base(WixDataErrors.InvalidIdt(new SourceLineNumber(idtFile), idtFile, tableName))
+            base(ErrorMessages.InvalidIdt(new SourceLineNumber(idtFile), idtFile, tableName))
         {
         }
     }

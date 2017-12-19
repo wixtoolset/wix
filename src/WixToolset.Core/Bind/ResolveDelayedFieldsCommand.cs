@@ -7,6 +7,7 @@ namespace WixToolset.Core.Bind
     using System.Globalization;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Resolves the fields which had variables that needed to be resolved after the file information
@@ -19,11 +20,14 @@ namespace WixToolset.Core.Bind
         /// </summary>
         /// <param name="delayedFields">The fields which had resolution delayed.</param>
         /// <param name="variableCache">The file information to use when resolving variables.</param>
-        public ResolveDelayedFieldsCommand(IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)
+        public ResolveDelayedFieldsCommand(IMessaging messaging, IEnumerable<IDelayedField> delayedFields, Dictionary<string, string> variableCache)
         {
+            this.Messaging = messaging;
             this.DelayedFields = delayedFields;
             this.VariableCache = variableCache;
         }
+
+        private IMessaging Messaging { get; }
 
         private IEnumerable<IDelayedField> DelayedFields { get;}
 
@@ -58,7 +62,7 @@ namespace WixToolset.Core.Bind
                 }
                 catch (WixException we)
                 {
-                    Messaging.Instance.OnMessage(we.Error);
+                    this.Messaging.Write(we.Error);
                     continue;
                 }
             }
@@ -103,7 +107,7 @@ namespace WixToolset.Core.Bind
                 }
                 catch (WixException we)
                 {
-                    Messaging.Instance.OnMessage(we.Error);
+                    this.Messaging.Write(we.Error);
                 }
             }
         }

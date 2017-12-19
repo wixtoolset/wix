@@ -3,12 +3,11 @@
 namespace WixToolset.Core
 {
     using WixToolset.Core.Extensibility;
-    using WixToolset.Data;
 
     /// <summary>
     /// The WiX Toolset Harvester application core.
     /// </summary>
-    public sealed class HeatCore : IHeatCore, IMessageHandler
+    public sealed class HeatCore : IHeatCore
     {
         private Harvester harvester;
         private Mutator mutator;
@@ -21,15 +20,6 @@ namespace WixToolset.Core
         {
             this.harvester = new Harvester();
             this.mutator = new Mutator();
-        }
-
-        /// <summary>
-        /// Gets whether the mutator core encountered an error while processing.
-        /// </summary>
-        /// <value>Flag if core encountered an error during processing.</value>
-        public bool EncounteredError
-        {
-            get { return Messaging.Instance.EncounteredError; }
         }
 
         /// <summary>
@@ -48,15 +38,6 @@ namespace WixToolset.Core
         public Mutator Mutator
         {
             get { return this.mutator; }
-        }
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs mea)
-        {
-            Messaging.Instance.OnMessage(mea);
         }
     }
 }

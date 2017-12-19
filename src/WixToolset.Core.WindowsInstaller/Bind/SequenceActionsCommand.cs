@@ -9,6 +9,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     internal class SequenceActionsCommand
     {
@@ -27,7 +28,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Dictionary<string, WixActionTuple> StandardActionsById { get; }
 
-        public Messaging Messaging { private get; set; }
+        public IMessaging Messaging { private get; set; }
 
         public void Execute()
         {
@@ -64,10 +65,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (overridableActionRows.TryGetValue(actionRow.Id.Id, out var collidingActionRow))
                     {
-                        this.Messaging.OnMessage(WixErrors.OverridableActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
+                        this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
                         if (null != collidingActionRow.SourceLineNumbers)
                         {
-                            this.Messaging.OnMessage(WixErrors.OverridableActionCollision2(collidingActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionRow.SourceLineNumbers));
                         }
                     }
                     else
@@ -93,10 +94,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (overridableActionRows.TryGetValue(actionRow.Id.Id, out var collidingActionRow))
                     {
-                        this.Messaging.OnMessage(WixErrors.ActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
+                        this.Messaging.Write(ErrorMessages.ActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
                         if (null != collidingActionRow.SourceLineNumbers)
                         {
-                            this.Messaging.OnMessage(WixErrors.ActionCollision2(collidingActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.ActionCollision2(collidingActionRow.SourceLineNumbers));
                         }
                     }
                     else
@@ -127,20 +128,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (requiredActionRow.Overridable)
                     {
-                        this.Messaging.OnMessage(WixWarnings.SuppressAction(suppressActionRow.SourceLineNumbers, suppressActionRow.Action, suppressActionRow.SequenceTable.ToString()));
+                        this.Messaging.Write(WarningMessages.SuppressAction(suppressActionRow.SourceLineNumbers, suppressActionRow.Action, suppressActionRow.SequenceTable.ToString()));
                         if (null != requiredActionRow.SourceLineNumbers)
                         {
-                            this.Messaging.OnMessage(WixWarnings.SuppressAction2(requiredActionRow.SourceLineNumbers));
+                            this.Messaging.Write(WarningMessages.SuppressAction2(requiredActionRow.SourceLineNumbers));
                         }
 
                         requiredActionRows.Remove(key);
                     }
                     else // suppressing a non-overridable action row
                     {
-                        this.Messaging.OnMessage(WixErrors.SuppressNonoverridableAction(suppressActionRow.SourceLineNumbers, suppressActionRow.SequenceTable.ToString(), suppressActionRow.Action));
+                        this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction(suppressActionRow.SourceLineNumbers, suppressActionRow.SequenceTable.ToString(), suppressActionRow.Action));
                         if (null != requiredActionRow.SourceLineNumbers)
                         {
-                            this.Messaging.OnMessage(WixErrors.SuppressNonoverridableAction2(requiredActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction2(requiredActionRow.SourceLineNumbers));
                         }
                     }
                 }
@@ -156,14 +157,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // check for standard actions that don't have a sequence number in a merge module
                     if (SectionType.Module == this.Section.Type && WindowsInstallerStandard.IsStandardAction(actionRow.Action))
                     {
-                        this.Messaging.OnMessage(WixErrors.StandardActionRelativelyScheduledInModule(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
+                        this.Messaging.Write(ErrorMessages.StandardActionRelativelyScheduledInModule(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
                     }
 
                     this.SequenceActionRow(actionRow, requiredActionRows);
                 }
                 else if (SectionType.Module == this.Section.Type && 0 < actionRow.Sequence && !WindowsInstallerStandard.IsStandardAction(actionRow.Action)) // check for custom actions and dialogs that have a sequence number
                 {
-                    this.Messaging.OnMessage(WixErrors.CustomActionSequencedInModule(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
+                    this.Messaging.Write(ErrorMessages.CustomActionSequencedInModule(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
                 }
             }
 
@@ -231,10 +232,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             if (sequenceScheduledActionRow.Sequence == actionRow.Sequence)
                             {
-                                this.Messaging.OnMessage(WixWarnings.ActionSequenceCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, sequenceScheduledActionRow.Action, actionRow.Sequence));
+                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, sequenceScheduledActionRow.Action, actionRow.Sequence));
                                 if (null != sequenceScheduledActionRow.SourceLineNumbers)
                                 {
-                                    this.Messaging.OnMessage(WixWarnings.ActionSequenceCollision2(sequenceScheduledActionRow.SourceLineNumbers));
+                                    this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionRow.SourceLineNumbers));
                                 }
                             }
                         }
@@ -262,19 +263,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // Create errors for all the before actions.
                         foreach (var actionRow in relativeActions.PreviousActions)
                         {
-                            this.Messaging.OnMessage(WixErrors.ActionScheduledRelativeToTerminationAction(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, absoluteActionRow.Action));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, absoluteActionRow.Action));
                         }
 
                         // Create errors for all the after actions.
                         foreach (var actionRow in relativeActions.NextActions)
                         {
-                            this.Messaging.OnMessage(WixErrors.ActionScheduledRelativeToTerminationAction(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, absoluteActionRow.Action));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, absoluteActionRow.Action));
                         }
 
                         // If there is source line information for the absolutely scheduled action display it
                         if (absoluteActionRow.SourceLineNumbers != null)
                         {
-                            this.Messaging.OnMessage(WixErrors.ActionScheduledRelativeToTerminationAction2(absoluteActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction2(absoluteActionRow.SourceLineNumbers));
                         }
 
                         continue;
@@ -289,10 +290,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // look for collisions
                         if (unusedSequence == previousUsedSequence)
                         {
-                            this.Messaging.OnMessage(WixErrors.NoUniqueActionSequenceNumber(relativeActionRow.SourceLineNumbers, relativeActionRow.SequenceTable.ToString(), relativeActionRow.Action, absoluteActionRow.Action));
+                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionRow.SourceLineNumbers, relativeActionRow.SequenceTable.ToString(), relativeActionRow.Action, absoluteActionRow.Action));
                             if (absoluteActionRow.SourceLineNumbers != null)
                             {
-                                this.Messaging.OnMessage(WixErrors.NoUniqueActionSequenceNumber2(absoluteActionRow.SourceLineNumbers));
+                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionRow.SourceLineNumbers));
                             }
 
                             unusedSequence++;
@@ -319,10 +320,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         if (unusedSequence == nextUsedSequence)
                         {
-                            this.Messaging.OnMessage(WixErrors.NoUniqueActionSequenceNumber(relativeActionRow.SourceLineNumbers, relativeActionRow.SequenceTable.ToString(), relativeActionRow.Action, absoluteActionRow.Action));
+                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionRow.SourceLineNumbers, relativeActionRow.SequenceTable.ToString(), relativeActionRow.Action, absoluteActionRow.Action));
                             if (absoluteActionRow.SourceLineNumbers != null)
                             {
-                                this.Messaging.OnMessage(WixErrors.NoUniqueActionSequenceNumber2(absoluteActionRow.SourceLineNumbers));
+                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionRow.SourceLineNumbers));
                             }
 
                             unusedSequence--;
@@ -596,7 +597,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else if (actionRow == parentActionRow || this.ContainsChildActionRow(actionRow, parentActionRow)) // cycle detected
             {
-                throw new WixException(WixErrors.ActionCircularDependency(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, parentActionRow.Action));
+                throw new WixException(ErrorMessages.ActionCircularDependency(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, parentActionRow.Action));
             }
 
             // Add this action to the appropriate list of dependent action rows.

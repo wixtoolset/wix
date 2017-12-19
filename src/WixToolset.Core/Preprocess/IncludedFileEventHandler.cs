@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset
+namespace WixToolset.Core.Preprocess
 {
     using System;
     using WixToolset.Data;
@@ -17,9 +17,6 @@ namespace WixToolset
     /// </summary>
     public class IncludedFileEventArgs : EventArgs
     {
-        private SourceLineNumber sourceLineNumbers;
-        private string fullName;
-
         /// <summary>
         /// Creates a new IncludedFileEventArgs.
         /// </summary>
@@ -27,26 +24,20 @@ namespace WixToolset
         /// <param name="fullName">The full path of the included file.</param>
         public IncludedFileEventArgs(SourceLineNumber sourceLineNumbers, string fullName)
         {
-            this.sourceLineNumbers = sourceLineNumbers;
-            this.fullName = fullName;
+            this.SourceLineNumbers = sourceLineNumbers;
+            this.FullName = fullName;
         }
 
         /// <summary>
         /// Gets the full path of the included file.
         /// </summary>
         /// <value>The full path of the included file.</value>
-        public string FullName
-        {
-            get { return this.fullName; }
-        }
+        public string FullName { get; }
 
         /// <summary>
         /// Gets the source line numbers.
         /// </summary>
         /// <value>The source line numbers.</value>
-        public SourceLineNumber SourceLineNumbers
-        {
-            get { return this.sourceLineNumbers; }
-        }
+        public SourceLineNumber SourceLineNumbers { get; }
     }
 }

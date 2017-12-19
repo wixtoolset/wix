@@ -6,23 +6,26 @@ namespace WixToolset.Extensibility
     using System.Collections;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Base class for creating a validator extension. This default implementation
     /// will fire and event with the ICE name and description.
     /// </summary>
-    public class ValidatorExtension : IMessageHandler
+    public class ValidatorExtension
     {
         private string databaseFile;
         private Hashtable indexedSourceLineNumbers;
         private Output output;
         private SourceLineNumber sourceLineNumbers;
+        private readonly IMessaging messaging;
 
         /// <summary>
         /// Instantiate a new <see cref="ValidatorExtension"/>.
         /// </summary>
-        public ValidatorExtension()
+        public ValidatorExtension(IMessaging messaging)
         {
+            this.messaging = messaging;
         }
 
         /// <summary>
@@ -183,11 +186,11 @@ namespace WixToolset.Extensibility
             {
                 if (null == action)
                 {
-                    throw new WixException(WixErrors.UnexpectedExternalUIMessage(message));
+                    throw new WixException(ErrorMessages.UnexpectedExternalUIMessage(message));
                 }
                 else
                 {
-                    throw new WixException(WixErrors.UnexpectedExternalUIMessage(message, action));
+                    throw new WixException(ErrorMessages.UnexpectedExternalUIMessage(message, action));
                 }
             }
 
@@ -209,16 +212,16 @@ namespace WixToolset.Extensibility
             {
                 case "0":
                 case "1":
-                    this.OnMessage(WixErrors.ValidationError(messageSourceLineNumbers, messageParts[0], messageParts[2]));
+                    this.messaging.Write(ErrorMessages.ValidationError(messageSourceLineNumbers, messageParts[0], messageParts[2]));
                     break;
                 case "2":
-                    this.OnMessage(WixWarnings.ValidationWarning(messageSourceLineNumbers, messageParts[0], messageParts[2]));
+                    this.messaging.Write(WarningMessages.ValidationWarning(messageSourceLineNumbers, messageParts[0], messageParts[2]));
                     break;
                 case "3":
-                    this.OnMessage(WixVerboses.ValidationInfo(messageParts[0], messageParts[2]));
+                    this.messaging.Write(VerboseMessages.ValidationInfo(messageParts[0], messageParts[2]));
                     break;
                 default:
-                    throw new WixException(WixErrors.InvalidValidatorMessageType(messageParts[1]));
+                    throw new WixException(ErrorMessages.InvalidValidatorMessageType(messageParts[1]));
             }
         }
  
@@ -264,7 +267,7 @@ namespace WixToolset.Extensibility
 
                                 if (this.indexedSourceLineNumbers.ContainsKey(key))
                                 {
-                                    this.OnMessage(WixWarnings.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, table.Name));
+                                    this.messaging.Write(WarningMessages.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, table.Name));
                                 }
                                 else
                                 {
@@ -280,21 +283,6 @@ namespace WixToolset.Extensibility
 
             // use the file name as the source line information
             return this.sourceLineNumbers;
-        }
-
-        /// <summary>
-        /// Sends a message to the <see cref="Message"/> delegate if there is one.
-        /// </summary>
-        /// <param name="e">Message event arguments.</param>
-        /// <remarks>
-        /// <para><b>Notes to Inheritors:</b> When overriding <b>OnMessage</b>
-        /// in a derived class, be sure to call the base class's
-        /// <b>OnMessage</b> method so that registered delegates recieve
-        /// the event.</para>
-        /// </remarks>
-        public virtual void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
         }
    }
 }

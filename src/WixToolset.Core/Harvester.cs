@@ -57,7 +57,7 @@ namespace WixToolset
 
             if (null == this.harvesterExtension)
             {
-                throw new WixException(WixErrors.HarvestTypeNotFound());
+                throw new WixException(ErrorMessages.HarvestTypeNotFound());
             }
 
             this.harvesterExtension.Core = this.Core;

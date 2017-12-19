@@ -3,8 +3,8 @@
 namespace WixToolset.Core
 {
     using System;
-    using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class InscribeContext : IInscribeContext
     {
@@ -15,7 +15,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public Messaging Messaging { get; } = Messaging.Instance;
+        public IMessaging Messaging { get; set; }
 
         public string IntermediateFolder { get; set; }
 

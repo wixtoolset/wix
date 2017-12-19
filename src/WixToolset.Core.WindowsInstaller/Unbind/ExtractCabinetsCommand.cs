@@ -136,7 +136,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     }
                     catch (FileNotFoundException)
                     {
-                        throw new WixException(WixErrors.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
+                        throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
                     }
                 }
             }

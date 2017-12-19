@@ -5,44 +5,26 @@ namespace WixToolset.Core
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// The WiX Toolset harvester core.
     /// </summary>
     public sealed class HarvesterCore : IHarvesterCore
     {
-        private string extensionArgument;
-        private string rootDirectory;
-
-        /// <summary>
-        /// Gets whether the harvester core encountered an error while processing.
-        /// </summary>
-        /// <value>Flag if core encountered an error during processing.</value>
-        public bool EncounteredError
-        {
-            get { return Messaging.Instance.EncounteredError; }
-        }
+        public IMessaging Messaging { get; set; }
 
         /// <summary>
         /// Gets or sets the value of the extension argument passed to heat.
         /// </summary>
         /// <value>The extension argument.</value>
-        public string ExtensionArgument
-        {
-            get { return this.extensionArgument; }
-            set { this.extensionArgument = value; }
-        }
+        public string ExtensionArgument { get; set; }
 
         /// <summary>
         /// Gets or sets the value of the root directory that is being harvested.
         /// </summary>
         /// <value>The root directory being harvested.</value>
-        public string RootDirectory
-        {
-            get { return this.rootDirectory; }
-            set { this.rootDirectory = value; }
-        }
+        public string RootDirectory { get; set; }
 
         /// <summary>
         /// Create an identifier based on passed file name
@@ -67,15 +49,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs mea)
-        {
-            Messaging.Instance.OnMessage(mea);
-        }
-
-        /// <summary>
         /// Resolves a file's path if the Wix.File.Source value starts with "SourceDir\".
         /// </summary>
         /// <param name="fileSource">The Wix.File.Source value with "SourceDir\".</param>
@@ -84,7 +57,7 @@ namespace WixToolset.Core
         {
             if (fileSource.StartsWith("SourceDir\\", StringComparison.Ordinal))
             {
-                string file = Path.GetFullPath(this.rootDirectory);
+                string file = Path.GetFullPath(this.RootDirectory);
                 if (File.Exists(file))
                 {
                     return file;
@@ -92,7 +65,7 @@ namespace WixToolset.Core
                 else
                 {
                     fileSource = fileSource.Substring(10);
-                    fileSource = Path.Combine(Path.GetFullPath(this.rootDirectory), fileSource);
+                    fileSource = Path.Combine(Path.GetFullPath(this.RootDirectory), fileSource);
                 }
             }
 

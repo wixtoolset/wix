@@ -2,22 +2,14 @@
 
 namespace WixToolset
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.IO;
-    using WixToolset.Data;
-    using Wix = WixToolset.Data.Serialize;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// The WiX Toolset harvester core.
     /// </summary>
     public interface IHarvesterCore
     {
-        /// <summary>
-        /// Gets whether the harvester core encountered an error while processing.
-        /// </summary>
-        /// <value>Flag if core encountered an error during processing.</value>
-        bool EncounteredError { get; }
+        IMessaging Messaging { get; set; }
 
         /// <summary>
         /// Gets or sets the value of the extension argument passed to heat.
@@ -45,12 +37,6 @@ namespace WixToolset
         /// <param name="args">Information to hash.</param>
         /// <returns>The generated identifier.</returns>
         string GenerateIdentifier(string prefix, params string[] args);
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        void OnMessage(MessageEventArgs mea);
 
         /// <summary>
         /// Resolves a file's path if the Wix.File.Source value starts with "SourceDir\".

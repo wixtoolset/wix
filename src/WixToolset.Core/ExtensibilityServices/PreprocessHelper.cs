@@ -42,7 +42,7 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (showWarning)
                 {
-                    context.Messaging.OnMessage(WixWarnings.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
+                    context.Messaging.Write(WarningMessages.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
                 }
 
                 context.Variables[name] = value;
@@ -56,7 +56,7 @@ namespace WixToolset.Core.ExtensibilityServices
             // Check to make sure there are 2 parts and neither is an empty string.
             if (2 != prefixParts.Length || 0 >= prefixParts[0].Length || 0 >= prefixParts[1].Length)
             {
-                throw new WixException(WixErrors.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, function));
+                throw new WixException(ErrorMessages.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, function));
             }
 
             var prefix = prefixParts[0];
@@ -65,7 +65,7 @@ namespace WixToolset.Core.ExtensibilityServices
             // Check to make sure there are 2 parts, neither is an empty string, and the second part ends with a closing paren.
             if (2 != functionParts.Length || 0 >= functionParts[0].Length || 0 >= functionParts[1].Length || !functionParts[1].EndsWith(")", StringComparison.Ordinal))
             {
-                throw new WixException(WixErrors.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, function));
+                throw new WixException(ErrorMessages.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, function));
             }
 
             var functionName = functionParts[0];
@@ -113,7 +113,7 @@ namespace WixToolset.Core.ExtensibilityServices
                             // Make sure the base version is specified
                             if (args.Length == 0 || String.IsNullOrEmpty(args[0]))
                             {
-                                throw new WixException(WixErrors.InvalidPreprocessorFunctionAutoVersion(context.CurrentSourceLineNumber));
+                                throw new WixException(ErrorMessages.InvalidPreprocessorFunctionAutoVersion(context.CurrentSourceLineNumber));
                             }
 
                             // Build = days since 1/1/2000; Revision = seconds since midnight / 2
@@ -137,7 +137,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         }
                         catch (Exception e)
                         {
-                            throw new WixException(WixErrors.PreprocessorExtensionEvaluateFunctionFailed(context.CurrentSourceLineNumber, prefix, function, String.Join(",", args), e.Message));
+                            throw new WixException(ErrorMessages.PreprocessorExtensionEvaluateFunctionFailed(context.CurrentSourceLineNumber, prefix, function, String.Join(",", args), e.Message));
                         }
                     }
                     else
@@ -165,7 +165,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else
                 {
-                    throw new WixException(WixErrors.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, variable));
+                    throw new WixException(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, variable));
                 }
             }
             else
@@ -185,7 +185,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else
                 {
-                    throw new WixException(WixErrors.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, variable));
+                    throw new WixException(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, variable));
                 }
             }
         }
@@ -220,7 +220,7 @@ namespace WixToolset.Core.ExtensibilityServices
                             return context.CurrentSourceLineNumber.FileName;
 
                         case "PLATFORM":
-                            context.Messaging.OnMessage(WixWarnings.DeprecatedPreProcVariable(context.CurrentSourceLineNumber, "$(sys.PLATFORM)", "$(sys.BUILDARCH)"));
+                            context.Messaging.Write(WarningMessages.DeprecatedPreProcVariable(context.CurrentSourceLineNumber, "$(sys.PLATFORM)", "$(sys.BUILDARCH)"));
 
                             goto case "BUILDARCH";
 
@@ -260,7 +260,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         }
                         catch (Exception e)
                         {
-                            throw new WixException(WixErrors.PreprocessorExtensionGetVariableValueFailed(context.CurrentSourceLineNumber, prefix, name, e.Message));
+                            throw new WixException(ErrorMessages.PreprocessorExtensionGetVariableValueFailed(context.CurrentSourceLineNumber, prefix, name, e.Message));
                         }
                     }
                     else
@@ -277,7 +277,7 @@ namespace WixToolset.Core.ExtensibilityServices
             // Check to make sure there are 2 parts and neither is an empty string.
             if (2 != prefixParts.Length)
             {
-                throw new WixException(WixErrors.InvalidPreprocessorPragma(context.CurrentSourceLineNumber, pragmaName));
+                throw new WixException(ErrorMessages.InvalidPreprocessorPragma(context.CurrentSourceLineNumber, pragmaName));
             }
 
             var prefix = prefixParts[0];
@@ -285,7 +285,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (String.IsNullOrEmpty(prefix) || String.IsNullOrEmpty(pragma))
             {
-                throw new WixException(WixErrors.InvalidPreprocessorPragma(context.CurrentSourceLineNumber, pragmaName));
+                throw new WixException(ErrorMessages.InvalidPreprocessorPragma(context.CurrentSourceLineNumber, pragmaName));
             }
 
             switch (prefix)
@@ -295,7 +295,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         // Add any core defined pragmas here
                         default:
-                            context.Messaging.OnMessage(WixWarnings.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
+                            context.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
                             break;
                     }
                     break;
@@ -306,7 +306,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (!extension.ProcessPragma(prefix, pragma, args, parent))
                         {
-                            context.Messaging.OnMessage(WixWarnings.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
+                            context.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
                         }
                     }
                     break;
@@ -339,7 +339,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     currentPosition = remainder.IndexOf(')');
                     if (-1 == currentPosition)
                     {
-                        context.Messaging.OnMessage(WixErrors.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
+                        context.Messaging.Write(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
                         break;
                     }
 
@@ -385,12 +385,12 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (isFunction)
                         {
-                            context.Messaging.OnMessage(WixErrors.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, remainder));
+                            context.Messaging.Write(ErrorMessages.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, remainder));
                             break;
                         }
                         else
                         {
-                            context.Messaging.OnMessage(WixErrors.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
+                            context.Messaging.Write(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
                             break;
                         }
                     }
@@ -410,12 +410,12 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (isFunction)
                         {
-                            context.Messaging.OnMessage(WixErrors.UndefinedPreprocessorFunction(context.CurrentSourceLineNumber, subString));
+                            context.Messaging.Write(ErrorMessages.UndefinedPreprocessorFunction(context.CurrentSourceLineNumber, subString));
                             break;
                         }
                         else
                         {
-                            context.Messaging.OnMessage(WixErrors.UndefinedPreprocessorVariable(context.CurrentSourceLineNumber, subString));
+                            context.Messaging.Write(ErrorMessages.UndefinedPreprocessorVariable(context.CurrentSourceLineNumber, subString));
                             break;
                         }
                     }
@@ -448,7 +448,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (!context.Variables.Remove(name))
             {
-                context.Messaging.OnMessage(WixErrors.CannotReundefineVariable(context.CurrentSourceLineNumber, name));
+                context.Messaging.Write(ErrorMessages.CannotReundefineVariable(context.CurrentSourceLineNumber, name));
             }
         }
 

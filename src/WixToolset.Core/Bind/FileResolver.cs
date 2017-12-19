@@ -221,7 +221,7 @@ namespace WixToolset.Core.Bind
             }
             catch (ArgumentException)
             {
-                throw new WixException(WixErrors.IllegalCharactersInPath(path));
+                throw new WixException(ErrorMessages.IllegalCharactersInPath(path));
             }
         }
 

@@ -123,13 +123,13 @@ namespace WixToolset.Core.Extensibility
                                 }
                                 else
                                 {
-                                    throw new WixException(WixErrors.InvalidExtension(assemblyName, innerE.Message));
+                                    throw new WixException(ErrorMessages.InvalidExtension(assemblyName, innerE.Message));
                                 }
                             }
                         }
                         else
                         {
-                            throw new WixException(WixErrors.InvalidExtension(assemblyName, e.Message));
+                            throw new WixException(ErrorMessages.InvalidExtension(assemblyName, e.Message));
                         }
                     }
                 }
@@ -143,7 +143,7 @@ namespace WixToolset.Core.Extensibility
                     }
                     catch (Exception e)
                     {
-                        throw new WixException(WixErrors.InvalidExtensionType(assemblyName, className, e.GetType().ToString(), e.Message));
+                        throw new WixException(ErrorMessages.InvalidExtensionType(assemblyName, className, e.GetType().ToString(), e.Message));
                     }
                 }
                 else
@@ -157,7 +157,7 @@ namespace WixToolset.Core.Extensibility
                     }
                     else
                     {
-                        throw new WixException(WixErrors.InvalidExtensionType(assemblyName, typeof(AssemblyDefaultHeatExtensionAttribute).ToString()));
+                        throw new WixException(ErrorMessages.InvalidExtensionType(assemblyName, typeof(AssemblyDefaultHeatExtensionAttribute).ToString()));
                     }
                 }
             }
@@ -168,7 +168,7 @@ namespace WixToolset.Core.Extensibility
             }
             else
             {
-                throw new WixException(WixErrors.InvalidExtensionType(extension, extensionType.ToString(), typeof(HeatExtension).ToString()));
+                throw new WixException(ErrorMessages.InvalidExtensionType(extension, extensionType.ToString(), typeof(HeatExtension).ToString()));
             }
         }
 
@@ -191,7 +191,7 @@ namespace WixToolset.Core.Extensibility
             }
             catch (Exception e)
             {
-                throw new WixException(WixErrors.InvalidExtension(assemblyName, e.Message));
+                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, e.Message));
             }
 
             return extensionAssembly;

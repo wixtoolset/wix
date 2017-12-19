@@ -8,7 +8,7 @@ namespace WixToolset
     /// <summary>
     /// Converts a wixout representation of an MSM database into a ComponentGroup the form of WiX source.
     /// </summary>
-    public sealed class Inscriber : IMessageHandler
+    public sealed class Inscriber
     {
         /// <summary>
         /// Gets or sets the temp files collection.
@@ -432,11 +432,6 @@ namespace WixToolset
             }
 #endif
             return true;
-        }
-
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
         }
     }
 }

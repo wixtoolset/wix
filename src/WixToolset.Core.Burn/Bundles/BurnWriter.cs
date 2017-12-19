@@ -6,6 +6,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Diagnostics;
     using System.IO;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Burn PE writer for the WiX toolset.
@@ -30,8 +31,8 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         /// <param name="fileExe">File to modify in-place.</param>
         /// <param name="bundleGuid">GUID for the bundle.</param>
-        private BurnWriter(string fileExe)
-            : base(fileExe)
+        private BurnWriter(IMessaging messaging, string fileExe)
+            : base(messaging, fileExe)
         {
         }
 
@@ -40,9 +41,9 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         /// <param name="fileExe">Path to file.</param>
         /// <returns>Burn writer.</returns>
-        public static BurnWriter Open(string fileExe)
+        public static BurnWriter Open(IMessaging messaging, string fileExe)
         {
-            BurnWriter writer = new BurnWriter(fileExe);
+            BurnWriter writer = new BurnWriter(messaging, fileExe);
 
             using (BinaryReader binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete)))
             {
@@ -76,7 +77,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_MAGIC, BURN_SECTION_MAGIC);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_VERSION, BURN_SECTION_VERSION);
 
-            Messaging.Instance.OnMessage(WixVerboses.BundleGuid(bundleId.ToString("B")));
+            this.messaging.Write(VerboseMessages.BundleGuid(bundleId.ToString("B")));
             this.binaryWriter.BaseStream.Seek(this.wixburnDataOffset + BURN_SECTION_OFFSET_BUNDLEGUID, SeekOrigin.Begin);
             this.binaryWriter.Write(bundleId.ToByteArray());
 

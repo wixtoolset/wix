@@ -5,14 +5,18 @@ namespace WixToolset.Link
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public class ReportConflictingSymbolsCommand
     {
-        public ReportConflictingSymbolsCommand(IEnumerable<Symbol> possibleConflicts, IEnumerable<IntermediateSection> resolvedSections)
+        public ReportConflictingSymbolsCommand(IMessaging messaging, IEnumerable<Symbol> possibleConflicts, IEnumerable<IntermediateSection> resolvedSections)
         {
+            this.Messaging = messaging;
             this.PossibleConflicts = possibleConflicts;
             this.ResolvedSections = resolvedSections;
         }
+
+        private IMessaging Messaging { get; }
 
         private  IEnumerable<Symbol> PossibleConflicts { get; }
 
@@ -37,11 +41,11 @@ namespace WixToolset.Link
 
                     if (actuallyReferencedDuplicateSymbols.Any())
                     {
-                        Messaging.Instance.OnMessage(WixErrors.DuplicateSymbol(referencedDuplicateSymbol.Row.SourceLineNumbers, referencedDuplicateSymbol.Name));
+                        this.Messaging.Write(ErrorMessages.DuplicateSymbol(referencedDuplicateSymbol.Row.SourceLineNumbers, referencedDuplicateSymbol.Name));
 
                         foreach (Symbol duplicate in actuallyReferencedDuplicateSymbols)
                         {
-                            Messaging.Instance.OnMessage(WixErrors.DuplicateSymbol2(duplicate.Row.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol2(duplicate.Row.SourceLineNumbers));
                         }
                     }
                 }

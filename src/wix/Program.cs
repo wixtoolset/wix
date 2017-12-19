@@ -3,7 +3,11 @@
 namespace WixToolset.Core
 {
     using System;
+    using System.Globalization;
+    using System.Text;
+    using System.Threading;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -19,12 +23,12 @@ namespace WixToolset.Core
         [MTAThread]
         public static int Main(string[] args)
         {
-            Messaging.Instance.InitializeAppName("WIX", "wix.exe");
-            Messaging.Instance.Display += DisplayMessage;
-
             var serviceProvider = new WixToolsetServiceProvider();
+
+            var listener = new ConsoleMessageListener("WIX", "wix.exe");
+
             var program = new Program();
-            return program.Run(serviceProvider, args);
+            return program.Run(serviceProvider, listener, args);
         }
 
         /// <summary>
@@ -33,10 +37,13 @@ namespace WixToolset.Core
         /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
         /// <param name="args">Command-line arguments to execute.</param>
         /// <returns>Returns the application error code.</returns>
-        public int Run(IServiceProvider serviceProvider, string[] args)
+        public int Run(IServiceProvider serviceProvider, IMessageListener listener, string[] args)
         {
+            var messaging = serviceProvider.GetService<IMessaging>();
+            messaging.SetListener(listener);
+
             var context = serviceProvider.GetService<ICommandLineContext>();
-            context.Messaging = Messaging.Instance;
+            context.Messaging = messaging;
             context.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider);
             context.ParsedArguments = args;
 
@@ -57,17 +64,50 @@ namespace WixToolset.Core
             return extensionManager;
         }
 
-        private static void DisplayMessage(object sender, DisplayEventArgs e)
+        private class ConsoleMessageListener : IMessageListener
         {
-            switch (e.Level)
+            public ConsoleMessageListener(string shortName, string longName)
             {
-                case MessageLevel.Warning:
-                case MessageLevel.Error:
-                    Console.Error.WriteLine(e.Message);
-                    break;
-                default:
-                    Console.WriteLine(e.Message);
-                    break;
+                this.ShortAppName = shortName;
+                this.LongAppName = longName;
+
+                PrepareConsoleForLocalization();
+            }
+
+            public string LongAppName { get; }
+
+            public string ShortAppName { get; }
+
+            public void Write(Message message)
+            {
+                var filename = message.SourceLineNumbers?.FileName ?? this.LongAppName;
+                var line = message.SourceLineNumbers?.LineNumber ?? -1;
+                var type = message.Level.ToString().ToLowerInvariant();
+                var output = message.Level >= MessageLevel.Warning ? Console.Out : Console.Error;
+
+                if (line > 0)
+                {
+                    filename = String.Concat(filename, "(", line, ")");
+                }
+
+                output.WriteLine("{0} : {1} {2}{3:0000}: {4}", filename, type, this.ShortAppName, message.Id, message.ToString());
+            }
+
+            public void Write(string message)
+            {
+                Console.Out.WriteLine(message);
+            }
+
+            private static void PrepareConsoleForLocalization()
+            {
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.CurrentUICulture.GetConsoleFallbackUICulture();
+
+                if (Console.OutputEncoding.CodePage != Encoding.UTF8.CodePage &&
+                    Console.OutputEncoding.CodePage != Thread.CurrentThread.CurrentUICulture.TextInfo.OEMCodePage &&
+                    Console.OutputEncoding.CodePage != Thread.CurrentThread.CurrentUICulture.TextInfo.ANSICodePage)
+                {
+                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
+                }
             }
         }
     }

@@ -8,21 +8,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// AssignMediaCommand assigns files to cabs based on Media or MediaTemplate rows.
     /// </summary>
     internal class AssignMediaCommand
     {
-        public AssignMediaCommand(IntermediateSection section)
+        public AssignMediaCommand(IntermediateSection section, IMessaging messaging)
         {
             this.CabinetNameTemplate = "Cab{0}.cab";
             this.Section = section;
+            this.Messaging = messaging;
         }
 
         private IntermediateSection Section { get; }
+
+        private IMessaging Messaging { get; }
 
         public IEnumerable<FileFacade> FileFacades { private get; set; }
 
@@ -60,7 +63,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // If both tables are authored, it is an error.
             if (mediaTemplateTable.Count > 0 && mediaTable.Count > 1)
             {
-                throw new WixException(WixErrors.MediaTableCollision(null));
+                throw new WixException(ErrorMessages.MediaTableCollision(null));
             }
 
             // When building merge module, all the files go to "#MergeModule.CABinet".
@@ -144,11 +147,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (FormatException)
             {
-                throw new WixException(WixErrors.IllegalEnvironmentVariable("WIX_MUMS", mumsString));
+                throw new WixException(ErrorMessages.IllegalEnvironmentVariable("WIX_MUMS", mumsString));
             }
             catch (OverflowException)
             {
-                throw new WixException(WixErrors.MaximumUncompressedMediaSizeTooLarge(null, maxPreCabSizeInMB));
+                throw new WixException(ErrorMessages.MaximumUncompressedMediaSizeTooLarge(null, maxPreCabSizeInMB));
             }
 
             foreach (FileFacade facade in this.FileFacades)
@@ -234,8 +237,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (cabinetMediaRows.TryGetValue(mediaRow.Cabinet, out var existingRow))
                         {
-                            Messaging.Instance.OnMessage(WixErrors.DuplicateCabinetName(mediaRow.SourceLineNumbers, mediaRow.Cabinet));
-                            Messaging.Instance.OnMessage(WixErrors.DuplicateCabinetName2(existingRow.SourceLineNumbers, existingRow.Cabinet));
+                            this.Messaging.Write(ErrorMessages.DuplicateCabinetName(mediaRow.SourceLineNumbers, mediaRow.Cabinet));
+                            this.Messaging.Write(ErrorMessages.DuplicateCabinetName2(existingRow.SourceLineNumbers, existingRow.Cabinet));
                         }
                         else
                         {
@@ -259,7 +262,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (!mediaRows.TryGetValue(facade.WixFile.DiskId, out var mediaRow))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.MissingMedia(facade.File.SourceLineNumbers, facade.WixFile.DiskId));
+                    this.Messaging.Write(ErrorMessages.MissingMedia(facade.File.SourceLineNumbers, facade.WixFile.DiskId));
                     continue;
                 }
 
@@ -279,7 +282,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        Messaging.Instance.OnMessage(WixErrors.ExpectedMediaCabinet(facade.File.SourceLineNumbers, facade.File.File, facade.WixFile.DiskId));
+                        this.Messaging.Write(ErrorMessages.ExpectedMediaCabinet(facade.File.SourceLineNumbers, facade.File.File, facade.WixFile.DiskId));
                     }
                 }
             }

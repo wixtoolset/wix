@@ -15,7 +15,5 @@ namespace WixToolset.Core
         public string OutputPath { get; set; }
 
         public string SourcePath { get; set; }
-
-        public Stream Stream { get; set; }
     }
 }

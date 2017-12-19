@@ -7,6 +7,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     public class CompileContext : ICompileContext
     {
@@ -17,7 +18,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public Messaging Messaging { get; set; }
+        public IMessaging Messaging { get; set; }
 
         public string CompilationId { get; set; }
 

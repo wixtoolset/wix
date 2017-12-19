@@ -23,7 +23,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -59,7 +59,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -95,7 +95,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -125,7 +125,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -155,7 +155,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -185,7 +185,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Module.wxs"),
@@ -219,7 +219,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -255,7 +255,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediateFolder = fs.GetFolder();
 
                 var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), new[]
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),

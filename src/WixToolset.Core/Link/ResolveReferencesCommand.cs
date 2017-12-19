@@ -7,19 +7,21 @@ namespace WixToolset.Link
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Resolves all the simple references in a section.
     /// </summary>
-    internal class ResolveReferencesCommand : ICommand
+    internal class ResolveReferencesCommand
     {
         private IntermediateSection entrySection;
         private IDictionary<string, Symbol> symbols;
         private HashSet<Symbol> referencedSymbols;
         private HashSet<IntermediateSection> resolvedSections;
 
-        public ResolveReferencesCommand(IntermediateSection entrySection, IDictionary<string, Symbol> symbols)
+        public ResolveReferencesCommand(IMessaging messaging, IntermediateSection entrySection, IDictionary<string, Symbol> symbols)
         {
+            this.Messaging = messaging;
             this.entrySection = entrySection;
             this.symbols = symbols;
         }
@@ -29,6 +31,8 @@ namespace WixToolset.Link
         public IEnumerable<Symbol> ReferencedSymbols { get { return this.referencedSymbols; } }
 
         public IEnumerable<IntermediateSection> ResolvedSections { get { return this.resolvedSections; } }
+
+        private IMessaging Messaging { get; }
 
         /// <summary>
         /// Resolves all the simple references in a section.
@@ -69,14 +73,14 @@ namespace WixToolset.Link
 
                 if (!this.symbols.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var symbol))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName));
+                    this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName));
                 }
                 else // see if the symbol (and any of its duplicates) are appropriately accessible.
                 {
                     IList<Symbol> accessible = DetermineAccessibleSymbols(section, symbol);
                     if (!accessible.Any())
                     {
-                        Messaging.Instance.OnMessage(WixErrors.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, symbol.Access));
+                        this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, symbol.Access));
                     }
                     else if (1 == accessible.Count)
                     {
@@ -95,16 +99,16 @@ namespace WixToolset.Link
 
                         if (String.IsNullOrEmpty(referencingSourceLineNumber))
                         {
-                            Messaging.Instance.OnMessage(WixErrors.DuplicateSymbol(accessibleSymbol.Row.SourceLineNumbers, accessibleSymbol.Name));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Row.SourceLineNumbers, accessibleSymbol.Name));
                         }
                         else
                         {
-                            Messaging.Instance.OnMessage(WixErrors.DuplicateSymbol(accessibleSymbol.Row.SourceLineNumbers, accessibleSymbol.Name, referencingSourceLineNumber));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol(accessibleSymbol.Row.SourceLineNumbers, accessibleSymbol.Name, referencingSourceLineNumber));
                         }
 
                         foreach (Symbol accessibleDuplicate in accessible.Skip(1))
                         {
-                            Messaging.Instance.OnMessage(WixErrors.DuplicateSymbol2(accessibleDuplicate.Row.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.DuplicateSymbol2(accessibleDuplicate.Row.SourceLineNumbers));
                         }
                     }
                 }

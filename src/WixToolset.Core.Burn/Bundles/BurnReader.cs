@@ -8,6 +8,7 @@ namespace WixToolset.Core.Burn.Bundles
     using System.IO;
     using System.Xml;
     using WixToolset.Core.Native;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Burn PE reader for the WiX toolset.
@@ -32,8 +33,8 @@ namespace WixToolset.Core.Burn.Bundles
         /// Creates a BurnReader for reading a PE file.
         /// </summary>
         /// <param name="fileExe">File to read.</param>
-        private BurnReader(string fileExe)
-            : base(fileExe)
+        private BurnReader(IMessaging messaging, string fileExe)
+            : base(messaging, fileExe)
         {
             this.attachedContainerPayloadNames = new List<DictionaryEntry>();
         }
@@ -59,9 +60,9 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         /// <param name="fileExe">Path to file.</param>
         /// <returns>Burn reader.</returns>
-        public static BurnReader Open(string fileExe)
+        public static BurnReader Open(IMessaging messaging, string fileExe)
         {
-            BurnReader reader = new BurnReader(fileExe);
+            BurnReader reader = new BurnReader(messaging, fileExe);
 
             reader.binaryReader = new BinaryReader(File.Open(fileExe, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete));
             if (!reader.Initialize(reader.binaryReader))

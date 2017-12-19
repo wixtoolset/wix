@@ -112,7 +112,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    Messaging.Instance.OnMessage(WixErrors.DuplicateExtensionXmlSchemaNamespace(extension.GetType().ToString(), extension.Namespace.NamespaceName, collidingExtension.GetType().ToString()));
+                    this.Context.Messaging.Write(ErrorMessages.DuplicateExtensionXmlSchemaNamespace(extension.GetType().ToString(), extension.Namespace.NamespaceName, collidingExtension.GetType().ToString()));
                 }
 
                 extension.PreCompile(context);
@@ -123,9 +123,9 @@ namespace WixToolset.Core
             {
                 var parseHelper = context.ServiceProvider.GetService<IParseHelper>();
 
-                this.Core = new CompilerCore(target, parseHelper, extensionsByNamespace);
+                this.Core = new CompilerCore(target, this.Context.Messaging, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
-                this.componentIdPlaceholdersResolver = new WixVariableResolver();
+                this.componentIdPlaceholdersResolver = new WixVariableResolver(this.Context.Messaging);
 
                 // parse the document
                 var source = context.Source;
@@ -140,17 +140,17 @@ namespace WixToolset.Core
                     {
                         if (String.IsNullOrEmpty(source.Root.Name.NamespaceName))
                         {
-                            this.Core.OnMessage(WixErrors.InvalidWixXmlNamespace(sourceLineNumbers, "Wix", CompilerCore.WixNamespace.ToString()));
+                            this.Core.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, "Wix", CompilerCore.WixNamespace.ToString()));
                         }
                         else
                         {
-                            this.Core.OnMessage(WixErrors.InvalidWixXmlNamespace(sourceLineNumbers, "Wix", source.Root.Name.NamespaceName, CompilerCore.WixNamespace.ToString()));
+                            this.Core.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, "Wix", source.Root.Name.NamespaceName, CompilerCore.WixNamespace.ToString()));
                         }
                     }
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.InvalidDocumentElement(sourceLineNumbers, source.Root.Name.LocalName, "source", "Wix"));
+                    this.Core.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, source.Root.Name.LocalName, "source", "Wix"));
                 }
 
                 // Resolve any Component Id placeholders compiled into the intermediate.
@@ -189,7 +189,7 @@ namespace WixToolset.Core
                 this.Core = null;
             }
 
-            return Messaging.Instance.EncounteredError ? null : target;
+            return this.Context.Messaging.EncounteredError ? null : target;
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace WixToolset.Core
                 return s;
             }
 
-            return String.Concat(s.Substring(0, 1).ToUpper(CultureInfo.InvariantCulture), s.Substring(1));
+            return String.Concat(s.Substring(0, 1).ToUpperInvariant(), s.Substring(1));
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace WixToolset.Core
             {
                 if (property.Id != property.Id.ToUpperInvariant())
                 {
-                    this.Core.OnMessage(WixErrors.SearchPropertyNotUppercase(sourceLineNumbers, "Property", "Id", property.Id));
+                    this.Core.Write(ErrorMessages.SearchPropertyNotUppercase(sourceLineNumbers, "Property", "Id", property.Id));
                 }
 
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.AppSearch, property);
@@ -290,7 +290,7 @@ namespace WixToolset.Core
                     Group group = match.Groups["identifier"];
                     if (group.Success)
                     {
-                        this.Core.OnMessage(WixWarnings.PropertyValueContainsPropertyReference(sourceLineNumbers, property.Id, group.Value));
+                        this.Core.Write(WarningMessages.PropertyValueContainsPropertyReference(sourceLineNumbers, property.Id, group.Value));
                     }
                 }
             }
@@ -330,7 +330,7 @@ namespace WixToolset.Core
         {
             if (secure && property.Id != property.Id.ToUpperInvariant())
             {
-                this.Core.OnMessage(WixErrors.SecurePropertyNotUppercase(sourceLineNumbers, "Property", "Id", property.Id));
+                this.Core.Write(ErrorMessages.SecurePropertyNotUppercase(sourceLineNumbers, "Property", "Id", property.Id));
             }
 
             if (null == section)
@@ -426,12 +426,12 @@ namespace WixToolset.Core
 
             if (null == appId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if ((YesNoType.No == advertise && YesNoType.Yes == appIdAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == appIdAdvertise))
             {
-                this.Core.OnMessage(WixErrors.AppIdIncompatibleAdvertiseState(sourceLineNumbers, node.Name.LocalName, "Advertise", appIdAdvertise.ToString(), advertise.ToString()));
+                this.Core.Write(ErrorMessages.AppIdIncompatibleAdvertiseState(sourceLineNumbers, node.Name.LocalName, "Advertise", appIdAdvertise.ToString(), advertise.ToString()));
             }
             else
             {
@@ -468,7 +468,7 @@ namespace WixToolset.Core
             {
                 if (null != description)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "Description"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "Description"));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -569,7 +569,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -609,12 +609,12 @@ namespace WixToolset.Core
                         case "src":
                             if (null != sourceFile)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile", "src"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile", "src"));
                             }
 
                             if ("src" == attrib.Name.LocalName)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
+                                this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
                             }
                             sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -634,27 +634,27 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
             else if (!String.IsNullOrEmpty(id.Id)) // only check legal values
             {
                 if (55 < id.Id.Length)
                 {
-                    this.Core.OnMessage(WixErrors.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 55));
+                    this.Core.Write(ErrorMessages.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 55));
                 }
                 else if (!this.compilingProduct) // if we're not doing a product then we can't be sure that a binary identifier will fit when modularized
                 {
                     if (18 < id.Id.Length)
                     {
-                        this.Core.OnMessage(WixWarnings.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 18));
+                        this.Core.Write(WarningMessages.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 18));
                     }
                 }
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -710,27 +710,27 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
             else if (!String.IsNullOrEmpty(id.Id)) // only check legal values
             {
                 if (57 < id.Id.Length)
                 {
-                    this.Core.OnMessage(WixErrors.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 57));
+                    this.Core.Write(ErrorMessages.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 57));
                 }
                 else if (!this.compilingProduct) // if we're not doing a product then we can't be sure that a binary identifier will fit when modularized
                 {
                     if (20 < id.Id.Length)
                     {
-                        this.Core.OnMessage(WixWarnings.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 20));
+                        this.Core.Write(WarningMessages.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 20));
                     }
                 }
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -776,7 +776,7 @@ namespace WixToolset.Core
 
             if (null == property)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
             }
 
             // find unexpected child elements
@@ -845,12 +845,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == productCode)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductCode"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductCode"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -917,12 +917,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == qualifier)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Qualifier"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Qualifier"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -1066,7 +1066,7 @@ namespace WixToolset.Core
 
             if (null == classId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             HashSet<string> uniqueContexts = new HashSet<string>();
@@ -1074,7 +1074,7 @@ namespace WixToolset.Core
             {
                 if (uniqueContexts.Contains(context))
                 {
-                    this.Core.OnMessage(WixErrors.DuplicateContextValue(sourceLineNumbers, context));
+                    this.Core.Write(ErrorMessages.DuplicateContextValue(sourceLineNumbers, context));
                 }
                 else
                 {
@@ -1093,7 +1093,7 @@ namespace WixToolset.Core
 
             if ((YesNoType.No == advertise && YesNoType.Yes == classAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == classAdvertise))
             {
-                this.Core.OnMessage(WixErrors.AdvertiseStateMustMatch(sourceLineNumbers, classAdvertise.ToString(), advertise.ToString()));
+                this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, classAdvertise.ToString(), advertise.ToString()));
             }
             else
             {
@@ -1108,12 +1108,12 @@ namespace WixToolset.Core
 
             if (YesNoType.Yes == advertise && 0 == contexts.Length)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Context", "Advertise", "yes"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Context", "Advertise", "yes"));
             }
 
             if (!String.IsNullOrEmpty(parentAppId) && !String.IsNullOrEmpty(appId))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "AppId", node.Parent.Name.LocalName));
+                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "AppId", node.Parent.Name.LocalName));
             }
 
             if (!String.IsNullOrEmpty(localFileServer))
@@ -1173,12 +1173,12 @@ namespace WixToolset.Core
             {
                 if (null != fileServer || null != localFileServer)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Server", "Advertise", "yes"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Server", "Advertise", "yes"));
                 }
 
                 if (null != foreignServer)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "Advertise", "yes"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "Advertise", "yes"));
                 }
 
                 if (null == appId && null != parentAppId)
@@ -1226,16 +1226,16 @@ namespace WixToolset.Core
             {
                 if (null == fileServer && null == localFileServer && null == foreignServer)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "Server"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "Server"));
                 }
 
                 if (null != fileServer && null != foreignServer)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "File"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "File"));
                 }
                 else if (null != localFileServer && null != foreignServer)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "Server"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ForeignServer", "Server"));
                 }
                 else if (null == fileServer)
                 {
@@ -1244,7 +1244,7 @@ namespace WixToolset.Core
 
                 if (null != appId) // need to use nesting (not a reference) for the unadvertised Class elements
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "AppId", "Advertise", "no"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "AppId", "Advertise", "no"));
                 }
 
                 // add the core registry keys for each context in the class
@@ -1254,7 +1254,7 @@ namespace WixToolset.Core
                     {
                         if (null != argument)
                         {
-                            this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Arguments", "Context", context));
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Arguments", "Context", context));
                         }
 
                         if (null != fileServer)
@@ -1291,7 +1291,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Context", context, "InprocServer", "InprocServer32", "LocalServer", "LocalServer32"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Context", context, "InprocServer", "InprocServer32", "LocalServer", "LocalServer32"));
                     }
 
                     this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\", context), String.Empty, formattedContextString, componentId); // ClassId context
@@ -1342,7 +1342,7 @@ namespace WixToolset.Core
 
                 if (YesNoType.NotSet != relativePath) // ClassId's RelativePath
                 {
-                    this.Core.OnMessage(WixErrors.RelativePathForRegistryElement(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.RelativePathForRegistryElement(sourceLineNumbers));
                 }
             }
 
@@ -1454,12 +1454,12 @@ namespace WixToolset.Core
 
             if (null == interfaceId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -1537,17 +1537,17 @@ namespace WixToolset.Core
 
             if (null == mask)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Mask"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Mask"));
             }
 
             if (CompilerConstants.IntegerNotSet == offset)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Offset"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Offset"));
             }
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -1556,7 +1556,7 @@ namespace WixToolset.Core
             {
                 if (mask.Length != value.Length)
                 {
-                    this.Core.OnMessage(WixErrors.ValueAndMaskMustBeSameLength(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.ValueAndMaskMustBeSameLength(sourceLineNumbers));
                 }
                 cb = mask.Length / 2;
             }
@@ -1628,7 +1628,7 @@ namespace WixToolset.Core
 
             if (null == minimum && null == maximum)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Minimum", "Maximum"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Minimum", "Maximum"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -1697,7 +1697,7 @@ namespace WixToolset.Core
                                         type = 2;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "raw"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "raw"));
                                         break;
                                 }
                             }
@@ -1729,17 +1729,17 @@ namespace WixToolset.Core
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             if (CompilerConstants.IntegerNotSet == root)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
             }
 
             if (CompilerConstants.IntegerNotSet == type)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
             }
 
             signature = id.Id;
@@ -1753,7 +1753,7 @@ namespace WixToolset.Core
                         case "DirectorySearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
 
@@ -1763,7 +1763,7 @@ namespace WixToolset.Core
                         case "DirectorySearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchRefElement(child, id.Id);
@@ -1771,7 +1771,7 @@ namespace WixToolset.Core
                         case "FileSearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
@@ -1780,7 +1780,7 @@ namespace WixToolset.Core
                         case "FileSearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             string newId = this.ParseSimpleRefElement(child, "Signature"); // FileSearch signatures override parent signatures
@@ -1844,7 +1844,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -1933,7 +1933,7 @@ namespace WixToolset.Core
                         case "DirectorySearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchElement(child, "CCP_DRIVE");
@@ -1941,7 +1941,7 @@ namespace WixToolset.Core
                         case "DirectorySearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchRefElement(child, "CCP_DRIVE");
@@ -1959,7 +1959,7 @@ namespace WixToolset.Core
 
             if (null == signature)
             {
-                this.Core.OnMessage(WixErrors.SearchElementRequired(sourceLineNumbers, node.Name.LocalName));
+                this.Core.Write(ErrorMessages.SearchElementRequired(sourceLineNumbers, node.Name.LocalName));
             }
 
             return signature;
@@ -2005,13 +2005,13 @@ namespace WixToolset.Core
                 else if (signature != sig)
                 {
                     // all signatures under a ComplianceCheck must be the same
-                    this.Core.OnMessage(WixErrors.MultipleIdentifiersFound(sourceLineNumbers, node.Name.LocalName, sig, signature));
+                    this.Core.Write(ErrorMessages.MultipleIdentifiersFound(sourceLineNumbers, node.Name.LocalName, sig, signature));
                 }
             }
 
             if (null == signature)
             {
-                this.Core.OnMessage(WixErrors.SearchElementRequired(sourceLineNumbers, node.Name.LocalName));
+                this.Core.Write(ErrorMessages.SearchElementRequired(sourceLineNumbers, node.Name.LocalName));
             }
 
             if (!this.Core.EncounteredError)
@@ -2110,7 +2110,7 @@ namespace WixToolset.Core
                                         bits |= MsiInterop.MsidbComponentAttributesSourceOnly;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "either", "local", "source"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "either", "local", "source"));
                                         break;
                                 }
                             }
@@ -2181,30 +2181,30 @@ namespace WixToolset.Core
 
             if (null == directoryId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Directory"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Directory"));
             }
 
             if (String.IsNullOrEmpty(guid) && MsiInterop.MsidbComponentAttributesShared == (bits & MsiInterop.MsidbComponentAttributesShared))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Shared", "yes", "Guid", ""));
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Shared", "yes", "Guid", ""));
             }
 
             if (String.IsNullOrEmpty(guid) && MsiInterop.MsidbComponentAttributesPermanent == (bits & MsiInterop.MsidbComponentAttributesPermanent))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Permanent", "yes", "Guid", ""));
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Permanent", "yes", "Guid", ""));
             }
 
             if (null != feature)
             {
                 if (this.compilingModule)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeInMergeModule(sourceLineNumbers, node.Name.LocalName, "Feature"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeInMergeModule(sourceLineNumbers, node.Name.LocalName, "Feature"));
                 }
                 else
                 {
                     if (ComplexReferenceParentType.Feature == parentType || ComplexReferenceParentType.FeatureGroup == parentType)
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Feature", node.Parent.Name.LocalName));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Feature", node.Parent.Name.LocalName));
                     }
                     else
                     {
@@ -2236,7 +2236,7 @@ namespace WixToolset.Core
                             if (null != condition)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                             }
                             condition = this.ParseConditionElement(child, node.Name.LocalName, null, null);
                             break;
@@ -2369,7 +2369,7 @@ namespace WixToolset.Core
 
                 if (keyFound && YesNoType.Yes == keyPathSet)
                 {
-                    this.Core.OnMessage(WixErrors.ComponentMultipleKeyPaths(sourceLineNumbers, node.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
+                    this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, node.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
                 }
 
                 // if a possible KeyPath has been found and that value was explicitly set as
@@ -2398,13 +2398,13 @@ namespace WixToolset.Core
             {
                 if (encounteredODBCDataSource)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalComponentWithAutoGeneratedGuid(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.IllegalComponentWithAutoGeneratedGuid(sourceLineNumbers));
                     isGeneratableGuidOk = false;
                 }
 
                 if (0 != files && MsiInterop.MsidbComponentAttributesRegistryKeyPath == keyBits)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalComponentWithAutoGeneratedGuid(sourceLineNumbers, true));
+                    this.Core.Write(ErrorMessages.IllegalComponentWithAutoGeneratedGuid(sourceLineNumbers, true));
                     isGeneratableGuidOk = false;
                 }
             }
@@ -2412,7 +2412,7 @@ namespace WixToolset.Core
             // check for implicit KeyPath which can easily be accidentally changed
             if (this.ShowPedanticMessages && !keyFound && !isGeneratableGuidOk)
             {
-                this.Core.OnMessage(WixErrors.ImplicitComponentKeyPath(sourceLineNumbers, id.Id));
+                this.Core.Write(ErrorMessages.ImplicitComponentKeyPath(sourceLineNumbers, id.Id));
             }
 
             // if there isn't an @Id attribute value, replace the placeholder with the id of the keypath.
@@ -2428,14 +2428,14 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.CannotDefaultComponentId(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.CannotDefaultComponentId(sourceLineNumbers));
                 }
             }
 
             // If an id was not determined by now, we have to error.
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             // finally add the Component table row
@@ -2524,7 +2524,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -2609,7 +2609,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -2658,7 +2658,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -2705,7 +2705,7 @@ namespace WixToolset.Core
                                         type = MsiInterop.MsidbLocatorTypeFileName;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue, "directory", "file"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue, "directory", "file"));
                                         break;
                                 }
                             }
@@ -2737,7 +2737,7 @@ namespace WixToolset.Core
                         case "DirectorySearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
 
@@ -2747,7 +2747,7 @@ namespace WixToolset.Core
                         case "DirectorySearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchRefElement(child, id.Id);
@@ -2755,7 +2755,7 @@ namespace WixToolset.Core
                         case "FileSearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
@@ -2764,7 +2764,7 @@ namespace WixToolset.Core
                         case "FileSearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             string newId = this.ParseSimpleRefElement(child, "Signature"); // FileSearch signatures override parent signatures
@@ -2907,7 +2907,7 @@ namespace WixToolset.Core
                         case "FileId":
                             if (null != fileId)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             fileId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "File", fileId);
@@ -2934,22 +2934,22 @@ namespace WixToolset.Core
 
             if (null != sourceFolder && null != sourceDirectory) // SourceFolder and SourceDirectory cannot coexist
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFolder", "SourceDirectory"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFolder", "SourceDirectory"));
             }
 
             if (null != sourceFolder && null != sourceProperty) // SourceFolder and SourceProperty cannot coexist
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFolder", "SourceProperty"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFolder", "SourceProperty"));
             }
 
             if (null != sourceDirectory && null != sourceProperty) // SourceDirectory and SourceProperty cannot coexist
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceProperty", "SourceDirectory"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceProperty", "SourceDirectory"));
             }
 
             if (null != destinationDirectory && null != destinationProperty) // DestinationDirectory and DestinationProperty cannot coexist
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DestinationProperty", "DestinationDirectory"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DestinationProperty", "DestinationDirectory"));
             }
 
             // generate a short file name
@@ -2970,7 +2970,7 @@ namespace WixToolset.Core
                 // DestinationDirectory or DestinationProperty must be specified
                 if (null == destinationDirectory && null == destinationProperty)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributesWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DestinationDirectory", "DestinationProperty", "FileId"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributesWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DestinationDirectory", "DestinationProperty", "FileId"));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -3007,32 +3007,32 @@ namespace WixToolset.Core
             {
                 if (null != sourceDirectory)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceDirectory", "FileId"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceDirectory", "FileId"));
                 }
 
                 if (null != sourceFolder)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFolder", "FileId"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFolder", "FileId"));
                 }
 
                 if (null != sourceName)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceName", "FileId"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceName", "FileId"));
                 }
 
                 if (null != sourceProperty)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceProperty", "FileId"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "SourceProperty", "FileId"));
                 }
 
                 if (delete)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Delete", "FileId"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Delete", "FileId"));
                 }
 
                 if (null == destinationName && null == destinationDirectory && null == destinationProperty)
                 {
-                    this.Core.OnMessage(WixWarnings.CopyFileFileIdUseless(sourceLineNumbers));
+                    this.Core.Write(WarningMessages.CopyFileFileIdUseless(sourceLineNumbers));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -3084,7 +3084,7 @@ namespace WixToolset.Core
                         case "BinaryKey":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                             }
                             source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             sourceBits = MsiInterop.MsidbCustomActionTypeBinaryData;
@@ -3093,7 +3093,7 @@ namespace WixToolset.Core
                         case "Directory":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                             }
                             source = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
                             sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
@@ -3101,7 +3101,7 @@ namespace WixToolset.Core
                         case "DllEntry":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             targetBits = MsiInterop.MsidbCustomActionTypeDll;
@@ -3109,7 +3109,7 @@ namespace WixToolset.Core
                         case "Error":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             targetBits = MsiInterop.MsidbCustomActionTypeTextData | MsiInterop.MsidbCustomActionTypeSourceFile;
@@ -3140,7 +3140,7 @@ namespace WixToolset.Core
                         case "ExeCommand":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                             targetBits = MsiInterop.MsidbCustomActionTypeExe;
@@ -3173,7 +3173,7 @@ namespace WixToolset.Core
                                         bits |= MsiInterop.MsidbCustomActionTypeClientRepeat;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, execute, "commit", "deferred", "firstSequence", "immediate", "oncePerProcess", "rollback", "secondSequence"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, execute, "commit", "deferred", "firstSequence", "immediate", "oncePerProcess", "rollback", "secondSequence"));
                                         break;
                                 }
                             }
@@ -3181,7 +3181,7 @@ namespace WixToolset.Core
                         case "FileKey":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                             }
                             source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             sourceBits = MsiInterop.MsidbCustomActionTypeSourceFile;
@@ -3202,7 +3202,7 @@ namespace WixToolset.Core
                         case "JScriptCall":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                             targetBits = MsiInterop.MsidbCustomActionTypeJScript;
@@ -3216,7 +3216,7 @@ namespace WixToolset.Core
                         case "Property":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                             }
                             source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             sourceBits = MsiInterop.MsidbCustomActionTypeProperty;
@@ -3240,7 +3240,7 @@ namespace WixToolset.Core
                                         bits |= MsiInterop.MsidbCustomActionTypeContinue;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, returnValue, "asyncNoWait", "asyncWait", "check", "ignore"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, returnValue, "asyncNoWait", "asyncWait", "check", "ignore"));
                                         break;
                                 }
                             }
@@ -3248,12 +3248,12 @@ namespace WixToolset.Core
                         case "Script":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                             }
 
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
 
                             // set the source and target to empty string for error messages when the user sets multiple sources or targets
@@ -3277,7 +3277,7 @@ namespace WixToolset.Core
                                         targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, script, "jscript", "vbscript"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, script, "jscript", "vbscript"));
                                         break;
                                 }
                             }
@@ -3294,7 +3294,7 @@ namespace WixToolset.Core
                         case "Value":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                             targetBits = MsiInterop.MsidbCustomActionTypeTextData;
@@ -3302,7 +3302,7 @@ namespace WixToolset.Core
                         case "VBScriptCall":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                             targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
@@ -3327,7 +3327,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -3348,48 +3348,48 @@ namespace WixToolset.Core
             {
                 if (null == source)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "BinaryKey", "FileKey", "Property"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "BinaryKey", "FileKey", "Property"));
                 }
                 else if (MsiInterop.MsidbCustomActionTypeDirectory == sourceBits)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "Directory"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "Directory"));
                 }
             }
             else if (MsiInterop.MsidbCustomActionTypeJScript == targetBits) // non-inline jscript
             {
                 if (null == source)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "BinaryKey", "FileKey", "Property"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "BinaryKey", "FileKey", "Property"));
                 }
                 else if (MsiInterop.MsidbCustomActionTypeDirectory == sourceBits)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "Directory"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "Directory"));
                 }
             }
             else if (MsiInterop.MsidbCustomActionTypeExe == targetBits) // exe-command
             {
                 if (null == source)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ExeCommand", "BinaryKey", "Directory", "FileKey", "Property"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ExeCommand", "BinaryKey", "Directory", "FileKey", "Property"));
                 }
             }
             else if (MsiInterop.MsidbCustomActionTypeTextData == (bits | sourceBits | targetBits))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Value", "Directory", "Property"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Value", "Directory", "Property"));
             }
             else if (!String.IsNullOrEmpty(innerText)) // inner text cannot be specified with non-script CAs
             {
-                this.Core.OnMessage(WixErrors.CustomActionIllegalInnerText(sourceLineNumbers, node.Name.LocalName, innerText, "Script"));
+                this.Core.Write(ErrorMessages.CustomActionIllegalInnerText(sourceLineNumbers, node.Name.LocalName, innerText, "Script"));
             }
 
             if (MsiInterop.MsidbCustomActionType64BitScript == (bits & MsiInterop.MsidbCustomActionType64BitScript) && MsiInterop.MsidbCustomActionTypeVBScript != targetBits && MsiInterop.MsidbCustomActionTypeJScript != targetBits)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Win64", "Script", "VBScriptCall", "JScriptCall"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Win64", "Script", "VBScriptCall", "JScriptCall"));
             }
 
             if ((MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue) == (bits & (MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue)) && MsiInterop.MsidbCustomActionTypeExe != targetBits)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Return", "asyncNoWait", "ExeCommand"));
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Return", "asyncNoWait", "ExeCommand"));
             }
 
             if (MsiInterop.MsidbCustomActionTypeTSAware == (bits & MsiInterop.MsidbCustomActionTypeTSAware))
@@ -3397,7 +3397,7 @@ namespace WixToolset.Core
                 // TS-aware CAs are valid only when deferred so require the in-script Type bit...
                 if (0 == (bits & MsiInterop.MsidbCustomActionTypeInScript))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalTerminalServerCustomActionAttributes(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.IllegalTerminalServerCustomActionAttributes(sourceLineNumbers));
                 }
             }
 
@@ -3406,12 +3406,12 @@ namespace WixToolset.Core
                 MsiInterop.MsidbCustomActionTypeTextData == targetBits &&
                 0 != (bits & MsiInterop.MsidbCustomActionTypeInScript))
             {
-                this.Core.OnMessage(WixErrors.IllegalPropertyCustomActionAttributes(sourceLineNumbers));
+                this.Core.Write(ErrorMessages.IllegalPropertyCustomActionAttributes(sourceLineNumbers));
             }
 
             if (0 == targetBits)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -3475,7 +3475,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -3520,7 +3520,7 @@ namespace WixToolset.Core
 
             if (null == primaryKeys[0])
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.CreateSimpleReference(sourceLineNumbers, "MsiPatchSequence", primaryKeys);
@@ -3565,7 +3565,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -3640,7 +3640,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -3682,11 +3682,11 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
             else if (31 < id.Length)
             {
-                this.Core.OnMessage(WixErrors.TableNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id));
+                this.Core.Write(ErrorMessages.TableNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -3743,11 +3743,11 @@ namespace WixToolset.Core
 
             if (null == tableId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
             else if (31 < tableId.Length)
             {
-                this.Core.OnMessage(WixErrors.CustomTableNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", tableId));
+                this.Core.Write(ErrorMessages.CustomTableNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", tableId));
             }
 
             foreach (XElement child in node.Elements())
@@ -3833,7 +3833,7 @@ namespace WixToolset.Core
                                                     typeName = "CHAR";
                                                     break;
                                                 default:
-                                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Type", typeValue, "binary", "int", "string"));
+                                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Type", typeValue, "binary", "int", "string"));
                                                     break;
                                             }
                                         }
@@ -3849,18 +3849,18 @@ namespace WixToolset.Core
 
                             if (null == columnName)
                             {
-                                this.Core.OnMessage(WixErrors.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Id"));
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Id"));
                             }
 
                             if (null == typeName)
                             {
-                                this.Core.OnMessage(WixErrors.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Type"));
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Type"));
                             }
                             else if ("SHORT" == typeName)
                             {
                                 if (2 != width && 4 != width)
                                 {
-                                    this.Core.OnMessage(WixErrors.CustomTableIllegalColumnWidth(childSourceLineNumbers, child.Name.LocalName, "Width", width));
+                                    this.Core.Write(ErrorMessages.CustomTableIllegalColumnWidth(childSourceLineNumbers, child.Name.LocalName, "Width", width));
                                 }
                                 columnType = String.Concat(nullable ? "I" : "i", width);
                             }
@@ -3873,7 +3873,7 @@ namespace WixToolset.Core
                             {
                                 if ("Binary" != category)
                                 {
-                                    this.Core.OnMessage(WixErrors.ExpectedBinaryCategory(childSourceLineNumbers));
+                                    this.Core.Write(ErrorMessages.ExpectedBinaryCategory(childSourceLineNumbers));
                                 }
                                 columnType = String.Concat(nullable ? "V" : "v", width);
                             }
@@ -3927,7 +3927,7 @@ namespace WixToolset.Core
 
                                         if (null == columnName)
                                         {
-                                            this.Core.OnMessage(WixErrors.ExpectedAttribute(dataSourceLineNumbers, data.Name.LocalName, "Column"));
+                                            this.Core.Write(ErrorMessages.ExpectedAttribute(dataSourceLineNumbers, data.Name.LocalName, "Column"));
                                         }
 
                                         dataValue = String.Concat(dataValue, null == dataValue ? String.Empty : Common.CustomRowFieldSeparator.ToString(), columnName, ":", Common.GetInnerText(data));
@@ -3959,7 +3959,7 @@ namespace WixToolset.Core
             {
                 if (null == primaryKeys || 0 == primaryKeys.Length)
                 {
-                    this.Core.OnMessage(WixErrors.CustomTableMissingPrimaryKey(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.CustomTableMissingPrimaryKey(sourceLineNumbers));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -4097,12 +4097,12 @@ namespace WixToolset.Core
             {
                 if (!String.IsNullOrEmpty(shortName))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
                 }
 
                 if (null == parentId)
                 {
-                    this.Core.OnMessage(WixErrors.DirectoryRootWithoutName(sourceLineNumbers, node.Name.LocalName, "Name"));
+                    this.Core.Write(ErrorMessages.DirectoryRootWithoutName(sourceLineNumbers, node.Name.LocalName, "Name"));
                 }
             }
             else if (!String.IsNullOrEmpty(name))
@@ -4116,11 +4116,11 @@ namespace WixToolset.Core
                 }
                 else if (name.Equals("."))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name", name));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name", name));
                 }
                 else if (name.Equals(shortName))
                 {
-                    this.Core.OnMessage(WixWarnings.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "Name", "ShortName", name));
+                    this.Core.Write(WarningMessages.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "Name", "ShortName", name));
                 }
             }
 
@@ -4128,7 +4128,7 @@ namespace WixToolset.Core
             {
                 if (!String.IsNullOrEmpty(shortSourceName))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ShortSourceName", "SourceName"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ShortSourceName", "SourceName"));
                 }
             }
             else
@@ -4142,11 +4142,11 @@ namespace WixToolset.Core
                 }
                 else if (sourceName.Equals("."))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ShortSourceName", "SourceName", sourceName));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ShortSourceName", "SourceName", sourceName));
                 }
                 else if (sourceName.Equals(shortSourceName))
                 {
-                    this.Core.OnMessage(WixWarnings.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "SourceName", "ShortSourceName", sourceName));
+                    this.Core.Write(WarningMessages.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "SourceName", "ShortSourceName", sourceName));
                 }
             }
 
@@ -4191,7 +4191,7 @@ namespace WixToolset.Core
 
             if ("TARGETDIR".Equals(id.Id) && !"SourceDir".Equals(defaultDir))
             {
-                this.Core.OnMessage(WixErrors.IllegalTargetDirDefaultDir(sourceLineNumbers, defaultDir));
+                this.Core.Write(ErrorMessages.IllegalTargetDirDefaultDir(sourceLineNumbers, defaultDir));
             }
 
             foreach (XElement child in node.Elements())
@@ -4293,7 +4293,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (!String.IsNullOrEmpty(fileSource) && !fileSource.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
@@ -4391,7 +4391,7 @@ namespace WixToolset.Core
                         case "DirectorySearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchElement(child, id.Id);
@@ -4399,7 +4399,7 @@ namespace WixToolset.Core
                         case "DirectorySearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchRefElement(child, id.Id);
@@ -4407,7 +4407,7 @@ namespace WixToolset.Core
                         case "FileSearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             hasFileSearch = true;
@@ -4416,7 +4416,7 @@ namespace WixToolset.Core
                         case "FileSearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseSimpleRefElement(child, "Signature");
@@ -4432,7 +4432,7 @@ namespace WixToolset.Core
                     {
                         if (!hasFileSearch)
                         {
-                            this.Core.OnMessage(WixErrors.IllegalParentAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "AssignToProperty", child.Name.LocalName));
+                            this.Core.Write(ErrorMessages.IllegalParentAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "AssignToProperty", child.Name.LocalName));
                         }
                         else if (!oneChild)
                         {
@@ -4518,7 +4518,7 @@ namespace WixToolset.Core
             {
                 if (!String.IsNullOrEmpty(parentSignature))
                 {
-                    this.Core.OnMessage(WixErrors.CanNotHaveTwoParents(sourceLineNumbers, id.Id, parent.Id, parentSignature));
+                    this.Core.Write(ErrorMessages.CanNotHaveTwoParents(sourceLineNumbers, id.Id, parent.Id, parentSignature));
                 }
                 else
                 {
@@ -4544,7 +4544,7 @@ namespace WixToolset.Core
                         case "DirectorySearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchElement(child, id.Id);
@@ -4552,7 +4552,7 @@ namespace WixToolset.Core
                         case "DirectorySearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchRefElement(child, id.Id);
@@ -4560,7 +4560,7 @@ namespace WixToolset.Core
                         case "FileSearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
@@ -4568,7 +4568,7 @@ namespace WixToolset.Core
                         case "FileSearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseSimpleRefElement(child, "Signature");
@@ -4636,7 +4636,7 @@ namespace WixToolset.Core
                                         bits = bits | MsiInterop.MsidbFeatureAttributesUIDisallowAbsent;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, absent, "allow", "disallow"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, absent, "allow", "disallow"));
                                         break;
                                 }
                             }
@@ -4657,7 +4657,7 @@ namespace WixToolset.Core
                                     case Wix.Feature.AllowAdvertiseType.yes: // this is the default
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, allowAdvertise, "no", "system", "yes"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, allowAdvertise, "no", "system", "yes"));
                                         break;
                                 }
                             }
@@ -4681,7 +4681,7 @@ namespace WixToolset.Core
                                     case Wix.Feature.InstallDefaultType.followParent:
                                         if (ComplexReferenceParentType.Product == parentType)
                                         {
-                                            this.Core.OnMessage(WixErrors.RootFeatureCannotFollowParent(sourceLineNumbers));
+                                            this.Core.Write(ErrorMessages.RootFeatureCannotFollowParent(sourceLineNumbers));
                                         }
                                         bits = bits | MsiInterop.MsidbFeatureAttributesFollowParent;
                                         break;
@@ -4691,7 +4691,7 @@ namespace WixToolset.Core
                                         bits = bits | MsiInterop.MsidbFeatureAttributesFavorSource;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installDefault, "followParent", "local", "source"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installDefault, "followParent", "local", "source"));
                                         break;
                                 }
                             }
@@ -4703,7 +4703,7 @@ namespace WixToolset.Core
                             title = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if ("PUT-FEATURE-TITLE-HERE" == title)
                             {
-                                this.Core.OnMessage(WixWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, title));
+                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, title));
                             }
                             break;
                         case "TypicalDefault":
@@ -4719,7 +4719,7 @@ namespace WixToolset.Core
                                     case Wix.Feature.TypicalDefaultType.install: // this is the default
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typicalDefault, "advertise", "install"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typicalDefault, "advertise", "install"));
                                         break;
                                 }
                             }
@@ -4737,27 +4737,27 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
             else if (38 < id.Id.Length)
             {
-                this.Core.OnMessage(WixErrors.FeatureNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                this.Core.Write(ErrorMessages.FeatureNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
             }
 
             if (null != configurableDirectory && configurableDirectory.ToUpper(CultureInfo.InvariantCulture) != configurableDirectory)
             {
-                this.Core.OnMessage(WixErrors.FeatureConfigurableDirectoryNotUppercase(sourceLineNumbers, node.Name.LocalName, "ConfigurableDirectory", configurableDirectory));
+                this.Core.Write(ErrorMessages.FeatureConfigurableDirectoryNotUppercase(sourceLineNumbers, node.Name.LocalName, "ConfigurableDirectory", configurableDirectory));
             }
 
             if ("advertise" == typicalDefault && "no" == allowAdvertise)
             {
-                this.Core.OnMessage(WixErrors.FeatureCannotFavorAndDisallowAdvertise(sourceLineNumbers, node.Name.LocalName, "TypicalDefault", typicalDefault, "AllowAdvertise", allowAdvertise));
+                this.Core.Write(ErrorMessages.FeatureCannotFavorAndDisallowAdvertise(sourceLineNumbers, node.Name.LocalName, "TypicalDefault", typicalDefault, "AllowAdvertise", allowAdvertise));
             }
 
             if (YesNoType.Yes == followParent && ("local" == installDefault || "source" == installDefault))
             {
-                this.Core.OnMessage(WixErrors.FeatureCannotFollowParentAndFavorLocalOrSource(sourceLineNumbers, node.Name.LocalName, "InstallDefault", "FollowParent", "yes"));
+                this.Core.Write(ErrorMessages.FeatureCannotFollowParentAndFavorLocalOrSource(sourceLineNumbers, node.Name.LocalName, "InstallDefault", "FollowParent", "yes"));
             }
 
             int childDisplay = 0;
@@ -4827,7 +4827,7 @@ namespace WixToolset.Core
                             int value;
                             if (!Int32.TryParse(display, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", display, "collapse", "expand", "hidden"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", display, "collapse", "expand", "hidden"));
                             }
                             else
                             {
@@ -4892,7 +4892,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             int lastDisplay = 0;
@@ -4978,7 +4978,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -5074,7 +5074,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -5133,7 +5133,7 @@ namespace WixToolset.Core
                                         action = "!";
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "create", "set", "remove"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "create", "set", "remove"));
                                         break;
                                 }
                             }
@@ -5145,7 +5145,7 @@ namespace WixToolset.Core
                             part = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if (!Wix.Environment.TryParsePartType(part, out partType))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Part", part, "all", "first", "last"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Part", part, "all", "first", "last"));
                             }
                             break;
                         case "Permanent":
@@ -5178,14 +5178,14 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (Wix.Environment.PartType.NotSet != partType)
             {
                 if ("+" == action)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Part", "Action", "create"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Part", "Action", "create"));
                 }
 
                 switch (partType)
@@ -5248,7 +5248,7 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = CompilerConstants.IllegalInteger;
             }
 
@@ -5288,7 +5288,7 @@ namespace WixToolset.Core
                             YesNoType extensionAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             if ((YesNoType.No == advertise && YesNoType.Yes == extensionAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == extensionAdvertise))
                             {
-                                this.Core.OnMessage(WixErrors.AdvertiseStateMustMatch(sourceLineNumbers, extensionAdvertise.ToString(), advertise.ToString()));
+                                this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, extensionAdvertise.ToString(), advertise.ToString()));
                             }
                             advertise = extensionAdvertise;
                             break;
@@ -5445,7 +5445,7 @@ namespace WixToolset.Core
                                         assemblyType = FileAssemblyType.Win32Assembly;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
                                         break;
                                 }
                             }
@@ -5545,7 +5545,7 @@ namespace WixToolset.Core
                                         procArch = "ia64";
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64", "ia64"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64", "ia64"));
                                         break;
                                 }
                             }
@@ -5609,7 +5609,7 @@ namespace WixToolset.Core
                 // the companion file cannot be the key path of a component
                 if (YesNoType.Yes == keyPath)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "CompanionFile", "KeyPath", "yes"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "CompanionFile", "KeyPath", "yes"));
                 }
             }
 
@@ -5618,7 +5618,7 @@ namespace WixToolset.Core
                 name = Path.GetFileName(source);
                 if (!this.Core.IsValidLongFilename(name, false))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
+                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
                 }
             }
 
@@ -5641,32 +5641,32 @@ namespace WixToolset.Core
 
             if (null != defaultVersion && null != companionFile)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DefaultVersion", "CompanionFile", companionFile));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DefaultVersion", "CompanionFile", companionFile));
             }
 
             if (FileAssemblyType.NotAnAssembly == assemblyType)
             {
                 if (null != assemblyManifest)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", "AssemblyManifest"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", "AssemblyManifest"));
                 }
 
                 if (null != assemblyApplication)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", "AssemblyApplication"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", "AssemblyApplication"));
                 }
             }
             else
             {
                 if (FileAssemblyType.Win32Assembly == assemblyType && null == assemblyManifest)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "AssemblyManifest", "Assembly", "win32"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "AssemblyManifest", "Assembly", "win32"));
                 }
 
                 // allow "*" guid components to omit explicit KeyPath as they can have only one file and therefore this file is the keypath
                 if (YesNoType.Yes != keyPath && "*" != componentGuid)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", (FileAssemblyType.DotNetAssembly == assemblyType ? ".net" : "win32"), "KeyPath", "yes"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", (FileAssemblyType.DotNetAssembly == assemblyType ? ".net" : "win32"), "KeyPath", "yes"));
                 }
             }
 
@@ -5942,11 +5942,11 @@ namespace WixToolset.Core
             // Using both ShortName and Name will not always work due to a Windows Installer bug.
             if (null != shortName && null != name)
             {
-                this.Core.OnMessage(WixWarnings.FileSearchFileNameIssue(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
+                this.Core.Write(WarningMessages.FileSearchFileNameIssue(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
             }
             else if (null == shortName && null == name) // at least one name must be specified.
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (this.Core.IsValidShortFilename(name, false))
@@ -5958,7 +5958,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
                 }
             }
 
@@ -5981,7 +5981,7 @@ namespace WixToolset.Core
                 // value must be specified and unique.
                 if (isSameId)
                 {
-                    this.Core.OnMessage(WixErrors.UniqueFileSearchIdRequired(sourceLineNumbers, parentSignature, node.Name.LocalName));
+                    this.Core.Write(ErrorMessages.UniqueFileSearchIdRequired(sourceLineNumbers, parentSignature, node.Name.LocalName));
                 }
             }
             else if (parentDepth > 1)
@@ -5990,7 +5990,7 @@ namespace WixToolset.Core
                 // as the parent DirectorySearch if AssignToProperty is not set.
                 if (!isSameId)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalSearchIdForParentDepth(sourceLineNumbers, id.Id, parentSignature));
+                    this.Core.Write(ErrorMessages.IllegalSearchIdForParentDepth(sourceLineNumbers, id.Id, parentSignature));
                 }
             }
 
@@ -6284,7 +6284,7 @@ namespace WixToolset.Core
                                     }
                                     else
                                     {
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "default", "disable", "enable", "hide", "show"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "default", "disable", "enable", "hide", "show"));
                                     }
                                 }
                             }
@@ -6333,7 +6333,7 @@ namespace WixToolset.Core
             if (null == condition || 0 == condition.Length)
             {
                 condition = null;
-                this.Core.OnMessage(WixErrors.ConditionExpected(sourceLineNumbers, node.Name.LocalName));
+                this.Core.Write(ErrorMessages.ConditionExpected(sourceLineNumbers, node.Name.LocalName));
             }
 
             switch (parentElementLocalName)
@@ -6341,7 +6341,7 @@ namespace WixToolset.Core
                 case "Control":
                     if (null == action)
                     {
-                        this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
                     }
 
                     if (!this.Core.EncounteredError)
@@ -6356,7 +6356,7 @@ namespace WixToolset.Core
                 case "Feature":
                     if (CompilerConstants.IntegerNotSet == level)
                     {
-                        this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
                         level = CompilerConstants.IllegalInteger;
                     }
 
@@ -6372,7 +6372,7 @@ namespace WixToolset.Core
                 case "Product":
                     if (null == message)
                     {
-                        this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Message"));
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Message"));
                     }
 
                     if (!this.Core.EncounteredError)
@@ -6437,7 +6437,7 @@ namespace WixToolset.Core
                                         action = MsiInterop.MsidbIniFileActionRemoveTag;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", actionValue, "addLine", "addTag", "createLine", "removeLine", "removeTag"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", actionValue, "addLine", "addTag", "createLine", "removeLine", "removeTag"));
                                         break;
                                 }
                             }
@@ -6473,18 +6473,18 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == action)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
                 action = CompilerConstants.IllegalInteger;
             }
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (0 < name.Length)
             {
@@ -6497,7 +6497,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
                     }
                 }
                 else // generate a short file name.
@@ -6511,7 +6511,7 @@ namespace WixToolset.Core
 
             if (null == section)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Section"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Section"));
             }
 
             if (null == id)
@@ -6529,7 +6529,7 @@ namespace WixToolset.Core
             {
                 if (null == value)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
                 }
 
                 tableName = TupleDefinitionType.IniFile;
@@ -6606,7 +6606,7 @@ namespace WixToolset.Core
                                         type = 2;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "registry"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "registry"));
                                         break;
                                 }
                             }
@@ -6624,12 +6624,12 @@ namespace WixToolset.Core
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (0 < name.Length)
             {
@@ -6642,7 +6642,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
                     }
                 }
                 else if (null == shortName) // generate a short file name.
@@ -6653,7 +6653,7 @@ namespace WixToolset.Core
 
             if (null == section)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Section"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Section"));
             }
 
             if (null == id)
@@ -6674,7 +6674,7 @@ namespace WixToolset.Core
                         case "DirectorySearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
 
@@ -6684,7 +6684,7 @@ namespace WixToolset.Core
                         case "DirectorySearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseDirectorySearchRefElement(child, id.Id);
@@ -6692,7 +6692,7 @@ namespace WixToolset.Core
                         case "FileSearch":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
@@ -6701,7 +6701,7 @@ namespace WixToolset.Core
                         case "FileSearchRef":
                             if (oneChild)
                             {
-                                this.Core.OnMessage(WixErrors.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                             }
                             oneChild = true;
                             string newId = this.ParseSimpleRefElement(child, "Signature"); // FileSearch signatures override parent signatures
@@ -6768,7 +6768,7 @@ namespace WixToolset.Core
 
             if (null == shared)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Shared"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Shared"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -6866,12 +6866,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
             else if (40 < id.Id.Length)
             {
-                this.Core.OnMessage(WixErrors.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 40));
+                this.Core.Write(ErrorMessages.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 40));
 
                 // No need to check for modularization problems since DigitalSignature and thus DigitalCertificate
                 // currently have no usage in merge modules.
@@ -6879,7 +6879,7 @@ namespace WixToolset.Core
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -6952,7 +6952,7 @@ namespace WixToolset.Core
 
             if (null == certificateId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "DigitalCertificate"));
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "DigitalCertificate"));
             }
 
             if (!this.Core.EncounteredError)
@@ -6985,13 +6985,13 @@ namespace WixToolset.Core
             string upgradeCode = contextValues["UpgradeCode"];
             if (String.IsNullOrEmpty(upgradeCode))
             {
-                this.Core.OnMessage(WixErrors.ParentElementAttributeRequired(sourceLineNumbers, "Product", "UpgradeCode", node.Name.LocalName));
+                this.Core.Write(ErrorMessages.ParentElementAttributeRequired(sourceLineNumbers, "Product", "UpgradeCode", node.Name.LocalName));
             }
 
             string productVersion = contextValues["ProductVersion"];
             if (String.IsNullOrEmpty(productVersion))
             {
-                this.Core.OnMessage(WixErrors.ParentElementAttributeRequired(sourceLineNumbers, "Product", "Version", node.Name.LocalName));
+                this.Core.Write(ErrorMessages.ParentElementAttributeRequired(sourceLineNumbers, "Product", "Version", node.Name.LocalName));
             }
 
             string productLanguage = contextValues["ProductLanguage"];
@@ -7056,27 +7056,27 @@ namespace WixToolset.Core
 
             if (!allowDowngrades && String.IsNullOrEmpty(downgradeErrorMessage))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DowngradeErrorMessage", "AllowDowngrades", "yes", true));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DowngradeErrorMessage", "AllowDowngrades", "yes", true));
             }
 
             if (allowDowngrades && !String.IsNullOrEmpty(downgradeErrorMessage))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DowngradeErrorMessage", "AllowDowngrades", "yes"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DowngradeErrorMessage", "AllowDowngrades", "yes"));
             }
 
             if (allowDowngrades && allowSameVersionUpgrades)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "AllowSameVersionUpgrades", "AllowDowngrades", "yes"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "AllowSameVersionUpgrades", "AllowDowngrades", "yes"));
             }
 
             if (blockUpgrades && String.IsNullOrEmpty(disallowUpgradeErrorMessage))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisallowUpgradeErrorMessage", "Disallow", "yes", true));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisallowUpgradeErrorMessage", "Disallow", "yes", true));
             }
 
             if (!blockUpgrades && !String.IsNullOrEmpty(disallowUpgradeErrorMessage))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DisallowUpgradeErrorMessage", "Disallow", "yes"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DisallowUpgradeErrorMessage", "Disallow", "yes"));
             }
 
             if (!this.Core.EncounteredError)
@@ -7207,7 +7207,7 @@ namespace WixToolset.Core
                                 Wix.CompressionLevelType compressionLevelType;
                                 if (!Wix.Enums.TryParseCompressionLevelType(compressionLevelString, out compressionLevelType))
                                 {
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, compressionLevelString, "high", "low", "medium", "mszip", "none"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, compressionLevelString, "high", "low", "medium", "mszip", "none"));
                                 }
                                 else
                                 {
@@ -7226,12 +7226,12 @@ namespace WixToolset.Core
                         case "src":
                             if (null != layout)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Layout", "src"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Layout", "src"));
                             }
 
                             if ("src" == attrib.Name.LocalName)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Layout"));
+                                this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Layout"));
                             }
                             layout = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -7254,7 +7254,7 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = CompilerConstants.IllegalInteger;
             }
 
@@ -7264,13 +7264,13 @@ namespace WixToolset.Core
                 {
                     if (null == cabinet)
                     {
-                        this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Cabinet", "EmbedCab", "yes"));
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Cabinet", "EmbedCab", "yes"));
                     }
                     else
                     {
                         if (62 < cabinet.Length)
                         {
-                            this.Core.OnMessage(WixErrors.MediaEmbeddedCabinetNameTooLong(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet, cabinet.Length));
+                            this.Core.Write(ErrorMessages.MediaEmbeddedCabinetNameTooLong(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet, cabinet.Length));
                         }
 
                         cabinet = String.Concat("#", cabinet);
@@ -7284,7 +7284,7 @@ namespace WixToolset.Core
                         // WiX variables in the name will trip the "not a valid 8.3 name" switch, so let them through
                         if (!Common.WixVariableRegex.Match(cabinet).Success)
                         {
-                            this.Core.OnMessage(WixWarnings.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet));
+                            this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet));
                         }
                     }
                 }
@@ -7292,7 +7292,7 @@ namespace WixToolset.Core
 
             if (null != compressionLevel && null == cabinet)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Cabinet", "CompressionLevel"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Cabinet", "CompressionLevel"));
             }
 
             if (patch)
@@ -7314,11 +7314,11 @@ namespace WixToolset.Core
                         case "DigitalSignature":
                             if (YesNoType.Yes == embedCab)
                             {
-                                this.Core.OnMessage(WixErrors.SignedEmbeddedCabinet(childSourceLineNumbers));
+                                this.Core.Write(ErrorMessages.SignedEmbeddedCabinet(childSourceLineNumbers));
                             }
                             else if (null == cabinet)
                             {
-                                this.Core.OnMessage(WixErrors.ExpectedSignedCabinetName(childSourceLineNumbers));
+                                this.Core.Write(ErrorMessages.ExpectedSignedCabinetName(childSourceLineNumbers));
                             }
                             else
                             {
@@ -7428,11 +7428,11 @@ namespace WixToolset.Core
                                 // reason for having multiple cabients. External cabinet files must also be valid file names.
                                 if (exampleCabinetName.Equals(authoredCabinetTemplateValue) || !this.Core.IsValidLongFilename(exampleCabinetName, false))
                                 {
-                                    this.Core.OnMessage(WixErrors.InvalidCabinetTemplate(sourceLineNumbers, cabinetTemplate));
+                                    this.Core.Write(ErrorMessages.InvalidCabinetTemplate(sourceLineNumbers, cabinetTemplate));
                                 }
                                 else if (!this.Core.IsValidShortFilename(exampleCabinetName, false) && !Common.WixVariableRegex.Match(exampleCabinetName).Success) // ignore short names with wix variables because it rarely works out.
                                 {
-                                    this.Core.OnMessage(WixWarnings.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
+                                    this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
                                 }
                             }
                             break;
@@ -7442,21 +7442,21 @@ namespace WixToolset.Core
                             {
                                 if (!Wix.Enums.TryParseCompressionLevelType(compressionLevel, out compressionLevelType))
                                 {
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, compressionLevel, "high", "low", "medium", "mszip", "none"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, compressionLevel, "high", "low", "medium", "mszip", "none"));
                                 }
                             }
                             break;
                         case "DiskPrompt":
                             diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Property", "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
-                            this.Core.OnMessage(WixWarnings.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "EmbedCab":
                             embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "VolumeLabel":
                             volumeLabel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.OnMessage(WixWarnings.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "MaximumUncompressedMediaSize":
                             maximumUncompressedMediaSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, int.MaxValue);
@@ -7582,22 +7582,22 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == language)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             if (CompilerConstants.IntegerNotSet == diskId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "DiskId", "Directory"));
+                this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "DiskId", "Directory"));
                 diskId = CompilerConstants.IllegalInteger;
             }
 
@@ -7688,7 +7688,7 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else // need to hex encode these characters
             {
@@ -7699,7 +7699,7 @@ namespace WixToolset.Core
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
             else // need to hex encode these characters
             {
@@ -7751,7 +7751,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -7806,7 +7806,7 @@ namespace WixToolset.Core
 
             if (null == contentType)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ContentType"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ContentType"));
             }
 
             // if the advertise state has not been set, default to non-advertised
@@ -7821,7 +7821,7 @@ namespace WixToolset.Core
             {
                 if (YesNoType.Yes != parentAdvertised)
                 {
-                    this.Core.OnMessage(WixErrors.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), parentAdvertised.ToString()));
+                    this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), parentAdvertised.ToString()));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -7836,7 +7836,7 @@ namespace WixToolset.Core
             {
                 if (YesNoType.Yes == returnContentType && YesNoType.Yes == parentAdvertised)
                 {
-                    this.Core.OnMessage(WixErrors.CannotDefaultMismatchedAdvertiseStates(sourceLineNumbers));
+                    this.Core.Write(ErrorMessages.CannotDefaultMismatchedAdvertiseStates(sourceLineNumbers));
                 }
 
                 this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("MIME\\Database\\Content Type\\", contentType), "Extension", String.Concat(".", extension), componentId);
@@ -7873,7 +7873,7 @@ namespace WixToolset.Core
                             this.activeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if ("PUT-MODULE-NAME-HERE" == this.activeName)
                             {
-                                this.Core.OnMessage(WixWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
+                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
                             }
                             else
                             {
@@ -7885,7 +7885,7 @@ namespace WixToolset.Core
                             break;
                         case "Guid":
                             moduleId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                            this.Core.OnMessage(WixWarnings.DeprecatedModuleGuidAttribute(sourceLineNumbers));
+                            this.Core.Write(WarningMessages.DeprecatedModuleGuidAttribute(sourceLineNumbers));
                             break;
                         case "Language":
                             this.activeLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
@@ -7906,21 +7906,21 @@ namespace WixToolset.Core
 
             if (null == this.activeName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == this.activeLanguage)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
             }
 
             if (null == version)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
             else if (!CompilerCore.IsValidModuleOrBundleVersion(version))
             {
-                this.Core.OnMessage(WixWarnings.InvalidModuleOrBundleVersion(sourceLineNumbers, "Module", version));
+                this.Core.Write(WarningMessages.InvalidModuleOrBundleVersion(sourceLineNumbers, "Module", version));
             }
 
             try
@@ -8119,7 +8119,7 @@ namespace WixToolset.Core
 
             if (null == this.activeName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.CreateActiveSection(this.activeName, SectionType.PatchCreation, codepage, this.Context.CompilationId);
@@ -8250,13 +8250,13 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (0 < name.Length)
             {
                 if (8 < name.Length) // check the length
                 {
-                    this.Core.OnMessage(WixErrors.FamilyNameTooLong(sourceLineNumbers, node.Name.LocalName, "Name", name, name.Length));
+                    this.Core.Write(ErrorMessages.FamilyNameTooLong(sourceLineNumbers, node.Name.LocalName, "Name", name, name.Length));
                 }
                 else // check for illegal characters
                 {
@@ -8264,7 +8264,7 @@ namespace WixToolset.Core
                     {
                         if (!Char.IsLetterOrDigit(character) && '_' != character)
                         {
-                            this.Core.OnMessage(WixErrors.IllegalFamilyName(sourceLineNumbers, node.Name.LocalName, "Name", name));
+                            this.Core.Write(ErrorMessages.IllegalFamilyName(sourceLineNumbers, node.Name.LocalName, "Name", name));
                         }
                     }
                 }
@@ -8338,19 +8338,19 @@ namespace WixToolset.Core
                             upgrade = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if (13 < upgrade.Length)
                             {
-                                this.Core.OnMessage(WixErrors.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", upgrade, 13));
+                                this.Core.Write(ErrorMessages.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", upgrade, 13));
                             }
                             break;
                         case "SourceFile":
                         case "src":
                             if (null != sourceFile)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "SourceFile"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "SourceFile"));
                             }
 
                             if ("src" == attrib.Name.LocalName)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
+                                this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
                             }
                             sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -8358,12 +8358,12 @@ namespace WixToolset.Core
                         case "srcPatch":
                             if (null != sourcePatch)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "srcPatch", "SourcePatch"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "srcPatch", "SourcePatch"));
                             }
 
                             if ("srcPatch" == attrib.Name.LocalName)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourcePatch"));
+                                this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourcePatch"));
                             }
                             sourcePatch = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -8380,12 +8380,12 @@ namespace WixToolset.Core
 
             if (null == upgrade)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             foreach (XElement child in node.Elements())
@@ -8470,7 +8470,7 @@ namespace WixToolset.Core
 
             if (null == file)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
             }
 
             foreach (XElement child in node.Elements())
@@ -8539,7 +8539,7 @@ namespace WixToolset.Core
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if (target.Length > 13)
                             {
-                                this.Core.OnMessage(WixErrors.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", target, 13));
+                                this.Core.Write(ErrorMessages.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", target, 13));
                             }
                             break;
                         case "IgnoreMissingFiles":
@@ -8552,12 +8552,12 @@ namespace WixToolset.Core
                         case "src":
                             if (null != sourceFile)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "SourceFile"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "SourceFile"));
                             }
 
                             if ("src" == attrib.Name.LocalName)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
+                                this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "SourceFile"));
                             }
                             sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -8577,17 +8577,17 @@ namespace WixToolset.Core
 
             if (null == target)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             if (CompilerConstants.IntegerNotSet == order)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Order"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Order"));
             }
 
             foreach (XElement child in node.Elements())
@@ -8671,7 +8671,7 @@ namespace WixToolset.Core
 
             if (null == file)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             foreach (XElement child in node.Elements())
@@ -8755,12 +8755,12 @@ namespace WixToolset.Core
                         case "src":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "Source"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "src", "Source"));
                             }
 
                             if ("src" == attrib.Name.LocalName)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Source"));
+                                this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Source"));
                             }
                             source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -8777,17 +8777,17 @@ namespace WixToolset.Core
 
             if (null == file)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
             }
 
             if (null == source)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Source"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Source"));
             }
 
             if (CompilerConstants.IntegerNotSet == order)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Order"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Order"));
             }
 
             foreach (XElement child in node.Elements())
@@ -8880,7 +8880,7 @@ namespace WixToolset.Core
 
             if (null == file)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
             }
 
             foreach (XElement child in node.Elements())
@@ -8905,7 +8905,7 @@ namespace WixToolset.Core
 
             if (null == protectOffsets || null == protectLengths)
             {
-                this.Core.OnMessage(WixErrors.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "ProtectRange"));
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "ProtectRange"));
             }
 
             if (!this.Core.EncounteredError)
@@ -8955,12 +8955,12 @@ namespace WixToolset.Core
 
             if (null == length)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Length"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Length"));
             }
 
             if (null == offset)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Offset"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Offset"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9025,12 +9025,12 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9047,7 +9047,7 @@ namespace WixToolset.Core
             {
                 if (null != company)
                 {
-                    this.Core.OnMessage(WixErrors.UnexpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Company"));
+                    this.Core.Write(ErrorMessages.UnexpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Company"));
                 }
                 this.ProcessProperties(sourceLineNumbers, name, value);
             }
@@ -9077,22 +9077,22 @@ namespace WixToolset.Core
                         case "ProductCode":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Target", "TargetImage"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Target", "TargetImage"));
                             }
                             target = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
                             break;
                         case "Target":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "TargetImage", "ProductCode"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "TargetImage", "ProductCode"));
                             }
-                            this.Core.OnMessage(WixWarnings.DeprecatedPatchSequenceTargetAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedPatchSequenceTargetAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "TargetImage":
                             if (null != target)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Target", "ProductCode"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Target", "ProductCode"));
                             }
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "TargetImages", target);
@@ -9119,7 +9119,7 @@ namespace WixToolset.Core
 
             if (null == family)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PatchFamily"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PatchFamily"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9173,7 +9173,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9221,7 +9221,7 @@ namespace WixToolset.Core
                             string id = this.ParseTargetProductCodeElement(child);
                             if (0 == String.CompareOrdinal("*", id))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeValueWhenNested(sourceLineNumbers, child.Name.LocalName, "Id", id, node.Name.LocalName));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValueWhenNested(sourceLineNumbers, child.Name.LocalName, "Id", id, node.Name.LocalName));
                             }
                             else
                             {
@@ -9288,7 +9288,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9328,7 +9328,7 @@ namespace WixToolset.Core
 
             if (null == path)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Path"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Path"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9446,11 +9446,11 @@ namespace WixToolset.Core
 
             if (null == this.activeName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
             if (null == classification)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Classification"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Classification"));
             }
             if (null == clientPatchId)
             {
@@ -9458,15 +9458,15 @@ namespace WixToolset.Core
             }
             if (null == description)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
             }
             if (null == displayName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayName"));
             }
             if (null == manufacturer)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
             }
 
             this.Core.CreateActiveSection(this.activeName, SectionType.Patch, codepage, this.Context.CompilationId);
@@ -9668,17 +9668,17 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
             if (String.IsNullOrEmpty(version))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
             else if (!CompilerCore.IsValidProductVersion(version))
             {
-                this.Core.OnMessage(WixErrors.InvalidProductVersion(sourceLineNumbers, version));
+                this.Core.Write(ErrorMessages.InvalidProductVersion(sourceLineNumbers, version));
             }
 
             // find unexpected child elements
@@ -9768,7 +9768,7 @@ namespace WixToolset.Core
             this.Core.ParseForExtensionElements(node);
 
             // Always warn when using the All element.
-            this.Core.OnMessage(WixWarnings.AllChangesIncludedInPatch(sourceLineNumbers));
+            this.Core.Write(WarningMessages.AllChangesIncludedInPatch(sourceLineNumbers));
 
             if (!this.Core.EncounteredError)
             {
@@ -9808,7 +9808,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -9853,12 +9853,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
             else if (27 < id.Id.Length)
             {
-                this.Core.OnMessage(WixErrors.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, 27));
+                this.Core.Write(ErrorMessages.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, 27));
             }
 
             foreach (XElement child in node.Elements())
@@ -9871,7 +9871,7 @@ namespace WixToolset.Core
                             if (parsedValidate)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                             }
                             else
                             {
@@ -9949,7 +9949,7 @@ namespace WixToolset.Core
                                     validationFlags |= TransformFlags.ValidateUpdateVersion;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Version", check, "Major", "Minor", "Update"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Version", check, "Major", "Minor", "Update"));
                                     break;
                             }
                             break;
@@ -9975,7 +9975,7 @@ namespace WixToolset.Core
                                     validationFlags |= TransformFlags.ValidateNewGreaterBaseVersion;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Operator", op, "Lesser", "LesserOrEqual", "Equal", "GreaterOrEqual", "Greater"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Operator", op, "Lesser", "LesserOrEqual", "Equal", "GreaterOrEqual", "Greater"));
                                     break;
                             }
                             break;
@@ -10117,13 +10117,13 @@ namespace WixToolset.Core
 
             if (null == requiredId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RequiredId"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RequiredId"));
                 requiredId = String.Empty;
             }
 
             if (CompilerConstants.IntegerNotSet == requiredLanguage)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RequiredLanguage"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RequiredLanguage"));
                 requiredLanguage = CompilerConstants.IllegalInteger;
             }
 
@@ -10188,13 +10188,13 @@ namespace WixToolset.Core
 
             if (null == excludedId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ExcludedId"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ExcludedId"));
                 excludedId = String.Empty;
             }
 
             if (CompilerConstants.IntegerNotSet != excludeExceptLanguage && CompilerConstants.IntegerNotSet != excludeLanguage)
             {
-                this.Core.OnMessage(WixErrors.IllegalModuleExclusionLanguageAttributes(sourceLineNumbers));
+                this.Core.Write(ErrorMessages.IllegalModuleExclusionLanguageAttributes(sourceLineNumbers));
             }
             else if (CompilerConstants.IntegerNotSet != excludeExceptLanguage)
             {
@@ -10278,7 +10278,7 @@ namespace WixToolset.Core
                                         format = 3;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Format", formatStr, "Text", "Key", "Integer", "Bitfield"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Format", formatStr, "Text", "Key", "Integer", "Bitfield"));
                                         break;
                                 }
                             }
@@ -10317,13 +10317,13 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
                 name = String.Empty;
             }
 
             if (CompilerConstants.IntegerNotSet == format)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Format"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Format"));
                 format = CompilerConstants.IllegalInteger;
             }
 
@@ -10388,19 +10388,19 @@ namespace WixToolset.Core
 
             if (null == column)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Column"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Column"));
                 column = String.Empty;
             }
 
             if (null == table)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Table"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Table"));
                 table = String.Empty;
             }
 
             if (null == rowKeys)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Row"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Row"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -10446,7 +10446,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -10506,7 +10506,7 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (null == id)
@@ -10594,7 +10594,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -10656,7 +10656,7 @@ namespace WixToolset.Core
                                         registration = 1;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Registration", registrationValue, "machine", "user"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Registration", registrationValue, "machine", "user"));
                                         break;
                                 }
                             }
@@ -10674,7 +10674,7 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == registration)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Registration"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Registration"));
                 registration = CompilerConstants.IllegalInteger;
             }
 
@@ -10784,7 +10784,7 @@ namespace WixToolset.Core
                             // merge modules must always be compressed, so this attribute is invalid
                             if (this.compilingModule)
                             {
-                                this.Core.OnMessage(WixWarnings.DeprecatedPackageCompressedAttribute(sourceLineNumbers));
+                                this.Core.Write(WarningMessages.DeprecatedPackageCompressedAttribute(sourceLineNumbers));
                                 // this.core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Compressed", "Module"));
                             }
                             else if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
@@ -10810,7 +10810,7 @@ namespace WixToolset.Core
                                         sourceBits = sourceBits | 8;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installPrivileges, "elevated", "limited"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installPrivileges, "elevated", "limited"));
                                         break;
                                 }
                             }
@@ -10833,7 +10833,7 @@ namespace WixToolset.Core
                                         sourceBits = sourceBits | 8;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
                                         break;
                                 }
                             }
@@ -10851,13 +10851,13 @@ namespace WixToolset.Core
                             packageAuthor = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if ("PUT-COMPANY-NAME-HERE" == packageAuthor)
                             {
-                                this.Core.OnMessage(WixWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, packageAuthor));
+                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, packageAuthor));
                             }
                             break;
                         case "Platform":
                             if (null != platformValue)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platforms"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platforms"));
                             }
 
                             platformValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -10865,7 +10865,7 @@ namespace WixToolset.Core
                             switch (platformType)
                             {
                                 case Wix.Package.PlatformType.intel:
-                                    this.Core.OnMessage(WixWarnings.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "x86"));
+                                    this.Core.Write(WarningMessages.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "x86"));
                                     goto case Wix.Package.PlatformType.x86;
                                 case Wix.Package.PlatformType.x86:
                                     platform = "Intel";
@@ -10874,7 +10874,7 @@ namespace WixToolset.Core
                                     platform = "x64";
                                     break;
                                 case Wix.Package.PlatformType.intel64:
-                                    this.Core.OnMessage(WixWarnings.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "ia64"));
+                                    this.Core.Write(WarningMessages.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "ia64"));
                                     goto case Wix.Package.PlatformType.ia64;
                                 case Wix.Package.PlatformType.ia64:
                                     platform = "Intel64";
@@ -10883,17 +10883,17 @@ namespace WixToolset.Core
                                     platform = "Arm";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.InvalidPlatformValue(sourceLineNumbers, platformValue));
+                                    this.Core.Write(ErrorMessages.InvalidPlatformValue(sourceLineNumbers, platformValue));
                                     break;
                             }
                             break;
                         case "Platforms":
                             if (null != platformValue)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
                             }
 
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
                             platformValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             platform = platformValue;
                             break;
@@ -10923,31 +10923,31 @@ namespace WixToolset.Core
 
             if (installPrivilegeSeen && installScopeSeen)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "InstallPrivileges", "InstallScope"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "InstallPrivileges", "InstallScope"));
             }
 
             if ((0 != String.Compare(platform, "Intel", StringComparison.OrdinalIgnoreCase)) && 200 > msiVersion)
             {
                 msiVersion = 200;
-                this.Core.OnMessage(WixWarnings.RequiresMsi200for64bitPackage(sourceLineNumbers));
+                this.Core.Write(WarningMessages.RequiresMsi200for64bitPackage(sourceLineNumbers));
             }
 
             if ((0 == String.Compare(platform, "Arm", StringComparison.OrdinalIgnoreCase)) && 500 > msiVersion)
             {
                 msiVersion = 500;
-                this.Core.OnMessage(WixWarnings.RequiresMsi500forArmPackage(sourceLineNumbers));
+                this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));
             }
 
             if (null == packageAuthor)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
             }
 
             if (this.compilingModule)
             {
                 if (null == packageCode)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 }
 
                 // merge modules use the modularization guid as the package code
@@ -10968,7 +10968,7 @@ namespace WixToolset.Core
 
                 if ("*" != packageCode)
                 {
-                    this.Core.OnMessage(WixWarnings.PackageCodeSet(sourceLineNumbers));
+                    this.Core.Write(WarningMessages.PackageCodeSet(sourceLineNumbers));
                 }
             }
 
@@ -11101,37 +11101,37 @@ namespace WixToolset.Core
 
             if (YesNoType.NotSet == allowRemoval)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "AllowRemoval"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "AllowRemoval"));
             }
 
             if (null == classification)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Classification"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Classification"));
             }
 
             if (null == description)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
             }
 
             if (null == displayName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayName"));
             }
 
             if (null == manufacturerName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ManufacturerName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ManufacturerName"));
             }
 
             if (null == moreInfoUrl)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "MoreInfoURL"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "MoreInfoURL"));
             }
 
             if (null == targetProductName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "TargetProductName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "TargetProductName"));
             }
 
             foreach (XElement child in node.Elements())
@@ -11288,17 +11288,17 @@ namespace WixToolset.Core
 
             if (null == company)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Company"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Company"));
             }
 
             if (null == property)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
             }
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -11382,13 +11382,13 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "AdminImage":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "Comments":
                             comments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Compressed":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "Description":
                             packageName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -11397,19 +11397,19 @@ namespace WixToolset.Core
                             keywords = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Languages":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "Manufacturer":
                             packageAuthor = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Platforms":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "ReadOnly":
                             security = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "ShortNames":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "SummaryCodepage":
                             codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib);
@@ -11508,7 +11508,7 @@ namespace WixToolset.Core
             SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string name = null;
 
-            this.Core.OnMessage(WixWarnings.DeprecatedIgnoreModularizationElement(sourceLineNumbers));
+            this.Core.Write(WarningMessages.DeprecatedIgnoreModularizationElement(sourceLineNumbers));
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -11535,7 +11535,7 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -11624,12 +11624,12 @@ namespace WixToolset.Core
 
             if (null == user)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "User"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "User"));
             }
 
             if (int.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
             {
-                this.Core.OnMessage(WixErrors.GenericReadNotAllowed(sourceLineNumbers));
+                this.Core.Write(ErrorMessages.GenericReadNotAllowed(sourceLineNumbers));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -11695,7 +11695,7 @@ namespace WixToolset.Core
 
             if (null == sddl)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Sddl"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Sddl"));
             }
 
             if (null == id)
@@ -11713,7 +11713,7 @@ namespace WixToolset.Core
                             if (null != condition)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                             }
 
                             condition = this.ParseConditionElement(child, node.Name.LocalName, null, null);
@@ -11776,14 +11776,14 @@ namespace WixToolset.Core
                             manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
                             if ("PUT-COMPANY-NAME-HERE" == manufacturer)
                             {
-                                this.Core.OnMessage(WixWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, manufacturer));
+                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, manufacturer));
                             }
                             break;
                         case "Name":
                             this.activeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
                             if ("PUT-PRODUCT-NAME-HERE" == this.activeName)
                             {
-                                this.Core.OnMessage(WixWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
+                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
                             }
                             break;
                         case "UpgradeCode":
@@ -11809,36 +11809,36 @@ namespace WixToolset.Core
 
             if (null == productCode)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == this.activeLanguage)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
             }
 
             if (null == manufacturer)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
             }
 
             if (null == this.activeName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (null == upgradeCode)
             {
-                this.Core.OnMessage(WixWarnings.MissingUpgradeCode(sourceLineNumbers));
+                this.Core.Write(WarningMessages.MissingUpgradeCode(sourceLineNumbers));
             }
 
             if (null == version)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
             else if (!CompilerCore.IsValidProductVersion(version))
             {
-                this.Core.OnMessage(WixErrors.InvalidProductVersion(sourceLineNumbers, version));
+                this.Core.Write(ErrorMessages.InvalidProductVersion(sourceLineNumbers, version));
             }
 
             if (this.Core.EncounteredError)
@@ -12079,7 +12079,7 @@ namespace WixToolset.Core
 
             if ((YesNoType.No == advertise && YesNoType.Yes == progIdAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == progIdAdvertise))
             {
-                this.Core.OnMessage(WixErrors.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), progIdAdvertise.ToString()));
+                this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), progIdAdvertise.ToString()));
             }
             else
             {
@@ -12093,7 +12093,7 @@ namespace WixToolset.Core
 
             if (null != parent && (null != icon || CompilerConstants.IntegerNotSet != iconIndex))
             {
-                this.Core.OnMessage(WixErrors.VersionIndependentProgIdsCannotHaveIcons(sourceLineNumbers));
+                this.Core.Write(ErrorMessages.VersionIndependentProgIdsCannotHaveIcons(sourceLineNumbers));
             }
 
             YesNoType firstProgIdForNestedClass = YesNoType.Yes;
@@ -12125,7 +12125,7 @@ namespace WixToolset.Core
                             else
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.ProgIdNestedTooDeep(childSourceLineNumbers));
+                                this.Core.Write(ErrorMessages.ProgIdNestedTooDeep(childSourceLineNumbers));
                             }
                             break;
                         default:
@@ -12209,7 +12209,7 @@ namespace WixToolset.Core
             // raise an error for an orphaned ProgId
             if (YesNoType.Yes == advertise && !foundExtension && null == parent && null == classId)
             {
-                this.Core.OnMessage(WixWarnings.OrphanedProgId(sourceLineNumbers, progId));
+                this.Core.Write(WarningMessages.OrphanedProgId(sourceLineNumbers, progId));
             }
 
             return progId;
@@ -12270,16 +12270,16 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
             else if ("ProductID" == id.Id)
             {
-                this.Core.OnMessage(WixWarnings.ProductIdAuthored(sourceLineNumbers));
+                this.Core.Write(WarningMessages.ProductIdAuthored(sourceLineNumbers));
             }
             else if ("SecureCustomProperties" == id.Id || "AdminProperties" == id.Id || "MsiHiddenProperties" == id.Id)
             {
-                this.Core.OnMessage(WixErrors.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
+                this.Core.Write(ErrorMessages.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
             }
 
             string innerText = this.Core.GetTrimmedInnerText(node);
@@ -12288,7 +12288,7 @@ namespace WixToolset.Core
                 // cannot specify both the value attribute and inner text
                 if (!String.IsNullOrEmpty(innerText))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
                 }
             }
             else // value attribute not specified, use inner text if any.
@@ -12326,7 +12326,7 @@ namespace WixToolset.Core
             // If we're doing CCP then there must be a signature.
             if (complianceCheck && 0 == signatures.Count)
             {
-                this.Core.OnMessage(WixErrors.SearchElementRequiredWithAttribute(sourceLineNumbers, node.Name.LocalName, "ComplianceCheck", "yes"));
+                this.Core.Write(ErrorMessages.SearchElementRequiredWithAttribute(sourceLineNumbers, node.Name.LocalName, "ComplianceCheck", "yes"));
             }
 
             foreach (string sig in signatures)
@@ -12350,7 +12350,7 @@ namespace WixToolset.Core
                 // the element.
                 if (String.IsNullOrEmpty(value) && !admin && !secure && !hidden)
                 {
-                    this.Core.OnMessage(WixWarnings.PropertyUseless(sourceLineNumbers, id.Id));
+                    this.Core.Write(WarningMessages.PropertyUseless(sourceLineNumbers, id.Id));
                 }
                 else // there is a value and/or a flag set, do that.
                 {
@@ -12360,7 +12360,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError && YesNoType.Yes == suppressModularization)
             {
-                this.Core.OnMessage(WixWarnings.PropertyModularizationSuppressed(sourceLineNumbers));
+                this.Core.Write(WarningMessages.PropertyModularizationSuppressed(sourceLineNumbers));
 
                 this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSuppressModularization, id);
             }
@@ -12402,7 +12402,7 @@ namespace WixToolset.Core
                             id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Action":
-                            this.Core.OnMessage(WixWarnings.DeprecatedRegistryKeyActionAttribute(sourceLineNumbers));
+                            this.Core.Write(WarningMessages.DeprecatedRegistryKeyActionAttribute(sourceLineNumbers));
                             action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < action.Length)
                             {
@@ -12419,7 +12419,7 @@ namespace WixToolset.Core
                                     case Wix.RegistryKey.ActionType.none:
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "create", "createAndRemoveOnUninstall", "none"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "create", "createAndRemoveOnUninstall", "none"));
                                         break;
                                 }
                             }
@@ -12440,7 +12440,7 @@ namespace WixToolset.Core
                         case "Root":
                             if (CompilerConstants.IntegerNotSet != root)
                             {
-                                this.Core.OnMessage(WixErrors.RegistryRootInvalid(sourceLineNumbers));
+                                this.Core.Write(ErrorMessages.RegistryRootInvalid(sourceLineNumbers));
                             }
 
                             root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, true);
@@ -12470,19 +12470,19 @@ namespace WixToolset.Core
             {
                 if (null != id)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Id", "ForceCreateOnInstall", "ForceDeleteOnUninstall", "yes", true));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Id", "ForceCreateOnInstall", "ForceDeleteOnUninstall", "yes", true));
                 }
             }
 
             if (CompilerConstants.IntegerNotSet == root)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
                 root = CompilerConstants.IllegalInteger;
             }
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
                 key = String.Empty; // set the key to something to prevent null reference exceptions
             }
 
@@ -12499,7 +12499,7 @@ namespace WixToolset.Core
                             {
                                 if (YesNoType.Yes == keyPath)
                                 {
-                                    this.Core.OnMessage(WixErrors.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
+                                    this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
                                 }
 
                                 possibleKeyPath = possibleChildKeyPath; // the child is the key path
@@ -12515,7 +12515,7 @@ namespace WixToolset.Core
                             {
                                 if (YesNoType.Yes == keyPath)
                                 {
-                                    this.Core.OnMessage(WixErrors.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
+                                    this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
                                 }
 
                                 possibleKeyPath = possibleChildKeyPath; // the child is the key path
@@ -12529,14 +12529,14 @@ namespace WixToolset.Core
                         case "Permission":
                             if (!forceCreateOnInstall)
                             {
-                                this.Core.OnMessage(WixErrors.UnexpectedElementWithAttributeValue(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "ForceCreateOnInstall", "yes"));
+                                this.Core.Write(ErrorMessages.UnexpectedElementWithAttributeValue(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "ForceCreateOnInstall", "yes"));
                             }
                             this.ParsePermissionElement(child, id.Id, "Registry");
                             break;
                         case "PermissionEx":
                             if (!forceCreateOnInstall)
                             {
-                                this.Core.OnMessage(WixErrors.UnexpectedElementWithAttributeValue(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "ForceCreateOnInstall", "yes"));
+                                this.Core.Write(ErrorMessages.UnexpectedElementWithAttributeValue(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "ForceCreateOnInstall", "yes"));
                             }
                             this.ParsePermissionExElement(child, id.Id, "Registry");
                             break;
@@ -12610,7 +12610,7 @@ namespace WixToolset.Core
                             {
                                 if (!Wix.RegistryValue.TryParseActionType(action, out actionType))
                                 {
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "append", "prepend", "write"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "append", "prepend", "write"));
                                 }
                             }
                             break;
@@ -12637,7 +12637,7 @@ namespace WixToolset.Core
                         case "Root":
                             if (CompilerConstants.IntegerNotSet != root)
                             {
-                                this.Core.OnMessage(WixErrors.RegistryRootInvalid(sourceLineNumbers));
+                                this.Core.Write(ErrorMessages.RegistryRootInvalid(sourceLineNumbers));
                             }
 
                             root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, true);
@@ -12648,7 +12648,7 @@ namespace WixToolset.Core
                             {
                                 if (!Wix.RegistryValue.TryParseTypeType(type, out typeType))
                                 {
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, type, "binary", "expandable", "integer", "multiString", "string"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, type, "binary", "expandable", "integer", "multiString", "string"));
                                 }
                             }
                             break;
@@ -12675,22 +12675,22 @@ namespace WixToolset.Core
             if ((Wix.RegistryValue.ActionType.append == actionType || Wix.RegistryValue.ActionType.prepend == actionType) &&
                 Wix.RegistryValue.TypeType.multiString != typeType)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Action", action, "Type", "multiString"));
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Action", action, "Type", "multiString"));
             }
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             if (CompilerConstants.IntegerNotSet == root)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
             }
 
             if (null == type)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
             }
 
             foreach (XElement child in node.Elements())
@@ -12702,7 +12702,7 @@ namespace WixToolset.Core
                         case "MultiStringValue":
                             if (Wix.RegistryValue.TypeType.multiString != typeType && null != value)
                             {
-                                this.Core.OnMessage(WixErrors.RegistryMultipleValuesWithoutMultiString(sourceLineNumbers, node.Name.LocalName, "Value", child.Name.LocalName, "Type"));
+                                this.Core.Write(ErrorMessages.RegistryMultipleValuesWithoutMultiString(sourceLineNumbers, node.Name.LocalName, "Value", child.Name.LocalName, "Type"));
                             }
                             else if (null == value)
                             {
@@ -12773,11 +12773,11 @@ namespace WixToolset.Core
             // value may be set by child MultiStringValue elements, so it must be checked here
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
             else if (0 == value.Length && ("+" == name || "-" == name || "*" == name)) // prevent accidental authoring of special name values
             {
-                this.Core.OnMessage(WixErrors.RegistryNameValueIncorrect(sourceLineNumbers, node.Name.LocalName, "Name", name));
+                this.Core.Write(ErrorMessages.RegistryNameValueIncorrect(sourceLineNumbers, node.Name.LocalName, "Name", name));
             }
 
             if (!this.Core.EncounteredError)
@@ -12834,7 +12834,7 @@ namespace WixToolset.Core
                             {
                                 if (!Wix.RemoveRegistryKey.TryParseActionType(action, out actionType))
                                 {
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "removeOnInstall", "removeOnUninstall"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "removeOnInstall", "removeOnUninstall"));
                                 }
                             }
                             break;
@@ -12863,17 +12863,17 @@ namespace WixToolset.Core
 
             if (null == action)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             if (CompilerConstants.IntegerNotSet == root)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -12949,12 +12949,12 @@ namespace WixToolset.Core
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             if (CompilerConstants.IntegerNotSet == root)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -13037,7 +13037,7 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (0 < name.Length)
             {
@@ -13050,7 +13050,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
                     }
                 }
                 else if (null == shortName) // generate a short file name.
@@ -13061,13 +13061,13 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == on)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
                 on = CompilerConstants.IllegalInteger;
             }
 
             if (null != directory && null != property)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
             }
 
             if (null == id)
@@ -13158,13 +13158,13 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == on)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
                 on = CompilerConstants.IllegalInteger;
             }
 
             if (null != directory && null != property)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
             }
 
             if (null == id)
@@ -13244,12 +13244,12 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet == runFromSource)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RunFromSource"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RunFromSource"));
             }
 
             if (CompilerConstants.IntegerNotSet == runLocal)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RunLocal"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RunLocal"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -13395,22 +13395,22 @@ namespace WixToolset.Core
 
                 if (customAction && "Custom" == actionName)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Action"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Action"));
                 }
                 else if (showDialog && "Show" == actionName)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Dialog"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Dialog"));
                 }
 
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
                     if (CompilerConstants.IntegerNotSet != exitSequence)
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "Sequence", "OnExit"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "Sequence", "OnExit"));
                     }
                     else if (null != beforeAction || null != afterAction)
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "Sequence", "Before", "After"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "Sequence", "Before", "After"));
                     }
                 }
                 else // sequence not specified use OnExit (which may also be not set).
@@ -13420,33 +13420,33 @@ namespace WixToolset.Core
 
                 if (null != beforeAction && null != afterAction)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "After", "Before"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "After", "Before"));
                 }
                 else if ((customAction || showDialog || specialAction) && !suppress && CompilerConstants.IntegerNotSet == sequence && null == beforeAction && null == afterAction)
                 {
-                    this.Core.OnMessage(WixErrors.NeedSequenceBeforeOrAfter(childSourceLineNumbers, child.Name.LocalName));
+                    this.Core.Write(ErrorMessages.NeedSequenceBeforeOrAfter(childSourceLineNumbers, child.Name.LocalName));
                 }
 
                 // action that is scheduled to occur before/after itself
                 if (beforeAction == actionName)
                 {
-                    this.Core.OnMessage(WixErrors.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "Before", beforeAction));
+                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "Before", beforeAction));
                 }
                 else if (afterAction == actionName)
                 {
-                    this.Core.OnMessage(WixErrors.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "After", afterAction));
+                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "After", afterAction));
                 }
 
                 // normal standard actions cannot be set overridable by the user (since they are overridable by default)
                 if (overridable && WindowsInstallerStandard.IsStandardAction(actionName) && !specialAction)
                 {
-                    this.Core.OnMessage(WixErrors.UnexpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Overridable"));
+                    this.Core.Write(ErrorMessages.UnexpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Overridable"));
                 }
 
                 // suppress cannot be specified at the same time as Before, After, or Sequence
                 if (suppress && (null != afterAction || null != beforeAction || CompilerConstants.IntegerNotSet != sequence || overridable))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(childSourceLineNumbers, child.Name.LocalName, "Suppress", "Before", "After", "Sequence", "Overridable"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(childSourceLineNumbers, child.Name.LocalName, "Suppress", "Before", "After", "Sequence", "Overridable"));
                 }
 
                 this.Core.ParseForExtensionElements(child);
@@ -13497,7 +13497,7 @@ namespace WixToolset.Core
             string requiredPrivileges = null;
             string sid = null;
 
-            this.Core.OnMessage(WixWarnings.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
+            this.Core.Write(WarningMessages.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -13574,7 +13574,7 @@ namespace WixToolset.Core
                         case "ServiceName":
                             if (!String.IsNullOrEmpty(serviceName))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ServiceInstall"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ServiceInstall"));
                             }
 
                             name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -13752,7 +13752,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(name))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ServiceName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ServiceName"));
             }
             else if (null == id)
             {
@@ -13761,12 +13761,12 @@ namespace WixToolset.Core
 
             if (0 == events)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "OnInstall", "OnReinstall", "OnUninstall"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "OnInstall", "OnReinstall", "OnUninstall"));
             }
 
             if (String.IsNullOrEmpty(delayedAutoStart) && String.IsNullOrEmpty(failureActionsWhen) && String.IsNullOrEmpty(preShutdownDelay) && String.IsNullOrEmpty(requiredPrivileges) && String.IsNullOrEmpty(sid))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DelayedAutoStart", "FailureActionsWhen", "PreShutdownDelay", "ServiceSid", "RequiredPrivilege"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DelayedAutoStart", "FailureActionsWhen", "PreShutdownDelay", "ServiceSid", "RequiredPrivilege"));
             }
 
             if (!this.Core.EncounteredError)
@@ -13841,7 +13841,7 @@ namespace WixToolset.Core
             string actions = null;
             string actionsDelays = null;
 
-            this.Core.OnMessage(WixWarnings.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
+            this.Core.Write(WarningMessages.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -13885,7 +13885,7 @@ namespace WixToolset.Core
                         case "ServiceName":
                             if (!String.IsNullOrEmpty(serviceName))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ServiceInstall"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ServiceInstall"));
                             }
 
                             name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -13952,12 +13952,12 @@ namespace WixToolset.Core
 
                             if (String.IsNullOrEmpty(action))
                             {
-                                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, child.Name.LocalName, "Action"));
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, child.Name.LocalName, "Action"));
                             }
 
                             if (String.IsNullOrEmpty(delay))
                             {
-                                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, child.Name.LocalName, "Delay"));
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, child.Name.LocalName, "Delay"));
                             }
 
                             if (!String.IsNullOrEmpty(actions))
@@ -13985,7 +13985,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(name))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ServiceName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ServiceName"));
             }
             else if (null == id)
             {
@@ -13994,7 +13994,7 @@ namespace WixToolset.Core
 
             if (0 == events)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "OnInstall", "OnReinstall", "OnUninstall"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "OnInstall", "OnReinstall", "OnUninstall"));
             }
 
             if (!this.Core.EncounteredError)
@@ -14106,7 +14106,7 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             // get the ServiceControl arguments
@@ -14184,7 +14184,7 @@ namespace WixToolset.Core
 
             if (null == dependency)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -14255,7 +14255,7 @@ namespace WixToolset.Core
                                         errorbits |= MsiInterop.MsidbServiceInstallErrorCritical;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, errorControlValue, "ignore", "normal", "critical"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, errorControlValue, "ignore", "normal", "critical"));
                                         break;
                                 }
                             }
@@ -14293,10 +14293,10 @@ namespace WixToolset.Core
                                         break;
                                     case Wix.ServiceInstall.StartType.boot:
                                     case Wix.ServiceInstall.StartType.system:
-                                        this.Core.OnMessage(WixErrors.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue));
+                                        this.Core.Write(ErrorMessages.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue));
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue, "auto", "demand", "disabled"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue, "auto", "demand", "disabled"));
                                         break;
                                 }
                             }
@@ -14316,10 +14316,10 @@ namespace WixToolset.Core
                                         break;
                                     case Wix.ServiceInstall.TypeType.kernelDriver:
                                     case Wix.ServiceInstall.TypeType.systemDriver:
-                                        this.Core.OnMessage(WixErrors.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue));
+                                        this.Core.Write(ErrorMessages.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue));
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, node.Name.LocalName, typeValue, "ownProcess", "shareProcess"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, node.Name.LocalName, typeValue, "ownProcess", "shareProcess"));
                                         break;
                                 }
                             }
@@ -14343,7 +14343,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(name))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (null == id)
             {
@@ -14352,7 +14352,7 @@ namespace WixToolset.Core
 
             if (0 == startType)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Start"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Start"));
             }
 
             if (eraseDescription)
@@ -14462,7 +14462,7 @@ namespace WixToolset.Core
                                         // default so no work necessary.
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
                                         break;
                                 }
                             }
@@ -14485,7 +14485,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
             else if (String.IsNullOrEmpty(actionName))
             {
@@ -14494,7 +14494,7 @@ namespace WixToolset.Core
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -14577,7 +14577,7 @@ namespace WixToolset.Core
                                         // default so no work necessary.
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
                                         break;
                                 }
                             }
@@ -14600,7 +14600,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
             else if (String.IsNullOrEmpty(actionName))
             {
@@ -14609,16 +14609,16 @@ namespace WixToolset.Core
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             if (null != beforeAction && null != afterAction)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "After", "Before"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "After", "Before"));
             }
             else if (null == beforeAction && null == afterAction)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "After", "Before", "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "After", "Before", "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -14629,11 +14629,11 @@ namespace WixToolset.Core
                 // action that is scheduled to occur before/after itself
                 if (beforeAction == actionName)
                 {
-                    this.Core.OnMessage(WixErrors.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "Before", beforeAction));
+                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "Before", beforeAction));
                 }
                 else if (afterAction == actionName)
                 {
-                    this.Core.OnMessage(WixErrors.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
+                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
                 }
 
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction);
@@ -14712,7 +14712,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -14767,12 +14767,12 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             foreach (XElement child in node.Elements())
@@ -14785,7 +14785,7 @@ namespace WixToolset.Core
                             this.ParseSFPCatalogElement(child, ref parentName);
                             if (null != dependency && parentName == dependency)
                             {
-                                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dependency"));
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dependency"));
                             }
                             dependency = parentName;
                             break;
@@ -14805,7 +14805,7 @@ namespace WixToolset.Core
 
             if (null == dependency)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dependency"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dependency"));
             }
 
             if (!this.Core.EncounteredError)
@@ -14916,7 +14916,7 @@ namespace WixToolset.Core
                                         show = 7;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Show", showValue, "normal", "maximized", "minimized"));
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Show", showValue, "normal", "maximized", "minimized"));
                                         show = CompilerConstants.IllegalInteger;
                                         break;
                                 }
@@ -14941,7 +14941,7 @@ namespace WixToolset.Core
 
             if (advertise && null != target)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "Advertise", "yes"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "Advertise", "yes"));
             }
 
             if (null == directory)
@@ -14952,7 +14952,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributeWhenElementNotUnderElement(sourceLineNumbers, node.Name.LocalName, "Directory", "Component"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributeWhenElementNotUnderElement(sourceLineNumbers, node.Name.LocalName, "Directory", "Component"));
                 }
             }
 
@@ -14960,14 +14960,14 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.IntegerNotSet == descriptionResourceId)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DescriptionResourceDll", "DescriptionResourceId"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DescriptionResourceDll", "DescriptionResourceId"));
                 }
             }
             else
             {
                 if (CompilerConstants.IntegerNotSet != descriptionResourceId)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DescriptionResourceId", "DescriptionResourceDll"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DescriptionResourceId", "DescriptionResourceDll"));
                 }
             }
 
@@ -14975,20 +14975,20 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.IntegerNotSet == displayResourceId)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayResourceDll", "DisplayResourceId"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayResourceDll", "DisplayResourceId"));
                 }
             }
             else
             {
                 if (CompilerConstants.IntegerNotSet != displayResourceId)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayResourceId", "DisplayResourceDll"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayResourceId", "DisplayResourceDll"));
                 }
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (0 < name.Length)
             {
@@ -15001,7 +15001,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
                     }
                 }
                 else if (null == shortName) // generate a short file name.
@@ -15012,7 +15012,7 @@ namespace WixToolset.Core
 
             if ("Component" != parentElementLocalName && null != target)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Target", parentElementLocalName));
+                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Target", parentElementLocalName));
             }
 
             if (null == id)
@@ -15053,7 +15053,7 @@ namespace WixToolset.Core
                 {
                     if (YesNoType.Yes != parentKeyPath && "Component" != parentElementLocalName)
                     {
-                        this.Core.OnMessage(WixWarnings.UnclearShortcut(sourceLineNumbers, id.Id, componentId, defaultTarget));
+                        this.Core.Write(WarningMessages.UnclearShortcut(sourceLineNumbers, id.Id, componentId, defaultTarget));
                     }
                     row.Set(4, Guid.Empty.ToString("B"));
                 }
@@ -15138,7 +15138,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(key))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
             else if (null == id)
             {
@@ -15154,13 +15154,13 @@ namespace WixToolset.Core
                 }
                 else // cannot specify both the value attribute and inner text
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
                 }
             }
 
             if (String.IsNullOrEmpty(value))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -15265,12 +15265,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (CompilerConstants.IntegerNotSet == language)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
                 language = CompilerConstants.IllegalInteger;
             }
 
@@ -15334,29 +15334,29 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.LongNotSet != resourceId)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "ResourceId"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "ResourceId"));
                 }
 
                 if (0 != flags)
                 {
                     if (0x1 == (flags & 0x1))
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Restricted", "Advertise", "yes"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Restricted", "Advertise", "yes"));
                     }
 
                     if (0x2 == (flags & 0x2))
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Control", "Advertise", "yes"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Control", "Advertise", "yes"));
                     }
 
                     if (0x4 == (flags & 0x4))
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Hidden", "Advertise", "yes"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Hidden", "Advertise", "yes"));
                     }
 
                     if (0x8 == (flags & 0x8))
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "HasDiskImage", "Advertise", "yes"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "HasDiskImage", "Advertise", "yes"));
                     }
                 }
 
@@ -15383,17 +15383,17 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.IntegerNotSet != cost && CompilerConstants.IllegalInteger != cost)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Cost", "Advertise", "no"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Cost", "Advertise", "no"));
                 }
 
                 if (null == fileServer)
                 {
-                    this.Core.OnMessage(WixErrors.MissingTypeLibFile(sourceLineNumbers, node.Name.LocalName, "File"));
+                    this.Core.Write(ErrorMessages.MissingTypeLibFile(sourceLineNumbers, node.Name.LocalName, "File"));
                 }
 
                 if (null == registryVersion)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "MajorVersion", "MinorVersion", "Advertise", "no"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "MajorVersion", "MinorVersion", "Advertise", "no"));
                 }
 
                 // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion], (Default) = [Description]
@@ -15443,7 +15443,7 @@ namespace WixToolset.Core
                         case "BinarySource":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "FileSource", "PropertySource"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "FileSource", "PropertySource"));
                             }
                             source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             type = MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeBinaryData;
@@ -15455,7 +15455,7 @@ namespace WixToolset.Core
                         case "FileSource":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinarySource", "PropertySource"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinarySource", "PropertySource"));
                             }
                             source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             type = MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeSourceFile;
@@ -15464,7 +15464,7 @@ namespace WixToolset.Core
                         case "PropertySource":
                             if (null != source)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinarySource", "FileSource"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinarySource", "FileSource"));
                             }
                             source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             type = MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeProperty;
@@ -15491,7 +15491,7 @@ namespace WixToolset.Core
 
             if (null == source)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "BinarySource", "FileSource", "PropertySource"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "BinarySource", "FileSource", "PropertySource"));
             }
 
             if (!this.Core.EncounteredError)
@@ -15556,7 +15556,7 @@ namespace WixToolset.Core
                             if (0 < embeddedUICount) // there can be only one embedded UI
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                             }
                             this.ParseEmbeddedUIElement(child);
                             ++embeddedUICount;
@@ -15582,7 +15582,7 @@ namespace WixToolset.Core
                             if (RadioButtonType.Bitmap == radioButtonType || RadioButtonType.Icon == radioButtonType)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.RadioButtonBitmapAndIconDisallowed(childSourceLineNumbers));
+                                this.Core.Write(ErrorMessages.RadioButtonBitmapAndIconDisallowed(childSourceLineNumbers));
                             }
                             break;
                         case "TextStyle":
@@ -15655,7 +15655,7 @@ namespace WixToolset.Core
                             }
                             else
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeExceptOnElement(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ListView"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeExceptOnElement(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ListView"));
                             }
                             break;
                         case "Text":
@@ -15677,7 +15677,7 @@ namespace WixToolset.Core
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -15725,7 +15725,7 @@ namespace WixToolset.Core
                         case "Bitmap":
                             if (RadioButtonType.NotSet != type)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Icon", "Text"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Icon", "Text"));
                             }
                             text = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", text);
@@ -15740,7 +15740,7 @@ namespace WixToolset.Core
                         case "Icon":
                             if (RadioButtonType.NotSet != type)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Text"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Text"));
                             }
                             text = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", text);
@@ -15749,7 +15749,7 @@ namespace WixToolset.Core
                         case "Text":
                             if (RadioButtonType.NotSet != type)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Icon"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Icon"));
                             }
                             text = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             type = RadioButtonType.Text;
@@ -15782,27 +15782,27 @@ namespace WixToolset.Core
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             if (null == x)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "X"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "X"));
             }
 
             if (null == y)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Y"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Y"));
             }
 
             if (null == width)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Width"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Width"));
             }
 
             if (null == height)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Height"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Height"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -15860,7 +15860,7 @@ namespace WixToolset.Core
 
             if (null == action)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             foreach (XElement child in node.Elements())
@@ -15996,7 +15996,7 @@ namespace WixToolset.Core
 
             if (null == property)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
             }
 
             foreach (XElement child in node.Elements())
@@ -16064,7 +16064,7 @@ namespace WixToolset.Core
 
             if (null == property)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
             }
 
             foreach (XElement child in node.Elements())
@@ -16082,7 +16082,7 @@ namespace WixToolset.Core
                             else if (groupType != type)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.RadioButtonTypeInconsistent(childSourceLineNumbers));
+                                this.Core.Write(ErrorMessages.RadioButtonTypeInconsistent(childSourceLineNumbers));
                             }
                             break;
                         default:
@@ -16135,7 +16135,7 @@ namespace WixToolset.Core
 
             if (null == action)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -16314,7 +16314,7 @@ namespace WixToolset.Core
 
             if (null == faceName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "FaceName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "FaceName"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -16458,7 +16458,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -16498,7 +16498,7 @@ namespace WixToolset.Core
 
             if (null == firstControl)
             {
-                this.Core.OnMessage(WixErrors.NoFirstControlSpecified(sourceLineNumbers, id.Id));
+                this.Core.Write(ErrorMessages.NoFirstControlSpecified(sourceLineNumbers, id.Id));
             }
 
             if (!this.Core.EncounteredError)
@@ -16676,14 +16676,14 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(sourceFile))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
             else if (String.IsNullOrEmpty(name))
             {
                 name = Path.GetFileName(sourceFile);
                 if (!this.Core.IsValidLongFilename(name, false))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
+                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
                 }
             }
 
@@ -16696,11 +16696,11 @@ namespace WixToolset.Core
 
                 if (null == id)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 }
                 else if (!Common.IsIdentifier(id.Id))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
                 }
             }
             else if (String.IsNullOrEmpty(name))
@@ -16710,7 +16710,7 @@ namespace WixToolset.Core
 
             if (!name.Contains("."))
             {
-                this.Core.OnMessage(WixErrors.InvalidEmbeddedUIFileName(sourceLineNumbers, name));
+                this.Core.Write(ErrorMessages.InvalidEmbeddedUIFileName(sourceLineNumbers, name));
             }
 
             foreach (XElement child in node.Elements())
@@ -16783,14 +16783,14 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(sourceFile))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
             else if (String.IsNullOrEmpty(name))
             {
                 name = Path.GetFileName(sourceFile);
                 if (!this.Core.IsValidLongFilename(name, false))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
+                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
                 }
             }
 
@@ -16803,11 +16803,11 @@ namespace WixToolset.Core
 
                 if (null == id)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 }
                 else if (!Common.IsIdentifier(id.Id))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
                 }
             }
             else if (String.IsNullOrEmpty(name))
@@ -16868,7 +16868,7 @@ namespace WixToolset.Core
             XAttribute typeAttribute = node.Attribute("Type");
             if (null == typeAttribute)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
             }
             else
             {
@@ -17016,14 +17016,14 @@ namespace WixToolset.Core
                                             this.Core.TrySetBitFromName(specialAttributes, "Icon32", YesNoType.Yes, bits, 16);
                                             break;
                                         default:
-                                            this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "16", "32", "48"));
+                                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "16", "32", "48"));
                                             break;
                                     }
                                 }
                             }
                             else
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "Type"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "Type"));
                             }
                             break;
                         case "Property":
@@ -17074,22 +17074,22 @@ namespace WixToolset.Core
 
             if (null == height)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Height"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Height"));
             }
 
             if (null == width)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Width"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Width"));
             }
 
             if (null == x)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "X"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "X"));
             }
 
             if (null == y)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Y"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Y"));
             }
 
             if (null == id)
@@ -17165,7 +17165,7 @@ namespace WixToolset.Core
                             text = Common.GetInnerText(child);
                             if (!String.IsNullOrEmpty(text) && null != sourceFile)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithInnerText(childSourceLineNumbers, child.Name.LocalName, "SourceFile"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(childSourceLineNumbers, child.Name.LocalName, "SourceFile"));
                             }
                             break;
                         default:
@@ -17211,11 +17211,11 @@ namespace WixToolset.Core
                 {
                     if (String.IsNullOrEmpty(property) && String.IsNullOrEmpty(checkBoxPropertyRef))
                     {
-                        this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "CheckBoxPropertyRef", true));
+                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "CheckBoxPropertyRef", true));
                     }
                     else if (!String.IsNullOrEmpty(property) && !String.IsNullOrEmpty(checkBoxPropertyRef))
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "CheckBoxPropertyRef"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "CheckBoxPropertyRef"));
                     }
                     else if (!String.IsNullOrEmpty(property))
                     {
@@ -17272,7 +17272,7 @@ namespace WixToolset.Core
             {
                 if (TupleDefinitionType.BBControl == tableName)
                 {
-                    this.Core.OnMessage(WixErrors.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
+                    this.Core.Write(ErrorMessages.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
                 }
 
                 if (null == firstControl)
@@ -17322,14 +17322,14 @@ namespace WixToolset.Core
                         case "Control":
                             if (null != control)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             control = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Dialog":
                             if (null != dialog)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             dialog = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Dialog", dialog);
@@ -17361,28 +17361,28 @@ namespace WixToolset.Core
 
             if (null == control)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Control"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Control"));
             }
 
             if (null == dialog)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dialog"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dialog"));
             }
 
             if (null == controlEvent && null == property) // need to specify at least one
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Event", "Property"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Event", "Property"));
             }
             else if (null != controlEvent && null != property) // cannot specify both
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Event", "Property"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Event", "Property"));
             }
 
             if (null == argument)
             {
                 if (null != controlEvent)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value", "Event"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value", "Event"));
                 }
                 else if (null != property)
                 {
@@ -17499,7 +17499,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             // process the UpgradeVersion children here
@@ -17513,7 +17513,7 @@ namespace WixToolset.Core
                     {
                         case "Property":
                             this.ParsePropertyElement(child);
-                            this.Core.OnMessage(WixWarnings.DeprecatedUpgradeProperty(childSourceLineNumbers));
+                            this.Core.Write(WarningMessages.DeprecatedUpgradeProperty(childSourceLineNumbers));
                             break;
                         case "UpgradeVersion":
                             this.ParseUpgradeVersionElement(child, id);
@@ -17618,16 +17618,16 @@ namespace WixToolset.Core
 
             if (null == actionProperty)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
             }
             else if (actionProperty.ToUpper(CultureInfo.InvariantCulture) != actionProperty)
             {
-                this.Core.OnMessage(WixErrors.SecurePropertyNotUppercase(sourceLineNumbers, node.Name.LocalName, "Property", actionProperty));
+                this.Core.Write(ErrorMessages.SecurePropertyNotUppercase(sourceLineNumbers, node.Name.LocalName, "Property", actionProperty));
             }
 
             if (null == minimum && null == maximum)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Minimum", "Maximum"));
+                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Minimum", "Maximum"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -17694,7 +17694,7 @@ namespace WixToolset.Core
                             break;
                         case "Target":
                             target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "TargetFile", "TargetProperty"));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "TargetFile", "TargetProperty"));
                             break;
                         case "TargetFile":
                             targetFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -17716,22 +17716,22 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null != target && null != targetFile)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetFile"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetFile"));
             }
 
             if (null != target && null != targetProperty)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetProperty"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetProperty"));
             }
 
             if (null != targetFile && null != targetProperty)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -17740,17 +17740,17 @@ namespace WixToolset.Core
             {
                 if (null != target)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "Target"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "Target"));
                 }
 
                 if (null != targetFile)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetFile"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetFile"));
                 }
 
                 if (null != targetProperty)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetProperty"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetProperty"));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -17770,12 +17770,12 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Sequence", "Advertise", "no"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Sequence", "Advertise", "no"));
                 }
 
                 if (null == target && null == targetFile && null == targetProperty)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty", "Advertise", "no"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty", "Advertise", "no"));
                 }
 
                 if (null == target)
@@ -17851,12 +17851,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == key)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
             BundleApprovedExeForElevationAttributes attributes = BundleApprovedExeForElevationAttributes.None;
@@ -17938,7 +17938,7 @@ namespace WixToolset.Core
                                     disableModify = 0;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
                                     break;
                             }
                             break;
@@ -17946,7 +17946,7 @@ namespace WixToolset.Core
                             disableRemove = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "DisableRepair":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "HelpTelephone":
                             helpTelephone = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -17990,16 +17990,16 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(version))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
             else if (!CompilerCore.IsValidModuleOrBundleVersion(version))
             {
-                this.Core.OnMessage(WixWarnings.InvalidModuleOrBundleVersion(sourceLineNumbers, "Bundle", version));
+                this.Core.Write(WarningMessages.InvalidModuleOrBundleVersion(sourceLineNumbers, "Bundle", version));
             }
 
             if (String.IsNullOrEmpty(upgradeCode))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpgradeCode"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpgradeCode"));
             }
 
             if (String.IsNullOrEmpty(copyright))
@@ -18054,7 +18054,7 @@ namespace WixToolset.Core
                             if (baSeen)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "BootstrapperApplication"));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "BootstrapperApplication"));
                             }
                             this.ParseBootstrapperApplicationElement(child);
                             baSeen = true;
@@ -18072,7 +18072,7 @@ namespace WixToolset.Core
                             if (chainSeen)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
                             }
                             this.ParseChainElement(child);
                             chainSeen = true;
@@ -18087,7 +18087,7 @@ namespace WixToolset.Core
                             if (logSeen)
                             {
                                 SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
                             }
                             logVariablePrefixAndExtension = this.ParseLogElement(child, fileSystemSafeBundleName);
                             logSeen = true;
@@ -18124,7 +18124,7 @@ namespace WixToolset.Core
 
             if (!chainSeen)
             {
-                this.Core.OnMessage(WixErrors.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Chain"));
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Chain"));
             }
 
             if (!this.Core.EncounteredError)
@@ -18278,12 +18278,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == sourceFile)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -18329,7 +18329,7 @@ namespace WixToolset.Core
                             string typeString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if (!Enum.TryParse<ContainerType>(typeString, out type))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
                             }
                             break;
                         default:
@@ -18352,12 +18352,12 @@ namespace WixToolset.Core
 
                 if (null == id)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                     id = Identifier.Invalid;
                 }
                 else if (!Common.IsIdentifier(id.Id))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
                 }
             }
             else if (null == name)
@@ -18367,7 +18367,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(downloadUrl) && ContainerType.Detached != type)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "Type", "attached"));
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "Type", "attached"));
             }
 
             foreach (XElement child in node.Elements())
@@ -18449,7 +18449,7 @@ namespace WixToolset.Core
                 // We need *either* <Payload> or <PayloadGroupRef> or even just @SourceFile on the BA...
                 // but we just say there's a missing <Payload>.
                 // TODO: Is there a better message for this?
-                this.Core.OnMessage(WixErrors.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
             }
 
             // Add the application as an attached container and if an Id was provided add that too.
@@ -18527,7 +18527,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(id))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
             else
             {
@@ -18593,7 +18593,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Manufacturer", node.Parent.Name.LocalName));
+                    this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Manufacturer", node.Parent.Name.LocalName));
                 }
             }
 
@@ -18613,13 +18613,13 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Name", node.Parent.Name.LocalName));
+                    this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Name", node.Parent.Name.LocalName));
                 }
             }
 
             if (String.IsNullOrEmpty(classification))
             {
-                this.Core.OnMessage(WixErrors.IllegalEmptyAttributeValue(sourceLineNumbers, node.Name.LocalName, "Classification", defaultClassification));
+                this.Core.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, node.Name.LocalName, "Classification", defaultClassification));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -18755,13 +18755,13 @@ namespace WixToolset.Core
 
                 if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage")
                 {
-                    this.Core.OnMessage(WixErrors.RemotePayloadUnsupported(childSourceLineNumbers));
+                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
                     continue;
                 }
 
                 if (null != remotePayload)
                 {
-                    this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                 }
 
                 remotePayload = this.ParseRemotePayloadElement(child);
@@ -18769,11 +18769,11 @@ namespace WixToolset.Core
 
             if (null != sourceFile && null != remotePayload)
             {
-                this.Core.OnMessage(WixErrors.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
+                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
             }
             else if (null == sourceFile && null == remotePayload)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributeOrElement(sourceLineNumbers, node.Name.LocalName, "SourceFile", "RemotePayload"));
+                this.Core.Write(ErrorMessages.ExpectedAttributeOrElement(sourceLineNumbers, node.Name.LocalName, "SourceFile", "RemotePayload"));
             }
             else if (null == sourceFile)
             {
@@ -18782,14 +18782,14 @@ namespace WixToolset.Core
 
             if (null == downloadUrl && null != remotePayload)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
+                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
             }
 
             if (Compiler.BurnUXContainerId == parentId)
             {
                 if (compressed == YesNoDefaultType.No)
                 {
-                    Core.OnMessage(WixWarnings.UxPayloadsOnlySupportEmbedding(sourceLineNumbers, sourceFile));
+                    Core.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(sourceLineNumbers, sourceFile));
                 }
 
                 compressed = YesNoDefaultType.Yes;
@@ -18845,27 +18845,27 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(remotePayload.ProductName))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductName"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductName"));
             }
 
             if (String.IsNullOrEmpty(remotePayload.Description))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
             }
 
             if (String.IsNullOrEmpty(remotePayload.Hash))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Hash"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Hash"));
             }
 
             if (0 == remotePayload.Size)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Size"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Size"));
             }
 
             if (String.IsNullOrEmpty(remotePayload.Version))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
 
             return remotePayload;
@@ -18947,7 +18947,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -19024,7 +19024,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -19084,7 +19084,7 @@ namespace WixToolset.Core
                             string behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if (!Enum.TryParse<ExitCodeBehaviorType>(behaviorString, true, out behavior))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
                             }
                             break;
                         default:
@@ -19100,7 +19100,7 @@ namespace WixToolset.Core
 
             if (ExitCodeBehaviorType.NotSet == behavior)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Behavior"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Behavior"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -19208,7 +19208,7 @@ namespace WixToolset.Core
 
             if (null == previousId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "MsiPackage", "ExePackage", "PackageGroupRef"));
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "MsiPackage", "ExePackage", "PackageGroupRef"));
             }
 
             if (!this.Core.EncounteredError)
@@ -19339,12 +19339,12 @@ namespace WixToolset.Core
 
                 if (null == id)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                     id = Identifier.Invalid;
                 }
                 else if (!Common.IsIdentifier(id.Id))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
                 }
             }
 
@@ -19437,7 +19437,7 @@ namespace WixToolset.Core
                             name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
                             if (!this.Core.IsValidLongFilename(name, false, true))
                             {
-                                this.Core.OnMessage(WixErrors.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Name", name));
+                                this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Name", name));
                             }
                             break;
                         case "SourceFile":
@@ -19528,7 +19528,7 @@ namespace WixToolset.Core
                             compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "SuppressLooseFilePayloadGeneration":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             suppressLooseFilePayloadGeneration = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             allowed = (packageType == WixBundlePackageType.Msi);
                             break;
@@ -19563,13 +19563,13 @@ namespace WixToolset.Core
 
                 if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage" && node.Name.LocalName != "MsuPackage")
                 {
-                    this.Core.OnMessage(WixErrors.RemotePayloadUnsupported(childSourceLineNumbers));
+                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
                     continue;
                 }
 
                 if (null != remotePayload)
                 {
-                    this.Core.OnMessage(WixErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                 }
 
                 remotePayload = this.ParseRemotePayloadElement(child);
@@ -19579,7 +19579,7 @@ namespace WixToolset.Core
             {
                 if (String.IsNullOrEmpty(name))
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile"));
+                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile"));
                 }
                 else if (null == remotePayload)
                 {
@@ -19592,13 +19592,13 @@ namespace WixToolset.Core
             }
             else if (null != remotePayload)
             {
-                this.Core.OnMessage(WixErrors.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
+                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
             }
             else if (sourceFile.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
             {
                 if (String.IsNullOrEmpty(name))
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile", sourceFile));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile", sourceFile));
                 }
                 else
                 {
@@ -19608,13 +19608,13 @@ namespace WixToolset.Core
 
             if (null == downloadUrl && null != remotePayload)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
+                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
             }
 
             if (YesNoDefaultType.No != compressed && null != remotePayload)
             {
                 compressed = YesNoDefaultType.No;
-                this.Core.OnMessage(WixWarnings.RemotePayloadsMustNotAlsoBeCompressed(sourceLineNumbers, node.Name.LocalName));
+                this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(sourceLineNumbers, node.Name.LocalName));
             }
 
             if (null == id)
@@ -19630,12 +19630,12 @@ namespace WixToolset.Core
 
                 if (null == id)
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                     id = Identifier.Invalid;
                 }
                 else if (!Common.IsIdentifier(id.Id))
                 {
-                    this.Core.OnMessage(WixErrors.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
                 }
             }
 
@@ -19651,7 +19651,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(protocol) && !protocol.Equals("burn", StringComparison.Ordinal) && !protocol.Equals("netfx4", StringComparison.Ordinal) && !protocol.Equals("none", StringComparison.Ordinal))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
             }
 
             if (!String.IsNullOrEmpty(protocol) && protocol.Equals("netfx4", StringComparison.Ordinal))
@@ -19660,17 +19660,17 @@ namespace WixToolset.Core
                 {
                     if (null == installCommand || -1 == installCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Core.OnMessage(WixWarnings.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallCommand", installCommand, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallCommand", installCommand, expectedArgument, "Protocol", "netfx4"));
                     }
 
                     if (null == repairCommand || -1 == repairCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Core.OnMessage(WixWarnings.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairCommand", repairCommand, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairCommand", repairCommand, expectedArgument, "Protocol", "netfx4"));
                     }
 
                     if (null == uninstallCommand || -1 == uninstallCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Core.OnMessage(WixWarnings.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallCommand", uninstallCommand, expectedArgument, "Protocol", "netfx4"));
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallCommand", uninstallCommand, expectedArgument, "Protocol", "netfx4"));
                     }
                 }
             }
@@ -19884,7 +19884,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(condition))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -19931,7 +19931,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = Identifier.Invalid;
             }
 
@@ -20042,12 +20042,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null != after && ComplexReferenceParentType.Container == parentType)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "After", parentId));
+                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "After", parentId));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -20175,12 +20175,12 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -20232,7 +20232,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -20281,7 +20281,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (!String.IsNullOrEmpty(action))
@@ -20298,7 +20298,7 @@ namespace WixToolset.Core
                     case Wix.RelatedBundle.ActionType.Patch:
                         break;
                     default:
-                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
+                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
                         break;
                 }
             }
@@ -20344,7 +20344,7 @@ namespace WixToolset.Core
 
             if (null == location)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Location"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Location"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -20409,11 +20409,11 @@ namespace WixToolset.Core
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             else if (name.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
             {
-                this.Core.OnMessage(WixErrors.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
+                this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
             }
 
             if (null == type && null != value)
@@ -20459,7 +20459,7 @@ namespace WixToolset.Core
 
             if (null == value && null != type)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -20586,12 +20586,12 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
             this.Core.ParseForExtensionElements(node);

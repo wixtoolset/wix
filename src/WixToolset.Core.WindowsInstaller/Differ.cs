@@ -10,26 +10,29 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     /// <summary>
     /// Creates a transform by diffing two outputs.
     /// </summary>
-    public sealed class Differ : IMessageHandler
+    public sealed class Differ
     {
         private List<IInspectorExtension> inspectorExtensions;
         private bool showPedanticMessages;
         private bool suppressKeepingSpecialRows;
         private bool preserveUnchangedRows;
         private const char sectionDelimiter = '/';
+        private readonly IMessaging messaging;
         private SummaryInformationStreams transformSummaryInfo;
 
         /// <summary>
         /// Instantiates a new Differ class.
         /// </summary>
-        public Differ()
+        public Differ(IMessaging messaging)
         {
             this.inspectorExtensions = new List<IInspectorExtension>();
+            this.messaging = messaging;
         }
 
         /// <summary>
@@ -99,17 +102,17 @@ namespace WixToolset.Core.WindowsInstaller
             // compare the codepages
             if (targetOutput.Codepage != updatedOutput.Codepage && 0 == (TransformFlags.ErrorChangeCodePage & validationFlags))
             {
-                this.OnMessage(WixErrors.OutputCodepageMismatch(targetOutput.SourceLineNumbers, targetOutput.Codepage, updatedOutput.Codepage));
+                this.messaging.Write(ErrorMessages.OutputCodepageMismatch(targetOutput.SourceLineNumbers, targetOutput.Codepage, updatedOutput.Codepage));
                 if (null != updatedOutput.SourceLineNumbers)
                 {
-                    this.OnMessage(WixErrors.OutputCodepageMismatch2(updatedOutput.SourceLineNumbers));
+                    this.messaging.Write(ErrorMessages.OutputCodepageMismatch2(updatedOutput.SourceLineNumbers));
                 }
             }
 
             // compare the output types
             if (targetOutput.Type != updatedOutput.Type)
             {
-                throw new WixException(WixErrors.OutputTypeMismatch(targetOutput.SourceLineNumbers, targetOutput.Type.ToString(), updatedOutput.Type.ToString()));
+                throw new WixException(ErrorMessages.OutputTypeMismatch(targetOutput.SourceLineNumbers, targetOutput.Type.ToString(), updatedOutput.Type.ToString()));
             }
 
             // compare the contents of the tables
@@ -160,15 +163,6 @@ namespace WixToolset.Core.WindowsInstaller
         }
 
         /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
-        }
-
-        /// <summary>
         /// Add a row to the <paramref name="index"/> using the primary key.
         /// </summary>
         /// <param name="index">The indexed rows.</param>
@@ -210,7 +204,7 @@ namespace WixToolset.Core.WindowsInstaller
                 }
                 else if (this.showPedanticMessages)
                 {
-                    this.OnMessage(WixWarnings.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, row.Table.Name));
+                    this.messaging.Write(ErrorMessages.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, row.Table.Name));
                 }
             }
             else // use the string representation of the row as its primary key (it may not be unique)
@@ -370,7 +364,7 @@ namespace WixToolset.Core.WindowsInstaller
                 if (0 != targetTable.Definition.CompareTo(updatedTable.Definition))
                 {
                     // continue to the next table; may be more mismatches
-                    this.OnMessage(WixErrors.DatabaseSchemaMismatch(targetOutput.SourceLineNumbers, targetTable.Name));
+                    this.messaging.Write(ErrorMessages.DatabaseSchemaMismatch(targetOutput.SourceLineNumbers, targetTable.Name));
                 }
                 else
                 {
@@ -425,7 +419,7 @@ namespace WixToolset.Core.WindowsInstaller
                         this.transformSummaryInfo.TargetProductCode = (string)row[1];
                         if ("*" == this.transformSummaryInfo.TargetProductCode)
                         {
-                            this.OnMessage(WixErrors.ProductCodeInvalidForTransform(row.SourceLineNumbers));
+                            this.messaging.Write(ErrorMessages.ProductCodeInvalidForTransform(row.SourceLineNumbers));
                         }
                     }
                     else if ("ProductVersion" == (string)row[0])
@@ -466,7 +460,7 @@ namespace WixToolset.Core.WindowsInstaller
                         this.transformSummaryInfo.UpdatedProductCode = (string)row[1];
                         if ("*" == this.transformSummaryInfo.UpdatedProductCode)
                         {
-                            this.OnMessage(WixErrors.ProductCodeInvalidForTransform(row.SourceLineNumbers));
+                            this.messaging.Write(ErrorMessages.ProductCodeInvalidForTransform(row.SourceLineNumbers));
                         }
                     }
                     else if ("ProductVersion" == (string)row[0])

@@ -7,8 +7,9 @@ namespace WixToolset
     /// <summary>
     /// Melts a Module Wix document into a ComponentGroup representation.
     /// </summary>
-    public sealed class MelterCore : IMessageHandler
+    public sealed class MelterCore
     {
+#if TODO_MELT
         /// <summary>
         /// Gets whether the melter core encountered an error while processing.
         /// </summary>
@@ -26,5 +27,6 @@ namespace WixToolset
         {
             Messaging.Instance.OnMessage(e);
         }
+#endif
     }
 }

@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller
     /// <summary>
     /// Runs internal consistency evaluators (ICEs) from cub files against a database.
     /// </summary>
-    public sealed class Validator : IMessageHandler
+    public sealed class Validator
     {
         private string actionName;
         private StringCollection cubeFiles;
@@ -30,15 +30,17 @@ namespace WixToolset.Core.WindowsInstaller
         private Output output;
         private InstallUIHandler validationUIHandler;
         private bool validationSessionComplete;
+        private readonly IMessaging messaging;
 
         /// <summary>
         /// Instantiate a new Validator.
         /// </summary>
-        public Validator()
+        public Validator(IMessaging messaging)
         {
             this.cubeFiles = new StringCollection();
-            this.extension = new ValidatorExtension();
+            this.extension = new ValidatorExtension(messaging);
             this.validationUIHandler = new InstallUIHandler(this.ValidationUIHandler);
+            this.messaging = messaging;
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 if (!mutex.WaitOne(0, false))
                 {
-                    this.OnMessage(WixVerboses.ValidationSerialized());
+                    this.messaging.Write(VerboseMessages.ValidationSerialized());
                     mutex.WaitOne();
                 }
 
@@ -176,7 +178,7 @@ namespace WixToolset.Core.WindowsInstaller
                         {
                             if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
                             {
-                                throw new WixException(WixErrors.CubeFileNotFound(cubeFile));
+                                throw new WixException(ErrorMessages.CubeFileNotFound(cubeFile));
                             }
 
                             throw;
@@ -248,7 +250,7 @@ namespace WixToolset.Core.WindowsInstaller
                             }
                             catch (Win32Exception e)
                             {
-                                if (!Messaging.Instance.EncounteredError)
+                                if (!this.messaging.EncounteredError)
                                 {
                                     throw e;
                                 }
@@ -270,7 +272,7 @@ namespace WixToolset.Core.WindowsInstaller
             catch (Win32Exception e)
             {
                 // avoid displaying errors twice since one may have already occurred in the UI handler
-                if (!Messaging.Instance.EncounteredError)
+                if (!this.messaging.EncounteredError)
                 {
                     if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
                     {
@@ -278,23 +280,23 @@ namespace WixToolset.Core.WindowsInstaller
                         // this would be the temporary copy and there would be
                         // no final output since the error occured; during smoke
                         // they should know the path passed into smoke
-                        this.OnMessage(WixErrors.ValidationFailedToOpenDatabase());
+                        this.messaging.Write(ErrorMessages.ValidationFailedToOpenDatabase());
                     }
                     else if (0x64D == e.NativeErrorCode)
                     {
-                        this.OnMessage(WixErrors.ValidationFailedDueToLowMsiEngine());
+                        this.messaging.Write(ErrorMessages.ValidationFailedDueToLowMsiEngine());
                     }
                     else if (0x654 == e.NativeErrorCode)
                     {
-                        this.OnMessage(WixErrors.ValidationFailedDueToInvalidPackage());
+                        this.messaging.Write(ErrorMessages.ValidationFailedDueToInvalidPackage());
                     }
                     else if (0x658 == e.NativeErrorCode)
                     {
-                        this.OnMessage(WixErrors.ValidationFailedDueToMultilanguageMergeModule());
+                        this.messaging.Write(ErrorMessages.ValidationFailedDueToMultilanguageMergeModule());
                     }
                     else if (0x659 == e.NativeErrorCode)
                     {
-                        this.OnMessage(WixWarnings.ValidationFailedDueToSystemPolicy());
+                        this.messaging.Write(WarningMessages.ValidationFailedDueToSystemPolicy());
                     }
                     else
                     {
@@ -305,7 +307,7 @@ namespace WixToolset.Core.WindowsInstaller
                             msgTemp = String.Concat("Action - '", this.actionName, "' ", e.Message);
                         }
 
-                        this.OnMessage(WixErrors.Win32Exception(e.NativeErrorCode, msgTemp));
+                        this.messaging.Write(ErrorMessages.Win32Exception(e.NativeErrorCode, msgTemp));
                     }
                 }
             }
@@ -322,16 +324,6 @@ namespace WixToolset.Core.WindowsInstaller
             }
         }
 
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
-            this.extension.OnMessage(e);
-        }
-
         public static Validator CreateFromContext(IBindContext context, string cubeFilename)
         {
             Validator validator = null;
@@ -339,7 +331,7 @@ namespace WixToolset.Core.WindowsInstaller
             // Tell the binder about the validator if validation isn't suppressed
             if (!context.SuppressValidation)
             {
-                validator = new Validator();
+                validator = new Validator(context.Messaging);
                 validator.IntermediateFolder = Path.Combine(context.IntermediateFolder, "validate");
 
                 // set the default cube file
@@ -378,7 +370,7 @@ namespace WixToolset.Core.WindowsInstaller
             }
             catch (WixException ex)
             {
-                this.OnMessage(ex.Error);
+                this.messaging.Write(ex.Error);
             }
 
             return 1;

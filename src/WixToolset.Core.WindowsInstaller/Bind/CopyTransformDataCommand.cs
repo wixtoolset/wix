@@ -12,13 +12,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class CopyTransformDataCommand
     {
         public bool CopyOutFileRows { private get; set; }
 
         public IEnumerable<IBinderExtension> Extensions { private get; set; }
-        
+
+        public IMessaging Messaging { private get; set; }
+
         public Output Output { private get; set; }
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
@@ -465,14 +468,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (seqDuplicateFiles < seqInstallFiles)
                         {
-                            throw new WixException(WixErrors.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, iesTable.Name, "InstallFiles", "DuplicateFiles", wixPatchAction.Action));
+                            throw new WixException(ErrorMessages.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, iesTable.Name, "InstallFiles", "DuplicateFiles", wixPatchAction.Action));
                         }
                         else
                         {
                             sequence = (seqDuplicateFiles + seqInstallFiles) / 2;
                             if (seqInstallFiles == sequence || seqDuplicateFiles == sequence)
                             {
-                                throw new WixException(WixErrors.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, iesTable.Name, "InstallFiles", "DuplicateFiles", wixPatchAction.Action));
+                                throw new WixException(ErrorMessages.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, iesTable.Name, "InstallFiles", "DuplicateFiles", wixPatchAction.Action));
                             }
                         }
                     }
@@ -579,7 +582,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Make sure all changes to non keypath files also had a change in the keypath.
                 if (!componentWithChangedKeyPath.ContainsKey(componentFile.Key) && componentKeyPath.ContainsKey(componentFile.Key))
                 {
-                    Messaging.Instance.OnMessage(WixWarnings.UpdateOfNonKeyPathFile((string)componentFile.Value, (string)componentFile.Key, (string)componentKeyPath[componentFile.Key]));
+                    this.Messaging.Write(WarningMessages.UpdateOfNonKeyPathFile((string)componentFile.Value, (string)componentFile.Key, (string)componentKeyPath[componentFile.Key]));
                 }
             }
         }

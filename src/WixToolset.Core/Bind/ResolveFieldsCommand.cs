@@ -7,12 +7,15 @@ namespace WixToolset.Core.Bind
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Resolve source fields in the tables included in the output
     /// </summary>
     internal class ResolveFieldsCommand
     {
+        public IMessaging Messaging { private get; set; }
+
         public bool BuildingPatch { private get; set; }
 
         public IBindVariableResolver BindVariableResolver { private get; set; }
@@ -75,7 +78,7 @@ namespace WixToolset.Core.Bind
                         }
 
                         // Move to next row if we've hit an error resolving variables.
-                        if (Messaging.Instance.EncounteredError) // TODO: make this error handling more specific to just the failure to resolve variables in this field.
+                        if (this.Messaging.EncounteredError) // TODO: make this error handling more specific to just the failure to resolve variables in this field.
                         {
                             continue;
                         }
@@ -151,7 +154,7 @@ namespace WixToolset.Core.Bind
                                 catch (WixFileNotFoundException)
                                 {
                                     // display the error with source line information
-                                    Messaging.Instance.OnMessage(WixErrors.FileNotFound(row.SourceLineNumbers, objectField.Path));
+                                    this.Messaging.Write(ErrorMessages.FileNotFound(row.SourceLineNumbers, objectField.Path));
                                 }
                             }
 
@@ -208,7 +211,7 @@ namespace WixToolset.Core.Bind
                                         catch (WixFileNotFoundException)
                                         {
                                             // display the error with source line information
-                                            Messaging.Instance.OnMessage(WixErrors.FileNotFound(row.SourceLineNumbers, (string)objectField.PreviousData));
+                                            Messaging.Instance.Write(WixErrors.FileNotFound(row.SourceLineNumbers, (string)objectField.PreviousData));
                                         }
                                     }
                                 }
