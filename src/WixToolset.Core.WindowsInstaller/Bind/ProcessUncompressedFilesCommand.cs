@@ -5,14 +5,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using WixToolset.Data;
-    using WixToolset.Msi;
-    using WixToolset.Core.Native;
-    using WixToolset.Bind;
+    using System.Linq;
     using WixToolset.Core.Bind;
+    using WixToolset.Core.Native;
+    using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
-    using System.Linq;
+    using WixToolset.Msi;
 
     /// <summary>
     /// Defines the file transfers necessary to layout the uncompressed files.
@@ -100,7 +99,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.File));
                                 }
 
-                                relativeFileLayoutPath = Binder.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);
+                                relativeFileLayoutPath = PathResolver.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);
                             }
 
                             // finally put together the base media layout path and the relative file layout path

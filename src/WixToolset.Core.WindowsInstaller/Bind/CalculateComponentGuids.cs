@@ -6,7 +6,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Bind;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
@@ -135,7 +134,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (fileRow.File == componentRow.KeyPath)
                         {
                             // calculate the key file's canonical target path
-                            string directoryPath = Binder.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentRow.Directory_, true);
+                            string directoryPath = PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentRow.Directory_, true);
                             string fileName = Common.GetName(fileRow.LongFileName, false, true).ToLowerInvariant();
                             path = Path.Combine(directoryPath, fileName);
 

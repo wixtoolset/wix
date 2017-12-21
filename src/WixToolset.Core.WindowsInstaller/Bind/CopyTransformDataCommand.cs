@@ -18,7 +18,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     {
         public bool CopyOutFileRows { private get; set; }
 
-        public IEnumerable<IBinderExtension> Extensions { private get; set; }
+        public IEnumerable<IFileSystemExtension> Extensions { private get; set; }
 
         public IMessaging Messaging { private get; set; }
 

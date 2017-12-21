@@ -19,7 +19,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     {
         public int Codepage { private get; set; }
 
-        public IEnumerable<IBinderExtension> Extensions { private get; set; }
+        public IEnumerable<IFileSystemExtension> Extensions { private get; set; }
 
         /// <summary>
         /// Whether to keep columns added in a transform.

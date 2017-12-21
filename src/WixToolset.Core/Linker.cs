@@ -8,11 +8,11 @@ namespace WixToolset.Core
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using WixToolset.Data;
-    using WixToolset.Link;
     using WixToolset.Core.Link;
+    using WixToolset.Data;
     using WixToolset.Data.Tuples;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility;
+    using WixToolset.Link;
 
     /// <summary>
     /// Linker core of the WiX toolset.

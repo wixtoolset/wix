@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal class MspBackend : IBackend
     {
-        public BindResult Bind(IBindContext context)
+        public BindResult Bind(WixToolset.Extensibility.IBindContext context)
         {
             throw new NotImplementedException();
         }

@@ -9,8 +9,6 @@ namespace WixToolset.Core
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -37,14 +35,15 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets the count of variables added to the resolver.
         /// </summary>
-        public int VariableCount => this.wixVariables.Count;
+        public int VariableCount  => this.wixVariables.Count;
 
         /// <summary>
         /// Add a variable.
         /// </summary>
         /// <param name="name">The name of the variable.</param>
         /// <param name="value">The value of the variable.</param>
-        public void AddVariable(string name, string value)
+        /// <param name="overridable">Indicates whether the variable can be overridden by an existing variable.</param>
+        public void AddVariable(string name, string value, bool overridable)
         {
             try
             {
@@ -52,25 +51,9 @@ namespace WixToolset.Core
             }
             catch (ArgumentException)
             {
-                this.Messaging.Write(ErrorMessages.WixVariableCollision(null, name));
-            }
-        }
-
-        /// <summary>
-        /// Add a variable.
-        /// </summary>
-        /// <param name="wixVariableRow">The WixVariableRow to add.</param>
-        public void AddVariable(WixVariableTuple wixVariableRow)
-        {
-            try
-            {
-                this.wixVariables.Add(wixVariableRow.WixVariable, wixVariableRow.Value);
-            }
-            catch (ArgumentException)
-            {
-                if (!wixVariableRow.Overridable) // collision
+                if (!overridable)
                 {
-                    this.Messaging.Write(ErrorMessages.WixVariableCollision(wixVariableRow.SourceLineNumbers, wixVariableRow.WixVariable));
+                    throw;
                 }
             }
         }
@@ -82,22 +65,9 @@ namespace WixToolset.Core
         /// <param name="value">The value to resolve.</param>
         /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
         /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly)
+        public BindVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly)
         {
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, out var defaultIgnored, out var delayedIgnored);
-        }
-
-        /// <summary>
-        /// Resolve the wix variables in a value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">The source line information for the value.</param>
-        /// <param name="value">The value to resolve.</param>
-        /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
-        /// <param name="isDefault">true if the resolved value was the default.</param>
-        /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, out bool isDefault)
-        {
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, out isDefault, out var ignored);
+            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, true);
         }
 
         /// <summary>
@@ -110,28 +80,12 @@ namespace WixToolset.Core
         /// <param name="isDefault">true if the resolved value was the default.</param>
         /// <param name="delayedResolve">true if the value has variables that cannot yet be resolved.</param>
         /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, out bool isDefault, out bool delayedResolve)
-        {
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, true, out isDefault, out delayedResolve);
-        }
-
-        /// <summary>
-        /// Resolve the wix variables in a value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">The source line information for the value.</param>
-        /// <param name="value">The value to resolve.</param>
-        /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
-        /// <param name="errorOnUnknown">true if unknown variables should throw errors.</param>
-        /// <param name="isDefault">true if the resolved value was the default.</param>
-        /// <param name="delayedResolve">true if the value has variables that cannot yet be resolved.</param>
-        /// <returns>The resolved value.</returns>
-        public string ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown, out bool isDefault, out bool delayedResolve)
+        internal BindVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown)
         {
             MatchCollection matches = Common.WixVariableRegex.Matches(value);
 
             // the value is the default unless its substituted further down
-            isDefault = true;
-            delayedResolve = false;
+            var result = new BindVariableResolution { IsDefault = true, Value = value };
 
             if (0 < matches.Count)
             {
@@ -172,6 +126,8 @@ namespace WixToolset.Core
                         if (!localizationOnly)
                         {
                             sb.Remove(matches[i].Index - 1, 1);
+
+                            result.UpdatedValue = true;
                         }
                     }
                     else
@@ -200,7 +156,7 @@ namespace WixToolset.Core
                                 if (this.wixVariables.TryGetValue(variableId, out resolvedValue))
                                 {
                                     resolvedValue = resolvedValue ?? String.Empty;
-                                    isDefault = false;
+                                    result.IsDefault = false;
                                 }
                                 else if (null != variableDefaultValue) // default the resolved value to the inline value if one was specified
                                 {
@@ -212,16 +168,17 @@ namespace WixToolset.Core
                         if ("bind" == variableNamespace)
                         {
                             // can't resolve these yet, but keep track of where we find them so they can be resolved later with less effort
-                            delayedResolve = true;
+                            result.DelayedResolve = true;
                         }
                         else
                         {
-
                             // insert the resolved value if it was found or display an error
                             if (null != resolvedValue)
                             {
                                 sb.Remove(matches[i].Index, matches[i].Length);
                                 sb.Insert(matches[i].Index, resolvedValue);
+
+                                result.UpdatedValue = true;
                             }
                             else if ("loc" == variableNamespace && errorOnUnknown) // unresolved loc variable
                             {
@@ -235,10 +192,10 @@ namespace WixToolset.Core
                     }
                 }
 
-                value = sb.ToString();
+                result.Value = sb.ToString();
             }
 
-            return value;
+            return result;
         }
 
         /// <summary>

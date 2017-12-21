@@ -154,30 +154,7 @@ namespace WixToolset.Core
                 }
 
                 // Resolve any Component Id placeholders compiled into the intermediate.
-                if (0 < this.componentIdPlaceholdersResolver.VariableCount)
-                {
-                    foreach (var section in target.Sections)
-                    {
-                        foreach (var tuple in section.Tuples)
-                        {
-                            foreach (var field in tuple.Fields)
-                            {
-                                if (field != null && field.Type == IntermediateFieldType.String)
-                                {
-                                    var data = field.AsString();
-                                    if (!String.IsNullOrEmpty(data))
-                                    {
-                                        var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(tuple.SourceLineNumbers, data, false, false, out var defaultIgnored, out var delayedIgnored);
-                                        if (data != resolved)
-                                        {
-                                            field.Set(resolved);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                this.ResolveComponentIdPlaceholders(target);
             }
             finally
             {
@@ -190,6 +167,34 @@ namespace WixToolset.Core
             }
 
             return this.Context.Messaging.EncounteredError ? null : target;
+        }
+
+        private void ResolveComponentIdPlaceholders(Intermediate target)
+        {
+            if (0 < this.componentIdPlaceholdersResolver.VariableCount)
+            {
+                foreach (var section in target.Sections)
+                {
+                    foreach (var tuple in section.Tuples)
+                    {
+                        foreach (var field in tuple.Fields)
+                        {
+                            if (field?.Type == IntermediateFieldType.String)
+                            {
+                                var data = field.AsString();
+                                if (!String.IsNullOrEmpty(data))
+                                {
+                                    var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(tuple.SourceLineNumbers, data, false, false);
+                                    if (resolved.UpdatedValue)
+                                    {
+                                        field.Set(resolved.Value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -2422,7 +2427,7 @@ namespace WixToolset.Core
             {
                 if (isGeneratableGuidOk || keyFound && !String.IsNullOrEmpty(keyPath))
                 {
-                    this.componentIdPlaceholdersResolver.AddVariable(componentIdPlaceholder, keyPath);
+                    this.componentIdPlaceholdersResolver.AddVariable(componentIdPlaceholder, keyPath, false);
 
                     id = new Identifier(keyPath, AccessModifier.Private);
                 }

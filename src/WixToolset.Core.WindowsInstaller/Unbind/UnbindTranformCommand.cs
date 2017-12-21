@@ -244,7 +244,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         private void GenerateDatabase(Output output, string databaseFile)
         {
             var command = new GenerateDatabaseCommand();
-            command.Extensions = Array.Empty<IBinderExtension>();
+            command.Extensions = Array.Empty<IFileSystemExtension>();
             command.Output = output;
             command.OutputPath = databaseFile;
             command.KeepAddedColumns = true;

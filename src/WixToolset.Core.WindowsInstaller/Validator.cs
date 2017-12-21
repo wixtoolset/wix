@@ -324,7 +324,7 @@ namespace WixToolset.Core.WindowsInstaller
             }
         }
 
-        public static Validator CreateFromContext(IBindContext context, string cubeFilename)
+        public static Validator CreateFromContext(WixToolset.Extensibility.IBindContext context, string cubeFilename)
         {
             Validator validator = null;
 

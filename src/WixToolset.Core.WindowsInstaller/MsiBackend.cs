@@ -12,9 +12,11 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal class MsiBackend : IBackend
     {
-        public BindResult Bind(IBindContext context)
+        public BindResult Bind(WixToolset.Extensibility.IBindContext context)
         {
-            var backendExtensions = context.ExtensionManager.Create<IWindowsInstallerBackendExtension>();
+            var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
+
+            var backendExtensions = extensionManager.Create<IWindowsInstallerBackendExtension>();
 
             foreach (var extension in backendExtensions)
             {
@@ -26,7 +28,7 @@ namespace WixToolset.Core.WindowsInstaller
             var command = new BindDatabaseCommand(context, backendExtensions, validator);
             command.Execute();
 
-            var result = new BindResult(command.FileTransfers, command.ContentFilePaths);
+            var result = new BindResult { FileTransfers = command.FileTransfers, ContentFilePaths = command.ContentFilePaths };
 
             foreach (var extension in backendExtensions)
             {

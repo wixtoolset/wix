@@ -22,30 +22,26 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
+        public BindDatabaseCommand(WixToolset.Extensibility.IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
         {
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
-            this.BindPaths = context.BindPaths;
             this.CabbingThreadCount = context.CabbingThreadCount;
             this.CabCachePath = context.CabCachePath;
             this.Codepage = context.Codepage;
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
-            this.Extensions = context.Extensions;
+            this.FileSystemExtensions = context.FileSystemExtensions;
             this.Intermediate = context.IntermediateRepresentation;
             this.Messaging = context.Messaging;
             this.OutputPath = context.OutputPath;
             this.PdbFile = context.OutputPdbPath;
             this.IntermediateFolder = context.IntermediateFolder;
             this.Validator = validator;
-            this.WixVariableResolver = context.WixVariableResolver;
-
+            
             this.BackendExtensions = backendExtension;
         }
-
-        private IEnumerable<BindPath> BindPaths { get; }
 
         private int Codepage { get; }
 
@@ -59,11 +55,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; }
 
+        public IEnumerable<IFileSystemExtension> FileSystemExtensions { get; }
+
         public bool DeltaBinaryPatch { get; set; }
 
         private IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { get; }
-
-        private IEnumerable<IBinderExtension> Extensions { get; }
 
         private string PdbFile { get; }
 
@@ -83,7 +79,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Validator Validator { get; }
 
-        private IBindVariableResolver WixVariableResolver { get; }
 
         public IEnumerable<FileTransfer> FileTransfers { get; private set; }
 
@@ -99,8 +94,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // If there are any fields to resolve later, create the cache to populate during bind.
             var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
-
-            this.LocalizeUI(section);
 
             // Process the summary information table before the other tables.
             bool compressed;
@@ -534,85 +527,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             intermediate.Save(Path.ChangeExtension(this.OutputPath, "wir"));
         }
 
-        /// <summary>
-        /// Localize dialogs and controls.
-        /// </summary>
-        /// <param name="tables">The tables to localize.</param>
-        private void LocalizeUI(IntermediateSection section)
-        {
-            foreach (var row in section.Tuples.OfType<DialogTuple>())
-            {
-                string dialog = row.Dialog;
-
-                if (this.WixVariableResolver.TryGetLocalizedControl(dialog, null, out LocalizedControl localizedControl))
-                {
-                    if (CompilerConstants.IntegerNotSet != localizedControl.X)
-                    {
-                        row.HCentering = localizedControl.X;
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != localizedControl.Y)
-                    {
-                        row.VCentering = localizedControl.Y;
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != localizedControl.Width)
-                    {
-                        row.Width = localizedControl.Width;
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != localizedControl.Height)
-                    {
-                        row.Height = localizedControl.Height;
-                    }
-
-                    row.Attributes = row.Attributes | localizedControl.Attributes;
-
-                    if (!String.IsNullOrEmpty(localizedControl.Text))
-                    {
-                        row.Title = localizedControl.Text;
-                    }
-                }
-            }
-
-
-            foreach (var row in section.Tuples.OfType<ControlTuple>())
-            {
-                string dialog = row.Dialog_;
-                string control = row.Control;
-
-                if (this.WixVariableResolver.TryGetLocalizedControl(dialog, control, out LocalizedControl localizedControl))
-                {
-                    if (CompilerConstants.IntegerNotSet != localizedControl.X)
-                    {
-                        row.X = localizedControl.X;
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != localizedControl.Y)
-                    {
-                        row.Y = localizedControl.Y;
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != localizedControl.Width)
-                    {
-                        row.Width = localizedControl.Width;
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != localizedControl.Height)
-                    {
-                        row.Height = localizedControl.Height;
-                    }
-
-                    row.Attributes = row.Attributes | localizedControl.Attributes;
-
-                    if (!String.IsNullOrEmpty(localizedControl.Text))
-                    {
-                        row.Text = localizedControl.Text;
-                    }
-                }
-            }
-        }
-
 #if TODO_FINISH_PATCH
         /// <summary>
         /// Copy file data between transform substorages and the patch output object
@@ -984,7 +898,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private void GenerateDatabase(Output output, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
         {
             var command = new GenerateDatabaseCommand();
-            command.Extensions = this.Extensions;
+            command.Extensions = this.FileSystemExtensions;
             command.Output = output;
             command.OutputPath = databaseFile;
             command.KeepAddedColumns = keepAddedColumns;

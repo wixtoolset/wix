@@ -14,7 +14,6 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Extensibility;
     using WixToolset.Core.Native;
     using Dtf = WixToolset.Dtf.WindowsInstaller;
-    using WixToolset.Bind;
     using WixToolset.Data.Bind;
 
     /// <summary>

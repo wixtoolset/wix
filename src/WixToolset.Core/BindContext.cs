@@ -35,7 +35,7 @@ namespace WixToolset.Core
 
         public IExtensionManager ExtensionManager { get; set; }
 
-        public IEnumerable<IBinderExtension> Extensions { get; set; }
+        public IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
 
         public IEnumerable<string> Ices { get; set; }
 
@@ -46,8 +46,6 @@ namespace WixToolset.Core
         public string OutputPath { get; set; }
 
         public string OutputPdbPath { get; set; }
-
-        public bool SuppressAclReset { get; set; }
 
         public IEnumerable<string> SuppressIces { get; set; }
 

@@ -38,11 +38,14 @@ namespace WixToolset.Core
 
             var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
 
-            var fileResolver = new FileResolver(this.Context.BindPaths, this.Context.Extensions);
+            var embedFilePaths = this.ResolveFilePathsToEmbed(sections);
 
-            var embedFilePaths = ResolveFilePathsToEmbed(sections, fileResolver);
+            var localizationsByCulture = this.CollateLocalizations(this.Context.Localizations);
 
-            var localizationsByCulture = CollateLocalizations(this.Context.Localizations);
+            if (this.Context.Messaging.EncounteredError)
+            {
+                return null;
+            }
 
             foreach (var section in sections)
             {
@@ -83,7 +86,7 @@ namespace WixToolset.Core
             return (this.Context.Messaging.EncounteredError ? null : library);
         }
 
-        private static Dictionary<string, Localization> CollateLocalizations(IEnumerable<Localization> localizations)
+        private Dictionary<string, Localization> CollateLocalizations(IEnumerable<Localization> localizations)
         {
             var localizationsByCulture = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
 
@@ -91,7 +94,14 @@ namespace WixToolset.Core
             {
                 if (localizationsByCulture.TryGetValue(localization.Culture, out var existingCulture))
                 {
-                    existingCulture.Merge(localization);
+                    try
+                    {
+                        existingCulture.Merge(localization);
+                    }
+                    catch (WixException e)
+                    {
+                        this.Context.Messaging.Write(e.Error);
+                    }
                 }
                 else
                 {
@@ -102,13 +112,17 @@ namespace WixToolset.Core
             return localizationsByCulture;
         }
 
-        private List<string> ResolveFilePathsToEmbed(IEnumerable<IntermediateSection> sections, FileResolver fileResolver)
+        private List<string> ResolveFilePathsToEmbed(IEnumerable<IntermediateSection> sections)
         {
             var embedFilePaths = new List<string>();
 
             // Resolve paths to files that are to be embedded in the library.
             if (this.Context.BindFiles)
             {
+                var variableResolver = new WixVariableResolver(this.Context.Messaging);
+
+                var fileResolver = new FileResolver(this.Context.BindPaths, this.Context.Extensions);
+
                 foreach (var tuple in sections.SelectMany(s => s.Tuples))
                 {
                     foreach (var field in tuple.Fields.Where(f => f.Type == IntermediateFieldType.Path))
@@ -117,9 +131,9 @@ namespace WixToolset.Core
 
                         if (pathField != null)
                         {
-                            var resolvedPath = this.Context.WixVariableResolver.ResolveVariables(tuple.SourceLineNumbers, pathField.Path, false);
+                            var resolution = variableResolver.ResolveVariables(tuple.SourceLineNumbers, pathField.Path, false);
 
-                            var file = fileResolver.Resolve(tuple.SourceLineNumbers, tuple.Definition.Name, resolvedPath);
+                            var file = fileResolver.Resolve(tuple.SourceLineNumbers, tuple.Definition, resolution.Value);
 
                             if (!String.IsNullOrEmpty(file))
                             {

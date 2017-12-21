@@ -9,6 +9,7 @@ namespace WixToolset
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
 
+#if DEAD_CODE
     public class BinderFileManagerCore : IBinderFileManagerCore
     {
         private Dictionary<string, List<string>>[] bindPaths;
@@ -97,4 +98,5 @@ namespace WixToolset
             return Enumerable.Empty<string>();
         }
     }
+#endif
 }

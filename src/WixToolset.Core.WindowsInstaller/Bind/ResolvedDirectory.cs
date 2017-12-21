@@ -1,11 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bind
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     /// <summary>
     /// Structure used for resolved directory information.
     /// </summary>
-    public struct ResolvedDirectory
+    internal struct ResolvedDirectory
     {
         /// <summary>
         /// Constructor for ResolvedDirectory.

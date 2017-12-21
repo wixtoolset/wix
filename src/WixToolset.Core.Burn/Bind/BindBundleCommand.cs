@@ -74,7 +74,9 @@ namespace WixToolset.Core.Burn
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
 
-            this.BackendExtensions = context.ExtensionManager.Create<IBurnBackendExtension>();
+            var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
+
+            this.BackendExtensions = extensionManager.Create<IBurnBackendExtension>();
         }
 
         public CompressionLevel DefaultCompressionLevel { private get; set; }
@@ -84,8 +86,6 @@ namespace WixToolset.Core.Burn
         public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; }
 
         private IEnumerable<IBurnBackendExtension> BackendExtensions { get; }
-
-        public IEnumerable<IBinderExtension> Extensions { private get; set; }
 
         public Intermediate Output { private get; set; }
 

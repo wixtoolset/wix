@@ -8,9 +8,6 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    /// <summary>
-    /// The preprocessor core.
-    /// </summary>
     internal class PreprocessContext : IPreprocessContext
     {
         internal PreprocessContext(IServiceProvider serviceProvider)

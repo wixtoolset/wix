@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
+    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
@@ -90,6 +90,12 @@ namespace WixToolset.Core
 
                 library?.Save(this.OutputPath);
             }
+            else if (this.OutputType == OutputType.Wixout)
+            {
+                var output = this.LinkPhase(intermediates);
+
+                output?.Save(this.OutputPath);
+            }
             else
             {
                 var output = this.LinkPhase(intermediates);
@@ -147,22 +153,20 @@ namespace WixToolset.Core
         {
             var localizations = this.LoadLocalizationFiles().ToList();
 
-            // If there was an error adding localization files, then bail.
+            // If there was an error loading localization files, then bail.
             if (this.Messaging.EncounteredError)
             {
                 return null;
             }
 
-            var resolver = CreateWixResolverWithVariables(null, null);
-
             var context = new LibraryContext();
+            context.Messaging = this.Messaging;
             context.BindFiles = this.BindFiles;
             context.BindPaths = this.BindPaths;
             context.Extensions = this.ExtensionManager.Create<ILibrarianExtension>();
             context.Localizations = localizations;
             context.LibraryId = Guid.NewGuid().ToString("N");
             context.Intermediates = intermediates;
-            context.WixVariableResolver = resolver;
 
             var librarian = new Librarian();
             return librarian.Combine(context);
@@ -174,6 +178,11 @@ namespace WixToolset.Core
 
             var libraries = this.LoadLibraries(creator);
 
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
             var context = this.ServiceProvider.GetService<ILinkContext>();
             context.Messaging = this.Messaging;
             context.Extensions = this.ExtensionManager.Create<ILinkerExtension>();
@@ -183,48 +192,72 @@ namespace WixToolset.Core
             context.TupleDefinitionCreator = creator;
 
             var linker = new Linker();
-            var output = linker.Link(context);
-            return output;
+            return linker.Link(context);
         }
 
         private void BindPhase(Intermediate output)
         {
             var localizations = this.LoadLocalizationFiles().ToList();
 
-            var localizer = new Localizer(this.Messaging, localizations);
-
-            var resolver = CreateWixResolverWithVariables(localizer, output);
-
-            var intermediateFolder = this.IntermediateFolder;
-            if (String.IsNullOrEmpty(intermediateFolder))
+            // If there was an error loading localization files, then bail.
+            if (this.Messaging.EncounteredError)
             {
-                intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                return;
             }
 
-            var context = this.ServiceProvider.GetService<IBindContext>();
-            context.Messaging = this.Messaging;
-            context.ExtensionManager = this.ExtensionManager;
-            context.BindPaths = this.BindPaths ?? Array.Empty<BindPath>();
-            //context.CabbingThreadCount = this.CabbingThreadCount;
-            context.CabCachePath = this.CabCachePath;
-            context.Codepage = localizer.Codepage;
-            //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
-            //context.Ices = this.Ices;
-            context.IntermediateFolder = intermediateFolder;
-            context.IntermediateRepresentation = output;
-            context.OutputPath = this.OutputPath;
-            context.OutputPdbPath = Path.ChangeExtension(this.OutputPath, ".wixpdb");
-            //context.SuppressIces = this.SuppressIces;
-            context.SuppressValidation = true;
-            //context.SuppressValidation = this.SuppressValidation;
-            context.WixVariableResolver = resolver;
-            context.ContentsFile = this.ContentsFile;
-            context.OutputsFile = this.OutputsFile;
-            context.BuiltOutputsFile = this.BuiltOutputsFile;
-            context.WixprojectFile = this.WixProjectFile;
+            ResolveResult resolveResult;
+            {
+                var resolver = new Resolver(this.ServiceProvider, this.BindPaths, output, this.IntermediateFolder, localizations);
+                resolveResult = resolver.Execute();
+            }
 
-            var binder = new Binder();
-            binder.Bind(context);
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
+            BindResult bindResult;
+            {
+                var intermediateFolder = this.IntermediateFolder;
+                if (String.IsNullOrEmpty(intermediateFolder))
+                {
+                    intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                }
+
+                var context = this.ServiceProvider.GetService<IBindContext>();
+                context.Messaging = this.Messaging;
+                //context.CabbingThreadCount = this.CabbingThreadCount;
+                context.CabCachePath = this.CabCachePath;
+                context.Codepage = resolveResult.Codepage;
+                //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
+                context.DelayedFields = resolveResult.DelayedFields;
+                context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
+                //context.Ices = this.Ices;
+                context.IntermediateFolder = intermediateFolder;
+                context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
+                context.OutputPath = this.OutputPath;
+                context.OutputPdbPath = Path.ChangeExtension(this.OutputPath, ".wixpdb");
+                //context.SuppressIces = this.SuppressIces;
+                context.SuppressValidation = true; // TODO: set this correctly
+                context.ContentsFile = this.ContentsFile;
+                context.OutputsFile = this.OutputsFile;
+                context.BuiltOutputsFile = this.BuiltOutputsFile;
+                context.WixprojectFile = this.WixProjectFile;
+
+                var binder = new Binder();
+                bindResult = binder.Bind(context);
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
+            {
+                // TODO: correctly set SuppressAclReset bool at the end.
+                var layout = new Layout(this.ServiceProvider, bindResult.FileTransfers, bindResult.ContentFilePaths, this.ContentsFile, this.OutputsFile, this.BuiltOutputsFile, false);
+                layout.Execute();
+            }
         }
 
         private IEnumerable<Intermediate> LoadLibraries(ITupleDefinitionCreator creator)
@@ -263,23 +296,6 @@ namespace WixToolset.Core
 
                 yield return localization;
             }
-        }
-
-        private WixVariableResolver CreateWixResolverWithVariables(Localizer localizer, Intermediate output)
-        {
-            var resolver = new WixVariableResolver(this.Messaging, localizer);
-
-            // Gather all the wix variables.
-            var wixVariables = output?.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
-            if (wixVariables != null)
-            {
-                foreach (var wixVariableRow in wixVariables)
-                {
-                    resolver.AddVariable(wixVariableRow);
-                }
-            }
-
-            return resolver;
         }
     }
 }

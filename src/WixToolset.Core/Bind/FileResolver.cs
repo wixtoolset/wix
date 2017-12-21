@@ -6,7 +6,6 @@ namespace WixToolset.Core.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
@@ -22,9 +21,9 @@ namespace WixToolset.Core.Bind
             this.RebaseUpdated = this.BindPaths[BindStage.Updated].Any();
         }
 
-        public FileResolver(IEnumerable<BindPath> bindPaths, IEnumerable<IBinderExtension> extensions) : this(bindPaths)
+        public FileResolver(IEnumerable<BindPath> bindPaths, IEnumerable<IResolverExtension> extensions) : this(bindPaths)
         {
-            this.BinderExtensions = extensions ?? Array.Empty<IBinderExtension>();
+            this.ResolverExtensions = extensions ?? Array.Empty<IResolverExtension>();
         }
 
         public FileResolver(IEnumerable<BindPath> bindPaths, IEnumerable<ILibrarianExtension> extensions) : this(bindPaths)
@@ -38,79 +37,15 @@ namespace WixToolset.Core.Bind
 
         public bool RebaseUpdated { get; }
 
-        private IEnumerable<IBinderExtension> BinderExtensions { get; }
+        private IEnumerable<IResolverExtension> ResolverExtensions { get; }
 
         private IEnumerable<ILibrarianExtension> LibrarianExtensions { get; }
 
-        /// <summary>
-        /// Copies a file.
-        /// </summary>
-        /// <param name="source">The file to copy.</param>
-        /// <param name="destination">The destination file.</param>
-        /// <param name="overwrite">true if the destination file can be overwritten; otherwise, false.</param>
-        public bool CopyFile(string source, string destination, bool overwrite)
-        {
-            foreach (var extension in this.BinderExtensions)
-            {
-                if (extension.CopyFile(source, destination, overwrite))
-                {
-                    return true;
-                }
-            }
-
-            if (overwrite && File.Exists(destination))
-            {
-                File.Delete(destination);
-            }
-
-            if (!CreateHardLink(destination, source, IntPtr.Zero))
-            {
-#if DEBUG
-                int er = Marshal.GetLastWin32Error();
-#endif
-
-                File.Copy(source, destination, overwrite);
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Moves a file.
-        /// </summary>
-        /// <param name="source">The file to move.</param>
-        /// <param name="destination">The destination file.</param>
-        public bool MoveFile(string source, string destination, bool overwrite)
-        {
-            foreach (var extension in this.BinderExtensions)
-            {
-                if (extension.MoveFile(source, destination, overwrite))
-                {
-                    return true;
-                }
-            }
-
-            if (overwrite && File.Exists(destination))
-            {
-                File.Delete(destination);
-            }
-
-            var directory = Path.GetDirectoryName(destination);
-            if (!String.IsNullOrEmpty(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            File.Move(source, destination);
-
-            return true;
-        }
-
-        public string Resolve(SourceLineNumber sourceLineNumbers, string table, string path)
+        public string Resolve(SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, string source)
         {
             foreach (var extension in this.LibrarianExtensions)
             {
-                var resolved = extension.Resolve(sourceLineNumbers, table, path);
+                var resolved = extension.Resolve(sourceLineNumbers, tupleDefinition, source);
 
                 if (null != resolved)
                 {
@@ -118,7 +53,7 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            return this.ResolveUsingBindPaths(path, table, sourceLineNumbers, BindStage.Normal);
+            return this.ResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, BindStage.Normal);
         }
 
         /// <summary>
@@ -129,11 +64,11 @@ namespace WixToolset.Core.Bind
         /// <param name="sourceLineNumbers">Optional source line of source file being resolved.</param>
         /// <param name="bindStage">The binding stage used to determine what collection of bind paths will be used</param>
         /// <returns>Should return a valid path for the stream to be imported.</returns>
-        public string ResolveFile(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage)
+        public string ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
         {
-            foreach (var extension in this.BinderExtensions)
+            foreach (var extension in this.ResolverExtensions)
             {
-                var resolved = extension.ResolveFile(source, type, sourceLineNumbers, bindStage);
+                var resolved = extension.ResolveFile(source, tupleDefinition, sourceLineNumbers, bindStage);
 
                 if (null != resolved)
                 {
@@ -141,10 +76,10 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            return this.ResolveUsingBindPaths(source, type, sourceLineNumbers, bindStage);
+            return this.ResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, bindStage);
         }
 
-        private string ResolveUsingBindPaths(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage)
+        private string ResolveUsingBindPaths(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
         {
             string resolved = null;
 
@@ -206,7 +141,7 @@ namespace WixToolset.Core.Bind
 
             if (null == resolved)
             {
-                throw new WixFileNotFoundException(sourceLineNumbers, source, type);
+                throw new WixFileNotFoundException(sourceLineNumbers, source, tupleDefinition.Name);
             }
 
             // Didn't find the file.
@@ -224,8 +159,5 @@ namespace WixToolset.Core.Bind
                 throw new WixException(ErrorMessages.IllegalCharactersInPath(path));
             }
         }
-
-        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
     }
 }

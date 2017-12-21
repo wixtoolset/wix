@@ -20,7 +20,8 @@ namespace WixToolsetTest.CoreIntegration
 
             using (var fs = new DisposableFileSystem())
             {
-                var intermediateFolder = fs.GetFolder();
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
 
                 var program = new Program();
                 var result = program.Run(new WixToolsetServiceProvider(), null, new[]
@@ -31,16 +32,16 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
                 });
 
                 Assert.Equal(0, result);
 
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wir"));
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
@@ -242,6 +243,38 @@ namespace WixToolsetTest.CoreIntegration
                 var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+            }
+        }
+
+        [Fact]
+        public void CanBuildWixout()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.wixout")
+                });
+
+                Assert.Equal(0, result);
+
+                var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
+
+                Assert.Equal(new[]{
+                    "test.wixout"
+                }, builtFiles.Select(Path.GetFileName).ToArray());
             }
         }
 

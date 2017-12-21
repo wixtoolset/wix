@@ -22,7 +22,7 @@ namespace WixToolset.Core.Bind
 
         public IEnumerable<BindPath> BindPaths { private get; set; }
 
-        public IEnumerable<IBinderExtension> Extensions { private get; set; }
+        public IEnumerable<IResolverExtension> Extensions { private get; set; }
 
         public ExtractEmbeddedFiles FilesWithEmbeddedFiles { private get; set; }
 
@@ -52,7 +52,6 @@ namespace WixToolset.Core.Bind
                         }
 
                         var isDefault = true;
-                        var delayedResolve = false;
 
                         // Check to make sure we're in a scenario where we can handle variable resolution.
                         if (null != delayedFields)
@@ -63,16 +62,18 @@ namespace WixToolset.Core.Bind
                                 var original = field.AsString();
                                 if (!String.IsNullOrEmpty(original))
                                 {
-                                    var value = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, original, false, out isDefault, out delayedResolve);
-                                    if (original != value)
+                                    var resolution = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, original, false);
+                                    if (resolution.UpdatedValue)
                                     {
-                                        field.Set(value);
+                                        field.Set(resolution.Value);
                                     }
 
-                                    if (delayedResolve)
+                                    if (resolution.DelayedResolve)
                                     {
                                         delayedFields.Add(new DelayedField(row, field));
                                     }
+
+                                    isDefault = resolution.IsDefault;
                                 }
                             }
                         }
@@ -119,13 +120,13 @@ namespace WixToolset.Core.Bind
 #endif
 
                                         // resolve the path to the file
-                                        var value = fileResolver.ResolveFile(objectField.Path, row.Definition.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        var value = fileResolver.ResolveFile(objectField.Path, row.Definition, row.SourceLineNumbers, BindStage.Normal);
                                         field.Set(value);
                                     }
                                     else if (!fileResolver.RebaseTarget && !fileResolver.RebaseUpdated) // Normal binding for Patch Scenario (normal patch, no re-basing logic)
                                     {
                                         // resolve the path to the file
-                                        var value = fileResolver.ResolveFile(objectField.Path, row.Definition.Name, row.SourceLineNumbers, BindStage.Normal);
+                                        var value = fileResolver.ResolveFile(objectField.Path, row.Definition, row.SourceLineNumbers, BindStage.Normal);
                                         field.Set(value);
                                     }
 #if REVISIT_FOR_PATCHING

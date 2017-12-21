@@ -42,6 +42,16 @@ namespace WixToolset.Core
                 return new BindContext(this);
             }
 
+            if (serviceType == typeof(ILayoutContext))
+            {
+                return new LayoutContext(this);
+            }
+
+            if (serviceType == typeof(IResolveContext))
+            {
+                return new ResolveContext(this);
+            }
+
             if (serviceType == typeof(IInscribeContext))
             {
                 return new InscribeContext(this);

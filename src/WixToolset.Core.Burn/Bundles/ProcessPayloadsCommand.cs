@@ -9,7 +9,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
-    using WixToolset.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Rows;

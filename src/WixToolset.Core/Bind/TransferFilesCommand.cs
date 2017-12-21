@@ -13,15 +13,15 @@ namespace WixToolset.Core.Bind
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IMessaging messaging, IEnumerable<BindPath> bindPaths, IEnumerable<IBinderExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
+        public TransferFilesCommand(IMessaging messaging, IEnumerable<IFileSystemExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
         {
-            this.FileResolver = new FileResolver(bindPaths, extensions);
+            this.FileSystem = new FileSystem(extensions);
             this.Messaging = messaging;
             this.FileTransfers = fileTransfers;
             this.SuppressAclReset = suppressAclReset;
         }
 
-        private FileResolver FileResolver { get; }
+        private FileSystem FileSystem { get; }
 
         private IMessaging Messaging { get; }
 
@@ -35,10 +35,8 @@ namespace WixToolset.Core.Bind
 
             foreach (var fileTransfer in this.FileTransfers)
             {
-                string fileSource = this.FileResolver.ResolveFile(fileTransfer.Source, fileTransfer.Type, fileTransfer.SourceLineNumbers, BindStage.Normal);
-
                 // If the source and destination are identical, then there's nothing to do here
-                if (0 == String.Compare(fileSource, fileTransfer.Destination, StringComparison.OrdinalIgnoreCase))
+                if (0 == String.Compare(fileTransfer.Source, fileTransfer.Destination, StringComparison.OrdinalIgnoreCase))
                 {
                     fileTransfer.Redundant = true;
                     continue;
@@ -51,13 +49,13 @@ namespace WixToolset.Core.Bind
                     {
                         if (fileTransfer.Move)
                         {
-                            this.Messaging.Write(VerboseMessages.MoveFile(fileSource, fileTransfer.Destination));
-                            this.TransferFile(true, fileSource, fileTransfer.Destination);
+                            this.Messaging.Write(VerboseMessages.MoveFile(fileTransfer.Source, fileTransfer.Destination));
+                            this.TransferFile(true, fileTransfer.Source, fileTransfer.Destination);
                         }
                         else
                         {
-                            this.Messaging.Write(VerboseMessages.CopyFile(fileSource, fileTransfer.Destination));
-                            this.TransferFile(false, fileSource, fileTransfer.Destination);
+                            this.Messaging.Write(VerboseMessages.CopyFile(fileTransfer.Source, fileTransfer.Destination));
+                            this.TransferFile(false, fileTransfer.Source, fileTransfer.Destination);
                         }
 
                         retry = false;
@@ -183,11 +181,11 @@ namespace WixToolset.Core.Bind
 
             if (move)
             {
-                complete = this.FileResolver.MoveFile(source, destination, true);
+                complete = this.FileSystem.MoveFile(source, destination, true);
             }
             else
             {
-                complete = this.FileResolver.CopyFile(source, destination, true);
+                complete = this.FileSystem.CopyFile(source, destination, true);
             }
 
             if (!complete)

@@ -12,7 +12,7 @@ namespace WixToolset
     using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
 
-#if false
+#if DEAD_CODE
     /// <summary>
     /// Base class for creating a binder file manager.
     /// </summary>

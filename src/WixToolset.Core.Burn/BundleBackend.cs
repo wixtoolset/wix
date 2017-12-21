@@ -9,7 +9,6 @@ namespace WixToolset.Core.Burn
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
 
     internal class BundleBackend : IBackend
     {
@@ -25,7 +24,7 @@ namespace WixToolset.Core.Burn
             //command.WixVariableResolver = context.WixVariableResolver;
             command.Execute();
 
-            return new BindResult(command.FileTransfers, command.ContentFilePaths);
+            return new BindResult { FileTransfers = command.FileTransfers, ContentFilePaths = command.ContentFilePaths };
         }
 
         public bool Inscribe(IInscribeContext context)

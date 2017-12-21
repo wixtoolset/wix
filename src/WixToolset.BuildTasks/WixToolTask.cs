@@ -193,8 +193,7 @@ namespace WixToolset.BuildTasks
             string responseFile = null;
             try
             {
-                string responseFileSwitch;
-                responseFile = this.GetTemporaryResponseFile(responseFileCommands, out responseFileSwitch);
+                responseFile = this.GetTemporaryResponseFile(responseFileCommands, out var responseFileSwitch);
                 if (!String.IsNullOrEmpty(responseFileSwitch))
                 {
                     commandLineCommands = commandLineCommands + " " + responseFileSwitch;

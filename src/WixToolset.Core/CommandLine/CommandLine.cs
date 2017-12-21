@@ -260,6 +260,10 @@ namespace WixToolset.Core
                 case "transform":
                 case ".mst":
                     return OutputType.Transform;
+
+                case "wixout":
+                case ".wixout":
+                    return OutputType.Wixout;
             }
 
             return OutputType.Unknown;

@@ -15,7 +15,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class BindTransformCommand
     {
-        public IEnumerable<IBinderExtension> Extensions { private get; set; }
+        public IEnumerable<IFileSystemExtension> Extensions { private get; set; }
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
