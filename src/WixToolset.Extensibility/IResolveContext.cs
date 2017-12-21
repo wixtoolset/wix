@@ -7,22 +7,20 @@ namespace WixToolset.Extensibility
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
-    public interface ILibraryContext
+    public interface IResolveContext
     {
         IServiceProvider ServiceProvider { get; }
 
         IMessaging Messaging { get; set; }
 
-        bool BindFiles { get; set; }
-
         IEnumerable<BindPath> BindPaths { get; set; }
 
-        IEnumerable<ILibrarianExtension> Extensions { get; set; }
+        IEnumerable<IResolverExtension> Extensions { get; set; }
 
-        string LibraryId { get; set; }
+        string IntermediateFolder { get; set; }
 
-        IEnumerable<Localization> Localizations { get; set; }
+        Intermediate IntermediateRepresentation { get; set; }
 
-        IEnumerable<Intermediate> Intermediates { get; set; }
+        IBindVariableResolver WixVariableResolver { get; set; }
     }
 }

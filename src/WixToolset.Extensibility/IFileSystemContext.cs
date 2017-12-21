@@ -3,26 +3,23 @@
 namespace WixToolset.Extensibility
 {
     using System;
-    using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
-    public interface ILibraryContext
+    public interface IFileSystemContext
     {
         IServiceProvider ServiceProvider { get; }
 
         IMessaging Messaging { get; set; }
 
-        bool BindFiles { get; set; }
+        string CabCachePath { get; set; }
 
-        IEnumerable<BindPath> BindPaths { get; set; }
+        string IntermediateFolder { get; set; }
 
-        IEnumerable<ILibrarianExtension> Extensions { get; set; }
+        Intermediate IntermediateRepresentation { get; set; }
 
-        string LibraryId { get; set; }
+        string OutputPath { get; set; }
 
-        IEnumerable<Localization> Localizations { get; set; }
-
-        IEnumerable<Intermediate> Intermediates { get; set; }
+        string OutputPdbPath { get; set; }
     }
 }

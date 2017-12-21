@@ -1,18 +1,17 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensibility.Services
+namespace WixToolset.Extensibility
 {
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface IBindContext
     {
         IServiceProvider ServiceProvider { get; }
 
         IMessaging Messaging { get; set; }
-
-        IEnumerable<BindPath> BindPaths { get; set; }
 
         int CabbingThreadCount { get; set; }
 
@@ -26,9 +25,7 @@ namespace WixToolset.Extensibility.Services
 
         IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
-        IExtensionManager ExtensionManager { get; set; }
-
-        IEnumerable<IBinderExtension> Extensions { get; set; }
+        IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
 
         IEnumerable<string> Ices { get; set; }
 
@@ -40,13 +37,9 @@ namespace WixToolset.Extensibility.Services
 
         string OutputPdbPath { get; set; }
 
-        bool SuppressAclReset { get; set; }
-
         IEnumerable<string> SuppressIces { get; set; }
 
         bool SuppressValidation { get; set; }
-
-        IBindVariableResolver WixVariableResolver { get; set; }
 
         string ContentsFile { get; set; }
 
