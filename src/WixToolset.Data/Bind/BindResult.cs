@@ -6,14 +6,8 @@ namespace WixToolset.Data.Bind
 
     public class BindResult
     {
-        public BindResult(IEnumerable<FileTransfer> fileTransfers, IEnumerable<string> contentFilePaths)
-        {
-            this.FileTransfers = fileTransfers;
-            this.ContentFilePaths = contentFilePaths;
-        }
+        public IEnumerable<FileTransfer> FileTransfers { get; set; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; }
-
-        public IEnumerable<string> ContentFilePaths { get; }
+        public IEnumerable<string> ContentFilePaths { get; set; }
     }
 }

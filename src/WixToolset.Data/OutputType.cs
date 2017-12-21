@@ -29,6 +29,9 @@ namespace WixToolset.Data
         Product,
 
         /// <summary>Transform output type.</summary>
-        Transform
+        Transform,
+        
+        /// <summary>Intermediate output type.</summary>
+        Wixout,
     }
 }

@@ -2,11 +2,6 @@
 
 namespace WixToolset.Data.Bind
 {
-    /// <summary>
-    /// Bind stage of a file.. The reason we need this is to change the ResolveFile behavior based on if
-    /// dynamic bindpath plugin is desirable. We cannot change the signature of ResolveFile since it might
-    /// break existing implementers which derived from BinderFileManager
-    /// </summary>
     public enum BindStage
     {
         /// <summary>
