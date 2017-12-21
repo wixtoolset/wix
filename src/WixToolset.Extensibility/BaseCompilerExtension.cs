@@ -13,6 +13,11 @@ namespace WixToolset.Extensibility
     public abstract class BaseCompilerExtension : ICompilerExtension
     {
         /// <summary>
+        /// Context for use by the extension.
+        /// </summary>
+        protected ICompileContext Context { get; private set; }
+
+        /// <summary>
         /// Messaging for use by the extension.
         /// </summary>
         protected IMessaging Messaging { get; private set; }
@@ -33,6 +38,8 @@ namespace WixToolset.Extensibility
         /// </summary>
         public virtual void PreCompile(ICompileContext context)
         {
+            this.Context = context;
+
             this.Messaging = context.Messaging;
 
             this.ParseHelper = context.ServiceProvider.GetService<IParseHelper>();
