@@ -9,9 +9,9 @@ namespace WixToolset.Extensibility
     {
         public int Codepage { get; set; }
 
-        public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
-
         public IEnumerable<IDelayedField> DelayedFields { get; set; }
+
+        public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }
     }

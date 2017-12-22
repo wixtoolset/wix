@@ -19,11 +19,13 @@ namespace WixToolset.Extensibility
 
         int Codepage { get; set; }
 
-        CompressionLevel DefaultCompressionLevel { get; set; }
+        CompressionLevel? DefaultCompressionLevel { get; set; }
 
         IEnumerable<IDelayedField> DelayedFields { get; set; }
 
         IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
+
+        IEnumerable<IBinderExtension> Extensions { get; set; }
 
         IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
 
@@ -40,13 +42,5 @@ namespace WixToolset.Extensibility
         IEnumerable<string> SuppressIces { get; set; }
 
         bool SuppressValidation { get; set; }
-
-        string ContentsFile { get; set; }
-
-        string OutputsFile { get; set; }
-
-        string BuiltOutputsFile { get; set; }
-
-        string WixprojectFile { get; set; }
     }
 }

@@ -2,19 +2,21 @@
 
 namespace WixToolset.Extensibility
 {
+    using WixToolset.Data.Bind;
+
     /// <summary>
-    /// Interface all layout extensions implement.
+    /// Interface all binder extensions implement.
     /// </summary>
-    public interface ILayoutExtension
+    public interface IBinderExtension
     {
         /// <summary>
-        /// Called before layout occurs.
+        /// Called before binding occurs.
         /// </summary>
-        void PreLayout(ILayoutContext context);
+        void PreBind(IBindContext context);
 
         /// <summary>
-        /// Called after all layout occurs.
+        /// Called after all binding occurs.
         /// </summary>
-        void PostLayout();
+        void PostBind(BindResult result);
     }
 }
