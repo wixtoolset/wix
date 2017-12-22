@@ -54,7 +54,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Sets the default compression level to use for cabinets
         /// that don't have their compression level explicitly set.
         /// </summary>
-        public CompressionLevel DefaultCompressionLevel { private get; set; }
+        public CompressionLevel? DefaultCompressionLevel { private get; set; }
 
         public IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { private get; set; }
 
@@ -99,7 +99,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 var mediaTuple = entry.Key;
                 IEnumerable<FileFacade> files = entry.Value;
-                CompressionLevel compressionLevel = this.DefaultCompressionLevel;
+                CompressionLevel compressionLevel = this.DefaultCompressionLevel ?? CompressionLevel.Medium;
 
                 string mediaLayoutFolder = null;
 

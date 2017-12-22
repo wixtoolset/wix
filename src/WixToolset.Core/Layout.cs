@@ -9,7 +9,6 @@ namespace WixToolset.Core
     using WixToolset.Core.Bind;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
-    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
@@ -18,36 +17,31 @@ namespace WixToolset.Core
     /// </summary>
     public sealed class Layout
     {
-        public Layout(IServiceProvider serviceProvider, IEnumerable<FileTransfer> fileTransfers, IEnumerable<string> contentFilePaths, string contentsFile, string outputsFile, string builtOutputsFile, bool suppressAclReset)
+        public Layout(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
-            this.FileTransfers = fileTransfers;
-            this.ContentFilePaths = contentFilePaths;
-            this.ContentsFile = contentsFile;
-            this.OutputsFile = outputsFile;
-            this.BuiltOutputsFile = builtOutputsFile;
-            this.SuppressAclReset = suppressAclReset;
-            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
 
-        private IEnumerable<FileTransfer> FileTransfers { get; }
+        public IEnumerable<FileTransfer> FileTransfers { get; set; }
 
-        private IEnumerable<string> ContentFilePaths { get; }
+        public IEnumerable<string> ContentFilePaths { get; set; }
 
-        private string ContentsFile { get; }
+        public string ContentsFile { get; set; }
 
-        private string OutputsFile { get; }
+        public string OutputsFile { get; set; }
 
-        private string BuiltOutputsFile { get; }
+        public string BuiltOutputsFile { get; set; }
 
-        private bool SuppressAclReset { get; }
+        public bool SuppressAclReset { get; set; }
 
-        private IMessaging Messaging { get; }
+        private IMessaging Messaging { get; set; }
 
         public void Execute()
         {
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
+
             var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
             var context = this.ServiceProvider.GetService<ILayoutContext>();

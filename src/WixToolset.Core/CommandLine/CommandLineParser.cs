@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core
+namespace WixToolset.Core.CommandLine
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace WixToolset.Core
         Bind,
     }
 
-    internal class CommandLine : ICommandLine, IParseCommandLine
+    internal class CommandLineParser : ICommandLine, IParseCommandLine
     {
         private IServiceProvider ServiceProvider { get; set; }
 
@@ -54,7 +54,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(context.Arguments))
             {
-                args = CommandLine.ParseArgumentsToArray(context.Arguments).Union(args).ToArray();
+                args = CommandLineParser.ParseArgumentsToArray(context.Arguments).Union(args).ToArray();
             }
 
             return this.ParseStandardCommandLine(context, args);
@@ -88,13 +88,12 @@ namespace WixToolset.Core
             var contentsFile = String.Empty;
             var outputsFile = String.Empty;
             var builtOutputsFile = String.Empty;
-            var wixProjectFile = String.Empty;
 
             this.Parse(context, args, (cmdline, arg) => Enum.TryParse(arg, true, out command), (cmdline, arg) =>
             {
                 if (cmdline.IsSwitch(arg))
                 {
-                    var parameter = arg.TrimStart(new[] { '-', '/' });
+                    var parameter = arg.Substring(1);
                     switch (parameter.ToLowerInvariant())
                     {
                         case "?":
@@ -126,9 +125,6 @@ namespace WixToolset.Core
                             return true;
                         case "builtoutputsfile":
                             cmdline.GetNextArgumentOrError(ref builtOutputsFile);
-                            return true;
-                        case "wixprojectfile":
-                            cmdline.GetNextArgumentOrError(ref wixProjectFile);
                             return true;
 
                         case "d":
@@ -181,7 +177,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    files.AddRange(cmdline.GetFiles(arg, "source code"));
+                    files.AddRange(CommandLineHelper.GetFiles(arg, "source code"));
                     return true;
                 }
             });
@@ -211,7 +207,7 @@ namespace WixToolset.Core
                         var variables = this.GatherPreprocessorVariables(defines);
                         var bindPathList = this.GatherBindPaths(bindPaths);
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(this.ServiceProvider, this.Messaging, this.ExtensionManager, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile, wixProjectFile);
+                        return new BuildCommand(this.ServiceProvider, this.Messaging, this.ExtensionManager, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
                     }
 
                 case Commands.Compile:
@@ -283,7 +279,7 @@ namespace WixToolset.Core
         }
 #endif
 
-        private ICommandLine Parse(ICommandLineContext context, string[] commandLineArguments, Func<CommandLine, string, bool> parseCommand, Func<CommandLine, string, bool> parseArgument)
+        private ICommandLine Parse(ICommandLineContext context, string[] commandLineArguments, Func<CommandLineParser, string, bool> parseCommand, Func<CommandLineParser, string, bool> parseArgument)
         {
             this.FlattenArgumentsWithResponseFilesIntoOriginalArguments(commandLineArguments);
 
@@ -335,7 +331,7 @@ namespace WixToolset.Core
 
             foreach (var bindPath in bindPaths)
             {
-                BindPath bp = BindPath.Parse(bindPath);
+                var bp = BindPath.Parse(bindPath);
 
                 if (Directory.Exists(bp.Path))
                 {
@@ -348,65 +344,6 @@ namespace WixToolset.Core
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Get a set of files that possibly have a search pattern in the path (such as '*').
-        /// </summary>
-        /// <param name="searchPath">Search path to find files in.</param>
-        /// <param name="fileType">Type of file; typically "Source".</param>
-        /// <returns>An array of files matching the search path.</returns>
-        /// <remarks>
-        /// This method is written in this verbose way because it needs to support ".." in the path.
-        /// It needs the directory path isolated from the file name in order to use Directory.GetFiles
-        /// or DirectoryInfo.GetFiles.  The only way to get this directory path is manually since
-        /// Path.GetDirectoryName does not support ".." in the path.
-        /// </remarks>
-        /// <exception cref="WixFileNotFoundException">Throws WixFileNotFoundException if no file matching the pattern can be found.</exception>
-        public string[] GetFiles(string searchPath, string fileType)
-        {
-            if (null == searchPath)
-            {
-                throw new ArgumentNullException(nameof(searchPath));
-            }
-
-            // Convert alternate directory separators to the standard one.
-            string filePath = searchPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            int lastSeparator = filePath.LastIndexOf(Path.DirectorySeparatorChar);
-            string[] files = null;
-
-            try
-            {
-                if (0 > lastSeparator)
-                {
-                    files = Directory.GetFiles(".", filePath);
-                }
-                else // found directory separator
-                {
-                    files = Directory.GetFiles(filePath.Substring(0, lastSeparator + 1), filePath.Substring(lastSeparator + 1));
-                }
-            }
-            catch (DirectoryNotFoundException)
-            {
-                // Don't let this function throw the DirectoryNotFoundException. This exception
-                // occurs for non-existant directories and invalid characters in the searchPattern.
-            }
-            catch (ArgumentException)
-            {
-                // Don't let this function throw the ArgumentException. This exception
-                // occurs in certain situations such as when passing a malformed UNC path.
-            }
-            catch (IOException)
-            {
-                throw new WixFileNotFoundException(searchPath, fileType);
-            }
-
-            if (null == files || 0 == files.Length)
-            {
-                throw new WixFileNotFoundException(searchPath, fileType);
-            }
-
-            return files;
         }
 
         /// <summary>
@@ -449,7 +386,7 @@ namespace WixToolset.Core
         {
             if (this.TryGetNextArgumentOrError(out var arg))
             {
-                foreach (var path in this.GetFiles(arg, fileType))
+                foreach (var path in CommandLineHelper.GetFiles(arg, fileType))
                 {
                     args.Add(path);
                 }
@@ -458,13 +395,12 @@ namespace WixToolset.Core
 
         public bool TryGetNextArgumentOrError(out string arg)
         {
-            //if (this.RemainingArguments.TryDequeue(out arg) && !this.IsSwitch(arg))
             if (TryDequeue(this.RemainingArguments, out arg) && !this.IsSwitch(arg))
             {
                 return true;
             }
 
-            this.ErrorArgument = arg ?? CommandLine.ExpectedArgument;
+            this.ErrorArgument = arg ?? CommandLineParser.ExpectedArgument;
 
             return false;
         }
@@ -489,7 +425,7 @@ namespace WixToolset.Core
             {
                 if ('@' == arg[0])
                 {
-                    var responseFileArguments = CommandLine.ParseResponseFile(arg.Substring(1));
+                    var responseFileArguments = CommandLineParser.ParseResponseFile(arg.Substring(1));
                     args.AddRange(responseFileArguments);
                 }
                 else
@@ -526,7 +462,7 @@ namespace WixToolset.Core
             }
         }
 
-        private void ProcessRemainingArguments(ICommandLineContext context, Func<CommandLine, string, bool> parseArgument, Func<CommandLine, string, bool> parseCommand)
+        private void ProcessRemainingArguments(ICommandLineContext context, Func<CommandLineParser, string, bool> parseArgument, Func<CommandLineParser, string, bool> parseCommand)
         {
             var extensions = this.ExtensionManager.Create<IExtensionCommandLine>();
 
@@ -593,7 +529,7 @@ namespace WixToolset.Core
                 arguments = reader.ReadToEnd();
             }
 
-            return CommandLine.ParseArgumentsToArray(arguments);
+            return CommandLineParser.ParseArgumentsToArray(arguments);
         }
 
         private static List<string> ParseArgumentsToArray(string arguments)
@@ -631,7 +567,7 @@ namespace WixToolset.Core
                     // Add the argument to the list if it's not empty.
                     if (arg.Length > 0)
                     {
-                        argsList.Add(CommandLine.ExpandEnvironmentVariables(arg.ToString()));
+                        argsList.Add(CommandLineParser.ExpandEnvironmentVariables(arg.ToString()));
                         arg.Length = 0;
                     }
                 }

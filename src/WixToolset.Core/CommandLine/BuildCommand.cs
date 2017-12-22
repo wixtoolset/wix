@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Core
+namespace WixToolset.Core.CommandLine
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace WixToolset.Core
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(IServiceProvider serviceProvider, IMessaging messaging, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile, string wixProjectFile)
+        public BuildCommand(IServiceProvider serviceProvider, IMessaging messaging, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = messaging;
@@ -34,7 +34,6 @@ namespace WixToolset.Core
             this.ContentsFile = contentsFile;
             this.OutputsFile = outputsFile;
             this.BuiltOutputsFile = builtOutputsFile;
-            this.WixProjectFile = wixProjectFile;
         }
 
         public IServiceProvider ServiceProvider { get; }
@@ -72,8 +71,6 @@ namespace WixToolset.Core
         public string OutputsFile { get; }
 
         public string BuiltOutputsFile { get; }
-
-        public string WixProjectFile { get; }
 
         public int Execute()
         {
@@ -207,7 +204,12 @@ namespace WixToolset.Core
 
             ResolveResult resolveResult;
             {
-                var resolver = new Resolver(this.ServiceProvider, this.BindPaths, output, this.IntermediateFolder, localizations);
+                var resolver = new Resolver(this.ServiceProvider);
+                resolver.BindPaths = this.BindPaths;
+                resolver.IntermediateFolder = this.IntermediateFolder;
+                resolver.IntermediateRepresentation = output;
+                resolver.Localizations = localizations;
+
                 resolveResult = resolver.Execute();
             }
 
@@ -224,28 +226,22 @@ namespace WixToolset.Core
                     intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 }
 
-                var context = this.ServiceProvider.GetService<IBindContext>();
-                context.Messaging = this.Messaging;
-                //context.CabbingThreadCount = this.CabbingThreadCount;
-                context.CabCachePath = this.CabCachePath;
-                context.Codepage = resolveResult.Codepage;
-                //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
-                context.DelayedFields = resolveResult.DelayedFields;
-                context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
-                //context.Ices = this.Ices;
-                context.IntermediateFolder = intermediateFolder;
-                context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
-                context.OutputPath = this.OutputPath;
-                context.OutputPdbPath = Path.ChangeExtension(this.OutputPath, ".wixpdb");
-                //context.SuppressIces = this.SuppressIces;
-                context.SuppressValidation = true; // TODO: set this correctly
-                context.ContentsFile = this.ContentsFile;
-                context.OutputsFile = this.OutputsFile;
-                context.BuiltOutputsFile = this.BuiltOutputsFile;
-                context.WixprojectFile = this.WixProjectFile;
+                var binder = new Binder(this.ServiceProvider);
+                //binder.CabbingThreadCount = this.CabbingThreadCount;
+                binder.CabCachePath = this.CabCachePath;
+                binder.Codepage = resolveResult.Codepage;
+                //binder.DefaultCompressionLevel = this.DefaultCompressionLevel;
+                binder.DelayedFields = resolveResult.DelayedFields;
+                binder.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
+                binder.Ices = Array.Empty<string>(); // TODO: set this correctly
+                binder.IntermediateFolder = intermediateFolder;
+                binder.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
+                binder.OutputPath = this.OutputPath;
+                binder.OutputPdbPath = Path.ChangeExtension(this.OutputPath, ".wixpdb");
+                binder.SuppressIces = Array.Empty<string>(); // TODO: set this correctly
+                binder.SuppressValidation = true; // TODO: set this correctly
 
-                var binder = new Binder();
-                bindResult = binder.Bind(context);
+                bindResult = binder.Execute();
             }
 
             if (this.Messaging.EncounteredError)
@@ -254,8 +250,14 @@ namespace WixToolset.Core
             }
 
             {
-                // TODO: correctly set SuppressAclReset bool at the end.
-                var layout = new Layout(this.ServiceProvider, bindResult.FileTransfers, bindResult.ContentFilePaths, this.ContentsFile, this.OutputsFile, this.BuiltOutputsFile, false);
+                var layout = new Layout(this.ServiceProvider);
+                layout.FileTransfers = bindResult.FileTransfers;
+                layout.ContentFilePaths = bindResult.ContentFilePaths;
+                layout.ContentsFile = this.ContentsFile;
+                layout.OutputsFile = this.OutputsFile;
+                layout.BuiltOutputsFile = this.BuiltOutputsFile;
+                layout.SuppressAclReset = false; // TODO: correctly set SuppressAclReset
+
                 layout.Execute();
             }
         }

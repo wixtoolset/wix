@@ -4,7 +4,6 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
@@ -14,6 +13,7 @@ namespace WixToolset.BuildTasks
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+    using WixToolset.Core.CommandLine;
 
     /// <summary>
     /// Base class for WiX tool tasks; executes tools in-process

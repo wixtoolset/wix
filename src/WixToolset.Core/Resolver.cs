@@ -16,34 +16,31 @@ namespace WixToolset.Core
     /// </summary>
     public sealed class Resolver
     {
-        public Resolver(IServiceProvider serviceProvider, IEnumerable<BindPath> bindPaths, Intermediate intermediateRepresentation, string intermediateFolder, IEnumerable<Localization> localizations)
+        public Resolver(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
-            this.BindPaths = bindPaths;
-            this.IntermediateRepresentation = intermediateRepresentation;
-            this.IntermediateFolder = intermediateFolder;
-            this.Localizations = localizations;
-
-            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IServiceProvider ServiceProvider { get; set; }
 
-        private IEnumerable<BindPath> BindPaths { get; }
+        public IEnumerable<BindPath> BindPaths { get; set; }
 
-        private Intermediate IntermediateRepresentation { get; }
+        public Intermediate IntermediateRepresentation { get; set; }
 
-        private string IntermediateFolder { get; }
+        public string IntermediateFolder { get; set; }
 
-        private IEnumerable<Localization> Localizations { get; }
+        public IEnumerable<Localization> Localizations { get; set; }
 
-        private  IMessaging Messaging { get; }
+        private IMessaging Messaging { get; set; }
 
         public ResolveResult Execute()
         {
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
+
             var localizer = new Localizer(this.Messaging, this.Localizations);
 
             var variableResolver = new WixVariableResolver(this.Messaging, localizer);
+            this.PopulateVariableResolver(variableResolver);
 
             var context = this.ServiceProvider.GetService<IResolveContext>();
             context.Messaging = this.Messaging;
@@ -51,7 +48,7 @@ namespace WixToolset.Core
             context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IResolverExtension>();
             context.IntermediateFolder = this.IntermediateFolder;
             context.IntermediateRepresentation = this.IntermediateRepresentation;
-            context.WixVariableResolver = this.PopulateVariableResolver(variableResolver);
+            context.WixVariableResolver = variableResolver;
 
             // Preresolve.
             //
@@ -212,7 +209,7 @@ namespace WixToolset.Core
             }
         }
 
-        private WixVariableResolver PopulateVariableResolver(WixVariableResolver resolver)
+        private void PopulateVariableResolver(WixVariableResolver resolver)
         {
             // Gather all the wix variables.
             var wixVariableTuples = this.IntermediateRepresentation.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
@@ -227,8 +224,6 @@ namespace WixToolset.Core
                     this.Messaging.Write(ErrorMessages.WixVariableCollision(tuple.SourceLineNumbers, tuple.WixVariable));
                 }
             }
-
-            return resolver;
         }
     }
 }

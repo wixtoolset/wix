@@ -3,6 +3,7 @@
 namespace WixToolset.Core
 {
     using System;
+    using WixToolset.Core.CommandLine;
     using WixToolset.Core.ExtensibilityServices;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -64,7 +65,7 @@ namespace WixToolset.Core
 
             if (serviceType == typeof(ICommandLine))
             {
-                return new CommandLine();
+                return new CommandLineParser();
             }
 
             // Singletons.

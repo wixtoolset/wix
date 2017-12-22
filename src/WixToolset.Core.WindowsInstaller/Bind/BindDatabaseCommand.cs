@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(WixToolset.Extensibility.IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
         {
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
@@ -49,7 +49,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string CabCachePath { get; }
 
-        private CompressionLevel DefaultCompressionLevel { get; }
+        private CompressionLevel? DefaultCompressionLevel { get; }
 
         public IEnumerable<IDelayedField> DelayedFields { get; }
 
