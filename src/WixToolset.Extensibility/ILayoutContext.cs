@@ -15,8 +15,6 @@ namespace WixToolset.Extensibility
 
         IEnumerable<ILayoutExtension> Extensions { get; set; }
 
-        IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
-
         IEnumerable<string> ContentFilePaths { get; set; }
 
         IEnumerable<FileTransfer> FileTransfers { get; set; }

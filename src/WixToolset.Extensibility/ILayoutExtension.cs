@@ -12,6 +12,10 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreLayout(ILayoutContext context);
 
+        bool CopyFile(string source, string destination);
+
+        bool MoveFile(string source, string destination);
+
         /// <summary>
         /// Called after all layout occurs.
         /// </summary>

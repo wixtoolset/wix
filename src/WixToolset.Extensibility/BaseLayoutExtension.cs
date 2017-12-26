@@ -20,6 +20,16 @@ namespace WixToolset.Extensibility
             this.Context = context;
         }
 
+        public bool CopyFile(string source, string destination)
+        {
+            return false;
+        }
+
+        public bool MoveFile(string source, string destination)
+        {
+            return false;
+        }
+
         /// <summary>
         /// Called at the end of ayout.
         /// </summary>

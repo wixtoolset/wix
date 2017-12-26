@@ -10,9 +10,5 @@ namespace WixToolset.Extensibility
         void Initialize(IFileSystemContext context);
 
         bool? CompareFiles(string targetFile, string updatedFile);
-
-        bool CopyFile(string source, string destination, bool overwrite);
-
-        bool MoveFile(string source, string destination, bool overwrite);
     }
 }
