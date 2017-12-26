@@ -13,7 +13,7 @@ namespace WixToolset.Core.Bind
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IMessaging messaging, IEnumerable<IFileSystemExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
+        public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
         {
             this.FileSystem = new FileSystem(extensions);
             this.Messaging = messaging;
@@ -181,11 +181,11 @@ namespace WixToolset.Core.Bind
 
             if (move)
             {
-                complete = this.FileSystem.MoveFile(source, destination, true);
+                complete = this.FileSystem.MoveFile(source, destination);
             }
             else
             {
-                complete = this.FileSystem.CopyFile(source, destination, true);
+                complete = this.FileSystem.CopyFile(source, destination);
             }
 
             if (!complete)

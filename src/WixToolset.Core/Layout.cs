@@ -47,7 +47,6 @@ namespace WixToolset.Core
             var context = this.ServiceProvider.GetService<ILayoutContext>();
             context.Messaging = this.Messaging;
             context.Extensions = extensionManager.Create<ILayoutExtension>();
-            context.FileSystemExtensions = extensionManager.Create<IFileSystemExtension>();
             context.FileTransfers = this.FileTransfers;
             context.ContentFilePaths = this.ContentFilePaths;
             context.ContentsFile = this.ContentsFile;
@@ -70,7 +69,7 @@ namespace WixToolset.Core
                 {
                     this.Messaging.Write(VerboseMessages.LayingOutMedia());
 
-                    var command = new TransferFilesCommand(context.Messaging, context.FileSystemExtensions, context.FileTransfers, context.SuppressAclReset);
+                    var command = new TransferFilesCommand(context.Messaging, context.Extensions, context.FileTransfers, context.SuppressAclReset);
                     command.Execute();
                 }
             }

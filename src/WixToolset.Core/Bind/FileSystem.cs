@@ -10,30 +10,29 @@ namespace WixToolset.Core.Bind
 
     internal class FileSystem
     {
-        public FileSystem(IEnumerable<IFileSystemExtension> extensions)
+        public FileSystem(IEnumerable<ILayoutExtension> extensions)
         {
-            this.Extensions = extensions ?? Array.Empty<IFileSystemExtension>();
+            this.Extensions = extensions ?? Array.Empty<ILayoutExtension>();
         }
 
-        private IEnumerable<IFileSystemExtension> Extensions { get; }
+        private IEnumerable<ILayoutExtension> Extensions { get; }
 
         /// <summary>
         /// Copies a file.
         /// </summary>
         /// <param name="source">The file to copy.</param>
         /// <param name="destination">The destination file.</param>
-        /// <param name="overwrite">true if the destination file can be overwritten; otherwise, false.</param>
-        public bool CopyFile(string source, string destination, bool overwrite)
+        public bool CopyFile(string source, string destination)
         {
             foreach (var extension in this.Extensions)
             {
-                if (extension.CopyFile(source, destination, overwrite))
+                if (extension.CopyFile(source, destination))
                 {
                     return true;
                 }
             }
 
-            if (overwrite && File.Exists(destination))
+            if (File.Exists(destination))
             {
                 File.Delete(destination);
             }
@@ -44,7 +43,7 @@ namespace WixToolset.Core.Bind
                 int er = Marshal.GetLastWin32Error();
 #endif
 
-                File.Copy(source, destination, overwrite);
+                File.Copy(source, destination, true);
             }
 
             return true;
@@ -55,17 +54,17 @@ namespace WixToolset.Core.Bind
         /// </summary>
         /// <param name="source">The file to move.</param>
         /// <param name="destination">The destination file.</param>
-        public bool MoveFile(string source, string destination, bool overwrite)
+        public bool MoveFile(string source, string destination)
         {
             foreach (var extension in this.Extensions)
             {
-                if (extension.MoveFile(source, destination, overwrite))
+                if (extension.MoveFile(source, destination))
                 {
                     return true;
                 }
             }
 
-            if (overwrite && File.Exists(destination))
+            if (File.Exists(destination))
             {
                 File.Delete(destination);
             }
