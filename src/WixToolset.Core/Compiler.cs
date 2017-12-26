@@ -68,9 +68,24 @@ namespace WixToolset.Core
             Icon,
         }
 
+        public Compiler(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        private IServiceProvider ServiceProvider { get; }
+
         private ICompileContext Context { get; set; }
 
         private CompilerCore Core { get; set; }
+
+        public string CompliationId { get; set; }
+
+        public string OutputPath { get;  set; }
+
+        public Platform Platform { get; set; }
+
+        public XDocument SourceDocument { get; set; }
 
         /// <summary>
         /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
@@ -87,17 +102,21 @@ namespace WixToolset.Core
         /// <summary>
         /// Compiles the provided Xml document into an intermediate object
         /// </summary>
-        /// <param name="context">Context for the compile. The BaseURI property
-        /// should be properly set to get messages containing source line information.</param>
         /// <returns>Intermediate object representing compiled source document.</returns>
         /// <remarks>This method is not thread-safe.</remarks>
-        public Intermediate Compile(ICompileContext context)
+        public Intermediate Execute()
         {
-            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Context = this.ServiceProvider.GetService<ICompileContext>();
+            this.Context.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            this.Context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<ICompilerExtension>();
+            this.Context.CompilationId = this.CompliationId;
+            this.Context.OutputPath = this.OutputPath;
+            this.Context.Platform = this.Platform;
+            this.Context.Source = this.SourceDocument;
 
             var target = new Intermediate();
 
-            if (String.IsNullOrEmpty(context.CompilationId))
+            if (String.IsNullOrEmpty(this.Context.CompilationId))
             {
                 this.Context.CompilationId = target.Id;
             }
@@ -115,20 +134,20 @@ namespace WixToolset.Core
                     this.Context.Messaging.Write(ErrorMessages.DuplicateExtensionXmlSchemaNamespace(extension.GetType().ToString(), extension.Namespace.NamespaceName, collidingExtension.GetType().ToString()));
                 }
 
-                extension.PreCompile(context);
+                extension.PreCompile(this.Context);
             }
 
             // Try to compile it.
             try
             {
-                var parseHelper = context.ServiceProvider.GetService<IParseHelper>();
+                var parseHelper = this.Context.ServiceProvider.GetService<IParseHelper>();
 
                 this.Core = new CompilerCore(target, this.Context.Messaging, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
                 this.componentIdPlaceholdersResolver = new WixVariableResolver(this.Context.Messaging);
 
                 // parse the document
-                var source = context.Source;
+                var source = this.Context.Source;
                 var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(source.Root);
                 if ("Wix" == source.Root.Name.LocalName)
                 {
@@ -158,7 +177,7 @@ namespace WixToolset.Core
             }
             finally
             {
-                foreach (var extension in context.Extensions)
+                foreach (var extension in this.Context.Extensions)
                 {
                     extension.PostCompile(target);
                 }

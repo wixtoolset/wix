@@ -12,6 +12,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Link;
 
     /// <summary>
@@ -27,13 +28,16 @@ namespace WixToolset.Core
         /// <summary>
         /// Creates a linker.
         /// </summary>
-        public Linker()
+        public Linker(IServiceProvider serviceProvider)
         {
+            this.ServiceProvider = serviceProvider;
             this.sectionIdOnRows = true; // TODO: what is the correct value for this?
 
             //this.extensionData = new List<IExtensionData>();
             //this.inspectorExtensions = new List<InspectorExtension>();
         }
+
+        private IServiceProvider ServiceProvider { get; }
 
         private ILinkContext Context { get; set; }
 
@@ -49,11 +53,13 @@ namespace WixToolset.Core
         /// <value>The option to show pedantic messages.</value>
         public bool ShowPedanticMessages { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Wix variable resolver.
-        /// </summary>
-        /// <value>The Wix variable resolver.</value>
-        //internal IBindVariableResolver WixVariableResolver { get; set; }
+        public OutputType OutputType { get; set; }
+
+        public IEnumerable<Intermediate> Intermediates { get; set; }
+
+        public IEnumerable<Intermediate> Libraries { get; set; }
+
+        public ITupleDefinitionCreator TupleDefinitionCreator { get;  set; }
 
         /// <summary>
         /// Links a collection of sections into an output.
@@ -61,16 +67,26 @@ namespace WixToolset.Core
         /// <param name="inputs">The collection of sections to link together.</param>
         /// <param name="expectedOutputType">Expected output type, based on output file extension provided to the linker.</param>
         /// <returns>Output object from the linking.</returns>
-        public Intermediate Link(ILinkContext context)
+        public Intermediate Execute()
         {
-            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+
+            var creator = this.TupleDefinitionCreator ?? this.ServiceProvider.GetService<ITupleDefinitionCreator>();
+
+            this.Context = this.ServiceProvider.GetService<ILinkContext>();
+            this.Context.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            this.Context.Extensions = extensionManager.Create<ILinkerExtension>();
+            this.Context.ExtensionData = extensionManager.Create<IExtensionData>();
+            this.Context.ExpectedOutputType = this.OutputType;
+            this.Context.Intermediates = this.Intermediates.Union(this.Libraries).ToList();
+            this.Context.TupleDefinitionCreator = creator;
 
             var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
 
             // Add sections from the extensions with data.
-            foreach (var data in context.ExtensionData)
+            foreach (var data in this.Context.ExtensionData)
             {
-                var library = data.GetLibrary(context.TupleDefinitionCreator);
+                var library = data.GetLibrary(this.Context.TupleDefinitionCreator);
 
                 if (library != null)
                 {

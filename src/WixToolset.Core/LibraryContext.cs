@@ -10,6 +10,11 @@ namespace WixToolset.Core
 
     public class LibraryContext : ILibraryContext
     {
+        public LibraryContext(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
         public IServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; set; }

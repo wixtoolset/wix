@@ -157,7 +157,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-contentsfile ", this.BindContentsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-outputsfile ", this.BindOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-builtoutputsfile ", this.BindBuiltOutputsFile);
-            commandLineBuilder.AppendSwitchIfNotNull("-wixprojectfile ", this.WixProjectFile);
 
             commandLineBuilder.AppendIfTrue("-bindFiles", this.BindFiles);
             commandLineBuilder.AppendArrayIfNotNull("-bindPath ", this.CalculateBindPathStrings());

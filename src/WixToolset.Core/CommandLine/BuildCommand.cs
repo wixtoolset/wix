@@ -13,11 +13,11 @@ namespace WixToolset.Core.CommandLine
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(IServiceProvider serviceProvider, IMessaging messaging, IExtensionManager extensions, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
+        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
         {
             this.ServiceProvider = serviceProvider;
-            this.Messaging = messaging;
-            this.ExtensionManager = extensions;
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
             this.LocFiles = locFiles;
             this.LibraryFiles = libraryFiles;
             this.PreprocessorVariables = preprocessorVariables;
@@ -76,6 +76,11 @@ namespace WixToolset.Core.CommandLine
         {
             var intermediates = this.CompilePhase();
 
+            if (this.Messaging.EncounteredError)
+            {
+                return this.Messaging.LastErrorNumber;
+            }
+
             if (!intermediates.Any())
             {
                 return 1;
@@ -112,35 +117,30 @@ namespace WixToolset.Core.CommandLine
 
             foreach (var sourceFile in this.SourceFiles)
             {
-                var preprocessContext = this.ServiceProvider.GetService<IPreprocessContext>();
-                preprocessContext.Messaging = this.Messaging;
-                preprocessContext.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
-                preprocessContext.Platform = Platform.X86; // TODO: set this correctly
-                preprocessContext.IncludeSearchPaths = this.IncludeSearchPaths?.ToList() ?? new List<string>();
-                preprocessContext.SourceFile = sourceFile.SourcePath;
-                preprocessContext.Variables = new Dictionary<string, string>(this.PreprocessorVariables);
+                var preprocessor = new Preprocessor(this.ServiceProvider);
+                preprocessor.IncludeSearchPaths = this.IncludeSearchPaths;
+                preprocessor.Platform = Platform.X86; // TODO: set this correctly
+                preprocessor.SourcePath = sourceFile.SourcePath;
+                preprocessor.Variables = this.PreprocessorVariables;
+                var document = preprocessor.Execute();
 
-                var preprocessor = new Preprocessor();
-                var document = preprocessor.Process(preprocessContext);
-
-                if (!this.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
-                    var compileContext = this.ServiceProvider.GetService<ICompileContext>();
-                    compileContext.Messaging = this.Messaging;
-                    compileContext.CompilationId = Guid.NewGuid().ToString("N");
-                    compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
-                    compileContext.OutputPath = sourceFile.OutputPath;
-                    compileContext.Platform = Platform.X86; // TODO: set this correctly
-                    compileContext.Source = document;
-
-                    var compiler = new Compiler();
-                    var intermediate = compiler.Compile(compileContext);
-
-                    if (!this.Messaging.EncounteredError)
-                    {
-                        intermediates.Add(intermediate);
-                    }
+                    continue;
                 }
+
+                var compiler = new Compiler(this.ServiceProvider);
+                compiler.OutputPath = sourceFile.OutputPath;
+                compiler.Platform = Platform.X86; // TODO: set this correctly
+                compiler.SourceDocument = document;
+                var intermediate = compiler.Execute();
+
+                if (this.Messaging.EncounteredError)
+                {
+                    continue;
+                }
+
+                intermediates.Add(intermediate);
             }
 
             return intermediates;
@@ -156,17 +156,12 @@ namespace WixToolset.Core.CommandLine
                 return null;
             }
 
-            var context = new LibraryContext();
-            context.Messaging = this.Messaging;
-            context.BindFiles = this.BindFiles;
-            context.BindPaths = this.BindPaths;
-            context.Extensions = this.ExtensionManager.Create<ILibrarianExtension>();
-            context.Localizations = localizations;
-            context.LibraryId = Guid.NewGuid().ToString("N");
-            context.Intermediates = intermediates;
-
-            var librarian = new Librarian();
-            return librarian.Combine(context);
+            var librarian = new Librarian(this.ServiceProvider);
+            librarian.BindFiles = this.BindFiles;
+            librarian.BindPaths = this.BindPaths;
+            librarian.Intermediates = intermediates;
+            librarian.Localizations = localizations;
+            return librarian.Execute();
         }
 
         private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates)
@@ -180,16 +175,12 @@ namespace WixToolset.Core.CommandLine
                 return null;
             }
 
-            var context = this.ServiceProvider.GetService<ILinkContext>();
-            context.Messaging = this.Messaging;
-            context.Extensions = this.ExtensionManager.Create<ILinkerExtension>();
-            context.ExtensionData = this.ExtensionManager.Create<IExtensionData>();
-            context.ExpectedOutputType = this.OutputType;
-            context.Intermediates = intermediates.Union(libraries).ToList();
-            context.TupleDefinitionCreator = creator;
-
-            var linker = new Linker();
-            return linker.Link(context);
+            var linker = new Linker(this.ServiceProvider);
+            linker.OutputType = this.OutputType;
+            linker.Intermediates = intermediates;
+            linker.Libraries = libraries;
+            linker.TupleDefinitionCreator = creator;
+            return linker.Execute();
         }
 
         private void BindPhase(Intermediate output)

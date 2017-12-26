@@ -458,7 +458,11 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 this.ExtensionsByPrefix = new Dictionary<string, IPreprocessorExtension>();
 
-                foreach (var extension in context.Extensions)
+                var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+
+                var extensions = extensionManager.Create<IPreprocessorExtension>();
+
+                foreach (var extension in extensions)
                 {
                     if (null != extension.Prefixes)
                     {

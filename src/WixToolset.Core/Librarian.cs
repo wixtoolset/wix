@@ -9,27 +9,45 @@ namespace WixToolset.Core
     using WixToolset.Core.Link;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Core librarian tool.
     /// </summary>
     public sealed class Librarian
     {
+        public Librarian(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        private IServiceProvider ServiceProvider { get; }
+
         private ILibraryContext Context { get; set; }
+
+        public bool BindFiles { get; set; }
+
+        public IEnumerable<BindPath> BindPaths { get; set; }
+
+        public IEnumerable<Localization> Localizations { get; set; }
+
+        public IEnumerable<Intermediate> Intermediates { get; set; }
 
         /// <summary>
         /// Create a library by combining several intermediates (objects).
         /// </summary>
         /// <param name="sections">The sections to combine into a library.</param>
         /// <returns>Returns the new library.</returns>
-        public Intermediate Combine(ILibraryContext context)
+        public Intermediate Execute()
         {
-            this.Context = context ?? throw new ArgumentNullException(nameof(context));
-
-            if (String.IsNullOrEmpty(this.Context.LibraryId))
-            {
-                this.Context.LibraryId = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
-            }
+            this.Context = new LibraryContext(this.ServiceProvider);
+            this.Context.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            this.Context.BindFiles = this.BindFiles;
+            this.Context.BindPaths = this.BindPaths;
+            this.Context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<ILibrarianExtension>();
+            this.Context.Localizations = this.Localizations;
+            this.Context.LibraryId = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
+            this.Context.Intermediates = this.Intermediates;
 
             foreach (var extension in this.Context.Extensions)
             {

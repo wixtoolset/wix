@@ -125,19 +125,19 @@ namespace WixToolset.Core
         {
             var entrySection = output.Sections.First(s => s.Type != SectionType.Fragment);
 
-            Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            var fileVersion = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
 
-            var buildInfoRow = new WixBuildInfoTuple();
-            buildInfoRow.WixVersion = fileVersion.FileVersion;
-            buildInfoRow.WixOutputFile = outputFile;
+            var buildInfoTuple = new WixBuildInfoTuple();
+            buildInfoTuple.WixVersion = fileVersion.FileVersion;
+            buildInfoTuple.WixOutputFile = outputFile;
 
             if (!String.IsNullOrEmpty(outputPdbPath))
             {
-                buildInfoRow.WixPdbFile = outputPdbPath;
+                buildInfoTuple.WixPdbFile = outputPdbPath;
             }
 
-            entrySection.Tuples.Add(buildInfoRow);
+            entrySection.Tuples.Add(buildInfoTuple);
         }
     }
 }

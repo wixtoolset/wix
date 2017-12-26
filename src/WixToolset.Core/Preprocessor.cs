@@ -14,6 +14,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Core.Preprocess;
     using WixToolset.Extensibility.Services;
+    using System.Linq;
 
     /// <summary>
     /// Preprocessor object
@@ -34,6 +35,21 @@ namespace WixToolset.Core
             ValidationFlags = System.Xml.Schema.XmlSchemaValidationFlags.None,
             XmlResolver = null,
         };
+
+        public Preprocessor(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        public IEnumerable<string> IncludeSearchPaths { get; set; }
+
+        public Platform Platform { get; set; }
+
+        public string SourcePath { get; set; }
+
+        public IDictionary<string, string> Variables { get; set; }
+
+        private IServiceProvider ServiceProvider { get; }
 
         private IPreprocessContext Context { get; set; }
 
@@ -87,14 +103,19 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="context">The preprocessing context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        public XDocument Process(IPreprocessContext context)
+        public XDocument Execute()
         {
-            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Context = this.CreateContext();
 
-            using (XmlReader reader = XmlReader.Create(context.SourceFile, DocumentXmlReaderSettings))
+            this.PreProcess();
+
+            XDocument document;
+            using (XmlReader reader = XmlReader.Create(this.Context.SourceFile, DocumentXmlReaderSettings))
             {
-                return Process(context, reader);
+                document = this.Process(reader);
             }
+
+            return PostProcess(document);
         }
 
         /// <summary>
@@ -103,46 +124,32 @@ namespace WixToolset.Core
         /// <param name="context">The preprocessing context.</param>
         /// <param name="reader">XmlReader to processing the context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        public XDocument Process(IPreprocessContext context, XmlReader reader)
+        public XDocument Execute(XmlReader reader)
         {
-            if (this.Context == null)
-            {
-                this.Context = context ?? throw new ArgumentNullException(nameof(context));
-            }
-            else if (this.Context != context)
-            {
-                throw new ArgumentException(nameof(context));
-            }
-
-            if (String.IsNullOrEmpty(this.Context.SourceFile) && !String.IsNullOrEmpty(reader.BaseURI))
+            if (String.IsNullOrEmpty(this.SourcePath) && !String.IsNullOrEmpty(reader.BaseURI))
             {
                 var uri = new Uri(reader.BaseURI);
-                this.Context.SourceFile = uri.AbsolutePath;
+                this.SourcePath = uri.AbsolutePath;
             }
 
-            this.Context.CurrentSourceLineNumber = new SourceLineNumber(this.Context.SourceFile);
+            this.Context = this.CreateContext();
 
-            this.Helper = this.Context.ServiceProvider.GetService<IPreprocessHelper>();
+            this.PreProcess();
 
-            foreach (var extension in this.Context.Extensions)
-            {
-                if (null != extension.Prefixes)
-                {
-                    foreach (string prefix in extension.Prefixes)
-                    {
-                        if (!this.ExtensionsByPrefix.TryGetValue(prefix, out var collidingExtension))
-                        {
-                            this.ExtensionsByPrefix.Add(prefix, extension);
-                        }
-                        else
-                        {
-                            this.Context.Messaging.Write(ErrorMessages.DuplicateExtensionPreprocessorType(extension.GetType().ToString(), prefix, collidingExtension.GetType().ToString()));
-                        }
-                    }
-                }
+            var document = this.Process(reader);
 
-                extension.PrePreprocess(context);
-            }
+            return PostProcess(document);
+        }
+
+        /// <summary>
+        /// Preprocesses a file.
+        /// </summary>
+        /// <param name="context">The preprocessing context.</param>
+        /// <param name="reader">XmlReader to processing the context.</param>
+        /// <returns>XDocument with the postprocessed data.</returns>
+        private XDocument Process(XmlReader reader)
+        {
+            this.Helper = this.ServiceProvider.GetService<IPreprocessHelper>();
 
             this.CurrentFileStack.Clear();
             this.CurrentFileStack.Push(this.Helper.GetVariableValue(this.Context, "sys", "SOURCEFILEDIR"));
@@ -160,14 +167,6 @@ namespace WixToolset.Core
             {
                 this.UpdateCurrentLineNumber(reader, 0);
                 throw new WixException(ErrorMessages.InvalidXml(this.Context.CurrentSourceLineNumber, "source", e.Message));
-            }
-            finally
-            {
-                // Finalize the preprocessing.
-                foreach (var extension in this.Context.Extensions)
-                {
-                    extension.PostPreprocess(output);
-                }
             }
 
             return this.Context.Messaging.EncounteredError ? null : output;
@@ -1404,7 +1403,7 @@ namespace WixToolset.Core
             {
                 // build a string to test the directory containing the source file first
                 var currentFolder = this.CurrentFileStack.Peek();
-                var includeTestPath = Path.Combine(Path.GetDirectoryName(currentFolder) , includePath);
+                var includeTestPath = Path.Combine(Path.GetDirectoryName(currentFolder), includePath);
 
                 // test the source file directory
                 if (File.Exists(includeTestPath))
@@ -1427,6 +1426,53 @@ namespace WixToolset.Core
             }
 
             return finalIncludePath;
+        }
+
+        private IPreprocessContext CreateContext()
+        {
+            var context = this.ServiceProvider.GetService<IPreprocessContext>();
+            context.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IPreprocessorExtension>();
+            context.CurrentSourceLineNumber = new SourceLineNumber(this.SourcePath);
+            context.Platform = this.Platform;
+            context.IncludeSearchPaths = this.IncludeSearchPaths?.ToList() ?? new List<string>();
+            context.SourceFile = this.SourcePath;
+            context.Variables = new Dictionary<string, string>(this.Variables);
+
+            return context;
+        }
+
+        private void PreProcess()
+        {
+            foreach (var extension in this.Context.Extensions)
+            {
+                if (extension.Prefixes != null)
+                {
+                    foreach (var prefix in extension.Prefixes)
+                    {
+                        if (!this.ExtensionsByPrefix.TryGetValue(prefix, out var collidingExtension))
+                        {
+                            this.ExtensionsByPrefix.Add(prefix, extension);
+                        }
+                        else
+                        {
+                            this.Context.Messaging.Write(ErrorMessages.DuplicateExtensionPreprocessorType(extension.GetType().ToString(), prefix, collidingExtension.GetType().ToString()));
+                        }
+                    }
+                }
+
+                extension.PrePreprocess(this.Context);
+            }
+        }
+
+        private XDocument PostProcess(XDocument document)
+        {
+            foreach (var extension in this.Context.Extensions)
+            {
+                extension.PostPreprocess(document);
+            }
+
+            return document;
         }
     }
 }

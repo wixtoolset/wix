@@ -207,14 +207,14 @@ namespace WixToolset.Core.CommandLine
                         var variables = this.GatherPreprocessorVariables(defines);
                         var bindPathList = this.GatherBindPaths(bindPaths);
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(this.ServiceProvider, this.Messaging, this.ExtensionManager, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
+                        return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
                     }
 
                 case Commands.Compile:
                     {
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = GatherPreprocessorVariables(defines);
-                        return new CompileCommand(this.ServiceProvider, this.Messaging, this.ExtensionManager, sourceFiles, variables);
+                        return new CompileCommand(this.ServiceProvider, sourceFiles, variables);
                     }
             }
 
