@@ -250,6 +250,7 @@ namespace WixToolset.Core.CommandLine
                     return OutputType.PatchCreation;
 
                 case "product":
+                case "package":
                 case ".msi":
                     return OutputType.Product;
 
@@ -257,9 +258,9 @@ namespace WixToolset.Core.CommandLine
                 case ".mst":
                     return OutputType.Transform;
 
-                case "wixout":
-                case ".wixout":
-                    return OutputType.Wixout;
+                case "intermediatepostlink":
+                case ".wixipl":
+                    return OutputType.IntermediatePostLink;
             }
 
             return OutputType.Unknown;

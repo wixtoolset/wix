@@ -92,7 +92,7 @@ namespace WixToolset.Core.CommandLine
 
                 library?.Save(this.OutputPath);
             }
-            else if (this.OutputType == OutputType.Wixout)
+            else if (this.OutputType == OutputType.IntermediatePostLink)
             {
                 var output = this.LinkPhase(intermediates);
 
