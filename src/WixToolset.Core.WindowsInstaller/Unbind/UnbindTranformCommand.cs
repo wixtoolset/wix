@@ -212,7 +212,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                             // mark the field as modified
                             int indexOfModifiedValue = -1;
-                            for (int i = 0; i < modifiedRow.TableDefinition.Columns.Count; ++i)
+                            for (int i = 0; i < modifiedRow.TableDefinition.Columns.Length; ++i)
                             {
                                 if (columnName.Equals(modifiedRow.TableDefinition.Columns[i].Name, StringComparison.Ordinal))
                                 {
@@ -270,7 +270,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             string[] primaryKeyParts = primaryKeys.Split('\t');
             int primaryKeyPartIndex = 0;
 
-            for (int i = 0; i < table.Definition.Columns.Count; i++)
+            for (int i = 0; i < table.Definition.Columns.Length; i++)
             {
                 ColumnDefinition columnDefinition = table.Definition.Columns[i];
 

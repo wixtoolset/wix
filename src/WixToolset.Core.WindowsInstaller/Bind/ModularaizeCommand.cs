@@ -48,7 +48,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var modularizedColumns = new List<int>();
 
             // find the modularized columns
-            for (var i = 0; i < table.Definition.Columns.Count; ++i)
+            for (var i = 0; i < table.Definition.Columns.Length; ++i)
             {
                 if (ColumnModularizeType.None != table.Definition.Columns[i].ModularizeType)
                 {

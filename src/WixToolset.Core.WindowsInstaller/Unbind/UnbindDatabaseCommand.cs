@@ -127,7 +127,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                             using (View tableView = this.Database.OpenExecuteView(String.Format(CultureInfo.InvariantCulture, "SELECT * FROM `{0}`", tableName)))
                             {
-                                List<ColumnDefinition> columns;
+                                ColumnDefinition[] columns;
                                 using (Record columnNameRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFONAMES),
                                               columnTypeRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFOTYPES))
                                 {
@@ -144,7 +144,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     }
 
                                     int columnCount = columnNameRecord.GetFieldCount();
-                                    columns = new List<ColumnDefinition>(columnCount);
+                                    columns = new ColumnDefinition[columnCount];
                                     for (int i = 1; i <= columnCount; i++)
                                     {
                                         string columnName = columnNameRecord.GetString(i);
@@ -260,7 +260,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                             columnModularizeType = ColumnModularizeType.Column;
                                         }
 
-                                        columns.Add(new ColumnDefinition(columnName, columnType, length, primary, nullable, columnCategory, minValue, maxValue, keyTable, keyColumn, set, description, columnModularizeType, (ColumnType.Localized == columnType), true));
+                                        columns[i - 1] = new ColumnDefinition(columnName, columnType, length, primary, nullable, columnCategory, minValue, maxValue, keyTable, keyColumn, set, description, columnModularizeType, (ColumnType.Localized == columnType), true);
                                     }
                                 }
 

@@ -30,7 +30,7 @@ namespace WixToolset.Core.ExtensibilityServices
             var row = table.CreateRow(tuple.SourceLineNumbers);
             for (var i = 0; i < tuple.Fields.Length; ++i)
             {
-                if (i < tableDefinition.Columns.Count)
+                if (i < tableDefinition.Columns.Length)
                 {
                     var column = tableDefinition.Columns[i];
 

@@ -69,9 +69,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            if (TableDefinition.MaxColumnsInRealTable < table.Definition.Columns.Count)
+            if (TableDefinition.MaxColumnsInRealTable < table.Definition.Columns.Length)
             {
-                throw new WixException(ErrorMessages.TooManyColumnsInRealTable(table.Definition.Name, table.Definition.Columns.Count, TableDefinition.MaxColumnsInRealTable));
+                throw new WixException(ErrorMessages.TooManyColumnsInRealTable(table.Definition.Name, table.Definition.Columns.Length, TableDefinition.MaxColumnsInRealTable));
             }
 
             // Tack on the table header, and flush before we start writing bytes directly to the stream.

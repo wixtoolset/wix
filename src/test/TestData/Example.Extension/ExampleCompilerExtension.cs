@@ -10,10 +10,7 @@ namespace Example.Extension
 
     internal class ExampleCompilerExtension : BaseCompilerExtension
     {
-        public ExampleCompilerExtension()
-        {
-            this.Namespace = "http://www.example.com/scheams/v1/wxs";
-        }
+        public override XNamespace Namespace => "http://www.example.com/scheams/v1/wxs";
 
         public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {

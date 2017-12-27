@@ -219,7 +219,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 // Import each row containing a stream
                                 foreach (Row row in table.Rows)
                                 {
-                                    using (Record record = new Record(table.Definition.Columns.Count))
+                                    using (Record record = new Record(table.Definition.Columns.Length))
                                     {
                                         StringBuilder streamName = new StringBuilder();
                                         bool needStream = false;
@@ -230,7 +230,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                             streamName.Append(table.Name);
                                         }
 
-                                        for (int i = 0; i < table.Definition.Columns.Count; i++)
+                                        for (int i = 0; i < table.Definition.Columns.Length; i++)
                                         {
                                             ColumnDefinition columnDefinition = table.Definition.Columns[i];
 
