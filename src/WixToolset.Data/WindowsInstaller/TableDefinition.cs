@@ -25,13 +25,13 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="columns">Column definitions for the table.</param>
         /// <param name="unreal">Flag if table is unreal.</param>
         /// <param name="bootstrapperApplicationData">Flag if table is part of UX Manifest.</param>
-        public TableDefinition(string name, IList<ColumnDefinition> columns, bool unreal = false, bool bootstrapperApplicationData = false)
+        public TableDefinition(string name, ColumnDefinition[] columns, bool unreal = false, bool bootstrapperApplicationData = false)
         {
             this.Name = name;
             this.Unreal = unreal;
             this.BootstrapperApplicationData = bootstrapperApplicationData;
 
-            this.Columns = new ReadOnlyCollection<ColumnDefinition>(columns);
+            this.Columns = columns;
         }
 
         /// <summary>
@@ -56,17 +56,14 @@ namespace WixToolset.Data.WindowsInstaller
         /// Gets the collection of column definitions for this table.
         /// </summary>
         /// <value>Collection of column definitions for this table.</value>
-        public IList<ColumnDefinition> Columns { get; private set; }
+        public ColumnDefinition[] Columns { get; private set; }
 
         /// <summary>
         /// Gets the column definition in the table by index.
         /// </summary>
         /// <param name="columnIndex">Index of column to locate.</param>
         /// <value>Column definition in the table by index.</value>
-        public ColumnDefinition this[int columnIndex]
-        {
-            get { return this.Columns[columnIndex]; }
-        }
+        public ColumnDefinition this[int columnIndex] => this.Columns[columnIndex];
 
         /// <summary>
         /// Compares this table definition to another table definition.
@@ -91,10 +88,10 @@ namespace WixToolset.Data.WindowsInstaller
             if (0 == ret)
             {
                 // transforms can only add columns
-                ret = Math.Min(0, updated.Columns.Count - this.Columns.Count);
+                ret = Math.Min(0, updated.Columns.Length - this.Columns.Length);
 
                 // compare name, type, and length of each column
-                for (int i = 0; 0 == ret && this.Columns.Count > i; i++)
+                for (int i = 0; 0 == ret && this.Columns.Length > i; i++)
                 {
                     ColumnDefinition thisColumnDef = this.Columns[i];
                     ColumnDefinition updatedColumnDef = updated.Columns[i];
@@ -113,10 +110,10 @@ namespace WixToolset.Data.WindowsInstaller
         /// <returns>The TableDefintion represented by the Xml.</returns>
         internal static TableDefinition Read(XmlReader reader)
         {
-            bool empty = reader.IsEmptyElement;
+            var empty = reader.IsEmptyElement;
             string name = null;
-            bool unreal = false;
-            bool bootstrapperApplicationData = false;
+            var unreal = false;
+            var bootstrapperApplicationData = false;
 
             while (reader.MoveToNextAttribute())
             {
@@ -139,13 +136,13 @@ namespace WixToolset.Data.WindowsInstaller
                 throw new XmlException();
             }
 
-            List<ColumnDefinition> columns = new List<ColumnDefinition>();
-            bool hasPrimaryKeyColumn = false;
+            var columns = new List<ColumnDefinition>();
+            var hasPrimaryKeyColumn = false;
 
             // parse the child elements
             if (!empty)
             {
-                bool done = false;
+                var done = false;
 
                 while (!done && reader.Read())
                 {
@@ -155,7 +152,7 @@ namespace WixToolset.Data.WindowsInstaller
                             switch (reader.LocalName)
                             {
                                 case "columnDefinition":
-                                    ColumnDefinition columnDefinition = ColumnDefinition.Read(reader);
+                                    var columnDefinition = ColumnDefinition.Read(reader);
                                     columns.Add(columnDefinition);
 
                                     if (columnDefinition.PrimaryKey)
@@ -184,7 +181,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            return new TableDefinition(name, columns, unreal, bootstrapperApplicationData);
+            return new TableDefinition(name, columns.ToArray(), unreal, bootstrapperApplicationData);
         }
 
         /// <summary>

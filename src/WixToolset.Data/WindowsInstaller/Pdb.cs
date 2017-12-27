@@ -15,14 +15,6 @@ namespace WixToolset.Data.WindowsInstaller
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
 
         /// <summary>
-        /// Creates a new empty pdb object.
-        /// </summary>
-        /// <param name="sourceLineNumbers">The source line information for the pdb.</param>
-        public Pdb()
-        {
-        }
-
-        /// <summary>
         /// Gets or sets the output that is a part of this pdb.
         /// </summary>
         /// <value>Type of the output.</value>

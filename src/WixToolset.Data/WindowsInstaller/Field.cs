@@ -35,16 +35,8 @@ namespace WixToolset.Data.WindowsInstaller
         /// <value>Data in the field.</value>
         public object Data
         {
-            get
-            {
-                return this.data;
-            }
-
-            set
-            {
-                // Validate the value before setting it.
-                this.data = this.ValidateValue(this.Column, value);
-            }
+            get => this.data;
+            set => this.data = this.ValidateValue(this.Column, value);
         }
 
         /// <summary>

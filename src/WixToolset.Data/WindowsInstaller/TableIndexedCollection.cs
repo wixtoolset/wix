@@ -17,7 +17,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         public TableIndexedCollection()
         {
-            this.collection = new Dictionary<string,Table>();
+            this.collection = new Dictionary<string, Table>();
         }
 
         /// <summary>

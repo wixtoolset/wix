@@ -37,7 +37,7 @@ namespace WixToolset.Data.WindowsInstaller
         {
             this.Number = rowCount++;
             this.SourceLineNumbers = sourceLineNumbers;
-            this.Fields = new Field[tableDefinition.Columns.Count];
+            this.Fields = new Field[tableDefinition.Columns.Length];
             this.TableDefinition = tableDefinition;
 
             for (var i = 0; i < this.Fields.Length; ++i)
