@@ -30,8 +30,8 @@ namespace WixToolset.Data
 
         /// <summary>Transform output type.</summary>
         Transform,
-        
-        /// <summary>Intermediate output type.</summary>
-        Wixout,
+
+        /// <summary>Intermediate representation post-link output type.</summary>
+        IntermediatePostLink,
     }
 }
