@@ -31,7 +31,7 @@ namespace WixToolset.Extensibility
         /// Gets the schema namespace for this extension.
         /// </summary>
         /// <value>Schema namespace supported by this extension.</value>
-        public XNamespace Namespace { get; protected set; }
+        public abstract XNamespace Namespace { get; }
 
         /// <summary>
         /// Called at the beginning of the compilation of a source file.

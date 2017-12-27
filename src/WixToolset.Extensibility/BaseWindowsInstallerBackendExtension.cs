@@ -24,6 +24,11 @@ namespace WixToolset.Extensibility
         /// </summary>
         protected IWindowsInstallerBackendHelper BackendHelper { get; private set; }
 
+        /// <summary>
+        /// Optional table definitions to automatically map to tuples.
+        /// </summary>
+        protected virtual TableDefinition[] TableDefinitionsForTuples { get; }
+
         public virtual void PreBackendBind(IBindContext context)
         {
             this.Context = context;
@@ -43,6 +48,11 @@ namespace WixToolset.Extensibility
 
         public virtual bool TryAddTupleToOutput(IntermediateTuple tuple, Output output)
         {
+            if (this.TableDefinitionsForTuples != null)
+            {
+                return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitionsForTuples);
+            }
+
             return false;
         }
 
