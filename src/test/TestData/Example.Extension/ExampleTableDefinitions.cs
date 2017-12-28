@@ -2,7 +2,6 @@
 
 namespace Example.Extension
 {
-    using System.Collections.Generic;
     using WixToolset.Data.WindowsInstaller;
 
     public static class ExampleTableDefinitions

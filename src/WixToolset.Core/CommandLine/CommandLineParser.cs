@@ -54,7 +54,7 @@ namespace WixToolset.Core.CommandLine
 
             if (!String.IsNullOrEmpty(context.Arguments))
             {
-                args = CommandLineParser.ParseArgumentsToArray(context.Arguments).Union(args).ToArray();
+                args = CommandLineParser.ParseArgumentsToArray(context.Arguments).Concat(args).ToArray();
             }
 
             return this.ParseStandardCommandLine(context, args);

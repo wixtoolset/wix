@@ -143,7 +143,7 @@ namespace WixToolset.Core
 
                 foreach (var tuple in sections.SelectMany(s => s.Tuples))
                 {
-                    foreach (var field in tuple.Fields.Where(f => f.Type == IntermediateFieldType.Path))
+                    foreach (var field in tuple.Fields.Where(f => f?.Type == IntermediateFieldType.Path))
                     {
                         var pathField = field.AsPath();
 

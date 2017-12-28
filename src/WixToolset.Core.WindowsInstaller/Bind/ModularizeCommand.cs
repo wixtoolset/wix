@@ -13,9 +13,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
 
-    internal class ModularaizeCommand
+    internal class ModularizeCommand
     {
-        public ModularaizeCommand(Output output, string modularizationGuid, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
+        public ModularizeCommand(Output output, string modularizationGuid, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
         {
             this.Output = output;
             this.ModularizationGuid = modularizationGuid;
@@ -38,12 +38,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        /// <summary>
-        /// Modularize the table.
-        /// </summary>
-        /// <param name="modularizationGuid">String containing the GUID of the Merge Module, if appropriate.</param>
-        /// <param name="suppressModularizationIdentifiers">Optional collection of identifiers that should not be modularized.</param>
-        public void ModularizeTable(Table table)
+        private void ModularizeTable(Table table)
         {
             var modularizedColumns = new List<int>();
 
@@ -79,7 +74,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (!(WindowsInstallerStandard.IsStandardAction(fieldData) || WindowsInstallerStandard.IsStandardProperty(fieldData)))
             {
-                ColumnModularizeType modularizeType = field.Column.ModularizeType;
+                var modularizeType = field.Column.ModularizeType;
 
                 // special logic for the ControlEvent table's Argument column
                 // this column requires different modularization methods depending upon the value of the Event column

@@ -39,7 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.PdbFile = context.OutputPdbPath;
             this.IntermediateFolder = context.IntermediateFolder;
             this.Validator = validator;
-            
+
             this.BackendExtensions = backendExtension;
         }
 
@@ -90,6 +90,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var fileTransfers = new List<FileTransfer>();
 
+            var containsMergeModules = false;
             var suppressedTableNames = new HashSet<string>();
 
             // If there are any fields to resolve later, create the cache to populate during bind.
@@ -209,7 +210,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Gather information about files that did not come from merge modules (i.e. rows with a reference to the File table).
+            // Gather information about files that do not come from merge modules.
             {
                 var command = new UpdateFileFacadesCommand(this.Messaging, section);
                 command.FileFacades = fileFacades;
@@ -233,13 +234,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            // Retrieve file information from merge modules.
             if (SectionType.Product == section.Type)
             {
-                // Retrieve files and their information from merge modules.
                 var wixMergeTuples = section.Tuples.OfType<WixMergeTuple>().ToList();
 
                 if (wixMergeTuples.Any())
                 {
+                    containsMergeModules = true;
+
                     var command = new ExtractMergeModuleFilesCommand(this.Messaging, section, wixMergeTuples);
                     command.FileFacades = fileFacades;
                     command.OutputInstallerVersion = installerVersion;
@@ -266,11 +269,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-#if TODO_FIX_INSTANCE_TRANSFORM
-            // With the Component Guids set now we can create instance transforms.
-            this.CreateInstanceTransforms(this.Output);
-#endif
-
             // Assign files to media.
             Dictionary<int, MediaTuple> assignedMediaRows;
             Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
@@ -292,7 +290,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            // Try to put as much above here as possible, updating the IR is better.
+            // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
             Output output;
             {
                 var command = new CreateOutputFromIRCommand(section, this.TableDefinitions, this.BackendExtensions);
@@ -307,11 +305,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Modularize identifiers and add tables with real streams to the import tables.
+            // Modularize identifiers.
             if (OutputType.Module == output.Type)
             {
-                var command = new ModularaizeCommand(output, modularizationGuid, section.Tuples.OfType<WixSuppressModularizationTuple>());
+                var command = new ModularizeCommand(output, modularizationGuid, section.Tuples.OfType<WixSuppressModularizationTuple>());
                 command.Execute();
+            }
+            else // we can create instance transforms since Component Guids are set.
+            {
+#if TODO_FIX_INSTANCE_TRANSFORM
+                this.CreateInstanceTransforms(this.Output);
+#endif
             }
 
 #if TODO_FINISH_UPDATE
@@ -367,7 +371,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // create cabinet files and process uncompressed files
-            string layoutDirectory = Path.GetDirectoryName(this.OutputPath);
+            var layoutDirectory = Path.GetDirectoryName(this.OutputPath);
             if (!this.SuppressLayout || OutputType.Module == output.Type)
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
@@ -399,36 +403,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 #endif
 
-            // Add back suppressed tables which must be present prior to merging in modules.
-            if (OutputType.Product == output.Type)
-            {
-                Table wixMergeTable = output.Tables["WixMerge"];
-
-                if (null != wixMergeTable && 0 < wixMergeTable.Rows.Count)
-                {
-                    foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
-                    {
-                        string sequenceTableName = sequence.ToString();
-                        Table sequenceTable = output.Tables[sequenceTableName];
-
-                        if (null == sequenceTable)
-                        {
-                            sequenceTable = output.EnsureTable(this.TableDefinitions[sequenceTableName]);
-                        }
-
-                        if (0 == sequenceTable.Rows.Count)
-                        {
-                            suppressedTableNames.Add(sequenceTableName);
-                        }
-                    }
-                }
-            }
-
-            //foreach (BinderExtension extension in this.Extensions)
-            //{
-            //    extension.PostBind(this.Context);
-            //}
-
             this.ValidateComponentGuids(output);
 
             // stop processing if an error previously occurred
@@ -455,17 +429,36 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Output the output to a file.
-            Pdb pdb = new Pdb();
-            pdb.Output = output;
             if (!String.IsNullOrEmpty(this.PdbFile))
             {
+                Pdb pdb = new Pdb();
+                pdb.Output = output;
                 pdb.Save(this.PdbFile);
             }
 
             // Merge modules.
-            if (OutputType.Product == output.Type)
+            if (containsMergeModules)
             {
                 this.Messaging.Write(VerboseMessages.MergingModules());
+
+                // Add back possibly suppressed sequence tables since all sequence tables must be present
+                // for the merge process to work. We'll drop the suppressed sequence tables again as
+                // necessary.
+                foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
+                {
+                    var sequenceTableName = sequence.ToString();
+                    var sequenceTable = output.Tables[sequenceTableName];
+
+                    if (null == sequenceTable)
+                    {
+                        sequenceTable = output.EnsureTable(this.TableDefinitions[sequenceTableName]);
+                    }
+
+                    if (0 == sequenceTable.Rows.Count)
+                    {
+                        suppressedTableNames.Add(sequenceTableName);
+                    }
+                }
 
                 var command = new MergeModulesCommand();
                 command.FileFacades = fileFacades;

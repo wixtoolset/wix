@@ -41,7 +41,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
-            List<FileTransfer> fileTransfers = new List<FileTransfer>();
+            var fileTransfers = new List<FileTransfer>();
 
             var directories = new Dictionary<string, ResolvedDirectory>();
 
