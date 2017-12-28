@@ -20,12 +20,12 @@ namespace WixToolset.Extensibility
             this.Context = context;
         }
 
-        public bool CopyFile(string source, string destination)
+        public virtual bool CopyFile(string source, string destination)
         {
             return false;
         }
 
-        public bool MoveFile(string source, string destination)
+        public virtual bool MoveFile(string source, string destination)
         {
             return false;
         }
