@@ -22,3 +22,8 @@ skip_tags: true
 artifacts:
 - path: build\Release\**\*.nupkg
   name: nuget
+
+notifications:
+- provider: Slack
+  incoming_webhook:
+    secure: p5xuu+4x2JHfwGDMDe5KcG1k7gZxqYc4jWVwvyNZv5cvkubPD2waJs5yXMAXZNN7Z63/3PWHb7q4KoY/99AjauYa1nZ4c5qYqRPFRBKTHfA=
