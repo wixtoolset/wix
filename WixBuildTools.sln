@@ -1,12 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{00E50075-E896-42D1-AC30-2D2E7D129FB9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixBuildTools.XsdGen", "src\WixBuildTools.XsdGen\WixBuildTools.XsdGen.csproj", "{E89E52C9-A4A1-4174-A1B1-3B72975E6ED6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixBuildTools.MsgGen", "src\WixBuildTools.MsgGen\WixBuildTools.MsgGen.csproj", "{DB6EF6F3-51B1-4214-9A14-D501C23F6FA4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixBuildTools.TestSupport", "src\WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj", "{6C57EF2C-979A-4106-A9E5-FE342810619A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,13 +42,21 @@ Global
 		{DB6EF6F3-51B1-4214-9A14-D501C23F6FA4}.Release|x64.Build.0 = Release|Any CPU
 		{DB6EF6F3-51B1-4214-9A14-D501C23F6FA4}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB6EF6F3-51B1-4214-9A14-D501C23F6FA4}.Release|x86.Build.0 = Release|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Debug|x64.Build.0 = Debug|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Release|x64.ActiveCfg = Release|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Release|x64.Build.0 = Release|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6C57EF2C-979A-4106-A9E5-FE342810619A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{E89E52C9-A4A1-4174-A1B1-3B72975E6ED6} = {00E50075-E896-42D1-AC30-2D2E7D129FB9}
-		{DB6EF6F3-51B1-4214-9A14-D501C23F6FA4} = {00E50075-E896-42D1-AC30-2D2E7D129FB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {83E9E075-B440-471A-9C37-9D84BA0AE3E0}
