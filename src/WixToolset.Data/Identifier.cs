@@ -12,18 +12,38 @@ namespace WixToolset.Data
     [DebuggerDisplay("{Access} {Id,nq}")]
     public class Identifier
     {
-        public static Identifier Invalid = new Identifier(null, AccessModifier.Private);
+        public static Identifier Invalid = new Identifier(AccessModifier.Private, (string)null);
 
+        // TODO: [Obsolete] this constructor.
         public Identifier(string id, AccessModifier access)
         {
             this.Id = id;
             this.Access = access;
         }
 
+        // TODO: [Obsolete] this constructor.
         public Identifier(int id, AccessModifier access)
         {
             this.Id = id.ToString();
             this.Access = access;
+        }
+
+        public Identifier(AccessModifier access, string id)
+        {
+            this.Access = access;
+            this.Id = id;
+        }
+
+        public Identifier(AccessModifier access, params string[] ids)
+        {
+            this.Access = access;
+            this.Id = String.Join("/", ids);
+        }
+
+        public Identifier(AccessModifier access, int id)
+        {
+            this.Access = access;
+            this.Id = id.ToString();
         }
 
         /// <summary>
@@ -42,7 +62,7 @@ namespace WixToolset.Data
             var accessValue = jsonObject.GetValueOrDefault<string>("access");
             Enum.TryParse(accessValue, true, out AccessModifier access);
 
-            return new Identifier(id, access);
+            return new Identifier(access, id);
         }
 
         internal JsonObject Serialize()
