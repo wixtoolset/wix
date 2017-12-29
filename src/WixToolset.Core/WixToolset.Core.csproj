@@ -8,18 +8,6 @@
     <Title>WiX Toolset Core</Title>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
-  <!--
-  <ItemGroup>
-    <MsgGenSource Include="Data\messages.xml">
-      <ResourcesLogicalName>WixToolset.Core.Data.messages.resources</ResourcesLogicalName>
-    </MsgGenSource>
-  </ItemGroup>
-  -->
-
   <ItemGroup>
     <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
     <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
@@ -32,18 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dtf.Resources" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.4.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
-    <PackageReference Include="WixBuildTools.MsgGen" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixBuildTools.XsdGen" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.7" PrivateAssets="all" />
   </ItemGroup>
 </Project>

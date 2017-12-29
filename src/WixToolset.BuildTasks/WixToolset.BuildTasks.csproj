@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" PrivateAssets="all" Condition="'$(TargetFramework)'=='net461' " />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" PrivateAssets="all" Condition="'$(TargetFramework)'=='netstandard2.0' " />
   </ItemGroup>
