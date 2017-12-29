@@ -11,6 +11,7 @@ dotnet publish -c Release -o %_P%\net461 -r win-x86 src\light
 dotnet publish -c Release -o %_P%\net461 -r win-x86 src\WixToolset.BuildTasks
 
 dotnet pack -c Release src\WixToolset.Core.InternalPackage
+dotnet pack -c Release src\WixToolset.Core.TestPackage
 
 @popd
 @endlocal
