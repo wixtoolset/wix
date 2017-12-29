@@ -81,7 +81,7 @@ namespace WixToolset.Core
 
         public string CompliationId { get; set; }
 
-        public string OutputPath { get;  set; }
+        public string OutputPath { get; set; }
 
         public Platform Platform { get; set; }
 
@@ -497,8 +497,8 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.AppId);
-                    row.Set(0, appId);
+                    var id = new Identifier(appId, AccessModifier.Public);
+                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.AppId, id);
                     row.Set(1, remoteServerName);
                     row.Set(2, localService);
                     row.Set(3, serviceParameters);
@@ -2411,7 +2411,7 @@ namespace WixToolset.Core
 
             if (shouldAddCreateFolder)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CreateFolder);
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CreateFolder, new Identifier(AccessModifier.Public, directoryId, id.Id));
                 row.Set(0, directoryId);
                 row.Set(1, id.Id);
             }
@@ -2876,7 +2876,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CreateFolder);
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CreateFolder, new Identifier(AccessModifier.Public, directoryId, componentId));
                 row.Set(0, directoryId);
                 row.Set(1, componentId);
             }
@@ -3988,8 +3988,8 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixCustomTable);
-                    row.Set(0, tableId);
+                    var id = new Identifier(tableId, AccessModifier.Public);
+                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixCustomTable, id);
                     row.Set(1, columnCount);
                     row.Set(2, columnNames);
                     row.Set(3, columnTypes);
@@ -4473,20 +4473,23 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                Identifier rowId = id;
+                var access = id.Access;
+                var rowId = id.Id;
 
                 // If AssignToProperty is set, the DrLocator row created by
                 // ParseFileSearchElement creates the directory entry to return
                 // and the row created here is for the file search.
                 if (assignToProperty)
                 {
-                    rowId = new Identifier(signature, AccessModifier.Private);
+                    access = AccessModifier.Private;
+                    rowId = signature;
 
                     // The property should be set to the directory search Id.
                     signature = id.Id;
                 }
 
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.DrLocator, rowId);
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.DrLocator, new Identifier(access, rowId, parentSignature, path));
+                row.Set(0, rowId);
                 row.Set(1, parentSignature);
                 row.Set(2, path);
                 if (CompilerConstants.IntegerNotSet != depth)
@@ -6053,13 +6056,14 @@ namespace WixToolset.Core
                     {
                         // Creates the DrLocator row for the directory search while
                         // the parent DirectorySearch creates the file locator row.
-                        row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.DrLocator);
+                        row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.DrLocator, new Identifier(AccessModifier.Public, parentSignature, id.Id, String.Empty));
                         row.Set(0, parentSignature);
-                        row.Set(1, id);
+                        row.Set(1, id.Id);
                     }
                     else
                     {
-                        row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.DrLocator, id);
+                        row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.DrLocator, new Identifier(AccessModifier.Public, id.Id, parentSignature, String.Empty));
+                        row.Set(0, id.Id);
                         row.Set(1, parentSignature);
                     }
                 }
@@ -7158,7 +7162,7 @@ namespace WixToolset.Core
                 }
 
                 // finally, schedule RemoveExistingProducts
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction, new Identifier("InstallExecuteSequence/RemoveExistingProducts", AccessModifier.Public));
+                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction, new Identifier(AccessModifier.Public, "InstallExecuteSequence", "RemoveExistingProducts"));
                 row.Set(0, "InstallExecuteSequence");
                 row.Set(1, "RemoveExistingProducts");
                 // row.Set(2, condition);
@@ -13486,7 +13490,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixAction, new Identifier($"{sequenceTable}/{actionName}", AccessModifier.Public));
+                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixAction, new Identifier(AccessModifier.Public, sequenceTable, actionName));
                         row.Set(0, sequenceTable);
                         row.Set(1, actionName);
                         row.Set(2, condition);
@@ -14526,8 +14530,7 @@ namespace WixToolset.Core
             // add the row and any references needed
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction);
-                row.Set(0, actionName);
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction, new Identifier(AccessModifier.Public, actionName));
                 row.Set(1, MsiInterop.MsidbCustomActionTypeProperty | MsiInterop.MsidbCustomActionTypeTextData | extraBits);
                 row.Set(2, id);
                 row.Set(3, value);
@@ -14660,15 +14663,14 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
                 }
 
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction);
-                row.Set(0, actionName);
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction, new Identifier(AccessModifier.Public, actionName));
                 row.Set(1, MsiInterop.MsidbCustomActionTypeProperty | MsiInterop.MsidbCustomActionTypeTextData | extraBits);
                 row.Set(2, id);
                 row.Set(3, value);
 
                 foreach (string sequence in sequences)
                 {
-                    var sequenceRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction);
+                    var sequenceRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction, new Identifier(AccessModifier.Public, sequence, actionName));
                     sequenceRow.Set(0, sequence);
                     sequenceRow.Set(1, actionName);
                     sequenceRow.Set(2, condition);
