@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:vs="http://wixtoolset.org/schemas/v4/wxs/vs">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+       <Component>
+         <File Name="fake.vsix" Source="example.txt">
+           <vs:VsixPackage PackageId="ExampleVsix" />
+         </File>
+         
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

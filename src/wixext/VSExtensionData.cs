@@ -1,55 +1,15 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.VisualStudio
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
-    /// <summary>
-    /// The WiX Toolset Visual Studio Extension.
-    /// </summary>
-    public sealed class VSExtensionData : ExtensionData
+    public sealed class VSExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the optional table definitions for this extension.
-        /// </summary>
-        /// <value>The optional table definitions for this extension.</value>
-        public override TableDefinitionCollection TableDefinitions
+        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            get
-            {
-                return VSExtensionData.GetExtensionTableDefinitions();
-            }
-        }
-
-        /// <summary>
-        /// Gets the library associated with this extension.
-        /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
-        /// <returns>The loaded library.</returns>
-        public override Library GetLibrary(TableDefinitionCollection tableDefinitions)
-        {
-            return VSExtensionData.GetExtensionLibrary(tableDefinitions);
-        }
-
-        /// <summary>
-        /// Internal mechanism to access the extension's table definitions.
-        /// </summary>
-        /// <returns>Extension's table definitions.</returns>
-        internal static TableDefinitionCollection GetExtensionTableDefinitions()
-        {
-            return ExtensionData.LoadTableDefinitionHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.tables.xml");
-        }
-
-        /// <summary>
-        /// Internal mechanism to access the extension's library.
-        /// </summary>
-        /// <returns>Extension's library.</returns>
-        internal static Library GetExtensionLibrary(TableDefinitionCollection tableDefinitions)
-        {
-            return ExtensionData.LoadLibraryHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.vs.wixlib", tableDefinitions);
+            return Intermediate.Load(typeof(VSExtensionData).Assembly, "WixToolset.VisualStudio.vs.wixlib", tupleDefinitions);
         }
     }
 }

@@ -4,66 +4,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>WixToolset.Extensions</RootNamespace>
+    <RootNamespace>WixToolset.VisualStudio</RootNamespace>
     <Description>WiX Toolset Visual Studio Extension</Description>
     <Title>WiX Toolset VS Extension</Title>
     <IsTool>true</IsTool>
     <ContentTargetFolders>build</ContentTargetFolders>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Data\tables.xml">
-      <LogicalName>$(RootNamespace).Data.tables.xml</LogicalName>
-    </EmbeddedResource>
-
-    <MsgGenSource Include="Data\messages.xml">
-      <ResourcesLogicalName>$(RootNamespace).Data.Messages.resources</ResourcesLogicalName>
-    </MsgGenSource>
-
-    <EmbeddedResource Include="Xsd\vs.xsd">
-      <LogicalName>$(RootNamespace).Xsd.vs.xsd</LogicalName>
-      <Pack>true</Pack>
-      <PackagePath>tools</PackagePath>
-    </EmbeddedResource>
-
-    <XsdGenSource Include="Xsd\vs.xsd">
-      <CommonNamespace>WixToolset.Data.Serialize</CommonNamespace>
-      <Namespace>WixToolset.Extensions.Serialize.VS</Namespace>
-    </XsdGenSource>
-
-    <EmbeddedResource Include="$(OutputPath)..\vs.wixlib">
-      <Link>Data\vs.wixlib</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
+    <Content Include="vs.xsd" PackagePath="tools" />
+    <EmbeddedResource Include="$(OutputPath)..\vs.wixlib" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " PrivateAssets="all" />
-
     <ProjectReference Include="$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " PrivateAssets="all" />
-
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core\WixToolset.Core.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\src\WixToolset.Core\WixToolset.Core.csproj') " />
-    <PackageReference Include="WixToolset.Core" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\src\WixToolset.Core\WixToolset.Core.csproj') " PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\vs.wixproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="..\wixlib\vs.wixproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
-    <PackageReference Include="WixBuildTools.MsgGen" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixBuildTools.XsdGen" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 </Project>

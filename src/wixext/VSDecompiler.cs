@@ -1,7 +1,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.VisualStudio
 {
+#if TODO_CONSIDER_DECOMPILER
     using System;
     using System.Collections;
     using System.Diagnostics;
@@ -104,7 +105,7 @@ namespace WixToolset.Extensions
                 {
                     helpFile.SampleLocation = (string)row[7];
                 }
-                
+
                 if (this.Core.RootElement is Wix.Module)
                 {
                     helpFile.SuppressCustomActions = VS.YesNoType.yes;
@@ -270,7 +271,7 @@ namespace WixToolset.Extensions
 
                 //we cannot do this work because we cannot get the FeatureComponent table
                 //plugCollectionInto.TargetFeature = DecompileHelpComponents();
-                
+
                 VS.HelpCollection helpCollection = (VS.HelpCollection)this.Core.GetIndexedElement("HelpNamespace", (string)row[0]);
                 if (null != helpCollection)
                 {
@@ -293,4 +294,5 @@ namespace WixToolset.Extensions
         //    return String.Empty;
         //}
     }
+#endif
 }
