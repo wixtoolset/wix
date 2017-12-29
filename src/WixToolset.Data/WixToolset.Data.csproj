@@ -10,21 +10,8 @@
     <Description></Description>
   </PropertyGroup>
 
-  <!--
   <ItemGroup>
-    <MsgGenSource Include="Data\messages.xml">
-      <ResourcesLogicalName>$(RootNamespace).Data.messages.resources</ResourcesLogicalName>
-    </MsgGenSource>
-    <XsdGenSource Include="Xsd\wix.xsd">
-      <Namespace>WixToolset.Data.Serialize</Namespace>
-    </XsdGenSource>
-  </ItemGroup>
-  -->
-
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.0.41" PrivateAssets="all" />
-    <PackageReference Include="WixBuildTools.MsgGen" Version="4.0.*" PrivateAssets="all" />
-    <PackageReference Include="WixBuildTools.XsdGen" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.7" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
