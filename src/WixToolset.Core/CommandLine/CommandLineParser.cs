@@ -171,6 +171,10 @@ namespace WixToolset.Core.CommandLine
                         case "-version":
                             showVersion = true;
                             return true;
+
+                        case "sval":
+                            // todo: implement
+                            return true;
                     }
 
                     return false;
@@ -207,7 +211,7 @@ namespace WixToolset.Core.CommandLine
                         var variables = this.GatherPreprocessorVariables(defines);
                         var bindPathList = this.GatherBindPaths(bindPaths);
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
+                        return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
                     }
 
                 case Commands.Compile:

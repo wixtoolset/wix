@@ -13,7 +13,7 @@ namespace WixToolset.Core.CommandLine
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
+        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, IEnumerable<string> includeSearchPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -29,6 +29,7 @@ namespace WixToolset.Core.CommandLine
             this.Cultures = cultures;
             this.BindFiles = bindFiles;
             this.BindPaths = bindPaths;
+            this.IncludeSearchPaths = includeSearchPaths;
 
             this.IntermediateFolder = intermediateFolder ?? Path.GetTempPath();
             this.ContentsFile = contentsFile;
