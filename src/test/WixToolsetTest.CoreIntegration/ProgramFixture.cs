@@ -4,11 +4,11 @@ namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
     using System.Linq;
+    using WixBuildTools.TestSupport;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolsetTest.CoreIntegration.Utility;
     using Xunit;
 
     public class ProgramFixture
@@ -247,7 +247,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildWixout()
+        public void CanBuildWixipl()
         {
             var folder = TestData.Get(@"TestData\SingleFile");
 
@@ -265,7 +265,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.wixout")
+                    "-o", Path.Combine(baseFolder, @"bin\test.wixipl")
                 });
 
                 Assert.Equal(0, result);
@@ -273,7 +273,7 @@ namespace WixToolsetTest.CoreIntegration
                 var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
 
                 Assert.Equal(new[]{
-                    "test.wixout"
+                    "test.wixipl"
                 }, builtFiles.Select(Path.GetFileName).ToArray());
             }
         }

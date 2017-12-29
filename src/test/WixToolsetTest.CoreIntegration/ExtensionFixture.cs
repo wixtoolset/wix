@@ -6,14 +6,27 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using System.Linq;
     using Example.Extension;
+    using WixBuildTools.TestSupport;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
-    using WixToolsetTest.CoreIntegration.Utility;
     using Xunit;
 
     public class ExtensionFixture
     {
+        [Fact]
+        public void CanBuildAndQuery()
+        {
+            var folder = TestData.Get(@"TestData\ExampleExtension");
+            var build = new Builder(folder, typeof(ExampleExtensionFactory), new[] { Path.Combine(folder, "data") });
+
+            var results = build.BuildAndQuery(Build, "Example");
+            Assert.Equal(new[]
+            {
+                "Example:Foo\tBar"
+            }, results);
+        }
+
         [Fact]
         public void CanBuildWithExampleExtension()
         {
@@ -83,21 +96,20 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal(0, result);
 
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.msi")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\example.txt")));
-
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wir"));
                 var section = intermediate.Sections.Single();
-
-                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
 
                 var property = section.Tuples.OfType<PropertyTuple>().Where(p => p.Id.Id == "ExampleProperty").Single();
                 Assert.Equal("ExampleProperty", property.Property);
                 Assert.Equal("test", property.Value);
             }
+        }
+
+        private static void Build(string[] args)
+        {
+            var program = new Program();
+            var result = program.Run(new WixToolsetServiceProvider(), null, args);
+            Assert.Equal(0, result);
         }
     }
 }

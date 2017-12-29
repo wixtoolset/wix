@@ -7,6 +7,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Content Include="TestData\SimpleModule\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
@@ -40,6 +44,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\wix\wix.csproj" />
     <ProjectReference Include="..\TestData\Example.Extension\Example.Extension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>
