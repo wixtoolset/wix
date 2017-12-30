@@ -198,17 +198,17 @@ namespace WixToolset.Data
                     jsonObject.Add("definitions", customDefinitionsJson);
                 }
 
-                //if (this.Localizations.Any())
-                //{
-                //    var localizationsJson = new JsonArray();
-                //    foreach (var localization in this.Localizations)
-                //    {
-                //        var localizationJson = localization.Serialize();
-                //        localizationsJson.Add(localizationJson);
-                //    }
+                if (this.Localizations.Any())
+                {
+                    var localizationsJson = new JsonArray();
+                    foreach (var localization in this.Localizations)
+                    {
+                        var localizationJson = localization.Serialize();
+                        localizationsJson.Add(localizationJson);
+                    }
 
-                //    jsonObject.Add("localizations", localizationsJson);
-                //}
+                    jsonObject.Add("localizations", localizationsJson);
+                }
 
                 var json = SimpleJson.SerializeObject(jsonObject);
                 writer.Write(json);
@@ -272,12 +272,12 @@ namespace WixToolset.Data
 
             var localizations = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
 
-            //var localizationsJson = jsonObject.GetValueOrDefault<JsonArray>("localizations") ?? new JsonArray();
-            //foreach (JsonObject localizationJson in localizationsJson)
-            //{
-            //    var localization = Localization.Deserialize(localizationJson);
-            //    localizations.Add(localization.Culture, localization);
-            //}
+            var localizationsJson = jsonObject.GetValueOrDefault<JsonArray>("localizations") ?? new JsonArray();
+            foreach (JsonObject localizationJson in localizationsJson)
+            {
+                var localization = Localization.Deserialize(localizationJson);
+                localizations.Add(localization.Culture, localization);
+            }
 
             return new Intermediate(id, sections, localizations, null);
         }

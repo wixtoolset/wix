@@ -1,9 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Data.Rows
+namespace WixToolset.Data.Bind
 {
+    using SimpleJson;
+
     /// <summary>
-    /// Specialization of a row for the WixVariable table.
+    /// Bind variable.
     /// </summary>
     public sealed class BindVariable
     {
@@ -29,5 +31,32 @@ namespace WixToolset.Data.Rows
         /// </summary>
         /// <value>Whether this variable is overridable.</value>
         public bool Overridable { get; set; }
+
+        internal JsonObject Serialize()
+        {
+            var jsonObject = new JsonObject
+            {
+                { "name", this.Id },
+            };
+
+            jsonObject.AddIsNotNullOrEmpty("value", this.Value);
+            jsonObject.AddNonDefaultValue("overridable", this.Overridable, false);
+            jsonObject.AddNonDefaultValue("ln", this.SourceLineNumbers?.Serialize());
+
+            return jsonObject;
+        }
+
+        internal static BindVariable Deserialize(JsonObject jsonObject)
+        {
+            var variable = new BindVariable()
+            {
+                Id = jsonObject.GetValueOrDefault<string>("name"),
+                Value = jsonObject.GetValueOrDefault<string>("value"),
+                Overridable = jsonObject.GetValueOrDefault("overridable", false),
+                SourceLineNumbers = jsonObject.GetValueOrDefault<SourceLineNumber>("ln")
+            };
+
+            return variable;
+        }
     }
 }

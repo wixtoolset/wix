@@ -7,6 +7,51 @@ namespace WixToolset.Data
 
     internal static class JsonObjectExtensions
     {
+        public static JsonObject AddNonDefaultValue(this JsonObject jsonObject, string key, bool value, bool defaultValue = default(bool))
+        {
+            if (value != defaultValue)
+            {
+                jsonObject.Add(key, value);
+            }
+
+            return jsonObject;
+        }
+
+        public static JsonObject AddNonDefaultValue(this JsonObject jsonObject, string key, int value, int defaultValue = default(int))
+        {
+            if (value != defaultValue)
+            {
+                jsonObject.Add(key, value);
+            }
+
+            return jsonObject;
+        }
+
+        public static JsonObject AddNonDefaultValue(this JsonObject jsonObject, string key, object value, object defaultValue = null)
+        {
+            if (value != defaultValue)
+            {
+                jsonObject.Add(key, value);
+            }
+
+            return jsonObject;
+        }
+
+        public static JsonObject AddIsNotNullOrEmpty(this JsonObject jsonObject, string key, string value)
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                jsonObject.Add(key, value);
+            }
+
+            return jsonObject;
+        }
+
+        public static bool GetValueOrDefault(this JsonObject jsonObject, string key, bool defaultValue)
+        {
+            return jsonObject.TryGetValue(key, out var value) ? Convert.ToBoolean(value) : defaultValue;
+        }
+
         public static int GetValueOrDefault(this JsonObject jsonObject, string key, int defaultValue)
         {
             return jsonObject.TryGetValue(key, out var value) ? Convert.ToInt32(value) : defaultValue;

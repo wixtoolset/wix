@@ -7,8 +7,9 @@ namespace WixToolset.Data
     using System.Diagnostics;
     using System.Globalization;
     using System.Xml;
+    using SimpleJson;
     using WixToolset.Data.Msi;
-    using WixToolset.Data.Rows;
+    using WixToolset.Data.Bind;
 
     /// <summary>
     /// Object that represents a localization file.
@@ -72,6 +73,75 @@ namespace WixToolset.Data
                     throw new WixException(ErrorMessages.DuplicateLocalizationIdentifier(wixVariableRow.SourceLineNumbers, wixVariableRow.Id));
                 }
             }
+        }
+
+        internal JsonObject Serialize()
+        {
+            var jsonObject = new JsonObject
+            {
+                { "codepage", this.Codepage },
+            };
+
+            jsonObject.AddIsNotNullOrEmpty("culture", this.Culture);
+
+            // Serialize bind variables.
+            if (this.Variables.Count > 0)
+            {
+                var variablesJson = new JsonArray(this.Variables.Count);
+
+                foreach (var variable in this.Variables)
+                {
+                    var variableJson = variable.Serialize();
+
+                    variablesJson.Add(variableJson);
+                }
+
+                jsonObject.Add("variables", variablesJson);
+            }
+
+            // Serialize localized control.
+            if (this.LocalizedControls.Count > 0)
+            {
+                var controlsJson = new JsonObject();
+
+                foreach (var controlWithKey in this.LocalizedControls)
+                {
+                    var controlJson = controlWithKey.Value.Serialize();
+
+                    controlsJson.Add(controlWithKey.Key, controlJson);
+                }
+
+                jsonObject.Add("controls", controlsJson);
+            }
+
+            return jsonObject;
+        }
+
+        internal static Localization Deserialize(JsonObject jsonObject)
+        {
+            var codepage = jsonObject.GetValueOrDefault("codepage", 0);
+            var culture = jsonObject.GetValueOrDefault<string>("culture");
+
+            var variables = new Dictionary<string, BindVariable>();
+            var variablesJson = jsonObject.GetValueOrDefault("variables", new JsonArray());
+            foreach (JsonObject variableJson in variablesJson)
+            {
+                var bindPath = BindVariable.Deserialize(variableJson);
+                variables.Add(bindPath.Id, bindPath);
+            }
+
+            var controls = new Dictionary<string, LocalizedControl>();
+            var controlsJson = jsonObject.GetValueOrDefault<JsonObject>("controls");
+            if (controlsJson != null)
+            {
+                foreach (var controlJsonWithKey in controlsJson)
+                {
+                    var control = LocalizedControl.Deserialize((JsonObject)controlJsonWithKey.Value);
+                    controls.Add(controlJsonWithKey.Key, control);
+                }
+            }
+
+            return new Localization(codepage, culture, variables, controls);
         }
 
         /// <summary>

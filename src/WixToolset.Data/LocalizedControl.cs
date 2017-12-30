@@ -3,6 +3,7 @@
 namespace WixToolset.Data
 {
     using System;
+    using SimpleJson;
 
     public class LocalizedControl
     {
@@ -47,5 +48,37 @@ namespace WixToolset.Data
         /// <param name="control">The id of the control.</param>
         /// <returns>The localized control id.</returns>
         public static string GetKey(string dialog, string control) => String.Concat(dialog, "/", control);
+
+        internal JsonObject Serialize()
+        {
+            var jsonObject = new JsonObject
+            {
+                { "dialog", this.Dialog },
+            };
+
+            jsonObject.AddIsNotNullOrEmpty("control", this.Control);
+            jsonObject.AddNonDefaultValue("x", this.X, 0);
+            jsonObject.AddNonDefaultValue("y", this.Y, 0);
+            jsonObject.AddNonDefaultValue("width", this.Width, 0);
+            jsonObject.AddNonDefaultValue("height", this.Height, 0);
+            jsonObject.AddNonDefaultValue("attribs", this.Attributes, 0);
+            jsonObject.AddIsNotNullOrEmpty("text", this.Text);
+
+            return jsonObject;
+        }
+
+        internal static LocalizedControl Deserialize(JsonObject jsonObject)
+        {
+            var dialog = jsonObject.GetValueOrDefault<string>("dialog");
+            var control = jsonObject.GetValueOrDefault<string>("control");
+            var x = jsonObject.GetValueOrDefault("x", 0);
+            var y = jsonObject.GetValueOrDefault("y", 0);
+            var width = jsonObject.GetValueOrDefault("width", 0);
+            var height = jsonObject.GetValueOrDefault("height", 0);
+            var attribs = jsonObject.GetValueOrDefault("attribs", 0);
+            var text = jsonObject.GetValueOrDefault<string>("text");
+
+            return new LocalizedControl(dialog, control, x, y, width, height, attribs, text);
+        }
     }
 }
