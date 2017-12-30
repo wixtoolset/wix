@@ -831,42 +831,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Gets a RegistryRoot value and displays an error for an illegal value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <param name="allowHkmu">Whether HKMU is considered a valid value.</param>
-        /// <returns>The attribute's RegisitryRootType value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        public Wix.RegistryRootType GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
-        {
-            Wix.RegistryRootType registryRoot = Wix.RegistryRootType.NotSet;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                registryRoot = Wix.Enums.ParseRegistryRootType(value);
-
-                if (Wix.RegistryRootType.IllegalValue == registryRoot || (!allowHkmu && Wix.RegistryRootType.HKMU == registryRoot))
-                {
-                    // TODO: Find a way to expose the valid values programatically!
-                    if (allowHkmu)
-                    {
-                        this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
-                            "HKMU", "HKCR", "HKCU", "HKLM", "HKU"));
-                    }
-                    else
-                    {
-                        this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
-                            "HKCR", "HKCU", "HKLM", "HKU"));
-                    }
-                }
-            }
-
-            return registryRoot;
-        }
-
-        /// <summary>
         /// Gets a RegistryRoot as a MsiInterop.MsidbRegistryRoot value and displays an error for an illegal value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
@@ -876,33 +840,7 @@ namespace WixToolset.Core
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
         public int GetAttributeMsidbRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
         {
-            Wix.RegistryRootType registryRoot = this.GetAttributeRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
-
-            switch (registryRoot)
-            {
-                case Wix.RegistryRootType.NotSet:
-                    return CompilerConstants.IntegerNotSet;
-                case Wix.RegistryRootType.HKCR:
-                    return Core.Native.MsiInterop.MsidbRegistryRootClassesRoot;
-                case Wix.RegistryRootType.HKCU:
-                    return Core.Native.MsiInterop.MsidbRegistryRootCurrentUser;
-                case Wix.RegistryRootType.HKLM:
-                    return Core.Native.MsiInterop.MsidbRegistryRootLocalMachine;
-                case Wix.RegistryRootType.HKU:
-                    return Core.Native.MsiInterop.MsidbRegistryRootUsers;
-                case Wix.RegistryRootType.HKMU:
-                    // This is gross, but there was *one* registry root parsing instance
-                    // (in Compiler.ParseRegistrySearchElement()) that did not explicitly
-                    // handle HKMU and it fell through to the default error case. The
-                    // others treated it as -1, which is what we do here.
-                    if (allowHkmu)
-                    {
-                        return -1;
-                    }
-                    break;
-            }
-
-            return CompilerConstants.IntegerNotSet;
+            return this.parseHelper.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
         }
 
         /// <summary>
