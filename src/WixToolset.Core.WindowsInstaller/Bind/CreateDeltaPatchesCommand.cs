@@ -8,7 +8,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Data.Tuples;
 
     /// <summary>

@@ -5,7 +5,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     internal class OrderPackagesAndRollbackBoundariesCommand
     {

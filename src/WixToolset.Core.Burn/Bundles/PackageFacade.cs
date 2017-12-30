@@ -2,8 +2,6 @@
 
 namespace WixToolset.Core.Burn.Bundles
 {
-    using WixToolset.Data.Rows;
-
     internal class PackageFacade
     {
 #if TODO

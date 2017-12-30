@@ -8,7 +8,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     /// <summary>
     /// Creates cabinet files.

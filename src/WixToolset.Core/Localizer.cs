@@ -5,9 +5,9 @@ namespace WixToolset.Core
     using System;
     using System.Collections.Generic;
     using System.Xml.Linq;
-    using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Core.Native;
+    using WixToolset.Data;
+    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 

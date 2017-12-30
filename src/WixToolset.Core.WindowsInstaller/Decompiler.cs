@@ -12,7 +12,6 @@ namespace WixToolset
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Core.Native;
     using Wix = WixToolset.Data.Serialize;

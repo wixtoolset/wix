@@ -9,7 +9,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Runtime.InteropServices;
     using System.Text;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     internal class VerifyPayloadsWithCatalogCommand
     {

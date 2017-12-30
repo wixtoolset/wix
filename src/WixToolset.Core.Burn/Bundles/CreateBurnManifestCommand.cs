@@ -10,7 +10,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Text;
     using System.Xml;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
 
     internal class CreateBurnManifestCommand

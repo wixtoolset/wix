@@ -13,7 +13,6 @@ namespace WixToolset.Core.Burn
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
-    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 

@@ -9,7 +9,6 @@ namespace WixToolset
     using System.Linq;
     using System.Runtime.InteropServices;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
 
 #if DEAD_CODE

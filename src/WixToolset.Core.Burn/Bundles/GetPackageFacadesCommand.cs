@@ -4,7 +4,6 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     internal class GetPackageFacadesCommand
     {

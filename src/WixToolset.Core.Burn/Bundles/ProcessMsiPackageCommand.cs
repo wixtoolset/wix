@@ -10,7 +10,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Core.Native;
     using Dtf = WixToolset.Dtf.WindowsInstaller;

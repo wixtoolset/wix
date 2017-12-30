@@ -7,7 +7,6 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Diagnostics;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     internal class AutomaticallySlipstreamPatchesCommand
     {

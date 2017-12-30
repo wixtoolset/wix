@@ -4,7 +4,6 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     /// <summary>
     /// Initializes package state from the Exe contents.

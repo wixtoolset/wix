@@ -4,7 +4,6 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using WixToolset.Data;
-    using WixToolset.Data.Rows;
 
     /// <summary>
     /// Processes the Msu packages to add properties and payloads from the Msu packages.
