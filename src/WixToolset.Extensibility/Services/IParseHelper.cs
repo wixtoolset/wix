@@ -219,6 +219,15 @@ namespace WixToolset.Extensibility.Services
         string GetAttributeLongFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards = false, bool allowRelative = false);
 
         /// <summary>
+        /// Gets a RegistryRoot as a MsiInterop.MsidbRegistryRoot value and displays an error for an illegal value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <param name="allowHkmu">Whether HKMU is returned as -1 (true), or treated as an error (false).</param>
+        /// <returns>The attribute's RegisitryRootType value.</returns>
+        int GetAttributeMsidbRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu);
+
+        /// <summary>
         /// Gets a version value or possibly a binder variable and displays an error for an illegal version value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
