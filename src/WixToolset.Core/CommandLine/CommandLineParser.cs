@@ -114,7 +114,7 @@ namespace WixToolset.Core.CommandLine
                             cmdline.GetNextArgumentOrError(ref cabCachePath);
                             return true;
 
-                        case "cultures":
+                        case "culture":
                             cmdline.GetNextArgumentOrError(cultures);
                             return true;
                         case "contentsfile":
@@ -210,8 +210,9 @@ namespace WixToolset.Core.CommandLine
                         var sourceFiles = GatherSourceFiles(files, outputFolder);
                         var variables = this.GatherPreprocessorVariables(defines);
                         var bindPathList = this.GatherBindPaths(bindPaths);
+                        var filterCultures = CalculateFilterCultures(cultures);
                         var type = CalculateOutputType(outputType, outputFile);
-                        return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, outputFile, type, cabCachePath, cultures, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
+                        return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, filterCultures, outputFile, type, cabCachePath, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
                     }
 
                 case Commands.Compile:
@@ -223,6 +224,33 @@ namespace WixToolset.Core.CommandLine
             }
 
             return null;
+        }
+
+        private static IEnumerable<string> CalculateFilterCultures(List<string> cultures)
+        {
+            var result = new List<string>();
+
+            if (cultures == null)
+            {
+            }
+            else if (cultures.Count == 1 && cultures[0].Equals("null", StringComparison.OrdinalIgnoreCase))
+            {
+                // When null is used treat it as if cultures wasn't specified. This is
+                // needed for batching in the MSBuild task since MSBuild doesn't support
+                // empty items.
+            }
+            else
+            {
+                foreach (var culture in cultures)
+                {
+                    // Neutral is different from null. For neutral we still want to do culture filtering.
+                    // Set the culture to the empty string = identifier for the invariant culture.
+                    var filter = (culture.Equals("neutral", StringComparison.OrdinalIgnoreCase)) ? String.Empty : culture;
+                    result.Add(filter);
+                }
+            }
+
+            return result;
         }
 
         private static OutputType CalculateOutputType(string outputType, string outputFile)

@@ -25,6 +25,8 @@ namespace WixToolset.Core
 
         public IEnumerable<IExtensionData> ExtensionData { get; set; }
 
+        public IEnumerable<string> FilterCultures { get; set; }
+
         public string IntermediateFolder { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }

@@ -31,6 +31,8 @@ namespace WixToolset.Core
 
         public IEnumerable<Localization> Localizations { get; set; }
 
+        public IEnumerable<string> FilterCultures { get; set; }
+
         public ResolveResult Execute()
         {
             var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
@@ -40,6 +42,7 @@ namespace WixToolset.Core
             context.BindPaths = this.BindPaths;
             context.Extensions = extensionManager.Create<IResolverExtension>();
             context.ExtensionData = extensionManager.Create<IExtensionData>();
+            context.FilterCultures = this.FilterCultures;
             context.IntermediateFolder = this.IntermediateFolder;
             context.IntermediateRepresentation = this.IntermediateRepresentation;
             context.Localizations = this.Localizations;
@@ -207,18 +210,7 @@ namespace WixToolset.Core
         {
             var creator = context.ServiceProvider.GetService<ITupleDefinitionCreator>();
 
-            var localizations = context.Localizations.Concat(context.IntermediateRepresentation.Localizations).ToList();
-
-            // Add localizations from the extensions with data.
-            foreach (var data in context.ExtensionData)
-            {
-                var library = data.GetLibrary(creator);
-
-                if (library?.Localizations != null)
-                {
-                    localizations.AddRange(library.Localizations);
-                }
-            }
+            var localizations = FilterLocalizations(context);
 
             foreach (var localization in localizations)
             {
@@ -230,6 +222,64 @@ namespace WixToolset.Core
             foreach (var tuple in wixVariableTuples)
             {
                 context.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.WixVariable, tuple.Value, tuple.Overridable);
+            }
+        }
+
+        private static IEnumerable<Localization> FilterLocalizations(IResolveContext context)
+        {
+            var result = new List<Localization>();
+            var filter = CalculateCultureFilter(context);
+
+            var localizations = context.Localizations.Concat(context.IntermediateRepresentation.Localizations).ToList();
+
+            // If there still is no filter, return all localizations.
+            AddFilteredLocalizations(result, filter, localizations);
+
+            // Filter localizations provided by extensions with data.
+            var creator = context.ServiceProvider.GetService<ITupleDefinitionCreator>();
+
+            foreach (var data in context.ExtensionData)
+            {
+                var library = data.GetLibrary(creator);
+
+                if (library?.Localizations != null)
+                {
+                    var extensionFilter = (!filter.Any() && data.DefaultCulture != null) ? new[] { data.DefaultCulture } : filter;
+
+                    AddFilteredLocalizations(result, extensionFilter, library.Localizations);
+                }
+            }
+
+            return result;
+        }
+
+        private static IEnumerable<string> CalculateCultureFilter(IResolveContext context)
+        {
+            var filter = context.FilterCultures ?? Array.Empty<string>();
+
+            // If no filter was specified, look for a language neutral localization file specified
+            // from the command-line (not embedded in the intermediate). If found, filter on language
+            // neutral.
+            if (!filter.Any() && context.Localizations.Any(l => String.IsNullOrEmpty(l.Culture)))
+            {
+                filter = new[] { String.Empty };
+            }
+
+            return filter;
+        }
+
+        private static void AddFilteredLocalizations(List<Localization> result, IEnumerable<string> filter, IEnumerable<Localization> localizations)
+        {
+            if (!filter.Any())
+            {
+                result.AddRange(localizations);
+            }
+            else // filter localizations in order specified by the filter
+            {
+                foreach (var culture in filter)
+                {
+                    result.AddRange(localizations.Where(l => culture.Equals(l.Culture, StringComparison.OrdinalIgnoreCase)));
+                }
             }
         }
     }

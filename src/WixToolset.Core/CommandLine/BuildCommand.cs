@@ -13,20 +13,20 @@ namespace WixToolset.Core.CommandLine
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, string outputPath, OutputType outputType, string cabCachePath, IEnumerable<string> cultures, bool bindFiles, IEnumerable<BindPath> bindPaths, IEnumerable<string> includeSearchPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
+        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, IEnumerable<string> filterCultures, string outputPath, OutputType outputType, string cabCachePath, bool bindFiles, IEnumerable<BindPath> bindPaths, IEnumerable<string> includeSearchPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
             this.LocFiles = locFiles;
             this.LibraryFiles = libraryFiles;
+            this.FilterCultures = filterCultures;
             this.PreprocessorVariables = preprocessorVariables;
             this.SourceFiles = sources;
             this.OutputPath = outputPath;
             this.OutputType = outputType;
 
             this.CabCachePath = cabCachePath;
-            this.Cultures = cultures;
             this.BindFiles = bindFiles;
             this.BindPaths = bindPaths;
             this.IncludeSearchPaths = includeSearchPaths;
@@ -43,6 +43,8 @@ namespace WixToolset.Core.CommandLine
 
         public IExtensionManager ExtensionManager { get; }
 
+        public IEnumerable<string> FilterCultures { get; }
+
         public IEnumerable<string> IncludeSearchPaths { get; }
 
         public IEnumerable<string> LocFiles { get; }
@@ -58,8 +60,6 @@ namespace WixToolset.Core.CommandLine
         private OutputType OutputType { get; }
 
         public string CabCachePath { get; }
-
-        public IEnumerable<string> Cultures { get; }
 
         public bool BindFiles { get; }
 
@@ -205,6 +205,7 @@ namespace WixToolset.Core.CommandLine
             {
                 var resolver = new Resolver(this.ServiceProvider);
                 resolver.BindPaths = this.BindPaths;
+                resolver.FilterCultures = this.FilterCultures;
                 resolver.IntermediateFolder = this.IntermediateFolder;
                 resolver.IntermediateRepresentation = output;
                 resolver.Localizations = localizations;
