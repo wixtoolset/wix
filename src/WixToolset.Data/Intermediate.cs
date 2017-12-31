@@ -59,38 +59,6 @@ namespace WixToolset.Data
         public IList<IntermediateSection> Sections { get; }
 
         /// <summary>
-        /// Adds a localization to the intermediate.
-        /// </summary>
-        /// <param name="localization">Localization to add to the intermediate.</param>
-        public void AddLocalization(Localization localization)
-        {
-            if (this.localizationsByCulture.TryGetValue(localization.Culture, out var existingCulture))
-            {
-                existingCulture.Merge(localization);
-            }
-            else
-            {
-                this.localizationsByCulture.Add(localization.Culture, localization);
-            }
-        }
-
-        /// <summary>
-        /// Gets localization files from this library that match the cultures passed in, in the order of the array of cultures.
-        /// </summary>
-        /// <param name="cultures">The list of cultures to get localizations for.</param>
-        /// <returns>All localizations contained in this library that match the set of cultures provided, in the same order.</returns>
-        public IEnumerable<Localization> GetLocalizationsForCultures(IEnumerable<string> cultures)
-        {
-            foreach (string culture in cultures ?? Array.Empty<string>())
-            {
-                if (this.localizationsByCulture.TryGetValue(culture, out var localization))
-                {
-                    yield return localization;
-                }
-            }
-        }
-
-        /// <summary>
         /// Loads an intermediate from a path on disk.
         /// </summary>
         /// <param name="path">Path to intermediate file saved on disk.</param>
@@ -223,7 +191,7 @@ namespace WixToolset.Data
         /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        internal static Intermediate Load(Stream stream, Uri baseUri, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        private static Intermediate Load(Stream stream, Uri baseUri, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
         {
             JsonObject jsonObject;
 
