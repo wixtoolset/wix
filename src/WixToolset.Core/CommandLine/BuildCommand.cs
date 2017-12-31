@@ -75,37 +75,48 @@ namespace WixToolset.Core.CommandLine
 
         public int Execute()
         {
-            var intermediates = this.CompilePhase();
+            var wixobjs = this.CompilePhase();
 
             if (this.Messaging.EncounteredError)
             {
                 return this.Messaging.LastErrorNumber;
             }
 
-            if (!intermediates.Any())
+            if (!wixobjs.Any())
             {
                 return 1;
             }
 
+            var wxls = this.LoadLocalizationFiles();
+
+            if (this.Messaging.EncounteredError)
+            {
+                return this.Messaging.LastErrorNumber;
+            }
+
             if (this.OutputType == OutputType.Library)
             {
-                var library = this.LibraryPhase(intermediates);
-
-                library?.Save(this.OutputPath);
-            }
-            else if (this.OutputType == OutputType.IntermediatePostLink)
-            {
-                var output = this.LinkPhase(intermediates);
-
-                output?.Save(this.OutputPath);
-            }
-            else
-            {
-                var output = this.LinkPhase(intermediates);
+                var wixlib = this.LibraryPhase(wixobjs, wxls);
 
                 if (!this.Messaging.EncounteredError)
                 {
-                    this.BindPhase(output);
+                    wixlib.Save(this.OutputPath);
+                }
+            }
+            else
+            {
+                var wixipl = this.LinkPhase(wixobjs);
+
+                if (!this.Messaging.EncounteredError)
+                {
+                    if (this.OutputType == OutputType.IntermediatePostLink)
+                    {
+                        wixipl.Save(this.OutputPath);
+                    }
+                    else
+                    {
+                        this.BindPhase(wixipl, wxls);
+                    }
                 }
             }
 
@@ -147,10 +158,8 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates)
+        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations)
         {
-            var localizations = this.LoadLocalizationFiles().ToList();
-
             // If there was an error loading localization files, then bail.
             if (this.Messaging.EncounteredError)
             {
@@ -184,12 +193,8 @@ namespace WixToolset.Core.CommandLine
             return linker.Execute();
         }
 
-        private void BindPhase(Intermediate output)
+        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations)
         {
-            var localizations = new List<Localization>(output.Localizations);
-
-            localizations.AddRange(this.LoadLocalizationFiles());
-
             // If there was an error loading localization files, then bail.
             if (this.Messaging.EncounteredError)
             {
@@ -288,7 +293,19 @@ namespace WixToolset.Core.CommandLine
         {
             foreach (var loc in this.LocFiles)
             {
-                var localization = Localizer.ParseLocalizationFile(this.Messaging, loc);
+                var preprocessor = new Preprocessor(this.ServiceProvider);
+                preprocessor.IncludeSearchPaths = this.IncludeSearchPaths;
+                preprocessor.Platform = Platform.X86; // TODO: set this correctly
+                preprocessor.SourcePath = loc;
+                preprocessor.Variables = this.PreprocessorVariables;
+                var document = preprocessor.Execute();
+
+                if (this.Messaging.EncounteredError)
+                {
+                    continue;
+                }
+
+                var localization = Localizer.ParseLocalizationFile(this.Messaging, document);
 
                 yield return localization;
             }

@@ -22,13 +22,22 @@ namespace WixToolset.Core
         /// <summary>
         /// Loads a localization file from a path on disk.
         /// </summary>
-        /// <param name="path">Path to library file saved on disk.</param>
-        /// <param name="tableDefinitions">Collection containing TableDefinitions to use when loading the localization file.</param>
-        /// <param name="suppressSchema">Suppress xml schema validation while loading.</param>
+        /// <param name="path">Path to localization file saved on disk.</param>
         /// <returns>Returns the loaded localization file.</returns>
         public static Localization ParseLocalizationFile(IMessaging messaging, string path)
         {
-            XElement root = XDocument.Load(path).Root;
+            var document = XDocument.Load(path);
+            return ParseLocalizationFile(messaging, document);
+        }
+
+        /// <summary>
+        /// Loads a localization file from memory.
+        /// </summary>
+        /// <param name="document">Document to parse as localization file.</param>
+        /// <returns>Returns the loaded localization file.</returns>
+        public static Localization ParseLocalizationFile(IMessaging messaging, XDocument document)
+        {
+            XElement root = document.Root;
             Localization localization = null;
 
             SourceLineNumber sourceLineNumbers = SourceLineNumber.CreateFromXObject(root);
