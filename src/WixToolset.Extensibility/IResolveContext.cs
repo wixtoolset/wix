@@ -17,10 +17,14 @@ namespace WixToolset.Extensibility
 
         IEnumerable<IResolverExtension> Extensions { get; set; }
 
+        IEnumerable<IExtensionData> ExtensionData { get; set; }
+
         string IntermediateFolder { get; set; }
 
         Intermediate IntermediateRepresentation { get; set; }
 
-        IBindVariableResolver WixVariableResolver { get; set; }
+        IEnumerable<Localization> Localizations { get; set; }
+
+        IVariableResolver VariableResolver { get; set; }
     }
 }

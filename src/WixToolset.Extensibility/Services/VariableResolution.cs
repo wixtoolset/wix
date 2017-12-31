@@ -2,7 +2,7 @@
 
 namespace WixToolset.Extensibility.Services
 {
-    public class BindVariableResolution
+    public class VariableResolution
     {
         /// <summary>
         /// Indicates whether the variable should be delay resolved.
