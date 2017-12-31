@@ -2446,7 +2446,7 @@ namespace WixToolset.Core
             {
                 if (isGeneratableGuidOk || keyFound && !String.IsNullOrEmpty(keyPath))
                 {
-                    this.componentIdPlaceholdersResolver.AddVariable(componentIdPlaceholder, keyPath, false);
+                    this.componentIdPlaceholdersResolver.AddVariable(sourceLineNumbers, componentIdPlaceholder, keyPath, false);
 
                     id = new Identifier(keyPath, AccessModifier.Private);
                 }

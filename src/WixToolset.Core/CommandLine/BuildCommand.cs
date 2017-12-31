@@ -186,7 +186,9 @@ namespace WixToolset.Core.CommandLine
 
         private void BindPhase(Intermediate output)
         {
-            var localizations = this.LoadLocalizationFiles().ToList();
+            var localizations = new List<Localization>(output.Localizations);
+
+            localizations.AddRange(this.LoadLocalizationFiles());
 
             // If there was an error loading localization files, then bail.
             if (this.Messaging.EncounteredError)

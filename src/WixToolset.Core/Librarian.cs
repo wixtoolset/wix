@@ -54,39 +54,46 @@ namespace WixToolset.Core
                 extension.PreCombine(this.Context);
             }
 
-            var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
-
-            var embedFilePaths = this.ResolveFilePathsToEmbed(sections);
-
-            var localizationsByCulture = this.CollateLocalizations(this.Context.Localizations);
-
-            if (this.Context.Messaging.EncounteredError)
+            Intermediate library = null;
+            try
             {
-                return null;
+                var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
+
+                var collate = new CollateLocalizationsCommand(this.Context.Messaging, this.Context.Localizations);
+                var localizationsByCulture = collate.Execute();
+
+                if (this.Context.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+
+                var embedFilePaths = this.ResolveFilePathsToEmbed(sections);
+
+                foreach (var section in sections)
+                {
+                    section.LibraryId = this.Context.LibraryId;
+                }
+
+                library = new Intermediate(this.Context.LibraryId, sections, localizationsByCulture, embedFilePaths);
+
+                this.Validate(library);
+            }
+            finally
+            {
+                foreach (var extension in this.Context.Extensions)
+                {
+                    extension.PostCombine(library);
+                }
             }
 
-            foreach (var section in sections)
-            {
-                section.LibraryId = this.Context.LibraryId;
-            }
-
-            var library = new Intermediate(this.Context.LibraryId, sections, localizationsByCulture, embedFilePaths);
-
-            this.Validate(library);
-
-            foreach (var extension in this.Context.Extensions)
-            {
-                extension.PostCombine(library);
-            }
-
-            return library;
+            return this.Context.Messaging.EncounteredError ? null : library;
         }
 
         /// <summary>
         /// Validate that a library contains one entry section and no duplicate symbols.
         /// </summary>
         /// <param name="library">Library to validate.</param>
-        private Intermediate Validate(Intermediate library)
+        private void Validate(Intermediate library)
         {
             FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(this.Context.Messaging, library.Sections);
             find.Execute();
@@ -100,34 +107,6 @@ namespace WixToolset.Core
             //     ReportDuplicateResolvedSymbolErrorsCommand reportDupes = new ReportDuplicateResolvedSymbolErrorsCommand(find.SymbolsWithDuplicates, resolve.ResolvedSections);
             //     reportDupes.Execute();
             // }
-
-            return (this.Context.Messaging.EncounteredError ? null : library);
-        }
-
-        private Dictionary<string, Localization> CollateLocalizations(IEnumerable<Localization> localizations)
-        {
-            var localizationsByCulture = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var localization in localizations)
-            {
-                if (localizationsByCulture.TryGetValue(localization.Culture, out var existingCulture))
-                {
-                    try
-                    {
-                        existingCulture.Merge(localization);
-                    }
-                    catch (WixException e)
-                    {
-                        this.Context.Messaging.Write(e.Error);
-                    }
-                }
-                else
-                {
-                    localizationsByCulture.Add(localization.Culture, localization);
-                }
-            }
-
-            return localizationsByCulture;
         }
 
         private List<string> ResolveFilePathsToEmbed(IEnumerable<IntermediateSection> sections)

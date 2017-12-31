@@ -18,7 +18,7 @@ namespace WixToolset.Core.Bind
 
         public bool BuildingPatch { private get; set; }
 
-        public IBindVariableResolver BindVariableResolver { private get; set; }
+        public IVariableResolver VariableResolver { private get; set; }
 
         public IEnumerable<BindPath> BindPaths { private get; set; }
 
@@ -62,7 +62,7 @@ namespace WixToolset.Core.Bind
                                 var original = field.AsString();
                                 if (!String.IsNullOrEmpty(original))
                                 {
-                                    var resolution = this.BindVariableResolver.ResolveVariables(row.SourceLineNumbers, original, false);
+                                    var resolution = this.VariableResolver.ResolveVariables(row.SourceLineNumbers, original, false);
                                     if (resolution.UpdatedValue)
                                     {
                                         field.Set(resolution.Value);

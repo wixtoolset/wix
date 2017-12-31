@@ -25,48 +25,42 @@ namespace WixToolset.Core
 
         public IEnumerable<BindPath> BindPaths { get; set; }
 
-        public Intermediate IntermediateRepresentation { get; set; }
-
         public string IntermediateFolder { get; set; }
+
+        public Intermediate IntermediateRepresentation { get; set; }
 
         public IEnumerable<Localization> Localizations { get; set; }
 
-        private IMessaging Messaging { get; set; }
-
         public ResolveResult Execute()
         {
-            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
-
-            var localizer = new Localizer(this.Messaging, this.Localizations);
-
-            var variableResolver = new WixVariableResolver(this.Messaging, localizer);
-            this.PopulateVariableResolver(variableResolver);
+            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
             var context = this.ServiceProvider.GetService<IResolveContext>();
-            context.Messaging = this.Messaging;
+            context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             context.BindPaths = this.BindPaths;
-            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IResolverExtension>();
+            context.Extensions = extensionManager.Create<IResolverExtension>();
+            context.ExtensionData = extensionManager.Create<IExtensionData>();
             context.IntermediateFolder = this.IntermediateFolder;
             context.IntermediateRepresentation = this.IntermediateRepresentation;
-            context.WixVariableResolver = variableResolver;
+            context.Localizations = this.Localizations;
+            context.VariableResolver = new WixVariableResolver(context.Messaging);
 
-            // Preresolve.
-            //
             foreach (IResolverExtension extension in context.Extensions)
             {
                 extension.PreResolve(context);
             }
 
-            // Resolve.
-            //
-            this.LocalizeUI(context);
-
-            var resolveResult = this.Resolve(localizer.Codepage, context);
-
-            if (resolveResult != null)
+            ResolveResult resolveResult = null;
+            try
             {
-                // Postresolve.
-                //
+                PopulateVariableResolver(context);
+
+                this.LocalizeUI(context);
+
+                resolveResult = this.Resolve(context);
+            }
+            finally
+            {
                 foreach (IResolverExtension extension in context.Extensions)
                 {
                     extension.PostResolve(resolveResult);
@@ -76,7 +70,7 @@ namespace WixToolset.Core
             return resolveResult;
         }
 
-        private ResolveResult Resolve(int codepage, IResolveContext context)
+        private ResolveResult Resolve(IResolveContext context)
         {
             var buildingPatch = context.IntermediateRepresentation.Sections.Any(s => s.Type == SectionType.Patch);
 
@@ -87,7 +81,7 @@ namespace WixToolset.Core
                 var command = new ResolveFieldsCommand();
                 command.Messaging = context.Messaging;
                 command.BuildingPatch = buildingPatch;
-                command.BindVariableResolver = context.WixVariableResolver;
+                command.VariableResolver = context.VariableResolver;
                 command.BindPaths = context.BindPaths;
                 command.Extensions = context.Extensions;
                 command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
@@ -122,7 +116,7 @@ namespace WixToolset.Core
 
             return new ResolveResult
             {
-                Codepage = codepage,
+                Codepage = context.VariableResolver.Codepage,
                 ExpectedEmbeddedFiles = expectedEmbeddedFiles,
                 DelayedFields = delayedFields,
                 IntermediateRepresentation = context.IntermediateRepresentation
@@ -140,7 +134,7 @@ namespace WixToolset.Core
                 {
                     string dialog = row.Dialog;
 
-                    if (context.WixVariableResolver.TryGetLocalizedControl(dialog, null, out LocalizedControl localizedControl))
+                    if (context.VariableResolver.TryGetLocalizedControl(dialog, null, out LocalizedControl localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
@@ -176,7 +170,7 @@ namespace WixToolset.Core
                     string dialog = row.Dialog_;
                     string control = row.Control;
 
-                    if (context.WixVariableResolver.TryGetLocalizedControl(dialog, control, out LocalizedControl localizedControl))
+                    if (context.VariableResolver.TryGetLocalizedControl(dialog, control, out LocalizedControl localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
@@ -209,20 +203,33 @@ namespace WixToolset.Core
             }
         }
 
-        private void PopulateVariableResolver(WixVariableResolver resolver)
+        private static void PopulateVariableResolver(IResolveContext context)
         {
+            var creator = context.ServiceProvider.GetService<ITupleDefinitionCreator>();
+
+            var localizations = context.Localizations.Concat(context.IntermediateRepresentation.Localizations).ToList();
+
+            // Add localizations from the extensions with data.
+            foreach (var data in context.ExtensionData)
+            {
+                var library = data.GetLibrary(creator);
+
+                if (library?.Localizations != null)
+                {
+                    localizations.AddRange(library.Localizations);
+                }
+            }
+
+            foreach (var localization in localizations)
+            {
+                context.VariableResolver.AddLocalization(localization);
+            }
+
             // Gather all the wix variables.
-            var wixVariableTuples = this.IntermediateRepresentation.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
+            var wixVariableTuples = context.IntermediateRepresentation.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
             foreach (var tuple in wixVariableTuples)
             {
-                try
-                {
-                    resolver.AddVariable(tuple.WixVariable, tuple.Value, tuple.Overridable);
-                }
-                catch (ArgumentException)
-                {
-                    this.Messaging.Write(ErrorMessages.WixVariableCollision(tuple.SourceLineNumbers, tuple.WixVariable));
-                }
+                context.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.WixVariable, tuple.Value, tuple.Overridable);
             }
         }
     }

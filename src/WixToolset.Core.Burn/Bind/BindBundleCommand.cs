@@ -96,7 +96,7 @@ namespace WixToolset.Core.Burn
 
         public string IntermediateFolder { private get; set; }
 
-        public IBindVariableResolver WixVariableResolver { private get; set; }
+        public IVariableResolver VariableResolver { private get; set; }
 
         public IEnumerable<FileTransfer> FileTransfers { get; private set; }
 

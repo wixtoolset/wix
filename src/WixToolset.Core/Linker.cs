@@ -32,9 +32,6 @@ namespace WixToolset.Core
         {
             this.ServiceProvider = serviceProvider;
             this.sectionIdOnRows = true; // TODO: what is the correct value for this?
-
-            //this.extensionData = new List<IExtensionData>();
-            //this.inspectorExtensions = new List<InspectorExtension>();
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -78,40 +75,49 @@ namespace WixToolset.Core
             this.Context.Extensions = extensionManager.Create<ILinkerExtension>();
             this.Context.ExtensionData = extensionManager.Create<IExtensionData>();
             this.Context.ExpectedOutputType = this.OutputType;
-            this.Context.Intermediates = this.Intermediates.Union(this.Libraries).ToList();
+            this.Context.Intermediates = this.Intermediates.Concat(this.Libraries).ToList();
             this.Context.TupleDefinitionCreator = creator;
 
-            var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
-
-            // Add sections from the extensions with data.
-            foreach (var data in this.Context.ExtensionData)
+            foreach (var extension in this.Context.Extensions)
             {
-                var library = data.GetLibrary(this.Context.TupleDefinitionCreator);
-
-                if (library != null)
-                {
-                    sections.AddRange(library.Sections);
-                }
+                extension.PreLink(this.Context);
             }
+
+            Intermediate intermediate = null;
+            try
+            {
+                var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
+                var localizations = this.Context.Intermediates.SelectMany(i => i.Localizations).ToList();
+
+                // Add sections from the extensions with data.
+                foreach (var data in this.Context.ExtensionData)
+                {
+                    var library = data.GetLibrary(this.Context.TupleDefinitionCreator);
+
+                    if (library != null)
+                    {
+                        sections.AddRange(library.Sections);
+                    }
+                }
 
 #if MOVE_TO_BACKEND
                 bool containsModuleSubstitution = false;
                 bool containsModuleConfiguration = false;
 #endif
 
-            //this.activeOutput = null;
+                //this.activeOutput = null;
 
-            //TableDefinitionCollection customTableDefinitions = new TableDefinitionCollection();
-            //IntermediateTuple customRows = new List<IntermediateTuple>();
+                //TableDefinitionCollection customTableDefinitions = new TableDefinitionCollection();
+                //IntermediateTuple customRows = new List<IntermediateTuple>();
 
 #if MOVE_TO_BACKEND
                 StringCollection generatedShortFileNameIdentifiers = new StringCollection();
                 Hashtable generatedShortFileNames = new Hashtable();
 #endif
 
-            Hashtable multipleFeatureComponents = new Hashtable();
+                Hashtable multipleFeatureComponents = new Hashtable();
 
-            var wixVariables = new Dictionary<string, WixVariableTuple>();
+                var wixVariables = new Dictionary<string, WixVariableTuple>();
 
 #if MOVE_TO_BACKEND
                 // verify that modularization types match for foreign key relationships
@@ -143,114 +149,117 @@ namespace WixToolset.Core
                 }
 #endif
 
-            // First find the entry section and while processing all sections load all the symbols from all of the sections.
-            // sections.FindEntrySectionAndLoadSymbols(false, this, expectedOutputType, out entrySection, out allSymbols);
-            var find = new FindEntrySectionAndLoadSymbolsCommand(this.Context.Messaging, sections);
-            find.ExpectedOutputType = this.Context.ExpectedOutputType;
-            find.Execute();
+                // First find the entry section and while processing all sections load all the symbols from all of the sections.
+                // sections.FindEntrySectionAndLoadSymbols(false, this, expectedOutputType, out entrySection, out allSymbols);
+                var find = new FindEntrySectionAndLoadSymbolsCommand(this.Context.Messaging, sections);
+                find.ExpectedOutputType = this.Context.ExpectedOutputType;
+                find.Execute();
 
-            // Must have found the entry section by now.
-            if (null == find.EntrySection)
-            {
-                throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
-            }
-
-            // Add the missing standard action symbols.
-            this.LoadStandardActionSymbols(find.EntrySection, find.Symbols);
-
-            // Resolve the symbol references to find the set of sections we care about for linking.
-            // Of course, we start with the entry section (that's how it got its name after all).
-            var resolve = new ResolveReferencesCommand(this.Context.Messaging, find.EntrySection, find.Symbols);
-            resolve.BuildingMergeModule = (SectionType.Module == find.EntrySection.Type);
-
-            resolve.Execute();
-
-            if (this.Context.Messaging.EncounteredError)
-            {
-                return null;
-            }
-
-            // Reset the sections to only those that were resolved then flatten the complex
-            // references that particpate in groups.
-            sections = resolve.ResolvedSections.ToList();
-
-            this.FlattenSectionsComplexReferences(sections);
-
-            if (this.Context.Messaging.EncounteredError)
-            {
-                return null;
-            }
-
-            // The hard part in linking is processing the complex references.
-            var referencedComponents = new HashSet<string>();
-            var componentsToFeatures = new ConnectToFeatureCollection();
-            var featuresToFeatures = new ConnectToFeatureCollection();
-            var modulesToFeatures = new ConnectToFeatureCollection();
-            this.ProcessComplexReferences(find.EntrySection, sections, referencedComponents, componentsToFeatures, featuresToFeatures, modulesToFeatures);
-
-            if (this.Context.Messaging.EncounteredError)
-            {
-                return null;
-            }
-
-            // Display an error message for Components that were not referenced by a Feature.
-            foreach (var symbol in resolve.ReferencedSymbols.Where(s => s.Row.Definition.Type == TupleDefinitionType.Component))
-            {
-                if (!referencedComponents.Contains(symbol.Name))
+                // Must have found the entry section by now.
+                if (null == find.EntrySection)
                 {
-                    this.OnMessage(ErrorMessages.OrphanedComponent(symbol.Row.SourceLineNumbers, symbol.Row.Id.Id));
-                }
-            }
-
-            // Report duplicates that would ultimately end up being primary key collisions.
-            var reportDupes = new ReportConflictingSymbolsCommand(this.Context.Messaging, find.PossiblyConflictingSymbols, resolve.ResolvedSections);
-            reportDupes.Execute();
-
-            if (this.Context.Messaging.EncounteredError)
-            {
-                return null;
-            }
-
-            // resolve the feature to feature connects
-            this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.Symbols);
-
-            // start generating OutputTables and OutputRows for all the sections in the output
-            var ensureTableRows = new List<IntermediateTuple>();
-
-            // Create the section to hold the linked content.
-            var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
-
-            var sectionCount = 0;
-
-            foreach (var section in sections)
-            {
-                sectionCount++;
-
-                var sectionId = section.Id;
-                if (null == sectionId && this.sectionIdOnRows)
-                {
-                    sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
+                    throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
                 }
 
-                foreach (var tuple in section.Tuples)
-                {
-                    var copyTuple = true; // by default, copy tuples.
+                // Add the missing standard action symbols.
+                this.LoadStandardActionSymbols(find.EntrySection, find.Symbols);
 
-                    // handle special tables
-                    switch (tuple.Definition.Type)
+                // Resolve the symbol references to find the set of sections we care about for linking.
+                // Of course, we start with the entry section (that's how it got its name after all).
+                var resolve = new ResolveReferencesCommand(this.Context.Messaging, find.EntrySection, find.Symbols);
+                resolve.BuildingMergeModule = (SectionType.Module == find.EntrySection.Type);
+
+                resolve.Execute();
+
+                if (this.Context.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+
+                // Reset the sections to only those that were resolved then flatten the complex
+                // references that particpate in groups.
+                sections = resolve.ResolvedSections.ToList();
+
+                // TODO: consider filtering "localizations" down to only those localizations from 
+                //       intermediates in the sections.
+
+                this.FlattenSectionsComplexReferences(sections);
+
+                if (this.Context.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+
+                // The hard part in linking is processing the complex references.
+                var referencedComponents = new HashSet<string>();
+                var componentsToFeatures = new ConnectToFeatureCollection();
+                var featuresToFeatures = new ConnectToFeatureCollection();
+                var modulesToFeatures = new ConnectToFeatureCollection();
+                this.ProcessComplexReferences(find.EntrySection, sections, referencedComponents, componentsToFeatures, featuresToFeatures, modulesToFeatures);
+
+                if (this.Context.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+
+                // Display an error message for Components that were not referenced by a Feature.
+                foreach (var symbol in resolve.ReferencedSymbols.Where(s => s.Row.Definition.Type == TupleDefinitionType.Component))
+                {
+                    if (!referencedComponents.Contains(symbol.Name))
                     {
+                        this.OnMessage(ErrorMessages.OrphanedComponent(symbol.Row.SourceLineNumbers, symbol.Row.Id.Id));
+                    }
+                }
+
+                // Report duplicates that would ultimately end up being primary key collisions.
+                var reportDupes = new ReportConflictingSymbolsCommand(this.Context.Messaging, find.PossiblyConflictingSymbols, resolve.ResolvedSections);
+                reportDupes.Execute();
+
+                if (this.Context.Messaging.EncounteredError)
+                {
+                    return null;
+                }
+
+                // resolve the feature to feature connects
+                this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.Symbols);
+
+                // start generating OutputTables and OutputRows for all the sections in the output
+                var ensureTableRows = new List<IntermediateTuple>();
+
+                // Create the section to hold the linked content.
+                var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
+
+                var sectionCount = 0;
+
+                foreach (var section in sections)
+                {
+                    sectionCount++;
+
+                    var sectionId = section.Id;
+                    if (null == sectionId && this.sectionIdOnRows)
+                    {
+                        sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
+                    }
+
+                    foreach (var tuple in section.Tuples)
+                    {
+                        var copyTuple = true; // by default, copy tuples.
+
+                        // handle special tables
+                        switch (tuple.Definition.Type)
+                        {
 #if MOVE_TO_BACKEND
                             case "AppSearch":
                                 this.activeOutput.EnsureTable(this.tableDefinitions["Signature"]);
                                 break;
 #endif
 
-                        case TupleDefinitionType.Class:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 2, 11, componentsToFeatures, multipleFeatureComponents);
-                            }
-                            break;
+                            case TupleDefinitionType.Class:
+                                if (SectionType.Product == resolvedSection.Type)
+                                {
+                                    this.ResolveFeatures(tuple, 2, 11, componentsToFeatures, multipleFeatureComponents);
+                                }
+                                break;
 
 #if MOVE_TO_BACKEND
                             case "CustomAction":
@@ -304,12 +313,12 @@ namespace WixToolset.Core
                                 }
                                 break;
 #endif
-                        case TupleDefinitionType.Extension:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 1, 4, componentsToFeatures, multipleFeatureComponents);
-                            }
-                            break;
+                            case TupleDefinitionType.Extension:
+                                if (SectionType.Product == resolvedSection.Type)
+                                {
+                                    this.ResolveFeatures(tuple, 1, 4, componentsToFeatures, multipleFeatureComponents);
+                                }
+                                break;
 
 #if MOVE_TO_BACKEND
                             case TupleDefinitionType.ModuleSubstitution:
@@ -321,12 +330,12 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                        case TupleDefinitionType.MsiAssembly:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 0, 1, componentsToFeatures, multipleFeatureComponents);
-                            }
-                            break;
+                            case TupleDefinitionType.MsiAssembly:
+                                if (SectionType.Product == resolvedSection.Type)
+                                {
+                                    this.ResolveFeatures(tuple, 0, 1, componentsToFeatures, multipleFeatureComponents);
+                                }
+                                break;
 
 #if MOVE_TO_BACKEND
                             case "ProgId":
@@ -348,26 +357,26 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                        case TupleDefinitionType.PublishComponent:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 2, 4, componentsToFeatures, multipleFeatureComponents);
-                            }
-                            break;
+                            case TupleDefinitionType.PublishComponent:
+                                if (SectionType.Product == resolvedSection.Type)
+                                {
+                                    this.ResolveFeatures(tuple, 2, 4, componentsToFeatures, multipleFeatureComponents);
+                                }
+                                break;
 
-                        case TupleDefinitionType.Shortcut:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 3, 4, componentsToFeatures, multipleFeatureComponents);
-                            }
-                            break;
+                            case TupleDefinitionType.Shortcut:
+                                if (SectionType.Product == resolvedSection.Type)
+                                {
+                                    this.ResolveFeatures(tuple, 3, 4, componentsToFeatures, multipleFeatureComponents);
+                                }
+                                break;
 
-                        case TupleDefinitionType.TypeLib:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 2, 6, componentsToFeatures, multipleFeatureComponents);
-                            }
-                            break;
+                            case TupleDefinitionType.TypeLib:
+                                if (SectionType.Product == resolvedSection.Type)
+                                {
+                                    this.ResolveFeatures(tuple, 2, 6, componentsToFeatures, multipleFeatureComponents);
+                                }
+                                break;
 
 #if SOLVE_CUSTOM_TABLE
                             case "WixCustomTable":
@@ -385,9 +394,9 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                        case TupleDefinitionType.WixEnsureTable:
-                            ensureTableRows.Add(tuple);
-                            break;
+                            case TupleDefinitionType.WixEnsureTable:
+                                ensureTableRows.Add(tuple);
+                                break;
 
 
 #if MOVE_TO_BACKEND
@@ -410,66 +419,66 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                        case TupleDefinitionType.WixMerge:
-                            if (SectionType.Product == resolvedSection.Type)
-                            {
-                                this.ResolveFeatures(tuple, 0, 7, modulesToFeatures, null);
-                            }
-                            break;
-
-                        case TupleDefinitionType.WixComplexReference:
-                            copyTuple = false;
-                            break;
-
-                        case TupleDefinitionType.WixSimpleReference:
-                            copyTuple = false;
-                            break;
-
-                        case TupleDefinitionType.WixVariable:
-                            // check for colliding values and collect the wix variable rows
-                            {
-                                var row = (WixVariableTuple)tuple;
-
-                                if (wixVariables.TryGetValue(row.WixVariable, out var collidingRow))
+                            case TupleDefinitionType.WixMerge:
+                                if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    if (collidingRow.Overridable && !row.Overridable)
+                                    this.ResolveFeatures(tuple, 0, 7, modulesToFeatures, null);
+                                }
+                                break;
+
+                            case TupleDefinitionType.WixComplexReference:
+                                copyTuple = false;
+                                break;
+
+                            case TupleDefinitionType.WixSimpleReference:
+                                copyTuple = false;
+                                break;
+
+                            case TupleDefinitionType.WixVariable:
+                                // check for colliding values and collect the wix variable rows
+                                {
+                                    var row = (WixVariableTuple)tuple;
+
+                                    if (wixVariables.TryGetValue(row.WixVariable, out var collidingRow))
                                     {
-                                        wixVariables[row.WixVariable] = row;
+                                        if (collidingRow.Overridable && !row.Overridable)
+                                        {
+                                            wixVariables[row.WixVariable] = row;
+                                        }
+                                        else if (!row.Overridable || (collidingRow.Overridable && row.Overridable))
+                                        {
+                                            this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, row.WixVariable));
+                                        }
                                     }
-                                    else if (!row.Overridable || (collidingRow.Overridable && row.Overridable))
+                                    else
                                     {
-                                        this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, row.WixVariable));
+                                        wixVariables.Add(row.WixVariable, row);
                                     }
                                 }
-                                else
-                                {
-                                    wixVariables.Add(row.WixVariable, row);
-                                }
-                            }
 
-                            copyTuple = false;
-                            break;
-                    }
+                                copyTuple = false;
+                                break;
+                        }
 
-                    if (copyTuple)
-                    {
-                        resolvedSection.Tuples.Add(tuple);
+                        if (copyTuple)
+                        {
+                            resolvedSection.Tuples.Add(tuple);
+                        }
                     }
                 }
-            }
 
-            // copy the module to feature connections into the output
-            foreach (ConnectToFeature connectToFeature in modulesToFeatures)
-            {
-                foreach (var feature in connectToFeature.ConnectFeatures)
+                // copy the module to feature connections into the output
+                foreach (ConnectToFeature connectToFeature in modulesToFeatures)
                 {
-                    var row = new WixFeatureModulesTuple();
-                    row.Feature_ = feature;
-                    row.WixMerge_ = connectToFeature.ChildId;
+                    foreach (var feature in connectToFeature.ConnectFeatures)
+                    {
+                        var row = new WixFeatureModulesTuple();
+                        row.Feature_ = feature;
+                        row.WixMerge_ = connectToFeature.ChildId;
 
-                    resolvedSection.Tuples.Add(row);
+                        resolvedSection.Tuples.Add(row);
+                    }
                 }
-            }
 
 #if MOVE_TO_BACKEND
                 // ensure the creation of tables that need to exist
@@ -612,24 +621,24 @@ namespace WixToolset.Core
                 }
 #endif
 
-            //correct the section Id in FeatureComponents table
-            if (this.sectionIdOnRows)
-            {
-                //var componentSectionIds = new Dictionary<string, string>();
+                //correct the section Id in FeatureComponents table
+                if (this.sectionIdOnRows)
+                {
+                    //var componentSectionIds = new Dictionary<string, string>();
 
-                //foreach (var componentTuple in entrySection.Tuples.OfType<ComponentTuple>())
-                //{
-                //    componentSectionIds.Add(componentTuple.Id.Id, componentTuple.SectionId);
-                //}
+                    //foreach (var componentTuple in entrySection.Tuples.OfType<ComponentTuple>())
+                    //{
+                    //    componentSectionIds.Add(componentTuple.Id.Id, componentTuple.SectionId);
+                    //}
 
-                //foreach (var featureComponentTuple in entrySection.Tuples.OfType<FeatureComponentsTuple>())
-                //{
-                //    if (componentSectionIds.TryGetValue(featureComponentTuple.Component_, out var componentSectionId))
-                //    {
-                //        featureComponentTuple.SectionId = componentSectionId;
-                //    }
-                //}
-            }
+                    //foreach (var featureComponentTuple in entrySection.Tuples.OfType<FeatureComponentsTuple>())
+                    //{
+                    //    if (componentSectionIds.TryGetValue(featureComponentTuple.Component_, out var componentSectionId))
+                    //    {
+                    //        featureComponentTuple.SectionId = componentSectionId;
+                    //    }
+                    //}
+                }
 
 #if MOVE_TO_BACKEND
                 // add the ModuleSubstitution table to the ModuleIgnoreTable
@@ -698,27 +707,38 @@ namespace WixToolset.Core
                 }
 #endif
 
-            // copy the wix variable rows to the output after all overriding has been accounted for.
-            foreach (var row in wixVariables.Values)
-            {
-                resolvedSection.Tuples.Add(row);
-            }
+                // copy the wix variable rows to the output after all overriding has been accounted for.
+                foreach (var row in wixVariables.Values)
+                {
+                    resolvedSection.Tuples.Add(row);
+                }
 
-            // Bundles have groups of data that must be flattened in a way different from other types.
-            this.FlattenBundleTables(resolvedSection);
+                // Bundles have groups of data that must be flattened in a way different from other types.
+                this.FlattenBundleTables(resolvedSection);
 
-            if (this.Context.Messaging.EncounteredError)
-            {
-                return null;
-            }
+                if (this.Context.Messaging.EncounteredError)
+                {
+                    return null;
+                }
 
-            var output = new Intermediate(resolvedSection.Id, new[] { resolvedSection }, null, null);
+                var collate = new CollateLocalizationsCommand(this.Context.Messaging, localizations);
+                var localizationsByCulture = collate.Execute();
+
+                intermediate = new Intermediate(resolvedSection.Id, new[] { resolvedSection }, localizationsByCulture, null);
 
 #if MOVE_TO_BACKEND
                 this.CheckOutputConsistency(output);
 #endif
+            }
+            finally
+            {
+                foreach (var extension in this.Context.Extensions)
+                {
+                    extension.PostLink(intermediate);
+                }
+            }
 
-            return this.Context.Messaging.EncounteredError ? null : output;
+            return this.Context.Messaging.EncounteredError ? null : intermediate;
         }
 
 #if SOLVE_CUSTOM_TABLE

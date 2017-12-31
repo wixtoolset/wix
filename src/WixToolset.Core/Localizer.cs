@@ -14,71 +14,10 @@ namespace WixToolset.Core
     /// <summary>
     /// Parses localization files and localizes database values.
     /// </summary>
-    public sealed class Localizer : ILocalizer
+    public sealed class Localizer
     {
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
         private static string XmlElementName = "WixLocalization";
-
-        private Dictionary<string, BindVariable> variables;
-        private Dictionary<string, LocalizedControl> localizedControls;
-
-        /// <summary>
-        /// Instantiate a new Localizer.
-        /// </summary>
-        public Localizer(IMessaging messaging, IEnumerable<Localization> localizations)
-        {
-            this.Codepage = -1;
-            this.variables = new Dictionary<string, BindVariable>();
-            this.localizedControls = new Dictionary<string, LocalizedControl>();
-
-            foreach (var localization in localizations)
-            {
-                if (-1 == this.Codepage)
-                {
-                    this.Codepage = localization.Codepage;
-                }
-
-                foreach (var variable in localization.Variables)
-                {
-                    Localizer.AddWixVariable(messaging, this.variables, variable);
-                }
-
-                foreach (KeyValuePair<string, LocalizedControl> localizedControl in localization.LocalizedControls)
-                {
-                    if (!this.localizedControls.ContainsKey(localizedControl.Key))
-                    {
-                        this.localizedControls.Add(localizedControl.Key, localizedControl.Value);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the codepage.
-        /// </summary>
-        /// <value>The codepage.</value>
-        public int Codepage { get; }
-
-        /// <summary>
-        /// Get a localized data value.
-        /// </summary>
-        /// <param name="id">The name of the localization variable.</param>
-        /// <returns>The localized data value or null if it wasn't found.</returns>
-        public string GetLocalizedValue(string id)
-        {
-            return this.variables.TryGetValue(id, out var wixVariableRow) ? wixVariableRow.Value : null;
-        }
-
-        /// <summary>
-        /// Get a localized control.
-        /// </summary>
-        /// <param name="dialog">The optional id of the control's dialog.</param>
-        /// <param name="control">The id of the control.</param>
-        /// <returns>The localized control or null if it wasn't found.</returns>
-        public LocalizedControl GetLocalizedControl(string dialog, string control)
-        {
-            return this.localizedControls.TryGetValue(LocalizedControl.GetKey(dialog, control), out var localizedControl) ? localizedControl : null;
-        }
 
         /// <summary>
         /// Loads a localization file from a path on disk.

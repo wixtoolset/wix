@@ -23,10 +23,14 @@ namespace WixToolset.Core
 
         public IEnumerable<IResolverExtension> Extensions { get; set; }
 
+        public IEnumerable<IExtensionData> ExtensionData { get; set; }
+
         public string IntermediateFolder { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }
 
-        public IBindVariableResolver WixVariableResolver { get; set; }
+        public IEnumerable<Localization> Localizations { get; set; }
+
+        public IVariableResolver VariableResolver { get; set; }
     }
 }
