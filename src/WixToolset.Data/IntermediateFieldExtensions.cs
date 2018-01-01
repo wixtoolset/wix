@@ -9,117 +9,6 @@ namespace WixToolset.Data
         [ThreadStatic]
         internal static string valueContext;
 
-        public static IntermediateField Set(this IntermediateField field, object value)
-        {
-            var data = value;
-
-            if (field == null)
-            {
-                throw new ArgumentNullException(nameof(field));
-            }
-            else if (value == null)
-            {
-                // Null is always allowed.
-            }
-            else if (field.Type == IntermediateFieldType.String && !(value is string))
-            {
-                if (value is int)
-                {
-                    data = value.ToString();
-                }
-                else if (value is bool b)
-                {
-                    data = b ? "true" : "false";
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-            else if (field.Type == IntermediateFieldType.Number && !(value is int))
-            {
-                if (value is string str && Int32.TryParse(str, out var number))
-                {
-                    data = number;
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-            else if (field.Type == IntermediateFieldType.Bool && !(value is bool))
-            {
-                if (value is int)
-                {
-                    data = ((int)value) != 0;
-                }
-                else if (value is string str)
-                {
-                    if (str.Equals("yes", StringComparison.OrdinalIgnoreCase) || str.Equals("true", StringComparison.OrdinalIgnoreCase))
-                    {
-                        data = true;
-                    }
-                    else if (str.Equals("no", StringComparison.OrdinalIgnoreCase) || str.Equals("false", StringComparison.OrdinalIgnoreCase))
-                    {
-                        data = false;
-                    }
-                    else
-                    {
-                        throw new ArgumentException(nameof(value));
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-            else if (field.Type == IntermediateFieldType.Path && !(value is IntermediateFieldPathValue))
-            {
-                if (value is string str)
-                {
-                    data = new IntermediateFieldPathValue { Path = str };
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-            else if (field.Type == IntermediateFieldType.LargeNumber && !(value is long))
-            {
-                if (value is string str && Int64.TryParse(str, out var number))
-                {
-                    data = number;
-                }
-                else if (value is int i)
-                {
-                    data = (long)i;
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-
-            field.Value = new IntermediateFieldValue
-            {
-                Context = valueContext,
-                Data = data,
-                PreviousValue = field.Value
-            };
-
-            return field;
-        }
-
-        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, object value)
-        {
-            if (field == null)
-            {
-                field = new IntermediateField(definition);
-            }
-
-            return field.Set(value);
-        }
-
         public static bool AsBool(this IntermediateField field)
         {
             if (field == null || field.Value == null || field.Value.Data == null)
@@ -260,6 +149,314 @@ namespace WixToolset.Data
                 default:
                     throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to string");
             }
+        }
+
+        public static IntermediateField Set(this IntermediateField field, bool value)
+        {
+            object data;
+
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            switch (field.Type)
+            {
+                case IntermediateFieldType.Bool:
+                    data = value;
+                    break;
+
+                case IntermediateFieldType.LargeNumber:
+                    data = value ? (long)1 : (long)0;
+                    break;
+
+                case IntermediateFieldType.Number:
+                    data = value ? 1 : 0;
+                    break;
+
+                case IntermediateFieldType.Path:
+                    throw new ArgumentException($"Cannot convert bool '{value}' to a 'Path' field type.", nameof(value));
+
+                case IntermediateFieldType.String:
+                    data = value ? "true" : "false";
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+            };
+
+            return AssignFieldValue(field, data);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, bool? value)
+        {
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            return value.HasValue ? field.Set(value.Value) : AssignFieldValue(field, null);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, long value)
+        {
+            object data;
+
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            switch (field.Type)
+            {
+                case IntermediateFieldType.Bool:
+                    data = (value != 0);
+                    break;
+
+                case IntermediateFieldType.LargeNumber:
+                    data = value;
+                    break;
+
+                case IntermediateFieldType.Number:
+                    data = (int)value;
+                    break;
+
+                case IntermediateFieldType.Path:
+                    throw new ArgumentException($"Cannot convert large number '{value}' to a 'Path' field type.", nameof(value));
+
+                case IntermediateFieldType.String:
+                    data = value.ToString();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+            };
+
+            return AssignFieldValue(field, data);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, long? value)
+        {
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            return value.HasValue ? field.Set(value.Value) : AssignFieldValue(field, null);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, int value)
+        {
+            object data;
+
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            switch (field.Type)
+            {
+                case IntermediateFieldType.Bool:
+                    data = (value != 0);
+                    break;
+
+                case IntermediateFieldType.LargeNumber:
+                    data = (long)value;
+                    break;
+
+                case IntermediateFieldType.Number:
+                    data = value;
+                    break;
+
+                case IntermediateFieldType.Path:
+                    throw new ArgumentException($"Cannot convert number '{value}' to a 'Path' field type.", nameof(value));
+
+                case IntermediateFieldType.String:
+                    data = value.ToString();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+            };
+
+            return AssignFieldValue(field, data);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, int? value)
+        {
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            return value.HasValue ? field.Set(value.Value) : AssignFieldValue(field, null);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldPathValue value)
+        {
+            object data;
+
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+            else if (value == null) // null is always allowed.
+            {
+                data = null;
+            }
+            else
+            {
+                switch (field.Type)
+                {
+                    case IntermediateFieldType.Bool:
+                        throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'bool' field type.", nameof(value));
+
+                    case IntermediateFieldType.LargeNumber:
+                        throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'large number' field type.", nameof(value));
+
+                    case IntermediateFieldType.Number:
+                        throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'number' field type.", nameof(value));
+
+                    case IntermediateFieldType.Path:
+                        data = value;
+                        break;
+
+                    case IntermediateFieldType.String:
+                        data = value.Path;
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+                };
+            }
+
+            return AssignFieldValue(field, data);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, string value)
+        {
+            object data;
+
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+            else if (value == null) // Null is always allowed.
+            {
+                data = null;
+            }
+            else
+            {
+                switch (field.Type)
+                {
+                    case IntermediateFieldType.Bool:
+                        if (value.Equals("yes", StringComparison.OrdinalIgnoreCase) || value.Equals("true", StringComparison.OrdinalIgnoreCase))
+                        {
+                            data = true;
+                        }
+                        else if (value.Equals("no", StringComparison.OrdinalIgnoreCase) || value.Equals("false", StringComparison.OrdinalIgnoreCase))
+                        {
+                            data = false;
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Cannot convert string '{value}' to a 'bool' field type.", nameof(value));
+                        }
+                        break;
+
+                    case IntermediateFieldType.LargeNumber:
+                        if (Int64.TryParse(value, out var largeNumber))
+                        {
+                            data = largeNumber;
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Cannot convert string '{value}' to a 'large number' field type.", nameof(value));
+                        }
+                        break;
+
+                    case IntermediateFieldType.Number:
+                        if (Int32.TryParse(value, out var number))
+                        {
+                            data = number;
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Cannot convert string '{value}' to a 'number' field type.", nameof(value));
+                        }
+                        break;
+
+                    case IntermediateFieldType.Path:
+                        data = new IntermediateFieldPathValue { Path = value };
+                        break;
+
+                    case IntermediateFieldType.String:
+                        data = value;
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+                };
+            }
+
+            return AssignFieldValue(field, data);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, bool value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, bool? value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, long value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, long? value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, int value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, int? value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, IntermediateFieldPathValue value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        public static IntermediateField Set(this IntermediateField field, IntermediateFieldDefinition definition, string value)
+        {
+            return EnsureField(field, definition).Set(value);
+        }
+
+        private static IntermediateField AssignFieldValue(IntermediateField field, object data)
+        {
+            field.Value = new IntermediateFieldValue
+            {
+                Context = valueContext,
+                Data = data,
+                PreviousValue = field.Value
+            };
+
+            return field;
+        }
+
+        private static IntermediateField EnsureField(IntermediateField field, IntermediateFieldDefinition definition)
+        {
+            return field ?? new IntermediateField(definition);
         }
     }
 }

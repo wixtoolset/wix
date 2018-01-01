@@ -4,15 +4,6 @@ namespace WixToolset.Data
 {
     public static class IntermediateTupleExtensions
     {
-        public static IntermediateField Set(this IntermediateTuple tuple, int index, object value)
-        {
-            var definition = tuple.Definition.FieldDefinitions[index];
-
-            var field = tuple.Fields[index].Set(definition, value);
-
-            return tuple.Fields[index] = field;
-        }
-
         public static bool AsBool(this IntermediateTuple tuple, int index)
         {
             return tuple?.Fields[index].AsBool() ?? false;
@@ -36,6 +27,78 @@ namespace WixToolset.Data
         public static string AsString(this IntermediateTuple tuple, int index)
         {
             return tuple?.Fields[index].AsString();
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, bool value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, bool? value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, long value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, long? value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, int value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, int? value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, IntermediateFieldPathValue value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
+        }
+
+        public static IntermediateField Set(this IntermediateTuple tuple, int index, string value)
+        {
+            var definition = tuple.Definition.FieldDefinitions[index];
+
+            var field = tuple.Fields[index].Set(definition, value);
+
+            return tuple.Fields[index] = field;
         }
     }
 }

@@ -126,7 +126,7 @@ namespace WixToolset.Data.Tuples
         public YesNoAlwaysType Cache
         {
             get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageTupleFields.Cache]?.Value, true, out YesNoAlwaysType value) ? value : YesNoAlwaysType.NotSet;
-            set => this.Set((int)WixBundlePackageTupleFields.Cache, value);
+            set => this.Set((int)WixBundlePackageTupleFields.Cache, value.ToString().ToLowerInvariant());
         }
 
         public string CacheId
@@ -144,7 +144,7 @@ namespace WixToolset.Data.Tuples
         public YesNoDefaultType PerMachine
         {
             get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageTupleFields.PerMachine]?.Value, true, out YesNoDefaultType value) ? value : YesNoDefaultType.NotSet;
-            set => this.Set((int)WixBundlePackageTupleFields.PerMachine, value);
+            set => this.Set((int)WixBundlePackageTupleFields.PerMachine, value.ToString().ToLowerInvariant());
         }
 
         public string LogPathVariable

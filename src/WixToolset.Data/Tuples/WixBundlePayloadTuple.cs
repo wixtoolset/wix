@@ -106,7 +106,7 @@ namespace WixToolset.Data.Tuples
         public YesNoDefaultType Compressed
         {
             get => Enum.TryParse((string)this.Fields[(int)WixBundlePayloadTupleFields.Compressed]?.Value, true, out YesNoDefaultType value) ? value : YesNoDefaultType.NotSet;
-            set => this.Set((int)WixBundlePayloadTupleFields.Compressed, value);
+            set => this.Set((int)WixBundlePayloadTupleFields.Compressed, value.ToString().ToLowerInvariant());
         }
 
         public string UnresolvedSourceFile
