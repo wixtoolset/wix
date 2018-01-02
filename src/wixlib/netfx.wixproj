@@ -45,9 +45,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.7\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.7\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.Util.wixext.4.0.1\build\WixToolset.Util.wixext.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Util.wixext.4.0.1\build\WixToolset.Util.wixext.targets'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.Core.InternalPackage.4.0.64\build\WixToolset.Core.InternalPackage.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Core.InternalPackage.4.0.64\build\WixToolset.Core.InternalPackage.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.Util.wixext.4.0.3\build\WixToolset.Util.wixext.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Util.wixext.4.0.3\build\WixToolset.Util.wixext.targets'))" />
   </Target>
   <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.7\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.7\build\Nerdbank.GitVersioning.targets')" />
-  <Import Project="..\..\packages\WixToolset.Util.wixext.4.0.1\build\WixToolset.Util.wixext.targets" Condition="Exists('..\..\packages\WixToolset.Util.wixext.4.0.1\build\WixToolset.Util.wixext.targets')" />
+  <Import Project="..\..\packages\WixToolset.Util.wixext.4.0.3\build\WixToolset.Util.wixext.targets" Condition="Exists('..\..\packages\WixToolset.Util.wixext.4.0.3\build\WixToolset.Util.wixext.targets')" />
 </Project>
