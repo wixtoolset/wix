@@ -23,9 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj') " />
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\wix\wix.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\src\wix\wix.csproj') " />
-    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj') " PrivateAssets="all" />
+    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
+    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\wix\wix.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\README.md') " PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

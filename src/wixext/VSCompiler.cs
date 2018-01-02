@@ -350,7 +350,7 @@ namespace WixToolset.VisualStudio
             if (!this.Messaging.EncounteredError)
             {
                 var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpFileToNamespace", id);
-                row.Set(1, collectionId);
+                row.Set(1, collectionId.Id);
             }
         }
 
