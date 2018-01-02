@@ -2676,8 +2676,7 @@ namespace WixToolset.Util
                     attributes |= WixProductSearchAttributes.UpgradeCode;
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixProductSearch");
-                row.Set(0, id);
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixProductSearch", id);
                 row.Set(1, productCode ?? upgradeCode);
                 row.Set(2, (int)attributes);
             }

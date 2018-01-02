@@ -8,7 +8,7 @@ namespace WixToolsetTest.VisualStudio
     using WixToolset.Util;
     using Xunit;
 
-    public class VisualStudioExtensionFixture
+    public class UtilExtensionFixture
     {
         [Fact]
         public void CanBuildUsingFileShare()
@@ -19,8 +19,8 @@ namespace WixToolsetTest.VisualStudio
             var results = build.BuildAndQuery(Build, "FileShare", "FileSharePermissions");
             Assert.Equal(new[]
             {
-                "FileShare:SetVS2010Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2010_VSIX_INSTALLER_PATH]\t0",
-                "FileSharePermissions:SetVS2012Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2012_VSIX_INSTALLER_PATH]\t0",
+                "FileShare:ExampleFileShare\texample\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example file share\tINSTALLFOLDER\t\t0",
+                "FileSharePermissions:ExampleFileShare\tEveryone\t1",
             }, results.OrderBy(s => s).ToArray());
         }
 

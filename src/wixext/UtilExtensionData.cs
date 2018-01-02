@@ -7,6 +7,8 @@ namespace WixToolset.Util
 
     public sealed class UtilExtensionData : BaseExtensionData
     {
+        public override string DefaultCulture => "en-US";
+
         public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
             tupleDefinition = UtilTupleDefinitions.ByName(name);
