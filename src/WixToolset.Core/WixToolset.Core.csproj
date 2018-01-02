@@ -9,14 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj') " />
+    <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\README.md') " />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\README.md') " />
 
-    <ProjectReference Include="$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
+    <ProjectReference Include="$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Extensibility\README.md') " />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\README.md') " />
 
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
-    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj') " />
+    <ProjectReference Include="$(WixToolsetRootFolder)\Core.Native\src\WixToolset.Core.Native\WixToolset.Core.Native.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core.Native\README.md') " />
+    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core.Native\README.md') " />
   </ItemGroup>
 
   <ItemGroup>

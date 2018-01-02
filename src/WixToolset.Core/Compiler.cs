@@ -690,8 +690,7 @@ namespace WixToolset.Core
 
                 if (YesNoType.Yes == suppressModularization)
                 {
-                    var wixSuppressModularizationRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSuppressModularization);
-                    wixSuppressModularizationRow.Set(0, id);
+                    var wixSuppressModularizationRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSuppressModularization, id);
                 }
             }
 
@@ -2474,8 +2473,7 @@ namespace WixToolset.Core
 
                 if (multiInstance)
                 {
-                    var instanceComponentRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixInstanceComponent);
-                    instanceComponentRow.Set(0, id);
+                    var instanceComponentRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixInstanceComponent, id);
                 }
 
                 if (0 < symbols.Count)
@@ -2488,8 +2486,7 @@ namespace WixToolset.Core
                 // Complus
                 if (CompilerConstants.IntegerNotSet != comPlusBits)
                 {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Complus);
-                    row.Set(0, id);
+                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Complus, id);
                     row.Set(1, comPlusBits);
                 }
 
@@ -4832,7 +4829,7 @@ namespace WixToolset.Core
             if (!this.Core.EncounteredError)
             {
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Feature, id);
-                row.Set(1, null); // this column is set in the linker
+                // row.Set(1, null); - this column is set in the linker
                 row.Set(2, title);
                 row.Set(3, description);
                 if (0 < display.Length)
@@ -9543,7 +9540,6 @@ namespace WixToolset.Core
                 }
             }
 
-
             if (!this.Core.EncounteredError)
             {
                 var patchIdRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixPatchId);
@@ -9555,7 +9551,6 @@ namespace WixToolset.Core
                 if (allowRemoval)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "AllowRemoval");
                     row.Set(2, allowRemoval ? "1" : "0");
                 }
@@ -9563,7 +9558,6 @@ namespace WixToolset.Core
                 if (null != classification)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "Classification");
                     row.Set(2, classification);
                 }
@@ -9571,7 +9565,6 @@ namespace WixToolset.Core
                 // always generate the CreationTimeUTC
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "CreationTimeUTC");
                     row.Set(2, DateTime.UtcNow.ToString("MM-dd-yy HH:mm", CultureInfo.InvariantCulture));
                 }
@@ -9579,7 +9572,6 @@ namespace WixToolset.Core
                 if (null != description)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "Description");
                     row.Set(2, description);
                 }
@@ -9587,7 +9579,6 @@ namespace WixToolset.Core
                 if (null != displayName)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "DisplayName");
                     row.Set(2, displayName);
                 }
@@ -9595,7 +9586,6 @@ namespace WixToolset.Core
                 if (null != manufacturer)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "ManufacturerName");
                     row.Set(2, manufacturer);
                 }
@@ -9603,7 +9593,6 @@ namespace WixToolset.Core
                 if (YesNoType.NotSet != minorUpdateTargetRTM)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "MinorUpdateTargetRTM");
                     row.Set(2, YesNoType.Yes == minorUpdateTargetRTM ? "1" : "0");
                 }
@@ -9611,7 +9600,6 @@ namespace WixToolset.Core
                 if (null != moreInfoUrl)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "MoreInfoURL");
                     row.Set(2, moreInfoUrl);
                 }
@@ -9619,7 +9607,6 @@ namespace WixToolset.Core
                 if (CompilerConstants.IntegerNotSet != optimizeCA)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "OptimizeCA");
                     row.Set(2, optimizeCA.ToString(CultureInfo.InvariantCulture));
                 }
@@ -9627,7 +9614,6 @@ namespace WixToolset.Core
                 if (YesNoType.NotSet != optimizedInstallMode)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "OptimizedInstallMode");
                     row.Set(2, YesNoType.Yes == optimizedInstallMode ? "1" : "0");
                 }
@@ -9635,7 +9621,6 @@ namespace WixToolset.Core
                 if (null != targetProductName)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiPatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "TargetProductName");
                     row.Set(2, targetProductName);
                 }
@@ -11190,7 +11175,6 @@ namespace WixToolset.Core
                 if (YesNoType.NotSet != allowRemoval)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "AllowRemoval");
                     row.Set(2, YesNoType.Yes == allowRemoval ? "1" : "0");
                 }
@@ -11198,7 +11182,6 @@ namespace WixToolset.Core
                 if (null != classification)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "Classification");
                     row.Set(2, classification);
                 }
@@ -11206,7 +11189,6 @@ namespace WixToolset.Core
                 if (null != creationTimeUtc)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "CreationTimeUTC");
                     row.Set(2, creationTimeUtc);
                 }
@@ -11214,7 +11196,6 @@ namespace WixToolset.Core
                 if (null != description)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "Description");
                     row.Set(2, description);
                 }
@@ -11222,7 +11203,6 @@ namespace WixToolset.Core
                 if (null != displayName)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "DisplayName");
                     row.Set(2, displayName);
                 }
@@ -11230,7 +11210,6 @@ namespace WixToolset.Core
                 if (null != manufacturerName)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "ManufacturerName");
                     row.Set(2, manufacturerName);
                 }
@@ -11238,7 +11217,6 @@ namespace WixToolset.Core
                 if (null != minorUpdateTargetRTM)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "MinorUpdateTargetRTM");
                     row.Set(2, minorUpdateTargetRTM);
                 }
@@ -11246,7 +11224,6 @@ namespace WixToolset.Core
                 if (null != moreInfoUrl)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "MoreInfoURL");
                     row.Set(2, moreInfoUrl);
                 }
@@ -11254,7 +11231,6 @@ namespace WixToolset.Core
                 if (CompilerConstants.IntegerNotSet != optimizeCA)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "OptimizeCA");
                     row.Set(2, optimizeCA.ToString(CultureInfo.InvariantCulture));
                 }
@@ -11262,7 +11238,6 @@ namespace WixToolset.Core
                 if (YesNoType.NotSet != optimizedInstallMode)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "OptimizedInstallMode");
                     row.Set(2, YesNoType.Yes == optimizedInstallMode ? "1" : "0");
                 }
@@ -11270,7 +11245,6 @@ namespace WixToolset.Core
                 if (null != targetProductName)
                 {
                     var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(0, null);
                     row.Set(1, "TargetProductName");
                     row.Set(2, targetProductName);
                 }
@@ -12587,7 +12561,7 @@ namespace WixToolset.Core
                 row.Set(1, root);
                 row.Set(2, key);
                 row.Set(3, name);
-                row.Set(4, null);
+                //row.Set(4, null);
                 row.Set(5, componentId);
             }
 
@@ -12914,7 +12888,7 @@ namespace WixToolset.Core
                 row.Set(3, name);
                 if (Wix.RemoveRegistryKey.ActionType.removeOnUninstall == actionType) // Registry table
                 {
-                    row.Set(4, null);
+                    //row.Set(4, null);
                     row.Set(5, componentId);
                 }
                 else // RemoveRegistry table
@@ -13206,7 +13180,7 @@ namespace WixToolset.Core
             {
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RemoveFile, id);
                 row.Set(1, componentId);
-                row.Set(2, null);
+                //row.Set(2, null);
                 if (null != directory)
                 {
                     row.Set(3, directory);
@@ -16848,7 +16822,7 @@ namespace WixToolset.Core
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiEmbeddedUI, id);
                 row.Set(1, name);
                 row.Set(2, 0); // embedded UI resources always set this to 0
-                row.Set(3, null);
+                //row.Set(3, null);
                 row.Set(4, sourceFile);
             }
         }
@@ -19610,10 +19584,6 @@ namespace WixToolset.Core
                 else if (null == remotePayload)
                 {
                     sourceFile = Path.Combine("SourceDir", name);
-                }
-                else
-                {
-                    sourceFile = String.Empty;  // SourceFile is required it cannot be null.
                 }
             }
             else if (null != remotePayload)
