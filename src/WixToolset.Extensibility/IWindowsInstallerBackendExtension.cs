@@ -7,7 +7,6 @@ namespace WixToolset.Extensibility
     using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Interface all binder extensions implement.
@@ -28,6 +27,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
         /// </summary>
-        void PostBackendBind(BindResult result);
+        void PostBackendBind(BindResult result, Pdb wixpdb);
     }
 }
