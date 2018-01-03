@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
+    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Core.WindowsInstaller.Inscribe;
     using WixToolset.Core.WindowsInstaller.Unbind;
@@ -32,7 +33,12 @@ namespace WixToolset.Core.WindowsInstaller
 
             foreach (var extension in backendExtensions)
             {
-                extension.PostBackendBind(result);
+                extension.PostBackendBind(result, command.Pdb);
+            }
+
+            if (!String.IsNullOrEmpty(context.OutputPdbPath))
+            {
+                command.Pdb?.Save(context.OutputPdbPath);
             }
 
             return result;

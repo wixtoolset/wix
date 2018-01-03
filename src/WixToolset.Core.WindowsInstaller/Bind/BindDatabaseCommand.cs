@@ -36,7 +36,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Intermediate = context.IntermediateRepresentation;
             this.Messaging = context.Messaging;
             this.OutputPath = context.OutputPath;
-            this.PdbFile = context.OutputPdbPath;
             this.IntermediateFolder = context.IntermediateFolder;
             this.Validator = validator;
 
@@ -61,8 +60,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { get; }
 
-        private string PdbFile { get; }
-
         private Intermediate Intermediate { get; }
 
         private IMessaging Messaging { get; }
@@ -83,6 +80,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public IEnumerable<FileTransfer> FileTransfers { get; private set; }
 
         public IEnumerable<string> ContentFilePaths { get; private set; }
+
+        public Pdb Pdb { get; private set; }
 
         public void Execute()
         {
@@ -428,14 +427,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            // Output the output to a file.
-            if (!String.IsNullOrEmpty(this.PdbFile))
-            {
-                Pdb pdb = new Pdb();
-                pdb.Output = output;
-                pdb.Save(this.PdbFile);
-            }
-
             // Merge modules.
             if (containsMergeModules)
             {
@@ -514,6 +505,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.FileTransfers = fileTransfers;
             this.ContentFilePaths = fileFacades.Select(r => r.WixFile.Source.Path).ToList();
+            this.Pdb = new Pdb { Output = output };
 
             // TODO: Eventually this gets removed
             var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase), this.Intermediate.EmbedFilePaths);
