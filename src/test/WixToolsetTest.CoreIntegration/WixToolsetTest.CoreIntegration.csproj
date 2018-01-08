@@ -44,6 +44,10 @@
     <Content Include="TestData\ManualUpgrade\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ManualUpgrade\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ManualUpgrade\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Assembly\data\candle.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Assembly\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Assembly\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Assembly\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

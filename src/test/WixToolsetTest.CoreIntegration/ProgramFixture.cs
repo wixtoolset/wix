@@ -317,6 +317,46 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildWithAssembly()
+        {
+            var folder = TestData.Get(@"TestData\Assembly");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\AssemblyMsiPackage\candle.exe")));
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\candle.exe"), wixFile[WixFileTupleFields.Source].AsPath().Path);
+                Assert.Equal(@"candle.exe", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+
+                var msiAssemblyNameTuples = section.Tuples.OfType<MsiAssemblyNameTuple>();
+                Assert.NotEmpty(msiAssemblyNameTuples);
+            }
+        }
+
         [Fact(Skip = "Not implemented yet.")]
         public void CanBuildInstanceTransform()
         {
