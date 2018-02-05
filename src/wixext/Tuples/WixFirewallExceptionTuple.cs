@@ -20,6 +20,7 @@ namespace WixToolset.Firewall
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Profile), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Description), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Direction), IntermediateFieldType.Number),
             },
             typeof(WixFirewallExceptionTuple));
     }
@@ -40,6 +41,7 @@ namespace WixToolset.Firewall.Tuples
         Profile,
         ComponentRef,
         Description,
+        Direction,
     }
 
     public class WixFirewallExceptionTuple : IntermediateTuple
@@ -106,6 +108,12 @@ namespace WixToolset.Firewall.Tuples
         {
             get => this.Fields[(int)WixFirewallExceptionTupleFields.Description].AsString();
             set => this.Set((int)WixFirewallExceptionTupleFields.Description, value);
+        }
+
+        public int Direction
+        {
+            get => this.Fields[(int)WixFirewallExceptionTupleFields.Direction].AsNumber();
+            set => this.Set((int)WixFirewallExceptionTupleFields.Direction, value);
         }
     }
 }

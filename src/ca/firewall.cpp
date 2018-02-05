@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 LPCWSTR vcsFirewallExceptionQuery =
-    L"SELECT `Name`, `RemoteAddresses`, `Port`, `Protocol`, `Program`, `Attributes`, `Profile`, `Component_`, `Description` FROM `WixFirewallException`";
+    L"SELECT `Name`, `RemoteAddresses`, `Port`, `Protocol`, `Program`, `Attributes`, `Profile`, `Component_`, `Description`, `Direction` FROM `WixFirewallException`";
 enum eFirewallExceptionQuery { feqName = 1, feqRemoteAddresses, feqPort, feqProtocol, feqProgram, feqAttributes, feqProfile, feqComponent, feqDescription };
 enum eFirewallExceptionTarget { fetPort = 1, fetApplication, fetUnknown };
 enum eFirewallExceptionAttributes { feaIgnoreFailures = 1 };
@@ -36,6 +36,7 @@ static UINT SchedFirewallExceptions(
     LPWSTR pwzComponent = NULL;
     LPWSTR pwzFormattedFile = NULL;
     LPWSTR pwzDescription = NULL;
+    int iDirection = 0;
 
     // initialize
     hr = WcaInitialize(hInstall, "SchedFirewallExceptions");
@@ -130,6 +131,9 @@ static UINT SchedFirewallExceptions(
 
         hr = WcaWriteStringToCaData(pwzDescription, &pwzCustomActionData);
         ExitOnFailure(hr, "failed to write firewall rule description to custom action data");
+
+        hr = WcaWriteIntegerToCaData(iDirection, &pwzCustomActionData);
+        ExitOnFailure(hr, "failed to write firewall rule direction to custom action data");
     }
 
     // reaching the end of the list is actually a good thing, not an error
@@ -270,6 +274,7 @@ static HRESULT CreateFwRuleObject(
     __in LPCWSTR wzPort,
     __in int iProtocol,
     __in LPCWSTR wzDescription,
+    __in int iDirection,
     __out INetFwRule** ppNetFwRule
     )
 {
@@ -319,6 +324,12 @@ static HRESULT CreateFwRuleObject(
     {
         hr = pNetFwRule->put_Description(bstrDescription);
         ExitOnFailure(hr, "failed to set exception description '%ls'", bstrDescription);
+    }
+
+    if (MSI_NULL_INTEGER != iDirection)
+    {
+        hr = pNetFwRule->put_Direction(static_cast<NET_FW_RULE_DIRECTION> (iDirection));
+        ExitOnFailure(hr, "failed to set exception direction");
     }
 
     *ppNetFwRule = pNetFwRule;
@@ -429,7 +440,8 @@ static HRESULT AddApplicationException(
     __in BOOL fIgnoreFailures,
     __in LPCWSTR wzPort,
     __in int iProtocol,
-    __in LPCWSTR wzDescription
+    __in LPCWSTR wzDescription,
+    __in int iDirection
     )
 {
     HRESULT hr = S_OK;
@@ -456,7 +468,7 @@ static HRESULT AddApplicationException(
     hr = pNetFwRules->Item(bstrName, &pNetFwRule);
     if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
     {
-        hr = CreateFwRuleObject(bstrName, iProfile, wzRemoteAddresses, wzPort, iProtocol, wzDescription, &pNetFwRule);
+        hr = CreateFwRuleObject(bstrName, iProfile, wzRemoteAddresses, wzPort, iProtocol, wzDescription, iDirection, &pNetFwRule);
         ExitOnFailure(hr, "failed to create FwRule object");
 
         // set edge traversal to true
@@ -590,8 +602,9 @@ static HRESULT AddPortException(
     __in BOOL fIgnoreFailures,
     __in LPCWSTR wzPort,
     __in int iProtocol,
-    __in LPCWSTR wzDescription
-    )
+    __in LPCWSTR wzDescription,
+    __in int iDirection
+)
 {
     HRESULT hr = S_OK;
     BSTR bstrName = NULL;
@@ -614,7 +627,7 @@ static HRESULT AddPortException(
     hr = pNetFwRules->Item(bstrName, &pNetFwRule);
     if (HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)
     {
-        hr = CreateFwRuleObject(bstrName, iProfile, wzRemoteAddresses, wzPort, iProtocol, wzDescription, &pNetFwRule);
+        hr = CreateFwRuleObject(bstrName, iProfile, wzRemoteAddresses, wzPort, iProtocol, wzDescription, iDirection, &pNetFwRule);
         ExitOnFailure(hr, "failed to create FwRule object");
 
         // enable it
@@ -825,14 +838,15 @@ static HRESULT AddApplicationException(
     __in BOOL fIgnoreFailures,
     __in LPCWSTR wzPort,
     __in int iProtocol,
-    __in LPCWSTR wzDescription
-    )
+    __in LPCWSTR wzDescription,
+    __in int iDirection
+)
 {
     HRESULT hr = S_OK;
 
     if (fSupportProfiles)
     {
-        hr = AddApplicationException(wzFile, wzName, iProfile, wzRemoteAddresses, fIgnoreFailures, wzPort, iProtocol, wzDescription);
+        hr = AddApplicationException(wzFile, wzName, iProfile, wzRemoteAddresses, fIgnoreFailures, wzPort, iProtocol, wzDescription, iDirection);
     }
     else
     {
@@ -860,14 +874,15 @@ static HRESULT AddPortException(
     __in BOOL fIgnoreFailures,
     __in LPCWSTR wzPort,
     __in int iProtocol,
-    __in LPCWSTR wzDescription
-    )
+    __in LPCWSTR wzDescription,
+    __in int iDirection
+)
 {
     HRESULT hr = S_OK;
 
     if (fSupportProfiles)
     {
-        hr = AddPortException(wzName, iProfile, wzRemoteAddresses, fIgnoreFailures, wzPort, iProtocol, wzDescription);
+        hr = AddPortException(wzName, iProfile, wzRemoteAddresses, fIgnoreFailures, wzPort, iProtocol, wzDescription, iDirection);
     }
     else
     {
@@ -951,6 +966,7 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
     LPWSTR pwzDescription = NULL;
     int iProtocol = 0;
     int iProfile = 0;
+    int iDirection = 0;
 
     // initialize
     hr = WcaInitialize(hInstall, "ExecFirewallExceptions");
@@ -1013,6 +1029,8 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
         ExitOnFailure(hr, "failed to read protocol from custom action data");
         hr = WcaReadStringFromCaData(&pwz, &pwzDescription);
         ExitOnFailure(hr, "failed to read protocol from custom action data");
+        hr = WcaReadIntegerFromCaData(&pwz, &iDirection);
+        ExitOnFailure(hr, "failed to read direction from custom action data");
 
         switch (iTarget)
         {
@@ -1022,7 +1040,7 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             case WCA_TODO_INSTALL:
             case WCA_TODO_REINSTALL:
                 WcaLog(LOGMSG_STANDARD, "Installing firewall exception2 %ls on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
-                hr = AddPortException(fSupportProfiles, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription);
+                hr = AddPortException(fSupportProfiles, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
                 ExitOnFailure(hr, "failed to add/update port exception for name '%ls' on port %ls, protocol %d", pwzName, pwzPort, iProtocol);
                 break;
 
@@ -1040,7 +1058,7 @@ extern "C" UINT __stdcall ExecFirewallExceptions(
             case WCA_TODO_INSTALL:
             case WCA_TODO_REINSTALL:
                 WcaLog(LOGMSG_STANDARD, "Installing firewall exception2 %ls (%ls)", pwzName, pwzFile);
-                hr = AddApplicationException(fSupportProfiles, pwzFile, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription);
+                hr = AddApplicationException(fSupportProfiles, pwzFile, pwzName, iProfile, pwzRemoteAddresses, fIgnoreFailures, pwzPort, iProtocol, pwzDescription, iDirection);
                 ExitOnFailure(hr, "failed to add/update application exception for name '%ls', file '%ls'", pwzName, pwzFile);
                 break;
 

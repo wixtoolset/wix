@@ -9,6 +9,8 @@ namespace WixToolset.Firewall
     static class FirewallConstants
     {
         // from icftypes.h
+        public const int NET_FW_RULE_DIR_IN = 1;
+        public const int NET_FW_RULE_DIR_OUT = 2;
         public const int NET_FW_IP_PROTOCOL_TCP = 6;
         public const int NET_FW_IP_PROTOCOL_UDP = 17;
 

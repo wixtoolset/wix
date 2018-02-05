@@ -141,7 +141,7 @@
             <xs:attribute name="IgnoreFailure" type="YesNoType">
                 <xs:annotation>
                     <xs:documentation>
-                        If "yes," failures to register this firewall exception will be silently 
+                        If "yes", failures to register this firewall exception will be silently 
                         ignored. If "no" (the default), failures will cause rollback.
                     </xs:documentation>
                 </xs:annotation>
@@ -167,6 +167,14 @@
                     <xs:documentation>
                       Description for this firewall rule displayed in Windows Firewall manager in 
                       Windows Vista and later.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+
+            <xs:attribute name="Outbound" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>
+                        If "yes", registers an outbound firewall rule.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
