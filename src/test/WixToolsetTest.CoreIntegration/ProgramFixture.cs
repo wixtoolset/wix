@@ -177,6 +177,42 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanLoadPdbGeneratedByBuild()
+        {
+            var folder = TestData.Get(@"TestData\MultiFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-d", "MediaTemplateCompressionLevel",
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                Assert.Equal(0, result);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
+
+                var pdbPath = Path.Combine(intermediateFolder, @"bin\test.wixpdb");
+                Assert.True(File.Exists(pdbPath));
+
+                var pdb = Pdb.Load(pdbPath, suppressVersionCheck: true);
+                Assert.NotNull(pdb);
+                Assert.NotNull(pdb.Output);
+            }
+        }
+
+        [Fact]
         public void CanBuildSimpleModule()
         {
             var folder = TestData.Get(@"TestData\SimpleModule");
@@ -274,6 +310,38 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal(new[]{
                     "test.wixipl"
+                }, builtFiles.Select(Path.GetFileName).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanBuildWixlib()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var program = new Program();
+                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.wixlib")
+                });
+
+                Assert.Equal(0, result);
+
+                var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
+
+                Assert.Equal(new[]{
+                    "test.wixlib"
                 }, builtFiles.Select(Path.GetFileName).ToArray());
             }
         }
