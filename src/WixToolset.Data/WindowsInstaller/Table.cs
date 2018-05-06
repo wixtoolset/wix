@@ -11,6 +11,7 @@ namespace WixToolset.Data.WindowsInstaller
     /// <summary>
     /// Object that represents a table in a database.
     /// </summary>
+    [DebuggerDisplay("{Name}")]
     public class Table
     {
         /// <summary>

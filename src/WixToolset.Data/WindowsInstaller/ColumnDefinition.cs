@@ -501,7 +501,7 @@ namespace WixToolset.Data.WindowsInstaller
 
             if (this.KeyColumn.HasValue)
             {
-                writer.WriteAttributeString("keyColumn", this.KeyColumn.HasValue.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                writer.WriteAttributeString("keyColumn", this.KeyColumn.Value.ToString(CultureInfo.InvariantCulture.NumberFormat));
             }
 
             switch (this.Category)
