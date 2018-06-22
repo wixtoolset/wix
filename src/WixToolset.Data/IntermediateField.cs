@@ -6,7 +6,7 @@ namespace WixToolset.Data
     using System.Diagnostics;
     using SimpleJson;
 
-    [DebuggerDisplay("Name={Name,nq} Type={Type} Value={Value.AsString()}")]
+    [DebuggerDisplay("Name={Name,nq} Type={Type} Value={Value?.AsString()}")]
     public class IntermediateField
     {
         public IntermediateField(IntermediateFieldDefinition definition)
