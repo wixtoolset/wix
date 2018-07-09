@@ -43,11 +43,11 @@ namespace WixToolset.Core
 
         private Dictionary<Type, object> Singletons { get; }
 
-        public object GetService(Type serviceType)
+        public bool TryGetService(Type serviceType, out object service)
         {
             if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));
 
-            if (!this.Singletons.TryGetValue(serviceType, out var service))
+            if (!this.Singletons.TryGetValue(serviceType, out service))
             {
                 if (this.CreationFunctions.TryGetValue(serviceType, out var creationFunction))
                 {
@@ -62,7 +62,12 @@ namespace WixToolset.Core
                 }
             }
 
-            return service ?? throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));
+            return service != null;
+        }
+
+        public object GetService(Type serviceType)
+        {
+            return this.TryGetService(serviceType, out var service) ? service : throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));
         }
 
         public void AddService(Type serviceType, Func<IServiceProvider, Dictionary<Type, object>, object> creationFunction)
