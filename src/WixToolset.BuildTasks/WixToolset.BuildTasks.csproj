@@ -6,6 +6,8 @@
     <TargetFramework>net461</TargetFramework>
     <Description></Description>
     <Title>WiX Toolset MSBuild Tasks</Title>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -32,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All"/>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" PrivateAssets="all" Condition="'$(TargetFramework)'=='net461' " />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" PrivateAssets="all" Condition="'$(TargetFramework)'=='netstandard2.0' " />

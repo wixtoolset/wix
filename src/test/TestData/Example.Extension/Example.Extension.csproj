@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

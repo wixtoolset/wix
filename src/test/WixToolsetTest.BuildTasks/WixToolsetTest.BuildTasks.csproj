@@ -6,9 +6,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <Description></Description>
     <Title>WiX Toolset Tests for MSBuild Tasks</Title>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
