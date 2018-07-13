@@ -10,19 +10,23 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
-<!--
+
     <dependencies>
+      <dependency id="runtime.win.WixToolset.Core.Native" version="$version$" />
+<!--
       <dependency id="runtime.win-x86.WixToolset.Core.Native" version="$version$" />
       <dependency id="runtime.win-x64.WixToolset.Core.Native" version="$version$" />
+-->
     </dependencies>
-     -->
   </metadata>
 
   <files>
     <file src="$id$.dll" target="lib\netstandard2.0" />
+<!--
     <file src="..\Win32\wixnative.exe" target="lib\netstandard2.0\x86" />
     <file src="..\Win32\wixnative.pdb" target="lib\netstandard2.0\x86" />
     <file src="..\x64\wixnative.exe" target="lib\netstandard2.0\x64" />
     <file src="..\x64\wixnative.pdb" target="lib\netstandard2.0\x64" />
+ -->
   </files>
 </package>

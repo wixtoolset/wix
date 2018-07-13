@@ -23,11 +23,16 @@
     </ProjectConfiguration>
   </ItemGroup>
 
+  <PropertyGroup>
+    <NameSuffix Condition=" '$(Platform)'=='Win32' ">x86</NameSuffix>
+    <NameSuffix Condition=" '$(Platform)'=='x64' ">amd64</NameSuffix>
+  </PropertyGroup>
+
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8497EC72-B8D0-4272-A9D0-7E9D871CEFBF}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
     <ProjectSubSystem>Console</ProjectSubSystem>
-    <TargetName>wixnative</TargetName>
+    <TargetName>wixnative.$(NameSuffix)</TargetName>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Core</Description>
@@ -68,6 +73,10 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+
+  <Target Name="Pack" DependsOnTargets="GetBuildVersion">
+    <Exec Command="nuget pack runtime.win.WixToolset.Core.Native.nuspec -BasePath &quot;$(BaseOutputPath)\&quot; -OutputDirectory &quot;$(BaseOutputPath)\&quot; -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Core.Native;Version=&quot;$(BuildVersionSimple)&quot;;Platform=$(PlatformTarget);Authors=&quot;$(Authors)&quot;;Copyright=&quot;$(Copyright)&quot;;Description=&quot;$(Description)&quot;;Title=&quot;$(Title)&quot;" />
+  </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

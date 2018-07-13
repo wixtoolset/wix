@@ -20,10 +20,10 @@
 
     <ItemGroup>
       <NativeProjectOutput Include="$(OutputPath)..\Win32\*.exe;$(OutputPath)..\Win32\*.pdb">
-        <TargetRelativeFolder>x86\</TargetRelativeFolder>
+        <TargetRelativeFolder>.\</TargetRelativeFolder>
       </NativeProjectOutput>
       <NativeProjectOutput Include="$(OutputPath)..\x64\*.exe;$(OutputPath)..\x64\*.pdb">
-        <TargetRelativeFolder>x64\</TargetRelativeFolder>
+        <TargetRelativeFolder>.\</TargetRelativeFolder>
       </NativeProjectOutput>
 
       <AllItemsFullPathWithTargetPath Include="@(NativeProjectOutput->'%(FullPath)')">

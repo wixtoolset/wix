@@ -19,7 +19,7 @@ namespace WixToolset.Core.Native
 
         static WixNativeExe()
         {
-            PathToWixNativeExe = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), "x86\\wixnative.exe");
+            PathToWixNativeExe = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), "wixnative.x86.exe");
         }
 
         public WixNativeExe(params object[] args)
