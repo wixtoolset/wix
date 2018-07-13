@@ -14,7 +14,7 @@ namespace WixToolsetTest.BuildTasks
     public partial class MsbuildFixture
     {
         [Fact]
-        public void CanBuildSingleFile()
+        public void CanBuildSimpleMsiPackage()
         {
             var folder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -23,9 +23,11 @@ namespace WixToolsetTest.BuildTasks
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
+                var engine = new FakeBuildEngine();
+
                 var task = new DoIt
                 {
-                    BuildEngine = new FakeBuildEngine(),
+                    BuildEngine = engine,
                     SourceFiles = new[]
                     {
                         new TaskItem(Path.Combine(folder, "Package.wxs")),
@@ -44,7 +46,7 @@ namespace WixToolsetTest.BuildTasks
                 };
 
                 var result = task.Execute();
-                Assert.True(result, "MSBuild task failed unexpectedly.");
+                Assert.True(result, $"MSBuild task failed unexpectedly. Output:\r\n{engine.Output}");
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));

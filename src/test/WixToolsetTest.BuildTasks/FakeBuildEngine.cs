@@ -3,11 +3,13 @@
 namespace WixToolsetTest.BuildTasks
 {
     using System.Collections;
-    using System.Diagnostics;
+    using System.Text;
     using Microsoft.Build.Framework;
 
     internal class FakeBuildEngine : IBuildEngine
     {
+        private StringBuilder output = new StringBuilder();
+
         public int ColumnNumberOfTaskNode => 0;
 
         public bool ContinueOnError => false;
@@ -16,14 +18,16 @@ namespace WixToolsetTest.BuildTasks
 
         public string ProjectFileOfTaskNode => "fake_wix.targets";
 
+        public string Output => this.output.ToString();
+
         public bool BuildProjectFile(string projectFileName, string[] targetNames, IDictionary globalProperties, IDictionary targetOutputs) => throw new System.NotImplementedException();
 
-        public void LogCustomEvent(CustomBuildEventArgs e) => Debug.Write(e.Message);
+        public void LogCustomEvent(CustomBuildEventArgs e) => this.output.AppendLine(e.Message);
 
-        public void LogErrorEvent(BuildErrorEventArgs e) => Debug.Write(e.Message);
+        public void LogErrorEvent(BuildErrorEventArgs e) => this.output.AppendLine(e.Message);
 
-        public void LogMessageEvent(BuildMessageEventArgs e) => Debug.Write(e.Message);
+        public void LogMessageEvent(BuildMessageEventArgs e) => this.output.AppendLine(e.Message);
 
-        public void LogWarningEvent(BuildWarningEventArgs e) => Debug.Write(e.Message);
+        public void LogWarningEvent(BuildWarningEventArgs e) => this.output.AppendLine(e.Message);
     }
 }
