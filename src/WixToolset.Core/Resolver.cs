@@ -232,7 +232,6 @@ namespace WixToolset.Core
 
             var localizations = context.Localizations.Concat(context.IntermediateRepresentation.Localizations).ToList();
 
-            // If there still is no filter, return all localizations.
             AddFilteredLocalizations(result, filter, localizations);
 
             // Filter localizations provided by extensions with data.
@@ -270,6 +269,7 @@ namespace WixToolset.Core
 
         private static void AddFilteredLocalizations(List<Localization> result, IEnumerable<string> filter, IEnumerable<Localization> localizations)
         {
+            // If there is no filter, return all localizations.
             if (!filter.Any())
             {
                 result.AddRange(localizations);

@@ -28,7 +28,7 @@ namespace WixToolset.BuildTasks
 
         public string AdditionalOptions { get; set; }
 
-        public string Cultures { get; set; }
+        public string[] Cultures { get; set; }
 
         public string[] DefineConstants { get; set; }
 
@@ -145,7 +145,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-outputType ", this.OutputType);
             commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
-            commandLineBuilder.AppendSwitchIfNotNull("-cultures ", this.Cultures);
+            commandLineBuilder.AppendArrayIfNotNull("-culture ", this.Cultures);
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
             commandLineBuilder.AppendArrayIfNotNull("-I ", this.IncludeSearchPaths);
             commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);

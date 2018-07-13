@@ -50,6 +50,6 @@
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets') " />
   <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="FG-WiX or WiX Toolset build tools (v3.11 or later) must be installed to build this project. To download FG-WiX, go to https://www.firegiant.com/downloads/. To download the WiX Toolset, go to http://wixtoolset.org/releases/." />
+    <Error Text="WiX Toolset build tools (v3.11 or later) must be installed to build this project. To download the WiX Toolset, go to http://wixtoolset.org/releases/." />
   </Target>
 </Project>

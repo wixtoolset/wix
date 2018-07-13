@@ -174,8 +174,6 @@ namespace WixToolset.BuildTasks
 
         private class CultureGroup
         {
-            private List<string> cultures = new List<string>();
-
             /// <summary>
             /// TargetPath already has a '\', do not double it!
             /// </summary>
@@ -193,11 +191,11 @@ namespace WixToolset.BuildTasks
                 Debug.Assert(!String.IsNullOrEmpty(cultureGroupString));
                 foreach (string cultureString in cultureGroupString.Split(','))
                 {
-                    this.cultures.Add(cultureString);
+                    this.Cultures.Add(cultureString);
                 }
             }
 
-            public List<string> Cultures { get { return cultures; } }
+            public List<string> Cultures { get; } = new List<string>();
 
             public string OutputFolder
             {
@@ -218,7 +216,7 @@ namespace WixToolset.BuildTasks
             {
                 if (this.Cultures.Count > 0)
                 {
-                    return String.Join(",", this.Cultures.ToArray());
+                    return String.Join(";", this.Cultures);
                 }
 
                 // We use a keyword for a null culture because MSBuild cannnot handle "" items
