@@ -5,11 +5,8 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <IsPackable>false</IsPackable>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="TestData\Wixout\Package.en-us.wxl" />
-    <None Remove="TestData\Wixout\test.wixout" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="TestData\Wixout\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
@@ -26,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
 </Project>

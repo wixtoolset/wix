@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.CoreIntegrat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "light", "src\light\light.csproj", "{821DCF25-4E4F-48B1-9DD6-80B01EBF9B16}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.LightIntegration", "src\test\WixToolsetTest.LightIntegration\WixToolsetTest.LightIntegration.csproj", "{87ED6392-D624-4C7E-80ED-6BE6047A4922}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,18 @@ Global
 		{821DCF25-4E4F-48B1-9DD6-80B01EBF9B16}.Release|x64.Build.0 = Release|Any CPU
 		{821DCF25-4E4F-48B1-9DD6-80B01EBF9B16}.Release|x86.ActiveCfg = Release|Any CPU
 		{821DCF25-4E4F-48B1-9DD6-80B01EBF9B16}.Release|x86.Build.0 = Release|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Debug|x64.Build.0 = Debug|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Debug|x86.Build.0 = Debug|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Release|x64.ActiveCfg = Release|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Release|x64.Build.0 = Release|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Release|x86.ActiveCfg = Release|Any CPU
+		{87ED6392-D624-4C7E-80ED-6BE6047A4922}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
