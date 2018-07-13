@@ -18,8 +18,6 @@ namespace WixToolset.Core.CommandLine
 
         public IExtensionManager ExtensionManager { get; set; }
 
-        public string Arguments { get; set; }
-
-        public string[] ParsedArguments { get; set; }
+        public ICommandLineArguments Arguments { get; set; }
     }
 }

@@ -171,27 +171,34 @@ namespace WixToolset.BuildTasks
 
             var serviceProvider = new WixToolsetServiceProvider();
 
-            var context = serviceProvider.GetService<ICommandLineContext>();
-
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(this.Listener);
 
+            var arguments = serviceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(commandLineString);
+
+            var context = serviceProvider.GetService<ICommandLineContext>();
             context.Messaging = messaging;
-            context.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider);
-            context.Arguments = commandLineString;
+            context.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
+            context.Arguments = arguments;
 
             var commandLine = serviceProvider.GetService<ICommandLine>();
             var command = commandLine.ParseStandardCommandLine(context);
             command?.Execute();
         }
 
-        private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider)
+        private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, string[] extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 
             foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
             {
                 extensionManager.Add(type.Assembly);
+            }
+
+            foreach (var extension in extensions)
+            {
+                extensionManager.Load(extension);
             }
 
             return extensionManager;

@@ -22,7 +22,6 @@ namespace WixToolset.Tools
     public sealed class Light
     {
         LightCommandLine commandLine;
-        private IEnumerable<IExtensionData> extensionData;
         //private IEnumerable<IBinderExtension> binderExtensions;
         //private IEnumerable<IBinderFileManager> fileManagers;
 
@@ -101,45 +100,20 @@ namespace WixToolset.Tools
         /// <param name="args">Command line arguments to be parsed.</param>
         private IEnumerable<string> ParseCommandLineAndLoadExtensions(IServiceProvider serviceProvider, IMessaging messaging, string[] args)
         {
-            this.commandLine = new LightCommandLine(messaging);
+            var arguments = serviceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(args);
 
-            string[] unprocessed = this.commandLine.Parse(args);
-            if (messaging.EncounteredError)
-            {
-                return unprocessed;
-            }
+            var extensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
 
-            // Load extensions.
-            var extensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider);
-            foreach (string extension in this.commandLine.Extensions)
-            {
-                extensionManager.Load(extension);
-            }
-
-            // Extension data command line processing.
             var context = serviceProvider.GetService<ICommandLineContext>();
-            context.Arguments = null;
             context.ExtensionManager = extensionManager;
             context.Messaging = messaging;
-            context.ParsedArguments = args;
+            context.Arguments = arguments;
 
-            var commandLineExtensions = extensionManager.Create<IExtensionCommandLine>();
-            foreach (var extension in commandLineExtensions)
-            {
-                extension.PreParse(context);
-            }
+            this.commandLine = new LightCommandLine(messaging);
+            var unprocessed = this.commandLine.Parse(context);
 
-            // Process unproccessed arguments.
-            List<string> actuallyUnprocessed = new List<string>();
-            foreach (var arg in unprocessed)
-            {
-                if (!this.TryParseCommandLineArgumentWithExtension(arg, commandLineExtensions))
-                {
-                    actuallyUnprocessed.Add(arg);
-                }
-            }
-
-            return this.commandLine.ParsePostExtensions(actuallyUnprocessed.ToArray());
+            return unprocessed;
         }
 
         private void Bind(IServiceProvider serviceProvider, IMessaging messaging)
@@ -194,7 +168,7 @@ namespace WixToolset.Tools
                 binder.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
                 binder.OutputPath = this.commandLine.OutputFile;
                 binder.OutputPdbPath = Path.ChangeExtension(this.commandLine.OutputFile, ".wixpdb");
-                binder.SuppressIces = this.commandLine.SuppressIces; 
+                binder.SuppressIces = this.commandLine.SuppressIces;
                 binder.SuppressValidation = this.commandLine.SuppressValidation;
 
                 bindResult = binder.Execute();
@@ -526,13 +500,18 @@ namespace WixToolset.Tools
             return Intermediate.Load(path);
         }
 
-        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider)
+        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, IEnumerable<string> extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 
             foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
             {
                 extensionManager.Add(type.Assembly);
+            }
+
+            foreach (var extension in extensions)
+            {
+                extensionManager.Load(extension);
             }
 
             return extensionManager;

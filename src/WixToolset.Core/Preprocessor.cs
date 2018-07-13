@@ -644,7 +644,7 @@ namespace WixToolset.Core
 
             if (null == includeFile)
             {
-                throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, includePath, "include"));
+                throw new WixFileNotFoundException(sourceLineNumbers, includePath, "include");
             }
 
             using (XmlReader reader = XmlReader.Create(includeFile, DocumentXmlReaderSettings))

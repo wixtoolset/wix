@@ -26,7 +26,7 @@ namespace Example.Extension
         {
             if (parseCommandLine.IsSwitch(arg) && arg.Substring(1).Equals("example", StringComparison.OrdinalIgnoreCase))
             {
-                parseCommandLine.GetNextArgumentOrError(ref this.exampleValueFromCommandLine);
+                this.exampleValueFromCommandLine = parseCommandLine.GetNextArgumentOrError(arg);
                 return true;
             }
 

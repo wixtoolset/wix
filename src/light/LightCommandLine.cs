@@ -6,8 +6,8 @@ namespace WixToolset.Tools
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using WixToolset.Core.CommandLine;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     public class LightCommandLine
@@ -22,7 +22,6 @@ namespace WixToolset.Tools
             this.SuppressIces = new List<string>();
             this.Ices = new List<string>();
             this.BindPaths = new List<BindPath>();
-            this.Extensions = new List<string>();
             this.Files = new List<string>();
             this.LocalizationFiles = new List<string>();
             this.Variables = new Dictionary<string, string>();
@@ -80,8 +79,6 @@ namespace WixToolset.Tools
 
         public List<BindPath> BindPaths { get; private set; }
 
-        public List<string> Extensions { get; private set; }
-
         public List<string> Files { get; private set; }
 
         public List<string> LocalizationFiles { get; private set; }
@@ -96,35 +93,40 @@ namespace WixToolset.Tools
         /// Parse the commandline arguments.
         /// </summary>
         /// <param name="args">Commandline arguments.</param>
-        public string[] Parse(string[] args)
+        public string[] Parse(ICommandLineContext context)
         {
-            List<string> unprocessed = new List<string>();
+            var unprocessed = new List<string>();
 
-            for (int i = 0; i < args.Length; ++i)
+            var extensions = context.ExtensionManager.Create<IExtensionCommandLine>();
+
+            foreach (var extension in extensions)
             {
-                string arg = args[i];
-                if (String.IsNullOrEmpty(arg)) // skip blank arguments
+                extension.PreParse(context);
+            }
+
+            var parser = context.Arguments.Parse();
+
+            while (!this.ShowHelp &&
+                   String.IsNullOrEmpty(parser.ErrorArgument) &&
+                   parser.TryGetNextSwitchOrArgument(out var arg))
+            {
+                if (String.IsNullOrWhiteSpace(arg)) // skip blank arguments.
                 {
                     continue;
                 }
 
-                if (1 == arg.Length) // treat '-' and '@' as filenames when by themselves.
+                if (parser.IsSwitch(arg))
                 {
-                    unprocessed.Add(arg);
-                }
-                else if ('-' == arg[0] || '/' == arg[0])
-                {
-                    string parameter = arg.Substring(1);
+                    var parameter = arg.Substring(1);
                     if (parameter.Equals("b", StringComparison.Ordinal))
                     {
-                        if (!CommandLineHelper.IsValidArg(args, ++i))
+                        var result = parser.GetNextArgumentOrError(arg);
+                        if (!String.IsNullOrEmpty(result))
                         {
-                            break;
+                            var bindPath = BindPath.Parse(result);
+
+                            this.BindPaths.Add(bindPath);
                         }
-
-                        var bindPath = BindPath.Parse(args[i]);
-
-                        this.BindPaths.Add(bindPath);
                     }
                     else if (parameter.StartsWith("cultures:", StringComparison.Ordinal))
                     {
@@ -184,25 +186,9 @@ namespace WixToolset.Tools
                             this.Variables.Add(value[0], value[1]);
                         }
                     }
-                    else if (parameter.Equals("ext", StringComparison.Ordinal))
-                    {
-                        if (!CommandLineHelper.IsValidArg(args, ++i))
-                        {
-                            this.Messaging.Write(ErrorMessages.TypeSpecificationForExtensionRequired("-ext"));
-                            break;
-                        }
-
-                        this.Extensions.Add(args[i]);
-                    }
                     else if (parameter.Equals("loc", StringComparison.Ordinal))
                     {
-                        string locFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-                        if (String.IsNullOrEmpty(locFile))
-                        {
-                            break;
-                        }
-
-                        this.LocalizationFiles.Add(locFile);
+                        parser.GetNextArgumentAsFilePathOrError(arg, "localization files", this.LocalizationFiles);
                     }
                     else if (parameter.Equals("nologo", StringComparison.Ordinal))
                     {
@@ -214,11 +200,7 @@ namespace WixToolset.Tools
                     }
                     else if ("o" == parameter || "out" == parameter)
                     {
-                        this.OutputFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-                        if (String.IsNullOrEmpty(this.OutputFile))
-                        {
-                            break;
-                        }
+                        this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg);
                     }
                     else if (parameter.Equals("pedantic", StringComparison.Ordinal))
                     {
@@ -230,12 +212,7 @@ namespace WixToolset.Tools
                     }
                     else if (parameter.Equals("usf", StringComparison.Ordinal))
                     {
-                        this.UnreferencedSymbolsFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.UnreferencedSymbolsFile))
-                        {
-                            break;
-                        }
+                        this.UnreferencedSymbolsFile = parser.GetNextArgumentAsDirectoryOrError(arg);
                     }
                     else if (parameter.Equals("xo", StringComparison.Ordinal))
                     {
@@ -243,41 +220,27 @@ namespace WixToolset.Tools
                     }
                     else if (parameter.Equals("cc", StringComparison.Ordinal))
                     {
-                        this.CabCachePath = CommandLineHelper.GetDirectory(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.CabCachePath))
-                        {
-                            break;
-                        }
+                        this.CabCachePath = parser.GetNextArgumentAsDirectoryOrError(arg);
                     }
                     else if (parameter.Equals("ct", StringComparison.Ordinal))
                     {
-                        if (!CommandLineHelper.IsValidArg(args, ++i))
+                        var result = parser.GetNextArgumentOrError(arg);
+                        if (!String.IsNullOrEmpty(result))
                         {
-                            this.Messaging.Write(ErrorMessages.IllegalCabbingThreadCount(String.Empty));
-                            break;
-                        }
+                            if (!Int32.TryParse(result, out var ct) || 0 >= ct)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalCabbingThreadCount(result));
+                                parser.ErrorArgument = arg;
+                                break;
+                            }
 
-                        int ct = 0;
-                        if (!Int32.TryParse(args[i], out ct) || 0 >= ct)
-                        {
-                            this.Messaging.Write(ErrorMessages.IllegalCabbingThreadCount(args[i]));
-                            break;
+                            this.CabbingThreadCount = ct;
+                            this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
                         }
-
-                        this.CabbingThreadCount = ct;
-                        this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
                     }
                     else if (parameter.Equals("cub", StringComparison.Ordinal))
                     {
-                        string cubeFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(cubeFile))
-                        {
-                            break;
-                        }
-
-                        this.CubeFiles.Add(cubeFile);
+                        parser.GetNextArgumentAsFilePathOrError(arg, "static validation files", this.CubeFiles);
                     }
                     else if (parameter.StartsWith("ice:", StringComparison.Ordinal))
                     {
@@ -285,57 +248,27 @@ namespace WixToolset.Tools
                     }
                     else if (parameter.Equals("intermediatefolder", StringComparison.OrdinalIgnoreCase))
                     {
-                        this.IntermediateFolder = CommandLineHelper.GetDirectory(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.IntermediateFolder))
-                        {
-                            break;
-                        }
+                        this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(arg);
                     }
                     else if (parameter.Equals("contentsfile", StringComparison.Ordinal))
                     {
-                        this.ContentsFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.ContentsFile))
-                        {
-                            break;
-                        }
+                        this.ContentsFile = parser.GetNextArgumentAsFilePathOrError(arg);
                     }
                     else if (parameter.Equals("outputsfile", StringComparison.Ordinal))
                     {
-                        this.OutputsFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.OutputsFile))
-                        {
-                            break;
-                        }
+                        this.OutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
                     }
                     else if (parameter.Equals("builtoutputsfile", StringComparison.Ordinal))
                     {
-                        this.BuiltOutputsFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.BuiltOutputsFile))
-                        {
-                            break;
-                        }
+                        this.BuiltOutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
                     }
                     else if (parameter.Equals("wixprojectfile", StringComparison.Ordinal))
                     {
-                        this.WixprojectFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.WixprojectFile))
-                        {
-                            break;
-                        }
+                        this.WixprojectFile = parser.GetNextArgumentAsFilePathOrError(arg);
                     }
                     else if (parameter.Equals("pdbout", StringComparison.Ordinal))
                     {
-                        this.PdbFile = CommandLineHelper.GetFile(parameter, this.Messaging, args, ++i);
-
-                        if (String.IsNullOrEmpty(this.PdbFile))
-                        {
-                            break;
-                        }
+                        this.PdbFile = parser.GetNextArgumentAsFilePathOrError(arg);
                     }
                     else if (parameter.StartsWith("sice:", StringComparison.Ordinal))
                     {
@@ -410,45 +343,35 @@ namespace WixToolset.Tools
                         this.ShowHelp = true;
                         break;
                     }
-                    else
+                    else if (!this.TryParseCommandLineArgumentWithExtension(arg, parser, extensions))
                     {
                         unprocessed.Add(arg);
                     }
                 }
-                else if ('@' == arg[0])
-                {
-                    string[] parsedArgs = CommandLineResponseFile.Parse(arg.Substring(1));
-                    string[] unparsedArgs = this.Parse(parsedArgs);
-                    unprocessed.AddRange(unparsedArgs);
-                }
-                else
+                else if (!this.TryParseCommandLineArgumentWithExtension(arg, parser, extensions))
                 {
                     unprocessed.Add(arg);
                 }
             }
 
-            return unprocessed.ToArray();
+            return this.ParsePostExtensions(parser, unprocessed.ToArray());
         }
 
-        public string[] ParsePostExtensions(string[] remaining)
+        private string[] ParsePostExtensions(IParseCommandLine parser, string[] remaining)
         {
-            List<string> unprocessed = new List<string>();
+            var unprocessed = new List<string>();
 
             for (int i = 0; i < remaining.Length; ++i)
             {
-                string arg = remaining[i];
-                if (String.IsNullOrEmpty(arg)) // skip blank arguments
-                {
-                    continue;
-                }
+                var arg = remaining[i];
 
-                if (1 < arg.Length && ('-' == arg[0] || '/' == arg[0]))
+                if (parser.IsSwitch(arg))
                 {
                     unprocessed.Add(arg);
                 }
                 else
                 {
-                    this.Files.AddRange(CommandLineHelper.GetFiles(arg, "Source"));
+                    parser.GetArgumentAsFilePathOrError(arg, "source files", this.Files);
                 }
             }
 
@@ -469,7 +392,7 @@ namespace WixToolset.Tools
                 // Add the directories of the input files as unnamed bind paths.
                 foreach (string file in this.Files)
                 {
-                    BindPath bindPath = new BindPath(Path.GetDirectoryName(Path.GetFullPath(file)));
+                    var bindPath = new BindPath(Path.GetDirectoryName(Path.GetFullPath(file)));
                     this.BindPaths.Add(bindPath);
                 }
             }
@@ -480,6 +403,19 @@ namespace WixToolset.Tools
             }
 
             return unprocessed.ToArray();
+        }
+
+        private bool TryParseCommandLineArgumentWithExtension(string arg, IParseCommandLine parser, IEnumerable<IExtensionCommandLine> extensions)
+        {
+            foreach (var extension in extensions)
+            {
+                if (extension.TryParseArgument(parser, arg))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

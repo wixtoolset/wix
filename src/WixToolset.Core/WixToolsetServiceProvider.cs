@@ -25,6 +25,7 @@ namespace WixToolset.Core
                 { typeof(IWindowsInstallerBackendHelper), (provider, singletons) => AddSingleton(singletons, typeof(IWindowsInstallerBackendHelper), new WindowsInstallerBackendHelper(provider)) },
 
             // Transients.
+                { typeof(ICommandLineArguments), (provider, singletons) => new CommandLineArguments(provider) },
                 { typeof(ICommandLineContext), (provider, singletons) => new CommandLineContext(provider) },
                 { typeof(ICommandLine), (provider, singletons) => new CommandLineParser() },
                 { typeof(IPreprocessContext), (provider, singletons) => new PreprocessContext(provider) },
