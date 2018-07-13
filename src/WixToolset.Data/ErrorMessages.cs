@@ -389,7 +389,7 @@ namespace WixToolset.Data
 
         public static Message ExpectedArgument(string argument)
         {
-            return Message(null, Ids.ExpectedArgument, "{0} is expected to be followed by a value argument.", argument);
+            return Message(null, Ids.ExpectedArgument, "{0} is expected to be followed by a value. See -? for additional detail.", argument);
         }
 
         public static Message ExpectedAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
