@@ -4,16 +4,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" NoWarn="NU1701" />
   </ItemGroup>
 
   <ItemGroup>
