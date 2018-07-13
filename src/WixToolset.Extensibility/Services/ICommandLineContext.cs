@@ -12,8 +12,6 @@ namespace WixToolset.Extensibility.Services
 
         IExtensionManager ExtensionManager { get; set; }
 
-        string Arguments { get; set; }
-
-        string[] ParsedArguments { get; set; }
+        ICommandLineArguments Arguments { get; set; }
     }
 }

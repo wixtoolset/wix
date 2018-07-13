@@ -6,16 +6,29 @@ namespace WixToolset.Extensibility.Services
 
     public interface IParseCommandLine
     {
+        string ErrorArgument { get; set; }
+
+        /// <summary>
+        /// Validates that a valid switch (starts with "/" or "-"), and returns a bool indicating its validity
+        /// </summary>
+        /// <param name="arg">The string check.</param>
+        /// <returns>True if a valid switch, otherwise false.</returns>
         bool IsSwitch(string arg);
 
-        bool IsSwitchAt(IEnumerable<string> args, int index);
+        void GetArgumentAsFilePathOrError(string argument, string fileType, IList<string> paths);
 
-        void GetNextArgumentOrError(ref string arg);
+        string GetNextArgumentOrError(string commandLineSwitch);
 
-        void GetNextArgumentOrError(IList<string> args);
+        bool GetNextArgumentOrError(string commandLineSwitch, IList<string> argument);
 
-        void GetNextArgumentAsFilePathOrError(IList<string> args, string fileType);
+        string GetNextArgumentAsDirectoryOrError(string commandLineSwitch);
 
-        bool TryGetNextArgumentOrError(out string arg);
+        bool GetNextArgumentAsDirectoryOrError(string commandLineSwitch, IList<string> directories);
+
+        string GetNextArgumentAsFilePathOrError(string commandLineSwitch);
+
+        bool GetNextArgumentAsFilePathOrError(string commandLineSwitch, string fileType, IList<string> paths);
+
+        bool TryGetNextSwitchOrArgument(out string arg);
     }
 }
