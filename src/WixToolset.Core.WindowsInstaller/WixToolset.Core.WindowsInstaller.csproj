@@ -8,10 +8,6 @@
     <Title>WiX Toolset Core Windows Installer</Title>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Data\actions.xml" />
     <EmbeddedResource Include="Data\tables.xml" />
@@ -22,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" NoWarn="NU1701" />
   </ItemGroup>
 
   <ItemGroup>

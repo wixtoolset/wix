@@ -9,10 +9,6 @@
     <Title>WiX Toolset Compiler</Title>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <!--
   <ItemGroup>
     <Content Include="wix.cmd" CopyToOutputDirectory="PreserveNewest" />

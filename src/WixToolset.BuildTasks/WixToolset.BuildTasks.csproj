@@ -10,7 +10,6 @@
 
   <PropertyGroup>
     <!-- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> -->
-    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

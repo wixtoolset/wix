@@ -8,17 +8,13 @@
     <Title>WiX Toolset Core Burn</Title>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Dtf.Resources" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Dtf.Resources" Version="4.0.*" NoWarn="NU1701" />
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" NoWarn="NU1701" />
   </ItemGroup>
 
   <ItemGroup>
