@@ -33,6 +33,10 @@ namespace Example.Extension
             return false;
         }
 
+        public void PostParse()
+        {
+        }
+
         public override string GetVariableValue(string prefix, string name)
         {
             if (prefix == "ex" && "test".Equals(name, StringComparison.OrdinalIgnoreCase))

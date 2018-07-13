@@ -323,6 +323,11 @@ namespace WixToolset.Core.CommandLine
                 }
             }
 
+            foreach (var extension in extensions)
+            {
+                extension.PostParse();
+            }
+
             return this;
         }
 
