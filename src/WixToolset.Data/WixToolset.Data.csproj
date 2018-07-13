@@ -6,9 +6,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Title>WiX Toolset Data</Title>
     <Description></Description>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All"/>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.7" PrivateAssets="all" />
   </ItemGroup>
 </Project>
