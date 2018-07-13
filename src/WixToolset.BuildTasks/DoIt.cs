@@ -17,15 +17,6 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public sealed class DoIt : Task
     {
-        public DoIt() : this(null)
-        {
-        }
-
-        public DoIt(IMessageListener listener)
-        {
-            this.Listener = listener ?? new MsbuildMessageListener(this.Log, "WIX", "wix.exe");
-        }
-
         public string AdditionalOptions { get; set; }
 
         public string[] Cultures { get; set; }
@@ -115,8 +106,6 @@ namespace WixToolset.BuildTasks
         public string[] SuppressIces { get; set; }
         public string AdditionalCub { get; set; }
 
-        private IMessageListener Listener { get; }
-
         public override bool Execute()
         {
             try
@@ -138,6 +127,8 @@ namespace WixToolset.BuildTasks
 
         private void ExecuteCore()
         {
+            var listener = new MsbuildMessageListener(this.Log, "WIX", this.BuildEngine.ProjectFileOfTaskNode);
+
             var commandLineBuilder = new WixCommandLineBuilder();
 
             commandLineBuilder.AppendTextUnquoted("build");
@@ -172,7 +163,7 @@ namespace WixToolset.BuildTasks
             var serviceProvider = new WixToolsetServiceProvider();
 
             var messaging = serviceProvider.GetService<IMessaging>();
-            messaging.SetListener(this.Listener);
+            messaging.SetListener(listener);
 
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(commandLineString);
@@ -302,11 +293,11 @@ namespace WixToolset.BuildTasks
 
         private class MsbuildMessageListener : IMessageListener
         {
-            public MsbuildMessageListener(TaskLoggingHelper logger, string longName, string shortName)
+            public MsbuildMessageListener(TaskLoggingHelper logger, string shortName, string longName)
             {
                 this.Logger = logger;
-                this.LongAppName = longName;
                 this.ShortAppName = shortName;
+                this.LongAppName = longName;
             }
 
             public string ShortAppName { get; }
