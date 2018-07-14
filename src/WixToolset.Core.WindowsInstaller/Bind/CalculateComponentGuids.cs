@@ -63,7 +63,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         var is64Bit = (componentRow.Attributes & MsiInterop.MsidbComponentAttributes64bit) != 0;
                         var bitness = is64Bit ? "64" : String.Empty;
-                        var regkey = String.Concat(bitness, foundRow[1], "\\", foundRow[2], "\\", foundRow[3]);
+                        var regkey = String.Concat(bitness, foundRow.AsString(1), "\\", foundRow.AsString(2), "\\", foundRow.AsString(3));
                         componentRow.ComponentId = Uuid.NewUuid(BindDatabaseCommand.WixComponentGuidNamespace, regkey.ToLowerInvariant()).ToString("B").ToUpperInvariant();
                     }
                 }
