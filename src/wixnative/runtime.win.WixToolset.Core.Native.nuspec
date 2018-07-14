@@ -13,9 +13,9 @@
   </metadata>
 
   <files>
-    <file src="Win32\wixnative.x86.exe" target="runtimes\win\native" />
-    <file src="Win32\wixnative.x86.pdb" target="runtimes\win\native" />
-    <file src="x64\wixnative.amd64.exe" target="runtimes\win\native" />
-    <file src="x64\wixnative.amd64.pdb" target="runtimes\win\native" />
+    <file src="Win32\wixnative.x86.exe" target="runtimes\win-x86\native" />
+    <file src="Win32\wixnative.x86.pdb" target="runtimes\win-x86\native" />
+    <file src="x64\wixnative.amd64.exe" target="runtimes\win-x64\native" />
+    <file src="x64\wixnative.amd64.pdb" target="runtimes\win-x64\native" />
   </files>
 </package>
