@@ -52,8 +52,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\wix\wix.csproj" />
-    <ProjectReference Include="..\TestData\Example.Extension\Example.Extension.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core\WixToolset.Core.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" />
+    <ProjectReference Include="..\..\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" />
+    <ProjectReference Include="..\Example.Extension\Example.Extension.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,9 +2,11 @@
 
 namespace WixToolset.Core.TestPackage
 {
+    using System;
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     public static class WixRunner
     {
@@ -12,12 +14,41 @@ namespace WixToolset.Core.TestPackage
         {
             var listener = new TestListener();
 
-            var program = new Program();
-            var result = program.Run(new WixToolsetServiceProvider(), listener, args);
-
             messages = listener.Messages;
 
-            return result;
+            var serviceProvider = new WixToolsetServiceProvider();
+
+            var messaging = serviceProvider.GetService<IMessaging>();
+            messaging.SetListener(listener);
+
+            var arguments = serviceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(args);
+
+            var context = serviceProvider.GetService<ICommandLineContext>();
+            context.Messaging = messaging;
+            context.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
+            context.Arguments = arguments;
+
+            var commandLine = serviceProvider.GetService<ICommandLine>();
+            var command = commandLine.ParseStandardCommandLine(context);
+            return command?.Execute() ?? 1;
+        }
+
+        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, string[] extensions)
+        {
+            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+
+            foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
+            {
+                extensionManager.Add(type.Assembly);
+            }
+
+            foreach (var extension in extensions)
+            {
+                extensionManager.Load(extension);
+            }
+
+            return extensionManager;
         }
 
         private class TestListener : IMessageListener

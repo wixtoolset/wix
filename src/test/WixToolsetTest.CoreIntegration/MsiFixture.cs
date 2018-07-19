@@ -5,13 +5,13 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core;
+    using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
-    public class ProgramFixture
+    public class MsiFixture
     {
         [Fact]
         public void CanBuildSingleFile()
@@ -23,8 +23,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -33,8 +32,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                });
-
+                }, out var messages);
                 Assert.Equal(0, result);
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
@@ -59,8 +57,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -69,7 +66,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -95,8 +92,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -106,7 +102,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -125,8 +121,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -136,7 +131,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -155,8 +150,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -166,7 +160,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -185,8 +179,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -196,7 +189,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -221,8 +214,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Module.wxs"),
@@ -230,7 +222,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msm")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -255,8 +247,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -265,7 +256,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -292,8 +283,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -302,7 +292,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.wixipl")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -324,8 +314,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -334,7 +323,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.wixlib")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -357,8 +346,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -368,7 +356,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi"),
                     "-i", bindpath,
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -395,8 +383,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -405,7 +392,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -434,8 +421,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -444,7 +430,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 

@@ -8,6 +8,7 @@ namespace WixToolsetTest.CoreIntegration
     using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core;
+    using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using Xunit;
@@ -37,8 +38,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -48,7 +48,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\extest.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -80,8 +80,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var intermediateFolder = fs.GetFolder();
 
-                var program = new Program();
-                var result = program.Run(new WixToolsetServiceProvider(), null, new[]
+                var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "Package.wxs"),
@@ -92,7 +91,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-intermediateFolder", intermediateFolder,
                     "-example", "test",
                     "-o", Path.Combine(intermediateFolder, @"bin\extest.msi")
-                });
+                }, out var messages);
 
                 Assert.Equal(0, result);
 
@@ -107,8 +106,7 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void Build(string[] args)
         {
-            var program = new Program();
-            var result = program.Run(new WixToolsetServiceProvider(), null, args);
+            var result = WixRunner.Execute(args, out var messages);
             Assert.Equal(0, result);
         }
     }

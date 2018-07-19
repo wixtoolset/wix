@@ -2,17 +2,13 @@
 @pushd %~dp0
 @set _P=%~dp0build\Release\publish
 
-@rem Disable this test until publishing of native assets is worked out
-@rem dotnet build -c Release src\test\WixToolsetTest.BuildTasks
-dotnet build -c Release src\test\WixToolsetTest.CoreIntegration
-dotnet build -c Release src\test\WixToolsetTest.LightIntegration
+dotnet pack -c Release src\WixToolset.Core
+dotnet pack -c Release src\WixToolset.Core.Burn
+dotnet pack -c Release src\WixToolset.Core.WindowsInstaller
 
-dotnet publish -c Release -o %_P%\netcoreapp2.1 -r win-x86 src\wix
-dotnet publish -c Release -o %_P%\net461 -r win-x86 src\light
-dotnet publish -c Release -o %_P%\net461 -r win-x86 src\WixToolset.BuildTasks
-
-dotnet pack -c Release src\WixToolset.Core.InternalPackage
 dotnet pack -c Release src\WixToolset.Core.TestPackage
+
+dotnet build -c Release src\test\WixToolsetTest.CoreIntegration
 
 @popd
 @endlocal

@@ -13,7 +13,7 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal class MsiBackend : IBackend
     {
-        public BindResult Bind(WixToolset.Extensibility.IBindContext context)
+        public BindResult Bind(IBindContext context)
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 

@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wix\wix.csproj" IncludeAssets="true" />
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" IncludeAssets="true" />
     <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" IncludeAssets="true" />
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" IncludeAssets="true" />
@@ -18,7 +17,6 @@
 
   <!-- This is a workaround until https://github.com/NuGet/Home/issues/3891 is resolved -->
   <ItemGroup>
-    <_PackageFiles Include="$(OutputPath)\wix.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
     <_PackageFiles Include="$(OutputPath)\WixToolset.Core.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
     <_PackageFiles Include="$(OutputPath)\WixToolset.Core.Burn.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
     <_PackageFiles Include="$(OutputPath)\WixToolset.Core.WindowsInstaller.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
@@ -37,6 +35,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All"/>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
   </ItemGroup>
 </Project>
