@@ -278,7 +278,7 @@ namespace WixToolset.Core
             {
                 foreach (var culture in filter)
                 {
-                    result.AddRange(localizations.Where(l => culture.Equals(l.Culture, StringComparison.OrdinalIgnoreCase)));
+                    result.AddRange(localizations.Where(l => culture.Equals(l.Culture, StringComparison.OrdinalIgnoreCase) || String.IsNullOrEmpty(l.Culture)));
                 }
             }
         }
