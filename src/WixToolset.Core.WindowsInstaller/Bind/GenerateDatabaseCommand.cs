@@ -114,6 +114,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 Directory.CreateDirectory(baseDirectory);
             }
 
+            var idtDirectory = Path.Combine(baseDirectory, "idts");
+            Directory.CreateDirectory(idtDirectory);
+
             try
             {
                 OpenDatabase type = OpenDatabase.CreateDirect;
@@ -128,20 +131,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 Console.WriteLine("Opening database at: {0}", this.OutputPath);
 #endif
 
+                // Localize the codepage if a value was specified directly.
+                if (-1 != this.Codepage)
+                {
+                    this.Output.Codepage = this.Codepage;
+                }
+
                 using (Database db = new Database(this.OutputPath, type))
                 {
-                    // Localize the codepage if a value was specified directly.
-                    if (-1 != this.Codepage)
-                    {
-                        this.Output.Codepage = this.Codepage;
-                    }
-
                     // if we're not using the default codepage, import a new one into our
                     // database before we add any tables (or the tables would be added
                     // with the wrong codepage).
                     if (0 != this.Output.Codepage)
                     {
-                        this.SetDatabaseCodepage(db, this.Output.Codepage);
+                        this.SetDatabaseCodepage(db, this.Output.Codepage, idtDirectory);
                     }
 
                     foreach (Table table in this.Output.Tables)
@@ -179,8 +182,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             try
                             {
-                                //db.ImportTable(this.Output.Codepage, importTable, baseDirectory, this.KeepAddedColumns);
-                                var command = new CreateIdtFileCommand(this.Messaging, importTable, this.Output.Codepage, baseDirectory, this.KeepAddedColumns);
+                                var command = new CreateIdtFileCommand(this.Messaging, importTable, this.Output.Codepage, idtDirectory, this.KeepAddedColumns);
                                 command.Execute();
 
                                 db.Import(command.IdtPath);
@@ -351,15 +353,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.Execute();
         }
 
-        /// <summary>
-        /// Sets the codepage of a database.
-        /// </summary>
-        /// <param name="db">Database to set codepage into.</param>
-        /// <param name="output">Output with the codepage for the database.</param>
-        private void SetDatabaseCodepage(Database db, int codepage)
+        private void SetDatabaseCodepage(Database db, int codepage, string idtDirectory)
         {
             // write out the _ForceCodepage IDT file
-            string idtPath = Path.Combine(this.TempFilesLocation, "_ForceCodepage.idt");
+            string idtPath = Path.Combine(idtDirectory, "_ForceCodepage.idt");
             using (StreamWriter idtFile = new StreamWriter(idtPath, false, Encoding.ASCII))
             {
                 idtFile.WriteLine(); // dummy column name record
