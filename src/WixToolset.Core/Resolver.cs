@@ -241,7 +241,7 @@ namespace WixToolset.Core
             {
                 var library = data.GetLibrary(creator);
 
-                if (library?.Localizations != null)
+                if (library?.Localizations != null && library.Localizations.Any())
                 {
                     var extensionFilter = (!filter.Any() && data.DefaultCulture != null) ? new[] { data.DefaultCulture } : filter;
 

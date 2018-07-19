@@ -87,7 +87,7 @@ namespace WixToolset.Core.CommandLine
                 return 1;
             }
 
-            var wxls = this.LoadLocalizationFiles();
+            var wxls = this.LoadLocalizationFiles().ToList();
 
             if (this.Messaging.EncounteredError)
             {
