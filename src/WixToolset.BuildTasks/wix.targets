@@ -663,7 +663,7 @@
         ExtensionDirectory="$(WixExtDir)"
         Extensions="@(_ResolvedWixExtensionPaths)"
 
-        IntermediateDirectory="$(IntermediateOutputPath)"
+        IntermediateDirectory="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)"
 
         OutputFile="$(OutputFile)"
         OutputType="$(OutputType)"
