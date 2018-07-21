@@ -64,17 +64,18 @@ namespace WixToolset.Data.Bind
 
             string fileLayoutFullPath = GetValidatedFullPath(sourceLineNumbers, destination);
 
-            // if the current source path (where we know that the file already exists) and the resolved
-            // path as dictated by the Directory table are not the same, then propagate the file.  The
-            // image that we create may have already been done by some other process other than the linker, so 
-            // there is no reason to copy the files to the resolved source if they are already there.
-            if (String.Equals(sourceFullPath, fileLayoutFullPath, StringComparison.OrdinalIgnoreCase))
-            {
-                transfer = null;
-                return false;
-            }
+            //// if the current source path (where we know that the file already exists) and the resolved
+            //// path as dictated by the Directory table are not the same, then propagate the file.  The
+            //// image that we create may have already been done by some other process other than the linker, so 
+            //// there is no reason to copy the files to the resolved source if they are already there.
+            //if (String.Equals(sourceFullPath, fileLayoutFullPath, StringComparison.OrdinalIgnoreCase))
+            //{
+            //    transfer = null;
+            //    return false;
+            //}
 
             transfer = new FileTransfer(source, destination, move, type, sourceLineNumbers);
+            transfer.Redundant = String.Equals(sourceFullPath, fileLayoutFullPath, StringComparison.OrdinalIgnoreCase);
             return true;
         }
 
