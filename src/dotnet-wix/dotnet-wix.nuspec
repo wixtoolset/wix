@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <packageTypes>
+      <packageType name="DotnetTool" />
+    </packageTypes>
+    <dependencies>
+      <group targetFramework=".NETCoreApp2.1" />
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="$projectFolder$DotnetToolSettings.xml" target="tools\netcoreapp2.1\any" />
+    <file src="**" target="tools\netcoreapp2.1\any" />
+    <file src="runtimes\win-x86\native\*.exe" target="tools\netcoreapp2.1\any" />
+  </files>
+</package>

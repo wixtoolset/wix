@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- These properties can be overridden to support non-default installations. -->
+  <PropertyGroup>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildThisFileFullPath)</WixTargetsPath>
+    <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixTargetsPath)WixTasks.dll</WixTasksPath>
+
+    <SignedFile Condition=" '$(SignedFile)' == '' ">$(MSBuildProjectFile).Signed.txt</SignedFile>
+  </PropertyGroup>
+
+  <UsingTask TaskName="Insignia" AssemblyFile="$(WixTasksPath)" />
+
+  <!-- Default Inscribe properties. -->
+  <PropertyGroup>
+    <InscribeNoLogo Condition=" '$(InscribeNoLogo)' == '' ">$(NoLogo)</InscribeNoLogo>
+    <InscribeSuppressAllWarnings Condition=" '$(InscribeSuppressAllWarnings)' == '' ">$(SuppressAllWarnings)</InscribeSuppressAllWarnings>
+    <InscribeSuppressSpecificWarnings Condition=" '$(InscribeSuppressSpecificWarnings)' == '' ">$(SuppressSpecificWarnings)</InscribeSuppressSpecificWarnings>
+    <InscribeTreatWarningsAsErrors Condition=" '$(InscribeTreatWarningsAsErrors)' == '' ">$(TreatWarningsAsErrors)</InscribeTreatWarningsAsErrors>
+    <InscribeTreatSpecificWarningsAsErrors Condition=" '$(InscribeTreatSpecificWarningsAsErrors)' == '' ">$(TreatSpecificWarningsAsErrors)</InscribeTreatSpecificWarningsAsErrors>
+    <InscribeVerboseOutput Condition=" '$(InscribeVerboseOutput)' == '' ">$(VerboseOutput)</InscribeVerboseOutput>
+  </PropertyGroup>
+
+  <!--
+  ==================================================================================================
+  Signing
+  ==================================================================================================
+  -->
+  <PropertyGroup>
+    <InternalSignDependsOn Condition=" '$(OutputType)' == 'Module' ">
+      GetMsmsToSign;
+      InternalSignMsm;
+    </InternalSignDependsOn>
+    <InternalSignDependsOn Condition=" '$(OutputType)' == 'Package' ">
+      GetCabsToSign;
+      GetMsiToSign;
+      InternalSignCabs;
+      InscribeMsi;
+      InternalSignMsi;
+    </InternalSignDependsOn>
+    <InternalSignDependsOn Condition=" '$(OutputType)' == 'Bundle' ">
+      GetContainersToSign;
+      InternalSignContainers;
+      InscribeBundleEngine;
+      InternalSignBundleEngine;
+      InscribeBundle;
+      InternalSignBundle;
+    </InternalSignDependsOn>
+
+    <SigningDependsOn>
+      CompileAndLink;
+      BeforeSigning;
+      $(InternalSignDependsOn);
+      AfterSigning
+    </SigningDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="Signing"
+    DependsOnTargets="$(SigningDependsOn)"
+    Inputs="@(SignTargetPath)"
+    Outputs="$(IntermediateOutputPath)$(SignedFile)"
+    Condition=" '@(SignTargetPath)' != '' ">
+
+    <CreateItem Include="$(IntermediateOutputPath)$(SignedFile)">
+      <Output TaskParameter="Include" ItemName="FileWrites" />
+    </CreateItem>
+
+    <WriteLinesToFile
+        File="$(IntermediateOutputPath)$(SignedFile)"
+        Lines="^$(MSBuildProjectFullPath);@(SignMsm);@(SignCabs);@(SignMsi);@(SignContainers);@(SignBundleEngine);@(SignBundle)"
+        Overwrite="true" />
+  </Target>
+
+  <!-- Internal targets so correct signing targets are called. -->
+  <Target
+      Name="GetMsmsToSign"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+    <CreateItem Include="@(SignTargetPath)">
+      <Output TaskParameter="Include" ItemName="SignMsm" />
+      <Output TaskParameter="Include" ItemName="FileWrites" />
+    </CreateItem>
+  </Target>
+
+  <Target
+    Name="InternalSignMsm"
+    DependsOnTargets="SignMsm"
+    Condition=" '@(SignMsm)' != '' " />
+
+  <Target
+      Name="GetCabsToSign"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+    <GetCabList Database="%(SignTargetPath.FullPath)">
+      <Output TaskParameter="CabList" ItemName="SignCabs" />
+      <Output TaskParameter="CabList" ItemName="FileWrites" />
+    </GetCabList>
+  </Target>
+
+  <Target
+    Name="InternalSignCabs"
+    DependsOnTargets="SignCabs"
+    Condition=" '@(SignCabs)' != '' " />
+
+  <Target
+      Name="GetMsiToSign"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+    <CreateItemAvoidingInference InputProperties="@(SignTargetPath)">
+      <Output TaskParameter="OuputItems" ItemName="SignMsi" />
+      <Output TaskParameter="OuputItems" ItemName="FileWrites" />
+    </CreateItemAvoidingInference>
+  </Target>
+
+  <Target
+    Name="InternalSignMsi"
+    DependsOnTargets="SignMsi"
+    Inputs="@(SignTargetPath)"
+    Outputs="$(IntermediateOutputPath)$(SignedFile)"
+    Condition=" '@(SignMsi)' != '' " />
+
+  <Target
+      Name="GetContainersToSign"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+    <!-- TODO: implement signing detached containers -->
+  </Target>
+
+  <Target
+    Name="InternalSignContainers"
+    DependsOnTargets="SignContainers"
+    Condition=" '@(SignContainers)' != '' " />
+
+  <Target
+    Name="InternalSignBundleEngine"
+    DependsOnTargets="SignBundleEngine"
+    Condition=" '@(SignBundleEngine)' != '' " />
+
+  <Target
+    Name="InternalSignBundle"
+    DependsOnTargets="SignBundle"
+    Condition=" '@(SignBundle)' != '' " />
+
+  <!--
+  ================================================================================================
+  InscribeMsi
+
+    To be called after signing an MSI's cabs - inscribes an MSI with the digital signature of its
+      external cabs.
+
+    [IN/OUT]
+    @(SignTargetPath) - The database file to inscribe - database file will be modified in-place.
+
+    [OUT]
+    @(SignMsi) - The database file to sign.
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <InscribeMsiDependsOn>
+      PrepareForBuild;
+      ResolveWixExtensionReferences;
+      CompileAndLink;
+      InternalSignCabs
+    </InscribeMsiDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="InscribeMsi"
+      DependsOnTargets="$(InscribeMsiDependsOn)"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)"
+      Condition=" '@(SignCabs)' != '' ">
+
+    <Insignia
+        DatabaseFile="%(SignTargetPath.FullPath)"
+        OutputFile="%(SignTargetPath.FullPath)"
+        ToolPath="$(WixToolPath)"
+        NoLogo="$(InscribeNoLogo)"
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        SuppressAllWarnings="$(InscribeSuppressAllWarnings)"
+        SuppressSpecificWarnings="$(InscribeSuppressSpecificWarnings)"
+        TreatWarningsAsErrors="$(InscribeTreatWarningsAsErrors)"
+        TreatSpecificWarningsAsErrors="$(InscribeTreatSpecificWarningsAsErrors)"
+        VerboseOutput="$(InscribeVerboseOutput)"
+        AdditionalOptions="$(InscribeAdditionalOptions)" />
+  </Target>
+
+  <!--
+  ================================================================================================
+  InscribeBundleEngine
+
+    To be called after signing a bundle's detached containers. Also removes attached container
+    so engine can be signed without attached container.
+
+    [IN]
+    @(SignTargetPath) - The bundle to inscribe.
+
+    [OUT]
+    @(SignBundleEngine) - The bundle engine file to be signed.
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <InscribeBundleEngineDependsOn>
+      PrepareForBuild;
+      ResolveWixExtensionReferences;
+      CompileAndLink;
+      InternalSignContainers
+    </InscribeBundleEngineDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="InscribeBundleEngine"
+      DependsOnTargets="$(InscribeBundleEngineDependsOn)"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+
+    <Insignia
+        BundleFile="@(SignTargetPath)"
+        OutputFile="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)"
+        ToolPath="$(WixToolPath)"
+        NoLogo="$(InscribeNoLogo)"
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        SuppressAllWarnings="$(InscribeSuppressAllWarnings)"
+        SuppressSpecificWarnings="$(InscribeSuppressSpecificWarnings)"
+        TreatWarningsAsErrors="$(InscribeTreatWarningsAsErrors)"
+        TreatSpecificWarningsAsErrors="$(InscribeTreatSpecificWarningsAsErrors)"
+        VerboseOutput="$(InscribeVerboseOutput)"
+        AdditionalOptions="$(InscribeAdditionalOptions)">
+      <Output TaskParameter="Output" ItemName="SignBundleEngine" />
+    </Insignia>
+
+    <!-- Explicitly add output to FileWrites to ensure even when the target is up to date. -->
+    <CreateItem Include="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)">
+      <Output TaskParameter="Include" ItemName="FileWrites" />
+    </CreateItem>
+
+  </Target>
+
+  <!--
+  ================================================================================================
+  InscribeBundle
+
+    To be called after signing the bundle engine to reattach the attached container.
+
+    [IN]
+    @(Inscribe) - The bundle to inscribe.
+
+    [OUT]
+    @(SignBundle) - The bundle engine file to be signed.
+  ================================================================================================
+  -->
+  <PropertyGroup>
+    <InscribeBundleDependsOn>
+      PrepareForBuild;
+      ResolveWixExtensionReferences;
+      CompileAndLink;
+      InternalSignBundleEngine
+    </InscribeBundleDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="InscribeBundle"
+      DependsOnTargets="$(InscribeBundleDependsOn)"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+
+    <Insignia
+        BundleFile="@(SignBundleEngine)"
+        OriginalBundleFile="@(SignTargetPath)"
+        OutputFile="@(SignTargetPath)"
+        ToolPath="$(WixToolPath)"
+        NoLogo="$(InscribeNoLogo)"
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        SuppressAllWarnings="$(InscribeSuppressAllWarnings)"
+        SuppressSpecificWarnings="$(InscribeSuppressSpecificWarnings)"
+        TreatWarningsAsErrors="$(InscribeTreatWarningsAsErrors)"
+        TreatSpecificWarningsAsErrors="$(InscribeTreatSpecificWarningsAsErrors)"
+        VerboseOutput="$(InscribeVerboseOutput)"
+        AdditionalOptions="$(InscribeAdditionalOptions)">
+      <Output TaskParameter="Output" ItemName="SignBundle" />
+      <Output TaskParameter="Output" ItemName="FileWrites" />
+    </Insignia>
+  </Target>
+
+  <!--
+  ==================================================================================================
+  BeforeSigning
+
+    Redefine this target in your project in order to run tasks just before all signing tasks.
+  ==================================================================================================
+  -->
+  <Target Name="BeforeSigning" />
+
+  <!--
+  ==================================================================================================
+  SignMsm
+
+    Redefine this target in your project in order to sign merge modules.
+
+    [IN]
+    @(SignMsm) - merge module files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignMsm" />
+
+  <!--
+  ==================================================================================================
+  SignCabs
+
+    Redefine this target in your project in order to sign the cabs of your database.
+
+    [IN]
+    @(SignCabs) - cabinet files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignCabs" />
+
+  <!--
+  ==================================================================================================
+  SignMsi
+
+    Redefine this target in your project in order to sign your database, after it has been inscribed
+    with the signatures of your signed cabs.
+
+    [IN]
+    @(SignMsi) - database files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignMsi" />
+
+  <!--
+  ==================================================================================================
+  SignContainers
+
+    Redefine this target in your project in order to sign your bundle's detached containers.
+
+    [IN]
+    @(SignContainers) - detached container files to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignContainers" />
+
+  <!--
+  ==================================================================================================
+  SignBundleEngine
+
+    Redefine this target in your project in order to sign your bundle, after it has been inscribed
+    with the signatures of your signed containers.
+
+    [IN]
+    @(SignBundleEngine) - bundle engine file to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignBundleEngine" />
+
+  <!--
+  ==================================================================================================
+  SignBundle
+
+    Redefine this target in your project in order to sign your bundle, after the attached container
+    is reattached.
+
+    [IN]
+    @(SignBundle) - bundle file to sign.
+  ==================================================================================================
+  -->
+  <Target Name="SignBundle" />
+
+  <!--
+  ==================================================================================================
+  AfterSigning
+
+    Redefine this target in your project in order to run tasks just after all signing tasks.
+  ==================================================================================================
+  -->
+  <Target Name="AfterSigning" />
+
+</Project>
