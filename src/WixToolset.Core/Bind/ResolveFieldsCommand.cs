@@ -5,8 +5,8 @@ namespace WixToolset.Core.Bind
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>

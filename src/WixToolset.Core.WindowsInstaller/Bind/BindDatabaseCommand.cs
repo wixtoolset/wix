@@ -8,10 +8,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -24,6 +24,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
         {
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
             this.CabbingThreadCount = context.CabbingThreadCount;
@@ -34,7 +36,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
             this.FileSystemExtensions = context.FileSystemExtensions;
             this.Intermediate = context.IntermediateRepresentation;
-            this.Messaging = context.Messaging;
             this.OutputPath = context.OutputPath;
             this.IntermediateFolder = context.IntermediateFolder;
             this.Validator = validator;
@@ -75,7 +76,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private string IntermediateFolder { get; }
 
         private Validator Validator { get; }
-
 
         public IEnumerable<FileTransfer> FileTransfers { get; private set; }
 

@@ -8,8 +8,8 @@ namespace WixToolset.Core
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -20,9 +20,13 @@ namespace WixToolset.Core
         public Layout(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         public IEnumerable<FileTransfer> FileTransfers { get; set; }
 
@@ -36,21 +40,16 @@ namespace WixToolset.Core
 
         public bool SuppressAclReset { get; set; }
 
-        private IMessaging Messaging { get; set; }
-
         public void Execute()
         {
-            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
-
             var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
             var context = this.ServiceProvider.GetService<ILayoutContext>();
-            context.Messaging = this.Messaging;
             context.Extensions = extensionManager.Create<ILayoutExtension>();
             context.FileTransfers = this.FileTransfers;
             context.ContentFilePaths = this.ContentFilePaths;
             context.ContentsFile = this.ContentsFile;
-            context.OutputPdbPath = this.OutputsFile;
+            context.OutputsFile = this.OutputsFile;
             context.BuiltOutputsFile = this.BuiltOutputsFile;
             context.SuppressAclReset = this.SuppressAclReset;
 
@@ -69,7 +68,7 @@ namespace WixToolset.Core
                 {
                     this.Messaging.Write(VerboseMessages.LayingOutMedia());
 
-                    var command = new TransferFilesCommand(context.Messaging, context.Extensions, context.FileTransfers, context.SuppressAclReset);
+                    var command = new TransferFilesCommand(this.Messaging, context.Extensions, context.FileTransfers, context.SuppressAclReset);
                     command.Execute();
                 }
             }

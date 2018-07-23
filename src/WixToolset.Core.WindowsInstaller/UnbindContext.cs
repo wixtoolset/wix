@@ -3,14 +3,11 @@
 namespace WixToolset.Core
 {
     using System;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     internal class UnbindContext : IUnbindContext
     {
         public IServiceProvider ServiceProvider { get; }
-
-        public IMessaging Messaging { get; set; }
 
         public string ExportBasePath { get; set; }
 

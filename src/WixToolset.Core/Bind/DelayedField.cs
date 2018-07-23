@@ -3,7 +3,7 @@
 namespace WixToolset.Core.Bind
 {
     using WixToolset.Data;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Structure used to hold a row and field that contain binder variables, which need to be resolved

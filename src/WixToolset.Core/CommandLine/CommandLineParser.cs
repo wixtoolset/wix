@@ -7,6 +7,7 @@ namespace WixToolset.Core.CommandLine
     using System.IO;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal enum Commands
@@ -19,27 +20,34 @@ namespace WixToolset.Core.CommandLine
         Bind,
     }
 
-    internal class CommandLineParser : ICommandLine
+    internal class CommandLineParser : ICommandLineParser
     {
-        private IServiceProvider ServiceProvider { get; set; }
+        public CommandLineParser(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
+        }
+
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; set; }
+
+        public IExtensionManager ExtensionManager { get; set; }
+
+        public ICommandLineArguments Arguments { get; set; }
 
         public static string ExpectedArgument { get; } = "expected argument";
 
         public string ActiveCommand { get; private set; }
 
-        public IExtensionManager ExtensionManager { get; private set; }
+        public bool ShowHelp { get; private set; }
 
-        public bool ShowHelp { get; set; }
-
-        public ICommandLineCommand ParseStandardCommandLine(ICommandLineContext context)
+        public ICommandLineCommand ParseStandardCommandLine()
         {
-            this.ServiceProvider = context.ServiceProvider;
-
-            this.Messaging = context.Messaging ?? this.ServiceProvider.GetService<IMessaging>();
-
-            this.ExtensionManager = context.ExtensionManager ?? this.ServiceProvider.GetService<IExtensionManager>();
+            var context = this.ServiceProvider.GetService<ICommandLineContext>();
+            context.ExtensionManager = this.ExtensionManager ?? this.ServiceProvider.GetService<IExtensionManager>();
+            context.Arguments = this.Arguments;
 
             var next = String.Empty;
 
@@ -277,7 +285,7 @@ namespace WixToolset.Core.CommandLine
             return OutputType.Unknown;
         }
 
-        private ICommandLine Parse(ICommandLineContext context, Func<CommandLineParser, string, bool> parseCommand, Func<CommandLineParser, IParseCommandLine, string, bool> parseArgument)
+        private ICommandLineParser Parse(ICommandLineContext context, Func<CommandLineParser, string, bool> parseCommand, Func<CommandLineParser, IParseCommandLine, string, bool> parseArgument)
         {
             var extensions = this.ExtensionManager.Create<IExtensionCommandLine>();
 

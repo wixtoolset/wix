@@ -5,15 +5,21 @@ namespace WixToolset.Core.Burn.Inscribe
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class InscribeBundleCommand
     {
         public InscribeBundleCommand(IInscribeContext context)
         {
             this.Context = context;
-        }
 
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+        }
+        
         private IInscribeContext Context { get; }
+
+        public IMessaging Messaging { get; }
 
         public bool Execute()
         {
@@ -29,7 +35,7 @@ namespace WixToolset.Core.Burn.Inscribe
                 {
                     reader.Stream.Seek(reader.AttachedContainerAddress, SeekOrigin.Begin);
 
-                    using (BurnWriter writer = BurnWriter.Open(this.Context.Messaging, tempFile))
+                    using (BurnWriter writer = BurnWriter.Open(this.Messaging, tempFile))
                     {
                         writer.RememberThenResetSignature();
                         writer.AppendContainer(reader.Stream, reader.AttachedContainerSize, BurnCommon.Container.Attached);

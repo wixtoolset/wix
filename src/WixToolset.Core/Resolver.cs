@@ -9,6 +9,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -19,9 +20,13 @@ namespace WixToolset.Core
         public Resolver(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; set; }
+        private IServiceProvider ServiceProvider { get; }
+
+        public IMessaging Messaging { get; }
 
         public IEnumerable<BindPath> BindPaths { get; set; }
 
@@ -38,7 +43,6 @@ namespace WixToolset.Core
             var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
             var context = this.ServiceProvider.GetService<IResolveContext>();
-            context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             context.BindPaths = this.BindPaths;
             context.Extensions = extensionManager.Create<IResolverExtension>();
             context.ExtensionData = extensionManager.Create<IExtensionData>();
@@ -46,7 +50,7 @@ namespace WixToolset.Core
             context.IntermediateFolder = this.IntermediateFolder;
             context.IntermediateRepresentation = this.IntermediateRepresentation;
             context.Localizations = this.Localizations;
-            context.VariableResolver = new WixVariableResolver(context.Messaging);
+            context.VariableResolver = new WixVariableResolver(this.Messaging);
 
             foreach (IResolverExtension extension in context.Extensions)
             {
@@ -82,7 +86,7 @@ namespace WixToolset.Core
             IEnumerable<DelayedField> delayedFields;
             {
                 var command = new ResolveFieldsCommand();
-                command.Messaging = context.Messaging;
+                command.Messaging = this.Messaging;
                 command.BuildingPatch = buildingPatch;
                 command.VariableResolver = context.VariableResolver;
                 command.BindPaths = context.BindPaths;

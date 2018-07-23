@@ -11,6 +11,7 @@ namespace WixToolset.Core
     using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -56,7 +57,6 @@ namespace WixToolset.Core
         public BindResult Execute()
         {
             var context = this.ServiceProvider.GetService<IBindContext>();
-            context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             context.CabbingThreadCount = this.CabbingThreadCount;
             context.CabCachePath = this.CabCachePath;
             context.Codepage = this.Codepage;
@@ -71,7 +71,6 @@ namespace WixToolset.Core
             context.OutputPdbPath = this.OutputPdbPath;
             context.SuppressIces = this.SuppressIces;
             context.SuppressValidation = this.SuppressValidation;
-
 
             // Prebind.
             //

@@ -3,7 +3,7 @@
 namespace WixToolset.Core.Bind
 {
     using System;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     internal class ExpectedExtractFile : IExpectedExtractFile
     {

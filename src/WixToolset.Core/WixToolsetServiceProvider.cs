@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using WixToolset.Core.CommandLine;
     using WixToolset.Core.ExtensibilityServices;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     public class WixToolsetServiceProvider : IServiceProvider
@@ -27,7 +27,7 @@ namespace WixToolset.Core
             // Transients.
                 { typeof(ICommandLineArguments), (provider, singletons) => new CommandLineArguments(provider) },
                 { typeof(ICommandLineContext), (provider, singletons) => new CommandLineContext(provider) },
-                { typeof(ICommandLine), (provider, singletons) => new CommandLineParser() },
+                { typeof(ICommandLineParser), (provider, singletons) => new CommandLineParser(provider) },
                 { typeof(IPreprocessContext), (provider, singletons) => new PreprocessContext(provider) },
                 { typeof(ICompileContext), (provider, singletons) => new CompileContext(provider) },
                 { typeof(ILinkContext), (provider, singletons) => new LinkContext(provider) },

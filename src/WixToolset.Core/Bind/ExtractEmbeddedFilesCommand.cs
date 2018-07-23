@@ -7,7 +7,7 @@ namespace WixToolset.Core.Bind
     using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     public class ExtractEmbeddedFilesCommand
     {

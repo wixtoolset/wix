@@ -4,9 +4,8 @@ namespace WixToolset.Core
 {
     using System;
     using System.Collections.Generic;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     public class LayoutContext : ILayoutContext
     {
@@ -16,8 +15,6 @@ namespace WixToolset.Core
         }
 
         public IServiceProvider ServiceProvider { get; }
-
-        public IMessaging Messaging { get; set; }
 
         public IEnumerable<ILayoutExtension> Extensions { get; set; }
 

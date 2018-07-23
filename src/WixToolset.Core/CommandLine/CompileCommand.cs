@@ -5,8 +5,7 @@ namespace WixToolset.Core.CommandLine
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     internal class CompileCommand : ICommandLineCommand
     {

@@ -6,15 +6,16 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.Linq;
+    using WixToolset.Core.Preprocess;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Core.Preprocess;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using System.Linq;
 
     /// <summary>
     /// Preprocessor object
@@ -39,6 +40,8 @@ namespace WixToolset.Core
         public Preprocessor(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
         public IEnumerable<string> IncludeSearchPaths { get; set; }
@@ -50,6 +53,8 @@ namespace WixToolset.Core
         public IDictionary<string, string> Variables { get; set; }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private IPreprocessContext Context { get; set; }
 
@@ -169,7 +174,7 @@ namespace WixToolset.Core
                 throw new WixException(ErrorMessages.InvalidXml(this.Context.CurrentSourceLineNumber, "source", e.Message));
             }
 
-            return this.Context.Messaging.EncounteredError ? null : output;
+            return this.Messaging.EncounteredError ? null : output;
         }
 
         /// <summary>
@@ -482,7 +487,7 @@ namespace WixToolset.Core
                         {
                             if ("Include" != reader.LocalName)
                             {
-                                this.Context.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
+                                this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
                             }
 
                             this.IncludeNextStack.Pop();
@@ -570,7 +575,7 @@ namespace WixToolset.Core
             // Resolve other variables in the warning message.
             warningMessage = this.Helper.PreprocessString(this.Context, warningMessage);
 
-            this.Context.Messaging.Write(WarningMessages.PreprocessorWarning(this.Context.CurrentSourceLineNumber, warningMessage));
+            this.Messaging.Write(WarningMessages.PreprocessorWarning(this.Context.CurrentSourceLineNumber, warningMessage));
         }
 
         /// <summary>
@@ -1431,7 +1436,6 @@ namespace WixToolset.Core
         private IPreprocessContext CreateContext()
         {
             var context = this.ServiceProvider.GetService<IPreprocessContext>();
-            context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IPreprocessorExtension>();
             context.CurrentSourceLineNumber = new SourceLineNumber(this.SourcePath);
             context.Platform = this.Platform;
@@ -1456,7 +1460,7 @@ namespace WixToolset.Core
                         }
                         else
                         {
-                            this.Context.Messaging.Write(ErrorMessages.DuplicateExtensionPreprocessorType(extension.GetType().ToString(), prefix, collidingExtension.GetType().ToString()));
+                            this.Messaging.Write(ErrorMessages.DuplicateExtensionPreprocessorType(extension.GetType().ToString(), prefix, collidingExtension.GetType().ToString()));
                         }
                     }
                 }

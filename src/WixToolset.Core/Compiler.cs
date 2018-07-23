@@ -15,6 +15,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using Wix = WixToolset.Data.Serialize;
 
@@ -71,9 +72,13 @@ namespace WixToolset.Core
         public Compiler(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        public IMessaging Messaging { get; }
 
         private ICompileContext Context { get; set; }
 
@@ -107,7 +112,6 @@ namespace WixToolset.Core
         public Intermediate Execute()
         {
             this.Context = this.ServiceProvider.GetService<ICompileContext>();
-            this.Context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             this.Context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<ICompilerExtension>();
             this.Context.CompilationId = this.CompliationId;
             this.Context.OutputPath = this.OutputPath;
@@ -131,7 +135,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Context.Messaging.Write(ErrorMessages.DuplicateExtensionXmlSchemaNamespace(extension.GetType().ToString(), extension.Namespace.NamespaceName, collidingExtension.GetType().ToString()));
+                    this.Messaging.Write(ErrorMessages.DuplicateExtensionXmlSchemaNamespace(extension.GetType().ToString(), extension.Namespace.NamespaceName, collidingExtension.GetType().ToString()));
                 }
 
                 extension.PreCompile(this.Context);
@@ -142,9 +146,9 @@ namespace WixToolset.Core
             {
                 var parseHelper = this.Context.ServiceProvider.GetService<IParseHelper>();
 
-                this.Core = new CompilerCore(target, this.Context.Messaging, parseHelper, extensionsByNamespace);
+                this.Core = new CompilerCore(target, this.Messaging, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
-                this.componentIdPlaceholdersResolver = new WixVariableResolver(this.Context.Messaging);
+                this.componentIdPlaceholdersResolver = new WixVariableResolver(this.Messaging);
 
                 // parse the document
                 var source = this.Context.Source;
@@ -185,7 +189,7 @@ namespace WixToolset.Core
                 this.Core = null;
             }
 
-            return this.Context.Messaging.EncounteredError ? null : target;
+            return this.Messaging.EncounteredError ? null : target;
         }
 
         private void ResolveComponentIdPlaceholders(Intermediate target)

@@ -16,6 +16,7 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
@@ -324,14 +325,15 @@ namespace WixToolset.Core.WindowsInstaller
             }
         }
 
-        public static Validator CreateFromContext(WixToolset.Extensibility.IBindContext context, string cubeFilename)
+        public static Validator CreateFromContext(IBindContext context, string cubeFilename)
         {
             Validator validator = null;
+            var messaging = context.ServiceProvider.GetService<IMessaging>();
 
             // Tell the binder about the validator if validation isn't suppressed
             if (!context.SuppressValidation)
             {
-                validator = new Validator(context.Messaging);
+                validator = new Validator(messaging);
                 validator.IntermediateFolder = Path.Combine(context.IntermediateFolder, "validate");
 
                 // set the default cube file

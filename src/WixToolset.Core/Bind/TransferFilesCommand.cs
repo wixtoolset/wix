@@ -7,8 +7,8 @@ namespace WixToolset.Core.Bind
     using System.IO;
     using System.Security.AccessControl;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class TransferFilesCommand

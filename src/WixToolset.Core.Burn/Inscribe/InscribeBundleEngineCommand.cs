@@ -5,7 +5,7 @@ namespace WixToolset.Core.Burn.Inscribe
     using System;
     using System.IO;
     using WixToolset.Core.Burn.Bundles;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     internal class InscribeBundleEngineCommand
     {

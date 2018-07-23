@@ -3,7 +3,7 @@
 namespace WixToolset.Core.CommandLine
 {
     using System;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     internal class VersionCommand : ICommandLineCommand
     {

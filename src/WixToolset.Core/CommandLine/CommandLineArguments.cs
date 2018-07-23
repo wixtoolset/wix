@@ -7,6 +7,7 @@ namespace WixToolset.Core.CommandLine
     using System.IO;
     using System.Text;
     using System.Text.RegularExpressions;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CommandLineArguments : ICommandLineArguments

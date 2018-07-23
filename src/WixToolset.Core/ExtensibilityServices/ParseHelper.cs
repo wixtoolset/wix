@@ -12,10 +12,11 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
-    using Wix = WixToolset.Data.Serialize;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
+    using Wix = WixToolset.Data.Serialize;
 
     internal class ParseHelper : IParseHelper
     {

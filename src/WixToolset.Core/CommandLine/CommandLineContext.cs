@@ -3,6 +3,7 @@
 namespace WixToolset.Core.CommandLine
 {
     using System;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class CommandLineContext : ICommandLineContext
@@ -13,8 +14,6 @@ namespace WixToolset.Core.CommandLine
         }
 
         public IServiceProvider ServiceProvider { get; }
-
-        public IMessaging Messaging { get; set; }
 
         public IExtensionManager ExtensionManager { get; set; }
 

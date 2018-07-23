@@ -10,6 +10,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     public class CabinetResolver
     {

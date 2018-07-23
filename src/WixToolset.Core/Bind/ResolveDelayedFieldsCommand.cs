@@ -7,7 +7,7 @@ namespace WixToolset.Core.Bind
     using System.Globalization;
     using System.Text;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>

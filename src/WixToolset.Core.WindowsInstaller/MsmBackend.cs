@@ -6,13 +6,13 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class MsmBackend : IBackend
     {
-        public BindResult Bind(WixToolset.Extensibility.IBindContext context)
+        public BindResult Bind(IBindContext context)
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 

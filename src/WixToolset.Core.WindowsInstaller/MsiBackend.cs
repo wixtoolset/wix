@@ -7,8 +7,8 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Core.WindowsInstaller.Inscribe;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class MsiBackend : IBackend

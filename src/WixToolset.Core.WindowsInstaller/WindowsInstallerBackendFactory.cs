@@ -5,6 +5,7 @@ namespace WixToolset.Core.WindowsInstaller
     using System;
     using System.IO;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     internal class WindowsInstallerBackendFactory : IBackendFactory
     {

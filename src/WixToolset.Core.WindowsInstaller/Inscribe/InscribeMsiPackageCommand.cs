@@ -12,7 +12,8 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     internal class InscribeMsiPackageCommand
@@ -20,10 +21,13 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
         public InscribeMsiPackageCommand(IInscribeContext context)
         {
             this.Context = context;
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
         }
 
         private IInscribeContext Context { get; }
+
+        private IMessaging Messaging { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 
@@ -36,7 +40,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
             FileAttributes attributes = File.GetAttributes(this.Context.InputFilePath);
             if (FileAttributes.ReadOnly == (attributes & FileAttributes.ReadOnly))
             {
-                this.Context.Messaging.Write(ErrorMessages.ReadOnlyOutputFile(this.Context.InputFilePath));
+                this.Messaging.Write(ErrorMessages.ReadOnlyOutputFile(this.Context.InputFilePath));
                 return shouldCommit;
             }
 
@@ -179,7 +183,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             // If the cabs aren't there, throw an error but continue to catch the other errors
                             if (!File.Exists(cabPath))
                             {
-                                this.Context.Messaging.Write(ErrorMessages.WixFileNotFound(cabPath));
+                                this.Messaging.Write(ErrorMessages.WixFileNotFound(cabPath));
                                 continue;
                             }
 
@@ -205,11 +209,11 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                                 if ((5 == Environment.OSVersion.Version.Major && 2 == Environment.OSVersion.Version.Minor) || // W2K3
                                     (5 == Environment.OSVersion.Version.Major && 1 == Environment.OSVersion.Version.Minor)) // XP
                                 {
-                                    this.Context.Messaging.Write(ErrorMessages.UnableToGetAuthenticodeCertOfFileDownlevelOS(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
+                                    this.Messaging.Write(ErrorMessages.UnableToGetAuthenticodeCertOfFileDownlevelOS(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
                                 }
                                 else // otherwise, generic error
                                 {
-                                    this.Context.Messaging.Write(ErrorMessages.UnableToGetAuthenticodeCertOfFile(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
+                                    this.Messaging.Write(ErrorMessages.UnableToGetAuthenticodeCertOfFile(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
                                 }
                             }
 
@@ -252,7 +256,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
                 if (digitalCertificateTable.Rows.Count > 0)
                 {
-                    var command = new CreateIdtFileCommand(this.Context.Messaging, digitalCertificateTable, codepage, this.Context.IntermediateFolder, true);
+                    var command = new CreateIdtFileCommand(this.Messaging, digitalCertificateTable, codepage, this.Context.IntermediateFolder, true);
                     command.Execute();
 
                     database.Import(command.IdtPath);
@@ -261,7 +265,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
 
                 if (digitalSignatureTable.Rows.Count > 0)
                 {
-                    var command = new CreateIdtFileCommand(this.Context.Messaging, digitalSignatureTable, codepage, this.Context.IntermediateFolder, true);
+                    var command = new CreateIdtFileCommand(this.Messaging, digitalSignatureTable, codepage, this.Context.IntermediateFolder, true);
                     command.Execute();
 
                     database.Import(command.IdtPath);
@@ -275,7 +279,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                 // If we did find external cabs but none of them were signed, give a warning
                 if (foundUnsignedExternals)
                 {
-                    this.Context.Messaging.Write(WarningMessages.ExternalCabsAreNotSigned(this.Context.InputFilePath));
+                    this.Messaging.Write(WarningMessages.ExternalCabsAreNotSigned(this.Context.InputFilePath));
                 }
 
                 if (shouldCommit)

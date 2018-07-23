@@ -9,6 +9,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class PreprocessHelper : IPreprocessHelper
@@ -19,9 +20,13 @@ namespace WixToolset.Core.ExtensibilityServices
         public PreprocessHelper(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private Dictionary<string, IPreprocessorExtension> ExtensionsByPrefix { get; set; }
 
@@ -42,7 +47,7 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (showWarning)
                 {
-                    context.Messaging.Write(WarningMessages.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
+                    this.Messaging.Write(WarningMessages.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
                 }
 
                 context.Variables[name] = value;
@@ -220,7 +225,7 @@ namespace WixToolset.Core.ExtensibilityServices
                             return context.CurrentSourceLineNumber.FileName;
 
                         case "PLATFORM":
-                            context.Messaging.Write(WarningMessages.DeprecatedPreProcVariable(context.CurrentSourceLineNumber, "$(sys.PLATFORM)", "$(sys.BUILDARCH)"));
+                            this.Messaging.Write(WarningMessages.DeprecatedPreProcVariable(context.CurrentSourceLineNumber, "$(sys.PLATFORM)", "$(sys.BUILDARCH)"));
 
                             goto case "BUILDARCH";
 
@@ -295,7 +300,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         // Add any core defined pragmas here
                         default:
-                            context.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
+                            this.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
                             break;
                     }
                     break;
@@ -306,7 +311,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (!extension.ProcessPragma(prefix, pragma, args, parent))
                         {
-                            context.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
+                            this.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
                         }
                     }
                     break;
@@ -339,7 +344,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     currentPosition = remainder.IndexOf(')');
                     if (-1 == currentPosition)
                     {
-                        context.Messaging.Write(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
+                        this.Messaging.Write(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
                         break;
                     }
 
@@ -385,12 +390,12 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (isFunction)
                         {
-                            context.Messaging.Write(ErrorMessages.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, remainder));
+                            this.Messaging.Write(ErrorMessages.InvalidPreprocessorFunction(context.CurrentSourceLineNumber, remainder));
                             break;
                         }
                         else
                         {
-                            context.Messaging.Write(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
+                            this.Messaging.Write(ErrorMessages.InvalidPreprocessorVariable(context.CurrentSourceLineNumber, remainder));
                             break;
                         }
                     }
@@ -410,12 +415,12 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (isFunction)
                         {
-                            context.Messaging.Write(ErrorMessages.UndefinedPreprocessorFunction(context.CurrentSourceLineNumber, subString));
+                            this.Messaging.Write(ErrorMessages.UndefinedPreprocessorFunction(context.CurrentSourceLineNumber, subString));
                             break;
                         }
                         else
                         {
-                            context.Messaging.Write(ErrorMessages.UndefinedPreprocessorVariable(context.CurrentSourceLineNumber, subString));
+                            this.Messaging.Write(ErrorMessages.UndefinedPreprocessorVariable(context.CurrentSourceLineNumber, subString));
                             break;
                         }
                     }
@@ -448,7 +453,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (!context.Variables.Remove(name))
             {
-                context.Messaging.Write(ErrorMessages.CannotReundefineVariable(context.CurrentSourceLineNumber, name));
+                this.Messaging.Write(ErrorMessages.CannotReundefineVariable(context.CurrentSourceLineNumber, name));
             }
         }
 

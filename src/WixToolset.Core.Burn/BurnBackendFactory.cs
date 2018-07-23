@@ -5,11 +5,11 @@ namespace WixToolset.Core.Burn
     using System;
     using System.IO;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     internal class BurnBackendFactory : IBackendFactory
     {
-        public bool TryCreateBackend(string outputType, string outputFile, WixToolset.Extensibility.IBindContext context, out IBackend backend)
+        public bool TryCreateBackend(string outputType, string outputFile, IBindContext context, out IBackend backend)
         {
             if (String.IsNullOrEmpty(outputType))
             {

@@ -12,6 +12,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Link;
 
@@ -31,10 +32,13 @@ namespace WixToolset.Core
         public Linker(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
             this.sectionIdOnRows = true; // TODO: what is the correct value for this?
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private ILinkContext Context { get; set; }
 
@@ -71,7 +75,6 @@ namespace WixToolset.Core
             var creator = this.TupleDefinitionCreator ?? this.ServiceProvider.GetService<ITupleDefinitionCreator>();
 
             this.Context = this.ServiceProvider.GetService<ILinkContext>();
-            this.Context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             this.Context.Extensions = extensionManager.Create<ILinkerExtension>();
             this.Context.ExtensionData = extensionManager.Create<IExtensionData>();
             this.Context.ExpectedOutputType = this.OutputType;
@@ -151,7 +154,7 @@ namespace WixToolset.Core
 
                 // First find the entry section and while processing all sections load all the symbols from all of the sections.
                 // sections.FindEntrySectionAndLoadSymbols(false, this, expectedOutputType, out entrySection, out allSymbols);
-                var find = new FindEntrySectionAndLoadSymbolsCommand(this.Context.Messaging, sections);
+                var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, sections);
                 find.ExpectedOutputType = this.Context.ExpectedOutputType;
                 find.Execute();
 
@@ -166,12 +169,12 @@ namespace WixToolset.Core
 
                 // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
-                var resolve = new ResolveReferencesCommand(this.Context.Messaging, find.EntrySection, find.Symbols);
+                var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.Symbols);
                 resolve.BuildingMergeModule = (SectionType.Module == find.EntrySection.Type);
 
                 resolve.Execute();
 
-                if (this.Context.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
                     return null;
                 }
@@ -185,7 +188,7 @@ namespace WixToolset.Core
 
                 this.FlattenSectionsComplexReferences(sections);
 
-                if (this.Context.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
                     return null;
                 }
@@ -197,7 +200,7 @@ namespace WixToolset.Core
                 var modulesToFeatures = new ConnectToFeatureCollection();
                 this.ProcessComplexReferences(find.EntrySection, sections, referencedComponents, componentsToFeatures, featuresToFeatures, modulesToFeatures);
 
-                if (this.Context.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
                     return null;
                 }
@@ -212,10 +215,10 @@ namespace WixToolset.Core
                 }
 
                 // Report duplicates that would ultimately end up being primary key collisions.
-                var reportDupes = new ReportConflictingSymbolsCommand(this.Context.Messaging, find.PossiblyConflictingSymbols, resolve.ResolvedSections);
+                var reportDupes = new ReportConflictingSymbolsCommand(this.Messaging, find.PossiblyConflictingSymbols, resolve.ResolvedSections);
                 reportDupes.Execute();
 
-                if (this.Context.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
                     return null;
                 }
@@ -716,12 +719,12 @@ namespace WixToolset.Core
                 // Bundles have groups of data that must be flattened in a way different from other types.
                 this.FlattenBundleTables(resolvedSection);
 
-                if (this.Context.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
                     return null;
                 }
 
-                var collate = new CollateLocalizationsCommand(this.Context.Messaging, localizations);
+                var collate = new CollateLocalizationsCommand(this.Messaging, localizations);
                 var localizationsByCulture = collate.Execute();
 
                 intermediate = new Intermediate(resolvedSection.Id, new[] { resolvedSection }, localizationsByCulture, null);
@@ -738,7 +741,7 @@ namespace WixToolset.Core
                 }
             }
 
-            return this.Context.Messaging.EncounteredError ? null : intermediate;
+            return this.Messaging.EncounteredError ? null : intermediate;
         }
 
 #if SOLVE_CUSTOM_TABLE
@@ -1118,7 +1121,7 @@ namespace WixToolset.Core
         /// <param name="message">Message event arguments.</param>
         public void OnMessage(Message message)
         {
-            this.Context.Messaging.Write(message);
+            this.Messaging.Write(message);
         }
 
         /// <summary>
@@ -1616,7 +1619,7 @@ namespace WixToolset.Core
             // will hold Payloads under UX, ChainPackages (references?) under Chain,
             // and ChainPackages/Payloads under the attached and any detatched
             // Containers.
-            var groups = new WixGroupingOrdering(entrySection, this.Context.Messaging);
+            var groups = new WixGroupingOrdering(entrySection, this.Messaging);
 
             // Create UX payloads and Package payloads
             groups.UseTypes(new string[] { "Container", "Layout", "PackageGroup", "PayloadGroup", "Package" }, new string[] { "PackageGroup", "Package", "PayloadGroup", "Payload" });

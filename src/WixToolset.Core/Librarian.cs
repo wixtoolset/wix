@@ -9,6 +9,7 @@ namespace WixToolset.Core
     using WixToolset.Core.Link;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -19,9 +20,13 @@ namespace WixToolset.Core
         public Librarian(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
+
+            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
         private IServiceProvider ServiceProvider { get; }
+
+        private IMessaging Messaging { get; }
 
         private ILibraryContext Context { get; set; }
 
@@ -41,7 +46,6 @@ namespace WixToolset.Core
         public Intermediate Execute()
         {
             this.Context = new LibraryContext(this.ServiceProvider);
-            this.Context.Messaging = this.ServiceProvider.GetService<IMessaging>();
             this.Context.BindFiles = this.BindFiles;
             this.Context.BindPaths = this.BindPaths;
             this.Context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<ILibrarianExtension>();
@@ -59,10 +63,10 @@ namespace WixToolset.Core
             {
                 var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
 
-                var collate = new CollateLocalizationsCommand(this.Context.Messaging, this.Context.Localizations);
+                var collate = new CollateLocalizationsCommand(this.Messaging, this.Context.Localizations);
                 var localizationsByCulture = collate.Execute();
 
-                if (this.Context.Messaging.EncounteredError)
+                if (this.Messaging.EncounteredError)
                 {
                     return null;
                 }
@@ -86,7 +90,7 @@ namespace WixToolset.Core
                 }
             }
 
-            return this.Context.Messaging.EncounteredError ? null : library;
+            return this.Messaging.EncounteredError ? null : library;
         }
 
         /// <summary>
@@ -95,7 +99,7 @@ namespace WixToolset.Core
         /// <param name="library">Library to validate.</param>
         private void Validate(Intermediate library)
         {
-            FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(this.Context.Messaging, library.Sections);
+            FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, library.Sections);
             find.Execute();
 
             // TODO: Consider bringing this sort of verification back.
@@ -116,7 +120,7 @@ namespace WixToolset.Core
             // Resolve paths to files that are to be embedded in the library.
             if (this.Context.BindFiles)
             {
-                var variableResolver = new WixVariableResolver(this.Context.Messaging);
+                var variableResolver = new WixVariableResolver(this.Messaging);
 
                 var fileResolver = new FileResolver(this.Context.BindPaths, this.Context.Extensions);
 
@@ -141,7 +145,7 @@ namespace WixToolset.Core
                             }
                             else
                             {
-                                this.Context.Messaging.Write(ErrorMessages.FileNotFound(tuple.SourceLineNumbers, pathField.Path, tuple.Definition.Name));
+                                this.Messaging.Write(ErrorMessages.FileNotFound(tuple.SourceLineNumbers, pathField.Path, tuple.Definition.Name));
                             }
                         }
                     }

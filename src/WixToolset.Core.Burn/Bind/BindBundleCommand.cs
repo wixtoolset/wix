@@ -14,6 +14,7 @@ namespace WixToolset.Core.Burn
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     // TODO: (4.0) Refactor so that these don't need to be copied.

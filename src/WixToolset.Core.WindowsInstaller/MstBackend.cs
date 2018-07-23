@@ -5,8 +5,8 @@ namespace WixToolset.Core.WindowsInstaller
     using System;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     internal class MstBackend : IBackend
     {

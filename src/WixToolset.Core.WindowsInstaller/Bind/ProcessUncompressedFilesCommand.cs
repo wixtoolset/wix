@@ -9,8 +9,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Bind;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Msi;
 
     /// <summary>

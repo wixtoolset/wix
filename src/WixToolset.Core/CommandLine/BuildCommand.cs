@@ -7,8 +7,7 @@ namespace WixToolset.Core.CommandLine
     using System.IO;
     using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class BuildCommand : ICommandLineCommand

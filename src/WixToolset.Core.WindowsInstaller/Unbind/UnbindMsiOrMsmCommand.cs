@@ -6,7 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.ComponentModel;
     using WixToolset.Core.Native;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Msi;
 
     internal class UnbindMsiOrMsmCommand

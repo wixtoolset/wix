@@ -5,6 +5,7 @@ namespace Example.Extension
     using System;
     using System.Collections.Generic;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class ExamplePreprocessorExtensionAndCommandLine : BasePreprocessorExtension, IExtensionCommandLine

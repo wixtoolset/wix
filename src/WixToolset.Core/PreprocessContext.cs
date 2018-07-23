@@ -6,7 +6,7 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     internal class PreprocessContext : IPreprocessContext
     {
@@ -16,8 +16,6 @@ namespace WixToolset.Core
         }
 
         public IServiceProvider ServiceProvider { get; }
-
-        public IMessaging Messaging { get; set; }
 
         public IEnumerable<IPreprocessorExtension> Extensions { get; set; }
 

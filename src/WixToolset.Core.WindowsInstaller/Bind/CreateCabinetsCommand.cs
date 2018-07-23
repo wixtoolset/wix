@@ -11,11 +11,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Threading;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>

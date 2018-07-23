@@ -14,6 +14,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using Wix = WixToolset.Data.Serialize;
 

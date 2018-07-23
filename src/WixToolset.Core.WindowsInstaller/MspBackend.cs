@@ -10,13 +10,13 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Msi;
     using WixToolset.Ole32;
 
     internal class MspBackend : IBackend
     {
-        public BindResult Bind(WixToolset.Extensibility.IBindContext context)
+        public BindResult Bind(IBindContext context)
         {
             throw new NotImplementedException();
         }
