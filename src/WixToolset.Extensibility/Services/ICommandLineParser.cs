@@ -4,7 +4,7 @@ namespace WixToolset.Extensibility.Services
 {
     using WixToolset.Extensibility.Data;
 
-    public interface ICommandLine
+    public interface ICommandLineParser
     {
         IExtensionManager ExtensionManager { get; set; }
 
