@@ -2,7 +2,7 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     public interface IBackendFactory
     {

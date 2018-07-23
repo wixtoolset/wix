@@ -3,7 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Interface all resolver extensions implement.

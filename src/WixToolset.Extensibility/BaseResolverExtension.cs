@@ -3,7 +3,8 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Base class for creating a resolver extension.
@@ -16,11 +17,18 @@ namespace WixToolset.Extensibility
         protected IResolveContext Context { get; private set; }
 
         /// <summary>
+        /// Messaging for use by the extension.
+        /// </summary>
+        protected IMessaging Messaging { get; private set; }
+
+        /// <summary>
         /// Called at the beginning of the resolving variables and files.
         /// </summary>
         public virtual void PreResolve(IResolveContext context)
         {
             this.Context = context;
+
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
         public virtual string ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)

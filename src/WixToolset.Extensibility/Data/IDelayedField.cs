@@ -1,15 +1,13 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensibility
+namespace WixToolset.Extensibility.Data
 {
-    using System;
+    using WixToolset.Data;
 
-    public interface IExpectedExtractFile
+    public interface IDelayedField
     {
-        Uri Uri { get; set; }
+        IntermediateField Field { get; }
 
-        int EmbeddedFileIndex { get; set; }
-
-        string OutputPath { get; set; }
+        IntermediateTuple Row { get; }
     }
 }

@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -40,7 +41,7 @@ namespace WixToolset.Extensibility
         {
             this.Context = context;
 
-            this.Messaging = context.Messaging;
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.ParseHelper = context.ServiceProvider.GetService<IParseHelper>();
         }

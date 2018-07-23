@@ -6,6 +6,7 @@ namespace WixToolset.Extensibility.Services
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Interface provided to help compiler extensions parse.

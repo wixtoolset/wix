@@ -3,7 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Interface all binder extensions implement.

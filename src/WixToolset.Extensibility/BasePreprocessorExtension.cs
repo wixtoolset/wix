@@ -3,6 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using System.Xml.Linq;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -14,6 +15,11 @@ namespace WixToolset.Extensibility
         /// Context for use by the extension.
         /// </summary>
         protected IPreprocessContext Context { get; private set; }
+
+        /// <summary>
+        /// Messaging for use by the extension.
+        /// </summary>
+        protected IMessaging Messaging { get; private set; }
 
         /// <summary>
         /// PreprocessHelper for use by the extension.
@@ -32,6 +38,8 @@ namespace WixToolset.Extensibility
         public virtual void PrePreprocess(IPreprocessContext context)
         {
             this.Context = context;
+
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.PreprocessHelper = context.ServiceProvider.GetService<IPreprocessHelper>();
         }

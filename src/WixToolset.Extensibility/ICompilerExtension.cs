@@ -5,6 +5,7 @@ namespace WixToolset.Extensibility
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Interface all compiler extensions implement.

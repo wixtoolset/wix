@@ -2,8 +2,14 @@
 
 namespace WixToolset.Extensibility.Services
 {
+    using WixToolset.Extensibility.Data;
+
     public interface ICommandLine
     {
-        ICommandLineCommand ParseStandardCommandLine(ICommandLineContext commandLineContext);
+        IExtensionManager ExtensionManager { get; set; }
+
+        ICommandLineArguments Arguments { get; set; }
+
+        ICommandLineCommand ParseStandardCommandLine();
     }
 }

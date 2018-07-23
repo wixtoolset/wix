@@ -4,9 +4,9 @@ namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -18,6 +18,11 @@ namespace WixToolset.Extensibility
         /// Context for use by the extension.
         /// </summary>
         protected IBindContext Context { get; private set; }
+
+        /// <summary>
+        /// Messaging for use by the extension.
+        /// </summary>
+        protected IMessaging Messaging { get; private set; }
 
         /// <summary>
         /// Backend helper for use by the extension.
@@ -32,6 +37,8 @@ namespace WixToolset.Extensibility
         public virtual void PreBackendBind(IBindContext context)
         {
             this.Context = context;
+
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.BackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
         }

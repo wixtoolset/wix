@@ -3,6 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
+    using WixToolset.Extensibility.Data;
 
     public interface ILibrarianExtension
     {

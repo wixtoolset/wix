@@ -2,7 +2,7 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data.Bind;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Base class for creating a resolver extension.

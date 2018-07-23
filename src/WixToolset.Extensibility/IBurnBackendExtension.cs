@@ -4,7 +4,7 @@ namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
     using WixToolset.Data.Bind;
-    using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     public interface IBurnBackendExtension
     {

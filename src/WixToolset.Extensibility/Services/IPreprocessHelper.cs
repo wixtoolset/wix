@@ -3,6 +3,7 @@
 namespace WixToolset.Extensibility.Services
 {
     using System.Xml.Linq;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Interface provided to help preprocessor extensions.

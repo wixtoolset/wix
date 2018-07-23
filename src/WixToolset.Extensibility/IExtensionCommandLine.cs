@@ -3,17 +3,8 @@
 namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-
-    /// <summary>
-    /// A command line option.
-    /// </summary>
-    public struct ExtensionCommandLineSwitch
-    {
-        public string Switch { get; set; }
-
-        public string Description { get; set; }
-    }
 
     /// <summary>
     /// Interface extensions implement to be able to parse command-line options.

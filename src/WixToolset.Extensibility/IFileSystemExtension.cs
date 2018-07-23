@@ -2,6 +2,8 @@
 
 namespace WixToolset.Extensibility
 {
+    using WixToolset.Extensibility.Data;
+
     /// <summary>
     /// Interface all file system extensions implement.
     /// </summary>

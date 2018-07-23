@@ -2,6 +2,9 @@
 
 namespace WixToolset.Extensibility
 {
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
+
     /// <summary>
     /// Base class for creating a resolver extension.
     /// </summary>
@@ -13,11 +16,18 @@ namespace WixToolset.Extensibility
         protected ILayoutContext Context { get; private set; }
 
         /// <summary>
+        /// Messaging for use by the extension.
+        /// </summary>
+        protected IMessaging Messaging { get; private set; }
+
+        /// <summary>
         /// Called at the beginning of layout.
         /// </summary>
         public virtual void PreLayout(ILayoutContext context)
         {
             this.Context = context;
+
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
         public virtual bool CopyFile(string source, string destination)

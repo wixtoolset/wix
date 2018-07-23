@@ -2,6 +2,8 @@
 
 namespace WixToolset.Extensibility
 {
+    using WixToolset.Extensibility.Data;
+
     /// <summary>
     /// Interface all layout extensions implement.
     /// </summary>
