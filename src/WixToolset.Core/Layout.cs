@@ -79,14 +79,17 @@ namespace WixToolset.Core
                     this.CreateContentsFile(context.ContentsFile, context.ContentFilePaths);
                 }
 
-                if (!String.IsNullOrEmpty(context.OutputsFile) && context.FileTransfers != null)
+                if (context.FileTransfers != null)
                 {
-                    this.CreateOutputsFile(context.OutputsFile, context.FileTransfers, context.OutputPdbPath);
-                }
+                    if (!String.IsNullOrEmpty(context.OutputsFile))
+                    {
+                        this.CreateOutputsFile(context.OutputsFile, context.FileTransfers);
+                    }
 
-                if (!String.IsNullOrEmpty(context.BuiltOutputsFile) && context.FileTransfers != null)
-                {
-                    this.CreateBuiltOutputsFile(context.BuiltOutputsFile, context.FileTransfers, context.OutputPdbPath);
+                    if (!String.IsNullOrEmpty(context.BuiltOutputsFile))
+                    {
+                        this.CreateBuiltOutputsFile(context.BuiltOutputsFile, context.FileTransfers);
+                    }
                 }
             }
 
@@ -121,8 +124,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
-        /// <param name="pdbPath">Optional path to created .wixpdb.</param>
-        private void CreateOutputsFile(string path, IEnumerable<FileTransfer> fileTransfers, string pdbPath)
+        private void CreateOutputsFile(string path, IEnumerable<FileTransfer> fileTransfers)
         {
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
@@ -139,11 +141,6 @@ namespace WixToolset.Core
                         outputs.WriteLine(fileTransfer.Destination);
                     }
                 }
-
-                if (!String.IsNullOrEmpty(pdbPath))
-                {
-                    outputs.WriteLine(Path.GetFullPath(pdbPath));
-                }
             }
         }
 
@@ -152,8 +149,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
-        /// <param name="pdbPath">Optional path to created .wixpdb.</param>
-        private void CreateBuiltOutputsFile(string path, IEnumerable<FileTransfer> fileTransfers, string pdbPath)
+        private void CreateBuiltOutputsFile(string path, IEnumerable<FileTransfer> fileTransfers)
         {
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
@@ -168,11 +164,6 @@ namespace WixToolset.Core
                     {
                         outputs.WriteLine(fileTransfer.Destination);
                     }
-                }
-
-                if (!String.IsNullOrEmpty(pdbPath))
-                {
-                    outputs.WriteLine(Path.GetFullPath(pdbPath));
                 }
             }
         }
