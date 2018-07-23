@@ -10,6 +10,7 @@ namespace WixToolset.BuildTasks
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -168,13 +169,10 @@ namespace WixToolset.BuildTasks
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(commandLineString);
 
-            var context = serviceProvider.GetService<ICommandLineContext>();
-            context.Messaging = messaging;
-            context.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
-            context.Arguments = arguments;
-
-            var commandLine = serviceProvider.GetService<ICommandLine>();
-            var command = commandLine.ParseStandardCommandLine(context);
+            var commandLine = serviceProvider.GetService<ICommandLineParser>();
+            commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
+            commandLine.Arguments = arguments;
+            var command = commandLine.ParseStandardCommandLine();
             command?.Execute();
         }
 
