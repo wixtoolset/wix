@@ -3,8 +3,8 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <WixTargetsPath Condition=" '$(Configuration)' != 'Release' And Exists('$(MSBuildThisFileDirectory)..\..\Core\README.md') ">$(MSBuildThisFileDirectory)..\..\Core\build\Debug\net461\wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(Configuration)' == 'Debug' And Exists('$(MSBuildThisFileDirectory)..\..\Tools\README.md') ">$(MSBuildThisFileDirectory)..\..\Tools\build\Debug\net461\wix.targets</WixTargetsPath>
 
-    <WixToolsetUtilWixextPath Condition=" '$(Configuration)' != 'Release' And Exists('$(MSBuildThisFileDirectory)..\..\Util.wixext\README.md') ">$(MSBuildThisFileDirectory)..\..\Util.wixext\build\Debug\netstandard2.0\WixToolset.Util.wixext.dll</WixToolsetUtilWixextPath>
+    <WixToolsetUtilWixextPath Condition=" '$(Configuration)' == 'Debug' And Exists('$(MSBuildThisFileDirectory)..\..\Util.wixext\README.md') ">$(MSBuildThisFileDirectory)..\..\Util.wixext\build\Debug\netstandard2.0\WixToolset.Util.wixext.dll</WixToolsetUtilWixextPath>
   </PropertyGroup>
 </Project>
