@@ -17,6 +17,13 @@ static PFN_REGDELETEVALUEW vpfnRegDeleteValueW = ::RegDeleteValueW;
 static HMODULE vhAdvApi32Dll = NULL;
 static BOOL vfRegInitialized = FALSE;
 
+static HRESULT WriteStringToRegistry(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __in_z_opt LPCWSTR wzValue,
+    __in DWORD dwType
+);
+
 /********************************************************************
  RegInitialize - initializes regutil
 
@@ -221,7 +228,7 @@ extern "C" HRESULT DAPI RegDelete(
         while (E_NOMOREITEMS != (hr = RegKeyEnum(hkKey, 0, &pszEnumeratedSubKey)))
         {
             ExitOnFailure(hr, "Failed to enumerate key 0");
-            
+
             hr = PathConcat(wzSubKey, pszEnumeratedSubKey, &pszRecursiveSubKey);
             ExitOnFailure(hr, "Failed to concatenate paths while recursively deleting subkeys. Path1: %ls, Path2: %ls", wzSubKey, pszEnumeratedSubKey);
 
@@ -734,6 +741,21 @@ LExit:
 
 
 /********************************************************************
+RegWriteExpandString - writes a registry key value as an expand string.
+
+Note: if wzValue is NULL the value will be removed.
+*********************************************************************/
+extern "C" HRESULT DAPI RegWriteExpandString(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __in_z_opt LPCWSTR wzValue
+)
+{
+    return WriteStringToRegistry(hk, wzName, wzValue, REG_EXPAND_SZ);
+}
+
+
+/********************************************************************
  RegWriteString - writes a registry key value as a string.
 
  Note: if wzValue is NULL the value will be removed.
@@ -744,30 +766,7 @@ extern "C" HRESULT DAPI RegWriteString(
     __in_z_opt LPCWSTR wzValue
     )
 {
-    HRESULT hr = S_OK;
-    DWORD er = ERROR_SUCCESS;
-    DWORD cbValue = 0;
-
-    if (wzValue)
-    {
-        hr = ::StringCbLengthW(wzValue, DWORD_MAX, reinterpret_cast<size_t*>(&cbValue));
-        ExitOnFailure(hr, "Failed to determine length of registry value: %ls", wzName);
-
-        er = vpfnRegSetValueExW(hk, wzName, 0, REG_SZ, reinterpret_cast<const BYTE *>(wzValue), cbValue);
-        ExitOnWin32Error(er, hr, "Failed to set registry value: %ls", wzName);
-    }
-    else
-    {
-        er = vpfnRegDeleteValueW(hk, wzName);
-        if (ERROR_FILE_NOT_FOUND == er || ERROR_PATH_NOT_FOUND == er)
-        {
-            er = ERROR_SUCCESS;
-        }
-        ExitOnWin32Error(er, hr, "Failed to delete registry value: %ls", wzName);
-    }
-
-LExit:
-    return hr;
+    return WriteStringToRegistry(hk, wzName, wzValue, REG_SZ);
 }
 
 
@@ -791,7 +790,7 @@ extern "C" HRESULT DAPI RegWriteStringFormatted(
     va_end(args);
     ExitOnFailure(hr, "Failed to allocate %ls value.", wzName);
 
-    hr = RegWriteString(hk, wzName, sczValue);
+    hr = WriteStringToRegistry(hk, wzName, sczValue, REG_SZ);
 
 LExit:
     ReleaseStr(sczValue);
@@ -845,7 +844,7 @@ HRESULT DAPI RegWriteStringArray(
         {
             hr = ::StringCchCopyW(wzCopyDestination, dwTotalStringSize, rgwzValues[i]);
             ExitOnFailure(hr, "failed to copy string: %ls", rgwzValues[i]);
-            
+
             dwTemp -= lstrlenW(rgwzValues[i]) + 1;
             wzCopyDestination += lstrlenW(rgwzValues[i]) + 1;
         }
@@ -920,6 +919,40 @@ extern "C" HRESULT DAPI RegQueryKey(
 
     er = vpfnRegQueryInfoKeyW(hk, NULL, NULL, NULL, pcSubKeys, NULL, NULL, pcValues, NULL, NULL, NULL, NULL);
     ExitOnWin32Error(er, hr, "Failed to get the number of subkeys and values under registry key.");
+
+LExit:
+    return hr;
+}
+
+
+static HRESULT WriteStringToRegistry(
+    __in HKEY hk,
+    __in_z_opt LPCWSTR wzName,
+    __in_z_opt LPCWSTR wzValue,
+    __in DWORD dwType
+)
+{
+    HRESULT hr = S_OK;
+    DWORD er = ERROR_SUCCESS;
+    DWORD cbValue = 0;
+
+    if (wzValue)
+    {
+        hr = ::StringCbLengthW(wzValue, DWORD_MAX, reinterpret_cast<size_t*>(&cbValue));
+        ExitOnFailure(hr, "Failed to determine length of registry value: %ls", wzName);
+
+        er = vpfnRegSetValueExW(hk, wzName, 0, dwType, reinterpret_cast<const BYTE *>(wzValue), cbValue);
+        ExitOnWin32Error(er, hr, "Failed to set registry value: %ls", wzName);
+    }
+    else
+    {
+        er = vpfnRegDeleteValueW(hk, wzName);
+        if (ERROR_FILE_NOT_FOUND == er || ERROR_PATH_NOT_FOUND == er)
+        {
+            er = ERROR_SUCCESS;
+        }
+        ExitOnWin32Error(er, hr, "Failed to delete registry value: %ls", wzName);
+    }
 
 LExit:
     return hr;
