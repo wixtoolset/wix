@@ -135,6 +135,8 @@ extern "C" HRESULT DAPI LogOpen(
         }
     }
 
+    LogUtil_fDisabled = FALSE;
+
     if (fHeader)
     {
         LogHeader();
@@ -152,8 +154,6 @@ extern "C" HRESULT DAPI LogOpen(
         hr = StrAllocString(psczLogPath, LogUtil_sczLogPath, 0);
         ExitOnFailure(hr, "Failed to copy log path.");
     }
-
-    LogUtil_fDisabled = FALSE;
 
 LExit:
     if (fEnteredCriticalSection)
