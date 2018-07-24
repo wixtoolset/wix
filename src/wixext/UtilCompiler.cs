@@ -12,6 +12,7 @@ namespace WixToolset.Util
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// The compiler for the WiX Toolset Utility Extension.
