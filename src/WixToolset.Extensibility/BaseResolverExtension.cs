@@ -31,7 +31,7 @@ namespace WixToolset.Extensibility
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
-        public virtual string ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
+        public virtual ResolveFileResult ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
         {
             return null;
         }

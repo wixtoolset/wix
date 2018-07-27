@@ -9,7 +9,7 @@ namespace WixToolset.Extensibility
     {
         void PreCombine(ILibraryContext context);
 
-        string Resolve(SourceLineNumber sourceLineNumber, IntermediateTupleDefinition tupleDefinition, string path);
+        ResolveFileResult ResolveFile(SourceLineNumber sourceLineNumber, IntermediateTupleDefinition tupleDefinition, string path);
 
         void PostCombine(Intermediate library);
     }
