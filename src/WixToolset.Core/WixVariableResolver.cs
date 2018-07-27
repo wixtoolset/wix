@@ -14,9 +14,9 @@ namespace WixToolset.Core
     /// </summary>
     internal sealed class WixVariableResolver : IVariableResolver
     {
-        private Dictionary<string, BindVariable> locVariables;
-        private Dictionary<string, BindVariable> wixVariables;
-        private Dictionary<string, LocalizedControl> localizedControls;
+        private readonly Dictionary<string, BindVariable> locVariables;
+        private readonly Dictionary<string, BindVariable> wixVariables;
+        private readonly Dictionary<string, LocalizedControl> localizedControls;
 
         /// <summary>
         /// Instantiate a new WixVariableResolver.
@@ -25,6 +25,7 @@ namespace WixToolset.Core
         {
             this.locVariables = new Dictionary<string, BindVariable>();
             this.wixVariables = new Dictionary<string, BindVariable>();
+            this.localizedControls = new Dictionary<string, LocalizedControl>();
             this.Codepage = -1;
             this.Messaging = messaging;
         }
