@@ -3,6 +3,8 @@
 namespace WixToolset.Data
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Resources;
 
     public static class ErrorMessages
@@ -645,6 +647,12 @@ namespace WixToolset.Data
         public static Message FileNotFound(SourceLineNumber sourceLineNumbers, string file, string fileType)
         {
             return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}' with type '{1}'.", file, fileType);
+        }
+
+        public static Message FileNotFound(SourceLineNumber sourceLineNumbers, string file, string fileType, IEnumerable<string> checkedPaths)
+        {
+            var combinedCheckedPaths = String.Join(", ", checkedPaths);
+            return Message(sourceLineNumbers, Ids.FileNotFound, "The system cannot find the file '{0}' with type '{1}'. The following paths were checked: {2}", file, fileType, combinedCheckedPaths);
         }
 
         public static Message FileOrDirectoryPathRequired(string parameter)
