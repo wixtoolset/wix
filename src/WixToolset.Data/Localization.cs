@@ -12,8 +12,6 @@ namespace WixToolset.Data
     /// </summary>
     public sealed class Localization
     {
-        private static string XmlElementName = "localization";
-
         private Dictionary<string, BindVariable> variables = new Dictionary<string, BindVariable>();
         private Dictionary<string, LocalizedControl> localizedControls = new Dictionary<string, LocalizedControl>();
 
