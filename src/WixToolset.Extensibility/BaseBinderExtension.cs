@@ -3,6 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Base class for creating a resolver extension.
@@ -15,11 +16,25 @@ namespace WixToolset.Extensibility
         protected IBindContext Context { get; private set; }
 
         /// <summary>
+        /// Messaging for use by the extension.
+        /// </summary>
+        protected IMessaging Messaging { get; private set; }
+
+        /// <summary>
+        /// BackendHelper for use by the extension.
+        /// </summary>
+        protected IBackendHelper BackendHelper { get; private set; }
+
+        /// <summary>
         /// Called at the beginning of bind.
         /// </summary>
         public virtual void PreBind(IBindContext context)
         {
             this.Context = context;
+
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+
+            this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace WixToolset.Extensibility.Data
 
         IEnumerable<string> ContentFilePaths { get; set; }
 
-        IEnumerable<FileTransfer> FileTransfers { get; set; }
+        IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
         string ContentsFile { get; set; }
 

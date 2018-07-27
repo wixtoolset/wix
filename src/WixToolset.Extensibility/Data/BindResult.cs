@@ -6,7 +6,7 @@ namespace WixToolset.Extensibility.Data
 
     public class BindResult
     {
-        public IEnumerable<FileTransfer> FileTransfers { get; set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
         public IEnumerable<string> ContentFilePaths { get; set; }
     }
