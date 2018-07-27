@@ -43,17 +43,24 @@ namespace WixToolset.Core.Bind
 
         public string Resolve(SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, string source)
         {
+            var checkedPaths = new List<string>();
+
             foreach (var extension in this.LibrarianExtensions)
             {
-                var resolved = extension.Resolve(sourceLineNumbers, tupleDefinition, source);
+                var resolved = extension.ResolveFile(sourceLineNumbers, tupleDefinition, source);
 
-                if (null != resolved)
+                if (resolved?.CheckedPaths != null)
                 {
-                    return resolved;
+                    checkedPaths.AddRange(resolved.CheckedPaths);
+                }
+
+                if (!String.IsNullOrEmpty(resolved?.Path))
+                {
+                    return resolved?.Path;
                 }
             }
 
-            return this.ResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, BindStage.Normal);
+            return this.MustResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, BindStage.Normal, checkedPaths);
         }
 
         /// <summary>
@@ -66,24 +73,32 @@ namespace WixToolset.Core.Bind
         /// <returns>Should return a valid path for the stream to be imported.</returns>
         public string ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
         {
+            var checkedPaths = new List<string>();
+
             foreach (var extension in this.ResolverExtensions)
             {
                 var resolved = extension.ResolveFile(source, tupleDefinition, sourceLineNumbers, bindStage);
 
-                if (null != resolved)
+                if (resolved?.CheckedPaths != null)
                 {
-                    return resolved;
+                    checkedPaths.AddRange(resolved.CheckedPaths);
+                }
+
+                if (!String.IsNullOrEmpty(resolved?.Path))
+                {
+                    return resolved?.Path;
                 }
             }
 
-            return this.ResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, bindStage);
+            return this.MustResolveUsingBindPaths(source, tupleDefinition, sourceLineNumbers, bindStage, checkedPaths);
         }
 
-        private string ResolveUsingBindPaths(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
+        private string MustResolveUsingBindPaths(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage, List<string> checkedPaths)
         {
             string resolved = null;
 
             // If the file exists, we're good to go.
+            checkedPaths.Add(source);
             if (CheckFileExists(source))
             {
                 resolved = source;
@@ -121,6 +136,7 @@ namespace WixToolset.Core.Bind
                     {
                         var filePath = Path.Combine(bindPath.Path, pathWithoutSourceDir);
 
+                        checkedPaths.Add(filePath);
                         if (CheckFileExists(filePath))
                         {
                             resolved = filePath;
@@ -131,6 +147,7 @@ namespace WixToolset.Core.Bind
                     {
                         var filePath = Path.Combine(bindPath.Path, path);
 
+                        checkedPaths.Add(filePath);
                         if (CheckFileExists(filePath))
                         {
                             resolved = filePath;
@@ -141,10 +158,9 @@ namespace WixToolset.Core.Bind
 
             if (null == resolved)
             {
-                throw new WixFileNotFoundException(sourceLineNumbers, source, tupleDefinition.Name);
+                throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, source, tupleDefinition.Name, checkedPaths));
             }
 
-            // Didn't find the file.
             return resolved;
         }
 

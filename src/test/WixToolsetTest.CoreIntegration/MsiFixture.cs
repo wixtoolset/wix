@@ -171,6 +171,41 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanFailBuildMissingFile()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "does-not-exist"),
+                    "-bindpath", Path.Combine(folder, "also-does-not-exist"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                }, out var messages);
+                Assert.Equal(103, result);
+
+                var error = messages.Single(m => m.Level == MessageLevel.Error);
+                var errorMessage = error.ToString();
+                var checkedPaths = errorMessage.Substring(errorMessage.IndexOf(':') + 1).Split(new[] { ',' }).Select(s => s.Trim()).ToArray();
+                Assert.Equal(new[]
+                {
+                    "test.txt",
+                    Path.Combine(folder, "does-not-exist", "test.txt"),
+                    Path.Combine(folder, "also-does-not-exist", "test.txt"),
+                }, checkedPaths);
+            }
+        }
+
+        [Fact]
         public void CanLoadPdbGeneratedByBuild()
         {
             var folder = TestData.Get(@"TestData\MultiFileCompressed");

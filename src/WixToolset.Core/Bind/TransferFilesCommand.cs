@@ -63,7 +63,7 @@ namespace WixToolset.Core.Bind
                     }
                     catch (FileNotFoundException e)
                     {
-                        throw new WixFileNotFoundException(fileTransfer.SourceLineNumbers, e.FileName);
+                        throw new WixException(ErrorMessages.FileNotFound(fileTransfer.SourceLineNumbers, e.FileName));
                     }
                     catch (DirectoryNotFoundException)
                     {

@@ -22,6 +22,8 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLineParser : ICommandLineParser
     {
+        private static readonly char[] BindPathSplit = { '=' };
+
         public CommandLineParser(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
@@ -380,15 +382,15 @@ namespace WixToolset.Core.CommandLine
 
             foreach (var bindPath in bindPaths)
             {
-                var bp = BindPath.Parse(bindPath);
+                var bp = ParseBindPath(bindPath);
 
-                if (Directory.Exists(bp.Path))
-                {
-                    result.Add(bp);
-                }
-                else if (File.Exists(bp.Path))
+                if (File.Exists(bp.Path))
                 {
                     this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile("-bindpath", bp.Path));
+                }
+                else
+                {
+                    result.Add(bp);
                 }
             }
 
@@ -406,6 +408,12 @@ namespace WixToolset.Core.CommandLine
             }
 
             return false;
+        }
+
+        public static BindPath ParseBindPath(string bindPath)
+        {
+            string[] namedPath = bindPath.Split(BindPathSplit, 2);
+            return (1 == namedPath.Length) ? new BindPath(namedPath[0]) : new BindPath(namedPath[0], namedPath[1]);
         }
     }
 }

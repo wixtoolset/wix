@@ -334,10 +334,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     db.Commit();
                 }
             }
-            catch (IOException)
+            catch (IOException e)
             {
                 // TODO: this error message doesn't seem specific enough
-                throw new WixFileNotFoundException(new SourceLineNumber(this.OutputPath), this.OutputPath);
+                throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.OutputPath), this.OutputPath), e);
             }
         }
 

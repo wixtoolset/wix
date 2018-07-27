@@ -152,10 +152,9 @@ namespace WixToolset.Core.Bind
                                     }
 #endif
                                 }
-                                catch (WixFileNotFoundException)
+                                catch (WixException e)
                                 {
-                                    // display the error with source line information
-                                    this.Messaging.Write(ErrorMessages.FileNotFound(row.SourceLineNumbers, objectField.Path));
+                                    this.Messaging.Write(e.Error);
                                 }
                             }
 
