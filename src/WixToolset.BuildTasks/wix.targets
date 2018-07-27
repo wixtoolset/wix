@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="_CheckRequiredProperties" DefaultTargets="Build">
   <PropertyGroup>
     <WixTargetsImported>true</WixTargetsImported>
@@ -119,11 +118,6 @@
   <UsingTask TaskName="GetCabList" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="GetLooseFileList" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="GenerateCompileWithObjectPath" AssemblyFile="$(WixTasksPath)"/>
-
-  <!-- WiX tools are 32bit EXEs, so run them out-of-proc when MSBuild is not 32bit. -->
-  <PropertyGroup>
-    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
-  </PropertyGroup>
 
   <PropertyGroup>
     <BindContentsFile Condition=" '$(BindContentsFile)' == '' ">$(MSBuildProjectFile).BindContentsFileList.txt</BindContentsFile>
@@ -284,8 +278,7 @@
       PreBuildEvent;
       ResolveReferences;
 
-      <!--CompileAndLink;-->
-      DoIt;
+      WixBuild;
       Signing;
 
       GetTargetPath;
@@ -598,43 +591,43 @@
   <!--
   //////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////
-  DoIt Targets
+  WixBuild Targets
   //////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////
   -->
 
   <!--
   ==================================================================================================
-  DoIt
+  WixBuild
   ==================================================================================================
   -->
   <PropertyGroup>
-    <DoItDependsOn>
-      PrepareForBuild;
+    <WixBuildDependsOn>
       ResolveReferences;
-      BeforeCompile;
-      _TimeStampBeforeCompile;
-      Harvest;
+      BeforeWixBuild;
+      _TimeStampBeforeWixBuild;
 
       CalculateDefineConstants;
+      Harvest;
+
       GenerateCompileWithObjectPath;
 
       AssignCultures;
       ReadPreviousBindInputsAndBuiltOutputs;
 
-      ActuallyDoIt;
+      CoreWixBuild;
 
       UpdateLinkFileWrites;
-      _TimeStampAfterCompile;
-      AfterCompile
-    </DoItDependsOn>
+      _TimeStampAfterWixBuild;
+      AfterWixBuild
+    </WixBuildDependsOn>
   </PropertyGroup>
   <Target
-    Name="DoIt"
-    DependsOnTargets="$(DoItDependsOn)" />
+    Name="WixBuild"
+    DependsOnTargets="$(WixBuildDependsOn)" />
 
   <Target
-    Name="ActuallyDoIt"
+    Name="CoreWixBuild"
 
     Inputs="@(Compile);
     @(Content);
@@ -703,40 +696,8 @@
     TreatWarningsAsErrors="$(CompilerTreatWarningsAsErrors);$(LinkerTreatWarningsAsErrors)"
     VerboseOutput="$(CompilerVerboseOutput);$(LinkerVerboseOutput)"
     -->
+  </Target>
 
-</Target>
-
-
-  <!--
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-  CompileAndLink Targets
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-  -->
-
-  <!--
-  ==================================================================================================
-  CompileAndLink
-  ==================================================================================================
-  -->
-  <PropertyGroup>
-    <CompileAndLinkDependsOn>
-      ResolveReferences;
-      BeforeCompile;
-      _TimeStampBeforeCompile;
-      Harvest;
-      Compile;
-      Lib;
-      Link;
-      UpdateLinkFileWrites;
-      _TimeStampAfterCompile;
-      AfterCompile
-    </CompileAndLinkDependsOn>
-  </PropertyGroup>
-  <Target
-    Name="CompileAndLink"
-    DependsOnTargets="$(CompileAndLinkDependsOn)" />
 
   <!--
   ==================================================================================================
@@ -819,72 +780,6 @@
         IntermediateOutputPath="$(IntermediateOutputPath)">
       <Output TaskParameter="CompileWithObjectPath" ItemName="_CompileWithObjectPath" />
     </GenerateCompileWithObjectPath>
-
-  </Target>
-
-  <!--
-  ================================================================================================
-  Compile
-
-    Compiles the wxs files into wixobj files using candle.exe.
-
-    [IN]
-    @(Compile) - The list of wxs files to compile.
-    @(Content) - Files that the project uses in the installer.
-    @(WixExtension) - The list of wixlib or wix dll extensions.
-
-    [OUT]
-    @(CompileObjOutput) - The compiled .wixobj files.
-  ================================================================================================
-  -->
-  <PropertyGroup>
-    <CompileDependsOn>
-      PrepareForBuild;
-      ResolveReferences;
-      CalculateDefineConstants;
-      GenerateCompileWithObjectPath
-    </CompileDependsOn>
-  </PropertyGroup>
-  <Target
-      Name="Compile"
-      Inputs="@(Compile);
-              @(Content);
-              @(_ResolvedWixExtensionPaths);
-              @(_ResolvedProjectReferencePaths);
-              $(MSBuildAllProjects)"
-      Outputs="@(_CompileWithObjectPath -> '%(ObjectPath)%(Filename).wixobj')"
-      DependsOnTargets="$(CompileDependsOn)"
-      Condition=" '@(Compile)' != '' ">
-
-    <Candle
-        SourceFiles="@(_CompileWithObjectPath)"
-        AdditionalOptions="$(CompilerAdditionalOptions)"
-        DefineConstants="$(DefineConstants);$(SolutionDefineConstants);$(ProjectDefineConstants);$(ProjectReferenceDefineConstants)"
-        ExtensionDirectory="$(WixExtDir)"
-        Extensions="@(_ResolvedWixExtensionPaths)"
-        PreprocessToStdOut="$(PreprocessToStdOut)"
-        PreprocessToFile="$(PreprocessToFile)"
-        IncludeSearchPaths="$(IncludeSearchPaths)"
-        InstallerPlatform="$(InstallerPlatform)"
-        IntermediateDirectory="$(IntermediateOutputPath)"
-        NoLogo="$(CompilerNoLogo)"
-        OutputFile="%(_CompileWithObjectPath.ObjectPath)"
-        Pedantic="$(Pedantic)"
-        ReferencePaths="$(ReferencePaths)"
-        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
-        SuppressAllWarnings="$(CompilerSuppressAllWarnings)"
-        SuppressSpecificWarnings="$(CompilerSuppressSpecificWarnings)"
-        ToolPath="$(WixToolDir)"
-        TreatWarningsAsErrors="$(CompilerTreatWarningsAsErrors)"
-        TreatSpecificWarningsAsErrors="$(CompilerTreatSpecificWarningsAsErrors)"
-        VerboseOutput="$(CompilerVerboseOutput)">
-    </Candle>
-
-    <!-- These will be still be set even if the Compile target is up to date. -->
-    <ItemGroup>
-      <CompileObjOutput Include="@(_CompileWithObjectPath -> '%(ObjectPath)%(Filename).wixobj')" />
-      <FileWrites Include="@(CompileObjOutput)" />
-    </ItemGroup>
   </Target>
 
   <!--
@@ -1050,120 +945,15 @@
 
   <!--
   ================================================================================================
-  Link
-
-    Links the .wixobj, .wxl, .wixlib, wix extensions into an .msi or .msm file using light.exe,
-    once per culture group. All WXL files are passed into light and the culture switch determines
-    which are used
-
-    [IN]
-    @(CompileObjOutput) - The compiled .wixobj file.
-    @(CultureGroup) - The cultures to build
-    @(EmbeddedResource) - The list of wxl files to use for localization.
-    @(WixObject) - The list of .wixobj files.
-    @(WixLibrary) - The list of .wixlib files.
-    @(WixExtension) - The list of wix dll extension files.
-
-    [OUT]
-    $(TargetDir)\%(Culture)\$(TargetName)$(TargetExt) - The compiled .msi, .msm, or .exe files.
-  ================================================================================================
-  -->
-  <PropertyGroup>
-    <LinkDependsOn>
-      PrepareForBuild;
-      ResolveReferences;
-      AssignCultures;
-      ReadPreviousBindInputsAndBuiltOutputs;
-    </LinkDependsOn>
-  </PropertyGroup>
-  <Target
-      Name="Link"
-      Inputs="@(CompileObjOutput);
-              @(EmbeddedResource);
-              @(WixObject);
-              @(_ResolvedProjectReferencePaths);
-              @(_ResolvedWixLibraryPaths);
-              @(_ResolvedWixExtensionPaths);
-              $(MSBuildAllProjects);
-              @(_BindInputs)"
-      Outputs="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile);@(_BindBuiltOutputs)"
-      DependsOnTargets="$(LinkDependsOn)"
-      Condition=" '$(OutputType)' == 'Bundle' or '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module' ">
-
-    <PropertyGroup>
-      <PdbOutputFile>$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbName)</PdbOutputFile>
-    </PropertyGroup>
-
-    <!-- Call light using the culture subdirectory for output -->
-    <Light
-      ObjectFiles="@(CompileObjOutput);@(WixObject);@(WixLibProjects);@(_ResolvedWixLibraryPaths)"
-      AdditionalOptions="$(LinkerAdditionalOptions)"
-      AllowIdenticalRows="$(AllowIdenticalRows)"
-      AllowUnresolvedReferences="$(AllowUnresolvedReferences)"
-      AdditionalCub="$(AdditionalCub)"
-      BackwardsCompatibleGuidGeneration="$(BackwardsCompatibleGuidGeneration)"
-      BindInputPaths="@(LinkerBindInputPaths)"
-      BindFiles="$(LinkerBindFiles)"
-      BindContentsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindContentsFile)"
-      BindOutputsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)"
-      BindBuiltOutputsFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)"
-      CabinetCachePath="$(CabinetCachePath)"
-      CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
-      Cultures="%(CultureGroup.Identity)"
-      CustomBinder="$(CustomBinder)"
-      DefaultCompressionLevel="$(DefaultCompressionLevel)"
-      DropUnrealTables="$(DropUnrealTables)"
-      ExactAssemblyVersions="$(ExactAssemblyVersions)"
-      ExtensionDirectory="$(WixExtDir)"
-      Extensions="@(_ResolvedWixExtensionPaths)"
-      Ices="$(Ices)"
-      LeaveTemporaryFiles="$(LeaveTemporaryFiles)"
-      LocalizationFiles="@(EmbeddedResource)"
-      NoLogo="$(LinkerNoLogo)"
-      OutputAsXml="$(OutputAsXml)"
-      OutputFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)"
-      PdbOutputFile="$(PdbOutputFile)"
-      Pedantic="$(LinkerPedantic)"
-      ReferencePaths="$(ReferencePaths)"
-      ReuseCabinetCache="$(ReuseCabinetCache)"
-      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
-      SuppressAclReset="$(SuppressAclReset)"
-      SuppressAllWarnings="$(LinkerSuppressAllWarnings)"
-      SuppressAssemblies="$(SuppressAssemblies)"
-      SuppressDefaultAdminSequenceActions="$(SuppressDefaultAdminSequenceActions)"
-      SuppressDefaultAdvSequenceActions="$(SuppressDefaultAdvSequenceActions)"
-      SuppressDefaultUISequenceActions="$(SuppressDefaultUISequenceActions)"
-      SuppressFileHashAndInfo="$(SuppressFileHashAndInfo)"
-      SuppressFiles="$(SuppressFiles)"
-      SuppressIntermediateFileVersionMatching="$(LinkerSuppressIntermediateFileVersionMatching)"
-      SuppressIces="$(SuppressIces)"
-      SuppressLayout="$(SuppressLayout)"
-      SuppressLocalization="$(SuppressLocalization)"
-      SuppressMsiAssemblyTableProcessing="$(SuppressMsiAssemblyTableProcessing)"
-      SuppressPdbOutput="$(SuppressPdbOutput)"
-      SuppressSchemaValidation="$(LinkerSuppressSchemaValidation)"
-      SuppressValidation="$(SuppressValidation)"
-      SuppressSpecificWarnings="$(LinkerSuppressSpecificWarnings)"
-      SuppressTagSectionIdAttributeOnTuples="$(SuppressTagSectionIdAttributeOnTuples)"
-      ToolPath="$(WixToolDir)"
-      TreatWarningsAsErrors="$(LinkerTreatWarningsAsErrors)"
-      UnreferencedSymbolsFile="$(UnreferencedSymbolsFile)"
-      VerboseOutput="$(LinkerVerboseOutput)"
-      WixProjectFile="$(ProjectPath)"
-      WixVariables="$(WixVariables)" />
-  </Target>
-
-  <!--
-  ================================================================================================
   UpdateLinkFileWrites
 
-    Reads the bind outputs file(s) output generated during Link to correctly set the @(FileWrites)
+    Reads the bind outputs file(s) output generated during WixBuild to correctly set the @(FileWrites)
     item. Most targets have it easy because they can do a static mapping from inputs to the outputs.
-    However, the Link target outputs are determined after a rather complex calculation we call
+    However, the WixBuild target outputs are determined after a rather complex calculation we call
     linking and binding!
 
     This target runs independently after Link to ensure that @(FileWrites) is updated even if the
-    "Light" task fails.
+    "WixBuild" task fails.
 
     [IN]
     Path to bind outputs file(s).
