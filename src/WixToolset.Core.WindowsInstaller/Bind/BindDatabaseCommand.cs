@@ -26,6 +26,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
+            this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
+
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
             this.CabbingThreadCount = context.CabbingThreadCount;
@@ -42,6 +44,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.BackendExtensions = backendExtension;
         }
+
+        private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private int Codepage { get; }
 
@@ -63,8 +69,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Intermediate Intermediate { get; }
 
-        private IMessaging Messaging { get; }
-
         private string OutputPath { get; }
 
         private bool SuppressAddingValidationRows { get; }
@@ -77,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Validator Validator { get; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; private set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
         public IEnumerable<string> ContentFilePaths { get; private set; }
 
@@ -87,7 +91,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var section = this.Intermediate.Sections.Single();
 
-            var fileTransfers = new List<FileTransfer>();
+            var fileTransfers = new List<IFileTransfer>();
 
             var containsMergeModules = false;
             var suppressedTableNames = new HashSet<string>();
@@ -375,7 +379,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                var command = new CreateCabinetsCommand();
+                var command = new CreateCabinetsCommand(this.BackendHelper);
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
@@ -415,11 +419,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             string tempDatabaseFile = Path.Combine(this.IntermediateFolder, Path.GetFileName(this.OutputPath));
             this.GenerateDatabase(output, tempDatabaseFile, false, false);
 
-            if (FileTransfer.TryCreate(tempDatabaseFile, this.OutputPath, true, output.Type.ToString(), null, out var transfer)) // note where this database needs to move in the future
-            {
-                transfer.Built = true;
-                fileTransfers.Add(transfer);
-            }
+            var transfer = this.BackendHelper.CreateFileTransfer(tempDatabaseFile, this.OutputPath, true, FileTransferType.Built); // note where this database needs to move in the future
+            fileTransfers.Add(transfer);
 
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)
@@ -491,7 +492,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Process uncompressed files.
             if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
             {
-                var command = new ProcessUncompressedFilesCommand(section);
+                var command = new ProcessUncompressedFilesCommand(section, this.BackendHelper);
                 command.Compressed = compressed;
                 command.FileFacades = uncompressedFiles;
                 command.LayoutDirectory = layoutDirectory;

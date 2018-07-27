@@ -22,6 +22,7 @@ namespace WixToolset.Core
                 { typeof(ITupleDefinitionCreator), (provider, singletons) => AddSingleton(singletons, typeof(ITupleDefinitionCreator), new TupleDefinitionCreator(provider)) },
                 { typeof(IParseHelper), (provider, singletons) => AddSingleton(singletons, typeof(IParseHelper), new ParseHelper(provider)) },
                 { typeof(IPreprocessHelper), (provider, singletons) => AddSingleton(singletons, typeof(IPreprocessHelper), new PreprocessHelper(provider)) },
+                { typeof(IBackendHelper), (provider, singletons) => AddSingleton(singletons, typeof(IBackendHelper), new BackendHelper(provider)) },
                 { typeof(IWindowsInstallerBackendHelper), (provider, singletons) => AddSingleton(singletons, typeof(IWindowsInstallerBackendHelper), new WindowsInstallerBackendHelper(provider)) },
 
             // Transients.

@@ -13,7 +13,7 @@ namespace WixToolset.Core.Bind
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<FileTransfer> fileTransfers, bool suppressAclReset)
+        public TransferFilesCommand(IMessaging messaging, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool suppressAclReset)
         {
             this.FileSystem = new FileSystem(extensions);
             this.Messaging = messaging;
@@ -25,7 +25,7 @@ namespace WixToolset.Core.Bind
 
         private IMessaging Messaging { get; }
 
-        private IEnumerable<FileTransfer> FileTransfers { get; }
+        private IEnumerable<IFileTransfer> FileTransfers { get; }
 
         private bool SuppressAclReset { get; }
 

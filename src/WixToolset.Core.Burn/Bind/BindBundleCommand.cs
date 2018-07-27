@@ -99,7 +99,7 @@ namespace WixToolset.Core.Burn
 
         public IVariableResolver VariableResolver { private get; set; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; private set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
         public IEnumerable<string> ContentFilePaths { get; private set; }
 

@@ -28,7 +28,7 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
         public IEnumerable<string> ContentFilePaths { get; set; }
 
@@ -124,14 +124,14 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
-        private void CreateOutputsFile(string path, IEnumerable<FileTransfer> fileTransfers)
+        private void CreateOutputsFile(string path, IEnumerable<IFileTransfer> fileTransfers)
         {
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
 
             using (var outputs = new StreamWriter(path, false))
             {
-                foreach (FileTransfer fileTransfer in fileTransfers)
+                foreach (var fileTransfer in fileTransfers)
                 {
                     // Don't list files where the source is the same as the destination since
                     // that might be the only place the file exists. The outputs file is often
@@ -149,18 +149,18 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
-        private void CreateBuiltOutputsFile(string path, IEnumerable<FileTransfer> fileTransfers)
+        private void CreateBuiltOutputsFile(string path, IEnumerable<IFileTransfer> fileTransfers)
         {
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
 
             using (var outputs = new StreamWriter(path, false))
             {
-                foreach (FileTransfer fileTransfer in fileTransfers)
+                foreach (var fileTransfer in fileTransfers)
                 {
                     // Only write the built file transfers. Also, skip redundant
                     // files for the same reason spelled out in this.CreateOutputsFile().
-                    if (fileTransfer.Built && !fileTransfer.Redundant)
+                    if (fileTransfer.Type == FileTransferType.Built && !fileTransfer.Redundant)
                     {
                         outputs.WriteLine(fileTransfer.Destination);
                     }

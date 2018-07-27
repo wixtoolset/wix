@@ -26,18 +26,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
         public const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
 
-        private List<FileTransfer> fileTransfers;
+        private List<IFileTransfer> fileTransfers;
 
         private FileSplitCabNamesCallback newCabNamesCallBack;
 
         private Dictionary<string, string> lastCabinetAddedToMediaTable; // Key is First Cabinet Name, Value is Last Cabinet Added in the Split Sequence
 
-        public CreateCabinetsCommand()
+        public CreateCabinetsCommand(IBackendHelper backendHelper)
         {
-            this.fileTransfers = new List<FileTransfer>();
+            this.fileTransfers = new List<IFileTransfer>();
 
             this.newCabNamesCallBack = this.NewCabNamesCallBack;
+
+            this.BackendHelper = backendHelper;
         }
+
+        public IBackendHelper BackendHelper { get; }
 
         /// <summary>
         /// Sets the number of threads to use for cabinet creation.
@@ -72,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<WixMediaTuple> WixMediaTuples { private get; set; }
 
-        public IEnumerable<FileTransfer> FileTransfers => this.fileTransfers;
+        public IEnumerable<IFileTransfer> FileTransfers => this.fileTransfers;
 
         /// <param name="output">Output to generate image for.</param>
         /// <param name="fileTransfers">Array of files to be transfered.</param>
@@ -186,7 +190,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <param name="fileTransfers">Array of files to be transfered.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades, List<FileTransfer> fileTransfers)
+        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades, List<IFileTransfer> fileTransfers)
         {
             CabinetWorkItem cabinetWorkItem = null;
             string tempCabinetFileX = Path.Combine(this.TempFilesLocation, mediaRow.Cabinet);
@@ -254,12 +258,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                string destinationPath = Path.Combine(cabinetDir, mediaRow.Cabinet);
-                if (FileTransfer.TryCreate(resolvedCabinet.Path, destinationPath, CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption, "Cabinet", mediaRow.SourceLineNumbers, out var transfer))
-                {
-                    transfer.Built = true;
-                    fileTransfers.Add(transfer);
-                }
+                var destinationPath = Path.Combine(cabinetDir, mediaRow.Cabinet);
+                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, destinationPath, CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption, FileTransferType.Built, mediaRow.SourceLineNumbers);
+                fileTransfers.Add(transfer);
             }
 
             return cabinetWorkItem;
@@ -315,21 +316,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 bool transferAdded = false; // Used for Error Handling
 
                 // Create File Transfer for new Cabinet using transfer of Base Cabinet
-                foreach (FileTransfer transfer in this.FileTransfers)
+                foreach (var transfer in this.FileTransfers)
                 {
                     if (firstCabinetName.Equals(Path.GetFileName(transfer.Source), StringComparison.InvariantCultureIgnoreCase))
                     {
                         string newCabSourcePath = Path.Combine(Path.GetDirectoryName(transfer.Source), newCabinetName);
                         string newCabTargetPath = Path.Combine(Path.GetDirectoryName(transfer.Destination), newCabinetName);
 
-                        FileTransfer newTransfer;
-                        if (FileTransfer.TryCreate(newCabSourcePath, newCabTargetPath, transfer.Move, "Cabinet", transfer.SourceLineNumbers, out newTransfer))
-                        {
-                            newTransfer.Built = true;
-                            this.fileTransfers.Add(newTransfer);
-                            transferAdded = true;
-                            break;
-                        }
+                        var newTransfer = this.BackendHelper.CreateFileTransfer(newCabSourcePath, newCabTargetPath, transfer.Move, FileTransferType.Built, transfer.SourceLineNumbers);
+                        this.fileTransfers.Add(newTransfer);
+
+                        transferAdded = true;
+                        break;
                     }
                 }
 

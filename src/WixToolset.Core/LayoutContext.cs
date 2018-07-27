@@ -20,7 +20,7 @@ namespace WixToolset.Core
 
         public IEnumerable<IFileSystemExtension> FileSystemExtensions { get; set; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
         public IEnumerable<string> ContentFilePaths { get; set; }
 

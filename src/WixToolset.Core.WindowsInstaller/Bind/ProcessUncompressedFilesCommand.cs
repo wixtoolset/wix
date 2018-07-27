@@ -11,6 +11,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Msi;
 
     /// <summary>
@@ -18,12 +19,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class ProcessUncompressedFilesCommand
     {
-        public ProcessUncompressedFilesCommand(IntermediateSection section)
+        public ProcessUncompressedFilesCommand(IntermediateSection section, IBackendHelper backendHelper)
         {
             this.Section = section;
+            this.BackendHelper = backendHelper;
         }
 
         private IntermediateSection Section { get; }
+
+        public IBackendHelper BackendHelper { get; }
 
         public string DatabasePath { private get; set; }
 
@@ -37,11 +41,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; private set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
         public void Execute()
         {
-            var fileTransfers = new List<FileTransfer>();
+            var fileTransfers = new List<IFileTransfer>();
 
             var directories = new Dictionary<string, ResolvedDirectory>();
 
@@ -103,11 +107,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
 
                             // finally put together the base media layout path and the relative file layout path
-                            string fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
-                            if (FileTransfer.TryCreate(facade.WixFile.Source.Path, fileLayoutPath, false, "File", facade.File.SourceLineNumbers, out var transfer))
-                            {
-                                fileTransfers.Add(transfer);
-                            }
+                            var fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
+                            var transfer = this.BackendHelper.CreateFileTransfer(facade.WixFile.Source.Path, fileLayoutPath, false, FileTransferType.Content, facade.File.SourceLineNumbers);
+                            fileTransfers.Add(transfer);
                         }
                     }
                 }
