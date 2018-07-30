@@ -8,6 +8,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixBuildTools.MsgGen", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixBuildTools.TestSupport", "src\WixBuildTools.TestSupport\WixBuildTools.TestSupport.csproj", "{6C57EF2C-979A-4106-A9E5-FE342810619A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6660B22-092F-4BC5-A303-E6F696C31E1B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
