@@ -8,7 +8,6 @@ namespace WixToolset.Core
     using System.Linq;
     using System.Reflection;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;

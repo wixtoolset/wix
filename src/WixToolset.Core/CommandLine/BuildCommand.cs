@@ -74,17 +74,16 @@ namespace WixToolset.Core.CommandLine
 
         public int Execute()
         {
-            var wixobjs = this.CompilePhase();
+            var creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
+
+            this.EvaluateSourceFiles(creator, out var codeFiles, out var wixipl);
 
             if (this.Messaging.EncounteredError)
             {
                 return this.Messaging.LastErrorNumber;
             }
 
-            if (!wixobjs.Any())
-            {
-                return 1;
-            }
+            var wixobjs = this.CompilePhase(codeFiles);
 
             var wxls = this.LoadLocalizationFiles().ToList();
 
@@ -104,7 +103,10 @@ namespace WixToolset.Core.CommandLine
             }
             else
             {
-                var wixipl = this.LinkPhase(wixobjs);
+                if (wixipl == null)
+                {
+                    wixipl = this.LinkPhase(wixobjs, creator);
+                }
 
                 if (!this.Messaging.EncounteredError)
                 {
@@ -122,11 +124,49 @@ namespace WixToolset.Core.CommandLine
             return this.Messaging.LastErrorNumber;
         }
 
-        private IEnumerable<Intermediate> CompilePhase()
+        private void EvaluateSourceFiles(ITupleDefinitionCreator creator, out List<SourceFile> codeFiles, out Intermediate wixipl)
+        {
+            codeFiles = new List<SourceFile>();
+
+            wixipl = null;
+
+            foreach (var sourceFile in this.SourceFiles)
+            {
+                var extension = Path.GetExtension(sourceFile.SourcePath);
+
+                if (wixipl != null || ".wxs".Equals(extension, StringComparison.OrdinalIgnoreCase))
+                {
+                    codeFiles.Add(sourceFile);
+                }
+                else
+                {
+                    try
+                    {
+                        wixipl = Intermediate.Load(sourceFile.SourcePath, creator);
+                    }
+                    catch (WixException)
+                    {
+                        // We'll assume anything that isn't a valid intermediate is source code to compile.
+                        codeFiles.Add(sourceFile);
+                    }
+                }
+            }
+
+            if (wixipl == null && codeFiles.Count == 0)
+            {
+                this.Messaging.Write(ErrorMessages.NoSourceFiles());
+            }
+            else if (wixipl != null && codeFiles.Count != 0)
+            {
+                this.Messaging.Write(ErrorMessages.WixiplSourceFileIsExclusive());
+            }
+        }
+
+        private IEnumerable<Intermediate> CompilePhase(IEnumerable<SourceFile> sourceFiles)
         {
             var intermediates = new List<Intermediate>();
 
-            foreach (var sourceFile in this.SourceFiles)
+            foreach (var sourceFile in sourceFiles)
             {
                 var preprocessor = new Preprocessor(this.ServiceProvider);
                 preprocessor.IncludeSearchPaths = this.IncludeSearchPaths;
@@ -159,12 +199,6 @@ namespace WixToolset.Core.CommandLine
 
         private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations)
         {
-            // If there was an error loading localization files, then bail.
-            if (this.Messaging.EncounteredError)
-            {
-                return null;
-            }
-
             var librarian = new Librarian(this.ServiceProvider);
             librarian.BindFiles = this.BindFiles;
             librarian.BindPaths = this.BindPaths;
@@ -173,10 +207,8 @@ namespace WixToolset.Core.CommandLine
             return librarian.Execute();
         }
 
-        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates)
+        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, ITupleDefinitionCreator creator)
         {
-            var creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
-
             var libraries = this.LoadLibraries(creator);
 
             if (this.Messaging.EncounteredError)
@@ -194,12 +226,6 @@ namespace WixToolset.Core.CommandLine
 
         private void BindPhase(Intermediate output, IEnumerable<Localization> localizations)
         {
-            // If there was an error loading localization files, then bail.
-            if (this.Messaging.EncounteredError)
-            {
-                return;
-            }
-
             ResolveResult resolveResult;
             {
                 var resolver = new Resolver(this.ServiceProvider);
