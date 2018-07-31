@@ -23,6 +23,7 @@ namespace WixToolset.Data
         {
             { "wir", FileFormat.WixIR },
             { "wixirf", FileFormat.WixIR },
+            { "wixipl", FileFormat.WixIR },
             { "wixobj", FileFormat.Wixobj },
             { "wixlib", FileFormat.Wixlib },
             { "wixout", FileFormat.Wixout },

@@ -3,7 +3,6 @@
 namespace WixToolset.Data
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Resources;
 
@@ -2225,6 +2224,16 @@ namespace WixToolset.Data
             return Message(null, Ids.WrongFileExtensionForNumberOfInputs, "The extension '{0}' on the input specified '{1}' does not match the number of inputs required to handle an input with this extension. Check if you are missing an input or have too many.", inputExtension, input);
         }
 
+        public static Message NoSourceFiles()
+        {
+            return Message(null, Ids.NoSourceFiles, "No source files specified.");
+        }
+
+        public static Message WixiplSourceFileIsExclusive()
+        {
+            return Message(null, Ids.WixiplSourceFileIsExclusive, "When an intermediate post link source file is specified, it must be the only source file provided.");
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2618,6 +2627,8 @@ namespace WixToolset.Data
             InsecureBundleFilename = 388,
             PayloadMustBeRelativeToCache = 389,
             MsiTransactionX86BeforeX64 = 390,
+            NoSourceFiles = 391,
+            WixiplSourceFileIsExclusive = 392,
         }
     }
 }
