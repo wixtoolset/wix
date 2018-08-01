@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility.Services
 {
+    using System;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
@@ -19,5 +20,13 @@ namespace WixToolset.Extensibility.Services
         /// <param name="type">Type of file transfer to create.</param>
         /// <param name="sourceLineNumbers">Optional source line numbers that requested the file transfer.</param>
         IFileTransfer CreateFileTransfer(string source, string destination, bool move, FileTransferType type, SourceLineNumber sourceLineNumbers = null);
+
+        /// <summary>
+        /// Creates a version 3 name-based UUID.
+        /// </summary>
+        /// <param name="namespaceGuid">The namespace UUID.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The generated GUID for the given namespace and value.</returns>
+        string CreateGuid(Guid namespaceGuid, string value);
     }
 }
