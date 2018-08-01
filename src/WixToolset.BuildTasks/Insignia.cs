@@ -11,6 +11,7 @@ namespace WixToolset.BuildTasks
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
+#if false
     /// <summary>
     /// An MSBuild task to run the WiX transform generator.
     /// </summary>
@@ -115,4 +116,5 @@ namespace WixToolset.BuildTasks
             return returnCode;
         }
     }
+#endif
 }

@@ -4,6 +4,7 @@ namespace WixToolset.BuildTasks
 {
     using Microsoft.Build.Framework;
 
+#if false
     public sealed class HeatFile : HeatTask
     {
         private string file;
@@ -92,4 +93,5 @@ namespace WixToolset.BuildTasks
             return commandLineBuilder.ToString();
         }
     }
+#endif
 }

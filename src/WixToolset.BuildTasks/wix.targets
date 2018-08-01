@@ -103,11 +103,7 @@
   -->
 
   <!-- These tasks can be used as general-purpose build tasks. -->
-  <UsingTask TaskName="Candle" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="DoIt" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="Lit" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="Light" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="Torch" AssemblyFile="$(WixTasksPath)" />
 
   <!-- These tasks are specific to the build process defined in this file, and are not considered general-purpose build tasks. -->
   <UsingTask TaskName="CreateItemAvoidingInference" AssemblyFile="$(WixTasksPath)" />
@@ -780,63 +776,6 @@
         IntermediateOutputPath="$(IntermediateOutputPath)">
       <Output TaskParameter="CompileWithObjectPath" ItemName="_CompileWithObjectPath" />
     </GenerateCompileWithObjectPath>
-  </Target>
-
-  <!--
-  ================================================================================================
-  Lib
-
-    Links the .wixobj, .wxl, .wixlib, wix extensions into a .wixlib file using lit.exe.
-
-    [IN]
-    @(CompileObjOutput) - The compiled .wixobj file.
-    @(EmbeddedResource) - The list of wxl files to use for localization.
-    @(WixObject) - The list of .wixobj files.
-    @(WixLibrary) - The list of .wixlib files.
-    @(WixExtension) - The list of wix dll extension files.
-
-    [OUT]
-    $(TargetPath) - The compiled .wixlib file.
-  ================================================================================================
-  -->
-  <PropertyGroup>
-    <LibDependsOn>
-      PrepareForBuild;
-      ResolveReferences
-    </LibDependsOn>
-  </PropertyGroup>
-  <Target
-      Name="Lib"
-      Inputs="@(CompileObjOutput);
-              @(EmbeddedResource);
-              @(WixObject);
-              @(WixLibrary);
-              @(_ResolvedWixExtensionPaths);
-              $(MSBuildAllProjects)"
-      Outputs="$(TargetPath)"
-      DependsOnTargets="$(LibDependsOn)"
-      Condition=" '$(OutputType)' == 'Library' ">
-
-    <Lit
-      ObjectFiles="@(CompileObjOutput);@(WixObject);@(WixLibProjects);@(WixLibrary)"
-      AdditionalOptions="$(LibAdditionalOptions)"
-      BindInputPaths="@(LinkerBindInputPaths)"
-      BindFiles="$(LibBindFiles)"
-      ExtensionDirectory="$(WixExtDir)"
-      Extensions="@(_ResolvedWixExtensionPaths)"
-      LocalizationFiles="@(EmbeddedResource)"
-      NoLogo="$(LibNoLogo)"
-      OutputFile="$(TargetPath)"
-      Pedantic="$(LibPedantic)"
-      ReferencePaths="$(ReferencePaths)"
-      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
-      SuppressAllWarnings="$(LibSuppressAllWarnings)"
-      SuppressIntermediateFileVersionMatching="$(LibSuppressIntermediateFileVersionMatching)"
-      SuppressSchemaValidation="$(LibSuppressSchemaValidation)"
-      SuppressSpecificWarnings="$(LibSuppressSpecificWarnings)"
-      ToolPath="$(WixToolDir)"
-      TreatWarningsAsErrors="$(LibTreatWarningsAsErrors)"
-      VerboseOutput="$(LibVerboseOutput)" />
   </Target>
 
   <!--

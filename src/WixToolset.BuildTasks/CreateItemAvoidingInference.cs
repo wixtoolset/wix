@@ -3,11 +3,7 @@
 namespace WixToolset.BuildTasks
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Xml;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
@@ -17,27 +13,17 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public class CreateItemAvoidingInference : Task
     {
-        private string inputProperties;
-        private ITaskItem[] outputItems;
+        /// <summary>
+        /// The properties to converty to items.
+        /// </summary>
+        [Required]
+        public string InputProperties { get; set; }
 
         /// <summary>
         /// The output items.
         /// </summary>
         [Output]
-        public ITaskItem[] OuputItems
-        {
-            get { return this.outputItems; }
-        }
-
-        /// <summary>
-        /// The properties to converty to items.
-        /// </summary>
-        [Required]
-        public string InputProperties
-        {
-            get { return this.inputProperties; }
-            set { this.inputProperties = value; }
-        }
+        public ITaskItem[] OuputItems { get; private set; }
 
         /// <summary>
         /// Gets a complete list of external cabs referenced by the given installer database file.
@@ -45,14 +31,14 @@ namespace WixToolset.BuildTasks
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            List<ITaskItem> newItems = new List<ITaskItem>();
+            var newItems = new List<ITaskItem>();
 
-            foreach (string property in this.inputProperties.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var property in this.InputProperties.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 newItems.Add(new TaskItem(property));
             }
 
-            this.outputItems = newItems.ToArray();
+            this.OuputItems = newItems.ToArray();
 
             return true;
         }

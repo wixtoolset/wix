@@ -3,11 +3,7 @@
 namespace WixToolset.BuildTasks
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.Text;
-    using Microsoft.Build.Framework;
 
     /// <summary>
     /// Contains helper methods on searching for files

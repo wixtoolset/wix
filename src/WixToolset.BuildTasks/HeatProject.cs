@@ -4,6 +4,7 @@ namespace WixToolset.BuildTasks
 {
     using Microsoft.Build.Framework;
 
+#if false
     public sealed class HeatProject : HeatTask
     {
         private string configuration;
@@ -105,4 +106,5 @@ namespace WixToolset.BuildTasks
             return commandLineBuilder.ToString();
         }
     }
+#endif
 }

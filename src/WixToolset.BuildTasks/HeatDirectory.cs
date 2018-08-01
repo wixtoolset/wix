@@ -4,6 +4,7 @@ namespace WixToolset.BuildTasks
 {
     using Microsoft.Build.Framework;
 
+#if false
     public sealed class HeatDirectory : HeatTask
     {
         private string directory;
@@ -100,4 +101,5 @@ namespace WixToolset.BuildTasks
             return commandLineBuilder.ToString();
         }
     }
+#endif
 }

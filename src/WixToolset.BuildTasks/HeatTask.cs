@@ -11,6 +11,7 @@ namespace WixToolset.BuildTasks
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
+#if false
     /// <summary>
     /// A base MSBuild task to run the WiX harvester.
     /// Specific harvester tasks should extend this class.
@@ -118,4 +119,5 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
         }
     }
+#endif
 }
