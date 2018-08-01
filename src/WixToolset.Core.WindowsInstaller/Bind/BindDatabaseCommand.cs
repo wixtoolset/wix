@@ -233,7 +233,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Set generated component guids.
             {
-                var command = new CalculateComponentGuids(this.Messaging, section);
+                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, section);
                 command.Execute();
             }
 

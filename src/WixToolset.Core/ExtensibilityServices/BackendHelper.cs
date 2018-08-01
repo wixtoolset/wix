@@ -36,6 +36,11 @@ namespace WixToolset.Core.ExtensibilityServices
             };
         }
 
+        public string CreateGuid(Guid namespaceGuid, string value)
+        {
+            return Uuid.NewUuid(namespaceGuid, value).ToString("B").ToUpperInvariant();
+        }
+
         private string GetValidatedFullPath(SourceLineNumber sourceLineNumbers, string path)
         {
             try
