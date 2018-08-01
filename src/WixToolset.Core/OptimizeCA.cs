@@ -8,7 +8,7 @@ namespace WixToolset.Core
     /// Values for the OptimizeCA MsiPatchMetdata property, which indicates whether custom actions can be skipped when applying the patch.
     /// </summary>
     [Flags]
-    public enum OptimizeCA
+    internal enum OptimizeCA
     {
         /// <summary>
         /// No custom actions are skipped.

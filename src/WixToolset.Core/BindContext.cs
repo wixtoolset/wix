@@ -8,7 +8,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
-    public class BindContext : IBindContext
+    internal class BindContext : IBindContext
     {
         internal BindContext(IServiceProvider serviceProvider)
         {

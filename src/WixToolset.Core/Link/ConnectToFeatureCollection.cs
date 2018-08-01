@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Link
+namespace WixToolset.Core.Link
 {
     using System;
     using System.Collections;
@@ -8,7 +8,7 @@ namespace WixToolset.Link
     /// <summary>
     /// Hash collection of connect to feature objects.
     /// </summary>
-    public sealed class ConnectToFeatureCollection : ICollection
+    internal class ConnectToFeatureCollection : ICollection
     {
         private Hashtable collection;
 

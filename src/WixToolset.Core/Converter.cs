@@ -15,7 +15,7 @@ namespace WixToolset.Core
     /// <summary>
     /// WiX source code converter.
     /// </summary>
-    public class Converter
+    internal class Converter
     {
         private const string XDocumentNewLine = "\n"; // XDocument normlizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
@@ -65,7 +65,7 @@ namespace WixToolset.Core
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="errorsAsWarnings">Test errors to display as warnings.</param>
         /// <param name="ignoreErrors">Test errors to ignore.</param>
-        public Converter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
+        internal Converter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>()
             {

@@ -32,12 +32,12 @@ namespace WixToolset.Core.Preprocess
         /// Gets the full path of the source file.
         /// </summary>
         /// <value>The full path of the source file.</value>
-        public string SourceFile { get; private set; }
+        public string SourceFile { get; }
 
         /// <summary>
         /// Gets the preprocessed output stream.
         /// </summary>
         /// <value>The the preprocessed output stream.</value>
-        public XDocument Document { get; private set; }
+        public XDocument Document { get; }
     }
 }

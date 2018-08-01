@@ -9,7 +9,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
-    public class CompileContext : ICompileContext
+    internal class CompileContext : ICompileContext
     {
         internal CompileContext(IServiceProvider serviceProvider)
         {

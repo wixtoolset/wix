@@ -7,7 +7,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
-    public class LayoutContext : ILayoutContext
+    internal class LayoutContext : ILayoutContext
     {
         internal LayoutContext(IServiceProvider serviceProvider)
         {

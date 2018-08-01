@@ -9,7 +9,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public class ResolveContext : IResolveContext
+    internal class ResolveContext : IResolveContext
     {
         internal ResolveContext(IServiceProvider serviceProvider)
         {

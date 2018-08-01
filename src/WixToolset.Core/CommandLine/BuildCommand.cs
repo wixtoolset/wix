@@ -317,6 +317,8 @@ namespace WixToolset.Core.CommandLine
 
         private IEnumerable<Localization> LoadLocalizationFiles()
         {
+            var localizer = new Localizer(this.ServiceProvider);
+
             foreach (var loc in this.LocFiles)
             {
                 var preprocessor = new Preprocessor(this.ServiceProvider);
@@ -331,8 +333,7 @@ namespace WixToolset.Core.CommandLine
                     continue;
                 }
 
-                var localization = Localizer.ParseLocalizationFile(this.Messaging, document);
-
+                var localization = localizer.ParseLocalizationFile(document);
                 yield return localization;
             }
         }

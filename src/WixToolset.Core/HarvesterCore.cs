@@ -10,7 +10,7 @@ namespace WixToolset.Core
     /// <summary>
     /// The WiX Toolset harvester core.
     /// </summary>
-    public sealed class HarvesterCore : IHarvesterCore
+    public class HarvesterCore : IHarvesterCore
     {
         public IMessaging Messaging { get; set; }
 

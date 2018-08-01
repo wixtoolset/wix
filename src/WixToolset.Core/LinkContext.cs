@@ -8,7 +8,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
-    public class LinkContext : ILinkContext
+    internal class LinkContext : ILinkContext
     {
         internal LinkContext(IServiceProvider serviceProvider)
         {

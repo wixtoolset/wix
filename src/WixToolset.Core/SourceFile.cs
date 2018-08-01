@@ -2,8 +2,6 @@
 
 namespace WixToolset.Core
 {
-    using System.IO;
-
     internal class SourceFile
     {
         public SourceFile(string sourcePath, string outputPath)
@@ -12,8 +10,8 @@ namespace WixToolset.Core
             this.OutputPath = outputPath;
         }
 
-        public string OutputPath { get; set; }
+        public string OutputPath { get; }
 
-        public string SourcePath { get; set; }
+        public string SourcePath { get; }
     }
 }

@@ -14,12 +14,11 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Link;
 
     /// <summary>
     /// Linker core of the WiX toolset.
     /// </summary>
-    public sealed class Linker
+    internal class Linker
     {
         private static readonly char[] colonCharacter = ":".ToCharArray();
         private static readonly string emptyGuid = Guid.Empty.ToString("B");
@@ -29,7 +28,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Creates a linker.
         /// </summary>
-        public Linker(IServiceProvider serviceProvider)
+        internal Linker(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();

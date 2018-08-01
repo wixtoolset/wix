@@ -22,7 +22,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Compiler of the WiX toolset.
     /// </summary>
-    public sealed class Compiler
+    internal class Compiler
     {
         public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
         public const string UpgradePreventedCondition = "NOT WIX_UPGRADE_DETECTED";
@@ -69,7 +69,7 @@ namespace WixToolset.Core
             Icon,
         }
 
-        public Compiler(IServiceProvider serviceProvider)
+        internal Compiler(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 

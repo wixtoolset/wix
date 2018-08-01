@@ -10,7 +10,7 @@ namespace WixToolset.Core
     /// <summary>
     /// The WiX Toolset mutator.
     /// </summary>
-    public sealed class Mutator
+    public class Mutator
     {
         private SortedList extensions;
         private string extensionArgument;

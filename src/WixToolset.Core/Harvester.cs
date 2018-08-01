@@ -11,7 +11,7 @@ namespace WixToolset
     /// <summary>
     /// The WiX Toolset harvester.
     /// </summary>
-    public sealed class Harvester
+    public class Harvester
     {
         private HarvesterExtension harvesterExtension;
 

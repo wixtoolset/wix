@@ -12,7 +12,7 @@ namespace WixToolset.Core
     /// <summary>
     /// WiX variable resolver.
     /// </summary>
-    internal sealed class WixVariableResolver : IVariableResolver
+    internal class WixVariableResolver : IVariableResolver
     {
         private readonly Dictionary<string, BindVariable> locVariables;
         private readonly Dictionary<string, BindVariable> wixVariables;

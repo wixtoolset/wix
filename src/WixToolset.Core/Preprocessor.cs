@@ -20,24 +20,24 @@ namespace WixToolset.Core
     /// <summary>
     /// Preprocessor object
     /// </summary>
-    public sealed class Preprocessor
+    internal class Preprocessor
     {
-        private readonly Regex defineRegex = new Regex(@"^\s*(?<varName>.+?)\s*(=\s*(?<varValue>.+?)\s*)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
-        private readonly Regex pragmaRegex = new Regex(@"^\s*(?<pragmaName>.+?)(?<pragmaValue>[\s\(].+?)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+        private static readonly Regex DefineRegex = new Regex(@"^\s*(?<varName>.+?)\s*(=\s*(?<varValue>.+?)\s*)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+        private static readonly Regex PragmaRegex = new Regex(@"^\s*(?<pragmaName>.+?)(?<pragmaValue>[\s\(].+?)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
-        private readonly XmlReaderSettings DocumentXmlReaderSettings = new XmlReaderSettings()
+        private static readonly XmlReaderSettings DocumentXmlReaderSettings = new XmlReaderSettings()
         {
             ValidationFlags = System.Xml.Schema.XmlSchemaValidationFlags.None,
             XmlResolver = null,
         };
-        private readonly XmlReaderSettings FragmentXmlReaderSettings = new XmlReaderSettings()
+        private static readonly XmlReaderSettings FragmentXmlReaderSettings = new XmlReaderSettings()
         {
             ConformanceLevel = ConformanceLevel.Fragment,
             ValidationFlags = System.Xml.Schema.XmlSchemaValidationFlags.None,
             XmlResolver = null,
         };
 
-        public Preprocessor(IServiceProvider serviceProvider)
+        internal Preprocessor(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
@@ -584,7 +584,7 @@ namespace WixToolset.Core
         /// <param name="originalDefine">Text from source.</param>
         private void PreprocessDefine(string originalDefine)
         {
-            var match = defineRegex.Match(originalDefine);
+            var match = DefineRegex.Match(originalDefine);
 
             if (!match.Success)
             {
@@ -791,7 +791,7 @@ namespace WixToolset.Core
         /// <param name="pragmaText">Text from source.</param>
         private void PreprocessPragma(string pragmaText, XContainer parent)
         {
-            var match = pragmaRegex.Match(pragmaText);
+            var match = PragmaRegex.Match(pragmaText);
 
             if (!match.Success)
             {

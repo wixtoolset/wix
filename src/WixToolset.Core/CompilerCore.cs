@@ -39,7 +39,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Core class for the compiler.
     /// </summary>
-    internal sealed class CompilerCore
+    internal class CompilerCore
     {
         internal static readonly XNamespace W3SchemaPrefix = "http://www.w3.org/";
         internal static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";

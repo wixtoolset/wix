@@ -1,11 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Link
+namespace WixToolset.Core.Link
 {
     /// <summary>
     /// Object that connects things to modules.
     /// </summary>
-    public sealed class ConnectToModule
+    internal class ConnectToModule
     {
         private string childId;
         private string module;

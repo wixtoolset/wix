@@ -16,7 +16,7 @@ namespace WixToolset.Core.Link
     /// <summary>
     /// Grouping and Ordering class of the WiX toolset.
     /// </summary>
-    internal sealed class WixGroupingOrdering
+    internal class WixGroupingOrdering
     {
         private IMessaging messageHandler;
         private List<string> groupTypes;
@@ -679,7 +679,7 @@ namespace WixToolset.Core.Link
             /// <summary>
             /// Helper IComparer class to make ordering easier.
             /// </summary>
-            internal sealed class AfterItemComparer : IComparer<Item>
+            internal class AfterItemComparer : IComparer<Item>
             {
                 public int Compare(Item x, Item y)
                 {

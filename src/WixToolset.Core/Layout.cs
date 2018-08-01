@@ -15,9 +15,9 @@ namespace WixToolset.Core
     /// <summary>
     /// Layout for the WiX toolset.
     /// </summary>
-    public sealed class Layout
+    internal class Layout
     {
-        public Layout(IServiceProvider serviceProvider)
+        internal Layout(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 

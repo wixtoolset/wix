@@ -15,9 +15,9 @@ namespace WixToolset.Core
     /// <summary>
     /// Resolver for the WiX toolset.
     /// </summary>
-    public sealed class Resolver
+    internal class Resolver
     {
-        public Resolver(IServiceProvider serviceProvider)
+        internal Resolver(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
@@ -26,7 +26,7 @@ namespace WixToolset.Core
 
         private IServiceProvider ServiceProvider { get; }
 
-        public IMessaging Messaging { get; }
+        private IMessaging Messaging { get; }
 
         public IEnumerable<BindPath> BindPaths { get; set; }
 

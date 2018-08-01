@@ -21,13 +21,13 @@ namespace WixToolset.Core.Bind
             this.WixFile = wixFile;
         }
 
-        public bool FromModule { get; private set; }
+        public bool FromModule { get; }
 
-        public FileTuple File { get; private set; }
+        public FileTuple File { get; }
 
-        public WixFileTuple WixFile { get; private set; }
+        public WixFileTuple WixFile { get; }
 
-        public WixDeltaPatchFileTuple DeltaPatchFile { get; private set; }
+        public WixDeltaPatchFileTuple DeltaPatchFile { get; }
 
         /// <summary>
         /// Gets the set of MsiAssemblyName rows created for this file.

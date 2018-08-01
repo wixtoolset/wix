@@ -10,7 +10,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public class WixToolsetServiceProvider : IServiceProvider
+    public sealed class WixToolsetServiceProvider : IServiceProvider
     {
         public WixToolsetServiceProvider()
         {
@@ -36,6 +36,9 @@ namespace WixToolset.Core
                 { typeof(IBindContext), (provider, singletons) => new BindContext(provider) },
                 { typeof(ILayoutContext), (provider, singletons) => new LayoutContext(provider) },
                 { typeof(IInscribeContext), (provider, singletons) => new InscribeContext(provider) },
+
+                // Internal implementations.
+                { typeof(ILocalizer), (provider, singletons) => new Localizer(provider) },
             };
 
             this.Singletons = new Dictionary<Type, object>();

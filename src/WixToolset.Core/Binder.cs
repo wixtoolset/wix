@@ -16,9 +16,9 @@ namespace WixToolset.Core
     /// <summary>
     /// Binder of the WiX toolset.
     /// </summary>
-    public sealed class Binder
+    internal class Binder
     {
-        public Binder(IServiceProvider serviceProvider)
+        internal Binder(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }

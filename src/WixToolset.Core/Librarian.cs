@@ -15,9 +15,9 @@ namespace WixToolset.Core
     /// <summary>
     /// Core librarian tool.
     /// </summary>
-    public sealed class Librarian
+    internal class Librarian
     {
-        public Librarian(IServiceProvider serviceProvider)
+        internal Librarian(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 

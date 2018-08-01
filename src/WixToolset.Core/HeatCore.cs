@@ -7,7 +7,7 @@ namespace WixToolset.Core
     /// <summary>
     /// The WiX Toolset Harvester application core.
     /// </summary>
-    public sealed class HeatCore : IHeatCore
+    public class HeatCore : IHeatCore
     {
         private Harvester harvester;
         private Mutator mutator;

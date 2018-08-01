@@ -5,7 +5,7 @@ namespace WixToolset.Core.Preprocess
     /// <summary>
     /// Context for an if statement in the preprocessor.
     /// </summary>
-    internal sealed class IfContext
+    internal class IfContext
     {
         private bool keep;
 

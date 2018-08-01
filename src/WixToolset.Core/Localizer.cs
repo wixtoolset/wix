@@ -11,31 +11,25 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    /// <summary>
-    /// Parses localization files and localizes database values.
-    /// </summary>
-    public sealed class Localizer
+    internal class Localizer : ILocalizer
     {
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
         private static string XmlElementName = "WixLocalization";
 
-        /// <summary>
-        /// Loads a localization file from a path on disk.
-        /// </summary>
-        /// <param name="path">Path to localization file saved on disk.</param>
-        /// <returns>Returns the loaded localization file.</returns>
-        public static Localization ParseLocalizationFile(IMessaging messaging, string path)
+        internal Localizer(IServiceProvider serviceProvider)
         {
-            var document = XDocument.Load(path);
-            return ParseLocalizationFile(messaging, document);
+            this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
-        /// <summary>
-        /// Loads a localization file from memory.
-        /// </summary>
-        /// <param name="document">Document to parse as localization file.</param>
-        /// <returns>Returns the loaded localization file.</returns>
-        public static Localization ParseLocalizationFile(IMessaging messaging, XDocument document)
+        private IMessaging Messaging { get; }
+
+        public Localization ParseLocalizationFile(string path)
+        {
+            var document = XDocument.Load(path);
+            return ParseLocalizationFile(document);
+        }
+
+        public Localization ParseLocalizationFile(XDocument document)
         {
             XElement root = document.Root;
             Localization localization = null;
@@ -45,23 +39,23 @@ namespace WixToolset.Core
             {
                 if (Localizer.WxlNamespace == root.Name.Namespace)
                 {
-                    localization = ParseWixLocalizationElement(messaging, root);
+                    localization = ParseWixLocalizationElement(this.Messaging, root);
                 }
                 else // invalid or missing namespace
                 {
                     if (null == root.Name.Namespace)
                     {
-                        messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, Localizer.XmlElementName, Localizer.WxlNamespace.NamespaceName));
+                        this.Messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, Localizer.XmlElementName, Localizer.WxlNamespace.NamespaceName));
                     }
                     else
                     {
-                        messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, Localizer.XmlElementName, root.Name.LocalName, Localizer.WxlNamespace.NamespaceName));
+                        this.Messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, Localizer.XmlElementName, root.Name.LocalName, Localizer.WxlNamespace.NamespaceName));
                     }
                 }
             }
             else
             {
-                messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, root.Name.LocalName, "localization", Localizer.XmlElementName));
+                this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, root.Name.LocalName, "localization", Localizer.XmlElementName));
             }
 
             return localization;

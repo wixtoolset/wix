@@ -9,9 +9,9 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public class LibraryContext : ILibraryContext
+    internal class LibraryContext : ILibraryContext
     {
-        public LibraryContext(IServiceProvider serviceProvider)
+        internal LibraryContext(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
