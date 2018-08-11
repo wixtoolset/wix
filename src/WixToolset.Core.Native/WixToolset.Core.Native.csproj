@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,32 +9,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
   </ItemGroup>
 
-  <Target Name="BuildWixNative"
-          BeforeTargets="GetCopyToOutputDirectoryItems">
-    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" />
-    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=x64" />
+  <Target Name="BuildWixNative" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" Targets="Build;BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+      <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
+    </MSBuild>
+    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=x64" Targets="Build;BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+      <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
+    </MSBuild>
 
     <ItemGroup>
-      <NativeProjectOutput Include="$(OutputPath)..\Win32\*.exe;$(OutputPath)..\Win32\*.pdb">
-        <TargetRelativeFolder>.\</TargetRelativeFolder>
-      </NativeProjectOutput>
-      <NativeProjectOutput Include="$(OutputPath)..\x64\*.exe;$(OutputPath)..\x64\*.pdb">
-        <TargetRelativeFolder>.\</TargetRelativeFolder>
-      </NativeProjectOutput>
-
-      <AllItemsFullPathWithTargetPath Include="@(NativeProjectOutput->'%(FullPath)')">
+      <AllItemsFullPathWithTargetPath Include="@(_NativeProjectOutput->'%(FullPath)')">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <TargetPath>%(TargetRelativeFolder)%(Filename)%(Extension)</TargetPath>
+        <TargetPath>%(Filename)%(Extension)</TargetPath>
       </AllItemsFullPathWithTargetPath>
     </ItemGroup>
   </Target>
 
-  <Target Name="SetNuspecProperties"
-          AfterTargets="Build">
+  <Target Name="SetNuspecProperties" AfterTargets="CoreBuild">
     <PropertyGroup>
       <NuspecBasePath>$(OutputPath)</NuspecBasePath>
       <NuspecProperties>Configuration=$(Configuration);Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
