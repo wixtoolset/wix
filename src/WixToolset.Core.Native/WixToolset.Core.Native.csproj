@@ -13,7 +13,12 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
   </ItemGroup>
 
-  <Target Name="BuildWixNative" BeforeTargets="GetCopyToOutputDirectoryItems">
+  <PropertyGroup>
+    <NativeFileListPath Condition=" '$(NCrunch)'=='' ">$(MSBuildProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
+    <NativeFileListPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
+  </PropertyGroup>
+
+  <Target Name="BuildWixNative" BeforeTargets="GetCopyToOutputDirectoryItems" Condition=" '$(NCrunch)'=='' ">
     <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" Targets="Build;BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
       <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
     </MSBuild>
@@ -21,11 +26,31 @@
       <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
     </MSBuild>
 
+    <WriteLinesToFile File="$(NativeFileListPath)" Lines="@(_NativeProjectOutput)" Overwrite="true" />
+
     <ItemGroup>
+      <FileWrites Include="$(NativeFileListPath)" />
+
       <AllItemsFullPathWithTargetPath Include="@(_NativeProjectOutput->'%(FullPath)')">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <TargetPath>%(Filename)%(Extension)</TargetPath>
       </AllItemsFullPathWithTargetPath>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="NCrunchCopyNative" AfterTargets="AfterBuild" Condition=" '$(NCrunch)'=='1' ">
+    <ReadLinesFromFile File="$(NativeFileListPath)">
+      <Output TaskParameter="Lines" ItemName="_NCrunchNativeProjectOutput" />
+    </ReadLinesFromFile>
+
+    <Error Text="You must build $(MSBuildProjectName) to create the referenced native projects. Once built, 'Reload and rebuild' the project in the NCrunch Tests. The $(NativeFileListPath) file must not be empty." Condition=" '@(_NCrunchNativeProjectOutput)'=='' " />
+
+    <Copy SourceFiles="@(_NCrunchNativeProjectOutput)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true">
+      <Output TaskParameter="CopiedFiles" ItemName="_NCrunchNativeCopied" />
+    </Copy>
+
+    <ItemGroup>
+      <FileWrites Include="@(_NCrunchNativeCopied)" />
     </ItemGroup>
   </Target>
 

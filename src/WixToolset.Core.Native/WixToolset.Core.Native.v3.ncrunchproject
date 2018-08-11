@@ -1,0 +1,10 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <AdditionalFilesToIncludeForProject>
+      <Value>..\..\build\Debug\Win32\wixnative.x86.exe</Value>
+      <Value>..\..\build\Debug\Win32\wixnative.x86.pdb</Value>
+      <Value>..\..\build\Debug\x64\wixnative.amd64.exe</Value>
+      <Value>..\..\build\Debug\x64\wixnative.amd64.pdb</Value>
+    </AdditionalFilesToIncludeForProject>
+  </Settings>
+</ProjectConfiguration>

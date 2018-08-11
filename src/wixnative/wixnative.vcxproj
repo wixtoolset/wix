@@ -75,7 +75,7 @@
   </ItemGroup>
 
   <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command="nuget pack runtime.win.WixToolset.Core.Native.nuspec -BasePath &quot;$(BaseOutputPath)\&quot; -OutputDirectory &quot;$(BaseOutputPath)\&quot; -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Core.Native;Version=&quot;$(BuildVersionSimple)&quot;;Platform=$(PlatformTarget);Authors=&quot;$(Authors)&quot;;Copyright=&quot;$(Copyright)&quot;;Description=&quot;$(Description)&quot;;Title=&quot;$(Title)&quot;" />
+    <Exec Command='nuget pack runtime.win.WixToolset.Core.Native.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Core.Native;Version="$(BuildVersionSimple)";Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
   </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
