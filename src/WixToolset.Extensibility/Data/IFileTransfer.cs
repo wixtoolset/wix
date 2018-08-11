@@ -23,8 +23,5 @@ namespace WixToolset.Extensibility.Data
 
         /// <summary>Optional source line numbers where this file transfer orginated.</summary>
         SourceLineNumber SourceLineNumbers { get; set; }
-
-        /// <summary>Type of file this transfer is moving or copying.</summary>
-        FileTransferType Type { get; set; }
     }
 }

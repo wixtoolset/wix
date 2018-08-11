@@ -17,9 +17,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="source">Source for the file transfer.</param>
         /// <param name="destination">Destiation for the file transfer.</param>
         /// <param name="move">Indicates whether to move or copy the source file.</param>
-        /// <param name="type">Type of file transfer to create.</param>
-        /// <param name="sourceLineNumbers">Optional source line numbers that requested the file transfer.</param>
-        IFileTransfer CreateFileTransfer(string source, string destination, bool move, FileTransferType type, SourceLineNumber sourceLineNumbers = null);
+        IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null);
 
         /// <summary>
         /// Creates a version 3 name-based UUID.
@@ -28,5 +26,13 @@ namespace WixToolset.Extensibility.Services
         /// <param name="value">The value.</param>
         /// <returns>The generated GUID for the given namespace and value.</returns>
         string CreateGuid(Guid namespaceGuid, string value);
+
+        /// <summary>
+        /// Creates a tracked file.
+        /// </summary>
+        /// <param name="path">Destination path for the build output.</param>
+        /// <param name="type">Type of tracked file to create.</param>
+        /// <param name="sourceLineNumbers">Optional source line numbers that requested the tracked file.</param>
+        ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null);
     }
 }

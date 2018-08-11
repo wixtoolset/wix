@@ -8,6 +8,6 @@ namespace WixToolset.Extensibility.Data
     {
         public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
-        public IEnumerable<string> ContentFilePaths { get; set; }
+        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
     }
 }

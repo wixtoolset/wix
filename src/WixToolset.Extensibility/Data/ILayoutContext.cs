@@ -11,7 +11,7 @@ namespace WixToolset.Extensibility.Data
 
         IEnumerable<ILayoutExtension> Extensions { get; set; }
 
-        IEnumerable<string> ContentFilePaths { get; set; }
+        IEnumerable<ITrackedFile> TrackedFiles { get; set; }
 
         IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
