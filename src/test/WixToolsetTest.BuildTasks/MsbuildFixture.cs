@@ -2,62 +2,103 @@
 
 namespace WixToolsetTest.BuildTasks
 {
+    using System;
     using System.IO;
     using System.Linq;
-    using Microsoft.Build.Utilities;
     using WixBuildTools.TestSupport;
     using WixToolset.BuildTasks;
-    using WixToolset.Data;
-    using WixToolset.Data.Tuples;
     using Xunit;
 
-    public partial class MsbuildFixture
+    public class MsbuildFixture
     {
+        private static readonly string WixTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(DoIt).Assembly.CodeBase).AbsolutePath), "wix.targets");
+
+        public MsbuildFixture()
+        {
+            this.MsbuildRunner = new MsbuildRunner();
+        }
+
+        private MsbuildRunner MsbuildRunner { get; }
+
         [Fact]
         public void CanBuildSimpleMsiPackage()
         {
-            var folder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
 
             using (var fs = new DisposableFileSystem())
             {
                 var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var engine = new FakeBuildEngine();
-
-                var task = new DoIt
+                var result = this.MsbuildRunner.Execute(projectPath, new[] 
                 {
-                    BuildEngine = engine,
-                    SourceFiles = new[]
-                    {
-                        new TaskItem(Path.Combine(folder, "Package.wxs")),
-                        new TaskItem(Path.Combine(folder, "PackageComponents.wxs")),
-                    },
-                    LocalizationFiles = new[]
-                    {
-                        new TaskItem(Path.Combine(folder, "Package.en-us.wxl")),
-                    },
-                    BindInputPaths = new[]
-                    {
-                        new TaskItem(Path.Combine(folder, "data")),
-                    },
-                    IntermediateDirectory = new TaskItem(intermediateFolder),
-                    OutputFile = new TaskItem(Path.Combine(baseFolder, @"bin\test.msi")),
-                };
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}"
+                });
+                result.AssertSuccess();
 
-                var result = task.Execute();
-                Assert.True(result, $"MSBuild task failed unexpectedly. Output:\r\n{engine.Output}");
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.Equal(new[]
+                {
+                    @"bin\en-US\cab1.cab",
+                    @"bin\en-US\MsiPackage.msi",
+                    @"bin\en-US\MsiPackage.wixpdb",
+                }, paths);
+            }
+        }
 
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\cab1.cab")));
+        [Fact]
+        public void CanBuildAndCleanSimpleMsiPackage()
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
 
-                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wir"));
-                var section = intermediate.Sections.Single();
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+                // Build
+                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                    "-v:diag"
+                });
+                result.AssertSuccess();
+
+                var buildOutput = String.Join("\r\n", result.Output);
+
+                var createdPaths = Directory.EnumerateFiles(baseFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.NotEmpty(createdPaths);
+
+                // Clean
+                result = this.MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                    "-t:Clean",
+                    "-v:diag"
+                });
+                result.AssertSuccess();
+
+                var cleanOutput = String.Join("\r\n", result.Output);
+
+                var remainingPaths = Directory.EnumerateFiles(baseFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.Empty(remainingPaths);
             }
         }
     }

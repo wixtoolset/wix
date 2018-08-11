@@ -48,14 +48,13 @@
   <PropertyGroup>
     <DefaultLanguageSourceExtension>.wxs</DefaultLanguageSourceExtension>
     <Language>wix</Language>
-    <TargetRuntime>Managed</TargetRuntime>
+    <TargetRuntime>wix</TargetRuntime>
 
     <!-- Use OutputName to set the AssemblyName for Microsoft.Common.targets -->
     <OutputName Condition=" '$(OutputName)'=='' ">$(MSBuildProjectName)</OutputName>
     <AssemblyName>$(OutputName)</AssemblyName>
 
-    <!-- Default the OutputType to a known WiX toolset TYPE.  -->
-    <_OriginalOutputType>$(OutputType)</_OriginalOutputType>
+    <!-- Default the OutputType to a known WiX Toolset type.  -->
     <OutputType Condition=" '$(OutputType)' == '' ">Package</OutputType>
   </PropertyGroup>
 
@@ -70,28 +69,24 @@
     <TargetExt Condition=" '$(OutputType)' == 'PatchCreation' ">.pcp</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Library' ">.wixlib</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Bundle' ">.exe</TargetExt>
+    <TargetExt Condition=" '$(OutputType)' == 'IntermediatePostLink' ">.wixipl</TargetExt>
   </PropertyGroup>
-
-  <!-- Provide the correct output name for the .wixpdb -->
-  <ItemGroup Condition="'$(_DebugSymbolsProduced)' == 'true'">
-    <_DebugSymbolsIntermediatePath Include="$(PdbOutputDir)$(TargetPdbName)" Condition=" '@(_DebugSymbolsIntermediatePath)' == '' " />
-  </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 
   <PropertyGroup>
     <!-- Default pdb output path to the intermediate output directory -->
-    <PdbOutputDir Condition=" '$(PdbOutputDir)'=='' ">$(IntermediateOutputPath)</PdbOutputDir>
-    <PdbOutputDir Condition=" '$(PdbOutputDir)' != '' and !HasTrailingSlash('$(PdbOutputDir)') ">$(PdbOutputDir)\</PdbOutputDir>
+    <PdbOutputDir Condition=" '$(PdbOutputDir)'=='' ">$(TargetDir)</PdbOutputDir>
+    <PdbOutputDir Condition=" !HasTrailingSlash('$(PdbOutputDir)') ">$(PdbOutputDir)\</PdbOutputDir>
 
     <!-- Example, C:\MyProjects\MyProject\bin\debug\ -->
     <TargetPdbDir Condition=" '$(PdbOutputDir)'!='' ">$([System.IO.Path]::GetFullPath(`$([System.IO.Path]::Combine(`$(MSBuildProjectDirectory)`, `$(PdbOutputDir)`))`))</TargetPdbDir>
 
     <!-- Example, MySetup.wixpdb" -->
-    <TargetPdbName Condition=" '$(TargetPdbName)' == '' ">$(TargetName).wixpdb</TargetPdbName>
+    <TargetPdbFileName Condition=" '$(TargetPdbFileName)' == '' ">$(TargetName).wixpdb</TargetPdbFileName>
 
     <!-- Example, C:\MyProjects\MyProject\bin\debug\MyPackage.wixpdb -->
-    <TargetPdbPath Condition=" '$(TargetPdbPath)' == '' ">$(TargetPdbDir)$(TargetPdbName)</TargetPdbPath>
+    <TargetPdbPath Condition=" '$(TargetPdbPath)' == '' ">$(TargetPdbDir)$(TargetPdbFileName)</TargetPdbPath>
   </PropertyGroup>
 
   <!--
@@ -111,8 +106,6 @@
   <UsingTask TaskName="WixAssignCulture" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)"/>
   <UsingTask TaskName="ReplaceString" AssemblyFile="$(WixTasksPath)"/>
-  <UsingTask TaskName="GetCabList" AssemblyFile="$(WixTasksPath)" />
-  <UsingTask TaskName="GetLooseFileList" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="GenerateCompileWithObjectPath" AssemblyFile="$(WixTasksPath)"/>
 
   <PropertyGroup>
@@ -129,14 +122,6 @@
     <WixToolDir Condition=" '$(WixToolDir)' == ''">$(WixBinDir)</WixToolDir>
     <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixToolDir)</WixExtDir>
   </PropertyGroup>
-
-  <!--
-  Set the SignTargetPath item directly when output is a Bundle. The AssignCultures target
-  sets SignTargetPath item for other output types based on the cultures provided.
-  -->
-  <ItemGroup>
-    <SignTargetPath Include="$(TargetPath)" Condition=" '$(OutputType)' == 'Bundle' AND '$(SignOutput)' == 'true' AND '$(SuppressLayout)' != 'true' " />
-  </ItemGroup>
 
   <!--
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,32 +204,27 @@
 
     [IN]
     $(OutputName) - The name of the MSI/MSM/wixlib to build (without the extension)
-    $(OutputType) - Possible values are 'package', 'PatchCreation', 'module', 'library', 'bundle'
+    $(OutputType) - Possible values are 'Package', 'PatchCreation', 'Module', 'Library', 'Bundle', 'IntermediatePostLink'
   ==================================================================================================
   -->
   <PropertyGroup>
     <_PleaseSetThisInProjectFile>Please set this in the project file before the &lt;Import&gt; of the wix.targets file.</_PleaseSetThisInProjectFile>
-    <_OutputTypeDescription>The OutputType defines whether a Windows Installer package (.msi), PatchCreation (.pcp), merge module (.msm), wix library (.wixlib), or self-extracting executable (.exe) is being built. $(_PleaseSetThisInProjectFile) Possible values are 'Package', 'Module', 'Library', and 'Bundle'.</_OutputTypeDescription>
+    <_OutputTypeDescription>Possible values are: 'Package', 'Module', 'Library', 'Bundle', 'IntermediatePostLink'. $(_PleaseSetThisInProjectFile)</_OutputTypeDescription>
   </PropertyGroup>
   <Target Name="_CheckRequiredProperties">
 
     <Error
-      Code="WIXTARGETS100"
+      Code="WIX100"
       Condition=" '$(OutputName)' == '' "
       Text="The OutputName property is not set in project &quot;$(MSBuildProjectFile)&quot;. The OutputName defines the name of the output without a file extension. $(_PleaseSetThisInProjectFile)" />
 
-    <Warning
-      Code="WIXTARGETS101"
-      Condition=" '$(_OriginalOutputType)' == '' "
-      Text="The OutputType property is not set in project &quot;$(MSBuildProjectFile)&quot;. Defaulting to '$(OutputType)'. $(_OutputTypeDescription)" />
-
     <Error
-      Code="WIXTARGETS102"
-      Condition=" '$(OutputType)' != 'Package' and '$(OutputType)' != 'PatchCreation' and '$(OutputType)' != 'Module' and '$(OutputType)' != 'Library' and '$(OutputType)' != 'Bundle' "
+      Code="WIX101"
+      Condition=" '$(OutputType)' != 'Package' and '$(OutputType)' != 'PatchCreation' and '$(OutputType)' != 'Module' and '$(OutputType)' != 'Library' and '$(OutputType)' != 'Bundle' and '$(OutputType)' != 'IntermediatePostLink' "
       Text="The OutputType property '$(OutputType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. $(_OutputTypeDescription)" />
 
     <Error
-      Code="WIXTARGETS103"
+      Code="WIX102"
       Condition=" '$(MSBuildToolsVersion)' == '' OR '$(MSBuildToolsVersion)' &lt; '4.0' "
       Text="MSBuild v$(MSBuildToolsVersion) is not supported by the project &quot;$(MSBuildProjectFile)&quot;. You must use MSBuild v4.0 or later." />
 
@@ -272,7 +252,6 @@
       BuildOnlySettings;
       PrepareForBuild;
       PreBuildEvent;
-      ResolveReferences;
 
       WixBuild;
       Signing;
@@ -580,7 +559,7 @@
   ================================================================================================
   -->
   <PropertyGroup>
-    <GetTargetPathDependsOn>AssignCultures</GetTargetPathDependsOn>
+    <GetTargetPathDependsOn>AssignTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
 
 
@@ -600,22 +579,22 @@
   <PropertyGroup>
     <WixBuildDependsOn>
       ResolveReferences;
-      BeforeWixBuild;
-      _TimeStampBeforeWixBuild;
+      BeforeCompile;
+      _TimeStampBeforeCompile;
 
       CalculateDefineConstants;
       Harvest;
 
       GenerateCompileWithObjectPath;
 
-      AssignCultures;
+      AssignTargetPaths;
       ReadPreviousBindInputsAndBuiltOutputs;
 
       CoreWixBuild;
 
       UpdateLinkFileWrites;
-      _TimeStampAfterWixBuild;
-      AfterWixBuild
+      _TimeStampAfterCompile;
+      AfterCompile
     </WixBuildDependsOn>
   </PropertyGroup>
   <Target
@@ -623,23 +602,24 @@
     DependsOnTargets="$(WixBuildDependsOn)" />
 
   <Target
-    Name="CoreWixBuild"
-
-    Inputs="@(Compile);
-    @(Content);
-    @(EmbeddedResource);
-    @(WixObject);
-    @(_ResolvedProjectReferencePaths);
-    @(_ResolvedWixLibraryPaths);
-    @(_ResolvedWixExtensionPaths);
-    @(_BindInputs);
-    $(MSBuildAllProjects)"
-    Outputs="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile);@(_BindBuiltOutputs)"
-    Condition=" '@(Compile)' != '' ">
+      Name="CoreWixBuild"
+      Inputs="@(Compile);
+      @(Content);
+      @(EmbeddedResource);
+      @(WixObject);
+      @(_ResolvedProjectReferencePaths);
+      @(_ResolvedWixLibraryPaths);
+      @(_ResolvedWixExtensionPaths);
+      @(_BindInputs);
+      $(MSBuildAllProjects)"
+      Outputs="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile);@(_BindBuiltOutputs)"
+      Condition=" '@(Compile)' != '' ">
 
     <PropertyGroup>
-      <OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)))</OutputFile>
-      <PdbOutputFile>$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbName)</PdbOutputFile>
+      <!--<OutputFile>$([System.IO.Path]::GetFullPath($(TargetDir)%(CultureGroup.OutputFolder)$(TargetFileName)))</OutputFile>-->
+      <OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)))</OutputFile>
+      <!--<OutputFile>$([System.IO.Path]::GetFullPath($(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)))</OutputFile>-->
+      <PdbOutputFile>$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)</PdbOutputFile>
     </PropertyGroup>
 
     <DoIt
@@ -780,7 +760,7 @@
 
   <!--
   ================================================================================================
-  AssignCultures
+  AssignTargetPaths - OVERRIDE Target
 
     Determines the final list of culture groups to build based on either the Cultures property or
     those specified in .wxl files.
@@ -811,37 +791,27 @@
     @(CultureGroup) - The list of culture group strings with OutputFolder metadata
     $(TargetPath) - Property list of target link output MSIs/MSMs
     $(TargetPdbPath) - Property list of target output pdbs
-    @(SignTargetPath) - The list of target to be signed
 
   ================================================================================================
   -->
   <Target
-      Name="AssignCultures"
+      Name="AssignTargetPaths"
       Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module' ">
 
-    <WixAssignCulture
-        Cultures="$(Cultures)"
-        Files="@(EmbeddedResource)">
-
+    <WixAssignCulture Cultures="$(Cultures)" Files="@(EmbeddedResource)">
       <Output TaskParameter="CultureGroups" ItemName="CultureGroup" />
     </WixAssignCulture>
 
-    <!-- Build an itemgroup of outputs -->
+    <!-- Expand the culture groups then put them back into the appropriate property -->
     <ItemGroup>
-      <_TargetPathItems Include="$(TargetDir)%(CultureGroup.OutputFolder)$(TargetName)$(TargetExt)" />
-      <_TargetPdbPathItems Include="$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbName)" />
+      <_CulturedTargetPath Include="$(TargetDir)%(CultureGroup.OutputFolder)$(TargetFileName)" />
+      <_CulturedTargetPdbPath Include="$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbFileName)" />
     </ItemGroup>
 
-    <!-- Convert the itemgroup to a semicolon-delimited property -->
     <PropertyGroup>
-      <TargetPath>@(_TargetPathItems)</TargetPath>
-      <TargetPdbPath>@(_TargetPdbPathItems)</TargetPdbPath>
+      <TargetPath>@(_CulturedTargetPath)</TargetPath>
+      <TargetPdbPath>@(_CulturedTargetPdbPath)</TargetPdbPath>
     </PropertyGroup>
-
-    <!-- Set the sign target items, if we're signing output. -->
-    <ItemGroup Condition=" '$(SignOutput)' == 'true' AND '$(SuppressLayout)' != 'true' ">
-      <SignTargetPath Include="@(_TargetPathItems)" />
-    </ItemGroup>
   </Target>
 
   <!--
@@ -957,7 +927,7 @@
   ==================================================================================================
   -->
   <PropertyGroup>
-    <BuiltProjectOutputGroupDependsOn>PrepareForBuild;AssignCultures</BuiltProjectOutputGroupDependsOn>
+    <BuiltProjectOutputGroupDependsOn>PrepareForBuild;AssignTargetPaths</BuiltProjectOutputGroupDependsOn>
   </PropertyGroup>
   <Target
     Name="BuiltProjectOutputGroup"
@@ -967,7 +937,7 @@
     <!-- Don't add BuiltProjectOutputGroupKeyOutput - to avoid duplicates, we only want to get the updated list of TargetPaths from the TargetPath property below -->
 
     <!-- Try to read the outputs from the bind outputs text file since that's the output list straight from linker. -->
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)">
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
       <Output TaskParameter="Lines" ItemName="_BuiltProjectOutputGroupOutputIntermediate"/>
     </ReadLinesFromFile>
 
@@ -993,14 +963,14 @@
   ==================================================================================================
   -->
   <PropertyGroup>
-    <DebugSymbolsProjectOutputGroupDependsOn>AssignCultures</DebugSymbolsProjectOutputGroupDependsOn>
+    <DebugSymbolsProjectOutputGroupDependsOn>AssignTargetPaths</DebugSymbolsProjectOutputGroupDependsOn>
   </PropertyGroup>
   <Target
     Name="DebugSymbolsProjectOutputGroup"
     Outputs="@(DebugSymbolsProjectOutputGroupOutput)"
     DependsOnTargets="$(DebugSymbolsProjectOutputGroupDependsOn)">
 
-    <!-- Include build output pdb(s).  Different than predefined itemgroup since AssignCultures target may change -->
+    <!-- Include build output pdb(s).  Different than predefined itemgroup since AssignTargetPaths target may change -->
     <ItemGroup>
       <DebugSymbolsProjectOutputGroupOutput Include="$(TargetPdbPath)" Condition=" '$(SuppressPdbOutput)' != 'true' "/>
     </ItemGroup>
@@ -1029,7 +999,7 @@
     </PropertyGroup>
 
     <!-- Copy the bound files. -->
-    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindOutputsFile)">
+    <ReadLinesFromFile File="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(BindBuiltOutputsFile)">
       <Output TaskParameter="Lines" ItemName="_FullPathToCopy"/>
     </ReadLinesFromFile>
 

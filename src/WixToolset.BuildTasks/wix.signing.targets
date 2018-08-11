@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
-    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildThisFileFullPath)</WixTargetsPath>
-    <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixTargetsPath)WixTasks.dll</WixTasksPath>
-
-    <SignedFile Condition=" '$(SignedFile)' == '' ">$(MSBuildProjectFile).Signed.txt</SignedFile>
+    <SignedFileName Condition=" '$(SignedFileName)' == '' ">$(MSBuildProjectFile).Signed.txt</SignedFileName>
+    <SignedFilePath>$(IntermediateOutputPath)$(SignedFileName)</SignedFilePath>
   </PropertyGroup>
 
   <UsingTask TaskName="Insignia" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="GetCabList" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="GetLooseFileList" AssemblyFile="$(WixTasksPath)" />
 
   <!-- Default Inscribe properties. -->
   <PropertyGroup>
@@ -51,49 +48,57 @@
     </InternalSignDependsOn>
 
     <SigningDependsOn>
-      CompileAndLink;
+      WixBuild;
+      CalculateSignTargetFiles;
       BeforeSigning;
       $(InternalSignDependsOn);
       AfterSigning
     </SigningDependsOn>
   </PropertyGroup>
   <Target
-    Name="Signing"
-    DependsOnTargets="$(SigningDependsOn)"
-    Inputs="@(SignTargetPath)"
-    Outputs="$(IntermediateOutputPath)$(SignedFile)"
-    Condition=" '@(SignTargetPath)' != '' ">
+      Name="Signing"
+      DependsOnTargets="$(SigningDependsOn)"
+      Inputs="$(TargetPath)"
+      Outputs="$(SignedFilePath)"
+      Condition=" '$(SignOutput)' == 'true' ">
 
-    <CreateItem Include="$(IntermediateOutputPath)$(SignedFile)">
-      <Output TaskParameter="Include" ItemName="FileWrites" />
-    </CreateItem>
+    <ItemGroup>
+      <FileWrites Include="$(SignedFilePath)" />
+    </ItemGroup>
 
     <WriteLinesToFile
-        File="$(IntermediateOutputPath)$(SignedFile)"
-        Lines="^$(MSBuildProjectFullPath);@(SignMsm);@(SignCabs);@(SignMsi);@(SignContainers);@(SignBundleEngine);@(SignBundle)"
-        Overwrite="true" />
+      File="$(SignedFilePath)"
+      Lines="^$(MSBuildProjectFullPath);@(SignMsm);@(SignCabs);@(SignMsi);@(SignContainers);@(SignBundleEngine);@(SignBundle)"
+      Overwrite="true" />
   </Target>
 
   <!-- Internal targets so correct signing targets are called. -->
   <Target
-      Name="GetMsmsToSign"
-      Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)">
-    <CreateItem Include="@(SignTargetPath)">
-      <Output TaskParameter="Include" ItemName="SignMsm" />
-      <Output TaskParameter="Include" ItemName="FileWrites" />
-    </CreateItem>
+      Name="CalculateSignTargetFiles">
+    <ItemGroup>
+      <SignTargetPath Include="$(TargetPath)" />
+    </ItemGroup>
   </Target>
 
   <Target
-    Name="InternalSignMsm"
-    DependsOnTargets="SignMsm"
-    Condition=" '@(SignMsm)' != '' " />
+      Name="GetMsmsToSign"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(SignedFilePath)">
+
+    <ItemGroup>
+      <SignMsm Include="@(SignTargetPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target
+      Name="InternalSignMsm"
+      DependsOnTargets="SignMsm"
+      Condition=" '@(SignMsm)' != '' " />
 
   <Target
       Name="GetCabsToSign"
       Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+      Outputs="$(SignedFilePath)">
     <GetCabList Database="%(SignTargetPath.FullPath)">
       <Output TaskParameter="CabList" ItemName="SignCabs" />
       <Output TaskParameter="CabList" ItemName="FileWrites" />
@@ -101,14 +106,14 @@
   </Target>
 
   <Target
-    Name="InternalSignCabs"
-    DependsOnTargets="SignCabs"
-    Condition=" '@(SignCabs)' != '' " />
+      Name="InternalSignCabs"
+      DependsOnTargets="SignCabs"
+      Condition=" '@(SignCabs)' != '' " />
 
   <Target
       Name="GetMsiToSign"
       Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+      Outputs="$(SignedFilePath)">
     <CreateItemAvoidingInference InputProperties="@(SignTargetPath)">
       <Output TaskParameter="OuputItems" ItemName="SignMsi" />
       <Output TaskParameter="OuputItems" ItemName="FileWrites" />
@@ -116,33 +121,33 @@
   </Target>
 
   <Target
-    Name="InternalSignMsi"
-    DependsOnTargets="SignMsi"
-    Inputs="@(SignTargetPath)"
-    Outputs="$(IntermediateOutputPath)$(SignedFile)"
-    Condition=" '@(SignMsi)' != '' " />
+      Name="InternalSignMsi"
+      DependsOnTargets="SignMsi"
+      Inputs="@(SignTargetPath)"
+      Outputs="$(SignedFilePath)"
+      Condition=" '@(SignMsi)' != '' " />
 
   <Target
       Name="GetContainersToSign"
       Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+      Outputs="$(SignedFilePath)">
     <!-- TODO: implement signing detached containers -->
   </Target>
 
   <Target
-    Name="InternalSignContainers"
-    DependsOnTargets="SignContainers"
-    Condition=" '@(SignContainers)' != '' " />
+      Name="InternalSignContainers"
+      DependsOnTargets="SignContainers"
+      Condition=" '@(SignContainers)' != '' " />
 
   <Target
-    Name="InternalSignBundleEngine"
-    DependsOnTargets="SignBundleEngine"
-    Condition=" '@(SignBundleEngine)' != '' " />
+      Name="InternalSignBundleEngine"
+      DependsOnTargets="SignBundleEngine"
+      Condition=" '@(SignBundleEngine)' != '' " />
 
   <Target
-    Name="InternalSignBundle"
-    DependsOnTargets="SignBundle"
-    Condition=" '@(SignBundle)' != '' " />
+      Name="InternalSignBundle"
+      DependsOnTargets="SignBundle"
+      Condition=" '@(SignBundle)' != '' " />
 
   <!--
   ================================================================================================
@@ -160,17 +165,13 @@
   -->
   <PropertyGroup>
     <InscribeMsiDependsOn>
-      PrepareForBuild;
-      ResolveWixExtensionReferences;
-      CompileAndLink;
-      InternalSignCabs
     </InscribeMsiDependsOn>
   </PropertyGroup>
   <Target
       Name="InscribeMsi"
       DependsOnTargets="$(InscribeMsiDependsOn)"
       Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)"
+      Outputs="$(SignedFilePath)"
       Condition=" '@(SignCabs)' != '' ">
 
     <Insignia
@@ -203,17 +204,13 @@
   -->
   <PropertyGroup>
     <InscribeBundleEngineDependsOn>
-      PrepareForBuild;
-      ResolveWixExtensionReferences;
-      CompileAndLink;
-      InternalSignContainers
     </InscribeBundleEngineDependsOn>
   </PropertyGroup>
   <Target
       Name="InscribeBundleEngine"
       DependsOnTargets="$(InscribeBundleEngineDependsOn)"
       Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+      Outputs="$(SignedFilePath)">
 
     <Insignia
         BundleFile="@(SignTargetPath)"
@@ -230,11 +227,10 @@
       <Output TaskParameter="Output" ItemName="SignBundleEngine" />
     </Insignia>
 
-    <!-- Explicitly add output to FileWrites to ensure even when the target is up to date. -->
-    <CreateItem Include="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)">
-      <Output TaskParameter="Include" ItemName="FileWrites" />
-    </CreateItem>
-
+    <!-- Explicitly add output to FileWrites to ensure they are included even when the target is up to date. -->
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)%(SignTargetPath.Filename)%(SignTargetPath.Extension)" />
+    </ItemGroup>
   </Target>
 
   <!--
@@ -252,17 +248,13 @@
   -->
   <PropertyGroup>
     <InscribeBundleDependsOn>
-      PrepareForBuild;
-      ResolveWixExtensionReferences;
-      CompileAndLink;
-      InternalSignBundleEngine
     </InscribeBundleDependsOn>
   </PropertyGroup>
   <Target
       Name="InscribeBundle"
       DependsOnTargets="$(InscribeBundleDependsOn)"
       Inputs="@(SignTargetPath)"
-      Outputs="$(IntermediateOutputPath)$(SignedFile)">
+      Outputs="$(SignedFilePath)">
 
     <Insignia
         BundleFile="@(SignBundleEngine)"
