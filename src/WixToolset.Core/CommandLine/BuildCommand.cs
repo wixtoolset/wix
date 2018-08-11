@@ -276,8 +276,9 @@ namespace WixToolset.Core.CommandLine
 
             {
                 var layout = new Layout(this.ServiceProvider);
+                layout.TrackedFiles = bindResult.TrackedFiles;
                 layout.FileTransfers = bindResult.FileTransfers;
-                layout.ContentFilePaths = bindResult.ContentFilePaths;
+                layout.IntermediateFolder = this.IntermediateFolder;
                 layout.ContentsFile = this.ContentsFile;
                 layout.OutputsFile = this.OutputsFile;
                 layout.BuiltOutputsFile = this.BuiltOutputsFile;

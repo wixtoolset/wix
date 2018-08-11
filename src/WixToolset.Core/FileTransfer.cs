@@ -15,8 +15,6 @@ namespace WixToolset.Core
 
         public SourceLineNumber SourceLineNumbers { get; set; }
 
-        public FileTransferType Type { get; set; }
-
         public bool Redundant { get; set; }
     }
 }

@@ -43,9 +43,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+
         public void Execute()
         {
             var fileTransfers = new List<IFileTransfer>();
+
+            var trackedFiles = new List<ITrackedFile>();
 
             var directories = new Dictionary<string, ResolvedDirectory>();
 
@@ -108,14 +112,26 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             // finally put together the base media layout path and the relative file layout path
                             var fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
-                            var transfer = this.BackendHelper.CreateFileTransfer(facade.WixFile.Source.Path, fileLayoutPath, false, FileTransferType.Content, facade.File.SourceLineNumbers);
+
+                            var transfer = this.BackendHelper.CreateFileTransfer(facade.WixFile.Source.Path, fileLayoutPath, false, facade.File.SourceLineNumbers);
                             fileTransfers.Add(transfer);
+
+                            // Track the location where the cabinet will be placed. If the transfer is
+                            // redundant then then the file should not be cleaned. This is important
+                            // because if the source and destination of the transfer is the same, we
+                            // don't want to clean the file because we'd be deleting the original
+                            // (and that would be bad).
+                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.Final, facade.File.SourceLineNumbers);
+                            tracked.Clean = !transfer.Redundant;
+
+                            trackedFiles.Add(tracked);
                         }
                     }
                 }
             }
 
             this.FileTransfers = fileTransfers;
+            this.TrackedFiles = trackedFiles;
         }
     }
 }

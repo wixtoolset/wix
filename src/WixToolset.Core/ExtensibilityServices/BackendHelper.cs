@@ -19,18 +19,17 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IMessaging Messaging { get; }
 
-        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, FileTransferType type, SourceLineNumber sourceLineNumbers)
+        public IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null)
         {
-            var sourceFullPath = GetValidatedFullPath(sourceLineNumbers, source);
+            var sourceFullPath = this.GetValidatedFullPath(sourceLineNumbers, source);
 
-            var destinationFullPath = GetValidatedFullPath(sourceLineNumbers, destination);
+            var destinationFullPath = this.GetValidatedFullPath(sourceLineNumbers, destination);
 
             return (String.IsNullOrEmpty(sourceFullPath) || String.IsNullOrEmpty(destinationFullPath)) ? null : new FileTransfer
             {
                 Source = sourceFullPath,
                 Destination = destinationFullPath,
                 Move = move,
-                Type = type,
                 SourceLineNumbers = sourceLineNumbers,
                 Redundant = String.Equals(sourceFullPath, destinationFullPath, StringComparison.OrdinalIgnoreCase)
             };
@@ -39,6 +38,11 @@ namespace WixToolset.Core.ExtensibilityServices
         public string CreateGuid(Guid namespaceGuid, string value)
         {
             return Uuid.NewUuid(namespaceGuid, value).ToString("B").ToUpperInvariant();
+        }
+
+        public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)
+        {
+            return new TrackedFile(path, type, sourceLineNumbers);
         }
 
         private string GetValidatedFullPath(SourceLineNumber sourceLineNumbers, string path)

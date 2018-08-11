@@ -28,6 +28,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private List<IFileTransfer> fileTransfers;
 
+        private List<ITrackedFile> trackedFiles;
+
         private FileSplitCabNamesCallback newCabNamesCallBack;
 
         private Dictionary<string, string> lastCabinetAddedToMediaTable; // Key is First Cabinet Name, Value is Last Cabinet Added in the Split Sequence
@@ -35,6 +37,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public CreateCabinetsCommand(IBackendHelper backendHelper)
         {
             this.fileTransfers = new List<IFileTransfer>();
+
+            this.trackedFiles = new List<ITrackedFile>();
 
             this.newCabNamesCallBack = this.NewCabNamesCallBack;
 
@@ -78,8 +82,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IFileTransfer> FileTransfers => this.fileTransfers;
 
+        public IEnumerable<ITrackedFile> TrackedFiles => this.trackedFiles;
+
         /// <param name="output">Output to generate image for.</param>
-        /// <param name="fileTransfers">Array of files to be transfered.</param>
         /// <param name="layoutDirectory">The directory in which the image should be layed out.</param>
         /// <param name="compressed">Flag if source image should be compressed.</param>
         /// <returns>The uncompressed file rows.</returns>
@@ -119,7 +124,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 string cabinetDir = this.ResolveMedia(mediaTuple, mediaLayoutFolder, this.LayoutDirectory);
 
-                CabinetWorkItem cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaTuple, compressionLevel, files, this.fileTransfers);
+                var cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaTuple, compressionLevel, files);
                 if (null != cabinetWorkItem)
                 {
                     cabinetBuilder.Enqueue(cabinetWorkItem);
@@ -188,9 +193,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="cabinetDir">Directory to create cabinet in.</param>
         /// <param name="mediaRow">MediaRow containing information about the cabinet.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
-        /// <param name="fileTransfers">Array of files to be transfered.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades, List<IFileTransfer> fileTransfers)
+        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
             string tempCabinetFileX = Path.Combine(this.TempFilesLocation, mediaRow.Cabinet);
@@ -219,7 +223,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var cabinetResolver = new CabinetResolver(this.CabCachePath, this.BackendExtensions);
 
-            ResolvedCabinet resolvedCabinet = cabinetResolver.ResolveCabinet(tempCabinetFileX, fileFacades);
+            var resolvedCabinet = cabinetResolver.ResolveCabinet(tempCabinetFileX, fileFacades);
 
             // create a cabinet work item if it's not being skipped
             if (CabinetBuildOption.BuildAndCopy == resolvedCabinet.BuildOption || CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption)
@@ -248,19 +252,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
+            var trackResolvedCabinet = this.BackendHelper.TrackFile(resolvedCabinet.Path, TrackedFileType.Intermediate, mediaRow.SourceLineNumbers);
+            this.trackedFiles.Add(trackResolvedCabinet);
+
             if (mediaRow.Cabinet.StartsWith("#", StringComparison.Ordinal))
             {
-                Table streamsTable = output.EnsureTable(this.TableDefinitions["_Streams"]);
+                var streamsTable = output.EnsureTable(this.TableDefinitions["_Streams"]);
 
-                Row streamRow = streamsTable.CreateRow(mediaRow.SourceLineNumbers);
+                var streamRow = streamsTable.CreateRow(mediaRow.SourceLineNumbers);
                 streamRow[0] = mediaRow.Cabinet.Substring(1);
                 streamRow[1] = resolvedCabinet.Path;
             }
             else
             {
-                var destinationPath = Path.Combine(cabinetDir, mediaRow.Cabinet);
-                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, destinationPath, CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption, FileTransferType.Built, mediaRow.SourceLineNumbers);
-                fileTransfers.Add(transfer);
+                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaRow.Cabinet), TrackedFileType.Final, mediaRow.SourceLineNumbers);
+                this.trackedFiles.Add(trackDestination);
+
+                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, trackDestination.Path, resolvedCabinet.BuildOption == CabinetBuildOption.BuildAndMove, mediaRow.SourceLineNumbers);
+                this.fileTransfers.Add(transfer);
             }
 
             return cabinetWorkItem;
@@ -298,10 +307,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="firstCabName">The name of splitting cabinet without extention e.g. "cab1".</param>
         /// <param name="newCabName">The name of the new cabinet that would be formed by splitting e.g. "cab1b.cab"</param>
         /// <param name="fileToken">The file token of the first file present in the splitting cabinet</param>
-        internal void NewCabNamesCallBack([MarshalAs(UnmanagedType.LPWStr)]string firstCabName, [MarshalAs(UnmanagedType.LPWStr)]string newCabName, [MarshalAs(UnmanagedType.LPWStr)]string fileToken)
+        internal void NewCabNamesCallBack([MarshalAs(UnmanagedType.LPWStr)]string firstCabName, [MarshalAs(UnmanagedType.LPWStr)]string newCabinetName, [MarshalAs(UnmanagedType.LPWStr)]string fileToken)
         {
             // Locking Mutex here as this callback can come from Multiple Cabinet Builder Threads
-            Mutex mutex = new Mutex(false, "WixCabinetSplitBinderCallback");
+            var mutex = new Mutex(false, "WixCabinetSplitBinderCallback");
             try
             {
                 if (!mutex.WaitOne(0, false)) // Check if you can get the lock
@@ -311,19 +320,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     mutex.WaitOne(); // Wait on other thread
                 }
 
-                string firstCabinetName = firstCabName + ".cab";
-                string newCabinetName = newCabName;
-                bool transferAdded = false; // Used for Error Handling
+                var firstCabinetName = firstCabName + ".cab";
+                var transferAdded = false; // Used for Error Handling
 
                 // Create File Transfer for new Cabinet using transfer of Base Cabinet
                 foreach (var transfer in this.FileTransfers)
                 {
                     if (firstCabinetName.Equals(Path.GetFileName(transfer.Source), StringComparison.InvariantCultureIgnoreCase))
                     {
-                        string newCabSourcePath = Path.Combine(Path.GetDirectoryName(transfer.Source), newCabinetName);
-                        string newCabTargetPath = Path.Combine(Path.GetDirectoryName(transfer.Destination), newCabinetName);
+                        var newCabSourcePath = Path.Combine(Path.GetDirectoryName(transfer.Source), newCabinetName);
+                        var newCabTargetPath = Path.Combine(Path.GetDirectoryName(transfer.Destination), newCabinetName);
 
-                        var newTransfer = this.BackendHelper.CreateFileTransfer(newCabSourcePath, newCabTargetPath, transfer.Move, FileTransferType.Built, transfer.SourceLineNumbers);
+                        var trackSource = this.BackendHelper.TrackFile(newCabSourcePath, TrackedFileType.Intermediate, transfer.SourceLineNumbers);
+                        this.trackedFiles.Add(trackSource);
+
+                        var trackTarget = this.BackendHelper.TrackFile(newCabTargetPath, TrackedFileType.Final, transfer.SourceLineNumbers);
+                        this.trackedFiles.Add(trackTarget);
+
+                        var newTransfer = this.BackendHelper.CreateFileTransfer(trackSource.Path, trackTarget.Path, transfer.Move, transfer.SourceLineNumbers);
                         this.fileTransfers.Add(newTransfer);
 
                         transferAdded = true;
@@ -338,13 +352,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // Add the new Cabinets to media table using LastSequence of Base Cabinet
-                Table mediaTable = this.Output.Tables["Media"];
-                Table wixFileTable = this.Output.Tables["WixFile"];
-                int diskIDForLastSplitCabAdded = 0; // The DiskID value for the first cab in this cabinet split chain
-                int lastSequenceForLastSplitCabAdded = 0; // The LastSequence value for the first cab in this cabinet split chain
-                bool lastSplitCabinetFound = false; // Used for Error Handling
+                var mediaTable = this.Output.Tables["Media"];
+                var wixFileTable = this.Output.Tables["WixFile"];
+                var diskIDForLastSplitCabAdded = 0; // The DiskID value for the first cab in this cabinet split chain
+                var lastSequenceForLastSplitCabAdded = 0; // The LastSequence value for the first cab in this cabinet split chain
+                var lastSplitCabinetFound = false; // Used for Error Handling
 
-                string lastCabinetOfThisSequence = String.Empty;
+                var lastCabinetOfThisSequence = String.Empty;
                 // Get the Value of Last Cabinet Added in this split Sequence from Dictionary
                 if (!this.lastCabinetAddedToMediaTable.TryGetValue(firstCabinetName, out lastCabinetOfThisSequence))
                 {

@@ -465,7 +465,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.Output = output;
             command.OutputPath = outputPath;
             command.TableDefinitions = this.TableDefinitions;
-            command.TempFilesLocation = this.TempFilesLocation;
+            command.IntermediateFolder = this.TempFilesLocation;
             command.SuppressAddingValidationRows = true;
             command.UseSubDirectory = true;
             command.Execute();

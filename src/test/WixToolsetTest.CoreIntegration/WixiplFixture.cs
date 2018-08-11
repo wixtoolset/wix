@@ -43,7 +43,7 @@ namespace WixToolsetTest.CoreIntegration
                 }, out var messagesBind);
                 Assert.Equal(0, result);
 
-                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"obj\test.wir"));
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Tuples.OfType<WixFileTuple>().Single();

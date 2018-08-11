@@ -56,7 +56,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\example.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"extest.wir"));
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
@@ -95,7 +95,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal(0, result);
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\extest.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"extest.wir"));
                 var section = intermediate.Sections.Single();
 
                 var property = section.Tuples.OfType<PropertyTuple>().Where(p => p.Id.Id == "ExampleProperty").Single();

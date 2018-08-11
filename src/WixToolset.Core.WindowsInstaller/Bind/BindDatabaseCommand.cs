@@ -39,6 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.FileSystemExtensions = context.FileSystemExtensions;
             this.Intermediate = context.IntermediateRepresentation;
             this.OutputPath = context.OutputPath;
+            this.OutputPdbPath = context.OutputPdbPath;
             this.IntermediateFolder = context.IntermediateFolder;
             this.Validator = validator;
 
@@ -71,6 +72,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string OutputPath { get; }
 
+        private string OutputPdbPath { get; }
+
         private bool SuppressAddingValidationRows { get; }
 
         private bool SuppressLayout { get; }
@@ -83,7 +86,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
-        public IEnumerable<string> ContentFilePaths { get; private set; }
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
         public Pdb Pdb { get; private set; }
 
@@ -92,6 +95,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var section = this.Intermediate.Sections.Single();
 
             var fileTransfers = new List<IFileTransfer>();
+            var trackedFiles = new List<ITrackedFile>();
 
             var containsMergeModules = false;
             var suppressedTableNames = new HashSet<string>();
@@ -396,6 +400,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
             }
 
 #if TODO_FINISH_PATCH
@@ -416,11 +421,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Generate database file.
             this.Messaging.Write(VerboseMessages.GeneratingDatabase());
-            string tempDatabaseFile = Path.Combine(this.IntermediateFolder, Path.GetFileName(this.OutputPath));
-            this.GenerateDatabase(output, tempDatabaseFile, false, false);
 
-            var transfer = this.BackendHelper.CreateFileTransfer(tempDatabaseFile, this.OutputPath, true, FileTransferType.Built); // note where this database needs to move in the future
-            fileTransfers.Add(transfer);
+            var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
+            trackedFiles.Add(trackMsi);
+
+            var temporaryFiles = this.GenerateDatabase(output, trackMsi.Path, false, false);
+            trackedFiles.AddRange(temporaryFiles);
 
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)
@@ -455,7 +461,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var command = new MergeModulesCommand();
                 command.FileFacades = fileFacades;
                 command.Output = output;
-                command.OutputPath = tempDatabaseFile;
+                command.OutputPath = this.OutputPath;
                 command.SuppressedTableNames = suppressedTableNames;
                 command.Execute();
             }
@@ -476,7 +482,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 Messaging.Instance.Write(WixVerboses.ValidatingDatabase());
 
-                this.Validator.Validate(tempDatabaseFile);
+                this.Validator.Validate(this.OutputPath);
 
                 stopwatch.Stop();
                 Messaging.Instance.Write(WixVerboses.ValidatedDatabase(stopwatch.ElapsedMilliseconds));
@@ -498,19 +504,36 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.LayoutDirectory = layoutDirectory;
                 command.LongNamesInImage = longNames;
                 command.ResolveMedia = this.ResolveMedia;
-                command.DatabasePath = tempDatabaseFile;
+                command.DatabasePath = this.OutputPath;
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
+            }
+
+            this.Pdb = new Pdb { Output = output };
+
+            if (!String.IsNullOrEmpty(this.OutputPdbPath))
+            {
+                var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
+                trackedFiles.Add(trackPdb);
+
+                this.Pdb.Save(trackPdb.Path);
             }
 
             this.FileTransfers = fileTransfers;
-            this.ContentFilePaths = fileFacades.Select(r => r.WixFile.Source.Path).ToList();
-            this.Pdb = new Pdb { Output = output };
+            // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
+            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.WixFile.Source.Path, TrackedFileType.Input, f.File.SourceLineNumbers))); 
+            this.TrackedFiles = trackedFiles;
 
             // TODO: Eventually this gets removed
             var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase), this.Intermediate.EmbedFilePaths);
-            intermediate.Save(Path.ChangeExtension(this.OutputPath, "wir"));
+            var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
+            intermediate.Save(trackIntermediate.Path);
+            trackedFiles.Add(trackIntermediate);
+
+            //transfer = this.BackendHelper.CreateFileTransfer(intermediatePath, Path.ChangeExtension(this.OutputPath, "wir"), true, FileTransferType.Built);
+            //fileTransfers.Add(transfer);
         }
 
 #if TODO_FINISH_PATCH
@@ -881,9 +904,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="databaseFile">The database file to create.</param>
         /// <param name="keepAddedColumns">Whether to keep columns added in a transform.</param>
         /// <param name="useSubdirectory">Whether to use a subdirectory based on the <paramref name="databaseFile"/> file name for intermediate files.</param>
-        private void GenerateDatabase(Output output, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
+        private IEnumerable<ITrackedFile> GenerateDatabase(Output output, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
         {
             var command = new GenerateDatabaseCommand();
+            command.BackendHelper = this.BackendHelper;
             command.Extensions = this.FileSystemExtensions;
             command.Output = output;
             command.OutputPath = databaseFile;
@@ -891,9 +915,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.UseSubDirectory = useSubdirectory;
             command.SuppressAddingValidationRows = this.SuppressAddingValidationRows;
             command.TableDefinitions = this.TableDefinitions;
-            command.TempFilesLocation = this.IntermediateFolder;
+            command.IntermediateFolder = this.IntermediateFolder;
             command.Codepage = this.Codepage;
             command.Execute();
+
+            return command.GeneratedTemporaryFiles;
         }
     }
 }

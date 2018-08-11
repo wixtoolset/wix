@@ -29,18 +29,12 @@ namespace WixToolset.Core.WindowsInstaller
             var command = new BindDatabaseCommand(context, backendExtensions, validator);
             command.Execute();
 
-            var result = new BindResult { FileTransfers = command.FileTransfers, ContentFilePaths = command.ContentFilePaths };
+            var result = new BindResult { FileTransfers = command.FileTransfers, TrackedFiles = command.TrackedFiles };
 
             foreach (var extension in backendExtensions)
             {
                 extension.PostBackendBind(result, command.Pdb);
             }
-
-            if (!String.IsNullOrEmpty(context.OutputPdbPath))
-            {
-                command.Pdb?.Save(context.OutputPdbPath);
-            }
-
             return result;
         }
 

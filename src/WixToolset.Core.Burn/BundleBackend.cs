@@ -24,7 +24,7 @@ namespace WixToolset.Core.Burn
             //command.WixVariableResolver = context.WixVariableResolver;
             command.Execute();
 
-            return new BindResult { FileTransfers = command.FileTransfers, ContentFilePaths = command.ContentFilePaths };
+            return new BindResult { FileTransfers = command.FileTransfers, TrackedFiles = command.TrackedFiles };
         }
 
         public bool Inscribe(IInscribeContext context)

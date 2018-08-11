@@ -22,7 +22,7 @@ namespace WixToolset.Core
 
         public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
-        public IEnumerable<string> ContentFilePaths { get; set; }
+        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
 
         public string OutputPdbPath { get; set; }
 

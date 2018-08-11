@@ -14,10 +14,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Extensibility.Data;
 
     internal class GenerateDatabaseCommand 
     {
         public int Codepage { private get; set; }
+
+        public IBackendHelper BackendHelper { private get; set; }
 
         public IEnumerable<IFileSystemExtension> Extensions { private get; set; }
 
@@ -34,7 +37,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
-        public string TempFilesLocation { private get; set; }
+        public string IntermediateFolder { private get; set; }
+
+        public List<ITrackedFile> GeneratedTemporaryFiles { get; } = new List<ITrackedFile>();
 
         /// <summary>
         /// Whether to use a subdirectory based on the <paramref name="databaseFile"/> file name for intermediate files.
@@ -103,7 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Set the base directory.
-            string baseDirectory = this.TempFilesLocation;
+            var baseDirectory = this.IntermediateFolder;
 
             if (this.UseSubDirectory)
             {
@@ -114,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 Directory.CreateDirectory(baseDirectory);
             }
 
-            var idtDirectory = Path.Combine(baseDirectory, "idts");
+            var idtDirectory = Path.Combine(baseDirectory, "_idts");
             Directory.CreateDirectory(idtDirectory);
 
             try
@@ -136,6 +141,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     this.Output.Codepage = this.Codepage;
                 }
+
+                Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
 
                 using (Database db = new Database(this.OutputPath, type))
                 {
@@ -184,6 +191,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             {
                                 var command = new CreateIdtFileCommand(this.Messaging, importTable, this.Output.Codepage, idtDirectory, this.KeepAddedColumns);
                                 command.Execute();
+
+                                var buildOutput = this.BackendHelper.TrackFile(command.IdtPath, TrackedFileType.Temporary);
+                                this.GeneratedTemporaryFiles.Add(buildOutput);
 
                                 db.Import(command.IdtPath);
                             }
@@ -309,7 +319,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (SubStorage subStorage in this.Output.SubStorages)
                             {
-                                string transformFile = Path.Combine(this.TempFilesLocation, String.Concat(subStorage.Name, ".mst"));
+                                string transformFile = Path.Combine(this.IntermediateFolder, String.Concat(subStorage.Name, ".mst"));
 
                                 // Bind the transform.
                                 this.BindTransform(subStorage.Data, transformFile);
@@ -346,7 +356,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var command = new BindTransformCommand();
             command.Messaging = this.Messaging;
             command.Extensions = this.Extensions;
-            command.TempFilesLocation = this.TempFilesLocation;
+            command.TempFilesLocation = this.IntermediateFolder;
             command.Transform = transform;
             command.OutputPath = outputPath;
             command.TableDefinitions = this.TableDefinitions;
@@ -356,14 +366,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private void SetDatabaseCodepage(Database db, int codepage, string idtDirectory)
         {
             // write out the _ForceCodepage IDT file
-            string idtPath = Path.Combine(idtDirectory, "_ForceCodepage.idt");
-            using (StreamWriter idtFile = new StreamWriter(idtPath, false, Encoding.ASCII))
+            var idtPath = Path.Combine(idtDirectory, "_ForceCodepage.idt");
+            using (var idtFile = new StreamWriter(idtPath, false, Encoding.ASCII))
             {
                 idtFile.WriteLine(); // dummy column name record
                 idtFile.WriteLine(); // dummy column definition record
                 idtFile.Write(codepage);
                 idtFile.WriteLine("\t_ForceCodepage");
             }
+
+            var trackId = this.BackendHelper.TrackFile(idtPath, TrackedFileType.Temporary);
+            this.GeneratedTemporaryFiles.Add(trackId);
 
             // try to import the table into the MSI
             try

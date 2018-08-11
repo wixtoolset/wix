@@ -48,7 +48,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // to be built to and check if there is a cabinet that can be reused.
             if (!String.IsNullOrEmpty(this.CabCachePath))
             {
-                string cabinetName = Path.GetFileName(cabinetPath);
+                var cabinetName = Path.GetFileName(cabinetPath);
                 resolved.Path = Path.Combine(this.CabCachePath, cabinetName);
 
                 if (CheckFileExists(resolved.Path))
@@ -57,10 +57,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // 1. any files are added or removed
                     // 2. order of files changed or names changed
                     // 3. modified time changed
-                    bool cabinetValid = true;
+                    var cabinetValid = true;
 
                     var cabinet = new Cabinet(resolved.Path);
-                    List<CabinetFileInfo> fileList = cabinet.Enumerate();
+                    var fileList = cabinet.Enumerate();
 
                     if (filesWithPath.Count() != fileList.Count)
                     {
@@ -68,16 +68,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        int i = 0;
-                        foreach (BindFileWithPath file in filesWithPath)
+                        var i = 0;
+                        foreach (var file in filesWithPath)
                         {
                             // First check that the file identifiers match because that is quick and easy.
-                            CabinetFileInfo cabFileInfo = fileList[i];
+                            var cabFileInfo = fileList[i];
                             cabinetValid = (cabFileInfo.FileId == file.Id);
                             if (cabinetValid)
                             {
                                 // Still valid so ensure the file sizes are the same.
-                                FileInfo fileInfo = new FileInfo(file.Path);
+                                var fileInfo = new FileInfo(file.Path);
                                 cabinetValid = (cabFileInfo.Size == fileInfo.Length);
                                 if (cabinetValid)
                                 {

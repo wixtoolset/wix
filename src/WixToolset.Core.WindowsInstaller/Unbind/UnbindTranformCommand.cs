@@ -251,7 +251,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             command.UseSubDirectory = false;
             command.SuppressAddingValidationRows = true;
             command.TableDefinitions = this.TableDefinitions;
-            command.TempFilesLocation = this.IntermediateFolder;
+            command.IntermediateFolder = this.IntermediateFolder;
             command.Codepage = -1;
             command.Execute();
         }

@@ -28,9 +28,11 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
+        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+
         public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
-        public IEnumerable<string> ContentFilePaths { get; set; }
+        public string IntermediateFolder { get; set; }
 
         public string ContentsFile { get; set; }
 
@@ -46,8 +48,8 @@ namespace WixToolset.Core
 
             var context = this.ServiceProvider.GetService<ILayoutContext>();
             context.Extensions = extensionManager.Create<ILayoutExtension>();
+            context.TrackedFiles = this.TrackedFiles;
             context.FileTransfers = this.FileTransfers;
-            context.ContentFilePaths = this.ContentFilePaths;
             context.ContentsFile = this.ContentsFile;
             context.OutputsFile = this.OutputsFile;
             context.BuiltOutputsFile = this.BuiltOutputsFile;
@@ -71,24 +73,29 @@ namespace WixToolset.Core
                     var command = new TransferFilesCommand(this.Messaging, context.Extensions, context.FileTransfers, context.SuppressAclReset);
                     command.Execute();
                 }
+
+                if (context.TrackedFiles != null)
+                {
+                    this.CleanTempFiles(context.TrackedFiles);
+                }
             }
             finally
             {
-                if (!String.IsNullOrEmpty(context.ContentsFile) && context.ContentFilePaths != null)
+                if (context.TrackedFiles != null)
                 {
-                    this.CreateContentsFile(context.ContentsFile, context.ContentFilePaths);
-                }
+                    if (!String.IsNullOrEmpty(context.ContentsFile))
+                    {
+                        this.CreateContentsFile(context.ContentsFile, context.TrackedFiles);
+                    }
 
-                if (context.FileTransfers != null)
-                {
                     if (!String.IsNullOrEmpty(context.OutputsFile))
                     {
-                        this.CreateOutputsFile(context.OutputsFile, context.FileTransfers);
+                        this.CreateOutputsFile(context.OutputsFile, context.TrackedFiles);
                     }
 
                     if (!String.IsNullOrEmpty(context.BuiltOutputsFile))
                     {
-                        this.CreateBuiltOutputsFile(context.BuiltOutputsFile, context.FileTransfers);
+                        this.CreateBuiltOutputsFile(context.BuiltOutputsFile, context.TrackedFiles);
                     }
                 }
             }
@@ -105,16 +112,23 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="contentFilePaths">Collection of paths to content files that will be written to file.</param>
-        private void CreateContentsFile(string path, IEnumerable<string> contentFilePaths)
+        private void CreateContentsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
+            var uniqueInputFilePaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Input).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+
+            if (!uniqueInputFilePaths.Any())
+            {
+                return;
+            }
+
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
 
             using (var contents = new StreamWriter(path, false))
             {
-                foreach (string contentPath in contentFilePaths)
+                foreach (string inputPath in uniqueInputFilePaths)
                 {
-                    contents.WriteLine(contentPath);
+                    contents.WriteLine(inputPath);
                 }
             }
         }
@@ -124,22 +138,28 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
-        private void CreateOutputsFile(string path, IEnumerable<IFileTransfer> fileTransfers)
+        private void CreateOutputsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
+            var uniqueOutputPaths = new SortedSet<string>(trackedFiles.Where(t => t.Clean).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+
+            if (!uniqueOutputPaths.Any())
+            {
+                return;
+            }
+
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
 
             using (var outputs = new StreamWriter(path, false))
             {
-                foreach (var fileTransfer in fileTransfers)
+                //// Don't list files where the source is the same as the destination since
+                //// that might be the only place the file exists. The outputs file is often
+                //// used to delete stuff and losing the original source would be bad.
+                //var uniqueOutputPaths = new SortedSet<string>(fileTransfers.Where(ft => !ft.Redundant).Select(ft => ft.Destination), StringComparer.OrdinalIgnoreCase);
+
+                foreach (var outputPath in uniqueOutputPaths)
                 {
-                    // Don't list files where the source is the same as the destination since
-                    // that might be the only place the file exists. The outputs file is often
-                    // used to delete stuff and losing the original source would be bad.
-                    if (!fileTransfer.Redundant)
-                    {
-                        outputs.WriteLine(fileTransfer.Destination);
-                    }
+                    outputs.WriteLine(outputPath);
                 }
             }
         }
@@ -149,21 +169,83 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="path">Path to write file.</param>
         /// <param name="fileTransfers">Collection of files that were transferred to the output directory.</param>
-        private void CreateBuiltOutputsFile(string path, IEnumerable<IFileTransfer> fileTransfers)
+        private void CreateBuiltOutputsFile(string path, IEnumerable<ITrackedFile> trackedFiles)
         {
+            var uniqueBuiltPaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Final).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+
+            if (!uniqueBuiltPaths.Any())
+            {
+                return;
+            }
+
             var directory = Path.GetDirectoryName(path);
             Directory.CreateDirectory(directory);
 
             using (var outputs = new StreamWriter(path, false))
             {
-                foreach (var fileTransfer in fileTransfers)
+                foreach (var builtPath in uniqueBuiltPaths)
                 {
-                    // Only write the built file transfers. Also, skip redundant
-                    // files for the same reason spelled out in this.CreateOutputsFile().
-                    if (fileTransfer.Type == FileTransferType.Built && !fileTransfer.Redundant)
-                    {
-                        outputs.WriteLine(fileTransfer.Destination);
-                    }
+                    outputs.WriteLine(builtPath);
+                }
+            }
+        }
+
+        private void CleanTempFiles(IEnumerable<ITrackedFile> trackedFiles)
+        {
+            var uniqueTempPaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Temporary).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+
+            if (!uniqueTempPaths.Any())
+            {
+                return;
+            }
+
+            var uniqueFolders = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                this.IntermediateFolder
+            };
+
+            // Clean up temp files.
+            foreach (var tempPath in uniqueTempPaths)
+            {
+                try
+                {
+                    this.SplitUniqueFolders(tempPath, uniqueFolders);
+
+                    File.Delete(tempPath);
+                }
+                catch // delete is best effort.
+                {
+                }
+            }
+
+            // Clean up empty temp folders.
+            foreach (var folder in uniqueFolders.Reverse())
+            {
+                try
+                {
+                    Directory.Delete(folder);
+                }
+                catch // delete is best effort.
+                {
+                }
+            }
+        }
+
+        private void SplitUniqueFolders(string tempPath, SortedSet<string> uniqueFolders)
+        {
+            if (tempPath.StartsWith(this.IntermediateFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                var folder = Path.GetDirectoryName(tempPath).Substring(this.IntermediateFolder.Length);
+
+                var parts = folder.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+                folder = this.IntermediateFolder;
+
+                foreach (var part in parts)
+                {
+                    folder = Path.Combine(folder, part);
+
+                    uniqueFolders.Add(folder);
                 }
             }
         }

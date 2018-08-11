@@ -101,7 +101,7 @@ namespace WixToolset.Core.Burn
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
-        public IEnumerable<string> ContentFilePaths { get; private set; }
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
         public void Execute()
         {
