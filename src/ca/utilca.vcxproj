@@ -24,6 +24,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>utilca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Util CustomAction</Description>
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
