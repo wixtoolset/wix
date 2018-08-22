@@ -4,6 +4,8 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -170,13 +172,13 @@ namespace WixToolset.BuildTasks
             arguments.Populate(commandLineString);
 
             var commandLine = serviceProvider.GetService<ICommandLineParser>();
-            commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
+            commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
             command?.Execute();
         }
 
-        private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, string[] extensions)
+        private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 
@@ -187,7 +189,14 @@ namespace WixToolset.BuildTasks
 
             foreach (var extension in extensions)
             {
-                extensionManager.Load(extension);
+                try
+                {
+                    extensionManager.Load(extension);
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    messaging.Write(ErrorMessages.InvalidExtension(extension, String.Join(Environment.NewLine, e.LoaderExceptions.Select(le => le.ToString()))));
+                }
             }
 
             return extensionManager;

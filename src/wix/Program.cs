@@ -4,6 +4,8 @@ namespace WixToolset.Tools
 {
     using System;
     using System.Globalization;
+    using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Threading;
     using WixToolset.Core;
@@ -48,13 +50,13 @@ namespace WixToolset.Tools
             arguments.Populate(args);
 
             var commandLine = serviceProvider.GetService<ICommandLineParser>();
-            commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
+            commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
             return command?.Execute() ?? 1;
         }
 
-        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, string[] extensions)
+        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 
@@ -65,7 +67,14 @@ namespace WixToolset.Tools
 
             foreach (var extension in extensions)
             {
-                extensionManager.Load(extension);
+                try
+                {
+                    extensionManager.Load(extension);
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    messaging.Write(ErrorMessages.InvalidExtension(extension, String.Join(Environment.NewLine, e.LoaderExceptions.Select(le => le.ToString()))));
+                }
             }
 
             return extensionManager;
