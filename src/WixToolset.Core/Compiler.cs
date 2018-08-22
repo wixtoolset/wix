@@ -1097,24 +1097,27 @@ namespace WixToolset.Core
             }
 
             HashSet<string> uniqueContexts = new HashSet<string>();
-            foreach (string context in contexts)
+            if (contexts != null)
             {
-                if (uniqueContexts.Contains(context))
+                foreach (string context in contexts)
                 {
-                    this.Core.Write(ErrorMessages.DuplicateContextValue(sourceLineNumbers, context));
-                }
-                else
-                {
-                    uniqueContexts.Add(context);
-                }
+                    if (uniqueContexts.Contains(context))
+                    {
+                        this.Core.Write(ErrorMessages.DuplicateContextValue(sourceLineNumbers, context));
+                    }
+                    else
+                    {
+                        uniqueContexts.Add(context);
+                    }
 
-                if (context.EndsWith("32", StringComparison.Ordinal))
-                {
-                    class32bit = true;
-                }
-                else
-                {
-                    class16bit = true;
+                    if (context.EndsWith("32", StringComparison.Ordinal))
+                    {
+                        class32bit = true;
+                    }
+                    else
+                    {
+                        class16bit = true;
+                    }
                 }
             }
 
