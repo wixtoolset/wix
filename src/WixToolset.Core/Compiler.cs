@@ -992,7 +992,7 @@ namespace WixToolset.Core
             bool class32bit = false;
             string classId = null;
             YesNoType classAdvertise = YesNoType.NotSet;
-            string[] contexts = null;
+            string[] contexts = new string[0];
             string formattedContextString = null;
             bool control = false;
             string defaultInprocHandler = null;
@@ -1097,27 +1097,24 @@ namespace WixToolset.Core
             }
 
             HashSet<string> uniqueContexts = new HashSet<string>();
-            if (contexts != null)
+            foreach (string context in contexts)
             {
-                foreach (string context in contexts)
+                if (uniqueContexts.Contains(context))
                 {
-                    if (uniqueContexts.Contains(context))
-                    {
-                        this.Core.Write(ErrorMessages.DuplicateContextValue(sourceLineNumbers, context));
-                    }
-                    else
-                    {
-                        uniqueContexts.Add(context);
-                    }
+                    this.Core.Write(ErrorMessages.DuplicateContextValue(sourceLineNumbers, context));
+                }
+                else
+                {
+                    uniqueContexts.Add(context);
+                }
 
-                    if (context.EndsWith("32", StringComparison.Ordinal))
-                    {
-                        class32bit = true;
-                    }
-                    else
-                    {
-                        class16bit = true;
-                    }
+                if (context.EndsWith("32", StringComparison.Ordinal))
+                {
+                    class32bit = true;
+                }
+                else
+                {
+                    class16bit = true;
                 }
             }
 
