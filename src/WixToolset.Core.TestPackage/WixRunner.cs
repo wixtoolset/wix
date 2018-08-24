@@ -13,11 +13,15 @@ namespace WixToolset.Core.TestPackage
     {
         public static int Execute(string[] args, out List<Message> messages)
         {
+            var serviceProvider = new WixToolsetServiceProvider();
+            return Execute(args, serviceProvider, out messages);
+        }
+
+        public static int Execute(string[] args, IServiceProvider serviceProvider, out List<Message> messages)
+        {
             var listener = new TestListener();
 
             messages = listener.Messages;
-
-            var serviceProvider = new WixToolsetServiceProvider();
 
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
