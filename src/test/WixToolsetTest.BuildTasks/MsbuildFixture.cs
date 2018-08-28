@@ -31,13 +31,16 @@ namespace WixToolsetTest.BuildTasks
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var result = this.MsbuildRunner.Execute(projectPath, new[] 
+                var result = this.MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });
                 result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning"));
+                Assert.Equal(4, warnings.Count());
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -49,6 +52,31 @@ namespace WixToolsetTest.BuildTasks
                     @"bin\en-US\MsiPackage.msi",
                     @"bin\en-US\MsiPackage.wixpdb",
                 }, paths);
+            }
+        }
+
+        [Fact]
+        public void CanBuildSimpleMsiPackageWithWarningSuppressions()
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+
+                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                    "-p:SuppressSpecificWarnings=\"1118;1102\""
+                });
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning"));
+                Assert.Empty(warnings);
             }
         }
 

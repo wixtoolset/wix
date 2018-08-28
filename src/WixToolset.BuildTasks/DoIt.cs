@@ -145,6 +145,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);
             commandLineBuilder.AppendIfTrue("-sval", this.SuppressValidation);
             commandLineBuilder.AppendArrayIfNotNull("-sice ", this.SuppressIces);
+            commandLineBuilder.AppendArrayIfNotNull("-sw ", this.SuppressSpecificWarnings);
             commandLineBuilder.AppendSwitchIfNotNull("-usf ", this.UnreferencedSymbolsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
