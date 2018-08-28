@@ -144,7 +144,7 @@ namespace WixToolset.Core.CommandLine
                         return true;
 
                     case "outputtype":
-                        outputType= parser.GetNextArgumentOrError(arg);
+                        outputType = parser.GetNextArgumentOrError(arg);
                         return true;
 
                     case "nologo":
@@ -163,6 +163,16 @@ namespace WixToolset.Core.CommandLine
 
                     case "sval":
                         // todo: implement
+                        return true;
+
+                    case "sw":
+                    case "suppresswarning":
+                        var warning = parser.GetNextArgumentOrError(arg);
+                        if (!String.IsNullOrEmpty(warning))
+                        {
+                            var warningNumber = Convert.ToInt32(warning);
+                            this.Messaging.SuppressWarningMessage(warningNumber);
+                        }
                         return true;
                     }
 
