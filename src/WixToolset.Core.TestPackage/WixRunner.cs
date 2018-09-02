@@ -5,7 +5,6 @@ namespace WixToolset.Core.TestPackage
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -19,7 +18,7 @@ namespace WixToolset.Core.TestPackage
 
         public static int Execute(string[] args, IServiceProvider serviceProvider, out List<Message> messages)
         {
-            var listener = new TestListener();
+            var listener = new TestMessageListener();
 
             messages = listener.Messages;
 
@@ -51,25 +50,6 @@ namespace WixToolset.Core.TestPackage
             }
 
             return extensionManager;
-        }
-
-        private class TestListener : IMessageListener
-        {
-            public List<Message> Messages { get; } = new List<Message>();
-
-            public string ShortAppName => "TEST";
-
-            public string LongAppName => "Test";
-
-            public void Write(Message message)
-            {
-                this.Messages.Add(message);
-            }
-
-            public void Write(string message)
-            {
-                this.Messages.Add(new Message(null, MessageLevel.Information, 0, message));
-            }
         }
     }
 }
