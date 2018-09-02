@@ -5,8 +5,8 @@
   <PropertyGroup>
     <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <Description>Compiler</Description>
-    <Title>WiX Toolset Compiler</Title>
+    <Description>Converter</Description>
+    <Title>WiX Error Correction Tool</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <!-- <PackAsTool>true</PackAsTool> -->
@@ -23,12 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core\WixToolset.Core.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\README.md') " />
-
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
-    <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\README.md') " />
-
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
-    <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\README.md') " />
   </ItemGroup>
 
   <ItemGroup>

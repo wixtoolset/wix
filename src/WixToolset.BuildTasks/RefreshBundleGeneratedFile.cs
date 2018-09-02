@@ -6,19 +6,16 @@ namespace WixToolset.BuildTasks
     using System.Collections;
     using System.Globalization;
     using System.IO;
-    using System.Text.RegularExpressions;
     using System.Xml;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+    using WixToolset.Tools.Core;
 
     /// <summary>
     /// This task refreshes the generated file for bundle projects.
     /// </summary>
     public class RefreshBundleGeneratedFile : Task
     {
-        private static readonly Regex AddPrefix = new Regex(@"^[^a-zA-Z_]", RegexOptions.Compiled);
-        private static readonly Regex IllegalIdentifierCharacters = new Regex(@"[^A-Za-z0-9_\.]|\.{2,}", RegexOptions.Compiled); // non 'words' and assorted valid characters
-
         private ITaskItem[] generatedFiles;
         private ITaskItem[] projectReferencePaths;
 
@@ -54,14 +51,14 @@ namespace WixToolset.BuildTasks
             {
                 ITaskItem item = this.ProjectReferencePaths[i];
 
-                if (!String.IsNullOrEmpty(item.GetMetadata(Common.DoNotHarvest)))
+                if (!String.IsNullOrEmpty(item.GetMetadata(ToolsCommon.DoNotHarvest)))
                 {
                     continue;
                 }
 
                 string projectPath = CreateProjectReferenceDefineConstants.GetProjectPath(this.ProjectReferencePaths, i);
                 string projectName = Path.GetFileNameWithoutExtension(projectPath);
-                string referenceName = Common.GetIdentifierFromName(CreateProjectReferenceDefineConstants.GetReferenceName(item, projectName));
+                string referenceName = ToolsCommon.GetIdentifierFromName(CreateProjectReferenceDefineConstants.GetReferenceName(item, projectName));
 
                 string[] pogs = item.GetMetadata("RefProjectOutputGroups").Split(';');
                 foreach (string pog in pogs)

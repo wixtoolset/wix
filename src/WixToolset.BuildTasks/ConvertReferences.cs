@@ -3,13 +3,10 @@
 namespace WixToolset.BuildTasks
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Xml;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+    using WixToolset.Tools.Core;
 
     /// <summary>
     /// This task assigns Culture metadata to files based on the value of the Culture attribute on the
@@ -62,7 +59,7 @@ namespace WixToolset.BuildTasks
             {
                 Dictionary<string, string> newItemMetadeta = new Dictionary<string, string>();
 
-                if (!String.IsNullOrEmpty(item.GetMetadata(Common.DoNotHarvest)))
+                if (!String.IsNullOrEmpty(item.GetMetadata(ToolsCommon.DoNotHarvest)))
                 {
                     continue;
                 }

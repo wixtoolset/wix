@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WixToolset.Tools.Core\WixToolset.Tools.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core\WixToolset.Core.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\README.md') " />
 
