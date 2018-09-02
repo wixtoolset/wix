@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset {
+namespace WixToolset.Core {
     using System;
     
     
@@ -31,7 +31,7 @@ namespace WixToolset {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WixToolset.WixStrings", typeof(WixStrings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WixToolset.Core.WixStrings", typeof(WixStrings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
