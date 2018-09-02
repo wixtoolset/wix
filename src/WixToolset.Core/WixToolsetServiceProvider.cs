@@ -14,34 +14,32 @@ namespace WixToolset.Core
     {
         public WixToolsetServiceProvider()
         {
-            this.CreationFunctions = new Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>>
-            {
+            this.CreationFunctions = new Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>>();
+            this.Singletons = new Dictionary<Type, object>();
+
             // Singletons.
-                { typeof(IExtensionManager), (provider, singletons) => AddSingleton(singletons, typeof(IExtensionManager), new ExtensionManager()) },
-                { typeof(IMessaging), (provider, singletons) => AddSingleton(singletons, typeof(IMessaging), new Messaging()) },
-                { typeof(ITupleDefinitionCreator), (provider, singletons) => AddSingleton(singletons, typeof(ITupleDefinitionCreator), new TupleDefinitionCreator(provider)) },
-                { typeof(IParseHelper), (provider, singletons) => AddSingleton(singletons, typeof(IParseHelper), new ParseHelper(provider)) },
-                { typeof(IPreprocessHelper), (provider, singletons) => AddSingleton(singletons, typeof(IPreprocessHelper), new PreprocessHelper(provider)) },
-                { typeof(IBackendHelper), (provider, singletons) => AddSingleton(singletons, typeof(IBackendHelper), new BackendHelper(provider)) },
-                { typeof(IWindowsInstallerBackendHelper), (provider, singletons) => AddSingleton(singletons, typeof(IWindowsInstallerBackendHelper), new WindowsInstallerBackendHelper(provider)) },
+            this.AddService((provider, singletons) => AddSingleton<IExtensionManager>(singletons, new ExtensionManager()));
+            this.AddService((provider, singletons) => AddSingleton<IMessaging>(singletons, new Messaging()));
+            this.AddService((provider, singletons) => AddSingleton<ITupleDefinitionCreator>(singletons, new TupleDefinitionCreator(provider)));
+            this.AddService((provider, singletons) => AddSingleton<IParseHelper>(singletons, new ParseHelper(provider)));
+            this.AddService((provider, singletons) => AddSingleton<IPreprocessHelper>(singletons, new PreprocessHelper(provider)));
+            this.AddService((provider, singletons) => AddSingleton<IBackendHelper>(singletons, new BackendHelper(provider)));
+            this.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper(provider)));
 
             // Transients.
-                { typeof(ICommandLineArguments), (provider, singletons) => new CommandLineArguments(provider) },
-                { typeof(ICommandLineContext), (provider, singletons) => new CommandLineContext(provider) },
-                { typeof(ICommandLineParser), (provider, singletons) => new CommandLineParser(provider) },
-                { typeof(IPreprocessContext), (provider, singletons) => new PreprocessContext(provider) },
-                { typeof(ICompileContext), (provider, singletons) => new CompileContext(provider) },
-                { typeof(ILinkContext), (provider, singletons) => new LinkContext(provider) },
-                { typeof(IResolveContext), (provider, singletons) => new ResolveContext(provider) },
-                { typeof(IBindContext), (provider, singletons) => new BindContext(provider) },
-                { typeof(ILayoutContext), (provider, singletons) => new LayoutContext(provider) },
-                { typeof(IInscribeContext), (provider, singletons) => new InscribeContext(provider) },
+            this.AddService<ICommandLineArguments>((provider, singletons) => new CommandLineArguments(provider));
+            this.AddService<ICommandLineContext>((provider, singletons) => new CommandLineContext(provider));
+            this.AddService<ICommandLineParser>((provider, singletons) => new CommandLineParser(provider));
+            this.AddService<IPreprocessContext>((provider, singletons) => new PreprocessContext(provider));
+            this.AddService<ICompileContext>((provider, singletons) => new CompileContext(provider));
+            this.AddService<ILinkContext>((provider, singletons) => new LinkContext(provider));
+            this.AddService<IResolveContext>((provider, singletons) => new ResolveContext(provider));
+            this.AddService<IBindContext>((provider, singletons) => new BindContext(provider));
+            this.AddService<ILayoutContext>((provider, singletons) => new LayoutContext(provider));
+            this.AddService<IInscribeContext>((provider, singletons) => new InscribeContext(provider));
 
-                // Internal implementations.
-                { typeof(ILocalizer), (provider, singletons) => new Localizer(provider) },
-            };
-
-            this.Singletons = new Dictionary<Type, object>();
+            // Internal implementations.
+            this.AddService<ILocalizer>((provider, singletons) => new Localizer(provider));
         }
 
         private Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>> CreationFunctions { get; }
@@ -80,9 +78,16 @@ namespace WixToolset.Core
             this.CreationFunctions[serviceType] = creationFunction;
         }
 
-        private static object AddSingleton(Dictionary<Type, object> singletons, Type type, object service)
+        public void AddService<T>(Func<IServiceProvider, Dictionary<Type, object>, T> creationFunction)
+            where T : class
         {
-            singletons.Add(type, service);
+            AddService(typeof(T), creationFunction);
+        }
+
+        private static T AddSingleton<T>(Dictionary<Type, object> singletons, T service)
+            where T : class
+        {
+            singletons.Add(typeof(T), service);
             return service;
         }
     }
