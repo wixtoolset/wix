@@ -45,7 +45,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             else
             {
-                if (showWarning)
+                if (showWarning && value != currentValue)
                 {
                     this.Messaging.Write(WarningMessages.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
                 }
