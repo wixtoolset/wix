@@ -172,6 +172,8 @@ namespace WixToolset.Core
         /// <exception cref="WixException">The code page is invalid for summary information.</exception>
         public static int GetValidCodePage(string value, bool allowNoChange = false, bool onlyAnsi = false, SourceLineNumber sourceLineNumbers = null)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             try
             {
                 Encoding encoding;
@@ -190,7 +192,7 @@ namespace WixToolset.Core
                         return -1;
                     }
 
-                    encoding = CodePagesEncodingProvider.Instance.GetEncoding(codePage);
+                    encoding = Encoding.GetEncoding(codePage);
                 }
                 else
                 {
@@ -206,6 +208,11 @@ namespace WixToolset.Core
                     {
                         throw new WixException(ErrorMessages.InvalidSummaryInfoCodePage(sourceLineNumbers, codePage));
                     }
+                }
+
+                if (encoding == null)
+                {
+                    throw new WixException(ErrorMessages.IllegalCodepage(sourceLineNumbers, codePage));
                 }
 
                 return encoding.CodePage;
