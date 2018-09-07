@@ -81,6 +81,33 @@ namespace WixToolsetTest.BuildTasks
         }
 
         [Fact]
+        public void CanBuildSimpleMsiPackageAsWixipl()
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+
+                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                    "-p:OutputType=IntermediatePostLink"
+                });
+                result.AssertSuccess();
+
+                var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .Single();
+                Assert.Equal(@"bin\MsiPackage.wixipl", path);
+            }
+        }
+
+        [Fact]
         public void CanBuildAndCleanSimpleMsiPackage()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
