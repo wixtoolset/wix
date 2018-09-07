@@ -904,6 +904,11 @@ namespace WixToolset.Data
             return Message(null, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Product/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
         }
 
+        public static Message IllegalCodepage(SourceLineNumber sourceLineNumbers, int codepage)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalCodepage, "The code page '{0}' is not a valid Windows code page. Update the database's code page by modifying one of the following attributes: Product/@Codepage, Module/@Codepage, Patch/@Codepage, PatchCreation/@Codepage, or WixLocalization/@Codepage.", codepage);
+        }
+
         public static Message IllegalCodepageAttribute(SourceLineNumber sourceLineNumbers, string codepage, string elementName, string attributeName)
         {
             return Message(sourceLineNumbers, Ids.IllegalCodepageAttribute, "The code page '{0}' is not a valid Windows code page. Please check the {1}/@{2} attribute value in your source file.", codepage, elementName, attributeName);
