@@ -49,6 +49,10 @@
     <Content Include="TestData\Assembly\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Assembly\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Assembly\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Variables\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Variables\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Variables\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Variables\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
