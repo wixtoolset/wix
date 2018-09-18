@@ -24,6 +24,10 @@
     <Content Include="TestData\ExampleExtension\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ForEach\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ForEach\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ForEach\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ForEach\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

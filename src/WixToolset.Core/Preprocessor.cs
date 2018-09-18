@@ -762,25 +762,27 @@ namespace WixToolset.Core
             }
 
             using (var fragmentStream = new MemoryStream(Encoding.UTF8.GetBytes(fragmentBuilder.ToString())))
-            using (var loopReader = XmlReader.Create(fragmentStream, FragmentXmlReaderSettings))
             {
                 // process each iteration, updating the variable's value each time
                 foreach (string varValue in varValues)
                 {
-                    // Always overwrite foreach variables.
-                    this.Helper.AddVariable(this.Context, varName, varValue, false);
-
-                    try
+                    using (var loopReader = XmlReader.Create(fragmentStream, FragmentXmlReaderSettings))
                     {
-                        this.PreprocessReader(false, loopReader, container, offset);
-                    }
-                    catch (XmlException e)
-                    {
-                        this.UpdateCurrentLineNumber(loopReader, offset);
-                        throw new WixException(ErrorMessages.InvalidXml(this.Context.CurrentSourceLineNumber, "source", e.Message));
-                    }
+                        // Always overwrite foreach variables.
+                        this.Helper.AddVariable(this.Context, varName, varValue, false);
 
-                    fragmentStream.Position = 0; // seek back to the beginning for the next loop.
+                        try
+                        {
+                            this.PreprocessReader(false, loopReader, container, offset);
+                        }
+                        catch (XmlException e)
+                        {
+                            this.UpdateCurrentLineNumber(loopReader, offset);
+                            throw new WixException(ErrorMessages.InvalidXml(this.Context.CurrentSourceLineNumber, "source", e.Message));
+                        }
+
+                        fragmentStream.Position = 0; // seek back to the beginning for the next loop.
+                    }
                 }
             }
         }

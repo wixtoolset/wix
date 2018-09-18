@@ -39,6 +39,30 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Single(warnings);
             }
         }
+
+        [Fact]
+        public void ForEachLoopsWork()
+        {
+            var folder = TestData.Get(@"TestData\ForEach");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                }, out var messages);
+                Assert.Equal(0, result);
+            }
+        }
     }
 }
 
