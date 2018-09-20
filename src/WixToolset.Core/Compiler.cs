@@ -1460,7 +1460,7 @@ namespace WixToolset.Core
                             numMethods = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "ProxyStubClassId":
-                            proxyId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            proxyId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
                             break;
                         case "ProxyStubClassId32":
                             proxyId32 = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
