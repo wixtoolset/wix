@@ -6,6 +6,7 @@ namespace WixToolset.Core.CommandLine
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -173,7 +174,16 @@ namespace WixToolset.Core.CommandLine
                 preprocessor.Platform = Platform.X86; // TODO: set this correctly
                 preprocessor.SourcePath = sourceFile.SourcePath;
                 preprocessor.Variables = this.PreprocessorVariables;
-                var document = preprocessor.Execute();
+
+                XDocument document = null;
+                try
+                {
+                    document = preprocessor.Execute();
+                }
+                catch (WixException e)
+                {
+                    this.Messaging.Write(e.Error);
+                }
 
                 if (this.Messaging.EncounteredError)
                 {
