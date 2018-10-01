@@ -12,12 +12,11 @@
     <None Remove="TestData\SingleFile\SingleFile.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestData\SingleFile\ConvertedSingleFile.wxs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\SingleFile\SingleFile.wxs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="TestData\SingleFile\ConvertedSingleFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFile\SingleFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Preprocessor\ConvertedPreprocessor.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Preprocessor\Preprocessor.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Preprocessor\wixcop.settings.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
