@@ -288,7 +288,7 @@
 
   <Target Name="PackNativeNuget"
           DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack dutil.nuspec -OutputDirectory $(BaseOutputPath) -Properties Configuration=$(Configuration);Id=WixToolset.DUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
+    <Exec Command='nuget pack dutil.nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=WixToolset.DUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
   </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
