@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wixlib\firewall.wixproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\wixlib\firewall.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
   </ItemGroup>
 
   <ItemGroup>
