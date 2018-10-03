@@ -29,8 +29,9 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"test.wixipl")
-                }, out var messagesCompile);
-                Assert.Equal(0, result);
+                });
+
+                result.AssertSuccess();
 
                 result = WixRunner.Execute(new[]
                 {
@@ -40,8 +41,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messagesBind);
-                Assert.Equal(0, result);
+                });
+
+                result.AssertSuccess();
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"obj\test.wir"));
                 var section = intermediate.Sections.Single();
@@ -69,8 +71,9 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"test.wixipl")
-                }, out var messagesCompile);
-                Assert.Equal(0, result);
+                });
+
+                result.AssertSuccess();
 
                 result = WixRunner.Execute(new[]
                 {
@@ -81,8 +84,8 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messagesBind);
-                Assert.Equal((int)ErrorMessages.Ids.WixiplSourceFileIsExclusive, result);
+                });
+                Assert.Equal((int)ErrorMessages.Ids.WixiplSourceFileIsExclusive, result.ExitCode);
             }
         }
     }

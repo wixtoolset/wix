@@ -16,6 +16,13 @@ namespace WixToolset.Core.TestPackage
             return Execute(args, serviceProvider, out messages);
         }
 
+        public static WixRunnerResult Execute(string[] args)
+        {
+            var serviceProvider = new WixToolsetServiceProvider();
+            var exitCode = Execute(args, serviceProvider, out var messages);
+            return new WixRunnerResult { ExitCode = exitCode, Messages = messages.ToArray() };
+        }
+
         public static int Execute(string[] args, IServiceProvider serviceProvider, out List<Message> messages)
         {
             var listener = new TestMessageListener();

@@ -32,8 +32,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messages);
-                Assert.Equal(0, result);
+                });
+
+                result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
@@ -66,9 +67,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example.cab")));
@@ -102,9 +103,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
@@ -391,9 +392,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi"),
                     "-i", bindpath,
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
@@ -427,9 +428,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
@@ -465,9 +466,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 var pdb = Pdb.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
                 Assert.NotEmpty(pdb.Output.SubStorages);

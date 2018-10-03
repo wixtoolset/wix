@@ -7,7 +7,6 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using Example.Extension;
     using WixBuildTools.TestSupport;
-    using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
@@ -48,9 +47,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(intermediateFolder, @"bin\extest.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.msi")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\extest.wixpdb")));
@@ -91,9 +90,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-intermediateFolder", intermediateFolder,
                     "-example", "test",
                     "-o", Path.Combine(intermediateFolder, @"bin\extest.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(0, result);
+                result.AssertSuccess();
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"extest.wir"));
                 var section = intermediate.Sections.Single();
@@ -106,8 +105,8 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args, out var messages);
-            Assert.Equal(0, result);
+            var result = WixRunner.Execute(args)
+                                  .AssertSuccess();
         }
     }
 }

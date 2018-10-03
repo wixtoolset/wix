@@ -32,10 +32,11 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messages);
-                Assert.Equal(0, result);
+                });
 
-                var warnings = messages.Where(message => message.Id == 1118);
+                result.AssertSuccess();
+
+                var warnings = result.Messages.Where(message => message.Id == 1118);
                 Assert.Single(warnings);
             }
         }
@@ -59,8 +60,9 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messages);
-                Assert.Equal(0, result);
+                });
+
+                result.AssertSuccess();
             }
         }
 
@@ -83,10 +85,10 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
-                }, out var messages);
+                });
 
-                Assert.Equal(147, result);
-                Assert.StartsWith("Found a <?if?>", messages.Single().ToString());
+                Assert.Equal(147, result.ExitCode);
+                Assert.StartsWith("Found a <?if?>", result.Messages.Single().ToString());
             }
         }
     }
