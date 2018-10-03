@@ -11,12 +11,13 @@ namespace WixToolset.Core.CommandLine
 
     internal class CompileCommand : ICommandLineCommand
     {
-        public CompileCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables)
+        public CompileCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, Platform platform)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.SourceFiles = sources;
             this.PreprocessorVariables = preprocessorVariables;
+            this.Platform = platform;
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -26,6 +27,8 @@ namespace WixToolset.Core.CommandLine
         private IEnumerable<SourceFile> SourceFiles { get; }
 
         private IDictionary<string, string> PreprocessorVariables { get; }
+
+        private Platform Platform { get; }
 
         public IEnumerable<string> IncludeSearchPaths { get; }
 
@@ -56,7 +59,7 @@ namespace WixToolset.Core.CommandLine
 
                 var compiler = new Compiler(this.ServiceProvider);
                 compiler.OutputPath = sourceFile.OutputPath;
-                compiler.Platform = Platform.X86; // TODO: set this correctly
+                compiler.Platform = this.Platform;
                 compiler.SourceDocument = document;
                 var intermediate = compiler.Execute();
 

@@ -59,6 +59,7 @@ namespace WixToolset.Core.CommandLine
             var outputFolder = String.Empty;
             var outputFile = String.Empty;
             var outputType = String.Empty;
+            var platformType = String.Empty;
             var verbose = false;
             var files = new List<string>();
             var defines = new List<string>();
@@ -89,6 +90,11 @@ namespace WixToolset.Core.CommandLine
                     case "h":
                     case "help":
                         cmdline.ShowHelp = true;
+                        return true;
+
+                    case "arch":
+                    case "platform":
+                        platformType = parser.GetNextArgumentOrError(arg);
                         return true;
 
                     case "bindfiles":
@@ -211,14 +217,16 @@ namespace WixToolset.Core.CommandLine
                 var bindPathList = this.GatherBindPaths(bindPaths);
                 var filterCultures = CalculateFilterCultures(cultures);
                 var type = CalculateOutputType(outputType, outputFile);
-                return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, filterCultures, outputFile, type, cabCachePath, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
+                var platform = CalculatePlatform(platformType);
+                return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, filterCultures, outputFile, type, platform, cabCachePath, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
             }
 
             case Commands.Compile:
             {
                 var sourceFiles = GatherSourceFiles(files, outputFolder);
-                var variables = GatherPreprocessorVariables(defines);
-                return new CompileCommand(this.ServiceProvider, sourceFiles, variables);
+                var variables = this.GatherPreprocessorVariables(defines);
+                var platform = CalculatePlatform(platformType);
+                return new CompileCommand(this.ServiceProvider, sourceFiles, variables, platform);
             }
             }
 
@@ -297,6 +305,11 @@ namespace WixToolset.Core.CommandLine
             return OutputType.Unknown;
         }
 
+        private static Platform CalculatePlatform(string platformType)
+        {
+            return Enum.TryParse(platformType, true, out Platform platform) ? platform : Platform.X86;
+        }
+
         private ICommandLineParser Parse(ICommandLineContext context, Func<CommandLineParser, string, bool> parseCommand, Func<CommandLineParser, IParseCommandLine, string, bool> parseArgument)
         {
             var extensions = this.ExtensionManager.Create<IExtensionCommandLine>();
@@ -372,7 +385,7 @@ namespace WixToolset.Core.CommandLine
 
             foreach (var pair in defineConstants)
             {
-                string[] value = pair.Split(new[] { '=' }, 2);
+                var value = pair.Split(new[] { '=' }, 2);
 
                 if (variables.ContainsKey(value[0]))
                 {
@@ -422,7 +435,7 @@ namespace WixToolset.Core.CommandLine
 
         public static BindPath ParseBindPath(string bindPath)
         {
-            string[] namedPath = bindPath.Split(BindPathSplit, 2);
+            var namedPath = bindPath.Split(BindPathSplit, 2);
             return (1 == namedPath.Length) ? new BindPath(namedPath[0]) : new BindPath(namedPath[0], namedPath[1]);
         }
     }

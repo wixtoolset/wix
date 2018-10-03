@@ -448,6 +448,38 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuild64bit()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-arch", "x64",
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var platformSummary = section.Tuples.OfType<_SummaryInformationTuple>().Single(s => s.PropertyId == 7);
+                Assert.Equal("x64;1033", platformSummary.Value);
+            }
+        }
+
         [Fact(Skip = "Not implemented yet.")]
         public void CanBuildInstanceTransform()
         {

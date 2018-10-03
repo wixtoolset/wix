@@ -13,7 +13,7 @@ namespace WixToolset.Core.CommandLine
 
     internal class BuildCommand : ICommandLineCommand
     {
-        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, IEnumerable<string> filterCultures, string outputPath, OutputType outputType, string cabCachePath, bool bindFiles, IEnumerable<BindPath> bindPaths, IEnumerable<string> includeSearchPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
+        public BuildCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, IEnumerable<string> locFiles, IEnumerable<string> libraryFiles, IEnumerable<string> filterCultures, string outputPath, OutputType outputType, Platform platform, string cabCachePath, bool bindFiles, IEnumerable<BindPath> bindPaths, IEnumerable<string> includeSearchPaths, string intermediateFolder, string contentsFile, string outputsFile, string builtOutputsFile)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -25,6 +25,7 @@ namespace WixToolset.Core.CommandLine
             this.SourceFiles = sources;
             this.OutputPath = outputPath;
             this.OutputType = outputType;
+            this.Platform = platform;
 
             this.CabCachePath = cabCachePath;
             this.BindFiles = bindFiles;
@@ -58,6 +59,8 @@ namespace WixToolset.Core.CommandLine
         private string OutputPath { get; }
 
         private OutputType OutputType { get; }
+
+        private Platform Platform { get; }
 
         public string CabCachePath { get; }
 
@@ -171,7 +174,7 @@ namespace WixToolset.Core.CommandLine
             {
                 var preprocessor = new Preprocessor(this.ServiceProvider);
                 preprocessor.IncludeSearchPaths = this.IncludeSearchPaths;
-                preprocessor.Platform = Platform.X86; // TODO: set this correctly
+                preprocessor.Platform = this.Platform;
                 preprocessor.SourcePath = sourceFile.SourcePath;
                 preprocessor.Variables = this.PreprocessorVariables;
 
@@ -192,7 +195,7 @@ namespace WixToolset.Core.CommandLine
 
                 var compiler = new Compiler(this.ServiceProvider);
                 compiler.OutputPath = sourceFile.OutputPath;
-                compiler.Platform = Platform.X86; // TODO: set this correctly
+                compiler.Platform = this.Platform;
                 compiler.SourceDocument = document;
                 var intermediate = compiler.Execute();
 
