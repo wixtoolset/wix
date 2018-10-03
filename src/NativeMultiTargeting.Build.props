@@ -4,7 +4,7 @@
 <Project>
   <!-- Overrides the standard Cpp.Build.props to include the PlatformToolset in the output path. -->
   <PropertyGroup>
-    <IntDir>$(BaseIntermediateOutputPath)$(PlatformToolset)\$(PlatformTarget)\</IntDir>
+    <IntDir>$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformToolset)\$(PlatformTarget)\</IntDir>
     <OutDir>$(OutputPath)$(PlatformToolset)\$(PlatformTarget)\</OutDir>
   </PropertyGroup>
 </Project>

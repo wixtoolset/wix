@@ -29,12 +29,14 @@
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Custom Action native utility library</Description>
   </PropertyGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="Shared">
     <Import Project="..\..\packages\Nerdbank.GitVersioning.2.0.37-beta\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.0.37-beta\build\Nerdbank.GitVersioning.targets')" />
   </ImportGroup>
   <Import Project="..\NativeMultiTargeting.Build.props" />
+
   <ItemGroup>
     <ClCompile Include="exbinary.cpp" />
     <ClCompile Include="wcalog.cpp" />
@@ -47,6 +49,7 @@
     <ClCompile Include="wcawrap.cpp" />
     <ClCompile Include="qtexec.cpp" />
   </ItemGroup>
+
   <ItemGroup Condition="'$(Platform)' == 'Win32'">
     <ClInclude Include="custommsierrors.h">
       <GenerateWixInclude>caerr.wxi</GenerateWixInclude>
@@ -62,12 +65,16 @@
     <ClInclude Include="inc\wcawow64.h" />
     <ClInclude Include="inc\wcawrapquery.h" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <Target Name="PackNativeNuget" DependsOnTargets="GetBuildVersion">
-    <Exec Command="nuget pack wcautil.nuspec -OutputDirectory $(BaseOutputPath) -Properties Configuration=$(Configuration);Id=WixToolset.WcaUtil;Version=&quot;$(BuildVersionSimple)&quot;;Authors=&quot;$(Authors)&quot;;Copyright=&quot;$(Copyright)&quot;;Description=&quot;$(Description)&quot;;Title=&quot;$(Title)&quot;" />
+
+  <Target Name="PackNativeNuget"
+          DependsOnTargets="GetBuildVersion">
+    <Exec Command='nuget pack wcautil.nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=WixToolset.WcaUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
   </Target>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
