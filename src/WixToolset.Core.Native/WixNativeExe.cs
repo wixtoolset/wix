@@ -39,6 +39,11 @@ namespace WixToolset.Core.Native
 
         public IEnumerable<string> Run()
         {
+            if (!File.Exists(PathToWixNativeExe))
+            {
+                throw new FileNotFoundException($"Could not find internal piece of WiX Toolset at: {PathToWixNativeExe}", PathToWixNativeExe);
+            }
+
             var wixNativeInfo = new ProcessStartInfo(PathToWixNativeExe, this.commandLine)
             {
                 RedirectStandardInput = true,
