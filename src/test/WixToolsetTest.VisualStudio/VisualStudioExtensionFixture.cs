@@ -38,9 +38,8 @@ namespace WixToolsetTest.VisualStudio
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args, out var messages);
-            Assert.Equal(0, result);
-            Assert.Empty(messages);
+            var result = WixRunner.Execute(args)
+                                  .AssertSuccess();
         }
     }
 }
