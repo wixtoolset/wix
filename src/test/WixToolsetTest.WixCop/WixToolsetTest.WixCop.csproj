@@ -7,6 +7,7 @@
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
+
   <ItemGroup>
     <None Remove="TestData\SingleFile\ConvertedSingleFile.wxs" />
     <None Remove="TestData\SingleFile\SingleFile.wxs" />

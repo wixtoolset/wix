@@ -1,8 +1,10 @@
-using System;
-using WixToolset.Extensibility.Data;
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixCop.CommandLine
+namespace WixToolset.Tools.WixCop.CommandLine
 {
+    using System;
+    using WixToolset.Extensibility.Data;
+
     internal class HelpCommand : ICommandLineCommand
     {
         public int Execute()

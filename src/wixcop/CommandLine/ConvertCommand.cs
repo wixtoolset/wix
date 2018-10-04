@@ -1,13 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml;
-using WixToolset.Extensibility.Data;
-using WixToolset.Extensibility.Services;
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixCop.CommandLine
+namespace WixToolset.Tools.WixCop.CommandLine
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Xml;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
+
     internal class ConvertCommand : ICommandLineCommand
     {
         private const string SettingsFileDefault = "wixcop.settings.xml";
@@ -69,7 +70,7 @@ namespace WixCop.CommandLine
 
             var errors = this.InspectSubDirectories(converter, Path.GetFullPath("."));
 
-            foreach (string searchPattern in this.SearchPatterns)
+            foreach (var searchPattern in this.SearchPatterns)
             {
                 if (!this.SearchPatternResults.Contains(searchPattern))
                 {

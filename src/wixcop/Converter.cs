@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixCop
+namespace WixToolset.Tools.WixCop
 {
     using System;
     using System.Collections.Generic;
@@ -141,7 +141,7 @@ namespace WixCop
             {
                 try
                 {
-                    using (StreamWriter writer = File.CreateText(this.SourceFile))
+                    using (var writer = File.CreateText(this.SourceFile))
                     {
                         document.Save(writer, SaveOptions.DisableFormatting | SaveOptions.OmitDuplicateNamespaces);
                     }
@@ -162,7 +162,7 @@ namespace WixCop
         /// <returns>The number of errors found.</returns>
         public int ConvertDocument(XDocument document)
         {
-            XDeclaration declaration = document.Declaration;
+            var declaration = document.Declaration;
 
             // Convert the declaration.
             if (null != declaration)
@@ -206,7 +206,7 @@ namespace WixCop
             }
 
             // Convert this node if it is an element.
-            XElement element = node as XElement;
+            var element = node as XElement;
 
             if (null != element)
             {
@@ -215,7 +215,7 @@ namespace WixCop
                 // Convert all children of this element.
                 IEnumerable<XNode> children = element.Nodes().ToList();
 
-                foreach (XNode child in children)
+                foreach (var child in children)
                 {
                     this.ConvertNode(child, level + 1);
                 }
@@ -225,9 +225,9 @@ namespace WixCop
         private void ConvertElement(XElement element)
         {
             // Gather any deprecated namespaces, then update this element tree based on those deprecations.
-            Dictionary<XNamespace, XNamespace> deprecatedToUpdatedNamespaces = new Dictionary<XNamespace, XNamespace>();
+            var deprecatedToUpdatedNamespaces = new Dictionary<XNamespace, XNamespace>();
 
-            foreach (XAttribute declaration in element.Attributes().Where(a => a.IsNamespaceDeclaration))
+            foreach (var declaration in element.Attributes().Where(a => a.IsNamespaceDeclaration))
             {
                 XNamespace ns;
 
@@ -258,7 +258,7 @@ namespace WixCop
         {
             if (null == element.Attribute("Id"))
             {
-                XAttribute attribute = element.Attribute("Name");
+                var attribute = element.Attribute("Name");
 
                 if (null == attribute)
                 {
@@ -267,7 +267,7 @@ namespace WixCop
 
                 if (null != attribute)
                 {
-                    string name = Path.GetFileName(attribute.Value);
+                    var name = Path.GetFileName(attribute.Value);
 
                     if (this.OnError(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the default", name))
                     {
@@ -282,7 +282,7 @@ namespace WixCop
 
         private void ConvertSuppressSignatureValidation(XElement element)
         {
-            XAttribute suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
+            var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
 
             if (null != suppressSignatureValidation)
             {
@@ -311,7 +311,7 @@ namespace WixCop
 
                 element.Add(new XAttribute("xmlns", WixNamespace.NamespaceName)); // set the default namespace.
 
-                foreach (XElement elementWithoutNamespace in element.Elements().Where(e => XNamespace.None == e.Name.Namespace))
+                foreach (var elementWithoutNamespace in element.Elements().Where(e => XNamespace.None == e.Name.Namespace))
                 {
                     elementWithoutNamespace.Name = WixNamespace.GetName(elementWithoutNamespace.Name.LocalName);
                 }
@@ -326,9 +326,7 @@ namespace WixCop
         private void ConvertWhitespace(XNode node, int level)
         {
             // Fix the whitespace before this node.
-            XText whitespace = node.PreviousNode as XText;
-
-            if (null != whitespace)
+            if (node.PreviousNode is XText whitespace)
             {
                 if (XmlNodeType.CDATA == node.NodeType)
                 {
@@ -351,9 +349,7 @@ namespace WixCop
             }
 
             // Fix the whitespace after CDATA nodes.
-            XCData cdata = node as XCData;
-
-            if (null != cdata)
+            if (node is XCData cdata)
             {
                 whitespace = cdata.NextNode as XText;
 
@@ -368,9 +364,7 @@ namespace WixCop
             else
             {
                 // Fix the whitespace inside and after this node (except for Error which may contain just whitespace).
-                XElement element = node as XElement;
-
-                if (null != element && "Error" != element.Name.LocalName)
+                if (node is XElement element && "Error" != element.Name.LocalName)
                 {
                     if (!element.HasElements && !element.IsEmpty && String.IsNullOrEmpty(element.Value.Trim()))
                     {
@@ -403,7 +397,7 @@ namespace WixCop
         {
             if (null != types)
             {
-                foreach (string type in types)
+                foreach (var type in types)
                 {
                     ConverterTestType itt;
 
@@ -421,7 +415,7 @@ namespace WixCop
 
         private static void UpdateElementsWithDeprecatedNamespaces(IEnumerable<XElement> elements, Dictionary<XNamespace, XNamespace> deprecatedToUpdatedNamespaces)
         {
-            foreach (XElement element in elements)
+            foreach (var element in elements)
             {
                 XNamespace ns;
 
@@ -434,9 +428,9 @@ namespace WixCop
                 IEnumerable<XAttribute> attributes = element.Attributes().ToList();
                 element.RemoveAttributes();
 
-                foreach (XAttribute attribute in attributes)
+                foreach (var attribute in attributes)
                 {
-                    XAttribute convertedAttribute = attribute;
+                    var convertedAttribute = attribute;
 
                     if (attribute.IsNamespaceDeclaration)
                     {
@@ -477,7 +471,7 @@ namespace WixCop
             }
 
             // check the spaces
-            foreach (char character in whitespace)
+            foreach (var character in whitespace)
             {
                 if (' ' != character)
                 {
@@ -496,9 +490,9 @@ namespace WixCop
         /// <param name="whitespace">The whitespace node to fix.</param>
         private static void FixWhitespace(int indentationAmount, int level, XText whitespace)
         {
-            int newLineCount = 0;
+            var newLineCount = 0;
 
-            for (int i = 0; i + 1 < whitespace.Value.Length; ++i)
+            for (var i = 0; i + 1 < whitespace.Value.Length; ++i)
             {
                 if (XDocumentNewLine == whitespace.Value.Substring(i, 2))
                 {
@@ -516,7 +510,7 @@ namespace WixCop
             whitespace.Value = String.Empty;
 
             // add the correct number of newlines
-            for (int i = 0; i < newLineCount; ++i)
+            for (var i = 0; i < newLineCount; ++i)
             {
                 whitespace.Value = String.Concat(whitespace.Value, XDocumentNewLine);
             }
@@ -543,9 +537,9 @@ namespace WixCop
             // Increase the error count.
             this.Errors++;
 
-            SourceLineNumber sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wixcop.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
-            bool warning = this.ErrorsAsWarnings.Contains(converterTestType);
-            string display = String.Format(CultureInfo.CurrentCulture, message, args);
+            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wixcop.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
+            var warning = this.ErrorsAsWarnings.Contains(converterTestType);
+            var display = String.Format(CultureInfo.CurrentCulture, message, args);
 
             var msg = new Message(sourceLine, warning ? MessageLevel.Warning : MessageLevel.Error, (int)converterTestType, "{0} ({1})", display, converterTestType.ToString());
 

@@ -1,15 +1,15 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixCop
+namespace WixToolset.Tools.WixCop
 {
     using System;
-    using WixCop.CommandLine;
-    using WixCop.Interfaces;
     using WixToolset.Core;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Tools.Core;
+    using WixToolset.Tools.WixCop.CommandLine;
+    using WixToolset.Tools.WixCop.Interfaces;
 
     /// <summary>
     /// Wix source code style inspector and converter.
