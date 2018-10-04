@@ -20,7 +20,7 @@ namespace WixToolsetTest.BuildTasks
 
         private MsbuildRunner MsbuildRunner { get; }
 
-        [Fact]
+        [Fact(Skip = "Re-enable when our assemblies are correctly copied together so they can be loaded by MSBuild via wix.targets")]
         public void CanBuildSimpleMsiPackage()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
@@ -55,7 +55,7 @@ namespace WixToolsetTest.BuildTasks
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Re-enable when our assemblies are correctly copied together so they can be loaded by MSBuild via wix.targets")]
         public void CanBuildSimpleMsiPackageWithWarningSuppressions()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
@@ -80,7 +80,7 @@ namespace WixToolsetTest.BuildTasks
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Re-enable when our assemblies are correctly copied together so they can be loaded by MSBuild via wix.targets")]
         public void CanBuildSimpleMsiPackageAsWixipl()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
@@ -107,7 +107,7 @@ namespace WixToolsetTest.BuildTasks
             }
         }
 
-        [Fact]
+        [Fact(Skip ="Re-enable when our assemblies are correctly copied together so they can be loaded by MSBuild via wix.targets")]
         public void CanBuildAndCleanSimpleMsiPackage()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
