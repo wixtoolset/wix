@@ -34,8 +34,8 @@ namespace WixToolsetTest.WixCop
 
                 Assert.Equal(2, result.ExitCode);
 
-                var expected = File.ReadAllText(Path.Combine(folder, afterFileName));
-                var actual = File.ReadAllText(targetFile);
+                var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
+                var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
                 Assert.Equal(expected, actual);
 
                 var runner2 = new WixCopRunner
@@ -80,8 +80,8 @@ namespace WixToolsetTest.WixCop
 
                 Assert.Equal(2, result.ExitCode);
 
-                var expected = File.ReadAllText(Path.Combine(folder, afterFileName));
-                var actual = File.ReadAllText(targetFile);
+                var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
+                var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
                 Assert.Equal(expected, actual);
 
                 var runner2 = new WixCopRunner
