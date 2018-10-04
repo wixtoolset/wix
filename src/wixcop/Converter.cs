@@ -7,6 +7,7 @@ namespace WixToolset.Tools.WixCop
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Xml;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -18,7 +19,7 @@ namespace WixToolset.Tools.WixCop
     /// </summary>
     public class Converter
     {
-        private const string XDocumentNewLine = "\n"; // XDocument normlizes "\r\n" to just "\n".
+        private const char XDocumentNewLine = '\n'; // XDocument normalizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
 
         private static readonly XName FileElementName = WixNamespace + "File";
@@ -58,7 +59,7 @@ namespace WixToolset.Tools.WixCop
             { "http://schemas.microsoft.com/wix/2006/WixUnit", "http://wixtoolset.org/schemas/v4/wixunit" },
         };
 
-        private Dictionary<XName, Action<XElement>> ConvertElementMapping;
+        private readonly Dictionary<XName, Action<XElement>> ConvertElementMapping;
 
         /// <summary>
         /// Instantiate a new Converter class.
@@ -79,14 +80,16 @@ namespace WixToolset.Tools.WixCop
                 { Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace },
             };*/
-            this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>();
-            this.ConvertElementMapping.Add(Converter.FileElementName, this.ConvertFileElement);
-            this.ConvertElementMapping.Add(Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation);
-            this.ConvertElementMapping.Add(Converter.MsiPackageElementName, this.ConvertSuppressSignatureValidation);
-            this.ConvertElementMapping.Add(Converter.MspPackageElementName, this.ConvertSuppressSignatureValidation);
-            this.ConvertElementMapping.Add(Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation);
-            this.ConvertElementMapping.Add(Converter.PayloadElementName, this.ConvertSuppressSignatureValidation);
-            this.ConvertElementMapping.Add(Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace);
+            this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
+            {
+                { Converter.FileElementName, this.ConvertFileElement },
+                { Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
+                { Converter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
+                { Converter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
+                { Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
+                { Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
+                { Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace }
+            };
 
             this.Messaging = messaging;
 
@@ -129,7 +132,7 @@ namespace WixToolset.Tools.WixCop
             }
             catch (XmlException e)
             {
-                this.OnError(ConverterTestType.XmlException, (XObject)null, "The xml is invalid.  Detail: '{0}'", e.Message);
+                this.OnError(ConverterTestType.XmlException, null, "The xml is invalid.  Detail: '{0}'", e.Message);
 
                 return this.Errors;
             }
@@ -148,7 +151,7 @@ namespace WixToolset.Tools.WixCop
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    this.OnError(ConverterTestType.UnauthorizedAccessException, (XObject)null, "Could not write to file.");
+                    this.OnError(ConverterTestType.UnauthorizedAccessException, null, "Could not write to file.");
                 }
             }
 
@@ -177,51 +180,90 @@ namespace WixToolset.Tools.WixCop
             }
             else // missing declaration
             {
-                if (this.OnError(ConverterTestType.DeclarationMissing, (XNode)null, "This file is missing an XML declaration on the first line."))
+                if (this.OnError(ConverterTestType.DeclarationMissing, null, "This file is missing an XML declaration on the first line."))
                 {
                     document.Declaration = new XDeclaration("1.0", "utf-8", null);
-                    document.Root.AddBeforeSelf(new XText(XDocumentNewLine));
+                    document.Root.AddBeforeSelf(new XText(XDocumentNewLine.ToString()));
                 }
             }
 
             // Start converting the nodes at the top.
-            this.ConvertNode(document.Root, 0);
+            this.ConvertNodes(document.Nodes(), 0);
 
             return this.Errors;
         }
 
-        /// <summary>
-        /// Convert a single xml node.
-        /// </summary>
-        /// <param name="node">The node to convert.</param>
-        /// <param name="level">The depth level of the node.</param>
-        /// <returns>The converted node.</returns>
-        private void ConvertNode(XNode node, int level)
+        private void ConvertNodes(IEnumerable<XNode> nodes, int level)
         {
-            // Convert this node's whitespace.
-            if ((XmlNodeType.Comment == node.NodeType && 0 > ((XComment)node).Value.IndexOf(XDocumentNewLine, StringComparison.Ordinal)) ||
-                XmlNodeType.CDATA == node.NodeType || XmlNodeType.Element == node.NodeType || XmlNodeType.ProcessingInstruction == node.NodeType)
+            // Note we operate on a copy of the node list since we may
+            // remove some whitespace nodes during this processing.
+            foreach (var node in nodes.ToList())
             {
-                this.ConvertWhitespace(node, level);
-            }
-
-            // Convert this node if it is an element.
-            var element = node as XElement;
-
-            if (null != element)
-            {
-                this.ConvertElement(element);
-
-                // Convert all children of this element.
-                IEnumerable<XNode> children = element.Nodes().ToList();
-
-                foreach (var child in children)
+                if (node is XText text)
                 {
-                    this.ConvertNode(child, level + 1);
+                    if (!String.IsNullOrWhiteSpace(text.Value))
+                    {
+                        text.Value = text.Value.Trim();
+                    }
+                    else if (node.NextNode is XCData cdata)
+                    {
+                        this.EnsurePrecedingWhitespaceRemoved(text, node, ConverterTestType.WhitespacePrecedingNodeWrong);
+                    }
+                    else if (node.NextNode is XElement element)
+                    {
+                        this.EnsurePrecedingWhitespaceCorrect(text, node, level, ConverterTestType.WhitespacePrecedingNodeWrong);
+                    }
+                    else if (node.NextNode is null) // this is the space before the close element
+                    {
+                        if (node.PreviousNode is null || node.PreviousNode is XCData)
+                        {
+                            this.EnsurePrecedingWhitespaceRemoved(text, node.Parent, ConverterTestType.WhitespacePrecedingEndElementWrong);
+                        }
+                        else if (level == 0) // root element's close tag
+                        {
+                            this.EnsurePrecedingWhitespaceCorrect(text, node, 0, ConverterTestType.WhitespacePrecedingEndElementWrong);
+                        }
+                        else
+                        {
+                            this.EnsurePrecedingWhitespaceCorrect(text, node, level - 1, ConverterTestType.WhitespacePrecedingEndElementWrong);
+                        }
+                    }
+                }
+                else if (node is XElement element)
+                {
+                    this.ConvertElement(element);
+
+                    this.ConvertNodes(element.Nodes(), level + 1);
                 }
             }
         }
 
+        private void EnsurePrecedingWhitespaceCorrect(XText whitespace, XNode node, int level, ConverterTestType testType)
+        {
+            if (!Converter.LeadingWhitespaceValid(this.IndentationAmount, level, whitespace.Value))
+            {
+                var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
+
+                if (this.OnError(testType, node, message))
+                {
+                    Converter.FixupWhitespace(this.IndentationAmount, level, whitespace);
+                }
+            }
+        }
+
+        private void EnsurePrecedingWhitespaceRemoved(XText whitespace, XNode node, ConverterTestType testType)
+        {
+            if (!String.IsNullOrEmpty(whitespace.Value))
+            {
+                var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
+
+                if (this.OnError(testType, node, message))
+                {
+                    whitespace.Remove();
+                }
+            }
+        }
+        
         private void ConvertElement(XElement element)
         {
             // Gather any deprecated namespaces, then update this element tree based on those deprecations.
@@ -229,9 +271,7 @@ namespace WixToolset.Tools.WixCop
 
             foreach (var declaration in element.Attributes().Where(a => a.IsNamespaceDeclaration))
             {
-                XNamespace ns;
-
-                if (Converter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out ns))
+                if (Converter.OldToNewNamespaceMapping.TryGetValue(declaration.Value, out var ns))
                 {
                     if (this.OnError(ConverterTestType.XmlnsValueWrong, declaration, "The namespace '{0}' is out of date.  It must be '{1}'.", declaration.Value, ns.NamespaceName))
                     {
@@ -245,10 +285,8 @@ namespace WixToolset.Tools.WixCop
                 Converter.UpdateElementsWithDeprecatedNamespaces(element.DescendantsAndSelf(), deprecatedToUpdatedNamespaces);
             }
 
-            // Convert the node in much greater detail.
-            Action<XElement> convert;
-
-            if (this.ConvertElementMapping.TryGetValue(element.Name, out convert))
+            // Apply any specialized conversion actions.
+            if (this.ConvertElementMapping.TryGetValue(element.Name, out var convert))
             {
                 convert(element);
             }
@@ -318,96 +356,20 @@ namespace WixToolset.Tools.WixCop
             }
         }
 
-        /// <summary>
-        /// Convert the whitespace adjacent to a node.
-        /// </summary>
-        /// <param name="node">The node to convert.</param>
-        /// <param name="level">The depth level of the node.</param>
-        private void ConvertWhitespace(XNode node, int level)
-        {
-            // Fix the whitespace before this node.
-            if (node.PreviousNode is XText whitespace)
-            {
-                if (XmlNodeType.CDATA == node.NodeType)
-                {
-                    if (this.OnError(ConverterTestType.WhitespacePrecedingCDATAWrong, node, "There should be no whitespace preceding a CDATA node."))
-                    {
-                        whitespace.Remove();
-                    }
-                }
-                else
-                {
-                    // TODO: this code complains about whitespace even after the file has been fixed.
-                    if (!Converter.IsLegalWhitespace(this.IndentationAmount, level, whitespace.Value))
-                    {
-                        if (this.OnError(ConverterTestType.WhitespacePrecedingNodeWrong, node, "The whitespace preceding this node is incorrect."))
-                        {
-                            Converter.FixWhitespace(this.IndentationAmount, level, whitespace);
-                        }
-                    }
-                }
-            }
-
-            // Fix the whitespace after CDATA nodes.
-            if (node is XCData cdata)
-            {
-                whitespace = cdata.NextNode as XText;
-
-                if (null != whitespace)
-                {
-                    if (this.OnError(ConverterTestType.WhitespaceFollowingCDATAWrong, node, "There should be no whitespace following a CDATA node."))
-                    {
-                        whitespace.Remove();
-                    }
-                }
-            }
-            else
-            {
-                // Fix the whitespace inside and after this node (except for Error which may contain just whitespace).
-                if (node is XElement element && "Error" != element.Name.LocalName)
-                {
-                    if (!element.HasElements && !element.IsEmpty && String.IsNullOrEmpty(element.Value.Trim()))
-                    {
-                        if (this.OnError(ConverterTestType.NotEmptyElement, element, "This should be an empty element since it contains nothing but whitespace."))
-                        {
-                            element.RemoveNodes();
-                        }
-                    }
-
-                    whitespace = node.NextNode as XText;
-
-                    if (null != whitespace)
-                    {
-                        // TODO: this code crashes when level is 0,
-                        //       complains about whitespace even after the file has been fixed,
-                        //       and the error text doesn't match the error.
-                        if (!Converter.IsLegalWhitespace(this.IndentationAmount, level - 1, whitespace.Value))
-                        {
-                            if (this.OnError(ConverterTestType.WhitespacePrecedingEndElementWrong, whitespace, "The whitespace preceding this end element is incorrect."))
-                            {
-                                Converter.FixWhitespace(this.IndentationAmount, level - 1, whitespace);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         private IEnumerable<ConverterTestType> YieldConverterTypes(IEnumerable<string> types)
         {
             if (null != types)
             {
                 foreach (var type in types)
                 {
-                    ConverterTestType itt;
 
-                    if (Enum.TryParse<ConverterTestType>(type, true, out itt))
+                    if (Enum.TryParse<ConverterTestType>(type, true, out var itt))
                     {
                         yield return itt;
                     }
                     else // not a known ConverterTestType
                     {
-                        this.OnError(ConverterTestType.ConverterTestTypeUnknown, (XObject)null, "Unknown error type: '{0}'.", type);
+                        this.OnError(ConverterTestType.ConverterTestTypeUnknown, null, "Unknown error type: '{0}'.", type);
                     }
                 }
             }
@@ -417,9 +379,8 @@ namespace WixToolset.Tools.WixCop
         {
             foreach (var element in elements)
             {
-                XNamespace ns;
 
-                if (deprecatedToUpdatedNamespaces.TryGetValue(element.Name.Namespace, out ns))
+                if (deprecatedToUpdatedNamespaces.TryGetValue(element.Name.Namespace, out var ns))
                 {
                     element.Name = ns.GetName(element.Name.LocalName);
                 }
@@ -456,67 +417,33 @@ namespace WixToolset.Tools.WixCop
         /// <param name="level">The depth level that should match this whitespace.</param>
         /// <param name="whitespace">The whitespace to validate.</param>
         /// <returns>true if the whitespace is legal; false otherwise.</returns>
-        private static bool IsLegalWhitespace(int indentationAmount, int level, string whitespace)
+        private static bool LeadingWhitespaceValid(int indentationAmount, int level, string whitespace)
         {
-            // strip off leading newlines; there can be an arbitrary number of these
-            while (whitespace.StartsWith(XDocumentNewLine, StringComparison.Ordinal))
-            {
-                whitespace = whitespace.Substring(XDocumentNewLine.Length);
-            }
+            // Strip off leading newlines; there can be an arbitrary number of these.
+            whitespace = whitespace.TrimStart(XDocumentNewLine);
 
-            // check the length
-            if (whitespace.Length != level * indentationAmount)
-            {
-                return false;
-            }
+            var indentation = new string(' ', level * indentationAmount);
 
-            // check the spaces
-            foreach (var character in whitespace)
-            {
-                if (' ' != character)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return whitespace == indentation;
         }
 
         /// <summary>
-        /// Fix the whitespace in a Whitespace node.
+        /// Fix the whitespace in a whitespace node.
         /// </summary>
         /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
         /// <param name="level">The depth level of the desired whitespace.</param>
         /// <param name="whitespace">The whitespace node to fix.</param>
-        private static void FixWhitespace(int indentationAmount, int level, XText whitespace)
+        private static void FixupWhitespace(int indentationAmount, int level, XText whitespace)
         {
-            var newLineCount = 0;
+            var value = new StringBuilder(whitespace.Value.Length);
 
-            for (var i = 0; i + 1 < whitespace.Value.Length; ++i)
-            {
-                if (XDocumentNewLine == whitespace.Value.Substring(i, 2))
-                {
-                    ++i; // skip an extra character
-                    ++newLineCount;
-                }
-            }
+            // Keep any previous preceeding new lines.
+            var newlines = whitespace.Value.TakeWhile(c => c == XDocumentNewLine).Count();
 
-            if (0 == newLineCount)
-            {
-                newLineCount = 1;
-            }
+            // Ensure there is always at least one new line before the indentation.
+            value.Append(XDocumentNewLine, newlines == 0 ? 1 : newlines);
 
-            // reset the whitespace value
-            whitespace.Value = String.Empty;
-
-            // add the correct number of newlines
-            for (var i = 0; i < newLineCount; ++i)
-            {
-                whitespace.Value = String.Concat(whitespace.Value, XDocumentNewLine);
-            }
-
-            // add the correct number of spaces based on configured indentation amount
-            whitespace.Value = String.Concat(whitespace.Value, new string(' ', level * indentationAmount));
+            whitespace.Value = value.Append(' ', level * indentationAmount).ToString();
         }
 
         /// <summary>

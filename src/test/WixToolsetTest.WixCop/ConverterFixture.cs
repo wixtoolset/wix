@@ -94,8 +94,82 @@ namespace WixToolsetTest.WixCop
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(4, errors);
             Assert.Equal(expected, actual);
+            Assert.Equal(4, errors);
+        }
+
+        [Fact]
+        public void CanPreserveNewLines()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "",
+                "    <Property Id='Prop' Value='Val' />",
+                "",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "    <Fragment>",
+                "",
+                "        <Property Id=\"Prop\" Value=\"Val\" />",
+                "",
+                "    </Fragment>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Converter(messaging, 4, null, null);
+
+            var conversions = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(expected, actual);
+            Assert.Equal(3, conversions);
+        }
+
+        [Fact]
+        public void CanConvertWithNewLineAtEndOfFile()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "",
+                "    <Property Id='Prop' Value='Val' />",
+                "",
+                "  </Fragment>",
+                "</Wix>",
+                "");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "    <Fragment>",
+                "",
+                "        <Property Id=\"Prop\" Value=\"Val\" />",
+                "",
+                "    </Fragment>",
+                "</Wix>",
+                "");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Converter(messaging, 4, null, null);
+
+            var conversions = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(expected, actual);
+            Assert.Equal(3, conversions);
         }
 
         [Fact]
