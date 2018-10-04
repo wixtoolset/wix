@@ -34,14 +34,9 @@ namespace WixToolsetTest.WixCop
 
                 Assert.Equal(2, result.ExitCode);
 
-                var actualLines = File.ReadAllLines(targetFile);
-                var expectedLines = File.ReadAllLines(Path.Combine(folder, afterFileName));
-
-                for (var i = 0; i < actualLines.Length && i < expectedLines.Length; ++i)
-                {
-                    Assert.Equal(expectedLines[i], actualLines[i]);
-                }
-                Assert.Equal(expectedLines.Length, actualLines.Length);
+                var expected = File.ReadAllText(Path.Combine(folder, afterFileName));
+                var actual = File.ReadAllText(targetFile);
+                Assert.Equal(expected, actual);
 
                 var runner2 = new WixCopRunner
                 {
@@ -85,9 +80,9 @@ namespace WixToolsetTest.WixCop
 
                 Assert.Equal(2, result.ExitCode);
 
-                var actualLines = File.ReadAllLines(targetFile);
-                var expectedLines = File.ReadAllLines(Path.Combine(folder, afterFileName));
-                Assert.Equal(expectedLines, actualLines);
+                var expected = File.ReadAllText(Path.Combine(folder, afterFileName));
+                var actual = File.ReadAllText(targetFile);
+                Assert.Equal(expected, actual);
 
                 var runner2 = new WixCopRunner
                 {

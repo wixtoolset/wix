@@ -41,7 +41,7 @@
             </Component>
 
             <Component Directory="BinFolder">
-                <File Source="common\wixtoolset.org.ico">
+                <File Id="wixtoolset.org.ico" Source="common\wixtoolset.org.ico">
                   <?include ComRegistration.wxi ?>
                 </File>
                 <util:InternetShortcut Id="wixtoolset.org" Directory="ShortcutFolder" Name="WiX Home Page" Target="http://wixtoolset.org/" IconFile="file://[#wixtoolset.org.ico]" />
