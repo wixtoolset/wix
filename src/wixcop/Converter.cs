@@ -28,6 +28,8 @@ namespace WixToolset.Tools.WixCop
         private static readonly XName MspPackageElementName = WixNamespace + "MspPackage";
         private static readonly XName MsuPackageElementName = WixNamespace + "MsuPackage";
         private static readonly XName PayloadElementName = WixNamespace + "Payload";
+        private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
+        private static readonly XName PropertyElementName = WixNamespace + "Property";
         private static readonly XName WixElementWithoutNamespaceName = XNamespace.None + "Wix";
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
@@ -88,6 +90,8 @@ namespace WixToolset.Tools.WixCop
                 { Converter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
                 { Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
                 { Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
+                { Converter.CustomActionElementName, this.ConvertCustomActionElement },
+                { Converter.PropertyElementName, this.ConvertPropertyElement },
                 { Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace }
             };
 
@@ -263,7 +267,7 @@ namespace WixToolset.Tools.WixCop
                 }
             }
         }
-        
+
         private void ConvertElement(XElement element)
         {
             // Gather any deprecated namespaces, then update this element tree based on those deprecations.
@@ -324,7 +328,7 @@ namespace WixToolset.Tools.WixCop
 
             if (null != suppressSignatureValidation)
             {
-                if (this.OnError(ConverterTestType.SuppressSignatureValidationDeprecated, element, "The chain package element contains deprecated '{0}' attribute. Use the 'EnableSignatureValidation' instead.", suppressSignatureValidation))
+                if (this.OnError(ConverterTestType.SuppressSignatureValidationDeprecated, element, "The chain package element contains deprecated '{0}' attribute. Use the 'EnableSignatureValidation' attribute instead.", suppressSignatureValidation))
                 {
                     if ("no" == suppressSignatureValidation.Value)
                     {
@@ -333,6 +337,49 @@ namespace WixToolset.Tools.WixCop
                 }
 
                 suppressSignatureValidation.Remove();
+            }
+        }
+
+        private void ConvertCustomActionElement(XElement xCustomAction)
+        {
+            var xBinaryKey = xCustomAction.Attribute("BinaryKey");
+
+            if (xBinaryKey?.Value == "WixCA")
+            {
+                if (this.OnError(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA custom action DLL Binary table id has been renamed. Use the id 'UtilCA' instead."))
+                {
+                    xBinaryKey.Value = "UtilCA";
+                }
+            }
+
+            var xDllEntry = xCustomAction.Attribute("DllEntry");
+
+            if (xDllEntry?.Value == "CAQuietExec" || xDllEntry?.Value == "CAQuietExec64")
+            {
+                if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The CAQuietExec and CAQuietExec64 custom action ids have been renamed. Use the ids 'WixQuietExec' and 'WixQuietExec64' instead."))
+                {
+                    xDllEntry.Value = xDllEntry.Value.Replace("CAQuietExec", "WixQuietExec");
+                }
+            }
+
+            var xProperty = xCustomAction.Attribute("Property");
+
+            if (xProperty?.Value == "QtExecCmdLine" || xProperty?.Value == "QtExec64CmdLine")
+            {
+                if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The QtExecCmdLine and QtExec64CmdLine property ids have been renamed. Use the ids 'WixQuietExecCmdLine' and 'WixQuietExec64CmdLine' instead."))
+                {
+                    xProperty.Value = xProperty.Value.Replace("QtExec", "WixQuietExec");
+                }
+            }
+        }
+
+        private void ConvertPropertyElement(XElement xProperty)
+        {
+            var xId = xProperty.Attribute("Id");
+
+            if (xId.Value == "QtExecCmdTimeout")
+            {
+                this.OnError(ConverterTestType.QtExecCmdTimeoutAmbiguous, xProperty, "QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.");
             }
         }
 
@@ -549,6 +596,21 @@ namespace WixToolset.Tools.WixCop
             /// SuppressSignatureValidation attribute is deprecated and replaced with EnableSignatureValidation.
             /// </summary>
             SuppressSignatureValidationDeprecated,
+
+            /// <summary>
+            /// WixCA Binary/@Id has been renamed to UtilCA.
+            /// </summary>
+            WixCABinaryIdRenamed,
+
+            /// <summary>
+            /// QtExec custom actions have been renamed.
+            /// </summary>
+            QuietExecCustomActionsRenamed,
+
+            /// <summary>
+            /// QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.
+            /// </summary>
+            QtExecCmdTimeoutAmbiguous,
         }
     }
 }

@@ -18,6 +18,10 @@
     <Content Include="TestData\Preprocessor\ConvertedPreprocessor.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Preprocessor\Preprocessor.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Preprocessor\wixcop.settings.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec\v3.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec.bad\v3.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec.bad\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
