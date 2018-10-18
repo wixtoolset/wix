@@ -8,7 +8,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.WindowsInst
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.Burn", "src\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj", "{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{1284331E-BC6C-426D-AAAF-140C0174F875}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Extension", "src\test\Example.Extension\Example.Extension.csproj", "{C66C2503-C671-4230-8B48-1D93A8532A28}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.CoreIntegration", "src\test\WixToolsetTest.CoreIntegration\WixToolsetTest.CoreIntegration.csproj", "{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Core.TestPackage", "src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj", "{853716DB-C02C-41BD-91BC-79CDC0C17D10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +62,18 @@ Global
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x64.Build.0 = Release|Any CPU
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC19D30D-C1B6-46DF-95B3-8EDF688E0FEC}.Release|x86.Build.0 = Release|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|x64.Build.0 = Debug|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Debug|x86.Build.0 = Debug|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Release|x64.ActiveCfg = Release|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Release|x64.Build.0 = Release|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Release|x86.ActiveCfg = Release|Any CPU
+		{C66C2503-C671-4230-8B48-1D93A8532A28}.Release|x86.Build.0 = Release|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -68,9 +86,25 @@ Global
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x64.Build.0 = Release|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B}.Release|x86.Build.0 = Release|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|x64.Build.0 = Debug|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Debug|x86.Build.0 = Debug|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Release|x64.ActiveCfg = Release|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Release|x64.Build.0 = Release|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Release|x86.ActiveCfg = Release|Any CPU
+		{853716DB-C02C-41BD-91BC-79CDC0C17D10}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C66C2503-C671-4230-8B48-1D93A8532A28} = {1284331E-BC6C-426D-AAAF-140C0174F875}
+		{E8A08E86-1780-4ED4-8F63-AB2B52C1C16B} = {1284331E-BC6C-426D-AAAF-140C0174F875}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BB8820D5-723D-426D-B4A0-4D221603C5FA}

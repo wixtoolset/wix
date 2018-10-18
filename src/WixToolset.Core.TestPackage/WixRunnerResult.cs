@@ -15,7 +15,7 @@ namespace WixToolset.Core.TestPackage
 
         public WixRunnerResult AssertSuccess()
         {
-            Assert.True(0 == this.ExitCode, $"MSBuild failed unexpectedly. Output:\r\n{String.Join("\r\n", this.Messages.Select(m => m.ToString()).ToArray())}");
+            Assert.True(0 == this.ExitCode, $"\r\n\r\nWixRunner failed with exit code: {this.ExitCode}\r\n   Output: {String.Join("\r\n           ", this.Messages.Select(m => m.ToString()).ToArray())}\r\n");
             return this;
         }
     }
