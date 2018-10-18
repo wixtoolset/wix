@@ -6,7 +6,6 @@ namespace WixToolset.Core
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
@@ -20,7 +19,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Preprocessor object
     /// </summary>
-    internal class Preprocessor
+    internal class Preprocessor : IPreprocessor
     {
         private static readonly Regex DefineRegex = new Regex(@"^\s*(?<varName>.+?)\s*(=\s*(?<varValue>.+?)\s*)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
         private static readonly Regex PragmaRegex = new Regex(@"^\s*(?<pragmaName>.+?)(?<pragmaValue>[\s\(].+?)?$", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
@@ -30,6 +29,7 @@ namespace WixToolset.Core
             ValidationFlags = System.Xml.Schema.XmlSchemaValidationFlags.None,
             XmlResolver = null,
         };
+
         private static readonly XmlReaderSettings FragmentXmlReaderSettings = new XmlReaderSettings()
         {
             ConformanceLevel = ConformanceLevel.Fragment,
@@ -43,14 +43,6 @@ namespace WixToolset.Core
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
-
-        public IEnumerable<string> IncludeSearchPaths { get; set; }
-
-        public Platform Platform { get; set; }
-
-        public string SourcePath { get; set; }
-
-        public IDictionary<string, string> Variables { get; set; }
 
         private IServiceProvider ServiceProvider { get; }
 
@@ -108,19 +100,21 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="context">The preprocessing context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        public XDocument Execute()
+        public XDocument Preprocess(IPreprocessContext context)
         {
-            this.Context = this.CreateContext();
+            this.Context = context;
+            this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
+            this.Context.Variables = this.Context.Variables == null ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
 
             this.PreProcess();
 
             XDocument document;
-            using (XmlReader reader = XmlReader.Create(this.Context.SourceFile, DocumentXmlReaderSettings))
+            using (var reader = XmlReader.Create(this.Context.SourcePath, DocumentXmlReaderSettings))
             {
                 document = this.Process(reader);
             }
 
-            return PostProcess(document);
+            return this.PostProcess(document);
         }
 
         /// <summary>
@@ -129,21 +123,23 @@ namespace WixToolset.Core
         /// <param name="context">The preprocessing context.</param>
         /// <param name="reader">XmlReader to processing the context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        public XDocument Execute(XmlReader reader)
+        public XDocument Preprocess(IPreprocessContext context, XmlReader reader)
         {
-            if (String.IsNullOrEmpty(this.SourcePath) && !String.IsNullOrEmpty(reader.BaseURI))
+            if (String.IsNullOrEmpty(context.SourcePath) && !String.IsNullOrEmpty(reader.BaseURI))
             {
                 var uri = new Uri(reader.BaseURI);
-                this.SourcePath = uri.AbsolutePath;
+                context.SourcePath = uri.AbsolutePath;
             }
 
-            this.Context = this.CreateContext();
+            this.Context = context;
+            this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
+            this.Context.Variables = this.Context.Variables == null ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
 
             this.PreProcess();
 
             var document = this.Process(reader);
 
-            return PostProcess(document);
+            return this.PostProcess(document);
         }
 
         /// <summary>
@@ -160,13 +156,13 @@ namespace WixToolset.Core
             this.CurrentFileStack.Push(this.Helper.GetVariableValue(this.Context, "sys", "SOURCEFILEDIR"));
 
             // Process the reader into the output.
-            XDocument output = new XDocument();
+            var output = new XDocument();
             try
             {
                 this.PreprocessReader(false, reader, output, 0);
 
                 // Fire event with post-processed document.
-                this.ProcessedStream?.Invoke(this, new ProcessedStreamEventArgs(this.Context.SourceFile, output));
+                this.ProcessedStream?.Invoke(this, new ProcessedStreamEventArgs(this.Context.SourcePath, output));
             }
             catch (XmlException e)
             {
@@ -221,8 +217,8 @@ namespace WixToolset.Core
                 return false;
             }
 
-            int numQuotes = 0;
-            int tmpIndex = 0;
+            var numQuotes = 0;
+            var tmpIndex = 0;
             while (-1 != (tmpIndex = expression.IndexOf('\"', tmpIndex, index - tmpIndex)))
             {
                 numQuotes++;
@@ -250,26 +246,26 @@ namespace WixToolset.Core
             expression = expression.ToUpperInvariant();
             switch (operation)
             {
-                case PreprocessorOperation.Not:
-                    if (expression.StartsWith("NOT ", StringComparison.Ordinal) || expression.StartsWith("NOT(", StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                    break;
-                case PreprocessorOperation.And:
-                    if (expression.StartsWith("AND ", StringComparison.Ordinal) || expression.StartsWith("AND(", StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                    break;
-                case PreprocessorOperation.Or:
-                    if (expression.StartsWith("OR ", StringComparison.Ordinal) || expression.StartsWith("OR(", StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                    break;
-                default:
-                    break;
+            case PreprocessorOperation.Not:
+                if (expression.StartsWith("NOT ", StringComparison.Ordinal) || expression.StartsWith("NOT(", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+                break;
+            case PreprocessorOperation.And:
+                if (expression.StartsWith("AND ", StringComparison.Ordinal) || expression.StartsWith("AND(", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+                break;
+            case PreprocessorOperation.Or:
+                if (expression.StartsWith("OR ", StringComparison.Ordinal) || expression.StartsWith("OR(", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+                break;
+            default:
+                break;
             }
             return false;
         }
@@ -283,11 +279,11 @@ namespace WixToolset.Core
         /// <param name="offset">Original offset for the line numbers being processed.</param>
         private void PreprocessReader(bool include, XmlReader reader, XContainer container, int offset)
         {
-            XContainer currentContainer = container;
-            Stack<XContainer> containerStack = new Stack<XContainer>();
+            var currentContainer = container;
+            var containerStack = new Stack<XContainer>();
 
-            IfContext ifContext = new IfContext(true, true, IfState.Unknown); // start by assuming we want to keep the nodes in the source code
-            Stack<IfContext> ifStack = new Stack<IfContext>();
+            var ifContext = new IfContext(true, true, IfState.Unknown); // start by assuming we want to keep the nodes in the source code
+            var ifStack = new Stack<IfContext>();
 
             // process the reader into the writer
             while (reader.Read())
@@ -300,102 +296,102 @@ namespace WixToolset.Core
                 // check for changes in conditional processing
                 if (XmlNodeType.ProcessingInstruction == reader.NodeType)
                 {
-                    bool ignore = false;
+                    var ignore = false;
                     string name = null;
 
                     switch (reader.LocalName)
                     {
-                        case "if":
-                            ifStack.Push(ifContext);
-                            if (ifContext.IsTrue)
-                            {
-                                ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, this.EvaluateExpression(reader.Value), IfState.If);
-                            }
-                            else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
-                            {
-                                ifContext = new IfContext();
-                            }
-                            ignore = true;
-                            break;
+                    case "if":
+                        ifStack.Push(ifContext);
+                        if (ifContext.IsTrue)
+                        {
+                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, this.EvaluateExpression(reader.Value), IfState.If);
+                        }
+                        else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
+                        {
+                            ifContext = new IfContext();
+                        }
+                        ignore = true;
+                        break;
 
-                        case "ifdef":
-                            ifStack.Push(ifContext);
-                            name = reader.Value.Trim();
-                            if (ifContext.IsTrue)
-                            {
-                                ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null != this.Helper.GetVariableValue(this.Context, name, true)), IfState.If);
-                            }
-                            else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
-                            {
-                                ifContext = new IfContext();
-                            }
-                            ignore = true;
-                            this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, true, ifContext.IsTrue, name));
-                            break;
+                    case "ifdef":
+                        ifStack.Push(ifContext);
+                        name = reader.Value.Trim();
+                        if (ifContext.IsTrue)
+                        {
+                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null != this.Helper.GetVariableValue(this.Context, name, true)), IfState.If);
+                        }
+                        else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
+                        {
+                            ifContext = new IfContext();
+                        }
+                        ignore = true;
+                        this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, true, ifContext.IsTrue, name));
+                        break;
 
-                        case "ifndef":
-                            ifStack.Push(ifContext);
-                            name = reader.Value.Trim();
-                            if (ifContext.IsTrue)
-                            {
-                                ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null == this.Helper.GetVariableValue(this.Context, name, true)), IfState.If);
-                            }
-                            else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
-                            {
-                                ifContext = new IfContext();
-                            }
-                            ignore = true;
-                            this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, false, !ifContext.IsTrue, name));
-                            break;
+                    case "ifndef":
+                        ifStack.Push(ifContext);
+                        name = reader.Value.Trim();
+                        if (ifContext.IsTrue)
+                        {
+                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null == this.Helper.GetVariableValue(this.Context, name, true)), IfState.If);
+                        }
+                        else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
+                        {
+                            ifContext = new IfContext();
+                        }
+                        ignore = true;
+                        this.IfDef?.Invoke(this, new IfDefEventArgs(sourceLineNumbers, false, !ifContext.IsTrue, name));
+                        break;
 
-                        case "elseif":
-                            if (0 == ifStack.Count)
-                            {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
-                            }
+                    case "elseif":
+                        if (0 == ifStack.Count)
+                        {
+                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
+                        }
 
-                            if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
-                            {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
-                            }
+                        if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
+                        {
+                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
+                        }
 
-                            ifContext.IfState = IfState.ElseIf;   // we're now in an elseif
-                            if (!ifContext.WasEverTrue)   // if we've never evaluated the if context to true, then we can try this test
-                            {
-                                ifContext.IsTrue = this.EvaluateExpression(reader.Value);
-                            }
-                            else if (ifContext.IsTrue)
-                            {
-                                ifContext.IsTrue = false;
-                            }
-                            ignore = true;
-                            break;
+                        ifContext.IfState = IfState.ElseIf;   // we're now in an elseif
+                        if (!ifContext.WasEverTrue)   // if we've never evaluated the if context to true, then we can try this test
+                        {
+                            ifContext.IsTrue = this.EvaluateExpression(reader.Value);
+                        }
+                        else if (ifContext.IsTrue)
+                        {
+                            ifContext.IsTrue = false;
+                        }
+                        ignore = true;
+                        break;
 
-                        case "else":
-                            if (0 == ifStack.Count)
-                            {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
-                            }
+                    case "else":
+                        if (0 == ifStack.Count)
+                        {
+                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
+                        }
 
-                            if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
-                            {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
-                            }
+                        if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
+                        {
+                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
+                        }
 
-                            ifContext.IfState = IfState.Else;   // we're now in an else
-                            ifContext.IsTrue = !ifContext.WasEverTrue;   // if we were never true, we can be true now
-                            ignore = true;
-                            break;
+                        ifContext.IfState = IfState.Else;   // we're now in an else
+                        ifContext.IsTrue = !ifContext.WasEverTrue;   // if we were never true, we can be true now
+                        ignore = true;
+                        break;
 
-                        case "endif":
-                            if (0 == ifStack.Count)
-                            {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "endif"));
-                            }
+                    case "endif":
+                        if (0 == ifStack.Count)
+                        {
+                            throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "endif"));
+                        }
 
-                            ifContext = (IfContext)ifStack.Pop();
-                            ignore = true;
-                            break;
+                        ifContext = ifStack.Pop();
+                        ignore = true;
+                        break;
                     }
 
                     if (ignore)   // ignore this node since we just handled it above
@@ -411,134 +407,134 @@ namespace WixToolset.Core
 
                 switch (reader.NodeType)
                 {
-                    case XmlNodeType.XmlDeclaration:
-                        XDocument document = currentContainer as XDocument;
-                        if (null != document)
-                        {
-                            document.Declaration = new XDeclaration(null, null, null);
-                            while (reader.MoveToNextAttribute())
-                            {
-                                switch (reader.LocalName)
-                                {
-                                    case "version":
-                                        document.Declaration.Version = reader.Value;
-                                        break;
-
-                                    case "encoding":
-                                        document.Declaration.Encoding = reader.Value;
-                                        break;
-
-                                    case "standalone":
-                                        document.Declaration.Standalone = reader.Value;
-                                        break;
-                                }
-                            }
-
-                        }
-                        //else
-                        //{
-                        //    display an error? Can this happen?
-                        //}
-                        break;
-
-                    case XmlNodeType.ProcessingInstruction:
-                        switch (reader.LocalName)
-                        {
-                            case "define":
-                                this.PreprocessDefine(reader.Value);
-                                break;
-
-                            case "error":
-                                this.PreprocessError(reader.Value);
-                                break;
-
-                            case "warning":
-                                this.PreprocessWarning(reader.Value);
-                                break;
-
-                            case "undef":
-                                this.PreprocessUndef(reader.Value);
-                                break;
-
-                            case "include":
-                                this.UpdateCurrentLineNumber(reader, offset);
-                                this.PreprocessInclude(reader.Value, currentContainer);
-                                break;
-
-                            case "foreach":
-                                this.PreprocessForeach(reader, currentContainer, offset);
-                                break;
-
-                            case "endforeach": // endforeach is handled in PreprocessForeach, so seeing it here is an error
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
-
-                            case "pragma":
-                                this.PreprocessPragma(reader.Value, currentContainer);
-                                break;
-
-                            default:
-                                // unknown processing instructions are currently ignored
-                                break;
-                        }
-                        break;
-
-                    case XmlNodeType.Element:
-                        if (0 < this.IncludeNextStack.Count && this.IncludeNextStack.Peek())
-                        {
-                            if ("Include" != reader.LocalName)
-                            {
-                                this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
-                            }
-
-                            this.IncludeNextStack.Pop();
-                            this.IncludeNextStack.Push(false);
-                            break;
-                        }
-
-                        var empty = reader.IsEmptyElement;
-                        var ns = XNamespace.Get(reader.NamespaceURI);
-                        var element = new XElement(ns + reader.LocalName);
-                        currentContainer.Add(element);
-
-                        this.UpdateCurrentLineNumber(reader, offset);
-                        element.AddAnnotation(sourceLineNumbers);
-
+                case XmlNodeType.XmlDeclaration:
+                    var document = currentContainer as XDocument;
+                    if (null != document)
+                    {
+                        document.Declaration = new XDeclaration(null, null, null);
                         while (reader.MoveToNextAttribute())
                         {
-                            var value = this.Helper.PreprocessString(this.Context, reader.Value);
+                            switch (reader.LocalName)
+                            {
+                            case "version":
+                                document.Declaration.Version = reader.Value;
+                                break;
 
-                            var attribNamespace = XNamespace.Get(reader.NamespaceURI);
-                            attribNamespace = XNamespace.Xmlns == attribNamespace && reader.LocalName.Equals("xmlns") ? XNamespace.None : attribNamespace;
+                            case "encoding":
+                                document.Declaration.Encoding = reader.Value;
+                                break;
 
-                            element.Add(new XAttribute(attribNamespace + reader.LocalName, value));
+                            case "standalone":
+                                document.Declaration.Standalone = reader.Value;
+                                break;
+                            }
                         }
 
-                        if (!empty)
-                        {
-                            containerStack.Push(currentContainer);
-                            currentContainer = element;
-                        }
+                    }
+                    //else
+                    //{
+                    //    display an error? Can this happen?
+                    //}
+                    break;
+
+                case XmlNodeType.ProcessingInstruction:
+                    switch (reader.LocalName)
+                    {
+                    case "define":
+                        this.PreprocessDefine(reader.Value);
                         break;
 
-                    case XmlNodeType.EndElement:
-                        if (0 < reader.Depth || !include)
-                        {
-                            currentContainer = containerStack.Pop();
-                        }
+                    case "error":
+                        this.PreprocessError(reader.Value);
                         break;
 
-                    case XmlNodeType.Text:
-                        string postprocessedText = this.Helper.PreprocessString(this.Context, reader.Value);
-                        currentContainer.Add(postprocessedText);
+                    case "warning":
+                        this.PreprocessWarning(reader.Value);
                         break;
 
-                    case XmlNodeType.CDATA:
-                        string postprocessedValue = this.Helper.PreprocessString(this.Context, reader.Value);
-                        currentContainer.Add(new XCData(postprocessedValue));
+                    case "undef":
+                        this.PreprocessUndef(reader.Value);
+                        break;
+
+                    case "include":
+                        this.UpdateCurrentLineNumber(reader, offset);
+                        this.PreprocessInclude(reader.Value, currentContainer);
+                        break;
+
+                    case "foreach":
+                        this.PreprocessForeach(reader, currentContainer, offset);
+                        break;
+
+                    case "endforeach": // endforeach is handled in PreprocessForeach, so seeing it here is an error
+                        throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
+
+                    case "pragma":
+                        this.PreprocessPragma(reader.Value, currentContainer);
                         break;
 
                     default:
+                        // unknown processing instructions are currently ignored
                         break;
+                    }
+                    break;
+
+                case XmlNodeType.Element:
+                    if (0 < this.IncludeNextStack.Count && this.IncludeNextStack.Peek())
+                    {
+                        if ("Include" != reader.LocalName)
+                        {
+                            this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
+                        }
+
+                        this.IncludeNextStack.Pop();
+                        this.IncludeNextStack.Push(false);
+                        break;
+                    }
+
+                    var empty = reader.IsEmptyElement;
+                    var ns = XNamespace.Get(reader.NamespaceURI);
+                    var element = new XElement(ns + reader.LocalName);
+                    currentContainer.Add(element);
+
+                    this.UpdateCurrentLineNumber(reader, offset);
+                    element.AddAnnotation(sourceLineNumbers);
+
+                    while (reader.MoveToNextAttribute())
+                    {
+                        var value = this.Helper.PreprocessString(this.Context, reader.Value);
+
+                        var attribNamespace = XNamespace.Get(reader.NamespaceURI);
+                        attribNamespace = XNamespace.Xmlns == attribNamespace && reader.LocalName.Equals("xmlns") ? XNamespace.None : attribNamespace;
+
+                        element.Add(new XAttribute(attribNamespace + reader.LocalName, value));
+                    }
+
+                    if (!empty)
+                    {
+                        containerStack.Push(currentContainer);
+                        currentContainer = element;
+                    }
+                    break;
+
+                case XmlNodeType.EndElement:
+                    if (0 < reader.Depth || !include)
+                    {
+                        currentContainer = containerStack.Pop();
+                    }
+                    break;
+
+                case XmlNodeType.Text:
+                    var postprocessedText = this.Helper.PreprocessString(this.Context, reader.Value);
+                    currentContainer.Add(postprocessedText);
+                    break;
+
+                case XmlNodeType.CDATA:
+                    var postprocessedValue = this.Helper.PreprocessString(this.Context, reader.Value);
+                    currentContainer.Add(new XCData(postprocessedValue));
+                    break;
+
+                default:
+                    break;
                 }
             }
 
@@ -652,7 +648,7 @@ namespace WixToolset.Core
                 throw new WixException(ErrorMessages.FileNotFound(sourceLineNumbers, includePath, "include"));
             }
 
-            using (XmlReader reader = XmlReader.Create(includeFile, DocumentXmlReaderSettings))
+            using (var reader = XmlReader.Create(includeFile, DocumentXmlReaderSettings))
             {
                 this.PushInclude(includeFile);
 
@@ -689,13 +685,13 @@ namespace WixToolset.Core
             }
 
             // parse out the variable name
-            string varName = reader.Value.Substring(0, indexOfInToken).Trim();
-            string varValuesString = reader.Value.Substring(indexOfInToken + 4).Trim();
+            var varName = reader.Value.Substring(0, indexOfInToken).Trim();
+            var varValuesString = reader.Value.Substring(indexOfInToken + 4).Trim();
 
             // preprocess the variable values string because it might be a variable itself
             varValuesString = this.Helper.PreprocessString(this.Context, varValuesString);
 
-            string[] varValues = varValuesString.Split(';');
+            var varValues = varValuesString.Split(';');
 
             // go through all the empty strings
             while (reader.Read() && XmlNodeType.Whitespace == reader.NodeType)
@@ -703,44 +699,44 @@ namespace WixToolset.Core
             }
 
             // get the offset of this xml fragment (for some reason its always off by 1)
-            IXmlLineInfo lineInfoReader = reader as IXmlLineInfo;
+            var lineInfoReader = reader as IXmlLineInfo;
             if (null != lineInfoReader)
             {
                 offset += lineInfoReader.LineNumber - 1;
             }
 
-            XmlTextReader textReader = reader as XmlTextReader;
+            var textReader = reader as XmlTextReader;
             // dump the xml to a string (maintaining whitespace if possible)
             if (null != textReader)
             {
                 textReader.WhitespaceHandling = WhitespaceHandling.All;
             }
 
-            StringBuilder fragmentBuilder = new StringBuilder();
-            int nestedForeachCount = 1;
+            var fragmentBuilder = new StringBuilder();
+            var nestedForeachCount = 1;
             while (nestedForeachCount != 0)
             {
                 if (reader.NodeType == XmlNodeType.ProcessingInstruction)
                 {
                     switch (reader.LocalName)
                     {
-                        case "foreach":
-                            ++nestedForeachCount;
-                            // Output the foreach statement
-                            fragmentBuilder.AppendFormat("<?foreach {0}?>", reader.Value);
-                            break;
+                    case "foreach":
+                        ++nestedForeachCount;
+                        // Output the foreach statement
+                        fragmentBuilder.AppendFormat("<?foreach {0}?>", reader.Value);
+                        break;
 
-                        case "endforeach":
-                            --nestedForeachCount;
-                            if (0 != nestedForeachCount)
-                            {
-                                fragmentBuilder.Append("<?endforeach ?>");
-                            }
-                            break;
+                    case "endforeach":
+                        --nestedForeachCount;
+                        if (0 != nestedForeachCount)
+                        {
+                            fragmentBuilder.Append("<?endforeach ?>");
+                        }
+                        break;
 
-                        default:
-                            fragmentBuilder.AppendFormat("<?{0} {1}?>", reader.LocalName, reader.Value);
-                            break;
+                    default:
+                        fragmentBuilder.AppendFormat("<?{0} {1}?>", reader.LocalName, reader.Value);
+                        break;
                     }
                 }
                 else if (reader.NodeType == XmlNodeType.Element)
@@ -764,7 +760,7 @@ namespace WixToolset.Core
             using (var fragmentStream = new MemoryStream(Encoding.UTF8.GetBytes(fragmentBuilder.ToString())))
             {
                 // process each iteration, updating the variable's value each time
-                foreach (string varValue in varValues)
+                foreach (var varValue in varValues)
                 {
                     using (var loopReader = XmlReader.Create(fragmentStream, FragmentXmlReaderSettings))
                     {
@@ -801,7 +797,7 @@ namespace WixToolset.Core
             }
 
             // resolve other variables in the pragma argument(s)
-            string pragmaArgs = this.Helper.PreprocessString(this.Context, match.Groups["pragmaValue"].Value).Trim();
+            var pragmaArgs = this.Helper.PreprocessString(this.Context, match.Groups["pragmaValue"].Value).Trim();
 
             try
             {
@@ -823,7 +819,7 @@ namespace WixToolset.Core
         private string GetNextToken(string originalExpression, ref string expression, out bool stringLiteral)
         {
             stringLiteral = false;
-            string token = String.Empty;
+            var token = String.Empty;
             expression = expression.Trim();
             if (0 == expression.Length)
             {
@@ -833,7 +829,7 @@ namespace WixToolset.Core
             if (expression.StartsWith("\"", StringComparison.Ordinal))
             {
                 stringLiteral = true;
-                int endingQuotes = expression.IndexOf('\"', 1);
+                var endingQuotes = expression.IndexOf('\"', 1);
                 if (-1 == endingQuotes)
                 {
                     throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
@@ -848,9 +844,9 @@ namespace WixToolset.Core
             else if (expression.StartsWith("$(", StringComparison.Ordinal))
             {
                 // Find the ending paren of the expression
-                int endingParen = -1;
-                int openedCount = 1;
-                for (int i = 2; i < expression.Length; i++)
+                var endingParen = -1;
+                var openedCount = 1;
+                for (var i = 2; i < expression.Length; i++)
                 {
                     if ('(' == expression[i])
                     {
@@ -881,14 +877,14 @@ namespace WixToolset.Core
             {
                 // Cut the token off at the next equal, space, inequality operator,
                 // or end of string, whichever comes first
-                int space = expression.IndexOf(" ", StringComparison.Ordinal);
-                int equals = expression.IndexOf("=", StringComparison.Ordinal);
-                int lessThan = expression.IndexOf("<", StringComparison.Ordinal);
-                int lessThanEquals = expression.IndexOf("<=", StringComparison.Ordinal);
-                int greaterThan = expression.IndexOf(">", StringComparison.Ordinal);
-                int greaterThanEquals = expression.IndexOf(">=", StringComparison.Ordinal);
-                int notEquals = expression.IndexOf("!=", StringComparison.Ordinal);
-                int equalsNoCase = expression.IndexOf("~=", StringComparison.Ordinal);
+                var space = expression.IndexOf(" ", StringComparison.Ordinal);
+                var equals = expression.IndexOf("=", StringComparison.Ordinal);
+                var lessThan = expression.IndexOf("<", StringComparison.Ordinal);
+                var lessThanEquals = expression.IndexOf("<=", StringComparison.Ordinal);
+                var greaterThan = expression.IndexOf(">", StringComparison.Ordinal);
+                var greaterThanEquals = expression.IndexOf(">=", StringComparison.Ordinal);
+                var notEquals = expression.IndexOf("!=", StringComparison.Ordinal);
+                var equalsNoCase = expression.IndexOf("~=", StringComparison.Ordinal);
                 int closingIndex;
 
                 if (space == -1)
@@ -970,7 +966,7 @@ namespace WixToolset.Core
         {
             // By default it's a literal and will only be evaluated if it
             // matches the variable format
-            string varValue = variable;
+            var varValue = variable;
 
             if (variable.StartsWith("$(", StringComparison.Ordinal))
             {
@@ -1008,8 +1004,7 @@ namespace WixToolset.Core
         /// <param name="rightValue">Right side value from expression.</param>
         private void GetNameValuePair(string originalExpression, ref string expression, out string leftValue, out string operation, out string rightValue)
         {
-            bool stringLiteral;
-            leftValue = this.GetNextToken(originalExpression, ref expression, out stringLiteral);
+            leftValue = this.GetNextToken(originalExpression, ref expression, out var stringLiteral);
 
             // If it wasn't a string literal, evaluate it
             if (!stringLiteral)
@@ -1060,14 +1055,10 @@ namespace WixToolset.Core
         private bool EvaluateAtomicExpression(string originalExpression, ref string expression)
         {
             // Quick test to see if the first token is a variable
-            bool startsWithVariable = expression.StartsWith("$(", StringComparison.Ordinal);
+            var startsWithVariable = expression.StartsWith("$(", StringComparison.Ordinal);
+            this.GetNameValuePair(originalExpression, ref expression, out var leftValue, out var operation, out var rightValue);
 
-            string leftValue;
-            string rightValue;
-            string operation;
-            this.GetNameValuePair(originalExpression, ref expression, out leftValue, out operation, out rightValue);
-
-            bool expressionValue = false;
+            var expressionValue = false;
 
             // If the variables don't exist, they were evaluated to null
             if (null == leftValue || null == rightValue)
@@ -1168,8 +1159,8 @@ namespace WixToolset.Core
             }
 
             // search for the end of the expression with the matching paren
-            int openParenIndex = 0;
-            int closeParenIndex = 1;
+            var openParenIndex = 0;
+            var closeParenIndex = 1;
             while (openParenIndex != -1 && openParenIndex < closeParenIndex)
             {
                 closeParenIndex = expression.IndexOf(')', closeParenIndex);
@@ -1214,17 +1205,17 @@ namespace WixToolset.Core
         {
             switch (operation)
             {
-                case PreprocessorOperation.And:
-                    currentValue = currentValue && prevResult;
-                    break;
-                case PreprocessorOperation.Or:
-                    currentValue = currentValue || prevResult;
-                    break;
-                case PreprocessorOperation.Not:
-                    currentValue = !currentValue;
-                    break;
-                default:
-                    throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(this.Context.CurrentSourceLineNumber, operation.ToString()));
+            case PreprocessorOperation.And:
+                currentValue = currentValue && prevResult;
+                break;
+            case PreprocessorOperation.Or:
+                currentValue = currentValue || prevResult;
+                break;
+            case PreprocessorOperation.Not:
+                currentValue = !currentValue;
+                break;
+            default:
+                throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(this.Context.CurrentSourceLineNumber, operation.ToString()));
             }
         }
 
@@ -1235,7 +1226,7 @@ namespace WixToolset.Core
         /// <returns>Boolean result of expression.</returns>
         private bool EvaluateExpression(string expression)
         {
-            string tmpExpression = expression;
+            var tmpExpression = expression;
             return this.EvaluateExpressionRecurse(expression, ref tmpExpression, PreprocessorOperation.And, true);
         }
 
@@ -1269,7 +1260,7 @@ namespace WixToolset.Core
         /// <returns>Boolean to indicate if the expression is true or false</returns>
         private bool EvaluateExpressionRecurse(string originalExpression, ref string expression, PreprocessorOperation prevResultOperation, bool prevResult)
         {
-            bool expressionValue = false;
+            var expressionValue = false;
             expression = expression.Trim();
             if (expression.Length == 0)
             {
@@ -1279,8 +1270,7 @@ namespace WixToolset.Core
             // If the expression starts with parenthesis, evaluate it
             if (expression.IndexOf('(') == 0)
             {
-                int endSubExpressionIndex;
-                string subExpression = this.GetParenthesisExpression(originalExpression, expression, out endSubExpressionIndex);
+                var subExpression = this.GetParenthesisExpression(originalExpression, expression, out var endSubExpressionIndex);
                 expressionValue = this.EvaluateExpressionRecurse(originalExpression, ref subExpression, PreprocessorOperation.And, true);
 
                 // Now get the rest of the expression that hasn't been evaluated
@@ -1337,10 +1327,10 @@ namespace WixToolset.Core
         /// <param name="offset">This is the artificial offset of the line numbers from the reader.  Used for the foreach processing.</param>
         private void UpdateCurrentLineNumber(XmlReader reader, int offset)
         {
-            IXmlLineInfo lineInfoReader = reader as IXmlLineInfo;
+            var lineInfoReader = reader as IXmlLineInfo;
             if (null != lineInfoReader)
             {
-                int newLine = lineInfoReader.LineNumber + offset;
+                var newLine = lineInfoReader.LineNumber + offset;
 
                 if (this.Context.CurrentSourceLineNumber.LineNumber != newLine)
                 {
@@ -1433,19 +1423,6 @@ namespace WixToolset.Core
             }
 
             return finalIncludePath;
-        }
-
-        private IPreprocessContext CreateContext()
-        {
-            var context = this.ServiceProvider.GetService<IPreprocessContext>();
-            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IPreprocessorExtension>();
-            context.CurrentSourceLineNumber = new SourceLineNumber(this.SourcePath);
-            context.Platform = this.Platform;
-            context.IncludeSearchPaths = this.IncludeSearchPaths?.ToList() ?? new List<string>();
-            context.SourceFile = this.SourcePath;
-            context.Variables = new Dictionary<string, string>(this.Variables);
-
-            return context;
         }
 
         private void PreProcess()

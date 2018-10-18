@@ -32,11 +32,22 @@ namespace WixToolset.Core
             this.AddService<ICommandLineParser>((provider, singletons) => new CommandLineParser(provider));
             this.AddService<IPreprocessContext>((provider, singletons) => new PreprocessContext(provider));
             this.AddService<ICompileContext>((provider, singletons) => new CompileContext(provider));
+            this.AddService<ILibraryContext>((provider, singletons) => new LibraryContext(provider));
             this.AddService<ILinkContext>((provider, singletons) => new LinkContext(provider));
             this.AddService<IResolveContext>((provider, singletons) => new ResolveContext(provider));
             this.AddService<IBindContext>((provider, singletons) => new BindContext(provider));
+            this.AddService<IDecompileContext>((provider, singletons) => new DecompileContext(provider));
             this.AddService<ILayoutContext>((provider, singletons) => new LayoutContext(provider));
             this.AddService<IInscribeContext>((provider, singletons) => new InscribeContext(provider));
+
+            this.AddService<IBinder>((provider, singletons) => new Binder(provider));
+            this.AddService<ICompiler>((provider, singletons) => new Compiler(provider));
+            this.AddService<IDecompiler>((provider, singletons) => new Decompiler(provider));
+            this.AddService<ILayoutCreator>((provider, singletons) => new LayoutCreator(provider));
+            this.AddService<IPreprocessor>((provider, singletons) => new Preprocessor(provider));
+            this.AddService<ILibrarian>((provider, singletons) => new Librarian(provider));
+            this.AddService<ILinker>((provider, singletons) => new Linker(provider));
+            this.AddService<IResolver>((provider, singletons) => new Resolver(provider));
 
             // Internal implementations.
             this.AddService<ILocalizer>((provider, singletons) => new Localizer(provider));

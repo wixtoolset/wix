@@ -3,7 +3,6 @@
 namespace WixToolset.Core
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
@@ -16,61 +15,17 @@ namespace WixToolset.Core
     /// <summary>
     /// Binder of the WiX toolset.
     /// </summary>
-    internal class Binder
+    internal class Binder : IBinder
     {
         internal Binder(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public int CabbingThreadCount { get; set; }
-
-        public string CabCachePath { get; set; }
-
-        public int Codepage { get; set; }
-
-        public CompressionLevel? DefaultCompressionLevel { get; set; }
-
-        public IEnumerable<IDelayedField> DelayedFields { get; set; }
-
-        public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
-
-        public IEnumerable<string> Ices { get; set; }
-
-        public string IntermediateFolder { get; set; }
-
-        public Intermediate IntermediateRepresentation { get; set; }
-
-        public string OutputPath { get; set; }
-
-        public string OutputPdbPath { get; set; }
-
-        public IEnumerable<string> SuppressIces { get; set; }
-
-        public bool SuppressValidation { get; set; }
-
-        public bool DeltaBinaryPatch { get; set; }
-
         public IServiceProvider ServiceProvider { get; }
 
-        public BindResult Execute()
+        public BindResult Bind(IBindContext context)
         {
-            var context = this.ServiceProvider.GetService<IBindContext>();
-            context.CabbingThreadCount = this.CabbingThreadCount;
-            context.CabCachePath = this.CabCachePath;
-            context.Codepage = this.Codepage;
-            context.DefaultCompressionLevel = this.DefaultCompressionLevel;
-            context.DelayedFields = this.DelayedFields;
-            context.ExpectedEmbeddedFiles = this.ExpectedEmbeddedFiles;
-            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IBinderExtension>();
-            context.Ices = this.Ices;
-            context.IntermediateFolder = this.IntermediateFolder;
-            context.IntermediateRepresentation = this.IntermediateRepresentation;
-            context.OutputPath = this.OutputPath;
-            context.OutputPdbPath = this.OutputPdbPath;
-            context.SuppressIces = this.SuppressIces;
-            context.SuppressValidation = this.SuppressValidation;
-
             // Prebind.
             //
             foreach (var extension in context.Extensions)
@@ -80,7 +35,7 @@ namespace WixToolset.Core
 
             // Bind.
             //
-            this.WriteBuildInfoTable(context.IntermediateRepresentation, context.OutputPath, context.OutputPdbPath);
+            this.WriteBuildInfoTuple(context.IntermediateRepresentation, context.OutputPath, context.OutputPdbPath);
 
             var bindResult = this.BackendBind(context);
 
@@ -107,7 +62,7 @@ namespace WixToolset.Core
 
             foreach (var factory in backendFactories)
             {
-                if (factory.TryCreateBackend(entrySection.Type.ToString(), context.OutputPath, null, out var backend))
+                if (factory.TryCreateBackend(entrySection.Type.ToString(), context.OutputPath, out var backend))
                 {
                     var result = backend.Bind(context);
                     return result;
@@ -118,8 +73,8 @@ namespace WixToolset.Core
 
             return null;
         }
-        
-        private void WriteBuildInfoTable(Intermediate output, string outputFile, string outputPdbPath)
+
+        private void WriteBuildInfoTuple(Intermediate output, string outputFile, string outputPdbPath)
         {
             var entrySection = output.Sections.First(s => s.Type != SectionType.Fragment);
 

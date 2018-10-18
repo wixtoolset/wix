@@ -22,7 +22,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Compiler of the WiX toolset.
     /// </summary>
-    internal class Compiler
+    internal class Compiler : ICompiler
     {
         public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
         public const string UpgradePreventedCondition = "NOT WIX_UPGRADE_DETECTED";
@@ -84,14 +84,6 @@ namespace WixToolset.Core
 
         private CompilerCore Core { get; set; }
 
-        public string CompliationId { get; set; }
-
-        public string OutputPath { get; set; }
-
-        public Platform Platform { get; set; }
-
-        public XDocument SourceDocument { get; set; }
-
         /// <summary>
         /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
         /// </summary>
@@ -109,21 +101,16 @@ namespace WixToolset.Core
         /// </summary>
         /// <returns>Intermediate object representing compiled source document.</returns>
         /// <remarks>This method is not thread-safe.</remarks>
-        public Intermediate Execute()
+        public Intermediate Compile(ICompileContext context)
         {
-            this.Context = this.ServiceProvider.GetService<ICompileContext>();
-            this.Context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<ICompilerExtension>();
-            this.Context.CompilationId = this.CompliationId;
-            this.Context.OutputPath = this.OutputPath;
-            this.Context.Platform = this.Platform;
-            this.Context.Source = this.SourceDocument;
-
             var target = new Intermediate();
 
-            if (String.IsNullOrEmpty(this.Context.CompilationId))
+            if (String.IsNullOrEmpty(context.CompilationId))
             {
-                this.Context.CompilationId = target.Id;
+                context.CompilationId = target.Id;
             }
+
+            this.Context = context;
 
             var extensionsByNamespace = new Dictionary<XNamespace, ICompilerExtension>();
 

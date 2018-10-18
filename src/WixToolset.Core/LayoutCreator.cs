@@ -8,16 +8,15 @@ namespace WixToolset.Core
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Layout for the WiX toolset.
     /// </summary>
-    internal class Layout
+    internal class LayoutCreator : ILayoutCreator
     {
-        internal Layout(IServiceProvider serviceProvider)
+        internal LayoutCreator(IServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
@@ -28,33 +27,8 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
-        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
-
-        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
-
-        public string IntermediateFolder { get; set; }
-
-        public string ContentsFile { get; set; }
-
-        public string OutputsFile { get; set; }
-
-        public string BuiltOutputsFile { get; set; }
-
-        public bool SuppressAclReset { get; set; }
-
-        public void Execute()
+        public void Layout(ILayoutContext context)
         {
-            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
-
-            var context = this.ServiceProvider.GetService<ILayoutContext>();
-            context.Extensions = extensionManager.Create<ILayoutExtension>();
-            context.TrackedFiles = this.TrackedFiles;
-            context.FileTransfers = this.FileTransfers;
-            context.ContentsFile = this.ContentsFile;
-            context.OutputsFile = this.OutputsFile;
-            context.BuiltOutputsFile = this.BuiltOutputsFile;
-            context.SuppressAclReset = this.SuppressAclReset;
-
             // Pre-layout.
             //
             foreach (var extension in context.Extensions)
@@ -76,7 +50,7 @@ namespace WixToolset.Core
 
                 if (context.TrackedFiles != null)
                 {
-                    this.CleanTempFiles(context.TrackedFiles);
+                    this.CleanTempFiles(context.IntermediateFolder, context.TrackedFiles);
                 }
             }
             finally
@@ -126,7 +100,7 @@ namespace WixToolset.Core
 
             using (var contents = new StreamWriter(path, false))
             {
-                foreach (string inputPath in uniqueInputFilePaths)
+                foreach (var inputPath in uniqueInputFilePaths)
                 {
                     contents.WriteLine(inputPath);
                 }
@@ -190,7 +164,7 @@ namespace WixToolset.Core
             }
         }
 
-        private void CleanTempFiles(IEnumerable<ITrackedFile> trackedFiles)
+        private void CleanTempFiles(string intermediateFolder, IEnumerable<ITrackedFile> trackedFiles)
         {
             var uniqueTempPaths = new SortedSet<string>(trackedFiles.Where(t => t.Type == TrackedFileType.Temporary).Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
 
@@ -201,7 +175,7 @@ namespace WixToolset.Core
 
             var uniqueFolders = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                this.IntermediateFolder
+                intermediateFolder
             };
 
             // Clean up temp files.
@@ -209,7 +183,7 @@ namespace WixToolset.Core
             {
                 try
                 {
-                    this.SplitUniqueFolders(tempPath, uniqueFolders);
+                    this.SplitUniqueFolders(intermediateFolder, tempPath, uniqueFolders);
 
                     File.Delete(tempPath);
                 }
@@ -231,15 +205,15 @@ namespace WixToolset.Core
             }
         }
 
-        private void SplitUniqueFolders(string tempPath, SortedSet<string> uniqueFolders)
+        private void SplitUniqueFolders(string intermediateFolder, string tempPath, SortedSet<string> uniqueFolders)
         {
-            if (tempPath.StartsWith(this.IntermediateFolder, StringComparison.OrdinalIgnoreCase))
+            if (tempPath.StartsWith(intermediateFolder, StringComparison.OrdinalIgnoreCase))
             {
-                var folder = Path.GetDirectoryName(tempPath).Substring(this.IntermediateFolder.Length);
+                var folder = Path.GetDirectoryName(tempPath).Substring(intermediateFolder.Length);
 
                 var parts = folder.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-                folder = this.IntermediateFolder;
+                folder = intermediateFolder;
 
                 foreach (var part in parts)
                 {

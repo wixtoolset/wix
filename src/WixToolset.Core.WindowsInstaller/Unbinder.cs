@@ -74,7 +74,7 @@ namespace WixToolset.Core
 
             foreach (var factory in this.BackendFactories)
             {
-                if (factory.TryCreateBackend(outputType.ToString(), file, null, out var backend))
+                if (factory.TryCreateBackend(outputType.ToString(), file, out var backend))
                 {
                     return backend.Unbind(context);
                 }

@@ -15,7 +15,7 @@ namespace WixToolset.Core
     /// <summary>
     /// Resolver for the WiX toolset.
     /// </summary>
-    internal class Resolver
+    internal class Resolver : IResolver
     {
         internal Resolver(IServiceProvider serviceProvider)
         {
@@ -38,21 +38,10 @@ namespace WixToolset.Core
 
         public IEnumerable<string> FilterCultures { get; set; }
 
-        public ResolveResult Execute()
+        public ResolveResult Resolve(IResolveContext context)
         {
-            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
-            var context = this.ServiceProvider.GetService<IResolveContext>();
-            context.BindPaths = this.BindPaths;
-            context.Extensions = extensionManager.Create<IResolverExtension>();
-            context.ExtensionData = extensionManager.Create<IExtensionData>();
-            context.FilterCultures = this.FilterCultures;
-            context.IntermediateFolder = this.IntermediateFolder;
-            context.IntermediateRepresentation = this.IntermediateRepresentation;
-            context.Localizations = this.Localizations;
-            context.VariableResolver = new WixVariableResolver(this.Messaging);
-
-            foreach (IResolverExtension extension in context.Extensions)
+            foreach (var extension in context.Extensions)
             {
                 extension.PreResolve(context);
             }
@@ -64,11 +53,11 @@ namespace WixToolset.Core
 
                 this.LocalizeUI(context);
 
-                resolveResult = this.Resolve(context);
+                resolveResult = this.DoResolve(context);
             }
             finally
             {
-                foreach (IResolverExtension extension in context.Extensions)
+                foreach (var extension in context.Extensions)
                 {
                     extension.PostResolve(resolveResult);
                 }
@@ -77,7 +66,7 @@ namespace WixToolset.Core
             return resolveResult;
         }
 
-        private ResolveResult Resolve(IResolveContext context)
+        private ResolveResult DoResolve(IResolveContext context)
         {
             var buildingPatch = context.IntermediateRepresentation.Sections.Any(s => s.Type == SectionType.Patch);
 

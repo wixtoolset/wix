@@ -21,6 +21,11 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
+        public BindResult Decompile(IDecompileContext context)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Inscribe(IInscribeContext context)
         {
             throw new NotImplementedException();

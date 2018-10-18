@@ -11,19 +11,18 @@ namespace WixToolset.Core
     using WixToolset.Core.Link;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Linker core of the WiX toolset.
     /// </summary>
-    internal class Linker
+    internal class Linker : ILinker
     {
         private static readonly char[] colonCharacter = ":".ToCharArray();
         private static readonly string emptyGuid = Guid.Empty.ToString("B");
 
-        private bool sectionIdOnRows;
+        private readonly bool sectionIdOnRows;
 
         /// <summary>
         /// Creates a linker.
@@ -53,32 +52,20 @@ namespace WixToolset.Core
         /// <value>The option to show pedantic messages.</value>
         public bool ShowPedanticMessages { get; set; }
 
-        public OutputType OutputType { get; set; }
-
-        public IEnumerable<Intermediate> Intermediates { get; set; }
-
-        public IEnumerable<Intermediate> Libraries { get; set; }
-
-        public ITupleDefinitionCreator TupleDefinitionCreator { get;  set; }
-
         /// <summary>
         /// Links a collection of sections into an output.
         /// </summary>
         /// <param name="inputs">The collection of sections to link together.</param>
         /// <param name="expectedOutputType">Expected output type, based on output file extension provided to the linker.</param>
         /// <returns>Output object from the linking.</returns>
-        public Intermediate Execute()
+        public Intermediate Link(ILinkContext context)
         {
-            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+            this.Context = context;
 
-            var creator = this.TupleDefinitionCreator ?? this.ServiceProvider.GetService<ITupleDefinitionCreator>();
-
-            this.Context = this.ServiceProvider.GetService<ILinkContext>();
-            this.Context.Extensions = extensionManager.Create<ILinkerExtension>();
-            this.Context.ExtensionData = extensionManager.Create<IExtensionData>();
-            this.Context.ExpectedOutputType = this.OutputType;
-            this.Context.Intermediates = this.Intermediates.Concat(this.Libraries).ToList();
-            this.Context.TupleDefinitionCreator = creator;
+            if (this.Context.TupleDefinitionCreator == null)
+            {
+                this.Context.TupleDefinitionCreator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
+            }
 
             foreach (var extension in this.Context.Extensions)
             {
@@ -117,7 +104,7 @@ namespace WixToolset.Core
                 Hashtable generatedShortFileNames = new Hashtable();
 #endif
 
-                Hashtable multipleFeatureComponents = new Hashtable();
+                var multipleFeatureComponents = new Hashtable();
 
                 var wixVariables = new Dictionary<string, WixVariableTuple>();
 
@@ -238,7 +225,7 @@ namespace WixToolset.Core
                     sectionCount++;
 
                     var sectionId = section.Id;
-                    if (null == sectionId && this.sectionIdOnRows)
+                    if (null == sectionId && sectionIdOnRows)
                     {
                         sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
                     }
@@ -256,12 +243,12 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                            case TupleDefinitionType.Class:
-                                if (SectionType.Product == resolvedSection.Type)
-                                {
-                                    this.ResolveFeatures(tuple, 2, 11, componentsToFeatures, multipleFeatureComponents);
-                                }
-                                break;
+                        case TupleDefinitionType.Class:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 2, 11, componentsToFeatures, multipleFeatureComponents);
+                            }
+                            break;
 
 #if MOVE_TO_BACKEND
                             case "CustomAction":
@@ -315,12 +302,12 @@ namespace WixToolset.Core
                                 }
                                 break;
 #endif
-                            case TupleDefinitionType.Extension:
-                                if (SectionType.Product == resolvedSection.Type)
-                                {
-                                    this.ResolveFeatures(tuple, 1, 4, componentsToFeatures, multipleFeatureComponents);
-                                }
-                                break;
+                        case TupleDefinitionType.Extension:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 1, 4, componentsToFeatures, multipleFeatureComponents);
+                            }
+                            break;
 
 #if MOVE_TO_BACKEND
                             case TupleDefinitionType.ModuleSubstitution:
@@ -332,12 +319,12 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                            case TupleDefinitionType.MsiAssembly:
-                                if (SectionType.Product == resolvedSection.Type)
-                                {
-                                    this.ResolveFeatures(tuple, 0, 1, componentsToFeatures, multipleFeatureComponents);
-                                }
-                                break;
+                        case TupleDefinitionType.MsiAssembly:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 0, 1, componentsToFeatures, multipleFeatureComponents);
+                            }
+                            break;
 
 #if MOVE_TO_BACKEND
                             case "ProgId":
@@ -359,26 +346,26 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                            case TupleDefinitionType.PublishComponent:
-                                if (SectionType.Product == resolvedSection.Type)
-                                {
-                                    this.ResolveFeatures(tuple, 2, 4, componentsToFeatures, multipleFeatureComponents);
-                                }
-                                break;
+                        case TupleDefinitionType.PublishComponent:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 2, 4, componentsToFeatures, multipleFeatureComponents);
+                            }
+                            break;
 
-                            case TupleDefinitionType.Shortcut:
-                                if (SectionType.Product == resolvedSection.Type)
-                                {
-                                    this.ResolveFeatures(tuple, 3, 4, componentsToFeatures, multipleFeatureComponents);
-                                }
-                                break;
+                        case TupleDefinitionType.Shortcut:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 3, 4, componentsToFeatures, multipleFeatureComponents);
+                            }
+                            break;
 
-                            case TupleDefinitionType.TypeLib:
-                                if (SectionType.Product == resolvedSection.Type)
-                                {
-                                    this.ResolveFeatures(tuple, 2, 6, componentsToFeatures, multipleFeatureComponents);
-                                }
-                                break;
+                        case TupleDefinitionType.TypeLib:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 2, 6, componentsToFeatures, multipleFeatureComponents);
+                            }
+                            break;
 
 #if SOLVE_CUSTOM_TABLE
                             case "WixCustomTable":
@@ -396,9 +383,9 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                            case TupleDefinitionType.WixEnsureTable:
-                                ensureTableRows.Add(tuple);
-                                break;
+                        case TupleDefinitionType.WixEnsureTable:
+                            ensureTableRows.Add(tuple);
+                            break;
 
 
 #if MOVE_TO_BACKEND
@@ -421,45 +408,45 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                            case TupleDefinitionType.WixMerge:
-                                if (SectionType.Product == resolvedSection.Type)
+                        case TupleDefinitionType.WixMerge:
+                            if (SectionType.Product == resolvedSection.Type)
+                            {
+                                this.ResolveFeatures(tuple, 0, 7, modulesToFeatures, null);
+                            }
+                            break;
+
+                        case TupleDefinitionType.WixComplexReference:
+                            copyTuple = false;
+                            break;
+
+                        case TupleDefinitionType.WixSimpleReference:
+                            copyTuple = false;
+                            break;
+
+                        case TupleDefinitionType.WixVariable:
+                        // check for colliding values and collect the wix variable rows
+                        {
+                            var row = (WixVariableTuple)tuple;
+
+                            if (wixVariables.TryGetValue(row.WixVariable, out var collidingRow))
+                            {
+                                if (collidingRow.Overridable && !row.Overridable)
                                 {
-                                    this.ResolveFeatures(tuple, 0, 7, modulesToFeatures, null);
+                                    wixVariables[row.WixVariable] = row;
                                 }
-                                break;
-
-                            case TupleDefinitionType.WixComplexReference:
-                                copyTuple = false;
-                                break;
-
-                            case TupleDefinitionType.WixSimpleReference:
-                                copyTuple = false;
-                                break;
-
-                            case TupleDefinitionType.WixVariable:
-                                // check for colliding values and collect the wix variable rows
+                                else if (!row.Overridable || (collidingRow.Overridable && row.Overridable))
                                 {
-                                    var row = (WixVariableTuple)tuple;
-
-                                    if (wixVariables.TryGetValue(row.WixVariable, out var collidingRow))
-                                    {
-                                        if (collidingRow.Overridable && !row.Overridable)
-                                        {
-                                            wixVariables[row.WixVariable] = row;
-                                        }
-                                        else if (!row.Overridable || (collidingRow.Overridable && row.Overridable))
-                                        {
-                                            this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, row.WixVariable));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        wixVariables.Add(row.WixVariable, row);
-                                    }
+                                    this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, row.WixVariable));
                                 }
+                            }
+                            else
+                            {
+                                wixVariables.Add(row.WixVariable, row);
+                            }
+                        }
 
-                                copyTuple = false;
-                                break;
+                        copyTuple = false;
+                        break;
                         }
 
                         if (copyTuple)
@@ -624,7 +611,7 @@ namespace WixToolset.Core
 #endif
 
                 //correct the section Id in FeatureComponents table
-                if (this.sectionIdOnRows)
+                if (sectionIdOnRows)
                 {
                     //var componentSectionIds = new Dictionary<string, string>();
 
@@ -1152,7 +1139,7 @@ namespace WixToolset.Core
         /// <param name="modulesToFeatures">Module to feature complex references.</param>
         private void ProcessComplexReferences(IntermediateSection resolvedSection, IEnumerable<IntermediateSection> sections, ISet<string> referencedComponents, ConnectToFeatureCollection componentsToFeatures, ConnectToFeatureCollection featuresToFeatures, ConnectToFeatureCollection modulesToFeatures)
         {
-            Hashtable componentsToModules = new Hashtable();
+            var componentsToModules = new Hashtable();
 
             foreach (var section in sections)
             {
@@ -1163,154 +1150,154 @@ namespace WixToolset.Core
                     ConnectToFeature connection;
                     switch (wixComplexReferenceRow.ParentType)
                     {
-                        case ComplexReferenceParentType.Feature:
-                            switch (wixComplexReferenceRow.ChildType)
+                    case ComplexReferenceParentType.Feature:
+                        switch (wixComplexReferenceRow.ChildType)
+                        {
+                        case ComplexReferenceChildType.Component:
+                            connection = componentsToFeatures[wixComplexReferenceRow.Child];
+                            if (null == connection)
                             {
-                                case ComplexReferenceChildType.Component:
-                                    connection = componentsToFeatures[wixComplexReferenceRow.Child];
-                                    if (null == connection)
-                                    {
-                                        componentsToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, wixComplexReferenceRow.Parent, wixComplexReferenceRow.IsPrimary));
-                                    }
-                                    else if (wixComplexReferenceRow.IsPrimary)
-                                    {
-                                        if (connection.IsExplicitPrimaryFeature)
-                                        {
-                                            this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), connection.PrimaryFeature ?? resolvedSection.Id));
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            connection.ConnectFeatures.Add(connection.PrimaryFeature); // move the guessed primary feature to the list of connects
-                                            connection.PrimaryFeature = wixComplexReferenceRow.Parent; // set the new primary feature
-                                            connection.IsExplicitPrimaryFeature = true; // and make sure we remember that we set it so we can fail if we try to set it again
-                                        }
-                                    }
-                                    else
-                                    {
-                                        connection.ConnectFeatures.Add(wixComplexReferenceRow.Parent);
-                                    }
-
-                                    // add a row to the FeatureComponents table
-                                    var featureComponent = new FeatureComponentsTuple();
-                                    featureComponent.Feature_ = wixComplexReferenceRow.Parent;
-                                    featureComponent.Component_ = wixComplexReferenceRow.Child;
-
-                                    featureComponents.Add(featureComponent);
-
-                                    // index the component for finding orphaned records
-                                    var symbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
-                                    referencedComponents.Add(symbolName);
-
-                                    break;
-
-                                case ComplexReferenceChildType.Feature:
-                                    connection = featuresToFeatures[wixComplexReferenceRow.Child];
-                                    if (null != connection)
-                                    {
-                                        this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
-                                        continue;
-                                    }
-
-                                    featuresToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, wixComplexReferenceRow.Parent, wixComplexReferenceRow.IsPrimary));
-                                    break;
-
-                                case ComplexReferenceChildType.Module:
-                                    connection = modulesToFeatures[wixComplexReferenceRow.Child];
-                                    if (null == connection)
-                                    {
-                                        modulesToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, wixComplexReferenceRow.Parent, wixComplexReferenceRow.IsPrimary));
-                                    }
-                                    else if (wixComplexReferenceRow.IsPrimary)
-                                    {
-                                        if (connection.IsExplicitPrimaryFeature)
-                                        {
-                                            this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            connection.ConnectFeatures.Add(connection.PrimaryFeature); // move the guessed primary feature to the list of connects
-                                            connection.PrimaryFeature = wixComplexReferenceRow.Parent; // set the new primary feature
-                                            connection.IsExplicitPrimaryFeature = true; // and make sure we remember that we set it so we can fail if we try to set it again
-                                        }
-                                    }
-                                    else
-                                    {
-                                        connection.ConnectFeatures.Add(wixComplexReferenceRow.Parent);
-                                    }
-                                    break;
-
-                                default:
-                                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                                componentsToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, wixComplexReferenceRow.Parent, wixComplexReferenceRow.IsPrimary));
                             }
+                            else if (wixComplexReferenceRow.IsPrimary)
+                            {
+                                if (connection.IsExplicitPrimaryFeature)
+                                {
+                                    this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                    continue;
+                                }
+                                else
+                                {
+                                    connection.ConnectFeatures.Add(connection.PrimaryFeature); // move the guessed primary feature to the list of connects
+                                    connection.PrimaryFeature = wixComplexReferenceRow.Parent; // set the new primary feature
+                                    connection.IsExplicitPrimaryFeature = true; // and make sure we remember that we set it so we can fail if we try to set it again
+                                }
+                            }
+                            else
+                            {
+                                connection.ConnectFeatures.Add(wixComplexReferenceRow.Parent);
+                            }
+
+                            // add a row to the FeatureComponents table
+                            var featureComponent = new FeatureComponentsTuple();
+                            featureComponent.Feature_ = wixComplexReferenceRow.Parent;
+                            featureComponent.Component_ = wixComplexReferenceRow.Child;
+
+                            featureComponents.Add(featureComponent);
+
+                            // index the component for finding orphaned records
+                            var symbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
+                            referencedComponents.Add(symbolName);
+
                             break;
 
-                        case ComplexReferenceParentType.Module:
-                            switch (wixComplexReferenceRow.ChildType)
+                        case ComplexReferenceChildType.Feature:
+                            connection = featuresToFeatures[wixComplexReferenceRow.Child];
+                            if (null != connection)
                             {
-                                case ComplexReferenceChildType.Component:
-                                    if (componentsToModules.ContainsKey(wixComplexReferenceRow.Child))
-                                    {
-                                        this.OnMessage(ErrorMessages.ComponentReferencedTwice(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.Child));
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        componentsToModules.Add(wixComplexReferenceRow.Child, wixComplexReferenceRow); // should always be new
-
-                                        // add a row to the ModuleComponents table
-                                        var moduleComponent = new ModuleComponentsTuple();
-                                        moduleComponent.Component = wixComplexReferenceRow.Child;
-                                        moduleComponent.ModuleID = wixComplexReferenceRow.Parent;
-                                        moduleComponent.Language = Convert.ToInt32(wixComplexReferenceRow.ParentLanguage);
-                                    }
-
-                                    // index the component for finding orphaned records
-                                    string componentSymbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
-                                    referencedComponents.Add(componentSymbolName);
-
-                                    break;
-
-                                default:
-                                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                                this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                continue;
                             }
+
+                            featuresToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, wixComplexReferenceRow.Parent, wixComplexReferenceRow.IsPrimary));
                             break;
 
-                        case ComplexReferenceParentType.Patch:
-                            switch (wixComplexReferenceRow.ChildType)
+                        case ComplexReferenceChildType.Module:
+                            connection = modulesToFeatures[wixComplexReferenceRow.Child];
+                            if (null == connection)
                             {
-                                case ComplexReferenceChildType.PatchFamily:
-                                case ComplexReferenceChildType.PatchFamilyGroup:
-                                    break;
-
-                                default:
-                                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                                modulesToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, wixComplexReferenceRow.Parent, wixComplexReferenceRow.IsPrimary));
                             }
-                            break;
-
-                        case ComplexReferenceParentType.Product:
-                            switch (wixComplexReferenceRow.ChildType)
+                            else if (wixComplexReferenceRow.IsPrimary)
                             {
-                                case ComplexReferenceChildType.Feature:
-                                    connection = featuresToFeatures[wixComplexReferenceRow.Child];
-                                    if (null != connection)
-                                    {
-                                        this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
-                                        continue;
-                                    }
-
-                                    featuresToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, null, wixComplexReferenceRow.IsPrimary));
-                                    break;
-
-                                default:
-                                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                                if (connection.IsExplicitPrimaryFeature)
+                                {
+                                    this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                    continue;
+                                }
+                                else
+                                {
+                                    connection.ConnectFeatures.Add(connection.PrimaryFeature); // move the guessed primary feature to the list of connects
+                                    connection.PrimaryFeature = wixComplexReferenceRow.Parent; // set the new primary feature
+                                    connection.IsExplicitPrimaryFeature = true; // and make sure we remember that we set it so we can fail if we try to set it again
+                                }
+                            }
+                            else
+                            {
+                                connection.ConnectFeatures.Add(wixComplexReferenceRow.Parent);
                             }
                             break;
 
                         default:
-                            // Note: Groups have been processed before getting here so they are not handled by any case above.
-                            throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceParentType), wixComplexReferenceRow.ParentType)));
+                            throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                        }
+                        break;
+
+                    case ComplexReferenceParentType.Module:
+                        switch (wixComplexReferenceRow.ChildType)
+                        {
+                        case ComplexReferenceChildType.Component:
+                            if (componentsToModules.ContainsKey(wixComplexReferenceRow.Child))
+                            {
+                                this.OnMessage(ErrorMessages.ComponentReferencedTwice(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.Child));
+                                continue;
+                            }
+                            else
+                            {
+                                componentsToModules.Add(wixComplexReferenceRow.Child, wixComplexReferenceRow); // should always be new
+
+                                // add a row to the ModuleComponents table
+                                var moduleComponent = new ModuleComponentsTuple();
+                                moduleComponent.Component = wixComplexReferenceRow.Child;
+                                moduleComponent.ModuleID = wixComplexReferenceRow.Parent;
+                                moduleComponent.Language = Convert.ToInt32(wixComplexReferenceRow.ParentLanguage);
+                            }
+
+                            // index the component for finding orphaned records
+                            var componentSymbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
+                            referencedComponents.Add(componentSymbolName);
+
+                            break;
+
+                        default:
+                            throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                        }
+                        break;
+
+                    case ComplexReferenceParentType.Patch:
+                        switch (wixComplexReferenceRow.ChildType)
+                        {
+                        case ComplexReferenceChildType.PatchFamily:
+                        case ComplexReferenceChildType.PatchFamilyGroup:
+                            break;
+
+                        default:
+                            throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                        }
+                        break;
+
+                    case ComplexReferenceParentType.Product:
+                        switch (wixComplexReferenceRow.ChildType)
+                        {
+                        case ComplexReferenceChildType.Feature:
+                            connection = featuresToFeatures[wixComplexReferenceRow.Child];
+                            if (null != connection)
+                            {
+                                this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                continue;
+                            }
+
+                            featuresToFeatures.Add(new ConnectToFeature(section, wixComplexReferenceRow.Child, null, wixComplexReferenceRow.IsPrimary));
+                            break;
+
+                        default:
+                            throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceChildType), wixComplexReferenceRow.ChildType)));
+                        }
+                        break;
+
+                    default:
+                        // Note: Groups have been processed before getting here so they are not handled by any case above.
+                        throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedComplexReferenceChildType, Enum.GetName(typeof(ComplexReferenceParentType), wixComplexReferenceRow.ParentType)));
                     }
                 }
 
@@ -1341,7 +1328,7 @@ namespace WixToolset.Core
             foreach (var section in sections)
             {
                 // Count down because we'll sometimes remove items from the list.
-                for (int i = section.Tuples.Count - 1; i >= 0; --i)
+                for (var i = section.Tuples.Count - 1; i >= 0; --i)
                 {
                     // Only process the "grouping parents" such as FeatureGroup, ComponentGroup, Feature,
                     // and Module.  Non-grouping complex references are simple and
@@ -1354,7 +1341,7 @@ namespace WixToolset.Core
                          ComplexReferenceParentType.PatchFamilyGroup == wixComplexReferenceRow.ParentType ||
                          ComplexReferenceParentType.Product == wixComplexReferenceRow.ParentType))
                     {
-                        var parentTypeAndId = CombineTypeAndId(wixComplexReferenceRow.ParentType, wixComplexReferenceRow.Parent);
+                        var parentTypeAndId = this.CombineTypeAndId(wixComplexReferenceRow.ParentType, wixComplexReferenceRow.Parent);
 
                         // Group all complex references with a common parent
                         // together so we can find them quickly while processing in
@@ -1402,7 +1389,7 @@ namespace WixToolset.Core
             // complex references should all be flattened.
             var keys = parentGroupsNeedingProcessing.Keys.ToList();
 
-            foreach (string key in keys)
+            foreach (var key in keys)
             {
                 if (parentGroupsNeedingProcessing.ContainsKey(key))
                 {
@@ -1466,14 +1453,14 @@ namespace WixToolset.Core
             foreach (var wixComplexReferenceRow in referencesToParent)
             {
                 Debug.Assert(ComplexReferenceParentType.ComponentGroup == wixComplexReferenceRow.ParentType || ComplexReferenceParentType.FeatureGroup == wixComplexReferenceRow.ParentType || ComplexReferenceParentType.Feature == wixComplexReferenceRow.ParentType || ComplexReferenceParentType.Module == wixComplexReferenceRow.ParentType || ComplexReferenceParentType.Product == wixComplexReferenceRow.ParentType || ComplexReferenceParentType.PatchFamilyGroup == wixComplexReferenceRow.ParentType || ComplexReferenceParentType.Patch == wixComplexReferenceRow.ParentType);
-                Debug.Assert(parentTypeAndId == CombineTypeAndId(wixComplexReferenceRow.ParentType, wixComplexReferenceRow.Parent));
+                Debug.Assert(parentTypeAndId == this.CombineTypeAndId(wixComplexReferenceRow.ParentType, wixComplexReferenceRow.Parent));
 
                 // We are only interested processing when the child is a group.
                 if ((ComplexReferenceChildType.ComponentGroup == wixComplexReferenceRow.ChildType) ||
                     (ComplexReferenceChildType.FeatureGroup == wixComplexReferenceRow.ChildType) ||
                     (ComplexReferenceChildType.PatchFamilyGroup == wixComplexReferenceRow.ChildType))
                 {
-                    string childTypeAndId = CombineTypeAndId(wixComplexReferenceRow.ChildType, wixComplexReferenceRow.Child);
+                    var childTypeAndId = this.CombineTypeAndId(wixComplexReferenceRow.ChildType, wixComplexReferenceRow.Child);
                     if (loopDetector.Contains(childTypeAndId))
                     {
                         // Create a comma delimited list of the references that participate in the 
@@ -1531,7 +1518,7 @@ namespace WixToolset.Core
             // duplicate complex references that occurred during the merge.
             referencesToParent.AddRange(allNewChildComplexReferences);
             referencesToParent.Sort(ComplexReferenceComparision);
-            for (int i = referencesToParent.Count - 1; i >= 0; --i)
+            for (var i = referencesToParent.Count - 1; i >= 0; --i)
             {
                 var wixComplexReferenceRow = referencesToParent[i];
 
@@ -1716,7 +1703,7 @@ namespace WixToolset.Core
 
             if (emptyGuid == featureId)
             {
-                ConnectToFeature connection = connectToFeatures[connectionId];
+                var connection = connectToFeatures[connectionId];
 
                 if (null == connection)
                 {

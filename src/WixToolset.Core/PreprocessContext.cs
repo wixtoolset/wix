@@ -21,9 +21,9 @@ namespace WixToolset.Core
 
         public Platform Platform { get; set; }
 
-        public IList<string> IncludeSearchPaths { get; set; }
+        public IEnumerable<string> IncludeSearchPaths { get; set; }
 
-        public string SourceFile { get; set; }
+        public string SourcePath { get; set; }
 
         public IDictionary<string, string> Variables { get; set; }
 

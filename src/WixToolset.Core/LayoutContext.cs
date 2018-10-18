@@ -24,7 +24,7 @@ namespace WixToolset.Core
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
 
-        public string OutputPdbPath { get; set; }
+        public string IntermediateFolder { get; set; }
 
         public string ContentsFile { get; set; }
 

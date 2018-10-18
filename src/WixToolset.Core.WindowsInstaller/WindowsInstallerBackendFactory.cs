@@ -9,7 +9,7 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal class WindowsInstallerBackendFactory : IBackendFactory
     {
-        public bool TryCreateBackend(string outputType, string outputFile, IBindContext context, out IBackend backend)
+        public bool TryCreateBackend(string outputType, string outputFile, out IBackend backend)
         {
             if (String.IsNullOrEmpty(outputType))
             {

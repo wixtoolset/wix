@@ -43,6 +43,11 @@ namespace WixToolset.Core.WindowsInstaller
             return result;
         }
 
+        public BindResult Decompile(IDecompileContext context)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Inscribe(IInscribeContext context)
         {
             return false;

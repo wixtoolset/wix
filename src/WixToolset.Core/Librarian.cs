@@ -8,14 +8,13 @@ namespace WixToolset.Core
     using WixToolset.Core.Bind;
     using WixToolset.Core.Link;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Core librarian tool.
     /// </summary>
-    internal class Librarian
+    internal class Librarian : ILibrarian
     {
         internal Librarian(IServiceProvider serviceProvider)
         {
@@ -28,42 +27,29 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
-        private ILibraryContext Context { get; set; }
-
-        public bool BindFiles { get; set; }
-
-        public IEnumerable<BindPath> BindPaths { get; set; }
-
-        public IEnumerable<Localization> Localizations { get; set; }
-
-        public IEnumerable<Intermediate> Intermediates { get; set; }
-
         /// <summary>
         /// Create a library by combining several intermediates (objects).
         /// </summary>
         /// <param name="sections">The sections to combine into a library.</param>
         /// <returns>Returns the new library.</returns>
-        public Intermediate Execute()
+        public Intermediate Combine(ILibraryContext context)
         {
-            this.Context = new LibraryContext(this.ServiceProvider);
-            this.Context.BindFiles = this.BindFiles;
-            this.Context.BindPaths = this.BindPaths;
-            this.Context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<ILibrarianExtension>();
-            this.Context.Localizations = this.Localizations;
-            this.Context.LibraryId = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
-            this.Context.Intermediates = this.Intermediates;
-
-            foreach (var extension in this.Context.Extensions)
+            if (String.IsNullOrEmpty(context.LibraryId))
             {
-                extension.PreCombine(this.Context);
+                context.LibraryId = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
+            }
+
+            foreach (var extension in context.Extensions)
+            {
+                extension.PreCombine(context);
             }
 
             Intermediate library = null;
             try
             {
-                var sections = this.Context.Intermediates.SelectMany(i => i.Sections).ToList();
+                var sections = context.Intermediates.SelectMany(i => i.Sections).ToList();
 
-                var collate = new CollateLocalizationsCommand(this.Messaging, this.Context.Localizations);
+                var collate = new CollateLocalizationsCommand(this.Messaging, context.Localizations);
                 var localizationsByCulture = collate.Execute();
 
                 if (this.Messaging.EncounteredError)
@@ -71,20 +57,20 @@ namespace WixToolset.Core
                     return null;
                 }
 
-                var embedFilePaths = this.ResolveFilePathsToEmbed(sections);
+                var embedFilePaths = this.ResolveFilePathsToEmbed(context, sections);
 
                 foreach (var section in sections)
                 {
-                    section.LibraryId = this.Context.LibraryId;
+                    section.LibraryId = context.LibraryId;
                 }
 
-                library = new Intermediate(this.Context.LibraryId, sections, localizationsByCulture, embedFilePaths);
+                library = new Intermediate(context.LibraryId, sections, localizationsByCulture, embedFilePaths);
 
                 this.Validate(library);
             }
             finally
             {
-                foreach (var extension in this.Context.Extensions)
+                foreach (var extension in context.Extensions)
                 {
                     extension.PostCombine(library);
                 }
@@ -99,7 +85,7 @@ namespace WixToolset.Core
         /// <param name="library">Library to validate.</param>
         private void Validate(Intermediate library)
         {
-            FindEntrySectionAndLoadSymbolsCommand find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, library.Sections);
+            var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, library.Sections);
             find.Execute();
 
             // TODO: Consider bringing this sort of verification back.
@@ -113,16 +99,16 @@ namespace WixToolset.Core
             // }
         }
 
-        private List<string> ResolveFilePathsToEmbed(IEnumerable<IntermediateSection> sections)
+        private List<string> ResolveFilePathsToEmbed(ILibraryContext context, IEnumerable<IntermediateSection> sections)
         {
             var embedFilePaths = new List<string>();
 
             // Resolve paths to files that are to be embedded in the library.
-            if (this.Context.BindFiles)
+            if (context.BindFiles)
             {
                 var variableResolver = new WixVariableResolver(this.Messaging);
 
-                var fileResolver = new FileResolver(this.Context.BindPaths, this.Context.Extensions);
+                var fileResolver = new FileResolver(context.BindPaths, context.Extensions);
 
                 foreach (var tuple in sections.SelectMany(s => s.Tuples))
                 {

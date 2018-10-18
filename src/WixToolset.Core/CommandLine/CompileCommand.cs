@@ -6,6 +6,7 @@ namespace WixToolset.Core.CommandLine
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -15,6 +16,7 @@ namespace WixToolset.Core.CommandLine
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
             this.SourceFiles = sources;
             this.PreprocessorVariables = preprocessorVariables;
             this.Platform = platform;
@@ -23,6 +25,8 @@ namespace WixToolset.Core.CommandLine
         private IServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; }
+
+        public IExtensionManager ExtensionManager { get; }
 
         private IEnumerable<SourceFile> SourceFiles { get; }
 
@@ -36,16 +40,18 @@ namespace WixToolset.Core.CommandLine
         {
             foreach (var sourceFile in this.SourceFiles)
             {
-                var preprocessor = new Preprocessor(this.ServiceProvider);
-                preprocessor.IncludeSearchPaths = this.IncludeSearchPaths;
-                preprocessor.Platform = Platform.X86; // TODO: set this correctly
-                preprocessor.SourcePath = sourceFile.SourcePath;
-                preprocessor.Variables = new Dictionary<string, string>(this.PreprocessorVariables);
+                var context = this.ServiceProvider.GetService<IPreprocessContext>();
+                context.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
+                context.Platform = this.Platform;
+                context.IncludeSearchPaths = this.IncludeSearchPaths;
+                context.SourcePath = sourceFile.SourcePath;
+                context.Variables = this.PreprocessorVariables;
 
                 XDocument document = null;
                 try
                 {
-                    document = preprocessor.Execute();
+                    var preprocessor = this.ServiceProvider.GetService<IPreprocessor>();
+                    document = preprocessor.Preprocess(context);
                 }
                 catch (WixException e)
                 {
@@ -57,11 +63,14 @@ namespace WixToolset.Core.CommandLine
                     continue;
                 }
 
-                var compiler = new Compiler(this.ServiceProvider);
-                compiler.OutputPath = sourceFile.OutputPath;
-                compiler.Platform = this.Platform;
-                compiler.SourceDocument = document;
-                var intermediate = compiler.Execute();
+                var compileContext = this.ServiceProvider.GetService<ICompileContext>();
+                compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
+                compileContext.OutputPath = sourceFile.OutputPath;
+                compileContext.Platform = this.Platform;
+                compileContext.Source = document;
+
+                var compiler = this.ServiceProvider.GetService<ICompiler>();
+                var intermediate = compiler.Compile(compileContext);
 
                 intermediate.Save(sourceFile.OutputPath);
             }

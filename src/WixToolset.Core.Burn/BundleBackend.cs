@@ -27,6 +27,11 @@ namespace WixToolset.Core.Burn
             return new BindResult { FileTransfers = command.FileTransfers, TrackedFiles = command.TrackedFiles };
         }
 
+        public BindResult Decompile(IDecompileContext context)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Inscribe(IInscribeContext context)
         {
             if (String.IsNullOrEmpty(context.SignedEngineFile))
