@@ -3,7 +3,6 @@
 namespace WixToolset.Core
 {
     using System;
-    using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -17,12 +16,6 @@ namespace WixToolset.Core
         {
             this.ServiceProvider = serviceProvider;
         }
-
-        public OutputType DecompileType { get; set; }
-
-        public string IntermediateFolder { get; set; }
-
-        public string OutputPath { get; set; }
 
         public IServiceProvider ServiceProvider { get; }
 

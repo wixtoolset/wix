@@ -92,7 +92,7 @@ namespace WixToolset.Core
         public void AddService<T>(Func<IServiceProvider, Dictionary<Type, object>, T> creationFunction)
             where T : class
         {
-            AddService(typeof(T), creationFunction);
+            this.AddService(typeof(T), creationFunction);
         }
 
         private static T AddSingleton<T>(Dictionary<Type, object> singletons, T service)

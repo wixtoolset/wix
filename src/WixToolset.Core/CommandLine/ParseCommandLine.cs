@@ -25,11 +25,14 @@ namespace WixToolset.Core.CommandLine
             this.ErrorArgument = errorArgument;
         }
 
-        public bool IsSwitch(string arg) => !String.IsNullOrEmpty(arg) && ('/' == arg[0] || '-' == arg[0]);
+        public bool IsSwitch(string arg)
+        {
+            return !String.IsNullOrEmpty(arg) && ('/' == arg[0] || '-' == arg[0]);
+        }
 
         public void GetArgumentAsFilePathOrError(string argument, string fileType, IList<string> paths)
         {
-            foreach (var path in GetFiles(argument, fileType))
+            foreach (var path in this.GetFiles(argument, fileType))
             {
                 paths.Add(path);
             }
@@ -60,7 +63,7 @@ namespace WixToolset.Core.CommandLine
 
         public string GetNextArgumentAsDirectoryOrError(string commandLineSwitch)
         {
-            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
             {
                 return directory;
             }
@@ -71,7 +74,7 @@ namespace WixToolset.Core.CommandLine
 
         public bool GetNextArgumentAsDirectoryOrError(string commandLineSwitch, IList<string> directories)
         {
-            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
             {
                 directories.Add(directory);
                 return true;
@@ -96,7 +99,7 @@ namespace WixToolset.Core.CommandLine
         {
             if (this.TryGetNextNonSwitchArgumentOrError(out var arg))
             {
-                foreach (var path in GetFiles(arg, fileType))
+                foreach (var path in this.GetFiles(arg, fileType))
                 {
                     paths.Add(path);
                 }
@@ -125,7 +128,10 @@ namespace WixToolset.Core.CommandLine
             return result;
         }
 
-        private static bool IsValidArg(string arg) => !(String.IsNullOrEmpty(arg) || '/' == arg[0] || '-' == arg[0]);
+        private static bool IsValidArg(string arg)
+        {
+            return !(String.IsNullOrEmpty(arg) || '/' == arg[0] || '-' == arg[0]);
+        }
 
         private static bool TryDequeue(Queue<string> q, out string arg)
         {
@@ -194,8 +200,8 @@ namespace WixToolset.Core.CommandLine
             }
 
             // Convert alternate directory separators to the standard one.
-            string filePath = searchPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            int lastSeparator = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+            var filePath = searchPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var lastSeparator = filePath.LastIndexOf(Path.DirectorySeparatorChar);
             var files = new string[0];
 
             try
