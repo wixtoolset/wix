@@ -19,7 +19,9 @@ namespace WixToolset.Extensibility
 
         void PreParse(ICommandLineContext context);
 
-        bool TryParseArgument(IParseCommandLine parseCommandLine, string arg);
+        bool TryParseArgument(ICommandLineParser parser, string argument);
+
+        bool TryParseCommand(ICommandLineParser parser, out ICommandLineCommand command);
 
         void PostParse();
     }

@@ -18,6 +18,6 @@ namespace WixToolset.Extensibility.Data
 
         void Populate(string[] args);
 
-        IParseCommandLine Parse();
+        ICommandLineParser Parse();
     }
 }
