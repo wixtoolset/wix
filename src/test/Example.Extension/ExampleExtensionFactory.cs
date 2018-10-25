@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace Example.Extension
 {
@@ -9,16 +9,26 @@ namespace Example.Extension
     {
         private ExamplePreprocessorExtensionAndCommandLine preprocessorExtension;
 
+        public ExampleExtensionFactory(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        /// <summary>
+        /// This exists just to show it is possible to get a service provider to the extension factory.
+        /// </summary>
+        private IServiceProvider ServiceProvider { get; }
+
         public bool TryCreateExtension(Type extensionType, out object extension)
         {
             if (extensionType == typeof(IExtensionCommandLine) || extensionType == typeof(IPreprocessorExtension))
             {
-                if (preprocessorExtension == null)
+                if (this.preprocessorExtension == null)
                 {
-                    preprocessorExtension = new ExamplePreprocessorExtensionAndCommandLine();
+                    this.preprocessorExtension = new ExamplePreprocessorExtensionAndCommandLine();
                 }
 
-                extension = preprocessorExtension;
+                extension = this.preprocessorExtension;
             }
             else if (extensionType == typeof(ICompilerExtension))
             {
@@ -28,7 +38,7 @@ namespace Example.Extension
             {
                 extension = new ExampleExtensionData();
             }
-            else if (extensionType == typeof(IWindowsInstallerBackendExtension))
+            else if (extensionType == typeof(IWindowsInstallerBackendBinderExtension))
             {
                 extension = new ExampleWindowsInstallerBackendExtension();
             }
@@ -36,7 +46,7 @@ namespace Example.Extension
             {
                 extension = null;
             }
-            
+
             return extension != null;
         }
     }

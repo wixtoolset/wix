@@ -16,12 +16,30 @@ namespace WixToolset.Core.ExtensibilityServices
         private List<IExtensionFactory> extensionFactories = new List<IExtensionFactory>();
         private Dictionary<Type, List<object>> loadedExtensionsByType = new Dictionary<Type, List<object>>();
 
+        public ExtensionManager(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
+        private IServiceProvider ServiceProvider { get; }
+
         public void Add(Assembly extensionAssembly)
         {
             var types = extensionAssembly.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && typeof(IExtensionFactory).IsAssignableFrom(t));
-            var factories = types.Select(t => (IExtensionFactory)Activator.CreateInstance(t)).ToList();
+            var factories = types.Select(this.CreateExtensionFactory).ToList();
 
             this.extensionFactories.AddRange(factories);
+        }
+
+        private IExtensionFactory CreateExtensionFactory(Type type)
+        {
+            var constructor = type.GetConstructor(new[] { typeof(IServiceProvider) });
+            if (constructor != null)
+            {
+                return (IExtensionFactory)constructor.Invoke(new[] { this.ServiceProvider });
+            }
+
+            return (IExtensionFactory)Activator.CreateInstance(type);
         }
 
         public void Load(string extensionPath)
