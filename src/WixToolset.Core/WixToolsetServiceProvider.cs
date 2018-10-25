@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core
 {
@@ -29,7 +29,7 @@ namespace WixToolset.Core
             // Transients.
             this.AddService<ICommandLineArguments>((provider, singletons) => new CommandLineArguments(provider));
             this.AddService<ICommandLineContext>((provider, singletons) => new CommandLineContext(provider));
-            this.AddService<ICommandLineParser>((provider, singletons) => new CommandLineParser(provider));
+            this.AddService<ICommandLine>((provider, singletons) => new CommandLine.CommandLine(provider));
             this.AddService<IPreprocessContext>((provider, singletons) => new PreprocessContext(provider));
             this.AddService<ICompileContext>((provider, singletons) => new CompileContext(provider));
             this.AddService<ILibraryContext>((provider, singletons) => new LibraryContext(provider));

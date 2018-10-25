@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace Example.Extension
 {
@@ -23,14 +23,20 @@ namespace Example.Extension
         {
         }
 
-        public bool TryParseArgument(IParseCommandLine parseCommandLine, string arg)
+        public bool TryParseArgument(ICommandLineParser parser, string argument)
         {
-            if (parseCommandLine.IsSwitch(arg) && arg.Substring(1).Equals("example", StringComparison.OrdinalIgnoreCase))
+            if (parser.IsSwitch(argument) && argument.Substring(1).Equals("example", StringComparison.OrdinalIgnoreCase))
             {
-                this.exampleValueFromCommandLine = parseCommandLine.GetNextArgumentOrError(arg);
+                this.exampleValueFromCommandLine = parser.GetNextArgumentOrError(argument);
                 return true;
             }
 
+            return false;
+        }
+
+        public bool TryParseCommand(ICommandLineParser parser, out ICommandLineCommand command)
+        {
+            command = null;
             return false;
         }
 

@@ -4,28 +4,24 @@ namespace WixToolset.Core.CommandLine
 {
     using System;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class HelpCommand : ICommandLineCommand
     {
-        public HelpCommand(Commands command)
-        {
-            this.Command = command;
-        }
+        public bool ShowLogo => true;
 
-        public Commands Command { get; }
+        public bool StopParsing => true;
 
         public int Execute()
         {
-            if (this.Command == Commands.Unknown)
-            {
-                Console.WriteLine();
-            }
-            else
-            {
-                Console.WriteLine();
-            }
+            Console.WriteLine("TODO: Show list of available commands");
 
             return -1;
+        }
+
+        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
+        {
+            return true; // eat any arguments
         }
     }
 }

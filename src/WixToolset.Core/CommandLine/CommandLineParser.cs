@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.CommandLine
 {
@@ -6,437 +6,269 @@ namespace WixToolset.Core.CommandLine
     using System.Collections.Generic;
     using System.IO;
     using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-
-    internal enum Commands
-    {
-        Unknown,
-        Build,
-        Preprocess,
-        Compile,
-        Link,
-        Bind,
-    }
 
     internal class CommandLineParser : ICommandLineParser
     {
-        private static readonly char[] BindPathSplit = { '=' };
+        private const string ExpectedArgument = "expected argument";
 
-        public CommandLineParser(IServiceProvider serviceProvider)
+        public string ErrorArgument { get; set; }
+
+        private Queue<string> RemainingArguments { get; }
+
+        private IMessaging Messaging { get; }
+
+        public CommandLineParser(IMessaging messaging, string[] arguments, string errorArgument)
         {
-            this.ServiceProvider = serviceProvider;
-
-            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
+            this.Messaging = messaging;
+            this.RemainingArguments = new Queue<string>(arguments);
+            this.ErrorArgument = errorArgument;
         }
 
-        private IServiceProvider ServiceProvider { get; }
-
-        private IMessaging Messaging { get; set; }
-
-        public IExtensionManager ExtensionManager { get; set; }
-
-        public ICommandLineArguments Arguments { get; set; }
-
-        public static string ExpectedArgument { get; } = "expected argument";
-
-        public string ActiveCommand { get; private set; }
-
-        public bool ShowHelp { get; private set; }
-
-        public ICommandLineCommand ParseStandardCommandLine()
+        public bool IsSwitch(string arg)
         {
-            var context = this.ServiceProvider.GetService<ICommandLineContext>();
-            context.ExtensionManager = this.ExtensionManager ?? this.ServiceProvider.GetService<IExtensionManager>();
-            context.Arguments = this.Arguments;
+            return !String.IsNullOrEmpty(arg) && ('/' == arg[0] || '-' == arg[0]);
+        }
 
-            var next = String.Empty;
-
-            var command = Commands.Unknown;
-            var showLogo = true;
-            var showVersion = false;
-            var outputFolder = String.Empty;
-            var outputFile = String.Empty;
-            var outputType = String.Empty;
-            var platformType = String.Empty;
-            var verbose = false;
-            var files = new List<string>();
-            var defines = new List<string>();
-            var includePaths = new List<string>();
-            var locFiles = new List<string>();
-            var libraryFiles = new List<string>();
-            var suppressedWarnings = new List<int>();
-
-            var bindFiles = false;
-            var bindPaths = new List<string>();
-
-            var intermediateFolder = String.Empty;
-
-            var cabCachePath = String.Empty;
-            var cultures = new List<string>();
-            var contentsFile = String.Empty;
-            var outputsFile = String.Empty;
-            var builtOutputsFile = String.Empty;
-
-            this.Parse(context, (cmdline, arg) => Enum.TryParse(arg, true, out command), (cmdline, parser, arg) =>
+        public string GetArgumentAsFilePathOrError(string argument, string fileType)
+        {
+            if (!File.Exists(argument))
             {
-                if (parser.IsSwitch(arg))
-                {
-                    var parameter = arg.Substring(1);
-                    switch (parameter.ToLowerInvariant())
-                    {
-                    case "?":
-                    case "h":
-                    case "help":
-                        cmdline.ShowHelp = true;
-                        return true;
-
-                    case "arch":
-                    case "platform":
-                        platformType = parser.GetNextArgumentOrError(arg);
-                        return true;
-
-                    case "bindfiles":
-                        bindFiles = true;
-                        return true;
-
-                    case "bindpath":
-                        parser.GetNextArgumentOrError(arg, bindPaths);
-                        return true;
-
-                    case "cc":
-                        cabCachePath = parser.GetNextArgumentOrError(arg);
-                        return true;
-
-                    case "culture":
-                        parser.GetNextArgumentOrError(arg, cultures);
-                        return true;
-                    case "contentsfile":
-                        contentsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-                    case "outputsfile":
-                        outputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-                    case "builtoutputsfile":
-                        builtOutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-
-                    case "d":
-                    case "define":
-                        parser.GetNextArgumentOrError(arg, defines);
-                        return true;
-
-                    case "i":
-                    case "includepath":
-                        parser.GetNextArgumentOrError(arg, includePaths);
-                        return true;
-
-                    case "intermediatefolder":
-                        intermediateFolder = parser.GetNextArgumentAsDirectoryOrError(arg);
-                        return true;
-
-                    case "loc":
-                        parser.GetNextArgumentAsFilePathOrError(arg, "localization files", locFiles);
-                        return true;
-
-                    case "lib":
-                        parser.GetNextArgumentAsFilePathOrError(arg, "library files", libraryFiles);
-                        return true;
-
-                    case "o":
-                    case "out":
-                        outputFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-
-                    case "outputtype":
-                        outputType = parser.GetNextArgumentOrError(arg);
-                        return true;
-
-                    case "nologo":
-                        showLogo = false;
-                        return true;
-
-                    case "v":
-                    case "verbose":
-                        verbose = true;
-                        return true;
-
-                    case "version":
-                    case "-version":
-                        showVersion = true;
-                        return true;
-
-                    case "sval":
-                        // todo: implement
-                        return true;
-
-                    case "sw":
-                    case "suppresswarning":
-                        var warning = parser.GetNextArgumentOrError(arg);
-                        if (!String.IsNullOrEmpty(warning))
-                        {
-                            var warningNumber = Convert.ToInt32(warning);
-                            this.Messaging.SuppressWarningMessage(warningNumber);
-                        }
-                        return true;
-                    }
-
-                    return false;
-                }
-                else
-                {
-                    parser.GetArgumentAsFilePathOrError(arg, "source code", files);
-                    return true;
-                }
-            });
-
-            this.Messaging.ShowVerboseMessages = verbose;
-
-            if (showVersion)
-            {
-                return new VersionCommand();
+                this.Messaging.Write(ErrorMessages.FileNotFound(null, argument, fileType));
+                return null;
             }
 
-            if (showLogo)
+            return argument;
+        }
+
+        public void GetArgumentAsFilePathOrError(string argument, string fileType, IList<string> paths)
+        {
+            foreach (var path in this.GetFiles(argument, fileType))
             {
-                AppCommon.DisplayToolHeader();
+                paths.Add(path);
+            }
+        }
+
+        public string GetNextArgumentOrError(string commandLineSwitch)
+        {
+            if (this.TryGetNextNonSwitchArgumentOrError(out var argument))
+            {
+                return argument;
             }
 
-            if (this.ShowHelp)
-            {
-                return new HelpCommand(command);
-            }
-
-            switch (command)
-            {
-            case Commands.Build:
-            {
-                var sourceFiles = GatherSourceFiles(files, outputFolder);
-                var variables = this.GatherPreprocessorVariables(defines);
-                var bindPathList = this.GatherBindPaths(bindPaths);
-                var filterCultures = CalculateFilterCultures(cultures);
-                var type = CalculateOutputType(outputType, outputFile);
-                var platform = CalculatePlatform(platformType);
-                return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, filterCultures, outputFile, type, platform, cabCachePath, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
-            }
-
-            case Commands.Compile:
-            {
-                var sourceFiles = GatherSourceFiles(files, outputFolder);
-                var variables = this.GatherPreprocessorVariables(defines);
-                var platform = CalculatePlatform(platformType);
-                return new CompileCommand(this.ServiceProvider, sourceFiles, variables, platform);
-            }
-            }
-
+            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
             return null;
         }
 
-        private static IEnumerable<string> CalculateFilterCultures(List<string> cultures)
+        public bool GetNextArgumentOrError(string commandLineSwitch, IList<string> args)
         {
-            var result = new List<string>();
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg))
+            {
+                args.Add(arg);
+                return true;
+            }
 
-            if (cultures == null)
+            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            return false;
+        }
+
+        public string GetNextArgumentAsDirectoryOrError(string commandLineSwitch)
+        {
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
             {
+                return directory;
             }
-            else if (cultures.Count == 1 && cultures[0].Equals("null", StringComparison.OrdinalIgnoreCase))
+
+            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            return null;
+        }
+
+        public bool GetNextArgumentAsDirectoryOrError(string commandLineSwitch, IList<string> directories)
+        {
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetDirectory(commandLineSwitch, this.Messaging, arg, out var directory))
             {
-                // When null is used treat it as if cultures wasn't specified. This is
-                // needed for batching in the MSBuild task since MSBuild doesn't support
-                // empty items.
+                directories.Add(directory);
+                return true;
             }
-            else
+
+            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            return false;
+        }
+
+        public string GetNextArgumentAsFilePathOrError(string commandLineSwitch)
+        {
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg) && this.TryGetFile(commandLineSwitch, arg, out var path))
             {
-                foreach (var culture in cultures)
+                return path;
+            }
+
+            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            return null;
+        }
+
+        public bool GetNextArgumentAsFilePathOrError(string commandLineSwitch, string fileType, IList<string> paths)
+        {
+            if (this.TryGetNextNonSwitchArgumentOrError(out var arg))
+            {
+                foreach (var path in this.GetFiles(arg, fileType))
                 {
-                    // Neutral is different from null. For neutral we still want to do culture filtering.
-                    // Set the culture to the empty string = identifier for the invariant culture.
-                    var filter = (culture.Equals("neutral", StringComparison.OrdinalIgnoreCase)) ? String.Empty : culture;
-                    result.Add(filter);
+                    paths.Add(path);
                 }
+
+                return true;
+            }
+
+            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            return false;
+        }
+
+        public bool TryGetNextSwitchOrArgument(out string arg)
+        {
+            return TryDequeue(this.RemainingArguments, out arg);
+        }
+
+        private bool TryGetNextNonSwitchArgumentOrError(out string arg)
+        {
+            var result = this.TryGetNextSwitchOrArgument(out arg);
+
+            if (!result && !this.IsSwitch(arg))
+            {
+                this.ErrorArgument = arg ?? CommandLineParser.ExpectedArgument;
             }
 
             return result;
         }
 
-        private static OutputType CalculateOutputType(string outputType, string outputFile)
+        private static bool IsValidArg(string arg)
         {
-            if (String.IsNullOrEmpty(outputType))
-            {
-                outputType = Path.GetExtension(outputFile);
-            }
-
-            switch (outputType.ToLowerInvariant())
-            {
-            case "bundle":
-            case ".exe":
-                return OutputType.Bundle;
-
-            case "library":
-            case ".wixlib":
-                return OutputType.Library;
-
-            case "module":
-            case ".msm":
-                return OutputType.Module;
-
-            case "patch":
-            case ".msp":
-                return OutputType.Patch;
-
-            case ".pcp":
-                return OutputType.PatchCreation;
-
-            case "product":
-            case "package":
-            case ".msi":
-                return OutputType.Product;
-
-            case "transform":
-            case ".mst":
-                return OutputType.Transform;
-
-            case "intermediatepostlink":
-            case ".wixipl":
-                return OutputType.IntermediatePostLink;
-            }
-
-            return OutputType.Unknown;
+            return !(String.IsNullOrEmpty(arg) || '/' == arg[0] || '-' == arg[0]);
         }
 
-        private static Platform CalculatePlatform(string platformType)
+        private static bool TryDequeue(Queue<string> q, out string arg)
         {
-            return Enum.TryParse(platformType, true, out Platform platform) ? platform : Platform.X86;
+            if (q.Count > 0)
+            {
+                arg = q.Dequeue();
+                return true;
+            }
+
+            arg = null;
+            return false;
         }
 
-        private ICommandLineParser Parse(ICommandLineContext context, Func<CommandLineParser, string, bool> parseCommand, Func<CommandLineParser, IParseCommandLine, string, bool> parseArgument)
+        private bool TryGetDirectory(string commandlineSwitch, IMessaging messageHandler, string arg, out string directory)
         {
-            var extensions = this.ExtensionManager.Create<IExtensionCommandLine>();
+            directory = null;
 
-            foreach (var extension in extensions)
+            if (File.Exists(arg))
             {
-                extension.PreParse(context);
+                this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile(commandlineSwitch, arg));
+                return false;
             }
 
-            var parser = context.Arguments.Parse();
-
-            while (!this.ShowHelp &&
-                   String.IsNullOrEmpty(parser.ErrorArgument) &&
-                   parser.TryGetNextSwitchOrArgument(out var arg))
-            {
-                if (String.IsNullOrWhiteSpace(arg)) // skip blank arguments.
-                {
-                    continue;
-                }
-
-                if (parser.IsSwitch(arg))
-                {
-                    if (!parseArgument(this, parser, arg) &&
-                        !this.TryParseCommandLineArgumentWithExtension(arg, parser, extensions))
-                    {
-                        parser.ErrorArgument = arg;
-                    }
-                }
-                else if (String.IsNullOrEmpty(this.ActiveCommand) && parseCommand != null) // First non-switch must be the command, if commands are supported.
-                {
-                    if (parseCommand(this, arg))
-                    {
-                        this.ActiveCommand = arg;
-                    }
-                    else
-                    {
-                        parser.ErrorArgument = arg;
-                    }
-                }
-                else if (!this.TryParseCommandLineArgumentWithExtension(arg, parser, extensions) &&
-                         !parseArgument(this, parser, arg))
-                {
-                    parser.ErrorArgument = arg;
-                }
-            }
-
-            foreach (var extension in extensions)
-            {
-                extension.PostParse();
-            }
-
-            return this;
+            directory = this.VerifyPath(arg);
+            return directory != null;
         }
 
-        private static IEnumerable<SourceFile> GatherSourceFiles(IEnumerable<string> sourceFiles, string intermediateDirectory)
+        private bool TryGetFile(string commandlineSwitch, string arg, out string path)
         {
-            var files = new List<SourceFile>();
+            path = null;
 
-            foreach (var item in sourceFiles)
+            if (!IsValidArg(arg))
             {
-                var sourcePath = item;
-                var outputPath = Path.Combine(intermediateDirectory, Path.GetFileNameWithoutExtension(sourcePath) + ".wir");
+                this.Messaging.Write(ErrorMessages.FilePathRequired(commandlineSwitch));
+            }
+            else if (Directory.Exists(arg))
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedFileGotDirectory(commandlineSwitch, arg));
+            }
+            else
+            {
+                path = this.VerifyPath(arg);
+            }
 
-                files.Add(new SourceFile(sourcePath, outputPath));
+            return path != null;
+        }
+
+        /// <summary>
+        /// Get a set of files that possibly have a search pattern in the path (such as '*').
+        /// </summary>
+        /// <param name="searchPath">Search path to find files in.</param>
+        /// <param name="fileType">Type of file; typically "Source".</param>
+        /// <returns>An array of files matching the search path.</returns>
+        /// <remarks>
+        /// This method is written in this verbose way because it needs to support ".." in the path.
+        /// It needs the directory path isolated from the file name in order to use Directory.GetFiles
+        /// or DirectoryInfo.GetFiles.  The only way to get this directory path is manually since
+        /// Path.GetDirectoryName does not support ".." in the path.
+        /// </remarks>
+        /// <exception cref="WixFileNotFoundException">Throws WixFileNotFoundException if no file matching the pattern can be found.</exception>
+        private string[] GetFiles(string searchPath, string fileType)
+        {
+            if (null == searchPath)
+            {
+                throw new ArgumentNullException(nameof(searchPath));
+            }
+
+            // Convert alternate directory separators to the standard one.
+            var filePath = searchPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var lastSeparator = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+            var files = new string[0];
+
+            try
+            {
+                if (0 > lastSeparator)
+                {
+                    files = Directory.GetFiles(".", filePath);
+                }
+                else // found directory separator
+                {
+                    files = Directory.GetFiles(filePath.Substring(0, lastSeparator + 1), filePath.Substring(lastSeparator + 1));
+                }
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // Don't let this function throw the DirectoryNotFoundException. This exception
+                // occurs for non-existant directories and invalid characters in the searchPattern.
+            }
+            catch (ArgumentException)
+            {
+                // Don't let this function throw the ArgumentException. This exception
+                // occurs in certain situations such as when passing a malformed UNC path.
+            }
+            catch (IOException)
+            {
+            }
+
+            if (0 == files.Length)
+            {
+                this.Messaging.Write(ErrorMessages.FileNotFound(null, searchPath, fileType));
             }
 
             return files;
         }
 
-        private IDictionary<string, string> GatherPreprocessorVariables(IEnumerable<string> defineConstants)
+        private string VerifyPath(string path)
         {
-            var variables = new Dictionary<string, string>();
+            string fullPath;
 
-            foreach (var pair in defineConstants)
+            if (0 <= path.IndexOf('\"'))
             {
-                var value = pair.Split(new[] { '=' }, 2);
-
-                if (variables.ContainsKey(value[0]))
-                {
-                    this.Messaging.Write(ErrorMessages.DuplicateVariableDefinition(value[0], (1 == value.Length) ? String.Empty : value[1], variables[value[0]]));
-                    continue;
-                }
-
-                variables.Add(value[0], (1 == value.Length) ? String.Empty : value[1]);
+                this.Messaging.Write(ErrorMessages.PathCannotContainQuote(path));
+                return null;
             }
 
-            return variables;
-        }
-
-        private IEnumerable<BindPath> GatherBindPaths(IEnumerable<string> bindPaths)
-        {
-            var result = new List<BindPath>();
-
-            foreach (var bindPath in bindPaths)
+            try
             {
-                var bp = ParseBindPath(bindPath);
-
-                if (File.Exists(bp.Path))
-                {
-                    this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile("-bindpath", bp.Path));
-                }
-                else
-                {
-                    result.Add(bp);
-                }
+                fullPath = Path.GetFullPath(path);
+            }
+            catch (Exception e)
+            {
+                this.Messaging.Write(ErrorMessages.InvalidCommandLineFileName(path, e.Message));
+                return null;
             }
 
-            return result;
-        }
-
-        private bool TryParseCommandLineArgumentWithExtension(string arg, IParseCommandLine parse, IEnumerable<IExtensionCommandLine> extensions)
-        {
-            foreach (var extension in extensions)
-            {
-                if (extension.TryParseArgument(parse, arg))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static BindPath ParseBindPath(string bindPath)
-        {
-            var namedPath = bindPath.Split(BindPathSplit, 2);
-            return (1 == namedPath.Length) ? new BindPath(namedPath[0]) : new BindPath(namedPath[0], namedPath[1]);
+            return fullPath;
         }
     }
 }

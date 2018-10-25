@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.CommandLine
 {
@@ -12,6 +12,13 @@ namespace WixToolset.Core.CommandLine
 
     internal class CompileCommand : ICommandLineCommand
     {
+        public CompileCommand(IServiceProvider serviceProvider)
+        {
+            this.ServiceProvider = serviceProvider;
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
+        }
+
         public CompileCommand(IServiceProvider serviceProvider, IEnumerable<SourceFile> sources, IDictionary<string, string> preprocessorVariables, Platform platform)
         {
             this.ServiceProvider = serviceProvider;
@@ -35,6 +42,15 @@ namespace WixToolset.Core.CommandLine
         private Platform Platform { get; }
 
         public IEnumerable<string> IncludeSearchPaths { get; }
+
+        public bool ShowLogo => throw new NotImplementedException();
+
+        public bool StopParsing => throw new NotImplementedException();
+
+        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
+        {
+            throw new NotImplementedException();
+        }
 
         public int Execute()
         {

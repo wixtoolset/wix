@@ -41,11 +41,11 @@ namespace WixToolset.Core.CommandLine
             this.ProcessArgumentsAndParseExtensions(this.OriginalArguments);
         }
 
-        public IParseCommandLine Parse()
+        public ICommandLineParser Parse()
         {
             var messaging = (IMessaging)this.ServiceProvider.GetService(typeof(IMessaging));
 
-            return new ParseCommandLine(messaging, this.Arguments, this.ErrorArgument);
+            return new CommandLineParser(messaging, this.Arguments, this.ErrorArgument);
         }
 
         private void FlattenArgumentsWithResponseFilesIntoOriginalArguments(string[] commandLineArguments)

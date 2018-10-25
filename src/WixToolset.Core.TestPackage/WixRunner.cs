@@ -35,7 +35,7 @@ namespace WixToolset.Core.TestPackage
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(args);
 
-            var commandLine = serviceProvider.GetService<ICommandLineParser>();
+            var commandLine = serviceProvider.GetService<ICommandLine>();
             commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
