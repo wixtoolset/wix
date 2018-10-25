@@ -4,9 +4,14 @@ namespace WixToolset.Tools.WixCop.CommandLine
 {
     using System;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class HelpCommand : ICommandLineCommand
     {
+        public bool ShowLogo => false;
+
+        public bool StopParsing => true;
+
         public int Execute()
         {
             Console.WriteLine(" usage:  wixcop.exe sourceFile [sourceFile ...]");
@@ -22,6 +27,11 @@ namespace WixToolset.Tools.WixCop.CommandLine
             Console.WriteLine("   sourceFile may use wildcards like *.wxs");
 
             return 0;
+        }
+
+        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        {
+            return true;
         }
     }
 }

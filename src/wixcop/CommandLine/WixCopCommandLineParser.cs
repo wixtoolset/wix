@@ -85,7 +85,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
             }
         }
 
-        private bool ParseArgument(IParseCommandLine parser, string arg)
+        private bool ParseArgument(ICommandLineParser parser, string arg)
         {
             var parameter = arg.Substring(1);
 

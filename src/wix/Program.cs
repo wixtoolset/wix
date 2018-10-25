@@ -3,11 +3,8 @@
 namespace WixToolset.Tools
 {
     using System;
-    using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using System.Text;
-    using System.Threading;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -50,7 +47,7 @@ namespace WixToolset.Tools
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(args);
 
-            var commandLine = serviceProvider.GetService<ICommandLineParser>();
+            var commandLine = serviceProvider.GetService<ICommandLine>();
             commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();

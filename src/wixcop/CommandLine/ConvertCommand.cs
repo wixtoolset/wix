@@ -50,6 +50,15 @@ namespace WixToolset.Tools.WixCop.CommandLine
 
         private bool SubDirectories { get; }
 
+        public bool ShowLogo => throw new NotImplementedException();
+
+        public bool StopParsing => throw new NotImplementedException();
+
+        public bool TryParseArgument(ICommandLineParser parser, string argument)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Execute()
         {
             // parse the settings if any were specified

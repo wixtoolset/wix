@@ -172,7 +172,7 @@ namespace WixToolset.BuildTasks
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(commandLineString);
 
-            var commandLine = serviceProvider.GetService<ICommandLineParser>();
+            var commandLine = serviceProvider.GetService<ICommandLine>();
             commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
