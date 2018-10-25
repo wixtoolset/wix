@@ -19,7 +19,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public BindResult Decompile(IDecompileContext context)
+        public DecompileResult Decompile(IDecompileContext context)
         {
             // Pre-decompile.
             //
@@ -30,22 +30,22 @@ namespace WixToolset.Core
 
             // Decompile.
             //
-            var bindResult = this.BackendDecompile(context);
+            var result = this.BackendDecompile(context);
 
-            if (bindResult != null)
+            if (result != null)
             {
                 // Post-decompile.
                 //
                 foreach (var extension in context.Extensions)
                 {
-                    extension.PostDecompile(bindResult);
+                    extension.PostDecompile(result);
                 }
             }
 
-            return bindResult;
+            return result;
         }
 
-        private BindResult BackendDecompile(IDecompileContext context)
+        private DecompileResult BackendDecompile(IDecompileContext context)
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 

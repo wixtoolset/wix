@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller
 {
@@ -21,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
-        public BindResult Decompile(IDecompileContext context)
+        public DecompileResult Decompile(IDecompileContext context)
         {
             throw new NotImplementedException();
         }

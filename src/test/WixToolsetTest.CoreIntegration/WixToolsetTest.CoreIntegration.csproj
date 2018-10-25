@@ -20,6 +20,9 @@
     <Content Include="TestData\InstanceTransform\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InstanceTransform\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\InstanceTransform\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\DecompileSingleFileCompressed\example.cab" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\DecompileSingleFileCompressed\example.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\DecompileSingleFileCompressed\Expected.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\data\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

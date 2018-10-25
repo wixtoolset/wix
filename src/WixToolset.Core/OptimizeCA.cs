@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core
 {
@@ -8,7 +8,7 @@ namespace WixToolset.Core
     /// Values for the OptimizeCA MsiPatchMetdata property, which indicates whether custom actions can be skipped when applying the patch.
     /// </summary>
     [Flags]
-    internal enum OptimizeCA
+    public enum OptimizeCA // TODO: review where to place this data so it can not be exposed by WixToolset.Core
     {
         /// <summary>
         /// No custom actions are skipped.

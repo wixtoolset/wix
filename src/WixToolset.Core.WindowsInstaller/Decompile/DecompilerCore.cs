@@ -4,20 +4,17 @@ namespace WixToolset
 {
     using System;
     using System.Collections;
-    using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using Wix = WixToolset.Data.Serialize;
 
-#if TODO
     /// <summary>
     /// The base of the decompiler. Holds some variables used by the decompiler and extensions,
     /// as well as some utility methods.
     /// </summary>
-    internal class DecompilerCore : IDecompilerCore
+    internal class DecompilerCore
     {
-        private Hashtable elements;
-        private Wix.IParentElement rootElement;
-        private bool showPedanticMessages;
+        private readonly Hashtable elements;
         private Wix.UI uiElement;
 
         /// <summary>
@@ -28,36 +25,14 @@ namespace WixToolset
         internal DecompilerCore(Wix.IParentElement rootElement)
         {
             this.elements = new Hashtable();
-            this.rootElement = rootElement;
-        }
-
-        /// <summary>
-        /// Gets whether the decompiler core encountered an error while processing.
-        /// </summary>
-        /// <value>Flag if core encountered an error during processing.</value>
-        public bool EncounteredError
-        {
-            get { return Messaging.Instance.EncounteredError; }
+            this.RootElement = rootElement;
         }
 
         /// <summary>
         /// Gets the root element of the decompiled output.
         /// </summary>
         /// <value>The root element of the decompiled output.</value>
-        public Wix.IParentElement RootElement
-        {
-            get { return this.rootElement; }
-        }
-
-        /// <summary>
-        /// Gets or sets the option to show pedantic messages.
-        /// </summary>
-        /// <value>The option to show pedantic messages.</value>
-        public bool ShowPedanticMessages
-        {
-            get { return this.showPedanticMessages; }
-            set { this.showPedanticMessages = value; }
-        }
+        public Wix.IParentElement RootElement { get; }
 
         /// <summary>
         /// Gets the UI element.
@@ -70,7 +45,7 @@ namespace WixToolset
                 if (null == this.uiElement)
                 {
                     this.uiElement = new Wix.UI();
-                    this.rootElement.AddChild(this.uiElement);
+                    this.RootElement.AddChild(this.uiElement);
                 }
 
                 return this.uiElement;
@@ -95,8 +70,8 @@ namespace WixToolset
         /// <returns>The DateTime.</returns>
         public DateTime ConvertIntegerToDateTime(int value)
         {
-            int date = value / 65536;
-            int time = value % 65536;
+            var date = value / 65536;
+            var time = value % 65536;
 
             return new DateTime(1980 + (date / 512), (date % 512) / 32, date % 32, time / 2048, (time % 2048) / 32, (time % 32) * 2);
         }
@@ -131,24 +106,5 @@ namespace WixToolset
         {
             this.elements.Add(String.Concat(row.TableDefinition.Name, ':', row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter)), element);
         }
-
-        /// <summary>
-        /// Indicates the decompiler encountered and unexpected table to decompile.
-        /// </summary>
-        /// <param name="table">Unknown decompiled table.</param>
-        public void UnexpectedTable(Table table)
-        {
-            this.OnMessage(WixErrors.TableDecompilationUnimplemented(table.Name));
-        }
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="mea">Message event arguments.</param>
-        public void OnMessage(MessageEventArgs e)
-        {
-            Messaging.Instance.OnMessage(e);
-        }
     }
-#endif
 }
