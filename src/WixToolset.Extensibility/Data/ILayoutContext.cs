@@ -19,6 +19,8 @@ namespace WixToolset.Extensibility.Data
 
         string OutputsFile { get; set; }
 
+        string IntermediateFolder { get; set; }
+
         string BuiltOutputsFile { get; set; }
 
         bool SuppressAclReset { get; set; }

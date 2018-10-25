@@ -2,10 +2,8 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Extensibility.Data;
-
     public interface IBackendFactory
     {
-        bool TryCreateBackend(string outputType, string outputPath, IBindContext context, out IBackend backend);
+        bool TryCreateBackend(string outputType, string outputPath, out IBackend backend);
     }
 }

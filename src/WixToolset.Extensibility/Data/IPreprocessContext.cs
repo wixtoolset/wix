@@ -12,7 +12,7 @@ namespace WixToolset.Extensibility.Data
 
         IEnumerable<IPreprocessorExtension> Extensions { get; set; }
 
-        IList<string> IncludeSearchPaths { get; set; }
+        IEnumerable<string> IncludeSearchPaths { get; set; }
 
         /// <summary>
         /// Gets the platform which the compiler will use when defaulting 64-bit attributes and elements.
@@ -20,7 +20,7 @@ namespace WixToolset.Extensibility.Data
         /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
         Platform Platform { get; set; }
 
-        string SourceFile { get; set; }
+        string SourcePath { get; set; }
 
         IDictionary<string, string> Variables { get; set; }
 
