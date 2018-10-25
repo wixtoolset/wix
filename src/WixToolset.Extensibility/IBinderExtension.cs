@@ -2,7 +2,6 @@
 
 namespace WixToolset.Extensibility
 {
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility.Data;
 
     /// <summary>

@@ -4,7 +4,6 @@ namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
@@ -12,7 +11,7 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Interface all binder extensions implement.
     /// </summary>
-    public interface IWindowsInstallerBackendExtension
+    public interface IWindowsInstallerBackendBinderExtension
     {
         /// <summary>
         /// Called before binding occurs.

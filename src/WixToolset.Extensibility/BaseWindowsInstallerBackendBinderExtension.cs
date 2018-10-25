@@ -12,7 +12,7 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Base class for creating a preprocessor extension.
     /// </summary>
-    public abstract class BaseWindowsInstallerBackendExtension : IWindowsInstallerBackendExtension
+    public abstract class BaseWindowsInstallerBackendBinderExtension : IWindowsInstallerBackendBinderExtension
     {
         /// <summary>
         /// Context for use by the extension.
