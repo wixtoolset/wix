@@ -64,7 +64,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         public CompressionLevel? DefaultCompressionLevel { private get; set; }
 
-        public IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { private get; set; }
+        public IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { private get; set; }
 
         public Output Output { private get; set; }
 

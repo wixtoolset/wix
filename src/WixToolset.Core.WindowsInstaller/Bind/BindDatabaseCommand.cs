@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendExtension> backendExtension, Validator validator)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator)
         {
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
@@ -66,7 +66,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public bool DeltaBinaryPatch { get; set; }
 
-        private IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
 
         private Intermediate Intermediate { get; }
 

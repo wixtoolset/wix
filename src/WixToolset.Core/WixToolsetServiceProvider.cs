@@ -18,7 +18,7 @@ namespace WixToolset.Core
             this.Singletons = new Dictionary<Type, object>();
 
             // Singletons.
-            this.AddService((provider, singletons) => AddSingleton<IExtensionManager>(singletons, new ExtensionManager()));
+            this.AddService((provider, singletons) => AddSingleton<IExtensionManager>(singletons, new ExtensionManager(provider)));
             this.AddService((provider, singletons) => AddSingleton<IMessaging>(singletons, new Messaging()));
             this.AddService((provider, singletons) => AddSingleton<ITupleDefinitionCreator>(singletons, new TupleDefinitionCreator(provider)));
             this.AddService((provider, singletons) => AddSingleton<IParseHelper>(singletons, new ParseHelper(provider)));

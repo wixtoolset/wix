@@ -14,14 +14,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreateOutputFromIRCommand
     {
-        public CreateOutputFromIRCommand(IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendExtension> backendExtensions)
+        public CreateOutputFromIRCommand(IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
             this.Section = section;
             this.TableDefinitions = tableDefinitions;
             this.BackendExtensions = backendExtensions;
         }
 
-        private IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 

@@ -6,7 +6,7 @@ namespace Example.Extension
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    internal class ExampleWindowsInstallerBackendExtension : BaseWindowsInstallerBackendExtension
+    internal class ExampleWindowsInstallerBackendExtension : BaseWindowsInstallerBackendBinderExtension
     {
         public override bool TryAddTupleToOutput(IntermediateTuple tuple, Output output)
         {

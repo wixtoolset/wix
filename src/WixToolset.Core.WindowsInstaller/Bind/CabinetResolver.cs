@@ -14,7 +14,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     public class CabinetResolver
     {
-        public CabinetResolver(string cabCachePath, IEnumerable<IWindowsInstallerBackendExtension> backendExtensions)
+        public CabinetResolver(string cabCachePath, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
             this.CabCachePath = cabCachePath;
 
@@ -23,7 +23,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private string CabCachePath { get; }
 
-        private IEnumerable<IWindowsInstallerBackendExtension> BackendExtensions { get; }
+        private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
 
         public ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<FileFacade> fileFacades)
         {

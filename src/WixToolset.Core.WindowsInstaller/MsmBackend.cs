@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            var backendExtensions = extensionManager.Create<IWindowsInstallerBackendExtension>();
+            var backendExtensions = extensionManager.Create<IWindowsInstallerBackendBinderExtension>();
 
             foreach (var extension in backendExtensions)
             {
