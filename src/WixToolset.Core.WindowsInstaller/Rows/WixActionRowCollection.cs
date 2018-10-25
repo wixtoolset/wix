@@ -13,6 +13,7 @@ namespace WixToolset.Core.WindowsInstaller.Rows
     /// <summary>
     /// A collection of action rows sorted by their sequence table and action name.
     /// </summary>
+    // TODO: Remove this
     internal sealed class WixActionRowCollection : ICollection
     {
         private SortedList collection;

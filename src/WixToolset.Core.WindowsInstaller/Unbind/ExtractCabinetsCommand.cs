@@ -1,10 +1,10 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
     using System;
     using System.Collections;
-    using System.Collections.Specialized;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using WixToolset.Core.Native;
@@ -24,6 +24,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.IntermediateFolder = intermediateFolder;
         }
 
+        public string[] ExtractedFiles { get; private set; }
+
         private Output Output { get; }
 
         private Database Database { get; }
@@ -36,9 +38,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public void Execute()
         {
-            string databaseBasePath = Path.GetDirectoryName(this.InputFilePath);
-            StringCollection cabinetFiles = new StringCollection();
-            SortedList embeddedCabinets = new SortedList();
+            var databaseBasePath = Path.GetDirectoryName(this.InputFilePath);
+            var cabinetFiles = new List<string>();
+            var embeddedCabinets = new SortedList();
 
             // index all of the cabinet files
             if (OutputType.Module == this.Output.Type)
@@ -70,31 +72,31 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // extract the embedded cabinet files from the database
             if (0 < embeddedCabinets.Count)
             {
-                using (View streamsView = this.Database.OpenView("SELECT `Data` FROM `_Streams` WHERE `Name` = ?"))
+                using (var streamsView = this.Database.OpenView("SELECT `Data` FROM `_Streams` WHERE `Name` = ?"))
                 {
                     foreach (int diskId in embeddedCabinets.Keys)
                     {
-                        using (Record record = new Record(1))
+                        using (var record = new Record(1))
                         {
                             record.SetString(1, (string)embeddedCabinets[diskId]);
                             streamsView.Execute(record);
                         }
 
-                        using (Record record = streamsView.Fetch())
+                        using (var record = streamsView.Fetch())
                         {
                             if (null != record)
                             {
                                 // since the cabinets are stored in case-sensitive streams inside the msi, but the file system is not case-sensitive,
                                 // embedded cabinets must be extracted to a canonical file name (like their diskid) to ensure extraction will always work
-                                string cabinetFile = Path.Combine(this.IntermediateFolder, String.Concat("Media", Path.DirectorySeparatorChar, diskId.ToString(CultureInfo.InvariantCulture), ".cab"));
+                                var cabinetFile = Path.Combine(this.IntermediateFolder, String.Concat("Media", Path.DirectorySeparatorChar, diskId.ToString(CultureInfo.InvariantCulture), ".cab"));
 
                                 // ensure the parent directory exists
                                 Directory.CreateDirectory(Path.GetDirectoryName(cabinetFile));
 
-                                using (FileStream fs = File.Create(cabinetFile))
+                                using (var fs = File.Create(cabinetFile))
                                 {
                                     int bytesRead;
-                                    byte[] buffer = new byte[512];
+                                    var buffer = new byte[512];
 
                                     while (0 != (bytesRead = record.GetStream(1, buffer, buffer.Length)))
                                     {
@@ -116,7 +118,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // extract the cabinet files
             if (0 < cabinetFiles.Count)
             {
-                string fileDirectory = Path.Combine(this.ExportBasePath, "File");
+                var fileDirectory = Path.Combine(this.ExportBasePath, "File");
 
                 // delete the directory and its files to prevent cab extraction due to an existing file
                 if (Directory.Exists(fileDirectory))
@@ -127,7 +129,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 // ensure the directory exists or extraction will fail
                 Directory.CreateDirectory(fileDirectory);
 
-                foreach (string cabinetFile in cabinetFiles)
+                foreach (var cabinetFile in cabinetFiles)
                 {
                     try
                     {
@@ -139,6 +141,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
                     }
                 }
+
+                this.ExtractedFiles = Directory.GetFiles(fileDirectory);
+            }
+            else
+            {
+                this.ExtractedFiles = new string[0];
             }
         }
     }

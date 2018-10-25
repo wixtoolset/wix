@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
@@ -57,21 +57,23 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         public Output Execute()
         {
             string modularizationGuid = null;
-            Output output = new Output(new SourceLineNumber(this.DatabasePath));
+            var output = new Output(new SourceLineNumber(this.DatabasePath));
             View validationView = null;
 
             // set the output type
             output.Type = this.OutputType;
 
+            Directory.CreateDirectory(this.IntermediateFolder);
+
             // get the codepage
             this.Database.Export("_ForceCodepage", this.IntermediateFolder, "_ForceCodepage.idt");
-            using (StreamReader sr = File.OpenText(Path.Combine(this.IntermediateFolder, "_ForceCodepage.idt")))
+            using (var sr = File.OpenText(Path.Combine(this.IntermediateFolder, "_ForceCodepage.idt")))
             {
                 string line;
 
                 while (null != (line = sr.ReadLine()))
                 {
-                    string[] data = line.Split('\t');
+                    var data = line.Split('\t');
 
                     if (2 == data.Length)
                     {
@@ -83,17 +85,17 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // get the summary information table if it exists; it won't if unbinding a transform
             if (!this.SkipSummaryInfo)
             {
-                using (SummaryInformation summaryInformation = new SummaryInformation(this.Database))
+                using (var summaryInformation = new SummaryInformation(this.Database))
                 {
-                    Table table = new Table(this.TableDefinitions["_SummaryInformation"]);
+                    var table = new Table(this.TableDefinitions["_SummaryInformation"]);
 
-                    for (int i = 1; 19 >= i; i++)
+                    for (var i = 1; 19 >= i; i++)
                     {
-                        string value = summaryInformation.GetProperty(i);
+                        var value = summaryInformation.GetProperty(i);
 
                         if (0 < value.Length)
                         {
-                            Row row = table.CreateRow(output.SourceLineNumbers);
+                            var row = table.CreateRow(output.SourceLineNumbers);
                             row[0] = i;
                             row[1] = value;
                         }
@@ -112,51 +114,51 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
 
                 // get the normal tables
-                using (View tablesView = this.Database.OpenExecuteView("SELECT * FROM _Tables"))
+                using (var tablesView = this.Database.OpenExecuteView("SELECT * FROM _Tables"))
                 {
                     while (true)
                     {
-                        using (Record tableRecord = tablesView.Fetch())
+                        using (var tableRecord = tablesView.Fetch())
                         {
                             if (null == tableRecord)
                             {
                                 break;
                             }
 
-                            string tableName = tableRecord.GetString(1);
+                            var tableName = tableRecord.GetString(1);
 
-                            using (View tableView = this.Database.OpenExecuteView(String.Format(CultureInfo.InvariantCulture, "SELECT * FROM `{0}`", tableName)))
+                            using (var tableView = this.Database.OpenExecuteView(String.Format(CultureInfo.InvariantCulture, "SELECT * FROM `{0}`", tableName)))
                             {
                                 ColumnDefinition[] columns;
                                 using (Record columnNameRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFONAMES),
                                               columnTypeRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFOTYPES))
                                 {
                                     // index the primary keys
-                                    HashSet<string> tablePrimaryKeys = new HashSet<string>();
-                                    using (Record primaryKeysRecord = this.Database.PrimaryKeys(tableName))
+                                    var tablePrimaryKeys = new HashSet<string>();
+                                    using (var primaryKeysRecord = this.Database.PrimaryKeys(tableName))
                                     {
-                                        int primaryKeysFieldCount = primaryKeysRecord.GetFieldCount();
+                                        var primaryKeysFieldCount = primaryKeysRecord.GetFieldCount();
 
-                                        for (int i = 1; i <= primaryKeysFieldCount; i++)
+                                        for (var i = 1; i <= primaryKeysFieldCount; i++)
                                         {
                                             tablePrimaryKeys.Add(primaryKeysRecord.GetString(i));
                                         }
                                     }
 
-                                    int columnCount = columnNameRecord.GetFieldCount();
+                                    var columnCount = columnNameRecord.GetFieldCount();
                                     columns = new ColumnDefinition[columnCount];
-                                    for (int i = 1; i <= columnCount; i++)
+                                    for (var i = 1; i <= columnCount; i++)
                                     {
-                                        string columnName = columnNameRecord.GetString(i);
-                                        string idtType = columnTypeRecord.GetString(i);
+                                        var columnName = columnNameRecord.GetString(i);
+                                        var idtType = columnTypeRecord.GetString(i);
 
                                         ColumnType columnType;
                                         int length;
                                         bool nullable;
 
-                                        ColumnCategory columnCategory = ColumnCategory.Unknown;
-                                        ColumnModularizeType columnModularizeType = ColumnModularizeType.None;
-                                        bool primary = tablePrimaryKeys.Contains(columnName);
+                                        var columnCategory = ColumnCategory.Unknown;
+                                        var columnModularizeType = ColumnModularizeType.None;
+                                        var primary = tablePrimaryKeys.Contains(columnName);
                                         int? minValue = null;
                                         int? maxValue = null;
                                         string keyTable = null;
@@ -168,22 +170,22 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                         // get the column type, length, and whether its nullable
                                         switch (Char.ToLower(idtType[0], CultureInfo.InvariantCulture))
                                         {
-                                            case 'i':
-                                                columnType = ColumnType.Number;
-                                                break;
-                                            case 'l':
-                                                columnType = ColumnType.Localized;
-                                                break;
-                                            case 's':
-                                                columnType = ColumnType.String;
-                                                break;
-                                            case 'v':
-                                                columnType = ColumnType.Object;
-                                                break;
-                                            default:
-                                                // TODO: error
-                                                columnType = ColumnType.Unknown;
-                                                break;
+                                        case 'i':
+                                            columnType = ColumnType.Number;
+                                            break;
+                                        case 'l':
+                                            columnType = ColumnType.Localized;
+                                            break;
+                                        case 's':
+                                            columnType = ColumnType.String;
+                                            break;
+                                        case 'v':
+                                            columnType = ColumnType.Object;
+                                            break;
+                                        default:
+                                            // TODO: error
+                                            columnType = ColumnType.Unknown;
+                                            break;
                                         }
                                         length = Convert.ToInt32(idtType.Substring(1), CultureInfo.InvariantCulture);
                                         nullable = Char.IsUpper(idtType[0]);
@@ -191,7 +193,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                         // try to get validation information
                                         if (null != validationView)
                                         {
-                                            using (Record validationRecord = new Record(2))
+                                            using (var validationRecord = new Record(2))
                                             {
                                                 validationRecord.SetString(1, tableName);
                                                 validationRecord.SetString(2, columnName);
@@ -199,11 +201,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                 validationView.Execute(validationRecord);
                                             }
 
-                                            using (Record validationRecord = validationView.Fetch())
+                                            using (var validationRecord = validationView.Fetch())
                                             {
                                                 if (null != validationRecord)
                                                 {
-                                                    string validationNullable = validationRecord.GetString(3);
+                                                    var validationNullable = validationRecord.GetString(3);
                                                     minValue = validationRecord.IsNull(4) ? null : (int?)validationRecord.GetInteger(4);
                                                     maxValue = validationRecord.IsNull(5) ? null : (int?)validationRecord.GetInteger(5);
                                                     keyTable = validationRecord.IsNull(6) ? null : validationRecord.GetString(6);
@@ -264,7 +266,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     }
                                 }
 
-                                TableDefinition tableDefinition = new TableDefinition(tableName, columns, false, false);
+                                var tableDefinition = new TableDefinition(tableName, columns, false, false);
 
                                 // use our table definitions if core properties are the same; this allows us to take advantage
                                 // of wix concepts like localizable columns which current code assumes
@@ -273,21 +275,21 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     tableDefinition = this.TableDefinitions[tableName];
                                 }
 
-                                Table table = new Table(tableDefinition);
+                                var table = new Table(tableDefinition);
 
                                 while (true)
                                 {
-                                    using (Record rowRecord = tableView.Fetch())
+                                    using (var rowRecord = tableView.Fetch())
                                     {
                                         if (null == rowRecord)
                                         {
                                             break;
                                         }
 
-                                        int recordCount = rowRecord.GetFieldCount();
-                                        Row row = table.CreateRow(output.SourceLineNumbers);
+                                        var recordCount = rowRecord.GetFieldCount();
+                                        var row = table.CreateRow(output.SourceLineNumbers);
 
-                                        for (int i = 0; recordCount > i && row.Fields.Length > i; i++)
+                                        for (var i = 0; recordCount > i && row.Fields.Length > i; i++)
                                         {
                                             if (rowRecord.IsNull(i + 1))
                                             {
@@ -303,87 +305,87 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                             {
                                                 switch (row.Fields[i].Column.Type)
                                                 {
-                                                    case ColumnType.Number:
-                                                        bool success = false;
-                                                        int intValue = rowRecord.GetInteger(i + 1);
-                                                        if (row.Fields[i].Column.IsLocalizable)
-                                                        {
-                                                            success = row.BestEffortSetField(i, Convert.ToString(intValue, CultureInfo.InvariantCulture));
-                                                        }
-                                                        else
-                                                        {
-                                                            success = row.BestEffortSetField(i, intValue);
-                                                        }
+                                                case ColumnType.Number:
+                                                    var success = false;
+                                                    var intValue = rowRecord.GetInteger(i + 1);
+                                                    if (row.Fields[i].Column.IsLocalizable)
+                                                    {
+                                                        success = row.BestEffortSetField(i, Convert.ToString(intValue, CultureInfo.InvariantCulture));
+                                                    }
+                                                    else
+                                                    {
+                                                        success = row.BestEffortSetField(i, intValue);
+                                                    }
 
-                                                        if (!success)
+                                                    if (!success)
+                                                    {
+                                                        this.Messaging.Write(WarningMessages.BadColumnDataIgnored(row.SourceLineNumbers, Convert.ToString(intValue, CultureInfo.InvariantCulture), tableName, row.Fields[i].Column.Name));
+                                                    }
+                                                    break;
+                                                case ColumnType.Object:
+                                                    var sourceFile = "FILE NOT EXPORTED, USE THE dark.exe -x OPTION TO EXPORT BINARIES";
+
+                                                    if (null != this.ExportBasePath)
+                                                    {
+                                                        var relativeSourceFile = Path.Combine(tableName, row.GetPrimaryKey('.'));
+                                                        sourceFile = Path.Combine(this.ExportBasePath, relativeSourceFile);
+
+                                                        // ensure the parent directory exists
+                                                        System.IO.Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
+
+                                                        using (var fs = System.IO.File.Create(sourceFile))
                                                         {
-                                                            this.Messaging.Write(WarningMessages.BadColumnDataIgnored(row.SourceLineNumbers, Convert.ToString(intValue, CultureInfo.InvariantCulture), tableName, row.Fields[i].Column.Name));
-                                                        }
-                                                        break;
-                                                    case ColumnType.Object:
-                                                        string sourceFile = "FILE NOT EXPORTED, USE THE dark.exe -x OPTION TO EXPORT BINARIES";
+                                                            int bytesRead;
+                                                            var buffer = new byte[512];
 
-                                                        if (null != this.ExportBasePath)
-                                                        {
-                                                            string relativeSourceFile = Path.Combine(tableName, row.GetPrimaryKey('.'));
-                                                            sourceFile = Path.Combine(this.ExportBasePath, relativeSourceFile);
-
-                                                            // ensure the parent directory exists
-                                                            System.IO.Directory.CreateDirectory(Path.Combine(this.ExportBasePath, tableName));
-
-                                                            using (FileStream fs = System.IO.File.Create(sourceFile))
+                                                            while (0 != (bytesRead = rowRecord.GetStream(i + 1, buffer, buffer.Length)))
                                                             {
-                                                                int bytesRead;
-                                                                byte[] buffer = new byte[512];
+                                                                fs.Write(buffer, 0, bytesRead);
+                                                            }
+                                                        }
+                                                    }
 
-                                                                while (0 != (bytesRead = rowRecord.GetStream(i + 1, buffer, buffer.Length)))
-                                                                {
-                                                                    fs.Write(buffer, 0, bytesRead);
-                                                                }
+                                                    row[i] = sourceFile;
+                                                    break;
+                                                default:
+                                                    var value = rowRecord.GetString(i + 1);
+
+                                                    switch (row.Fields[i].Column.Category)
+                                                    {
+                                                    case ColumnCategory.Guid:
+                                                        value = value.ToUpper(CultureInfo.InvariantCulture);
+                                                        break;
+                                                    }
+
+                                                    // de-modularize
+                                                    if (!this.SuppressDemodularization && OutputType.Module == output.Type && ColumnModularizeType.None != row.Fields[i].Column.ModularizeType)
+                                                    {
+                                                        var modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
+
+                                                        if (null == modularizationGuid)
+                                                        {
+                                                            var match = modularization.Match(value);
+                                                            if (match.Success)
+                                                            {
+                                                                modularizationGuid = String.Concat('{', match.Value.Substring(1).Replace('_', '-'), '}');
                                                             }
                                                         }
 
-                                                        row[i] = sourceFile;
-                                                        break;
-                                                    default:
-                                                        string value = rowRecord.GetString(i + 1);
+                                                        value = modularization.Replace(value, String.Empty);
+                                                    }
 
-                                                        switch (row.Fields[i].Column.Category)
-                                                        {
-                                                            case ColumnCategory.Guid:
-                                                                value = value.ToUpper(CultureInfo.InvariantCulture);
-                                                                break;
-                                                        }
+                                                    // escape "$(" for the preprocessor
+                                                    value = value.Replace("$(", "$$(");
 
-                                                        // de-modularize
-                                                        if (!this.SuppressDemodularization && OutputType.Module == output.Type && ColumnModularizeType.None != row.Fields[i].Column.ModularizeType)
-                                                        {
-                                                            Regex modularization = new Regex(@"\.[0-9A-Fa-f]{8}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{4}_[0-9A-Fa-f]{12}");
+                                                    // escape things that look like wix variables
+                                                    var matches = Common.WixVariableRegex.Matches(value);
+                                                    for (var j = matches.Count - 1; 0 <= j; j--)
+                                                    {
+                                                        value = value.Insert(matches[j].Index, "!");
+                                                    }
 
-                                                            if (null == modularizationGuid)
-                                                            {
-                                                                Match match = modularization.Match(value);
-                                                                if (match.Success)
-                                                                {
-                                                                    modularizationGuid = String.Concat('{', match.Value.Substring(1).Replace('_', '-'), '}');
-                                                                }
-                                                            }
-
-                                                            value = modularization.Replace(value, String.Empty);
-                                                        }
-
-                                                        // escape "$(" for the preprocessor
-                                                        value = value.Replace("$(", "$$(");
-
-                                                        // escape things that look like wix variables
-                                                        MatchCollection matches = Common.WixVariableRegex.Matches(value);
-                                                        for (int j = matches.Count - 1; 0 <= j; j--)
-                                                        {
-                                                            value = value.Insert(matches[j].Index, "!");
-                                                        }
-
-                                                        row[i] = value;
-                                                        break;
+                                                    row[i] = value;
+                                                    break;
                                                 }
                                             }
                                         }
@@ -408,9 +410,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // set the modularization guid as the PackageCode
             if (null != modularizationGuid)
             {
-                Table table = output.Tables["_SummaryInformation"];
+                var table = output.Tables["_SummaryInformation"];
 
-                foreach (Row row in table.Rows)
+                foreach (var row in table.Rows)
                 {
                     if (9 == (int)row[0]) // PID_REVNUMBER
                     {
@@ -421,8 +423,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
             if (this.IsAdminImage)
             {
-                GenerateWixFileTable(this.DatabasePath, output);
-                GenerateSectionIds(output);
+                this.GenerateWixFileTable(this.DatabasePath, output);
+                this.GenerateSectionIds(output);
             }
 
             return output;
@@ -435,21 +437,21 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// <param name="output">The Output that represents the msi database.</param>
         private void GenerateWixFileTable(string databaseFile, Output output)
         {
-            string adminRootPath = Path.GetDirectoryName(databaseFile);
+            var adminRootPath = Path.GetDirectoryName(databaseFile);
 
-            Hashtable componentDirectoryIndex = new Hashtable();
-            Table componentTable = output.Tables["Component"];
-            foreach (Row row in componentTable.Rows)
+            var componentDirectoryIndex = new Hashtable();
+            var componentTable = output.Tables["Component"];
+            foreach (var row in componentTable.Rows)
             {
                 componentDirectoryIndex.Add(row[0], row[2]);
             }
 
             // Index full source paths for all directories
-            Hashtable directoryDirectoryParentIndex = new Hashtable();
-            Hashtable directoryFullPathIndex = new Hashtable();
-            Hashtable directorySourceNameIndex = new Hashtable();
-            Table directoryTable = output.Tables["Directory"];
-            foreach (Row row in directoryTable.Rows)
+            var directoryDirectoryParentIndex = new Hashtable();
+            var directoryFullPathIndex = new Hashtable();
+            var directorySourceNameIndex = new Hashtable();
+            var directoryTable = output.Tables["Directory"];
+            foreach (var row in directoryTable.Rows)
             {
                 directoryDirectoryParentIndex.Add(row[0], row[1]);
                 if (null == row[1])
@@ -466,15 +468,15 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 if (!directoryFullPathIndex.ContainsKey(directoryEntry.Key))
                 {
-                    GetAdminFullPath((string)directoryEntry.Key, directoryDirectoryParentIndex, directorySourceNameIndex, directoryFullPathIndex);
+                    this.GetAdminFullPath((string)directoryEntry.Key, directoryDirectoryParentIndex, directorySourceNameIndex, directoryFullPathIndex);
                 }
             }
 
-            Table fileTable = output.Tables["File"];
-            Table wixFileTable = output.EnsureTable(this.TableDefinitions["WixFile"]);
-            foreach (Row row in fileTable.Rows)
+            var fileTable = output.Tables["File"];
+            var wixFileTable = output.EnsureTable(this.TableDefinitions["WixFile"]);
+            foreach (var row in fileTable.Rows)
             {
-                WixFileRow wixFileRow = new WixFileRow(null, this.TableDefinitions["WixFile"]);
+                var wixFileRow = new WixFileRow(null, this.TableDefinitions["WixFile"]);
                 wixFileRow.File = (string)row[0];
                 wixFileRow.Directory = (string)componentDirectoryIndex[(string)row[1]];
                 wixFileRow.Source = Path.Combine((string)directoryFullPathIndex[wixFileRow.Directory], GetAdminSourceName((string)row[2]));
@@ -498,8 +500,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// <returns>The full path to the directory.</returns>
         private string GetAdminFullPath(string directory, Hashtable directoryDirectoryParentIndex, Hashtable directorySourceNameIndex, Hashtable directoryFullPathIndex)
         {
-            string parent = (string)directoryDirectoryParentIndex[directory];
-            string sourceName = (string)directorySourceNameIndex[directory];
+            var parent = (string)directoryDirectoryParentIndex[directory];
+            var sourceName = (string)directorySourceNameIndex[directory];
 
             string parentFullPath;
             if (directoryFullPathIndex.ContainsKey(parent))
@@ -508,7 +510,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
             else
             {
-                parentFullPath = GetAdminFullPath(parent, directoryDirectoryParentIndex, directorySourceNameIndex, directoryFullPathIndex);
+                parentFullPath = this.GetAdminFullPath(parent, directoryDirectoryParentIndex, directorySourceNameIndex, directoryFullPathIndex);
             }
 
             if (null == sourceName)
@@ -516,7 +518,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 sourceName = String.Empty;
             }
 
-            string fullPath = Path.Combine(parentFullPath, sourceName);
+            var fullPath = Path.Combine(parentFullPath, sourceName);
             directoryFullPathIndex.Add(directory, fullPath);
 
             return fullPath;
@@ -596,104 +598,104 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         private void GenerateSectionIds(Output output)
         {
             // First assign and index section ids for the tables that are in their own sections.
-            AssignSectionIdsToTable(output.Tables["Binary"], 0);
-            Hashtable componentSectionIdIndex = AssignSectionIdsToTable(output.Tables["Component"], 0);
-            Hashtable customActionSectionIdIndex = AssignSectionIdsToTable(output.Tables["CustomAction"], 0);
-            AssignSectionIdsToTable(output.Tables["Directory"], 0);
-            Hashtable featureSectionIdIndex = AssignSectionIdsToTable(output.Tables["Feature"], 0);
-            AssignSectionIdsToTable(output.Tables["Icon"], 0);
-            Hashtable digitalCertificateSectionIdIndex = AssignSectionIdsToTable(output.Tables["MsiDigitalCertificate"], 0);
-            AssignSectionIdsToTable(output.Tables["Property"], 0);
+            this.AssignSectionIdsToTable(output.Tables["Binary"], 0);
+            var componentSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["Component"], 0);
+            var customActionSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["CustomAction"], 0);
+            this.AssignSectionIdsToTable(output.Tables["Directory"], 0);
+            var featureSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["Feature"], 0);
+            this.AssignSectionIdsToTable(output.Tables["Icon"], 0);
+            var digitalCertificateSectionIdIndex = this.AssignSectionIdsToTable(output.Tables["MsiDigitalCertificate"], 0);
+            this.AssignSectionIdsToTable(output.Tables["Property"], 0);
 
             // Now handle all the tables that rely on the first set of indexes but also produce their own indexes. Order matters here.
-            Hashtable fileSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["File"], componentSectionIdIndex, 1, 0);
-            Hashtable appIdSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["Class"], componentSectionIdIndex, 2, 5);
-            Hashtable odbcDataSourceSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ODBCDataSource"], componentSectionIdIndex, 1, 0);
-            Hashtable odbcDriverSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ODBCDriver"], componentSectionIdIndex, 1, 0);
-            Hashtable registrySectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["Registry"], componentSectionIdIndex, 5, 0);
-            Hashtable serviceInstallSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ServiceInstall"], componentSectionIdIndex, 11, 0);
+            var fileSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["File"], componentSectionIdIndex, 1, 0);
+            var appIdSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["Class"], componentSectionIdIndex, 2, 5);
+            var odbcDataSourceSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ODBCDataSource"], componentSectionIdIndex, 1, 0);
+            var odbcDriverSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ODBCDriver"], componentSectionIdIndex, 1, 0);
+            var registrySectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["Registry"], componentSectionIdIndex, 5, 0);
+            var serviceInstallSectionIdIndex = ConnectTableToSectionAndIndex(output.Tables["ServiceInstall"], componentSectionIdIndex, 11, 0);
 
             // Now handle all the tables which only rely on previous indexes and order does not matter.
-            foreach (Table table in output.Tables)
+            foreach (var table in output.Tables)
             {
                 switch (table.Name)
                 {
-                    case "WixFile":
-                    case "MsiFileHash":
-                        ConnectTableToSection(table, fileSectionIdIndex, 0);
-                        break;
-                    case "MsiAssembly":
-                    case "MsiAssemblyName":
-                        ConnectTableToSection(table, componentSectionIdIndex, 0);
-                        break;
-                    case "MsiPackageCertificate":
-                    case "MsiPatchCertificate":
-                        ConnectTableToSection(table, digitalCertificateSectionIdIndex, 1);
-                        break;
-                    case "CreateFolder":
-                    case "FeatureComponents":
-                    case "MoveFile":
-                    case "ReserveCost":
-                    case "ODBCTranslator":
-                        ConnectTableToSection(table, componentSectionIdIndex, 1);
-                        break;
-                    case "TypeLib":
-                        ConnectTableToSection(table, componentSectionIdIndex, 2);
-                        break;
-                    case "Shortcut":
-                    case "Environment":
-                        ConnectTableToSection(table, componentSectionIdIndex, 3);
-                        break;
-                    case "RemoveRegistry":
-                        ConnectTableToSection(table, componentSectionIdIndex, 4);
-                        break;
-                    case "ServiceControl":
-                        ConnectTableToSection(table, componentSectionIdIndex, 5);
-                        break;
-                    case "IniFile":
-                    case "RemoveIniFile":
-                        ConnectTableToSection(table, componentSectionIdIndex, 7);
-                        break;
-                    case "AppId":
-                        ConnectTableToSection(table, appIdSectionIdIndex, 0);
-                        break;
-                    case "Condition":
-                        ConnectTableToSection(table, featureSectionIdIndex, 0);
-                        break;
-                    case "ODBCSourceAttribute":
-                        ConnectTableToSection(table, odbcDataSourceSectionIdIndex, 0);
-                        break;
-                    case "ODBCAttribute":
-                        ConnectTableToSection(table, odbcDriverSectionIdIndex, 0);
-                        break;
-                    case "AdminExecuteSequence":
-                    case "AdminUISequence":
-                    case "AdvtExecuteSequence":
-                    case "AdvtUISequence":
-                    case "InstallExecuteSequence":
-                    case "InstallUISequence":
-                        ConnectTableToSection(table, customActionSectionIdIndex, 0);
-                        break;
-                    case "LockPermissions":
-                    case "MsiLockPermissions":
-                        foreach (Row row in table.Rows)
+                case "WixFile":
+                case "MsiFileHash":
+                    ConnectTableToSection(table, fileSectionIdIndex, 0);
+                    break;
+                case "MsiAssembly":
+                case "MsiAssemblyName":
+                    ConnectTableToSection(table, componentSectionIdIndex, 0);
+                    break;
+                case "MsiPackageCertificate":
+                case "MsiPatchCertificate":
+                    ConnectTableToSection(table, digitalCertificateSectionIdIndex, 1);
+                    break;
+                case "CreateFolder":
+                case "FeatureComponents":
+                case "MoveFile":
+                case "ReserveCost":
+                case "ODBCTranslator":
+                    ConnectTableToSection(table, componentSectionIdIndex, 1);
+                    break;
+                case "TypeLib":
+                    ConnectTableToSection(table, componentSectionIdIndex, 2);
+                    break;
+                case "Shortcut":
+                case "Environment":
+                    ConnectTableToSection(table, componentSectionIdIndex, 3);
+                    break;
+                case "RemoveRegistry":
+                    ConnectTableToSection(table, componentSectionIdIndex, 4);
+                    break;
+                case "ServiceControl":
+                    ConnectTableToSection(table, componentSectionIdIndex, 5);
+                    break;
+                case "IniFile":
+                case "RemoveIniFile":
+                    ConnectTableToSection(table, componentSectionIdIndex, 7);
+                    break;
+                case "AppId":
+                    ConnectTableToSection(table, appIdSectionIdIndex, 0);
+                    break;
+                case "Condition":
+                    ConnectTableToSection(table, featureSectionIdIndex, 0);
+                    break;
+                case "ODBCSourceAttribute":
+                    ConnectTableToSection(table, odbcDataSourceSectionIdIndex, 0);
+                    break;
+                case "ODBCAttribute":
+                    ConnectTableToSection(table, odbcDriverSectionIdIndex, 0);
+                    break;
+                case "AdminExecuteSequence":
+                case "AdminUISequence":
+                case "AdvtExecuteSequence":
+                case "AdvtUISequence":
+                case "InstallExecuteSequence":
+                case "InstallUISequence":
+                    ConnectTableToSection(table, customActionSectionIdIndex, 0);
+                    break;
+                case "LockPermissions":
+                case "MsiLockPermissions":
+                    foreach (var row in table.Rows)
+                    {
+                        var lockObject = (string)row[0];
+                        var tableName = (string)row[1];
+                        switch (tableName)
                         {
-                            string lockObject = (string)row[0];
-                            string tableName = (string)row[1];
-                            switch (tableName)
-                            {
-                                case "File":
-                                    row.SectionId = (string)fileSectionIdIndex[lockObject];
-                                    break;
-                                case "Registry":
-                                    row.SectionId = (string)registrySectionIdIndex[lockObject];
-                                    break;
-                                case "ServiceInstall":
-                                    row.SectionId = (string)serviceInstallSectionIdIndex[lockObject];
-                                    break;
-                            }
+                        case "File":
+                            row.SectionId = (string)fileSectionIdIndex[lockObject];
+                            break;
+                        case "Registry":
+                            row.SectionId = (string)registrySectionIdIndex[lockObject];
+                            break;
+                        case "ServiceInstall":
+                            row.SectionId = (string)serviceInstallSectionIdIndex[lockObject];
+                            break;
                         }
-                        break;
+                    }
+                    break;
                 }
             }
 
@@ -712,12 +714,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// <returns>A Hashtable containing the tables key for each row paired with its assigned section id.</returns>
         private Hashtable AssignSectionIdsToTable(Table table, int rowPrimaryKeyIndex)
         {
-            Hashtable hashtable = new Hashtable();
+            var hashtable = new Hashtable();
             if (null != table)
             {
-                foreach (Row row in table.Rows)
+                foreach (var row in table.Rows)
                 {
-                    row.SectionId = GetNewSectionId();
+                    row.SectionId = this.GetNewSectionId();
                     hashtable.Add(row[rowPrimaryKeyIndex], row.SectionId);
                 }
             }
@@ -734,7 +736,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         {
             if (null != table)
             {
-                foreach (Row row in table.Rows)
+                foreach (var row in table.Rows)
                 {
                     if (sectionIdIndex.ContainsKey(row[rowIndex]))
                     {
@@ -754,10 +756,10 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// <returns>A Hashtable containing the tables key for each row paired with its assigned section id.</returns>
         private static Hashtable ConnectTableToSectionAndIndex(Table table, Hashtable sectionIdIndex, int rowIndex, int rowPrimaryKeyIndex)
         {
-            Hashtable newHashTable = new Hashtable();
+            var newHashTable = new Hashtable();
             if (null != table)
             {
-                foreach (Row row in table.Rows)
+                foreach (var row in table.Rows)
                 {
                     if (!sectionIdIndex.ContainsKey(row[rowIndex]))
                     {

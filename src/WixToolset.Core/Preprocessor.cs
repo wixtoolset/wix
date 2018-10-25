@@ -133,7 +133,7 @@ namespace WixToolset.Core
 
             this.Context = context;
             this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
-            this.Context.Variables = this.Context.Variables == null ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
+            this.Context.Variables = (this.Context.Variables == null) ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
 
             this.PreProcess();
 

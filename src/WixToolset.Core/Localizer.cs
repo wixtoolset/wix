@@ -26,7 +26,7 @@ namespace WixToolset.Core
         public Localization ParseLocalizationFile(string path)
         {
             var document = XDocument.Load(path);
-            return ParseLocalizationFile(document);
+            return this.ParseLocalizationFile(document);
         }
 
         public Localization ParseLocalizationFile(XDocument document)

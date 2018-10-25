@@ -21,6 +21,12 @@ namespace WixToolset.Core
     /// </summary>
     public static class Common
     {
+        // TODO: Find a place to put all of these so they doesn't have to be public and exposed by WixToolset.Core.dll
+        public const string UpgradeDetectedProperty = "WIX_UPGRADE_DETECTED";
+        public const string UpgradePreventedCondition = "NOT WIX_UPGRADE_DETECTED";
+        public const string DowngradeDetectedProperty = "WIX_DOWNGRADE_DETECTED";
+        public const string DowngradePreventedCondition = "NOT WIX_DOWNGRADE_DETECTED";
+
         //-------------------------------------------------------------------------------------------------
         // Layout of an Access Mask (from http://technet.microsoft.com/en-us/library/cc783530(WS.10).aspx)
         //
@@ -45,7 +51,8 @@ namespace WixToolset.Core
         // GENERIC_EXECUTE                  (0x20000000L)
         // GENERIC_WRITE                    (0x40000000L)
         // GENERIC_READ                     (0x80000000L)
-        internal static readonly string[] GenericPermissions = { "GenericAll", "GenericExecute", "GenericWrite", "GenericRead" };
+        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        public static readonly string[] GenericPermissions = { "GenericAll", "GenericExecute", "GenericWrite", "GenericRead" };
 
         // Standard Access Rights (per WinNT.h)
         // ----------------------
@@ -54,7 +61,8 @@ namespace WixToolset.Core
         // WRITE_DAC                        (0x00040000L)
         // WRITE_OWNER                      (0x00080000L)
         // SYNCHRONIZE                      (0x00100000L)
-        internal static readonly string[] StandardPermissions = { "Delete", "ReadPermission", "ChangePermission", "TakeOwnership", "Synchronize" };
+        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        public static readonly string[] StandardPermissions = { "Delete", "ReadPermission", "ChangePermission", "TakeOwnership", "Synchronize" };
 
         // Object-Specific Access Rights
         // =============================
@@ -69,11 +77,13 @@ namespace WixToolset.Core
         // FILE_DELETE_CHILD         ( 0x0040 )
         // FILE_READ_ATTRIBUTES      ( 0x0080 )
         // FILE_WRITE_ATTRIBUTES     ( 0x0100 )
-        internal static readonly string[] FolderPermissions = { "Read", "CreateFile", "CreateChild", "ReadExtendedAttributes", "WriteExtendedAttributes", "Traverse", "DeleteChild", "ReadAttributes", "WriteAttributes" };
+        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        public static readonly string[] FolderPermissions = { "Read", "CreateFile", "CreateChild", "ReadExtendedAttributes", "WriteExtendedAttributes", "Traverse", "DeleteChild", "ReadAttributes", "WriteAttributes" };
 
         // Registry Access Rights (per TODO)
         // ----------------------
-        internal static readonly string[] RegistryPermissions = { "Read", "Write", "CreateSubkeys", "EnumerateSubkeys", "Notify", "CreateLink" };
+        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        public static readonly string[] RegistryPermissions = { "Read", "Write", "CreateSubkeys", "EnumerateSubkeys", "Notify", "CreateLink" };
 
         // File Access Rights (per WinNT.h)
         // ------------------
@@ -89,7 +99,8 @@ namespace WixToolset.Core
         //
         // STANDARD_RIGHTS_REQUIRED  (0x000F0000L)
         // FILE_ALL_ACCESS           (STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0x1FF)
-        internal static readonly string[] FilePermissions = { "Read", "Write", "Append", "ReadExtendedAttributes", "WriteExtendedAttributes", "Execute", "FileAllRights", "ReadAttributes", "WriteAttributes" };
+        // TODO: Find a place to put this that it doesn't have to be public and exposed by WixToolset.Core.dll
+        public static readonly string[] FilePermissions = { "Read", "Write", "Append", "ReadExtendedAttributes", "WriteExtendedAttributes", "Execute", "FileAllRights", "ReadAttributes", "WriteAttributes" };
 
         public static readonly Regex WixVariableRegex = new Regex(@"(\!|\$)\((?<namespace>loc|wix|bind|bindpath)\.(?<fullname>(?<name>[_A-Za-z][0-9A-Za-z_]+)(\.(?<scope>[_A-Za-z][0-9A-Za-z_\.]*))?)(\=(?<value>.+?))?\)", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
@@ -105,58 +116,6 @@ namespace WixToolset.Core
 
         private const string LegalWildcardShortFilenameCharacters = @"[^\\|><:/""\+,;=\[\]\. ]"; // illegal: \ | > < : / " + , ; = [ ] . (space)
         private static readonly Regex LegalWildcardShortFilename = new Regex(String.Concat("^", LegalWildcardShortFilenameCharacters, @"{1,16}(\.", LegalWildcardShortFilenameCharacters, "{0,6})?$"));
-
-        /// <summary>
-        /// Cleans up the temp files.
-        /// </summary>
-        /// <param name="path">The temporary directory to delete.</param>
-        /// <param name="messageHandler">The message handler.</param>
-        /// <returns>True if all files were deleted, false otherwise.</returns>
-        internal static bool DeleteTempFiles(string path, IMessaging messageHandler)
-        {
-            // try three times and give up with a warning if the temp files aren't gone by then
-            int retryLimit = 3;
-            bool removedReadOnly = false;
-
-            for (int i = 0; i < retryLimit; i++)
-            {
-                try
-                {
-                    Directory.Delete(path, true);   // toast the whole temp directory
-                    break; // no exception means we got success the first time
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    if (!removedReadOnly) // should only need to unmark readonly once - there's no point in doing it again and again
-                    {
-                        removedReadOnly = true;
-                        RecursiveFileAttributes(path, FileAttributes.ReadOnly, false, messageHandler); // toasting will fail if any files are read-only. Try changing them to not be.
-                    }
-                    else
-                    {
-                        messageHandler.Write(WarningMessages.AccessDeniedForDeletion(null, path));
-                        return false;
-                    }
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    // if the path doesn't exist, then there is nothing for us to worry about
-                    break;
-                }
-                catch (IOException) // directory in use
-                {
-                    if (i == (retryLimit - 1)) // last try failed still, give up
-                    {
-                        messageHandler.Write(WarningMessages.DirectoryInUse(null, path));
-                        return false;
-                    }
-
-                    System.Threading.Thread.Sleep(300);  // sleep a bit before trying again
-                }
-            }
-
-            return true;
-        }
 
         /// <summary>
         /// Gets a valid code page from the given web name or integer value.
@@ -316,30 +275,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Get the value of an attribute with type YesNoType.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source information for the value.</param>
-        /// <param name="elementName">Name of the element for this attribute, used for a possible exception.</param>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <param name="value">Value to process.</param>
-        /// <returns>Returns true for a value of 'yes' and false for a value of 'no'.</returns>
-        /// <exception cref="WixException">Thrown when the attribute's value is not 'yes' or 'no'.</exception>
-        internal static bool IsYes(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
-        {
-            switch (value)
-            {
-                case "no":
-                case "false":
-                    return false;
-                case "yes":
-                case "true":
-                    return true;
-                default:
-                    throw new WixException(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, elementName, attributeName, value, "no", "yes"));
-            }
-        }
-
-        /// <summary>
         /// Verifies the given string is a valid module or bundle version.
         /// </summary>
         /// <param name="version">The version to verify.</param>
@@ -467,18 +402,6 @@ namespace WixToolset.Core
                 catch (UnauthorizedAccessException)
                 {
                     messageHandler.Write(WarningMessages.AccessDeniedForSettingAttributes(null, filePath));
-                }
-            }
-        }
-
-        public static string GetFileHash(string path)
-        {
-            using (SHA1Managed managed = new SHA1Managed())
-            {
-                using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.Read))
-                {
-                    byte[] hash = managed.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", String.Empty);
                 }
             }
         }
