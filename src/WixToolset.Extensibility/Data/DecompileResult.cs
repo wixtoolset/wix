@@ -3,10 +3,11 @@
 namespace WixToolset.Extensibility.Data
 {
     using System.Collections.Generic;
+    using System.Xml.Linq;
 
     public class DecompileResult
     {
-        public string SourceDocumentPath { get; set; }
+        public XDocument Document { get; set; }
 
         public IEnumerable<string> ExtractedFilePaths { get; set; }
     }
