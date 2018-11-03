@@ -3,8 +3,8 @@
 namespace WixToolset.Core.CommandLine
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
+    using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -29,10 +29,6 @@ namespace WixToolset.Core.CommandLine
 
         public IMessaging Messaging { get; }
 
-        private IEnumerable<SourceFile> SourceFiles { get; }
-
-        private string OutputPath { get; }
-
         public int Execute()
         {
             if (this.commandLine.ShowHelp)
@@ -52,6 +48,11 @@ namespace WixToolset.Core.CommandLine
             {
                 var decompiler = this.ServiceProvider.GetService<IDecompiler>();
                 var result = decompiler.Decompile(context);
+
+                if (!this.Messaging.EncounteredError)
+                {
+                    result.Document.Save(context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
+                }
             }
             catch (WixException e)
             {

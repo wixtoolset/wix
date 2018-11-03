@@ -5,7 +5,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Xml.Linq;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -40,10 +39,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     var output = unbindCommand.Execute();
 
                     var decompiler = new Decompiler(this.Messaging, this.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressUI, this.Context.TreatProductAsModule);
-                    var wxs = decompiler.Decompile(output);
-
-                    wxs.Save(this.Context.OutputPath, SaveOptions.OmitDuplicateNamespaces);
-                    result.SourceDocumentPath = this.Context.OutputPath;
+                    result.Document = decompiler.Decompile(output);
 
                     // extract the files from the cabinets
                     if (!String.IsNullOrEmpty(this.Context.ExtractFolder) && !this.Context.SuppressExtractCabinets)
