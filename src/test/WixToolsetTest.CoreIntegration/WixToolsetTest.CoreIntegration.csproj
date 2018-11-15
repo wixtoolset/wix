@@ -23,6 +23,9 @@
     <Content Include="TestData\DecompileSingleFileCompressed\example.cab" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DecompileSingleFileCompressed\example.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DecompileSingleFileCompressed\Expected.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\DecompileSingleFileCompressed64\example.cab" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\DecompileSingleFileCompressed64\example.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\DecompileSingleFileCompressed64\Expected.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\data\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ExampleExtension\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

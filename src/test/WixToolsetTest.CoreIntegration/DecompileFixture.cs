@@ -37,5 +37,33 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(expected, actualFormatted);
             }
         }
+
+        [Fact]
+        public void CanDecompile64BitSingleFileCompressed()
+        {
+            var folder = TestData.Get(@"TestData\DecompileSingleFileCompressed64");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "decompile",
+                    Path.Combine(folder, "example.msi"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", outputPath
+                });
+
+                result.AssertSuccess();
+
+                var actual = File.ReadAllText(outputPath);
+                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
+                var expected = XDocument.Load(Path.Combine(folder, "Expected.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
+
+                Assert.Equal(expected, actualFormatted);
+            }
+        }
     }
 }

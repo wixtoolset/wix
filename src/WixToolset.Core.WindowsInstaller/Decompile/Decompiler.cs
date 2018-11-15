@@ -4663,6 +4663,11 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     customAction.Win64 = Wix.YesNoType.yes;
                 }
+                else if (MsiInterop.MsidbCustomActionTypeVBScript == (type & MsiInterop.MsidbCustomActionTypeVBScript) ||
+                    MsiInterop.MsidbCustomActionTypeJScript == (type & MsiInterop.MsidbCustomActionTypeJScript))
+                {
+                    customAction.Win64 = Wix.YesNoType.no;
+                }
 
                 switch (type & MsiInterop.MsidbCustomActionTypeExecuteBits)
                 {
@@ -4902,6 +4907,10 @@ namespace WixToolset.Core.WindowsInstaller
                 if (MsiInterop.MsidbComponentAttributes64bit == (attributes & MsiInterop.MsidbComponentAttributes64bit))
                 {
                     component.Win64 = Wix.YesNoType.yes;
+                }
+                else
+                {
+                    component.Win64 = Wix.YesNoType.no;
                 }
 
                 if (MsiInterop.MsidbComponentAttributesDisableRegistryReflection == (attributes & MsiInterop.MsidbComponentAttributesDisableRegistryReflection))
@@ -7809,6 +7818,10 @@ namespace WixToolset.Core.WindowsInstaller
                     {
                         registrySearch.Win64 = Wix.YesNoType.yes;
                         type &= ~MsiInterop.MsidbLocatorType64bit;
+                    }
+                    else
+                    {
+                        registrySearch.Win64 = Wix.YesNoType.no;
                     }
 
                     switch (type)
