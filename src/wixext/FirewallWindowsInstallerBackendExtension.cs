@@ -7,7 +7,7 @@ namespace WixToolset.Firewall
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    public class FirewallWindowsInstallerBackendExtension : BaseWindowsInstallerBackendExtension
+    public class FirewallWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
         private static readonly TableDefinition[] Tables = LoadTables();
 
@@ -15,7 +15,7 @@ namespace WixToolset.Firewall
 
         private static TableDefinition[] LoadTables()
         {
-            using (var resourceStream = typeof(FirewallWindowsInstallerBackendExtension).Assembly.GetManifestResourceStream("WixToolset.Firewall.tables.xml"))
+            using (var resourceStream = typeof(FirewallWindowsInstallerBackendBinderExtension).Assembly.GetManifestResourceStream("WixToolset.Firewall.tables.xml"))
             using (var reader = XmlReader.Create(resourceStream))
             {
                 var tables = TableDefinitionCollection.Load(reader);

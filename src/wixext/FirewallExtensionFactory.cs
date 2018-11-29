@@ -12,7 +12,7 @@ namespace WixToolset.Firewall
         {
             typeof(FirewallCompiler),
             typeof(FirewallExtensionData),
-            typeof(FirewallWindowsInstallerBackendExtension),
+            typeof(FirewallWindowsInstallerBackendBinderExtension),
         };
     }
 }
