@@ -5,7 +5,7 @@ namespace WixToolset.VisualStudio
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    public class VSWindowsInstallerBackendExtension : BaseWindowsInstallerBackendExtension
+    public class VSWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
         private static readonly TableDefinition[] Tables = new[] {
             new TableDefinition(

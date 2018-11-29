@@ -12,7 +12,7 @@ namespace WixToolset.VisualStudio
         {
             typeof(VSCompiler),
             typeof(VSExtensionData),
-            typeof(VSWindowsInstallerBackendExtension),
+            typeof(VSWindowsInstallerBackendBinderExtension),
         };
     }
 }
