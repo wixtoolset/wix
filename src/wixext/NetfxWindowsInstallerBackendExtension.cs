@@ -5,7 +5,7 @@ namespace WixToolset.Netfx
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    public class NetfxWindowsInstallerBackendExtension : BaseWindowsInstallerBackendExtension
+    public class NetfxWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
         private static readonly TableDefinition[] Tables = new[] {
             new TableDefinition(

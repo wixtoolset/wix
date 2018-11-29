@@ -12,7 +12,7 @@ namespace WixToolset.Netfx
         {
             typeof(NetfxCompiler),
             typeof(NetfxExtensionData),
-            typeof(NetfxWindowsInstallerBackendExtension),
+            typeof(NetfxWindowsInstallerBackendBinderExtension),
         };
     }
 }
