@@ -12,7 +12,7 @@ namespace WixToolset.Util
         {
             typeof(UtilCompiler),
             typeof(UtilExtensionData),
-            typeof(UtilWindowsInstallerBackendExtension),
+            typeof(UtilWindowsInstallerBackendBinderExtension),
         };
     }
 }

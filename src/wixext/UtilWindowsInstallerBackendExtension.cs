@@ -7,7 +7,7 @@ namespace WixToolset.Util
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    public class UtilWindowsInstallerBackendExtension : BaseWindowsInstallerBackendExtension
+    public class UtilWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
         private static readonly TableDefinition[] Tables = LoadTables();
 
@@ -15,7 +15,7 @@ namespace WixToolset.Util
 
         private static TableDefinition[] LoadTables()
         {
-            using (var resourceStream = typeof(UtilWindowsInstallerBackendExtension).Assembly.GetManifestResourceStream("WixToolset.Util.tables.xml"))
+            using (var resourceStream = typeof(UtilWindowsInstallerBackendBinderExtension).Assembly.GetManifestResourceStream("WixToolset.Util.tables.xml"))
             using (var reader = XmlReader.Create(resourceStream))
             {
                 var tables = TableDefinitionCollection.Load(reader);
