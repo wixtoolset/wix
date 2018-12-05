@@ -15,13 +15,14 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class ExtractCabinetsCommand
     {
-        public ExtractCabinetsCommand(Output output, Database database, string inputFilePath, string exportBasePath, string intermediateFolder)
+        public ExtractCabinetsCommand(Output output, Database database, string inputFilePath, string exportBasePath, string intermediateFolder, bool treatOutputAsModule = false)
         {
             this.Output = output;
             this.Database = database;
             this.InputFilePath = inputFilePath;
             this.ExportBasePath = exportBasePath;
             this.IntermediateFolder = intermediateFolder;
+            this.TreatOutputAsModule = treatOutputAsModule;
         }
 
         public string[] ExtractedFiles { get; private set; }
@@ -36,6 +37,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private string IntermediateFolder { get; }
 
+        public bool TreatOutputAsModule { get; }
+
         public void Execute()
         {
             var databaseBasePath = Path.GetDirectoryName(this.InputFilePath);
@@ -43,7 +46,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             var embeddedCabinets = new SortedList();
 
             // index all of the cabinet files
-            if (OutputType.Module == this.Output.Type)
+            if (OutputType.Module == this.Output.Type || this.TreatOutputAsModule)
             {
                 embeddedCabinets.Add(0, "MergeModule.CABinet");
             }
