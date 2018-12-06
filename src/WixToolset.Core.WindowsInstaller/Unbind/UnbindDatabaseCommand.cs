@@ -7,6 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using WixToolset.Core.Native;
     using WixToolset.Data;
@@ -17,6 +18,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class UnbindDatabaseCommand
     {
+        private List<string> exportedFiles;
+
         public UnbindDatabaseCommand(IMessaging messaging, Database database, string databasePath, OutputType outputType, string exportBasePath, string intermediateFolder, bool isAdminImage, bool suppressDemodularization, bool skipSummaryInfo)
         {
             this.Messaging = messaging;
@@ -52,10 +55,14 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public TableDefinitionCollection TableDefinitions { get; }
 
+        public IEnumerable<string> ExportedFiles => this.exportedFiles;
+
         private int SectionCount { get; set; }
 
         public Output Execute()
         {
+            this.exportedFiles = new List<string>();
+
             string modularizationGuid = null;
             var output = new Output(new SourceLineNumber(this.DatabasePath));
             View validationView = null;
@@ -343,6 +350,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                                                 fs.Write(buffer, 0, bytesRead);
                                                             }
                                                         }
+
+                                                        this.exportedFiles.Add(sourceFile);
                                                     }
 
                                                     row[i] = sourceFile;

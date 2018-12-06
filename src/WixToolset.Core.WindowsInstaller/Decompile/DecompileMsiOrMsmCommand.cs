@@ -5,6 +5,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -37,6 +38,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 {
                     var unbindCommand = new UnbindDatabaseCommand(this.Messaging, database, this.Context.DecompilePath, this.Context.DecompileType, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.IsAdminImage, false, skipSummaryInfo: false);
                     var output = unbindCommand.Execute();
+                    var extractedFilePaths = new List<string>(unbindCommand.ExportedFiles);
 
                     var decompiler = new Decompiler(this.Messaging, this.Extensions, this.Context.BaseSourcePath, this.Context.SuppressCustomTables, this.Context.SuppressDroppingEmptyTables, this.Context.SuppressUI, this.Context.TreatProductAsModule);
                     result.Document = decompiler.Decompile(output);
@@ -47,7 +49,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         var extractCommand = new ExtractCabinetsCommand(output, database, this.Context.DecompilePath, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.TreatProductAsModule);
                         extractCommand.Execute();
 
-                        result.ExtractedFilePaths = extractCommand.ExtractedFiles;
+                        extractedFilePaths.AddRange(extractCommand.ExtractedFiles);
+                        result.ExtractedFilePaths = extractedFilePaths;
                     }
                     else
                     {
