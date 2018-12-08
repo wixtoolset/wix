@@ -121,23 +121,21 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // extract the cabinet files
             if (0 < cabinetFiles.Count)
             {
-                var fileDirectory = Path.Combine(this.ExportBasePath, "File");
-
                 // delete the directory and its files to prevent cab extraction due to an existing file
-                if (Directory.Exists(fileDirectory))
+                if (Directory.Exists(this.ExportBasePath))
                 {
-                    Directory.Delete(fileDirectory, true);
+                    Directory.Delete(this.ExportBasePath, true);
                 }
 
                 // ensure the directory exists or extraction will fail
-                Directory.CreateDirectory(fileDirectory);
+                Directory.CreateDirectory(this.ExportBasePath);
 
                 foreach (var cabinetFile in cabinetFiles)
                 {
                     try
                     {
                         var cabinet = new Cabinet(cabinetFile);
-                        cabinet.Extract(fileDirectory);
+                        cabinet.Extract(this.ExportBasePath);
                     }
                     catch (FileNotFoundException)
                     {
@@ -145,7 +143,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     }
                 }
 
-                this.ExtractedFiles = Directory.GetFiles(fileDirectory);
+                this.ExtractedFiles = Directory.GetFiles(this.ExportBasePath);
             }
             else
             {
