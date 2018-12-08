@@ -18,6 +18,8 @@ namespace WixToolset.Extensibility.Data
 
         string ExtractFolder { get; set; }
 
+        string CabinetExtractFolder { get; set; }
+
         /// <summary>
         /// Optional gets or sets the base path for the File/@Source.
         /// </summary>
