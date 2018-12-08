@@ -25,6 +25,8 @@ namespace WixToolset.Core
 
         public string ExtractFolder { get; set; }
 
+        public string CabinetExtractFolder { get; set; }
+
         public string BaseSourcePath { get; set; }
 
         public string IntermediateFolder { get; set; }

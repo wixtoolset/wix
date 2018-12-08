@@ -46,7 +46,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     // extract the files from the cabinets
                     if (!String.IsNullOrEmpty(this.Context.ExtractFolder) && !this.Context.SuppressExtractCabinets)
                     {
-                        var fileDirectory = Path.Combine(this.Context.ExtractFolder, "File");
+                        var fileDirectory = String.IsNullOrEmpty(this.Context.CabinetExtractFolder) ? Path.Combine(this.Context.ExtractFolder, "File") : this.Context.CabinetExtractFolder;
 
                         var extractCommand = new ExtractCabinetsCommand(output, database, this.Context.DecompilePath, fileDirectory, this.Context.IntermediateFolder, this.Context.TreatProductAsModule);
                         extractCommand.Execute();
