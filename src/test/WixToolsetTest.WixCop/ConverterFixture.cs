@@ -421,6 +421,34 @@ namespace WixToolsetTest.WixCop
         }
 
         [Fact]
+        public void CanConvertShortNameDirectoryWithoutName()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Directory ShortName='iamshort' />",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Directory Name=\"iamshort\" />",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Converter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(1, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void CanConvertSuppressSignatureValidationNo()
         {
             var parse = String.Join(Environment.NewLine,

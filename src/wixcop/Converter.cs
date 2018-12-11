@@ -22,6 +22,7 @@ namespace WixToolset.Tools.WixCop
         private const char XDocumentNewLine = '\n'; // XDocument normalizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
 
+        private static readonly XName DirectoryElementName = WixNamespace + "Directory";
         private static readonly XName FileElementName = WixNamespace + "File";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
         private static readonly XName MsiPackageElementName = WixNamespace + "MsiPackage";
@@ -71,19 +72,9 @@ namespace WixToolset.Tools.WixCop
         /// <param name="ignoreErrors">Test errors to ignore.</param>
         public Converter(IMessaging messaging, int indentationAmount, IEnumerable<string> errorsAsWarnings = null, IEnumerable<string> ignoreErrors = null)
         {
-            // workaround IDE0009 bug
-            /*this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>()
-            {
-                { Converter.FileElementName, this.ConvertFileElement },
-                { Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
-                { Converter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
-                { Converter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
-                { Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
-                { Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
-                { Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace },
-            };*/
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
             {
+                { Converter.DirectoryElementName, this.ConvertDirectoryElement },
                 { Converter.FileElementName, this.ConvertFileElement },
                 { Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
                 { Converter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
@@ -92,7 +83,7 @@ namespace WixToolset.Tools.WixCop
                 { Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { Converter.CustomActionElementName, this.ConvertCustomActionElement },
                 { Converter.PropertyElementName, this.ConvertPropertyElement },
-                { Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace }
+                { Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace },
             };
 
             this.Messaging = messaging;
@@ -293,6 +284,23 @@ namespace WixToolset.Tools.WixCop
             if (this.ConvertElementMapping.TryGetValue(element.Name, out var convert))
             {
                 convert(element);
+            }
+        }
+
+        private void ConvertDirectoryElement(XElement element)
+        {
+            if (null == element.Attribute("Name"))
+            {
+                var attribute = element.Attribute("ShortName");
+                if (null != attribute)
+                {
+                    var shortName = attribute.Value;
+                    if (this.OnError(ConverterTestType.AssignDirectoryNameFromShortName, element, "The directory ShortName attribute is being renamed to Name since Name wasn't specified for value '{0}'", shortName))
+                    {
+                        element.Add(new XAttribute("Name", shortName));
+                        attribute.Remove();
+                    }
+                }
             }
         }
 
@@ -611,6 +619,11 @@ namespace WixToolset.Tools.WixCop
             /// QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.
             /// </summary>
             QtExecCmdTimeoutAmbiguous,
+
+            /// <summary>
+            /// Directory/@ShortName may only be specified with Directory/@Name.
+            /// </summary>
+            AssignDirectoryNameFromShortName,
         }
     }
 }
