@@ -6252,13 +6252,13 @@
                                 </html:dd></html:dl></html:dd><html:dt>Handler</html:dt><html:dd><html:dl><html:dt>In General</html:dt><html:dd>
                                     Value "1" specified:<html:br />
                                     [HKCR\CLSID\{<html:b>Id</html:b>}\InprocHandler]<html:br />
-                                    @="ole.dll"<html:br />
+                                    @="ole2.dll"<html:br />
                                     Value "2" specified:<html:br />
                                     [HKCR\CLSID\{<html:b>Id</html:b>}\InprocHandler32]<html:br />
                                     @="ole32.dll"<html:br />
                                     Value "3" specified:<html:br />
                                     [HKCR\CLSID\{<html:b>Id</html:b>}\InprocHandler]<html:br />
-                                    @="ole.dll"<html:br />
+                                    @="ole2.dll"<html:br />
                                     [HKCR\CLSID\{<html:b>Id</html:b>}\InprocHandler32]<html:br />
                                     @="ole32.dll"<html:br />
                                     Other value specified:<html:br />
