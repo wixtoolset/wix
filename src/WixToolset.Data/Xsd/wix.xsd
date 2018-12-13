@@ -6267,7 +6267,7 @@
                                 </html:dd><html:dt>Specific Example (for other value)</html:dt><html:dd>
                                     [HKCR\CLSID\{<html:b>01234567-89AB-CDEF-0123-456789ABCDEF</html:b>}\InprocHandler32]<html:br />
                                     @="<html:b>handler.dll</html:b>"
-                                </html:dd></html:dl></html:dd><html:dt>Icon/IconIndex</html:dt><html:dd>This is not currently handled properly.</html:dd><html:dt>Insertable</html:dt><html:dd><html:dl><html:dt>In General</html:dt><html:dd>
+                                </html:dd></html:dl></html:dd><html:dt>Icon/IconIndex</html:dt><html:dt>Insertable</html:dt><html:dd><html:dl><html:dt>In General</html:dt><html:dd>
                                     Value "no" specified:<html:br />
                                     [HKCR\CLSID\{<html:b>Id</html:b>}\NotInsertable]<html:br />
                                     Value "yes" specified:<html:br />
@@ -6393,8 +6393,7 @@
         <xs:annotation>
           <xs:documentation>
                     The file providing the icon associated with this CLSID.  Reference to an Icon element
-                    (should match the Id attribute of an Icon element).  This is currently not supported if the
-                    value of the Advertise attribute is "no".
+                    (should match the Id attribute of an Icon element).
                 </xs:documentation>
         </xs:annotation>
       </xs:attribute>
