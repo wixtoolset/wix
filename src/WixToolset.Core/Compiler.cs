@@ -1316,7 +1316,7 @@ namespace WixToolset.Core
                         {
                             icon = String.Concat(icon, ",", iconIndex);
                         }
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\", context, "\\DefaultIcon"), String.Empty, icon, componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\DefaultIcon"), String.Empty, icon, componentId);
                     }
                 }
 
