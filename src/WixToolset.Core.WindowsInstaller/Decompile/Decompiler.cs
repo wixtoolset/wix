@@ -1452,7 +1452,7 @@ namespace WixToolset.Core.WindowsInstaller
                         {
                             file.Source = String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, file.Id, '.', this.modularizationGuid.Substring(1, 36).Replace('-', '_'));
                         }
-                        else if (Wix.YesNoDefaultType.yes == file.Compressed || (Wix.YesNoDefaultType.no != file.Compressed && this.compressed))
+                        else if (Wix.YesNoDefaultType.yes == file.Compressed || (Wix.YesNoDefaultType.no != file.Compressed && this.compressed) || (OutputType.Product == this.OutputType && this.TreatProductAsModule))
                         {
                             file.Source = String.Concat(this.BaseSourcePath, Path.DirectorySeparatorChar, "File", Path.DirectorySeparatorChar, file.Id);
                         }
