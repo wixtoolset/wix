@@ -1,64 +1,30 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Iis
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
     /// <summary>
     /// The WiX Toolset Internet Information Services Extension.
     /// </summary>
-    public sealed class IIsExtensionData : ExtensionData
+    public sealed class IIsExtensionData : BaseExtensionData
     {
         /// <summary>
         /// Gets the default culture.
         /// </summary>
         /// <value>The default culture.</value>
-        public override string DefaultCulture
+        public override string DefaultCulture => "en-US";
+
+        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            get { return "en-us"; }
+            tupleDefinition = null;
+            return tupleDefinition != null;
         }
 
-        /// <summary>
-        /// Gets the optional table definitions for this extension.
-        /// </summary>
-        /// <value>The optional table definitions for this extension.</value>
-        public override TableDefinitionCollection TableDefinitions
+        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            get
-            {
-                return IIsExtensionData.GetExtensionTableDefinitions();
-            }
-        }
-
-        /// <summary>
-        /// Gets the library associated with this extension.
-        /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
-        /// <returns>The loaded library.</returns>
-        public override Library GetLibrary(TableDefinitionCollection tableDefinitions)
-        {
-            return IIsExtensionData.GetExtensionLibrary(tableDefinitions);
-        }
-
-        /// <summary>
-        /// Internal mechanism to access the extension's table definitions.
-        /// </summary>
-        /// <returns>Extension's table definitions.</returns>
-        internal static TableDefinitionCollection GetExtensionTableDefinitions()
-        {
-            return ExtensionData.LoadTableDefinitionHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.tables.xml");
-        }
-
-        /// <summary>
-        /// Internal mechanism to access the extension's library.
-        /// </summary>
-        /// <returns>Extension's library.</returns>
-        internal static Library GetExtensionLibrary(TableDefinitionCollection tableDefinitions)
-        {
-            return ExtensionData.LoadLibraryHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.iis.wixlib", tableDefinitions);
+            return Intermediate.Load(typeof(IIsExtensionData).Assembly, "WixToolset.Iis.iis.wixlib", tupleDefinitions);
         }
     }
 }

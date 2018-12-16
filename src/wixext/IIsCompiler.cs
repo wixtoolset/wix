@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Iis
 {
     using System;
     using System.Collections.Generic;
@@ -12,15 +12,9 @@ namespace WixToolset.Extensions
     /// <summary>
     /// The compiler for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    public sealed class IIsCompiler : CompilerExtension
+    public sealed class IIsCompiler : BaseCompilerExtension
     {
-        /// <summary>
-        /// Instantiate a new IIsCompiler.
-        /// </summary>
-        public IIsCompiler()
-        {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/iis";
-        }
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/iis";
 
         /// <summary>
         /// Types of objects that custom HTTP Headers can be applied to.
@@ -65,7 +59,7 @@ namespace WixToolset.Extensions
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             switch (parentElement.Name.LocalName)
             {
@@ -76,31 +70,31 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "Certificate":
-                            this.ParseCertificateElement(element, componentId);
+                            this.ParseCertificateElement(intermediate, section, element, componentId);
                             break;
                         case "WebAppPool":
-                            this.ParseWebAppPoolElement(element, componentId);
+                            this.ParseWebAppPoolElement(intermediate, section, element, componentId);
                             break;
                         case "WebDir":
-                            this.ParseWebDirElement(element, componentId, null);
+                            this.ParseWebDirElement(intermediate, section, element, componentId, null);
                             break;
                         case "WebFilter":
-                            this.ParseWebFilterElement(element, componentId, null);
+                            this.ParseWebFilterElement(intermediate, section, element, componentId, null);
                             break;
                         case "WebProperty":
-                            this.ParseWebPropertyElement(element, componentId);
+                            this.ParseWebPropertyElement(intermediate, section, element, componentId);
                             break;
                         case "WebServiceExtension":
-                            this.ParseWebServiceExtensionElement(element, componentId);
+                            this.ParseWebServiceExtensionElement(intermediate, section, element, componentId);
                             break;
                         case "WebSite":
-                            this.ParseWebSiteElement(element, componentId);
+                            this.ParseWebSiteElement(intermediate, section, element, componentId);
                             break;
                         case "WebVirtualDir":
-                            this.ParseWebVirtualDirElement(element, componentId, null, null);
+                            this.ParseWebVirtualDirElement(intermediate, section, element, componentId, null, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
@@ -110,27 +104,27 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "WebApplication":
-                            this.ParseWebApplicationElement(element);
+                            this.ParseWebApplicationElement(intermediate, section, element);
                             break;
                         case "WebAppPool":
-                            this.ParseWebAppPoolElement(element, null);
+                            this.ParseWebAppPoolElement(intermediate, section, element, null);
                             break;
                         case "WebDirProperties":
-                            this.ParseWebDirPropertiesElement(element);
+                            this.ParseWebDirPropertiesElement(intermediate, section, element);
                             break;
                         case "WebLog":
-                            this.ParseWebLogElement(element);
+                            this.ParseWebLogElement(intermediate, section, element);
                             break;
                         case "WebSite":
-                            this.ParseWebSiteElement(element, null);
+                            this.ParseWebSiteElement(intermediate, section, element, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
         }
@@ -138,12 +132,12 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses a certificate element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
-        private void ParseCertificateElement(XElement node, string componentId)
+        private void ParseCertificateElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int attributes = 0;
             string binaryKey = null;
             string certificatePath = null;
@@ -152,28 +146,28 @@ namespace WixToolset.Extensions
             int storeLocation = 0;
             string storeName = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "BinaryKey":
                             attributes |= 2; // SCA_CERT_ATTRIBUTE_BINARYDATA
-                            binaryKey = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", binaryKey);
+                            binaryKey = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Binary", binaryKey);
                             break;
                         case "CertificatePath":
-                            certificatePath = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            certificatePath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Overwrite":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= 4; // SCA_CERT_ATTRIBUTE_OVERWRITE
                             }
@@ -183,10 +177,10 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "PFXPassword":
-                            pfxPassword = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            pfxPassword = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Request":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= 1; // SCA_CERT_ATTRIBUTE_REQUEST
                             }
@@ -196,7 +190,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "StoreLocation":
-                            string storeLocationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string storeLocationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < storeLocationValue.Length)
                             {
                                 switch (storeLocationValue)
@@ -209,13 +203,13 @@ namespace WixToolset.Extensions
                                         break;
                                     default:
                                         storeLocation = -1;
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "StoreLocation", storeLocationValue, "currentUser", "localMachine"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "StoreLocation", storeLocationValue, "currentUser", "localMachine"));
                                         break;
                                 }
                             }
                             break;
                         case "StoreName":
-                            string storeNameValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string storeNameValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < storeNameValue.Length)
                             {
                                 switch (storeNameValue)
@@ -243,232 +237,230 @@ namespace WixToolset.Extensions
                                         storeName = "TrustedPublisher";
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "StoreName", storeNameValue, "ca", "my", "request", "root", "otherPeople", "trustedPeople", "trustedPublisher"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "StoreName", storeNameValue, "ca", "my", "request", "root", "otherPeople", "trustedPeople", "trustedPublisher"));
                                         break;
                                 }
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
             if (0 == storeLocation)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "StoreLocation"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "StoreLocation"));
             }
 
             if (null == storeName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "StoreName"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "StoreName"));
             }
 
             if (null != binaryKey && null != certificatePath)
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "BinaryKey", "CertificatePath", certificatePath));
+                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryKey", "CertificatePath", certificatePath));
             }
             else if (null == binaryKey && null == certificatePath)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "BinaryKey", "CertificatePath"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "BinaryKey", "CertificatePath"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallCertificates and UninstallCertificates since nothing will happen without them
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "InstallCertificates");
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "UninstallCertificates");
-            this.Core.EnsureTable(sourceLineNumbers, "CertificateHash"); // Certificate CustomActions require the CertificateHash table
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallCertificates");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallCertificates");
+            this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CertificateHash"); // Certificate CustomActions require the CertificateHash table
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "Certificate");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = name;
-                row[3] = storeLocation;
-                row[4] = storeName;
-                row[5] = attributes;
-                row[6] = binaryKey;
-                row[7] = certificatePath;
-                row[8] = pfxPassword;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Certificate", id);
+                row.Set(1, componentId);
+                row.Set(2, name);
+                row.Set(3, storeLocation);
+                row.Set(4, storeName);
+                row.Set(5, attributes);
+                row.Set(6, binaryKey);
+                row.Set(7, certificatePath);
+                row.Set(8, pfxPassword);
             }
         }
 
         /// <summary>
         /// Parses a CertificateRef extension element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="webId">Identifier for parent web site.</param>
-        private void ParseCertificateRefElement(XElement node, string webId)
+        private void ParseCertificateRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string webId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Certificate", id);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Certificate", id.Id);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "Certificate", id);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Certificate", id.Id);
 
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebSiteCertificates");
-                row[0] = webId;
-                row[1] = id;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebSiteCertificates");
+                row.Set(0, webId);
+                row.Set(1, id.Id);
             }
         }
 
         /// <summary>
         /// Parses a mime map element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="parentId">Identifier for parent symbol.</param>
         /// <param name="parentType">Type that parentId refers to.</param>
-        private void ParseMimeMapElement(XElement node, string parentId, MimeMapParentType parentType)
+        private void ParseMimeMapElement(Intermediate intermediate, IntermediateSection section, XElement element, string parentId, MimeMapParentType parentType)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string extension = null;
             string type = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Extension":
-                            extension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            extension = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Type":
-                            type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            type = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == extension)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Extension"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Extension"));
             }
             else if (0 < extension.Length)
             {
                 if (!extension.StartsWith(".", StringComparison.Ordinal))
                 {
-                    this.Core.OnMessage(IIsErrors.MimeMapExtensionMissingPeriod(sourceLineNumbers, node.Name.LocalName, "Extension", extension));
+                    this.Messaging.Write(IIsErrors.MimeMapExtensionMissingPeriod(sourceLineNumbers, element.Name.LocalName, "Extension", extension));
                 }
             }
 
             if (null == type)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Type"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsMimeMap");
-                row[0] = id;
-                row[1] = (int)parentType;
-                row[2] = parentId;
-                row[3] = type;
-                row[4] = extension;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsMimeMap", id);
+                row.Set(1, (int)parentType);
+                row.Set(2, parentId);
+                row.Set(3, type);
+                row.Set(4, extension);
             }
         }
 
         /// <summary>
         /// Parses a recycle time element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <returns>Recycle time value.</returns>
-        private string ParseRecycleTimeElement(XElement node)
+        private string ParseRecycleTimeElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string value = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Value":
-                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            value = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == value)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Value"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             return value;
         }
@@ -476,85 +468,84 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses a web address element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="parentWeb">Identifier of parent web site.</param>
         /// <returns>Identifier for web address.</returns>
-        private string ParseWebAddressElement(XElement node, string parentWeb)
+        private string ParseWebAddressElement(Intermediate intermediate, IntermediateSection section, XElement element, string parentWeb)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string header = null;
             string ip = null;
             string port = null;
             bool secure = false;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Header":
-                            header = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            header = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "IP":
-                            ip = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            ip = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Port":
-                            port = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            port = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Secure":
-                            secure = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            secure = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == port)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Port"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Port"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebAddress");
-                row[0] = id;
-                row[1] = parentWeb;
-                row[2] = ip;
-                row[3] = port;
-                row[4] = header;
-                row[5] = secure ? 1 : 0;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebAddress", id);
+                row.Set(1, parentWeb);
+                row.Set(2, ip);
+                row.Set(3, port);
+                row.Set(4, header);
+                row.Set(5, secure ? 1 : 0);
             }
 
-            return id;
+            return id?.Id;
         }
 
         /// <summary>
         /// Parses a web application element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <returns>Identifier for web application.</returns>
-        private string ParseWebApplicationElement(XElement node)
+        private string ParseWebApplicationElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             YesNoDefaultType allowSessions = YesNoDefaultType.Default;
             string appPool = null;
             YesNoDefaultType buffer = YesNoDefaultType.Default;
@@ -567,26 +558,26 @@ namespace WixToolset.Extensions
             int sessionTimeout = CompilerConstants.IntegerNotSet;
             YesNoDefaultType serverDebugging = YesNoDefaultType.Default;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "AllowSessions":
-                            allowSessions = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            allowSessions = this.ParseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "Buffer":
-                            buffer = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            buffer = this.ParseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "ClientDebugging":
-                            clientDebugging = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            clientDebugging = this.ParseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "DefaultScript":
-                            defaultScript = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            defaultScript = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < defaultScript.Length)
                             {
                                 switch (defaultScript)
@@ -596,13 +587,13 @@ namespace WixToolset.Extensions
                                         // these are valid values
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, defaultScript, "JScript", "VBScript"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, defaultScript, "JScript", "VBScript"));
                                         break;
                                 }
                             }
                             break;
                         case "Isolation":
-                            string isolationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string isolationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < isolationValue.Length)
                             {
                                 switch (isolationValue)
@@ -617,143 +608,142 @@ namespace WixToolset.Extensions
                                         isolation = 1;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, isolationValue, "low", "medium", "high"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, isolationValue, "low", "medium", "high"));
                                         break;
                                 }
                             }
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ParentPaths":
-                            parentPaths = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            parentPaths = this.ParseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "ScriptTimeout":
-                            scriptTimeout = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            scriptTimeout = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "ServerDebugging":
-                            serverDebugging = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            serverDebugging = this.ParseHelper.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "SessionTimeout":
-                            sessionTimeout = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            sessionTimeout = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "WebAppPool":
-                            appPool = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "IIsAppPool", appPool);
+                            appPool = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsAppPool", appPool);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
             else if (-1 != name.IndexOf("\\", StringComparison.Ordinal))
             {
-                this.Core.OnMessage(IIsErrors.IllegalCharacterInAttributeValue(sourceLineNumbers, node.Name.LocalName, "Name", name, '\\'));
+                this.Messaging.Write(IIsErrors.IllegalCharacterInAttributeValue(sourceLineNumbers, element.Name.LocalName, "Name", name, '\\'));
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (XElement child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "WebApplicationExtension":
-                            this.ParseWebApplicationExtensionElement(child, id);
+                            this.ParseWebApplicationExtensionElement(intermediate, section, child, id?.Id);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebApplication");
-                row[0] = id;
-                row[1] = name;
-                row[2] = isolation;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebApplication", id);
+                row.Set(1, name);
+                row.Set(2, isolation);
                 if (YesNoDefaultType.Default != allowSessions)
                 {
-                    row[3] = YesNoDefaultType.Yes == allowSessions ? 1 : 0;
+                    row.Set(3, YesNoDefaultType.Yes == allowSessions ? 1 : 0);
                 }
 
                 if (CompilerConstants.IntegerNotSet != sessionTimeout)
                 {
-                    row[4] = sessionTimeout;
+                    row.Set(4, sessionTimeout);
                 }
 
                 if (YesNoDefaultType.Default != buffer)
                 {
-                    row[5] = YesNoDefaultType.Yes == buffer ? 1 : 0;
+                    row.Set(5, YesNoDefaultType.Yes == buffer ? 1 : 0);
                 }
 
                 if (YesNoDefaultType.Default != parentPaths)
                 {
-                    row[6] = YesNoDefaultType.Yes == parentPaths ? 1 : 0;
+                    row.Set(6, YesNoDefaultType.Yes == parentPaths ? 1 : 0);
                 }
-                row[7] = defaultScript;
+                row.Set(7, defaultScript);
                 if (CompilerConstants.IntegerNotSet != scriptTimeout)
                 {
-                    row[8] = scriptTimeout;
+                    row.Set(8, scriptTimeout);
                 }
 
                 if (YesNoDefaultType.Default != serverDebugging)
                 {
-                    row[9] = YesNoDefaultType.Yes == serverDebugging ? 1 : 0;
+                    row.Set(9, YesNoDefaultType.Yes == serverDebugging ? 1 : 0);
                 }
 
                 if (YesNoDefaultType.Default != clientDebugging)
                 {
-                    row[10] = YesNoDefaultType.Yes == clientDebugging ? 1 : 0;
+                    row.Set(10, YesNoDefaultType.Yes == clientDebugging ? 1 : 0);
                 }
-                row[11] = appPool;
+                row.Set(11, appPool);
             }
 
-            return id;
+            return id?.Id;
         }
 
         /// <summary>
         /// Parses a web application extension element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="application">Identifier for parent web application.</param>
-        private void ParseWebApplicationExtensionElement(XElement node, string application)
+        private void ParseWebApplicationExtensionElement(Intermediate intermediate, IntermediateSection section, XElement element, string application)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             int attributes = 0;
             string executable = null;
             string extension = null;
             string verbs = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "CheckPath":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= 4;
                             }
@@ -763,13 +753,13 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "Executable":
-                            executable = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            executable = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Extension":
-                            extension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            extension = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Script":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= 1;
                             }
@@ -779,31 +769,31 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "Verbs":
-                            verbs = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            verbs = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebApplicationExtension");
-                row[0] = application;
-                row[1] = extension;
-                row[2] = verbs;
-                row[3] = executable;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebApplicationExtension");
+                row.Set(0, application);
+                row.Set(1, extension);
+                row.Set(2, verbs);
+                row.Set(3, executable);
                 if (0 < attributes)
                 {
-                    row[4] = attributes;
+                    row.Set(4, attributes);
                 }
             }
         }
@@ -811,12 +801,12 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses web application pool element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Optional identifier of parent component.</param>
-        private void ParseWebAppPoolElement(XElement node, string componentId)
+        private void ParseWebAppPoolElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int attributes = 0;
             int cpuAction = CompilerConstants.IntegerNotSet;
             string cpuMon = null;
@@ -835,22 +825,22 @@ namespace WixToolset.Extensions
             string user = null;
             int virtualMemory = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "CpuAction":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            string cpuActionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string cpuActionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < cpuActionValue.Length)
                             {
                                 switch (cpuActionValue)
@@ -862,7 +852,7 @@ namespace WixToolset.Extensions
                                         cpuAction = 0;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, cpuActionValue, "shutdown", "none"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, cpuActionValue, "shutdown", "none"));
                                         break;
                                 }
                             }
@@ -870,10 +860,10 @@ namespace WixToolset.Extensions
                         case "Identity":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            string identityValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string identityValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < identityValue.Length)
                             {
                                 switch (identityValue)
@@ -894,7 +884,7 @@ namespace WixToolset.Extensions
                                         attributes |= 0x10;
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, identityValue, "networkService", "localService", "localSystem", "other", "applicationPoolIdentity"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, identityValue, "networkService", "localService", "localSystem", "other", "applicationPoolIdentity"));
                                         break;
                                 }
                             }
@@ -902,18 +892,18 @@ namespace WixToolset.Extensions
                         case "IdleTimeout":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            idleTimeout = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            idleTimeout = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "ManagedPipelineMode":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            managedPipelineMode = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            managedPipelineMode = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
 
 
                             if (!String.IsNullOrEmpty(managedPipelineMode))
@@ -933,9 +923,9 @@ namespace WixToolset.Extensions
                                     case "Integrated":
                                         break;
                                     default:
-                                        if (!this.Core.ContainsProperty(managedPipelineMode))
+                                        if (!this.ParseHelper.ContainsProperty(managedPipelineMode))
                                         {
-                                            this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, managedPipelineMode, "Classic", "Integrated"));
+                                            this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, managedPipelineMode, "Classic", "Integrated"));
                                         }
                                         break;
                                 }
@@ -945,116 +935,116 @@ namespace WixToolset.Extensions
                         case "ManagedRuntimeVersion":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            managedRuntimeVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            managedRuntimeVersion = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MaxCpuUsage":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            maxCpuUsage = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 100);
+                            maxCpuUsage = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 100);
                             break;
                         case "MaxWorkerProcesses":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            maxWorkerProcs = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            maxWorkerProcs = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PrivateMemory":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            privateMemory = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 4294967);
+                            privateMemory = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 4294967);
                             break;
                         case "QueueLimit":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            queueLimit = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            queueLimit = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "RecycleMinutes":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            recycleMinutes = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            recycleMinutes = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "RecycleRequests":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            recycleRequests = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            recycleRequests = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "RefreshCpu":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            refreshCpu = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            refreshCpu = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "User":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            user = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
                         case "VirtualMemory":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            virtualMemory = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 4294967);
+                            virtualMemory = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 4294967);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
             if (null == user && 8 == (attributes & 0x1F))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "User", "Identity", "other"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "User", "Identity", "other"));
             }
 
             if (null != user && 8 != (attributes & 0x1F))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "User", user, "Identity", "other"));
+                this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, element.Name.LocalName, "User", user, "Identity", "other"));
             }
 
             cpuMon = maxCpuUsage.ToString(CultureInfo.InvariantCulture.NumberFormat);
@@ -1067,7 +1057,7 @@ namespace WixToolset.Extensions
                 }
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (XElement child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -1076,228 +1066,226 @@ namespace WixToolset.Extensions
                         case "RecycleTime":
                             if (null == componentId)
                             {
-                                SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, node.Name.LocalName));
+                                SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, element.Name.LocalName));
                             }
 
                             if (null == recycleTimes)
                             {
-                                recycleTimes = this.ParseRecycleTimeElement(child);
+                                recycleTimes = this.ParseRecycleTimeElement(intermediate, section, child);
                             }
                             else
                             {
-                                recycleTimes = String.Concat(recycleTimes, ",", this.ParseRecycleTimeElement(child));
+                                recycleTimes = String.Concat(recycleTimes, ",", this.ParseRecycleTimeElement(intermediate, section, child));
                             }
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
             }
 
             if (null != componentId)
             {
                 // Reference ConfigureIIs since nothing will happen without it
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsAppPool");
-                row[0] = id;
-                row[1] = name;
-                row[2] = componentId;
-                row[3] = attributes;
-                row[4] = user;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsAppPool", id);
+                row.Set(1, name);
+                row.Set(2, componentId);
+                row.Set(3, attributes);
+                row.Set(4, user);
                 if (CompilerConstants.IntegerNotSet != recycleMinutes)
                 {
-                    row[5] = recycleMinutes;
+                    row.Set(5, recycleMinutes);
                 }
 
                 if (CompilerConstants.IntegerNotSet != recycleRequests)
                 {
-                    row[6] = recycleRequests;
+                    row.Set(6, recycleRequests);
                 }
-                row[7] = recycleTimes;
+                row.Set(7, recycleTimes);
                 if (CompilerConstants.IntegerNotSet != idleTimeout)
                 {
-                    row[8] = idleTimeout;
+                    row.Set(8, idleTimeout);
                 }
 
                 if (CompilerConstants.IntegerNotSet != queueLimit)
                 {
-                    row[9] = queueLimit;
+                    row.Set(9, queueLimit);
                 }
-                row[10] = cpuMon;
+                row.Set(10, cpuMon);
                 if (CompilerConstants.IntegerNotSet != maxWorkerProcs)
                 {
-                    row[11] = maxWorkerProcs;
+                    row.Set(11, maxWorkerProcs);
                 }
 
                 if (CompilerConstants.IntegerNotSet != virtualMemory)
                 {
-                    row[12] = virtualMemory;
+                    row.Set(12, virtualMemory);
                 }
 
                 if (CompilerConstants.IntegerNotSet != privateMemory)
                 {
-                    row[13] = privateMemory;
+                    row.Set(13, privateMemory);
                 }
-                row[14] = managedRuntimeVersion;
-                row[15] = managedPipelineMode;
+                row.Set(14, managedRuntimeVersion);
+                row.Set(15, managedPipelineMode);
             }
         }
 
         /// <summary>
         /// Parses a web directory element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
         /// <param name="parentWeb">Optional identifier for parent web site.</param>
-        private void ParseWebDirElement(XElement node, string componentId, string parentWeb)
+        private void ParseWebDirElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentWeb)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string dirProperties = null;
             string path = null;
             string application = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "DirProperties":
-                            dirProperties = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            dirProperties = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Path":
-                            path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            path = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "WebApplication":
-                            application = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            application = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "WebSite":
                             if (null != parentWeb)
                             {
-                                this.Core.OnMessage(IIsErrors.WebSiteAttributeUnderWebSite(sourceLineNumbers, node.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.WebSiteAttributeUnderWebSite(sourceLineNumbers, element.Name.LocalName));
                             }
 
-                            parentWeb = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebSite", parentWeb);
+                            parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebSite", parentWeb);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == path)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Path"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Path"));
             }
 
             if (null == parentWeb)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "WebSite"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "WebSite"));
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (XElement child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "WebApplication":
                             if (null != application)
                             {
-                                this.Core.OnMessage(IIsErrors.WebApplicationAlreadySpecified(childSourceLineNumbers, node.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.WebApplicationAlreadySpecified(childSourceLineNumbers, element.Name.LocalName));
                             }
 
-                            application = this.ParseWebApplicationElement(child);
+                            application = this.ParseWebApplicationElement(intermediate, section, child);
                             break;
                         case "WebDirProperties":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            string childWebDirProperties = this.ParseWebDirPropertiesElement(child);
+                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child);
                             if (null == dirProperties)
                             {
                                 dirProperties = childWebDirProperties;
                             }
                             else
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, child.Name.LocalName, "DirProperties", child.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, child.Name.LocalName, "DirProperties", child.Name.LocalName));
                             }
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
             }
 
             if (null == dirProperties)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DirProperties"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "DirProperties"));
             }
 
             if (null != application)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebApplication", application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebApplication", application);
             }
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebDirProperties", dirProperties);
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebDirProperties", dirProperties);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebDir");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = parentWeb;
-                row[3] = path;
-                row[4] = dirProperties;
-                row[5] = application;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebDir", id);
+                row.Set(1, componentId);
+                row.Set(2, parentWeb);
+                row.Set(3, path);
+                row.Set(4, dirProperties);
+                row.Set(5, application);
             }
         }
 
         /// <summary>
         /// Parses a web directory properties element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <returns>The identifier for this WebDirProperties.</returns>
-        private string ParseWebDirPropertiesElement(XElement node)
+        private string ParseWebDirPropertiesElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int access = 0;
             bool accessSet = false;
             int accessSSLFlags = 0;
@@ -1316,53 +1304,53 @@ namespace WixToolset.Extensions
             YesNoType logVisits = YesNoType.NotSet;
             YesNoType notCustomError = YesNoType.NotSet;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "AnonymousUser":
-                            anonymousUser = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", anonymousUser);
+                            anonymousUser = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", anonymousUser);
                             break;
                         case "AspDetailedError":
-                            aspDetailedError = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            aspDetailedError = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "AuthenticationProviders":
-                            authenticationProviders = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            authenticationProviders = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "CacheControlCustom":
-                            cacheControlCustom = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            cacheControlCustom = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "CacheControlMaxAge":
-                            cacheControlMaxAge = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, 0, uint.MaxValue); // 4294967295 (uint.MaxValue) represents unlimited
+                            cacheControlMaxAge = this.ParseHelper.GetAttributeLongValue(sourceLineNumbers, attrib, 0, uint.MaxValue); // 4294967295 (uint.MaxValue) represents unlimited
                             break;
                         case "ClearCustomError":
-                            notCustomError = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            notCustomError = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "DefaultDocuments":
-                            defaultDocuments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            defaultDocuments = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "HttpExpires":
-                            httpExpires = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            httpExpires = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "IIsControlledPassword":
-                            iisControlledPassword = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            iisControlledPassword = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "Index":
-                            index = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            index = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "LogVisits":
-                            logVisits = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            logVisits = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
 
                         // Access attributes
                         case "Execute":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 access |= 4;
                             }
@@ -1373,7 +1361,7 @@ namespace WixToolset.Extensions
                             accessSet = true;
                             break;
                         case "Read":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 access |= 1;
                             }
@@ -1384,7 +1372,7 @@ namespace WixToolset.Extensions
                             accessSet = true;
                             break;
                         case "Script":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 access |= 512;
                             }
@@ -1395,7 +1383,7 @@ namespace WixToolset.Extensions
                             accessSet = true;
                             break;
                         case "Write":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 access |= 2;
                             }
@@ -1408,7 +1396,7 @@ namespace WixToolset.Extensions
 
                         // AccessSSL Attributes
                         case "AccessSSL":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 accessSSLFlags |= 8;
                             }
@@ -1419,7 +1407,7 @@ namespace WixToolset.Extensions
                             accessSSLFlagsSet = true;
                             break;
                         case "AccessSSL128":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 accessSSLFlags |= 256;
                             }
@@ -1430,7 +1418,7 @@ namespace WixToolset.Extensions
                             accessSSLFlagsSet = true;
                             break;
                         case "AccessSSLMapCert":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 accessSSLFlags |= 128;
                             }
@@ -1441,7 +1429,7 @@ namespace WixToolset.Extensions
                             accessSSLFlagsSet = true;
                             break;
                         case "AccessSSLNegotiateCert":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 accessSSLFlags |= 32;
                             }
@@ -1452,7 +1440,7 @@ namespace WixToolset.Extensions
                             accessSSLFlagsSet = true;
                             break;
                         case "AccessSSLRequireCert":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 accessSSLFlags |= 64;
                             }
@@ -1465,7 +1453,7 @@ namespace WixToolset.Extensions
 
                         // Authorization attributes
                         case "AnonymousAccess":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 authorization |= 1;
                             }
@@ -1476,7 +1464,7 @@ namespace WixToolset.Extensions
                             authorizationSet = true;
                             break;
                         case "BasicAuthentication":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 authorization |= 2;
                             }
@@ -1487,7 +1475,7 @@ namespace WixToolset.Extensions
                             authorizationSet = true;
                             break;
                         case "DigestAuthentication":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 authorization |= 16;
                             }
@@ -1498,7 +1486,7 @@ namespace WixToolset.Extensions
                             authorizationSet = true;
                             break;
                         case "PassportAuthentication":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 authorization |= 64;
                             }
@@ -1509,7 +1497,7 @@ namespace WixToolset.Extensions
                             authorizationSet = true;
                             break;
                         case "WindowsAuthentication":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 authorization |= 4;
                             }
@@ -1520,187 +1508,186 @@ namespace WixToolset.Extensions
                             authorizationSet = true;
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebDirProperties");
-                row[0] = id;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebDirProperties", id);
                 if (accessSet)
                 {
-                    row[1] = access;
+                    row.Set(1, access);
                 }
 
                 if (authorizationSet)
                 {
-                    row[2] = authorization;
+                    row.Set(2, authorization);
                 }
-                row[3] = anonymousUser;
-                row[4] = iisControlledPassword ? 1 : 0;
+                row.Set(3, anonymousUser);
+                row.Set(4, iisControlledPassword ? 1 : 0);
                 if (YesNoType.NotSet != logVisits)
                 {
-                    row[5] = YesNoType.Yes == logVisits ? 1 : 0;
+                    row.Set(5, YesNoType.Yes == logVisits ? 1 : 0);
                 }
 
                 if (YesNoType.NotSet != index)
                 {
-                    row[6] = YesNoType.Yes == index ? 1 : 0;
+                    row.Set(6, YesNoType.Yes == index ? 1 : 0);
                 }
-                row[7] = defaultDocuments;
+                row.Set(7, defaultDocuments);
                 if (YesNoType.NotSet != aspDetailedError)
                 {
-                    row[8] = YesNoType.Yes == aspDetailedError ? 1 : 0;
+                    row.Set(8, YesNoType.Yes == aspDetailedError ? 1 : 0);
                 }
-                row[9] = httpExpires;
+                row.Set(9, httpExpires);
                 if (CompilerConstants.LongNotSet != cacheControlMaxAge)
                 {
-                    row[10] = unchecked((int)cacheControlMaxAge);
+                    row.Set(10, unchecked((int)cacheControlMaxAge));
                 }
-                row[11] = cacheControlCustom;
+                row.Set(11, cacheControlCustom);
                 if (YesNoType.NotSet != notCustomError)
                 {
-                    row[12] = YesNoType.Yes == notCustomError ? 1 : 0;
+                    row.Set(12, YesNoType.Yes == notCustomError ? 1 : 0);
                 }
 
                 if (accessSSLFlagsSet)
                 {
-                    row[13] = accessSSLFlags;
+                    row.Set(13, accessSSLFlags);
                 }
 
                 if (null != authenticationProviders)
                 {
-                    row[14] = authenticationProviders;
+                    row.Set(14, authenticationProviders);
                 }
             }
 
-            return id;
+            return id?.Id;
         }
 
         /// <summary>
         /// Parses a web error element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="parentType">Type of the parent.</param>
         /// <param name="parent">Id of the parent.</param>
-        private void ParseWebErrorElement(XElement node, WebErrorParentType parentType, string parent)
+        private void ParseWebErrorElement(Intermediate intermediate, IntermediateSection section, XElement element, WebErrorParentType parentType, string parent)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             int errorCode = CompilerConstants.IntegerNotSet;
             string file = null;
             string url = null;
             int subCode = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "ErrorCode":
-                            errorCode = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 400, 599);
+                            errorCode = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 400, 599);
                             break;
                         case "File":
-                            file = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            file = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SubCode":
-                            subCode = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            subCode = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "URL":
-                            url = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            url = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (CompilerConstants.IntegerNotSet == errorCode)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ErrorCode"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "ErrorCode"));
                 errorCode = CompilerConstants.IllegalInteger;
             }
 
             if (CompilerConstants.IntegerNotSet == subCode)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SubCode"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "SubCode"));
                 subCode = CompilerConstants.IllegalInteger;
             }
 
             if (String.IsNullOrEmpty(file) && String.IsNullOrEmpty(url))
             {
-                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "File", "URL"));
+                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "File", "URL"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebError");
-                row[0] = errorCode;
-                row[1] = subCode;
-                row[2] = (int)parentType;
-                row[3] = parent;
-                row[4] = file;
-                row[5] = url;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebError");
+                row.Set(0, errorCode);
+                row.Set(1, subCode);
+                row.Set(2, (int)parentType);
+                row.Set(3, parent);
+                row.Set(4, file);
+                row.Set(5, url);
             }
         }
 
         /// <summary>
         /// Parses a web filter element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier of parent component.</param>
         /// <param name="parentWeb">Optional identifier of parent web site.</param>
-        private void ParseWebFilterElement(XElement node, string componentId, string parentWeb)
+        private void ParseWebFilterElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentWeb)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string description = null;
             int flags = 0;
             int loadOrder = CompilerConstants.IntegerNotSet;
             string name = null;
             string path = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Description":
-                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            description = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Flags":
-                            flags = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            flags = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "LoadOrder":
-                            string loadOrderValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string loadOrderValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < loadOrderValue.Length)
                             {
                                 switch (loadOrderValue)
@@ -1712,70 +1699,69 @@ namespace WixToolset.Extensions
                                         loadOrder = -1;
                                         break;
                                     default:
-                                        loadOrder = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
+                                        loadOrder = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
                                         break;
                                 }
                             }
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Path":
-                            path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            path = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "WebSite":
                             if (null != parentWeb)
                             {
-                                this.Core.OnMessage(IIsErrors.WebSiteAttributeUnderWebSite(sourceLineNumbers, node.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.WebSiteAttributeUnderWebSite(sourceLineNumbers, element.Name.LocalName));
                             }
 
-                            parentWeb = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebSite", parentWeb);
+                            parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebSite", parentWeb);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
             if (null == path)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Path"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Path"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsFilter");
-                row[0] = id;
-                row[1] = name;
-                row[2] = componentId;
-                row[3] = path;
-                row[4] = parentWeb;
-                row[5] = description;
-                row[6] = flags;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsFilter", id);
+                row.Set(1, name);
+                row.Set(2, componentId);
+                row.Set(3, path);
+                row.Set(4, parentWeb);
+                row.Set(5, description);
+                row.Set(6, flags);
                 if (CompilerConstants.IntegerNotSet != loadOrder)
                 {
-                    row[7] = loadOrder;
+                    row.Set(7, loadOrder);
                 }
             }
         }
@@ -1783,24 +1769,24 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses web log element.
         /// </summary>
-        /// <param name="node">Node to be parsed.</param>
-        private void ParseWebLogElement(XElement node)
+        /// <param name="element">Node to be parsed.</param>
+        private void ParseWebLogElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string type = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Type":
-                            string typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string typeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < typeValue.Length)
                             {
                                 switch (typeValue)
@@ -1821,84 +1807,83 @@ namespace WixToolset.Extensions
                                         type = "W3C Extended Log File Format";
                                         break;
                                     default:
-                                        this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "IIS", "NCSA", "none", "ODBC", "W3C"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Type", typeValue, "IIS", "NCSA", "none", "ODBC", "W3C"));
                                         break;
                                 }
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == type)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Type"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebLog");
-                row[0] = id;
-                row[1] = type;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebLog", id);
+                row.Set(1, type);
             }
         }
 
         /// <summary>
         /// Parses a web property element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
-        private void ParseWebPropertyElement(XElement node, string componentId)
+        private void ParseWebPropertyElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string value = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Value":
-                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            value = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
-            switch (id)
+            switch (id?.Id)
             {
                 case "ETagChangeNumber":
                 case "MaxGlobalBandwidth":
                     // Must specify a value for these
                     if (null == value)
                     {
-                        this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value", "Id", id));
+                        this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Value", "Id", id.Id));
                     }
                     break;
                 case "IIs5IsolationMode":
@@ -1906,54 +1891,53 @@ namespace WixToolset.Extensions
                     // Can't specify a value for these
                     if (null != value)
                     {
-                        this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Value", "Id", id));
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Value", "Id", id.Id));
                     }
                     break;
                 default:
-                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Id", id, "ETagChangeNumber", "IIs5IsolationMode", "LogInUTF8", "MaxGlobalBandwidth"));
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Id", id?.Id, "ETagChangeNumber", "IIs5IsolationMode", "LogInUTF8", "MaxGlobalBandwidth"));
                     break;
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsProperty");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = 0;
-                row[3] = value;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsProperty", id);
+                row.Set(1, componentId);
+                row.Set(2, 0);
+                row.Set(3, value);
             }
         }
 
         /// <summary>
         /// Parses a web service extension element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
-        private void ParseWebServiceExtensionElement(XElement node, string componentId)
+        private void ParseWebServiceExtensionElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int attributes = 0;
             string description = null;
             string file = null;
             string group = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Allow":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= 1;
                             }
@@ -1963,16 +1947,16 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "Description":
-                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            description = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "File":
-                            file = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            file = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Group":
-                            group = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            group = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "UIDeletable":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= 2;
                             }
@@ -1982,52 +1966,51 @@ namespace WixToolset.Extensions
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == file)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "File"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "File"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebServiceExtension");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = file;
-                row[3] = description;
-                row[4] = group;
-                row[5] = attributes;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebServiceExtension", id);
+                row.Set(1, componentId);
+                row.Set(2, file);
+                row.Set(3, description);
+                row.Set(4, group);
+                row.Set(5, attributes);
             }
         }
 
         /// <summary>
         /// Parses a web site element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Optional identifier of parent component.</param>
-        private void ParseWebSiteElement(XElement node, string componentId)
+        private void ParseWebSiteElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string application = null;
             int attributes = 0;
             int connectionTimeout = CompilerConstants.IntegerNotSet;
@@ -2040,22 +2023,22 @@ namespace WixToolset.Extensions
             int sequence = CompilerConstants.IntegerNotSet;
             int state = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "AutoStart":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 state = 2;
                             }
@@ -2067,10 +2050,10 @@ namespace WixToolset.Extensions
                         case "ConfigureIfExists":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes &= ~2;
                             }
@@ -2080,41 +2063,41 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "ConnectionTimeout":
-                            connectionTimeout = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            connectionTimeout = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "Description":
-                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            description = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Directory":
-                            directory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Directory", directory);
+                            directory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Directory", directory);
                             break;
                         case "DirProperties":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            dirProperties = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            dirProperties = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SiteId":
-                            siteId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            siteId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if ("*" == siteId)
                             {
                                 siteId = "-1";
                             }
                             break;
                         case "Sequence":
-                            sequence = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
+                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
                             break;
                         case "StartOnInstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
                             // when state is set to 2 it implies 1, so don't set it to 1
-                            if (2 != state && YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (2 != state && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 state = 1;
                             }
@@ -2126,71 +2109,71 @@ namespace WixToolset.Extensions
                         case "WebApplication":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            application = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            application = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "WebLog":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            log = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebLog", log);
+                            log = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebLog", log);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == description)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Description"));
             }
 
             if (null == directory && null != componentId)
             {
-                this.Core.OnMessage(IIsErrors.RequiredAttributeUnderComponent(sourceLineNumbers, node.Name.LocalName, "Directory"));
+                this.Messaging.Write(IIsErrors.RequiredAttributeUnderComponent(sourceLineNumbers, element.Name.LocalName, "Directory"));
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (XElement child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "CertificateRef":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseCertificateRefElement(child, id);
+                            this.ParseCertificateRefElement(intermediate, section, child, id?.Id);
                             break;
                         case "HttpHeader":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseHttpHeaderElement(child, HttpHeaderParentType.WebSite, id);
+                            this.ParseHttpHeaderElement(intermediate, section, child, HttpHeaderParentType.WebSite, id?.Id);
                             break;
                         case "WebAddress":
-                            string address = this.ParseWebAddressElement(child, id);
+                            string address = this.ParseWebAddressElement(intermediate, section, child, id?.Id);
                             if (null == keyAddress)
                             {
                                 keyAddress = address;
@@ -2199,279 +2182,278 @@ namespace WixToolset.Extensions
                         case "WebApplication":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
                             if (null != application)
                             {
-                                this.Core.OnMessage(IIsErrors.WebApplicationAlreadySpecified(childSourceLineNumbers, node.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.WebApplicationAlreadySpecified(childSourceLineNumbers, element.Name.LocalName));
                             }
 
-                            application = this.ParseWebApplicationElement(child);
+                            application = this.ParseWebApplicationElement(intermediate, section, child);
                             break;
                         case "WebDir":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseWebDirElement(child, componentId, id);
+                            this.ParseWebDirElement(intermediate, section, child, componentId, id?.Id);
                             break;
                         case "WebDirProperties":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            string childWebDirProperties = this.ParseWebDirPropertiesElement(child);
+                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child);
                             if (null == dirProperties)
                             {
                                 dirProperties = childWebDirProperties;
                             }
                             else
                             {
-                                this.Core.OnMessage(WixErrors.IllegalParentAttributeWhenNested(sourceLineNumbers, "WebSite", "DirProperties", child.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalParentAttributeWhenNested(sourceLineNumbers, "WebSite", "DirProperties", child.Name.LocalName));
                             }
                             break;
                         case "WebError":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseWebErrorElement(child, WebErrorParentType.WebSite, id);
+                            this.ParseWebErrorElement(intermediate, section, child, WebErrorParentType.WebSite, id?.Id);
                             break;
                         case "WebFilter":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseWebFilterElement(child, componentId, id);
+                            this.ParseWebFilterElement(intermediate, section, child, componentId, id?.Id);
                             break;
                         case "WebVirtualDir":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseWebVirtualDirElement(child, componentId, id, null);
+                            this.ParseWebVirtualDirElement(intermediate, section, child, componentId, id?.Id, null);
                             break;
                         case "MimeMap":
-                            this.ParseMimeMapElement(child, id, MimeMapParentType.WebSite);
+                            this.ParseMimeMapElement(intermediate, section, child, id?.Id, MimeMapParentType.WebSite);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
             }
 
 
             if (null == keyAddress)
             {
-                this.Core.OnMessage(WixErrors.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "WebAddress"));
+                this.Messaging.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, element.Name.LocalName, "WebAddress"));
             }
 
             if (null != application)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebApplication", application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebApplication", application);
             }
 
             if (null != dirProperties)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebDirProperties", dirProperties);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebDirProperties", dirProperties);
             }
 
             if (null != componentId)
             {
                 // Reference ConfigureIIs since nothing will happen without it
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebSite");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = description;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebSite", id);
+                row.Set(1, componentId);
+                row.Set(2, description);
                 if (CompilerConstants.IntegerNotSet != connectionTimeout)
                 {
-                    row[3] = connectionTimeout;
+                    row.Set(3, connectionTimeout);
                 }
-                row[4] = directory;
+                row.Set(4, directory);
                 if (CompilerConstants.IntegerNotSet != state)
                 {
-                    row[5] = state;
+                    row.Set(5, state);
                 }
 
                 if (0 != attributes)
                 {
-                    row[6] = attributes;
+                    row.Set(6, attributes);
                 }
-                row[7] = keyAddress;
-                row[8] = dirProperties;
-                row[9] = application;
+                row.Set(7, keyAddress);
+                row.Set(8, dirProperties);
+                row.Set(9, application);
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row[10] = sequence;
+                    row.Set(10, sequence);
                 }
-                row[11] = log;
-                row[12] = siteId;
+                row.Set(11, log);
+                row.Set(12, siteId);
             }
         }
 
         /// <summary>
         /// Parses a HTTP Header element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="parentType">Type of the parent.</param>
         /// <param name="parent">Id of the parent.</param>
-        private void ParseHttpHeaderElement(XElement node, HttpHeaderParentType parentType, string parent)
+        private void ParseHttpHeaderElement(Intermediate intermediate, IntermediateSection section, XElement element, HttpHeaderParentType parentType, string parent)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string headerName = null;
             string headerValue = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Name":
-                            headerName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            headerName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Value":
-                            headerValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            headerValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == headerName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
             else if (null == id)
             {
-                id = this.Core.CreateIdentifierFromFilename(headerName);
+                id = this.ParseHelper.CreateIdentifierFromFilename(headerName);
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "IIsHttpHeader", id);
-            row[1] = (int)parentType;
-            row[2] = parent;
-            row[3] = headerName;
-            row[4] = headerValue;
-            row[5] = 0;
-            row[6] = null;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsHttpHeader", id);
+            row.Set(1, (int)parentType);
+            row.Set(2, parent);
+            row.Set(3, headerName);
+            row.Set(4, headerValue);
+            row.Set(5, 0);
+            //row.Set(6, null);
         }
 
         /// <summary>
         /// Parses a virtual directory element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier of parent component.</param>
         /// <param name="parentWeb">Identifier of parent web site.</param>
         /// <param name="parentAlias">Alias of the parent web site.</param>
-        private void ParseWebVirtualDirElement(XElement node, string componentId, string parentWeb, string parentAlias)
+        private void ParseWebVirtualDirElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentWeb, string parentAlias)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string alias = null;
             string application = null;
             string directory = null;
             string dirProperties = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Alias":
-                            alias = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            alias = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Directory":
-                            directory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Directory", directory);
+                            directory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Directory", directory);
                             break;
                         case "DirProperties":
-                            dirProperties = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            dirProperties = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "WebApplication":
-                            application = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            application = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "WebSite":
                             if (null != parentWeb)
                             {
-                                this.Core.OnMessage(IIsErrors.WebSiteAttributeUnderWebSite(sourceLineNumbers, node.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.WebSiteAttributeUnderWebSite(sourceLineNumbers, element.Name.LocalName));
                             }
 
-                            parentWeb = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebSite", parentWeb);
+                            parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebSite", parentWeb);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == alias)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Alias"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Alias"));
             }
             else if (-1 != alias.IndexOf("\\", StringComparison.Ordinal))
             {
-                this.Core.OnMessage(IIsErrors.IllegalCharacterInAttributeValue(sourceLineNumbers, node.Name.LocalName, "Alias", alias, '\\'));
+                this.Messaging.Write(IIsErrors.IllegalCharacterInAttributeValue(sourceLineNumbers, element.Name.LocalName, "Alias", alias, '\\'));
             }
 
             if (null == directory)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Directory"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Directory"));
             }
 
             if (null == parentWeb)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "WebSite"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "WebSite"));
             }
 
             if (null == componentId)
             {
-                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(sourceLineNumbers, node.Name.LocalName));
+                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(sourceLineNumbers, element.Name.LocalName));
             }
 
             if (null != parentAlias)
@@ -2479,84 +2461,83 @@ namespace WixToolset.Extensions
                 alias = String.Concat(parentAlias, "/", alias);
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (XElement child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "WebApplication":
                             if (null != application)
                             {
-                                this.Core.OnMessage(IIsErrors.WebApplicationAlreadySpecified(childSourceLineNumbers, node.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.WebApplicationAlreadySpecified(childSourceLineNumbers, element.Name.LocalName));
                             }
 
-                            application = this.ParseWebApplicationElement(child);
+                            application = this.ParseWebApplicationElement(intermediate, section, child);
                             break;
                         case "WebDirProperties":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            string childWebDirProperties = this.ParseWebDirPropertiesElement(child);
+                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child);
                             if (null == dirProperties)
                             {
                                 dirProperties = childWebDirProperties;
                             }
                             else
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, child.Name.LocalName, "DirProperties", child.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, child.Name.LocalName, "DirProperties", child.Name.LocalName));
                             }
                             break;
 
                         case "WebError":
-                            this.ParseWebErrorElement(child, WebErrorParentType.WebVirtualDir, id);
+                            this.ParseWebErrorElement(intermediate, section, child, WebErrorParentType.WebVirtualDir, id?.Id);
                             break;
                         case "WebVirtualDir":
-                            this.ParseWebVirtualDirElement(child, componentId, parentWeb, alias);
+                            this.ParseWebVirtualDirElement(intermediate, section, child, componentId, parentWeb, alias);
                             break;
                         case "HttpHeader":
-                            this.ParseHttpHeaderElement(child, HttpHeaderParentType.WebVirtualDir, id);
+                            this.ParseHttpHeaderElement(intermediate, section, child, HttpHeaderParentType.WebVirtualDir, id?.Id);
                             break;
                         case "MimeMap":
-                            this.ParseMimeMapElement(child, id, MimeMapParentType.WebVirtualDir);
+                            this.ParseMimeMapElement(intermediate, section, child, id?.Id, MimeMapParentType.WebVirtualDir);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
             }
 
             if (null != dirProperties)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebDirProperties", dirProperties);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebDirProperties", dirProperties);
             }
 
             if (null != application)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "IIsWebApplication", application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebApplication", application);
             }
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "IIsWebVirtualDir");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = parentWeb;
-                row[3] = alias;
-                row[4] = directory;
-                row[5] = dirProperties;
-                row[6] = application;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebVirtualDir", id);
+                row.Set(1, componentId);
+                row.Set(2, parentWeb);
+                row.Set(3, alias);
+                row.Set(4, directory);
+                row.Set(5, dirProperties);
+                row.Set(6, application);
             }
         }
     }

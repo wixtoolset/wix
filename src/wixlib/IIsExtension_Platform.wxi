@@ -22,18 +22,18 @@
       <ProgressText Action="WriteIIS7ConfigChanges$(var.DeferredSuffix)">!(loc.WriteIIS7ConfigChanges)</ProgressText>
     </UI>
 
-    <CustomAction Id="ConfigureIIs$(var.Suffix)" BinaryKey="IIsSchedule$(var.Suffix)" DllEntry="ConfigureIIs" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigureIIsExec$(var.DeferredSuffix)" BinaryKey="IIsSchedule$(var.Suffix)" DllEntry="ConfigureIIsExec" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="StartMetabaseTransaction$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="StartMetabaseTransaction" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="RollbackMetabaseTransaction$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="RollbackMetabaseTransaction" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="CommitMetabaseTransaction$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="CommitMetabaseTransaction" Impersonate="no" Execute="commit" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="WriteMetabaseChanges$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="WriteMetabaseChanges" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureIIs$(var.Suffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="ConfigureIIs" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureIIsExec$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="ConfigureIIsExec" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="StartMetabaseTransaction$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="StartMetabaseTransaction" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="RollbackMetabaseTransaction$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="RollbackMetabaseTransaction" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="CommitMetabaseTransaction$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="CommitMetabaseTransaction" Impersonate="no" Execute="commit" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="WriteMetabaseChanges$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="WriteMetabaseChanges" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
-    <CustomAction Id="ConfigureIIs7Exec$(var.DeferredSuffix)" BinaryKey="IIsSchedule$(var.Suffix)" DllEntry="ConfigureIIs7Exec" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="StartIIS7ConfigTransaction$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="StartIIS7ConfigTransaction" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="RollbackIIS7ConfigTransaction$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="RollbackIIS7ConfigTransaction" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="CommitIIS7ConfigTransaction$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="CommitIIS7ConfigTransaction" Impersonate="no" Execute="commit" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="WriteIIS7ConfigChanges$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="WriteIIS7ConfigChanges" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureIIs7Exec$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="ConfigureIIs7Exec" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="StartIIS7ConfigTransaction$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="StartIIS7ConfigTransaction" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="RollbackIIS7ConfigTransaction$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="RollbackIIS7ConfigTransaction" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="CommitIIS7ConfigTransaction$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="CommitIIS7ConfigTransaction" Impersonate="no" Execute="commit" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="WriteIIS7ConfigChanges$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="WriteIIS7ConfigChanges" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
       <Custom Action="ConfigureIIs$(var.Suffix)" Before="RegisterUser" Overridable="yes">NOT SKIPCONFIGUREIIS AND VersionNT &gt; 400</Custom>
@@ -41,23 +41,22 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="IIsSchedule$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))scasched.dll" />
-    <Binary Id="IIsExecute$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))scaexec.dll" />
+    <Binary Id="IisCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))iisca.dll" />
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="InstallCertificates$(var.Suffix)" BinaryKey="IIsSchedule$(var.Suffix)" DllEntry="InstallCertificates" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="UninstallCertificates$(var.Suffix)" BinaryKey="IIsSchedule$(var.Suffix)" DllEntry="UninstallCertificates" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="InstallCertificates$(var.Suffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="InstallCertificates" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="UninstallCertificates$(var.Suffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="UninstallCertificates" Execute="immediate" Return="check" SuppressModularization="yes" />
 
-    <CustomAction Id="AddUserCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="AddUserCertificate" Impersonate="yes" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-    <CustomAction Id="AddMachineCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="AddMachineCertificate" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="DeleteUserCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="DeleteUserCertificate" Impersonate="yes" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-    <CustomAction Id="DeleteMachineCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="DeleteMachineCertificate" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="AddUserCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="AddUserCertificate" Impersonate="yes" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+    <CustomAction Id="AddMachineCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="AddMachineCertificate" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="DeleteUserCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="DeleteUserCertificate" Impersonate="yes" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+    <CustomAction Id="DeleteMachineCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="DeleteMachineCertificate" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
-    <CustomAction Id="RollbackAddUserCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="DeleteUserCertificate" Impersonate="yes" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-    <CustomAction Id="RollbackAddMachineCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="DeleteMachineCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="RollbackDeleteUserCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="AddUserCertificate" Impersonate="yes" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-    <CustomAction Id="RollbackDeleteMachineCertificate$(var.DeferredSuffix)" BinaryKey="IIsExecute$(var.Suffix)" DllEntry="AddMachineCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="RollbackAddUserCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="DeleteUserCertificate" Impersonate="yes" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+    <CustomAction Id="RollbackAddMachineCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="DeleteMachineCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="RollbackDeleteUserCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="AddUserCertificate" Impersonate="yes" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+    <CustomAction Id="RollbackDeleteMachineCertificate$(var.DeferredSuffix)" BinaryKey="IisCA$(var.Suffix)" DllEntry="AddMachineCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
       <Custom Action="UninstallCertificates$(var.Suffix)" Before="RemoveFiles" Overridable="yes">VersionNT &gt; 400</Custom>
