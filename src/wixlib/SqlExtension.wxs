@@ -24,13 +24,13 @@
         </UI>
 
         <!-- The SQL custom actions should impersonate the user because the user"s cridentials are used when connected to the database if none are provided -->
-        <CustomAction Id="InstallSqlData" BinaryKey="ScaSchedule2" DllEntry="InstallSqlData" Execute="immediate" Return="check" />
-        <CustomAction Id="UninstallSqlData" BinaryKey="ScaSchedule2" DllEntry="UninstallSqlData" Execute="immediate" Return="check" />
-        <CustomAction Id="CreateDatabase" BinaryKey="ScaExecute2" DllEntry="CreateDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="RollbackCreateDatabase" BinaryKey="ScaExecute2" DllEntry="DropDatabase" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="DropDatabase" BinaryKey="ScaExecute2" DllEntry="DropDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="ExecuteSqlStrings" BinaryKey="ScaExecute2" DllEntry="ExecuteSqlStrings" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
-        <CustomAction Id="RollbackExecuteSqlStrings" BinaryKey="ScaExecute2" DllEntry="ExecuteSqlStrings" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+        <CustomAction Id="InstallSqlData" BinaryKey="SqlCA" DllEntry="InstallSqlData" Execute="immediate" Return="check" />
+        <CustomAction Id="UninstallSqlData" BinaryKey="SqlCA" DllEntry="UninstallSqlData" Execute="immediate" Return="check" />
+        <CustomAction Id="CreateDatabase" BinaryKey="SqlCA" DllEntry="CreateDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+        <CustomAction Id="RollbackCreateDatabase" BinaryKey="SqlCA" DllEntry="DropDatabase" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+        <CustomAction Id="DropDatabase" BinaryKey="SqlCA" DllEntry="DropDatabase" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+        <CustomAction Id="ExecuteSqlStrings" BinaryKey="SqlCA" DllEntry="ExecuteSqlStrings" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
+        <CustomAction Id="RollbackExecuteSqlStrings" BinaryKey="SqlCA" DllEntry="ExecuteSqlStrings" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="UninstallSqlData" Before="RemoveFiles" Overridable="yes">NOT SKIPUNINSTALLSQLDATA AND VersionNT &gt; 400</Custom>
@@ -40,7 +40,6 @@
 
     <!-- Server Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="ScaSchedule2" SourceFile="scasched.dll" />
-        <Binary Id="ScaExecute2" SourceFile="scaexec.dll" />
+        <Binary Id="SqlCA" SourceFile="sqlca.dll" />
     </Fragment>
 </Wix>

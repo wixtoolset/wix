@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Sql
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace WixToolset.Extensions
     /// <summary>
     /// The compiler for the WiX Toolset SQL Server Extension.
     /// </summary>
-    public sealed class SqlCompiler : CompilerExtension
+    public sealed class SqlCompiler : BaseCompilerExtension
     {
         // sql database attributes definitions (from sca.h)
         internal const int DbCreateOnInstall = 0x00000001;
@@ -30,22 +30,17 @@ namespace WixToolset.Extensions
         internal const int SqlRollback = 0x00000008;
         internal const int SqlExecuteOnReinstall = 0x00000010;
 
-        /// <summary>
-        /// Instantiate a new SqlCompiler.
-        /// </summary>
-        public SqlCompiler()
-        {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/sql";
-        }
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/sql";
 
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>
-        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
+        /// <param name="intermediate"></param>
+        /// <param name="section"></param>
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
-        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        /// <param name="context">Extra information about the context in which this element is being parsed.</param>
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             switch (parentElement.Name.LocalName)
             {
@@ -56,16 +51,16 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "SqlDatabase":
-                            this.ParseSqlDatabaseElement(element, componentId);
+                            this.ParseSqlDatabaseElement(intermediate, section, element, componentId);
                             break;
                         case "SqlScript":
-                            this.ParseSqlScriptElement(element, componentId, null);
+                            this.ParseSqlScriptElement(intermediate, section, element, componentId, null);
                             break;
                         case "SqlString":
-                            this.ParseSqlStringElement(element, componentId, null);
+                            this.ParseSqlStringElement(intermediate, section, element, componentId, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
@@ -75,15 +70,15 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "SqlDatabase":
-                            this.ParseSqlDatabaseElement(element, null);
+                            this.ParseSqlDatabaseElement(intermediate, section, element, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
         }
@@ -91,36 +86,38 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses a sql database element
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="intermediate"></param>
+        /// <param name="section"></param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
-        private void ParseSqlDatabaseElement(XElement node, string componentId)
+        private void ParseSqlDatabaseElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int attributes = 0;
             string database = null;
-            string fileSpec = null;
+            Identifier fileSpec = null;
             string instance = null;
-            string logFileSpec = null;
+            Identifier logFileSpec = null;
             string server = null;
             string user = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "ConfirmOverwrite":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbConfirmOverwrite;
                             }
@@ -128,10 +125,10 @@ namespace WixToolset.Extensions
                         case "ContinueOnError":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbContinueOnError;
                             }
@@ -139,10 +136,10 @@ namespace WixToolset.Extensions
                         case "CreateOnInstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbCreateOnInstall;
                             }
@@ -150,10 +147,10 @@ namespace WixToolset.Extensions
                         case "CreateOnReinstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbCreateOnReinstall;
                             }
@@ -161,24 +158,24 @@ namespace WixToolset.Extensions
                         case "CreateOnUninstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbCreateOnUninstall;
                             }
                             break;
                         case "Database":
-                            database = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            database = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "DropOnInstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbDropOnInstall;
                             }
@@ -186,10 +183,10 @@ namespace WixToolset.Extensions
                         case "DropOnReinstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbDropOnReinstall;
                             }
@@ -198,142 +195,141 @@ namespace WixToolset.Extensions
                         case "DropOnUninstall":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DbDropOnUninstall;
                             }
                             break;
                         case "Instance":
-                            instance = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            instance = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Server":
-                            server = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            server = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "User":
-                            user = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            if (!this.Core.ContainsProperty(user))
+                            user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            if (!this.ParseHelper.ContainsProperty(user))
                             {
-                                user = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                                user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == database)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Database"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Database"));
             }
             else if (128 < database.Length)
             {
-                this.Core.OnMessage(WixErrors.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Database", database, 128));
+                this.Messaging.Write(ErrorMessages.IdentifierTooLongError(sourceLineNumbers, element.Name.LocalName, "Database", database, 128));
             }
 
             if (null == server)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Server"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Server"));
             }
 
             if (0 == attributes && null != componentId)
             {
-                this.Core.OnMessage(SqlErrors.OneOfAttributesRequiredUnderComponent(sourceLineNumbers, node.Name.LocalName, "CreateOnInstall", "CreateOnUninstall", "DropOnInstall", "DropOnUninstall"));
+                this.Messaging.Write(SqlErrors.OneOfAttributesRequiredUnderComponent(sourceLineNumbers, element.Name.LocalName, "CreateOnInstall", "CreateOnUninstall", "DropOnInstall", "DropOnUninstall"));
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (XElement child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "SqlScript":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseSqlScriptElement(child, componentId, id);
+                            this.ParseSqlScriptElement(intermediate, section, child, componentId, id.Id);
                             break;
                         case "SqlString":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseSqlStringElement(child, componentId, id);
+                            this.ParseSqlStringElement(intermediate, section, child, componentId, id.Id);
                             break;
                         case "SqlFileSpec":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
                             else if (null != fileSpec)
                             {
-                                this.Core.OnMessage(WixErrors.TooManyElements(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, 1));
+                                this.Messaging.Write(ErrorMessages.TooManyElements(sourceLineNumbers, element.Name.LocalName, child.Name.LocalName, 1));
                             }
 
-                            fileSpec = this.ParseSqlFileSpecElement(child);
+                            fileSpec = this.ParseSqlFileSpecElement(intermediate, section, child);
                             break;
                         case "SqlLogFileSpec":
                             if (null == componentId)
                             {
-                                this.Core.OnMessage(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
+                                this.Messaging.Write(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
                             else if (null != logFileSpec)
                             {
-                                this.Core.OnMessage(WixErrors.TooManyElements(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, 1));
+                                this.Messaging.Write(ErrorMessages.TooManyElements(sourceLineNumbers, element.Name.LocalName, child.Name.LocalName, 1));
                             }
 
-                            logFileSpec = this.ParseSqlFileSpecElement(child);
+                            logFileSpec = this.ParseSqlFileSpecElement(intermediate, section, child);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
                 }
             }
 
             if (null != componentId)
             {
                 // Reference InstallSqlData and UninstallSqlData since nothing will happen without it
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "InstallSqlData");
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "UninstallSqlData");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallSqlData");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallSqlData");
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "SqlDatabase");
-                row[0] = id;
-                row[1] = server;
-                row[2] = instance;
-                row[3] = database;
-                row[4] = componentId;
-                row[5] = user;
-                row[6] = fileSpec;
-                row[7] = logFileSpec;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlDatabase", id);
+                row.Set(1, server);
+                row.Set(2, instance);
+                row.Set(3, database);
+                row.Set(4, componentId);
+                row.Set(5, user);
+                row.Set(6, fileSpec.Id);
+                row.Set(7, logFileSpec.Id);
                 if (0 != attributes)
                 {
-                    row[8] = attributes;
+                    row.Set(8, attributes);
                 }
             }
         }
@@ -341,89 +337,90 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses a sql file specification element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="intermediate"></param>
+        /// <param name="section"></param>
+        /// <param name="element">Element to parse.</param>
         /// <returns>Identifier of sql file specification.</returns>
-        private string ParseSqlFileSpecElement(XElement node)
+        private Identifier ParseSqlFileSpecElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             string fileName = null;
             string growthSize = null;
             string maxSize = null;
             string name = null;
             string size = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Filename":
-                            fileName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            fileName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Size":
-                            size = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            size = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MaxSize":
-                            maxSize = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            maxSize = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "GrowthSize":
-                            growthSize = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            growthSize = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == name)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
             if (null == fileName)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Filename"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Filename"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "SqlFileSpec");
-                row[0] = id;
-                row[1] = name;
-                row[2] = fileName;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlFileSpec", id);
+                row.Set(1, name);
+                row.Set(2, fileName);
                 if (null != size)
                 {
-                    row[3] = size;
+                    row.Set(3, size);
                 }
 
                 if (null != maxSize)
                 {
-                    row[4] = maxSize;
+                    row.Set(4, maxSize);
                 }
 
                 if (null != growthSize)
                 {
-                    row[5] = growthSize;
+                    row.Set(5, growthSize);
                 }
             }
 
@@ -433,13 +430,13 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses a sql script element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
         /// <param name="sqlDb">Optional database to execute script against.</param>
-        private void ParseSqlScriptElement(XElement node, string componentId, string sqlDb)
+        private void ParseSqlScriptElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string sqlDb)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int attributes = 0;
             bool rollbackAttribute = false;
             bool nonRollbackAttribute = false;
@@ -447,38 +444,38 @@ namespace WixToolset.Extensions
             int sequence = CompilerConstants.IntegerNotSet;
             string user = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "BinaryKey":
-                            binary = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", binary);
+                            binary = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Binary", binary);
                             break;
                         case "Sequence":
-                            sequence = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
+                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
                             break;
                         case "SqlDb":
                             if (null != sqlDb)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, element.Parent.Name.LocalName));
                             }
-                            sqlDb = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "SqlDatabase", sqlDb);
+                            sqlDb = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "SqlDatabase", sqlDb);
                             break;
                         case "User":
-                            user = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
 
                         // Flag-setting attributes
                         case "ContinueOnError":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlContinueOnError;
                             }
@@ -486,11 +483,11 @@ namespace WixToolset.Extensions
                         case "ExecuteOnInstall":
                             if (rollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
                             }
                             nonRollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnInstall;
                             }
@@ -498,11 +495,11 @@ namespace WixToolset.Extensions
                         case "ExecuteOnReinstall":
                             if (rollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
                             }
                             nonRollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnReinstall;
                             }
@@ -510,11 +507,11 @@ namespace WixToolset.Extensions
                         case "ExecuteOnUninstall":
                             if (rollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
                             }
                             nonRollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnUninstall;
                             }
@@ -522,11 +519,11 @@ namespace WixToolset.Extensions
                         case "RollbackOnInstall":
                             if (nonRollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
                             }
                             rollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnInstall;
                                 attributes |= SqlRollback;
@@ -535,11 +532,11 @@ namespace WixToolset.Extensions
                         case "RollbackOnReinstall":
                             if (nonRollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
                             }
                             rollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnReinstall;
                                 attributes |= SqlRollback;
@@ -548,65 +545,64 @@ namespace WixToolset.Extensions
                         case "RollbackOnUninstall":
                             if (nonRollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
                             }
                             rollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnUninstall;
                                 attributes |= SqlRollback;
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == binary)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BinaryKey"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "BinaryKey"));
             }
 
             if (null == sqlDb)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SqlDb"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "SqlDb"));
             }
 
             if (0 == attributes)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall", "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall", "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallSqlData and UninstallSqlData since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "InstallSqlData");
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "UninstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallSqlData");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "SqlScript");
-                row[0] = id;
-                row[1] = sqlDb;
-                row[2] = componentId;
-                row[3] = binary;
-                row[4] = user;
-                row[5] = attributes;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlScript", id);
+                row.Set(1, sqlDb);
+                row.Set(2, componentId);
+                row.Set(3, binary);
+                row.Set(4, user);
+                row.Set(5, attributes);
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row[6] = sequence;
+                    row.Set(6, sequence);
                 }
             }
         }
@@ -614,13 +610,13 @@ namespace WixToolset.Extensions
         /// <summary>
         /// Parses a sql string element.
         /// </summary>
-        /// <param name="node">Element to parse.</param>
+        /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
         /// <param name="sqlDb">Optional database to execute string against.</param>
-        private void ParseSqlStringElement(XElement node, string componentId, string sqlDb)
+        private void ParseSqlStringElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string sqlDb)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
             int attributes = 0;
             bool rollbackAttribute = false;
             bool nonRollbackAttribute = false;
@@ -628,17 +624,17 @@ namespace WixToolset.Extensions
             string sql = null;
             string user = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (XAttribute attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "ContinueOnError":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlContinueOnError;
                             }
@@ -646,11 +642,11 @@ namespace WixToolset.Extensions
                         case "ExecuteOnInstall":
                             if (rollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
                             }
                             nonRollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnInstall;
                             }
@@ -658,11 +654,11 @@ namespace WixToolset.Extensions
                         case "ExecuteOnReinstall":
                             if (rollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
                             }
                             nonRollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnReinstall;
                             }
@@ -670,11 +666,11 @@ namespace WixToolset.Extensions
                         case "ExecuteOnUninstall":
                             if (rollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
                             }
                             nonRollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnUninstall;
                             }
@@ -682,11 +678,11 @@ namespace WixToolset.Extensions
                         case "RollbackOnInstall":
                             if (nonRollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
                             }
                             rollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnInstall;
                                 attributes |= SqlRollback;
@@ -695,11 +691,11 @@ namespace WixToolset.Extensions
                         case "RollbackOnReinstall":
                             if (nonRollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
                             }
                             rollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnReinstall;
                                 attributes |= SqlRollback;
@@ -708,84 +704,83 @@ namespace WixToolset.Extensions
                         case "RollbackOnUninstall":
                             if (nonRollbackAttribute)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall"));
                             }
                             rollbackAttribute = true;
 
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= SqlExecuteOnUninstall;
                                 attributes |= SqlRollback;
                             }
                             break;
                         case "Sequence":
-                            sequence = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
+                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
                             break;
                         case "SQL":
-                            sql = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            sql = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SqlDb":
                             if (null != sqlDb)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "SqlDb", "SqlDatabase"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "SqlDb", "SqlDatabase"));
                             }
 
-                            sqlDb = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "SqlDatabase", sqlDb);
+                            sqlDb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "SqlDatabase", sqlDb);
                             break;
                         case "User":
-                            user = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
                 }
             }
 
             if (null == id)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
             if (null == sql)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SQL"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "SQL"));
             }
 
             if (null == sqlDb)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SqlDb"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "SqlDb"));
             }
 
             if (0 == attributes)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall", "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "ExecuteOnInstall", "ExecuteOnReinstall", "ExecuteOnUninstall", "RollbackOnInstall", "RollbackOnReinstall", "RollbackOnUninstall"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallSqlData and UninstallSqlData since nothing will happen without it
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "InstallSqlData");
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "UninstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallSqlData");
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "SqlString");
-                row[0] = id;
-                row[1] = sqlDb;
-                row[2] = componentId;
-                row[3] = sql;
-                row[4] = user;
-                row[5] = attributes;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlString", id);
+                row.Set(1, sqlDb);
+                row.Set(2, componentId);
+                row.Set(3, sql);
+                row.Set(4, user);
+                row.Set(5, attributes);
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row[6] = sequence;
+                    row.Set(6, sequence);
                 }
             }
         }
