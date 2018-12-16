@@ -4,4 +4,10 @@
 LIBRARY      "sqlca"
 
 EXPORTS
-	
+;scaexec.cpp
+    CreateDatabase
+    DropDatabase
+    ExecuteSqlStrings
+;scasql.cpp	
+    InstallSqlData
+    UninstallSqlData

@@ -45,11 +45,22 @@
     <ClCompile Include="dllmain.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="scadb.cpp" />
+    <ClCompile Include="scaexec.cpp" />
+    <ClCompile Include="scasql.cpp" />
+    <ClCompile Include="scasqlstr.cpp" />
+    <ClCompile Include="scauser.cpp" />
     <ClCompile Include="sqlca.cpp" />
   </ItemGroup>
 
   <ItemGroup>
+    <ClInclude Include="CustomMsiErrors.h" />
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="sca.h" />
+    <ClInclude Include="scacost.h" />
+    <ClInclude Include="scadb.h" />
+    <ClInclude Include="scasqlstr.h" />
+    <ClInclude Include="scauser.h" />
   </ItemGroup>
 
   <ItemGroup>
