@@ -63,7 +63,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixFailWhenDeferred" BinaryKey="WixCA" DllEntry="WixFailWhenDeferred" Execute="deferred" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixFailWhenDeferred" BinaryKey="UtilCA" DllEntry="WixFailWhenDeferred" Execute="deferred" Return="check" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixFailWhenDeferred" Before="InstallFinalize" Overridable="yes">WIXFAILWHENDEFERRED=1 AND VersionNT &gt; 400</Custom>
@@ -71,7 +71,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixWaitForEvent" BinaryKey="WixCA" DllEntry="WixWaitForEvent" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixWaitForEvent" BinaryKey="UtilCA" DllEntry="WixWaitForEvent" Execute="immediate" Return="check" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixWaitForEvent" Before="InstallFinalize" Overridable="yes" />
@@ -79,7 +79,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixWaitForEventDeferred" BinaryKey="WixCA" DllEntry="WixWaitForEvent" Execute="deferred" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixWaitForEventDeferred" BinaryKey="UtilCA" DllEntry="WixWaitForEvent" Execute="deferred" Return="check" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixWaitForEventDeferred" After="InstallInitialize" Overridable="yes" />
@@ -87,7 +87,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixExitEarlyWithSuccess" BinaryKey="WixCA" DllEntry="WixExitEarlyWithSuccess" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixExitEarlyWithSuccess" BinaryKey="UtilCA" DllEntry="WixExitEarlyWithSuccess" Execute="immediate" Return="check" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixExitEarlyWithSuccess" After="FindRelatedProducts" Overridable="yes">NEWERVERSIONDETECTED AND VersionNT &gt; 400</Custom>
@@ -95,7 +95,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixRemoveFoldersEx" BinaryKey="WixCA" DllEntry="WixRemoveFoldersEx" Execute="immediate" Return="ignore" />
+        <CustomAction Id="WixRemoveFoldersEx" BinaryKey="UtilCA" DllEntry="WixRemoveFoldersEx" Execute="immediate" Return="ignore" />
         
         <InstallExecuteSequence>
             <Custom Action="WixRemoveFoldersEx" Before="CostInitialize" />
@@ -103,7 +103,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixBroadcastSettingChange" BinaryKey="WixCA" DllEntry="WixBroadcastSettingChange" Execute="immediate" Return="ignore" SuppressModularization="yes" />
+        <CustomAction Id="WixBroadcastSettingChange" BinaryKey="UtilCA" DllEntry="WixBroadcastSettingChange" Execute="immediate" Return="ignore" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixBroadcastSettingChange" After="InstallFinalize" Overridable="yes" />
@@ -111,7 +111,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixBroadcastEnvironmentChange" BinaryKey="WixCA" DllEntry="WixBroadcastEnvironmentChange" Execute="immediate" Return="ignore" SuppressModularization="yes" />
+        <CustomAction Id="WixBroadcastEnvironmentChange" BinaryKey="UtilCA" DllEntry="WixBroadcastEnvironmentChange" Execute="immediate" Return="ignore" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixBroadcastEnvironmentChange" After="InstallFinalize" Overridable="yes" />
@@ -120,7 +120,7 @@
 
     <!-- WiX OS-detection properties and custom action -->
     <Fragment>
-        <CustomAction Id="WixQueryOsInfo" BinaryKey="WixCA" DllEntry="WixQueryOsInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixQueryOsInfo" BinaryKey="UtilCA" DllEntry="WixQueryOsInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
         
         <InstallExecuteSequence>
             <Custom Action="WixQueryOsInfo" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
@@ -213,7 +213,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixQueryOsDirs" BinaryKey="WixCA" DllEntry="WixQueryOsDirs" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixQueryOsDirs" BinaryKey="UtilCA" DllEntry="WixQueryOsDirs" Execute="firstSequence" Return="check" SuppressModularization="yes" />
         
         <InstallExecuteSequence>
             <Custom Action="WixQueryOsDirs" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
@@ -318,7 +318,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixQueryOsWellKnownSID" BinaryKey="WixCA" DllEntry="WixQueryOsWellKnownSID" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="WixQueryOsWellKnownSID" BinaryKey="UtilCA" DllEntry="WixQueryOsWellKnownSID" Execute="firstSequence" Return="check" SuppressModularization="yes" />
 
         <InstallExecuteSequence>
             <Custom Action="WixQueryOsWellKnownSID" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
@@ -360,7 +360,7 @@
     </Fragment>
 
     <Fragment>
-      <CustomAction Id="WixQueryOsDriverInfo" BinaryKey="WixCA" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
+      <CustomAction Id="WixQueryOsDriverInfo" BinaryKey="UtilCA" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" />
 
       <InstallExecuteSequence>
         <Custom Action="WixQueryOsDriverInfo" After="AppSearch" Overridable="yes">VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)</Custom>
@@ -384,47 +384,47 @@
     <!-- ShellExec custom actions (for when only one is needed; multiple executions need their own IDs) --> 
     <Fragment>
         <PropertyRef Id="WixShellExecBinaryId" />
-        <CustomAction Id="WixShellExecBinary" BinaryKey="WixCA" DllEntry="WixShellExecBinary" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixShellExecBinary" BinaryKey="UtilCA" DllEntry="WixShellExecBinary" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="WixShellExecTarget" />
-        <CustomAction Id="WixShellExec" BinaryKey="WixCA" DllEntry="WixShellExec" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixShellExec" BinaryKey="UtilCA" DllEntry="WixShellExec" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="WixUnelevatedShellExecTarget" />
-        <CustomAction Id="WixUnelevatedShellExec" BinaryKey="WixCA" DllEntry="WixUnelevatedShellExec" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixUnelevatedShellExec" BinaryKey="UtilCA" DllEntry="WixUnelevatedShellExec" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="QtExecCmdLine" />
-        <CustomAction Id="QtExec" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="QtExec" BinaryKey="UtilCA" DllEntry="CAQuietExec" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="QtExec64CmdLine" />
-        <CustomAction Id="QtExec64" BinaryKey="WixCA" DllEntry="CAQuietExec64" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="QtExec64" BinaryKey="UtilCA" DllEntry="CAQuietExec64" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="WixQuietExecCmdLine" />
-        <CustomAction Id="WixQuietExec" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixQuietExec" BinaryKey="UtilCA" DllEntry="WixQuietExec" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="WixQuietExec64CmdLine" />
-        <CustomAction Id="WixQuietExec64" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixQuietExec64" BinaryKey="UtilCA" DllEntry="WixQuietExec64" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <!-- SilentExec custom actions differ from QtExec in that they do not log the commandline or output of the exe -->
     <Fragment>
         <PropertyRef Id="WixSilentExecCmdLine" />
-        <CustomAction Id="WixSilentExec" BinaryKey="WixCA" DllEntry="WixSilentExec" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixSilentExec" BinaryKey="UtilCA" DllEntry="WixSilentExec" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 
     <Fragment>
         <PropertyRef Id="WixSilentExec64CmdLine" />
-        <CustomAction Id="WixSilentExec64" BinaryKey="WixCA" DllEntry="WixSilentExec64" Execute="immediate" Return="check" Impersonate="yes" />
+        <CustomAction Id="WixSilentExec64" BinaryKey="UtilCA" DllEntry="WixSilentExec64" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
 </Wix>

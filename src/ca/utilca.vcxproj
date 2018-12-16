@@ -38,18 +38,51 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>activeds.lib;adsiid.lib;msi.lib;netapi32.lib;shlwapi.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
+    <ClCompile Include="BroadcastSettingChange.cpp" />
+    <ClCompile Include="CheckReboot.cpp" />
+    <ClCompile Include="CloseApps.cpp" />
     <ClCompile Include="dllmain.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="exitearlywithsuccess.cpp" />
+    <ClCompile Include="FormatFiles.cpp" />
+    <ClCompile Include="netshortcuts.cpp" />
+    <ClCompile Include="OsInfo.cpp" />
+    <ClCompile Include="qtexecca.cpp" />
+    <ClCompile Include="RemoveFoldersEx.cpp" />
+    <ClCompile Include="RestartManager.cpp" />
+    <ClCompile Include="scaexec.cpp" />
+    <ClCompile Include="scamanifest.cpp" />
+    <ClCompile Include="scaperf.cpp" />
+    <ClCompile Include="scaperfexec.cpp" />
+    <ClCompile Include="scasched.cpp" />
+    <ClCompile Include="scasmbexec.cpp" />
+    <ClCompile Include="scasmbsched.cpp" />
+    <ClCompile Include="scauser.cpp" />
+    <ClCompile Include="secureobj.cpp" />
+    <ClCompile Include="serviceconfig.cpp" />
+    <ClCompile Include="shellexecca.cpp" />
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="TouchFile.cpp" />
     <ClCompile Include="utilca.cpp" />
+    <ClCompile Include="XmlConfig.cpp" />
+    <ClCompile Include="XmlFile.cpp" />
   </ItemGroup>
 
   <ItemGroup>
+    <ClInclude Include="caSuffix.h" />
+    <ClInclude Include="cost.h" />
+    <ClInclude Include="CustomMsiErrors.h" />
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="sca.h" />
+    <ClInclude Include="scacost.h" />
+    <ClInclude Include="scasmb.h" />
+    <ClInclude Include="scasmbexec.h" />
+    <ClInclude Include="scauser.h" />
   </ItemGroup>
 
   <ItemGroup>

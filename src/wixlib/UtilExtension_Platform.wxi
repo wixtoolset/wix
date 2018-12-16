@@ -31,7 +31,7 @@
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="WixRegisterRestartResources$(var.Suffix)" BinaryKey="WixCA" DllEntry="WixRegisterRestartResources$(var.Suffix)" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="WixRegisterRestartResources$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixRegisterRestartResources$(var.Suffix)" Execute="immediate" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
       <Custom Action="WixRegisterRestartResources$(var.Suffix)" Before="InstallValidate" Overridable="yes" />
