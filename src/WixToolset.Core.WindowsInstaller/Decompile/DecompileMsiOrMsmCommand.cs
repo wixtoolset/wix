@@ -36,6 +36,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 using (var database = new Database(this.Context.DecompilePath, OpenDatabase.ReadOnly))
                 {
+                    // Delete the directory and its files to prevent cab extraction failure due to an existing file.
+                    if (Directory.Exists(this.Context.ExtractFolder))
+                    {
+                        Directory.Delete(this.Context.ExtractFolder, true);
+                    }
+
                     var unbindCommand = new UnbindDatabaseCommand(this.Messaging, database, this.Context.DecompilePath, this.Context.DecompileType, this.Context.ExtractFolder, this.Context.IntermediateFolder, this.Context.IsAdminImage, false, skipSummaryInfo: false);
                     var output = unbindCommand.Execute();
                     var extractedFilePaths = new List<string>(unbindCommand.ExportedFiles);

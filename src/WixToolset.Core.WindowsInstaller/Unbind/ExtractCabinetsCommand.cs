@@ -121,12 +121,6 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // extract the cabinet files
             if (0 < cabinetFiles.Count)
             {
-                // delete the directory and its files to prevent cab extraction due to an existing file
-                if (Directory.Exists(this.ExportBasePath))
-                {
-                    Directory.Delete(this.ExportBasePath, true);
-                }
-
                 // ensure the directory exists or extraction will fail
                 Directory.CreateDirectory(this.ExportBasePath);
 
