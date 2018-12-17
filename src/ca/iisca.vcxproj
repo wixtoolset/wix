@@ -38,7 +38,7 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>crypt32.lib;msi.lib;Ws2_32.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,10 +46,87 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="iisca.cpp" />
+    <ClCompile Include="scaapppool.cpp" />
+    <ClCompile Include="scaapppool7.cpp" />
+    <ClCompile Include="scacert.cpp" />
+    <ClCompile Include="scacertexec.cpp" />
+    <ClCompile Include="scaexec.cpp" />
+    <ClCompile Include="scaexecIIS7.cpp" />
+    <ClCompile Include="scafilter.cpp" />
+    <ClCompile Include="scafilter7.cpp" />
+    <ClCompile Include="scahttpheader.cpp" />
+    <ClCompile Include="scahttpheader7.cpp" />
+    <ClCompile Include="scaiis.cpp" />
+    <ClCompile Include="scaiis7.cpp" />
+    <ClCompile Include="scamimemap.cpp" />
+    <ClCompile Include="scamimemap7.cpp" />
+    <ClCompile Include="scaproperty.cpp" />
+    <ClCompile Include="scaproperty7.cpp" />
+    <ClCompile Include="scasched.cpp" />
+    <ClCompile Include="scassl.cpp" />
+    <ClCompile Include="scassl7.cpp" />
+    <ClCompile Include="scauser.cpp" />
+    <ClCompile Include="scavdir.cpp" />
+    <ClCompile Include="scavdir7.cpp" />
+    <ClCompile Include="scaweb.cpp" />
+    <ClCompile Include="scaweb7.cpp" />
+    <ClCompile Include="scawebapp.cpp" />
+    <ClCompile Include="scawebapp7.cpp" />
+    <ClCompile Include="scawebappext.cpp" />
+    <ClCompile Include="scawebappext7.cpp" />
+    <ClCompile Include="scawebdir.cpp" />
+    <ClCompile Include="scawebdir7.cpp" />
+    <ClCompile Include="scaweberr.cpp" />
+    <ClCompile Include="scaweberr7.cpp" />
+    <ClCompile Include="scaweblog.cpp" />
+    <ClCompile Include="scaweblog7.cpp" />
+    <ClCompile Include="scawebprop.cpp" />
+    <ClCompile Include="scawebprop7.cpp" />
+    <ClCompile Include="scawebsvcext.cpp" />
+    <ClCompile Include="scawebsvcext7.cpp" />
   </ItemGroup>
 
   <ItemGroup>
+    <ClInclude Include="caSuffix.h" />
+    <ClInclude Include="CustomMsiErrors.h" />
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="sca.h" />
+    <ClInclude Include="scaapppool.h" />
+    <ClInclude Include="scaapppool7.h" />
+    <ClInclude Include="scacert.h" />
+    <ClInclude Include="scacost.h" />
+    <ClInclude Include="scaexecIIS7.h" />
+    <ClInclude Include="scafilter.h" />
+    <ClInclude Include="scafilter7.h" />
+    <ClInclude Include="scahttpheader.h" />
+    <ClInclude Include="scahttpheader7.h" />
+    <ClInclude Include="scaiis.h" />
+    <ClInclude Include="scaiis7.h" />
+    <ClInclude Include="scamimemap.h" />
+    <ClInclude Include="scamimemap7.h" />
+    <ClInclude Include="scaproperty.h" />
+    <ClInclude Include="scaproperty7.h" />
+    <ClInclude Include="scassl.h" />
+    <ClInclude Include="scassl7.h" />
+    <ClInclude Include="scauser.h" />
+    <ClInclude Include="scavdir.h" />
+    <ClInclude Include="scavdir7.h" />
+    <ClInclude Include="scaweb.h" />
+    <ClInclude Include="scaweb7.h" />
+    <ClInclude Include="scawebapp.h" />
+    <ClInclude Include="scawebapp7.h" />
+    <ClInclude Include="scawebappext.h" />
+    <ClInclude Include="scawebappext7.h" />
+    <ClInclude Include="scawebdir.h" />
+    <ClInclude Include="scawebdir7.h" />
+    <ClInclude Include="scaweberr.h" />
+    <ClInclude Include="scaweberr7.h" />
+    <ClInclude Include="scaweblog.h" />
+    <ClInclude Include="scaweblog7.h" />
+    <ClInclude Include="scawebprop.h" />
+    <ClInclude Include="scawebprop7.h" />
+    <ClInclude Include="scawebsvcext.h" />
+    <ClInclude Include="scawebsvcext7.h" />
   </ItemGroup>
 
   <ItemGroup>
