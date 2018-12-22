@@ -13,7 +13,7 @@ namespace WixToolsetTest.BuildTasks
 
     public class WixBuildTaskFixture
     {
-        [Fact(Skip = "Re-enable when our assemblies are correctly copied together so they can be loaded by MSBuild via wix.targets")]
+        [Fact]
         public void CanBuildSimpleMsiPackage()
         {
             var folder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
