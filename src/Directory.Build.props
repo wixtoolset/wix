@@ -17,6 +17,7 @@
     <Authors>WiX Toolset Team</Authors>
     <Company>WiX Toolset</Company>
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
+    <PackageLicenseExpression>MS-RL</PackageLicenseExpression>
     <Product>WiX Toolset</Product>
   </PropertyGroup>
 
