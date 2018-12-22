@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!--
+  Do NOT modify this file. Update the canonical version in Home\repo-template\src\Directory.Build.targets
+  then update all of the repos.
+-->
+<!--
+  Replace PackageReferences with ProjectReferences when the projects can be found in .sln.
+  See the original here: https://github.com/dotnet/sdk/issues/1151#issuecomment-385133284
+-->
+<Project>
+  <PropertyGroup>
+    <ReplacePackageReferences>true</ReplacePackageReferences>
+    <TheSolutionPath Condition=" '$(NCrunch)'=='' ">$(SolutionPath)</TheSolutionPath>
+    <TheSolutionPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalSolutionPath)</TheSolutionPath>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="$(ReplacePackageReferences) AND '$(TheSolutionPath)' != '' AND '$(TheSolutionPath)' != '*undefined*' AND Exists('$(TheSolutionPath)')">
+
+      <PropertyGroup>
+        <SolutionFileContent>$([System.IO.File]::ReadAllText($(TheSolutionPath)))</SolutionFileContent>
+        <SmartSolutionDir>$([System.IO.Path]::GetDirectoryName( $(TheSolutionPath) ))</SmartSolutionDir>
+        <RegexPattern>(?&lt;="[PackageName]", ")(.*)(?=", ")</RegexPattern>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <!-- Keep the identity of the PackageReference -->
+        <SmartPackageReference Include="@(PackageReference)">
+          <PackageName>%(Identity)</PackageName>
+          <InSolution>$(SolutionFileContent.Contains('\%(Identity).csproj'))</InSolution>
+        </SmartPackageReference>
+
+        <!-- Filter them by mapping them to another ItemGroup using the WithMetadataValue item function -->
+        <PackageInSolution Include="@(SmartPackageReference->WithMetadataValue('InSolution', True))">
+          <Pattern>$(RegexPattern.Replace('[PackageName]','%(PackageName)') )</Pattern>
+          <SmartPath>$([System.Text.RegularExpressions.Regex]::Match('$(SolutionFileContent)', '%(Pattern)'))</SmartPath>
+        </PackageInSolution>
+
+        <ProjectReference  Include="@(PackageInSolution->'$(SmartSolutionDir)\%(SmartPath)' )"/>
+
+        <!-- Remove the package references that are now referenced as projects -->
+        <PackageReference Remove="@(PackageInSolution->'%(PackageName)' )"/>
+      </ItemGroup>
+
+    </When>
+  </Choose>
+</Project>
