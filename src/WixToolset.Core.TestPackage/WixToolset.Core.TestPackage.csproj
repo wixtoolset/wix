@@ -22,6 +22,15 @@
     <_PackageFiles Include="$(OutputPath)\WixToolset.Core.WindowsInstaller.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
   </ItemGroup>
 
+  <!--
+    These package references duplicate the dependencies in WixToolset.Core.csproj to ensure
+    WixToolset.Core.dll's dependencies are referenced by this test .nupkg.
+  -->
+  <ItemGroup>
+    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.5.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />

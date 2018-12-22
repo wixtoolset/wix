@@ -16,6 +16,10 @@
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
   </ItemGroup>
 
+  <!--
+    These package references are duplicated in WixToolset.Core.TestPackage.csproj. If
+    you update these here, be sure to update them there.
+  -->
   <ItemGroup>
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.5.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
