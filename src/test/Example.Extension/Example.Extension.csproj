@@ -13,8 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj') " />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
   </ItemGroup>
 
 </Project>
