@@ -29,8 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WixToolsetRootFolder)\Core\src\WixToolset.Core.TestPackage\WixToolset.Core.TestPackage.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Core\README.md') " />
-    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Core\README.md') " />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>
