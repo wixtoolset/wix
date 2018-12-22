@@ -10,7 +10,7 @@
     <EnableSourceLink Condition=" '$(NCrunch)' == '1' ">false</EnableSourceLink>
 
     <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)..\build\</BaseOutputPath>
+    <BaseOutputPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</BaseOutputPath>
     <BaseIntermediateOutputPath>$(BaseOutputPath)obj\$(ProjectName)\</BaseIntermediateOutputPath>
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
 
@@ -18,10 +18,6 @@
     <Company>WiX Toolset</Company>
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
     <Product>WiX Toolset</Product>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <WixToolsetRootFolder>$(MSBuildThisFileDirectory)..\..\</WixToolsetRootFolder>
   </PropertyGroup>
 
   <Import Project="Cpp.Build.props" Condition=" '$(MSBuildProjectExtension)'=='.vcxproj' " />
