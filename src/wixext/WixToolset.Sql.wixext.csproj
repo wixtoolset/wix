@@ -19,11 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WixToolsetRootFolder)\Data\src\WixToolset.Data\WixToolset.Data.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Data\README.md') " />
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Data\README.md') " PrivateAssets="all" />
-
-    <ProjectReference Include="$(WixToolsetRootFolder)\Extensibility\src\WixToolset.Extensibility\WixToolset.Extensibility.csproj" Condition=" '$(Configuration)' == 'Debug' And Exists('$(WixToolsetRootFolder)\Extensibility\README.md') " />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" Condition=" '$(Configuration)' == 'Release' Or !Exists('$(WixToolsetRootFolder)\Extensibility\README.md') " PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
