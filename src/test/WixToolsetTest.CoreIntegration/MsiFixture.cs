@@ -409,7 +409,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Assembly information not getting gathered yet.")]
+        [Fact]
         public void CanBuildWithAssembly()
         {
             var folder = TestData.Get(@"TestData\Assembly");
@@ -436,7 +436,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\AssemblyMsiPackage\candle.exe")));
 
-                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
@@ -444,7 +444,25 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"candle.exe", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
 
                 var msiAssemblyNameTuples = section.Tuples.OfType<MsiAssemblyNameTuple>();
-                Assert.NotEmpty(msiAssemblyNameTuples);
+                Assert.Equal(new[]
+                {
+                    "culture",
+                    "fileVersion",
+                    "name",
+                    "processorArchitecture",
+                    "publicKeyToken",
+                    "version"
+                }, msiAssemblyNameTuples.OrderBy(a => a.Name).Select(a => a.Name).ToArray());
+
+                Assert.Equal(new[]
+                {
+                    "neutral",
+                    "3.11.11810.0",
+                    "candle",
+                    "x86",
+                    "256B3414DFA97718",
+                    "3.0.0.0"
+                }, msiAssemblyNameTuples.OrderBy(a => a.Name).Select(a => a.Value).ToArray());
             }
         }
 
