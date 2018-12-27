@@ -4,8 +4,6 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
     using System.Runtime.InteropServices;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -111,9 +109,17 @@ namespace WixToolset.BuildTasks
 
         public override bool Execute()
         {
+            var serviceProvider = new WixToolsetServiceProvider();
+
+            var listener = new MsbuildMessageListener(this.Log, "WIX", this.BuildEngine.ProjectFileOfTaskNode);
+
             try
             {
-                this.ExecuteCore();
+                this.ExecuteCore(serviceProvider, listener);
+            }
+            catch (WixException e)
+            {
+                listener.Write(e.Error);
             }
             catch (Exception e)
             {
@@ -128,10 +134,8 @@ namespace WixToolset.BuildTasks
             return !this.Log.HasLoggedErrors;
         }
 
-        private void ExecuteCore()
+        private void ExecuteCore(IServiceProvider serviceProvider, IMessageListener listener)
         {
-            var listener = new MsbuildMessageListener(this.Log, "WIX", this.BuildEngine.ProjectFileOfTaskNode);
-
             var commandLineBuilder = new WixCommandLineBuilder();
 
             commandLineBuilder.AppendTextUnquoted("build");
@@ -164,8 +168,6 @@ namespace WixToolset.BuildTasks
 
             this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
 
-            var serviceProvider = new WixToolsetServiceProvider();
-
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
 
@@ -194,9 +196,9 @@ namespace WixToolset.BuildTasks
                 {
                     extensionManager.Load(extension);
                 }
-                catch (ReflectionTypeLoadException e)
+                catch (WixException e)
                 {
-                    messaging.Write(ErrorMessages.InvalidExtension(extension, String.Join(Environment.NewLine, e.LoaderExceptions.Select(le => le.ToString()))));
+                    messaging.Write(e.Error);
                 }
             }
 

@@ -3,8 +3,7 @@
 namespace WixToolset.Tools
 {
     using System;
-    using System.Linq;
-    using System.Reflection;
+    using System.Runtime.InteropServices;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -29,8 +28,28 @@ namespace WixToolset.Tools
 
             var listener = new ConsoleMessageListener("WIX", "wix.exe");
 
-            var program = new Program();
-            return program.Run(serviceProvider, listener, args);
+            try
+            {
+                var program = new Program();
+                return program.Run(serviceProvider, listener, args);
+            }
+            catch (WixException e)
+            {
+                listener.Write(e.Error);
+
+                return e.Error.Id;
+            }
+            catch (Exception e)
+            {
+                listener.Write(ErrorMessages.UnexpectedException(e.Message, e.GetType().ToString(), e.StackTrace));
+
+                if (e is NullReferenceException || e is SEHException)
+                {
+                    throw;
+                }
+
+                return e.HResult;
+            }
         }
 
         /// <summary>
@@ -69,9 +88,9 @@ namespace WixToolset.Tools
                 {
                     extensionManager.Load(extension);
                 }
-                catch (ReflectionTypeLoadException e)
+                catch (WixException e)
                 {
-                    messaging.Write(ErrorMessages.InvalidExtension(extension, String.Join(Environment.NewLine, e.LoaderExceptions.Select(le => le.ToString()))));
+                    messaging.Write(e.Error);
                 }
             }
 
