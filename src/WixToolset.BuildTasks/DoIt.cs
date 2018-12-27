@@ -136,6 +136,25 @@ namespace WixToolset.BuildTasks
 
         private void ExecuteCore(IServiceProvider serviceProvider, IMessageListener listener)
         {
+            var commandLineString = this.BuildCommandLine();
+
+            this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
+
+            var messaging = serviceProvider.GetService<IMessaging>();
+            messaging.SetListener(listener);
+
+            var arguments = serviceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(commandLineString);
+
+            var commandLine = serviceProvider.GetService<ICommandLine>();
+            commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
+            commandLine.Arguments = arguments;
+            var command = commandLine.ParseStandardCommandLine();
+            command?.Execute();
+        }
+
+        private string BuildCommandLine()
+        {
             var commandLineBuilder = new WixCommandLineBuilder();
 
             commandLineBuilder.AppendTextUnquoted("build");
@@ -164,21 +183,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
             commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
 
-            var commandLineString = commandLineBuilder.ToString();
-
-            this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
-
-            var messaging = serviceProvider.GetService<IMessaging>();
-            messaging.SetListener(listener);
-
-            var arguments = serviceProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(commandLineString);
-
-            var commandLine = serviceProvider.GetService<ICommandLine>();
-            commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
-            commandLine.Arguments = arguments;
-            var command = commandLine.ParseStandardCommandLine();
-            command?.Execute();
+            return commandLineBuilder.ToString();
         }
 
         private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
@@ -205,11 +210,6 @@ namespace WixToolset.BuildTasks
             return extensionManager;
         }
 
-        private void DisplayMessage(object sender, DisplayEventArgs e)
-        {
-            this.Log.LogMessageFromText(e.Message, MessageImportance.Normal);
-        }
-
         private IEnumerable<string> CalculateBindPathStrings()
         {
             if (null != this.BindInputPaths)
@@ -230,76 +230,6 @@ namespace WixToolset.BuildTasks
                 }
             }
         }
-
-        ///// <summary>
-        ///// Builds a command line from options in this task.
-        ///// </summary>
-        //protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
-        //{
-        //    base.BuildCommandLine(commandLineBuilder);
-
-        //    commandLineBuilder.AppendIfTrue("-p", this.PreprocessToStdOut);
-        //    commandLineBuilder.AppendSwitchIfNotNull("-p", this.PreprocessToFile);
-        //    commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
-        //    commandLineBuilder.AppendArrayIfNotNull("-d", this.DefineConstants);
-        //    commandLineBuilder.AppendArrayIfNotNull("-I", this.IncludeSearchPaths);
-        //    commandLineBuilder.AppendIfTrue("-pedantic", this.Pedantic);
-        //    commandLineBuilder.AppendSwitchIfNotNull("-arch ", this.InstallerPlatform);
-        //    commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.referencePaths);
-        //    commandLineBuilder.AppendTextIfNotNull(this.AdditionalOptions);
-
-        //    // Support per-source-file output by looking at the SourceFiles items to
-        //    // see if there is any "CandleOutput" metadata.  If there is, we do our own
-        //    // appending, otherwise we fall back to the built-in "append file names" code.
-        //    // Note also that the wix.targets "Compile" target does *not* automagically
-        //    // fix the "@(CompileObjOutput)" list to include these new output names.
-        //    // If you really want to use this, you're going to have to clone the target
-        //    // in your own .targets file and create the output list yourself.
-        //    bool usePerSourceOutput = false;
-        //    if (this.SourceFiles != null)
-        //    {
-        //        foreach (ITaskItem item in this.SourceFiles)
-        //        {
-        //            if (!String.IsNullOrEmpty(item.GetMetadata("CandleOutput")))
-        //            {
-        //                usePerSourceOutput = true;
-        //                break;
-        //            }
-        //        }
-        //    }
-
-        //    if (usePerSourceOutput)
-        //    {
-        //        string[] newSourceNames = new string[this.SourceFiles.Length];
-        //        for (int iSource = 0; iSource < this.SourceFiles.Length; ++iSource)
-        //        {
-        //            ITaskItem item = this.SourceFiles[iSource];
-        //            if (null == item)
-        //            {
-        //                newSourceNames[iSource] = null;
-        //            }
-        //            else
-        //            {
-        //                string output = item.GetMetadata("CandleOutput");
-
-        //                if (!String.IsNullOrEmpty(output))
-        //                {
-        //                    newSourceNames[iSource] = String.Concat(item.ItemSpec, ";", output);
-        //                }
-        //                else
-        //                {
-        //                    newSourceNames[iSource] = item.ItemSpec;
-        //                }
-        //            }
-        //        }
-
-        //        commandLineBuilder.AppendFileNamesIfNotNull(newSourceNames, " ");
-        //    }
-        //    else
-        //    {
-        //        commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
-        //    }
-        //}
 
         private class MsbuildMessageListener : IMessageListener
         {
