@@ -44,33 +44,44 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void Load(string extensionPath)
         {
-            Assembly assembly;
+            try
+            {
+                Assembly assembly;
 
-            // Absolute path to an assembly which means only "load from" will work even though we'd prefer to
-            // use Assembly.Load (see the documentation for Assembly.LoadFrom why).
-            if (Path.IsPathRooted(extensionPath))
-            {
-                assembly = ExtensionManager.ExtensionLoadFrom(extensionPath);
-            }
-            else if (ExtensionManager.TryExtensionLoad(extensionPath, out assembly))
-            {
-                // Loaded the assembly by name from the probing path.
-            }
-            else if (ExtensionManager.TryExtensionLoad(Path.GetFileNameWithoutExtension(extensionPath), out assembly))
-            {
-                // Loaded the assembly by filename alone along the probing path.
-            }
-            else // relative path to an assembly
-            {
-                // We want to use Assembly.Load when we can because it has some benefits over Assembly.LoadFrom
-                // (see the documentation for Assembly.LoadFrom). However, it may fail when the path is a relative
-                // path, so we should try Assembly.LoadFrom one last time. We could have detected a directory
-                // separator character and used Assembly.LoadFrom directly, but dealing with path canonicalization
-                // issues is something we don't want to deal with if we don't have to.
-                assembly = ExtensionManager.ExtensionLoadFrom(extensionPath);
-            }
+                // Absolute path to an assembly which means only "load from" will work even though we'd prefer to
+                // use Assembly.Load (see the documentation for Assembly.LoadFrom why).
+                if (Path.IsPathRooted(extensionPath))
+                {
+                    assembly = Assembly.LoadFrom(extensionPath);
+                }
+                else if (ExtensionManager.TryExtensionLoad(extensionPath, out assembly))
+                {
+                    // Loaded the assembly by name from the probing path.
+                }
+                else if (ExtensionManager.TryExtensionLoad(Path.GetFileNameWithoutExtension(extensionPath), out assembly))
+                {
+                    // Loaded the assembly by filename alone along the probing path.
+                }
+                else // relative path to an assembly
+                {
+                    // We want to use Assembly.Load when we can because it has some benefits over Assembly.LoadFrom
+                    // (see the documentation for Assembly.LoadFrom). However, it may fail when the path is a relative
+                    // path, so we should try Assembly.LoadFrom one last time. We could have detected a directory
+                    // separator character and used Assembly.LoadFrom directly, but dealing with path canonicalization
+                    // issues is something we don't want to deal with if we don't have to.
+                    assembly = Assembly.LoadFrom(extensionPath);
+                }
 
-            this.Add(assembly);
+                this.Add(assembly);
+            }
+            catch (ReflectionTypeLoadException rtle)
+            {
+                throw new WixException(ErrorMessages.InvalidExtension(extensionPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))));
+            }
+            catch (Exception e)
+            {
+                throw new WixException(ErrorMessages.InvalidExtension(extensionPath, e.Message), e);
+            }
         }
 
         public IEnumerable<T> Create<T>() where T : class
@@ -93,18 +104,6 @@ namespace WixToolset.Core.ExtensibilityServices
             return extensions.Cast<T>().ToList();
         }
 
-        private static Assembly ExtensionLoadFrom(string assemblyName)
-        {
-            try
-            {
-                return Assembly.LoadFrom(assemblyName);
-            }
-            catch (Exception e)
-            {
-                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, e.Message), e);
-            }
-        }
-
         private static bool TryExtensionLoad(string assemblyName, out Assembly assembly)
         {
             try
@@ -112,19 +111,10 @@ namespace WixToolset.Core.ExtensibilityServices
                 assembly = Assembly.Load(assemblyName);
                 return true;
             }
-            catch (IOException innerE)
+            catch (IOException e) when (e is FileLoadException || e is FileNotFoundException)
             {
-                if (innerE is FileLoadException || innerE is FileNotFoundException)
-                {
-                    assembly = null;
-                    return false;
-                }
-
-                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, innerE.Message), innerE);
-            }
-            catch (Exception e)
-            {
-                throw new WixException(ErrorMessages.InvalidExtension(assemblyName, e.Message), e);
+                  assembly = null;
+                  return false;
             }
         }
     }
