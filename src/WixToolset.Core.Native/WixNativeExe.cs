@@ -12,7 +12,6 @@ namespace WixToolset.Core.Native
     internal class WixNativeExe
     {
         private const int FiveMinutesInMilliseconds = 300000;
-        private static readonly object PathToWixNativeExeLock = new object();
         private static string PathToWixNativeExe;
 
         private readonly string commandLine;
@@ -83,24 +82,16 @@ namespace WixToolset.Core.Native
 
         private static void EnsurePathToWixNativeExeSet()
         {
-            lock (PathToWixNativeExeLock)
+            if (String.IsNullOrEmpty(PathToWixNativeExe))
             {
-                if (String.IsNullOrEmpty(PathToWixNativeExe))
+                var path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), "wixnative.x86.exe");
+
+                if (!File.Exists(path))
                 {
-                    var path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"x86\wixnative.x86.exe");
-
-                    if (!File.Exists(path))
-                    {
-                        path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), "wixnative.x86.exe");
-
-                        if (!File.Exists(path))
-                        {
-                            throw new FileNotFoundException($"Could not find internal piece of WiX Toolset at: {path}", path);
-                        }
-                    }
-
-                    PathToWixNativeExe = path;
+                    throw new FileNotFoundException($"Could not find internal piece of WiX Toolset at: {path}", path);
                 }
+
+                PathToWixNativeExe = path;
             }
         }
 
