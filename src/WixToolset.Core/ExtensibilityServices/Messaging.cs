@@ -65,10 +65,10 @@ namespace WixToolset.Core.ExtensibilityServices
                 {
                     if (fileNames.Count == 0)
                     {
-                        errorFileName = String.Format(CultureInfo.CurrentUICulture, WixStrings.Format_FirstLineNumber, sln.FileName, sln.LineNumber);
+                        errorFileName = String.Format(CultureInfo.CurrentUICulture, "{0}({1})", sln.FileName, sln.LineNumber);
                     }
 
-                    fileNames.Add(String.Format(CultureInfo.CurrentUICulture, WixStrings.Format_LineNumber, sln.FileName, sln.LineNumber));
+                    fileNames.Add(String.Format(CultureInfo.CurrentUICulture, "{0}: line {1}", sln.FileName, sln.LineNumber));
                 }
                 else
                 {
@@ -84,11 +84,11 @@ namespace WixToolset.Core.ExtensibilityServices
             var levelString = String.Empty;
             if (MessageLevel.Warning == level)
             {
-                levelString = WixStrings.MessageType_Warning;
+                levelString = "warning";
             }
             else if (MessageLevel.Error == level)
             {
-                levelString = WixStrings.MessageType_Error;
+                levelString = "error";
             }
 
             string formatted;
@@ -104,20 +104,20 @@ namespace WixToolset.Core.ExtensibilityServices
             var builder = new StringBuilder();
             if (level == MessageLevel.Information || level == MessageLevel.Verbose)
             {
-                builder.AppendFormat(WixStrings.Format_InfoMessage, formatted);
+                builder.Append(formatted);
             }
             else
             {
-                builder.AppendFormat(WixStrings.Format_NonInfoMessage, errorFileName, levelString, shortAppName, message.Id, formatted);
+                builder.AppendFormat("{0} : {1} {2}{3:0000} : {4}", errorFileName, levelString, shortAppName, message.Id, formatted);
             }
 
             if (fileNames.Count > 1)
             {
-                builder.AppendFormat(WixStrings.INF_SourceTrace, Environment.NewLine);
+                builder.AppendFormat("Source trace:{0}", Environment.NewLine);
 
                 foreach (var fileName in fileNames)
                 {
-                    builder.AppendFormat(WixStrings.INF_SourceTraceLocation, fileName, Environment.NewLine);
+                    builder.AppendFormat("Source trace:{0}", fileName, Environment.NewLine);
                 }
 
                 builder.AppendLine();

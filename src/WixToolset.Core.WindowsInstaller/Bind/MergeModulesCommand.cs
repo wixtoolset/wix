@@ -171,14 +171,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     this.Messaging.Write(ErrorMessages.MergePlatformMismatch(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
                                     break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedMergerErrorWithType, Enum.GetName(typeof(MsmErrorType), mergeError.Type), logPath), "InvalidOperationException", Environment.StackTrace));
+                                    this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, "Encountered an unexpected merge error of type '{0}' for which there is currently no error message to display.  More information about the merge and the failure can be found in the merge log: '{1}'", Enum.GetName(typeof(MsmErrorType), mergeError.Type), logPath), "InvalidOperationException", Environment.StackTrace));
                                     break;
                             }
                         }
 
                         if (0 >= mergeErrors.Count && !commit)
                         {
-                            this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_UnexpectedMergerErrorInSourceFile, wixMergeRow.SourceFile, logPath), "InvalidOperationException", Environment.StackTrace));
+                            this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, "Encountered an unexpected error while merging '{0}'. More information about the merge and the failure can be found in the merge log: '{1}'", wixMergeRow.SourceFile, logPath), "InvalidOperationException", Environment.StackTrace));
                         }
 
                         if (moduleOpen)

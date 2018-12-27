@@ -10757,7 +10757,7 @@ namespace WixToolset.Core
                 msiVersion = 500;
                 break;
             default:
-                throw new ArgumentException(WixStrings.EXP_UnknownPlatformEnum, this.CurrentPlatform.ToString());
+                throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", this.CurrentPlatform.ToString());
             }
 
             foreach (var attrib in node.Attributes())

@@ -151,7 +151,7 @@ namespace WixToolset.Core.Extensibility
                     }
                 }
 
-                throw new InvalidOperationException(WixStrings.EXP_CouldnotFileUniqueIDForResourceName);
+                throw new InvalidOperationException("Could not find a unique identifier for the given resource name.");
             }
 
             /// <summary>

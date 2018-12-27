@@ -88,7 +88,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else // not a supported unscheduled action.
                         {
-                            throw new InvalidOperationException(WixStrings.EXP_FoundActionRowWithNoSequenceBeforeOrAfterColumnSet);
+                            throw new InvalidOperationException("Found an ActionRow with no Sequence, Before, or After column set.");
                         }
                     }
 
@@ -575,7 +575,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else if (actionRow.Before == null)
             {
-                throw new InvalidOperationException(WixStrings.EXP_FoundActionRowWithNoSequenceBeforeOrAfterColumnSet);
+                throw new InvalidOperationException("Found an ActionRow with no Sequence, Before, or After column set.");
             }
 
             var parentActionName = (after ? actionRow.After : actionRow.Before);
@@ -593,7 +593,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, WixStrings.EXP_FoundActionRowWinNonExistentAction, (after ? "After" : "Before"), parentActionName));
+                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Found an ActionRow with a non-existent {0} action: {1}.", (after ? "After" : "Before"), parentActionName));
                 }
             }
             else if (actionRow == parentActionRow || this.ContainsChildActionRow(actionRow, parentActionRow)) // cycle detected

@@ -35,7 +35,7 @@ namespace WixToolset.Core
             {
                 if (null != this.harvesterExtension)
                 {
-                    throw new InvalidOperationException(WixStrings.EXP_MultipleHarvesterExtensionsSpecified);
+                    throw new InvalidOperationException("Multiple harvester extensions specified.");
                 }
 
                 this.harvesterExtension = value;
