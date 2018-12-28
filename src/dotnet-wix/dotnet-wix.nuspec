@@ -19,6 +19,5 @@
   <files>
     <file src="$projectFolder$DotnetToolSettings.xml" target="tools\netcoreapp2.1\any" />
     <file src="**" target="tools\netcoreapp2.1\any" />
-    <file src="runtimes\win-x86\native\*.exe" target="tools\netcoreapp2.1\any" />
   </files>
 </package>
