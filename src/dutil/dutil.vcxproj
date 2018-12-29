@@ -171,6 +171,7 @@
     <ClCompile Include="condutil.cpp" />
     <ClCompile Include="conutil.cpp" />
     <ClCompile Include="cryputil.cpp" />
+    <ClCompile Include="deputil.cpp" />
     <ClCompile Include="dictutil.cpp" />
     <ClCompile Include="dirutil.cpp" />
     <ClCompile Include="dlutil.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="inc\condutil.h" />
     <ClInclude Include="inc\conutil.h" />
     <ClInclude Include="inc\cryputil.h" />
+    <ClInclude Include="inc\deputil.h" />
     <ClInclude Include="inc\dictutil.h" />
     <ClInclude Include="inc\dirutil.h" />
     <ClInclude Include="inc\dlutil.h" />

@@ -56,6 +56,7 @@
 #include "guidutil.h"
 #include "gdiputil.h"
 #include "dictutil.h"
+#include "deputil.h" // NOTE: This must come after dictutil.h since it uses it.
 #include "inetutil.h"
 #include "iniutil.h"
 #include "jsonutil.h"
