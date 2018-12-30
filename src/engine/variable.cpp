@@ -1698,6 +1698,7 @@ static HRESULT InitializeVariableOsInfo(
     BURN_VARIANT value = { };
 
     ovix.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
+    #pragma warning(suppress: 4996)
     if (!::GetVersionExW((LPOSVERSIONINFOW)&ovix))
     {
         ExitWithLastError(hr, "Failed to get OS info.");

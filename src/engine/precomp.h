@@ -4,12 +4,15 @@
 
 #define ExitTrace LogErrorString
 
-#include <wixver.h>
-
 #include <windows.h>
 #include <aclapi.h>
 #include <Bits.h>
+
+#pragma warning(push)
+#pragma warning(disable:4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
+#pragma warning(pop)
+
 #include <math.h>
 #include <msiquery.h>
 #include <sddl.h>

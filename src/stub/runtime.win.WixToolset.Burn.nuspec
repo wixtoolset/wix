@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$authors$</authors>
+    <owners>$authors$</owners>
+    <!-- <license type="expression">MS-RL</license> -->
+    <licenseUrl>https://licenses.nuget.org/MS-RL</licenseUrl>
+    <projectUrl>https://github.com/wixtoolset/burn</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+  </metadata>
+
+  <files>
+    <file src="Win32\burn.x86.exe" target="runtimes\win-x86\native" />
+    <file src="Win32\burn.x86.pdb" target="runtimes\win-x86\native" />
+  </files>
+</package>
