@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\WixToolset.BootstrapperCore.4.0.1\build\WixToolset.BootstrapperCore.props" Condition="Exists('..\..\packages\WixToolset.BootstrapperCore.4.0.1\build\WixToolset.BootstrapperCore.props')" />
+  <Import Project="..\..\packages\WixToolset.DUtil.4.0.13\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.13\build\WixToolset.DUtil.props')" />
+
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}</ProjectGuid>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <TargetName>balutil</TargetName>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <Description>WiX Toolset Bootstrapper Application Layer native utility library</Description>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\NativeMultiTargeting.Build.props" />
+
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+
+  <PropertyGroup>
+    <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\inc</ProjectAdditionalIncludeDirectories>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="BalBootstrapperEngine.cpp" />
+    <ClCompile Include="balcondition.cpp" />
+    <ClCompile Include="balinfo.cpp" />
+    <ClCompile Include="balretry.cpp" />
+    <ClCompile Include="balutil.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\BAFunctions.h" />
+    <ClInclude Include="inc\BalBaseBAFunctions.h" />
+    <ClInclude Include="inc\BalBaseBAFunctionsProc.h" />
+    <ClInclude Include="inc\BalBaseBootstrapperApplication.h" />
+    <ClInclude Include="inc\BalBaseBootstrapperApplicationProc.h" />
+    <ClInclude Include="inc\BalBootstrapperEngine.h" />
+    <ClInclude Include="inc\balcondition.h" />
+    <ClInclude Include="inc\balinfo.h" />
+    <ClInclude Include="inc\balretry.h" />
+    <ClInclude Include="inc\balutil.h" />
+    <ClInclude Include="inc\IBAFunctions.h" />
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+
+  <Target Name="Pack"
+          DependsOnTargets="GetBuildVersion">
+    <Exec Command='nuget pack balutil.nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=WixToolset.BalUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
+  </Target>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\WixToolset.BootstrapperCore.4.0.1\build\WixToolset.BootstrapperCore.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.BootstrapperCore.4.0.1\build\WixToolset.BootstrapperCore.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.13\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.13\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+  </Target>
+</Project>
