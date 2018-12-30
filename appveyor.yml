@@ -3,6 +3,11 @@
 #  Do NOT modify this file. Update the canonical version in Home\repo-template\src\appveyor.yml
 #  then update all of the repos.
 
+branches:
+  only:
+    - master
+    - develop
+
 image: Visual Studio 2017
 
 version: 0.0.0.{build}
