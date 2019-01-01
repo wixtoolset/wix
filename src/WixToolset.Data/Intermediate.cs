@@ -17,7 +17,7 @@ namespace WixToolset.Data
         public const string XmlNamespaceUri = "http://wixtoolset.org/schemas/v4/wixobj";
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
 
-        private Dictionary<string, Localization> localizationsByCulture;
+        private readonly Dictionary<string, Localization> localizationsByCulture;
 
         /// <summary>
         /// Instantiate a new Intermediate.
@@ -70,7 +70,7 @@ namespace WixToolset.Data
             {
                 var uri = new Uri(Path.GetFullPath(path));
                 var creator = new SimpleTupleDefinitionCreator();
-                return Intermediate.Load(stream, uri, creator, suppressVersionCheck);
+                return Intermediate.LoadIntermediate(stream, uri, creator, suppressVersionCheck);
             }
         }
 
@@ -97,13 +97,13 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(Assembly assembly, string resourceName, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
         {
-            using (Stream resourceStream = assembly.GetManifestResourceStream(resourceName))
+            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             {
                 var uriBuilder = new UriBuilder(assembly.CodeBase);
                 uriBuilder.Scheme = "embeddedresource";
                 uriBuilder.Fragment = resourceName;
 
-                return Intermediate.Load(resourceStream, uriBuilder.Uri, creator, suppressVersionCheck);
+                return Intermediate.LoadIntermediate(resourceStream, uriBuilder.Uri, creator, suppressVersionCheck);
             }
         }
 
@@ -120,8 +120,59 @@ namespace WixToolset.Data
             {
                 var uri = new Uri(Path.GetFullPath(path));
 
-                return Intermediate.Load(stream, uri, creator, suppressVersionCheck);
+                return Intermediate.LoadIntermediate(stream, uri, creator, suppressVersionCheck);
             }
+        }
+
+        /// <summary>
+        /// Loads several intermediates from paths on disk using the same definitions.
+        /// </summary>
+        /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediates</returns>
+        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles, bool suppressVersionCheck = false)
+        {
+            var creator = new SimpleTupleDefinitionCreator();
+
+            return Intermediate.Load(intermediateFiles, creator);
+        }
+
+        /// <summary>
+        /// Loads several intermediates from paths on disk using the same definitions.
+        /// </summary>
+        /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediates.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediates</returns>
+        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        {
+            var jsons = new Queue<JsonWithPath>();
+            var intermediates = new List<Intermediate>();
+
+            foreach (var path in intermediateFiles)
+            {
+                using (var stream = File.OpenRead(path))
+                {
+                    var uri = new Uri(Path.GetFullPath(path));
+
+                    var json = Intermediate.LoadJson(stream, uri, suppressVersionCheck);
+
+                    Intermediate.LoadDefinitions(json, creator);
+
+                    jsons.Enqueue(new JsonWithPath { Json = json, Path = uri });
+                }
+            }
+
+            while (jsons.Count > 0)
+            {
+                var jsonWithPath = jsons.Dequeue();
+
+                var intermediate = Intermediate.FinalizeLoad(jsonWithPath.Json, jsonWithPath.Path, creator);
+
+                intermediates.Add(intermediate);
+            }
+
+            return intermediates;
         }
 
         /// <summary>
@@ -151,7 +202,7 @@ namespace WixToolset.Data
 
                 jsonObject.Add("sections", sectionsJson);
 
-                var customDefinitions = GetCustomDefinitionsInSections();
+                var customDefinitions = this.GetCustomDefinitionsInSections();
 
                 if (customDefinitions.Count > 0)
                 {
@@ -191,10 +242,25 @@ namespace WixToolset.Data
         /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        private static Intermediate Load(Stream stream, Uri baseUri, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        private static Intermediate LoadIntermediate(Stream stream, Uri baseUri, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        {
+            var json = Intermediate.LoadJson(stream, baseUri, suppressVersionCheck);
+
+            Intermediate.LoadDefinitions(json, creator);
+
+            return Intermediate.FinalizeLoad(json, baseUri, creator);
+        }
+
+        /// <summary>
+        /// Loads json form of intermedaite from stream.
+        /// </summary>
+        /// <param name="stream">Stream to intermediate file.</param>
+        /// <param name="baseUri">Path name of intermediate file.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded json.</returns>
+        private static JsonObject LoadJson(Stream stream, Uri baseUri, bool suppressVersionCheck)
         {
             JsonObject jsonObject;
-
             using (var fs = FileStructure.Read(stream))
             {
                 if (FileFormat.WixIR != fs.FileFormat)
@@ -216,7 +282,17 @@ namespace WixToolset.Data
                 }
             }
 
-            var definitionsJson = jsonObject.GetValueOrDefault<JsonArray>("definitions");
+            return jsonObject;
+        }
+
+        /// <summary>
+        /// Loads custom definitions in intermediate json into the creator.
+        /// </summary>
+        /// <param name="json">Json version of intermediate.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        private static void LoadDefinitions(JsonObject json, ITupleDefinitionCreator creator)
+        {
+            var definitionsJson = json.GetValueOrDefault<JsonArray>("definitions");
 
             if (definitionsJson != null)
             {
@@ -226,12 +302,22 @@ namespace WixToolset.Data
                     creator.AddCustomTupleDefinition(definition);
                 }
             }
+        }
 
-            var id = jsonObject.GetValueOrDefault<string>("id");
+        /// <summary>
+        /// Loads the sections and localization for the intermediate.
+        /// </summary>
+        /// <param name="json">Json version of intermediate.</param>
+        /// <param name="baseUri">Path to the intermediate.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <returns>The finalized intermediate.</returns>
+        private static Intermediate FinalizeLoad(JsonObject json, Uri baseUri, ITupleDefinitionCreator creator)
+        {
+            var id = json.GetValueOrDefault<string>("id");
 
             var sections = new List<IntermediateSection>();
 
-            var sectionsJson = jsonObject.GetValueOrDefault<JsonArray>("sections");
+            var sectionsJson = json.GetValueOrDefault<JsonArray>("sections");
             foreach (JsonObject sectionJson in sectionsJson)
             {
                 var section = IntermediateSection.Deserialize(creator, baseUri, sectionJson);
@@ -240,7 +326,7 @@ namespace WixToolset.Data
 
             var localizations = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
 
-            var localizationsJson = jsonObject.GetValueOrDefault<JsonArray>("localizations") ?? new JsonArray();
+            var localizationsJson = json.GetValueOrDefault<JsonArray>("localizations") ?? new JsonArray();
             foreach (JsonObject localizationJson in localizationsJson)
             {
                 var localization = Localization.Deserialize(localizationJson);
@@ -408,6 +494,13 @@ namespace WixToolset.Data
             }
 
             return customDefinitions;
+        }
+
+        private struct JsonWithPath
+        {
+            public JsonObject Json { get; set; }
+
+            public Uri Path { get; set; }
         }
     }
 }
