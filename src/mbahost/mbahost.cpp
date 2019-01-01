@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include <BootstrapperCore.h> // includes the generated assembly name macros.
+#include <WixToolset.BootstrapperCore.h> // includes the generated assembly name macros.
 #include "BalBaseBootstrapperApplicationProc.h"
 
 static const DWORD NET452_RELEASE = 379893;
@@ -185,7 +185,7 @@ static HRESULT GetAppDomain(
     hr = GetAppBase(&sczAppBase);
     ExitOnFailure(hr, "Failed to get the host base path.");
 
-    hr = PathConcat(sczAppBase, L"BootstrapperCore.config", &sczConfigPath);
+    hr = PathConcat(sczAppBase, L"WixToolset.BootstrapperCore.config", &sczConfigPath);
     ExitOnFailure(hr, "Failed to get the full path to the application configuration file.");
 
     // Check that the supported framework is installed.
@@ -554,10 +554,10 @@ static HRESULT CreateManagedBootstrapperApplicationFactory(
 
     ::VariantInit(&vtBAFactory);
 
-    bstrAssemblyName = ::SysAllocString(MUX_ASSEMBLY_FULL_NAME);
+    bstrAssemblyName = ::SysAllocString(MBA_ASSEMBLY_FULL_NAME);
     ExitOnNull(bstrAssemblyName, hr, E_OUTOFMEMORY, "Failed to allocate the full assembly name for the bootstrapper application factory.");
 
-    bstrTypeName = ::SysAllocString(L"WixToolset.Bootstrapper.BootstrapperApplicationFactory");
+    bstrTypeName = ::SysAllocString(L"WixToolset.BootstrapperCore.BootstrapperApplicationFactory");
     ExitOnNull(bstrTypeName, hr, E_OUTOFMEMORY, "Failed to allocate the full type name for the BA factory.");
 
     hr = pAppDomain->CreateInstance(bstrAssemblyName, bstrTypeName, &pObj);

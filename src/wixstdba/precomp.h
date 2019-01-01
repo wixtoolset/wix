@@ -3,7 +3,12 @@
 
 
 #include <windows.h>
+
+#pragma warning(push)
+#pragma warning(disable:4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
+#pragma warning(pop)
+
 #include <msiquery.h>
 #include <objbase.h>
 #include <shlobj.h>

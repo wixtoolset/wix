@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props')" />
+  <Import Project="..\FindLocalWix.props" />
+  <PropertyGroup>
+    <ProjectGuid>{3444D952-F21C-496F-AB6B-56435BFD0787}</ProjectGuid>
+    <OutputName>bal</OutputName>
+    <OutputType>Library</OutputType>
+    <BindFiles>true</BindFiles>
+    <Pedantic>true</Pedantic>
+    <Cultures>en-us</Cultures>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="BalExtension.wxs" />
+    <!-- TODO: Reenable when compiling Bundle elements is supported
+    <Compile Include="Mba.wxs" />
+    <Compile Include="NetFx4AsPrereq.wxs" />
+    <Compile Include="NetFx45AsPrereq.wxs" />
+    <Compile Include="NetFx451AsPrereq.wxs" />
+    <Compile Include="NetFx452AsPrereq.wxs" />
+    <Compile Include="NetFx46AsPrereq.wxs" />
+    <Compile Include="NetFx461AsPrereq.wxs" />
+    <Compile Include="NetFx462AsPrereq.wxs" />
+    <Compile Include="wixstdba.wxs" />
+    <Compile Include="wixstdba_x86.wxs" />
+    -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BindInputPaths Include="$(OutputPath)WixstdbaResources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\mbahost\mbahost.vcxproj">
+      <Name>mbahost</Name>
+      <Project>{12C87C77-3547-44F8-8134-29BC915CB19D}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\wixstdba\wixstdba.vcxproj">
+      <Name>wixstdba</Name>
+      <Project>{41085A22-E6AA-4E8B-AB1B-DDEE0DC89DFA}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="WiX Toolset build tools (v4.0 or later) must be installed to build this project. To download the WiX Toolset, go to http://wixtoolset.org/releases/." />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props'))" />
+  </Target>
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+</Project>

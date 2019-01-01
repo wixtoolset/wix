@@ -18,87 +18,36 @@
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{41085A22-E6AA-4E8B-AB1B-DDEE0DC89DFA}</ProjectGuid>
+    <ProjectGuid>{12C87C77-3547-44F8-8134-29BC915CB19D}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <TargetName>WixStdBA</TargetName>
-    <ProjectModuleDefinitionFile>wixstdba.def</ProjectModuleDefinitionFile>
+    <TargetName>mbahost</TargetName>
+    <ProjectModuleDefinitionFile>mbahost.def</ProjectModuleDefinitionFile>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;wininet.lib;wixstdba.res</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>shlwapi.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
+    <ClCompile Include="mbahost.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WixStandardBootstrapperApplication.cpp" />
-    <ClCompile Include="wixstdba.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precomp.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\logo.png">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\logoside.png">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\LoremIpsumLicense.rtf">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkTheme.wxl">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkLargeTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\HyperlinkSidebarTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\mbapreq.png">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\mbapreq.thm">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\mbapreq.wxl">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\RtfTheme.wxl">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\RtfTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\RtfLargeTheme.xml">
-      <CopyToOutputSubDirectory>WixstdbaResources</CopyToOutputSubDirectory>
-    </None>
-    <None Include="Resources\*\mbapreq.wxl">
-      <CopyToOutputSubDirectory>Wixstdba%(RelativeDir)</CopyToOutputSubDirectory>
-    </None>
-    <None Include="wixstdba.def" />
+    <None Include="mbahost.def" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="wixstdba.mc">
-      <Message>Compiling message file...</Message>
-      <Command>mc.exe -h "$(IntDir)." -r "$(IntDir)." -A -c -z wixstdba.messages "$(InputDir)wixstdba.mc"
-rc.exe -fo "$(OutDir)wixstdba.res" "$(IntDir)wixstdba.messages.rc"</Command>
-      <Outputs>$(IntDir)wixstdba.messages.h;$(OutDir)wixstdba.messages.rc</Outputs>
-    </CustomBuild>
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
