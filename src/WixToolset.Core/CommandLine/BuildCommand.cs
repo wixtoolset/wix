@@ -331,27 +331,20 @@ namespace WixToolset.Core.CommandLine
 
         private IEnumerable<Intermediate> LoadLibraries(IEnumerable<string> libraryFiles, ITupleDefinitionCreator creator)
         {
-            var libraries = new List<Intermediate>();
-
-            foreach (var libraryFile in libraryFiles)
+            try
             {
-                try
-                {
-                    var library = Intermediate.Load(libraryFile, creator);
-
-                    libraries.Add(library);
-                }
-                catch (WixCorruptFileException e)
-                {
-                    this.Messaging.Write(e.Error);
-                }
-                catch (WixUnexpectedFileFormatException e)
-                {
-                    this.Messaging.Write(e.Error);
-                }
+                return Intermediate.Load(libraryFiles, creator);
+            }
+            catch (WixCorruptFileException e)
+            {
+                this.Messaging.Write(e.Error);
+            }
+            catch (WixUnexpectedFileFormatException e)
+            {
+                this.Messaging.Write(e.Error);
             }
 
-            return libraries;
+            return Array.Empty<Intermediate>();
         }
 
         private IEnumerable<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables)
@@ -437,7 +430,7 @@ namespace WixToolset.Core.CommandLine
             public string OutputsFile { get; private set; }
 
             public string BuiltOutputsFile { get; private set; }
-            
+
             public CommandLine(IMessaging messaging)
             {
                 this.Messaging = messaging;
