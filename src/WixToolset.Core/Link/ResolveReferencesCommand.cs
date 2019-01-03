@@ -95,7 +95,7 @@ namespace WixToolset.Core.Link
                     else // display errors for the duplicate symbols.
                     {
                         var accessibleSymbol = accessible[0];
-                        var referencingSourceLineNumber = wixSimpleReferenceRow.SourceLineNumbers.ToString();
+                        var referencingSourceLineNumber = wixSimpleReferenceRow.SourceLineNumbers?.ToString();
 
                         if (String.IsNullOrEmpty(referencingSourceLineNumber))
                         {
