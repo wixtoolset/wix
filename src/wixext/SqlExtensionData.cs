@@ -18,7 +18,7 @@ namespace WixToolset.Sql
 
         public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            tupleDefinition = null;
+            tupleDefinition = SqlTupleDefinitions.ByName(name);
             return tupleDefinition != null;
         }
 

@@ -3,8 +3,8 @@
      xmlns:sql="http://wixtoolset.org/schemas/v4/wxs/sql">
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-        <Component KeyPath="yes">
-            <CreateFolder />
+        <Component>
+            <File Source="example.txt" />
             <sql:SqlDatabase Id="TestDB" Database="MyDB" Server="MySQLHostName" Instance="MyInstanceName" CreateOnInstall="yes" DropOnUninstall="yes" ConfirmOverwrite="yes">
                 <sql:SqlString Id="TestString" SQL="CREATE TABLE TestTable1(name varchar(20), value varchar(20))" ExecuteOnInstall="yes" />
             </sql:SqlDatabase>

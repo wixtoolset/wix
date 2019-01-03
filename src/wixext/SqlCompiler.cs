@@ -265,7 +265,7 @@ namespace WixToolset.Sql
                                 this.Messaging.Write(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseSqlScriptElement(intermediate, section, child, componentId, id.Id);
+                            this.ParseSqlScriptElement(intermediate, section, child, componentId, id?.Id);
                             break;
                         case "SqlString":
                             if (null == componentId)
@@ -273,7 +273,7 @@ namespace WixToolset.Sql
                                 this.Messaging.Write(SqlErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseSqlStringElement(intermediate, section, child, componentId, id.Id);
+                            this.ParseSqlStringElement(intermediate, section, child, componentId, id?.Id);
                             break;
                         case "SqlFileSpec":
                             if (null == componentId)
@@ -325,8 +325,8 @@ namespace WixToolset.Sql
                 row.Set(3, database);
                 row.Set(4, componentId);
                 row.Set(5, user);
-                row.Set(6, fileSpec.Id);
-                row.Set(7, logFileSpec.Id);
+                row.Set(6, fileSpec?.Id);
+                row.Set(7, logFileSpec?.Id);
                 if (0 != attributes)
                 {
                     row.Set(8, attributes);
