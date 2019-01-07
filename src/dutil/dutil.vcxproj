@@ -168,7 +168,6 @@
     <ClCompile Include="cabcutil.cpp" />
     <ClCompile Include="cabutil.cpp" />
     <ClCompile Include="certutil.cpp" />
-    <ClCompile Include="condutil.cpp" />
     <ClCompile Include="conutil.cpp" />
     <ClCompile Include="cryputil.cpp" />
     <ClCompile Include="deputil.cpp" />
@@ -220,7 +219,6 @@
     <ClCompile Include="uncutil.cpp" />
     <ClCompile Include="uriutil.cpp" />
     <ClCompile Include="userutil.cpp" />
-    <ClCompile Include="varutil.cpp" />
     <ClCompile Include="wiutil.cpp" />
     <ClCompile Include="wuautil.cpp" />
     <ClCompile Include="xmlutil.cpp" />
@@ -236,7 +234,6 @@
     <ClInclude Include="inc\cabcutil.h" />
     <ClInclude Include="inc\cabutil.h" />
     <ClInclude Include="inc\certutil.h" />
-    <ClInclude Include="inc\condutil.h" />
     <ClInclude Include="inc\conutil.h" />
     <ClInclude Include="inc\cryputil.h" />
     <ClInclude Include="inc\deputil.h" />
@@ -276,7 +273,6 @@
     <ClInclude Include="inc\timeutil.h" />
     <ClInclude Include="inc\uriutil.h" />
     <ClInclude Include="inc\userutil.h" />
-    <ClInclude Include="inc\varutil.h" />
     <ClInclude Include="inc\wiutil.h" />
     <ClInclude Include="inc\wuautil.h" />
     <ClInclude Include="inc\xmlutil.h" />

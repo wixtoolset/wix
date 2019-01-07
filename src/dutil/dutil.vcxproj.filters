@@ -45,9 +45,6 @@
     <ClCompile Include="certutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="condutil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="conutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -162,9 +159,6 @@
     <ClCompile Include="userutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="varutil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="wiutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -219,9 +213,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\certutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\condutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\conutil.h">
@@ -327,9 +318,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\userutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\varutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\wiutil.h">
