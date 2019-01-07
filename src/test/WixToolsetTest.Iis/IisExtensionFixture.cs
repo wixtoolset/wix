@@ -11,7 +11,7 @@ namespace WixToolsetTest.Iis
     public class IisExtensionFixture
     {
         [Fact]
-        public void CanBuildUsingFileShare()
+        public void CanBuildUsingIIsWebAddress()
         {
             var folder = TestData.Get(@"TestData\UsingIis");
             var build = new Builder(folder, typeof(IisExtensionFactory), new[] { folder });
@@ -19,7 +19,7 @@ namespace WixToolsetTest.Iis
             var results = build.BuildAndQuery(Build, "IIsWebAddress");
             Assert.Equal(new[]
             {
-                "IIsWebAddress:",
+                "IIsWebAddress:TestAddress\tTest\t\t[PORT]\t\t0",
             }, results.OrderBy(s => s).ToArray());
         }
 

@@ -11,5 +11,6 @@
          </iis:WebSite>
        </Component>
     </ComponentGroup>
+    <iis:WebDirProperties Id="ReadAndExecute" />
   </Fragment>
 </Wix>

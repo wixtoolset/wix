@@ -15,7 +15,9 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage">
+          <Directory Id="TestWebSiteProductDirectory" />
+        </Directory>
       </Directory>
     </Directory>
   </Fragment>

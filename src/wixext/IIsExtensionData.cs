@@ -18,7 +18,7 @@ namespace WixToolset.Iis
 
         public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            tupleDefinition = null;
+            tupleDefinition = IisTupleDefinitions.ByName(name);
             return tupleDefinition != null;
         }
 
