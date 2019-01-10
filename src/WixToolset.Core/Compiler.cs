@@ -5267,8 +5267,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Error);
-                row.Set(0, id);
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Error, new Identifier(AccessModifier.Public, id));
                 row.Set(1, Common.GetInnerText(node)); // TODO: *
             }
         }
