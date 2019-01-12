@@ -206,6 +206,47 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact(Skip = "Currently fails")]
+        public void CanBuildDialogsInInstallUISequence()
+        {
+            var folder = TestData.Get(@"TestData\DialogsInInstallUISequence");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var textStyle = section.Tuples.OfType<TextStyleTuple>().Single();
+                Assert.Equal("Tahoma", textStyle.FaceName);
+                Assert.Equal(8, textStyle.Size);
+
+                var installUIActions = section.Tuples.OfType<WixActionTuple>()
+                                                     .Where(t => t.SequenceTable == SequenceTable.InstallUISequence)
+                                                     .ToList();
+                Assert.Equal(10, installUIActions.Count);
+            }
+        }
+
         [Fact]
         public void CanLoadPdbGeneratedByBuild()
         {

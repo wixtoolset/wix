@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <UI Id="CustomDialog">
+            <!-- TODO: compiler can't handle loc strings for number fields -->
+            <TextStyle Id="CustomFont" FaceName="!(loc.CustomFontName)" Size="!(loc.CustomFontSize)" />
+            <Dialog Id="FirstDialog" Width="100" Height="100">
+                <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="FirstDialogTitle" />
+            </Dialog>
+            <Dialog Id="SecondDialog" Width="100" Height="100">
+                <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="SecondDialogTitle" />
+            </Dialog>
+
+            <InstallUISequence>
+                <!-- TODO: overriding this currently causes a duplicate symbol error -->
+                <Show Dialog="SecondDialog" Before="FirstDialog" Overridable="yes">NOT Installed</Show>
+            </InstallUISequence>
+        </UI>
+    </Fragment>
+    <Fragment>
+        <UI Id="CustomUI">
+            <DialogRef Id="FirstDialog" />
+            <DialogRef Id="SecondDialog" />
+
+            <Publish Dialog="FirstDialog" Control="Next" Event="NewDialog" Value="SecondDialog">Installed AND PATCH</Publish>
+
+            <InstallUISequence>
+                <Show Dialog="FirstDialog" Before="SecondDialog">Installed AND PATCH</Show>
+                <Show Dialog="SecondDialog" Before="ExecuteAction">NOT Installed</Show>
+            </InstallUISequence>
+        </UI>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
