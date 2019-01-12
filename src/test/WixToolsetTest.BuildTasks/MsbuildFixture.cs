@@ -55,6 +55,28 @@ namespace WixToolsetTest.BuildTasks
             }
         }
 
+        [Fact(Skip = "Currently fails")]
+        public void CanBuildSimpleMsiPackageWithIceSuppressions()
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+
+                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                    "-p:SuppressIces=\"ICE45;ICE46\""
+                });
+                result.AssertSuccess();
+            }
+        }
+
         [Fact]
         public void CanBuildSimpleMsiPackageWithWarningSuppressions()
         {
