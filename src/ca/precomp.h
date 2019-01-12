@@ -7,7 +7,6 @@
 #include <richedit.h>
 #include <shlwapi.h>
 
-#include "wixstrsafe.h"
 #include "wcautil.h"
 #include "aclutil.h"
 #include "fileutil.h"

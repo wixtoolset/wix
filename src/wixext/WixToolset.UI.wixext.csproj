@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>WixToolset.UI</RootNamespace>
+    <Description>WiX Toolset UI Extension</Description>
+    <Title>WiX Toolset UI Extension</Title>
+    <IsTool>true</IsTool>
+    <ContentTargetFolders>build</ContentTargetFolders>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileName).targets" />
+    <EmbeddedResource Include="$(OutputPath)..\ui.wixlib" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\wixlib\ui.wixproj" ReferenceOutputAssembly="false" Condition=" '$(NCrunch)'=='' " />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

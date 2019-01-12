@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
-
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props')" />
+  <Import Project="..\FindLocalWix.props" />
   <PropertyGroup>
     <ProjectGuid>{2D4FF07B-26F8-4BEF-B41C-E4383F86DC32}</ProjectGuid>
     <OutputName>ui</OutputName>
     <OutputType>Library</OutputType>
     <BindFiles>true</BindFiles>
     <Pedantic>true</Pedantic>
-    <!-- Suppress ICE45 until we get a new darice.cub drop that properly supports the ElevationShield control attribute bit -->
-    <SuppressIces>ICE45</SuppressIces>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
 
@@ -63,7 +61,12 @@
     <Compile Include="AdvancedWelcomeEulaDlg.wxs" />
     <Compile Include="FeaturesDlg.wxs" />
     <Compile Include="InstallScopeDlg.wxs" />
+    <!-- TODO: Reenable when able to compile
     <Compile Include="WixUI_Advanced.wxs" />
+    -->
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="WixUI_ar-SA.wxl" />
     <EmbeddedResource Include="WixUI_bg-BG.wxl" />
     <EmbeddedResource Include="WixUI_ca-ES.wxl" />
@@ -107,8 +110,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\uica.vcxproj" />
+    <None Include="packages.config" />
   </ItemGroup>
 
-  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\ca\uica.vcxproj">
+      <Name>uica</Name>
+      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="WiX Toolset build tools (v4.0 or later) must be installed to build this project. To download the WiX Toolset, go to http://wixtoolset.org/releases/." />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0035\build\WixToolset.MSBuild.props'))" />
+  </Target>
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
 </Project>

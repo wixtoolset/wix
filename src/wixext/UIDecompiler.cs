@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensions
 {
+#if TODO_CONSIDER_DECOMPILER
     using System;
     using System.Collections;
     using System.Diagnostics;
@@ -54,4 +55,5 @@ namespace WixToolset.Extensions
             }
         }
     }
+#endif
 }

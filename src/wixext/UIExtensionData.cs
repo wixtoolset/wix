@@ -1,43 +1,23 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.UI
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
-    /// <summary>
-    /// The WiX Toolset UI Extension.
-    /// </summary>
-    public sealed class UIExtensionData : ExtensionData
+    public sealed class UIExtensionData : BaseExtensionData
     {
-        /// <summary>
-        /// Gets the default culture.
-        /// </summary>
-        /// <value>The default culture.</value>
-        public override string DefaultCulture
+        public override string DefaultCulture => "en-US";
+
+        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            get { return "en-us"; }
+            tupleDefinition = null;
+            return tupleDefinition != null;
         }
 
-        /// <summary>
-        /// Gets the library associated with this extension.
-        /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
-        /// <returns>The loaded library.</returns>
-        public override Library GetLibrary(TableDefinitionCollection tableDefinitions)
+        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            return UIExtensionData.GetExtensionLibrary(tableDefinitions);
-        }
-
-        /// <summary>
-        /// Internal mechanism to access the extension's library.
-        /// </summary>
-        /// <returns>Extension's library.</returns>
-        internal static Library GetExtensionLibrary(TableDefinitionCollection tableDefinitions)
-        {
-            return ExtensionData.LoadLibraryHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.ui.wixlib", tableDefinitions);
+            return Intermediate.Load(typeof(UIExtensionData).Assembly, "WixToolset.UI.ui.wixlib", tupleDefinitions);
         }
     }
 }
