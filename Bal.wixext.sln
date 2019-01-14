@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bafunctions", "src\Samples\bafunctions\bafunctions.vcxproj", "{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mbahost", "src\mbahost\mbahost.vcxproj", "{12C87C77-3547-44F8-8134-29BC915CB19D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wixstdba", "src\wixstdba\wixstdba.vcxproj", "{41085A22-E6AA-4E8B-AB1B-DDEE0DC89DFA}"
@@ -19,6 +21,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Debug|Any CPU.Build.0 = Debug|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Debug|x86.ActiveCfg = Debug|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Debug|x86.Build.0 = Debug|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Release|Any CPU.ActiveCfg = Release|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Release|Any CPU.Build.0 = Release|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Release|x86.ActiveCfg = Release|Win32
+		{EB0A7D51-2133-4EE7-B6CA-87DBEAC67E02}.Release|x86.Build.0 = Release|Win32
 		{12C87C77-3547-44F8-8134-29BC915CB19D}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{12C87C77-3547-44F8-8134-29BC915CB19D}.Debug|Any CPU.Build.0 = Debug|Win32
 		{12C87C77-3547-44F8-8134-29BC915CB19D}.Debug|x86.ActiveCfg = Debug|Win32
