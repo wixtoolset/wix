@@ -24,18 +24,10 @@
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>iisca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Iis CustomAction</Description>
-    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-
-  <ImportGroup Label="Shared">
-    <Import Project="..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Native.1.14.114\build\native\Microsoft.VisualStudio.Setup.Configuration.Native.targets" Condition="Exists('..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Native.1.14.114\build\native\Microsoft.VisualStudio.Setup.Configuration.Native.targets')" />
-  </ImportGroup>
 
   <PropertyGroup>
     <ProjectAdditionalLinkLibraries>crypt32.lib;msi.lib;Ws2_32.lib</ProjectAdditionalLinkLibraries>
@@ -140,7 +132,6 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Native.1.14.114\build\native\Microsoft.VisualStudio.Setup.Configuration.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Native.1.14.114\build\native\Microsoft.VisualStudio.Setup.Configuration.Native.targets'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.6\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.6\build\WixToolset.DUtil.props'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.WcaUtil.4.0.2\build\WixToolset.WcaUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.WcaUtil.4.0.2\build\WixToolset.WcaUtil.props'))" />
   </Target>

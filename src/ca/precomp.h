@@ -18,7 +18,6 @@
 #include <ahadmin.h>    // IIS 7 config
 
 #define MAXUINT USHRT_MAX
-#include <Setup.Configuration.h>
 
 #include "wcautil.h"
 #include "wcawow64.h"
