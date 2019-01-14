@@ -23,7 +23,6 @@
 #include <intshcut.h>
 
 #define MAXUINT USHRT_MAX
-#include <Setup.Configuration.h>
 
 #include "wcautil.h"
 #include "wcawow64.h"
