@@ -132,9 +132,6 @@
     <ClCompile Include="rssutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sceutil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shelutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -184,6 +181,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="polcutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deputil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -311,9 +311,6 @@
     <ClInclude Include="inc\timeutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\uncutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\uriutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -342,6 +339,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\polcutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\deputil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

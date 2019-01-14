@@ -20,5 +20,7 @@
     <file src="..\..\build\$configuration$\v140_xp\x86\dutil.lib" target="build\native\v140\x86" />
     <file src="..\..\build\$configuration$\v141_xp\x64\dutil.lib" target="build\native\v141\x64" />
     <file src="..\..\build\$configuration$\v141_xp\x86\dutil.lib" target="build\native\v141\x86" />
+    <file src="..\..\build\$configuration$\v141\ARM\dutil.lib" target="build\native\v141\ARM" />
+    <file src="..\..\build\$configuration$\v141\ARM64\dutil.lib" target="build\native\v141\ARM64" />
   </files>
 </package>
