@@ -77,6 +77,10 @@
     <Content Include="TestData\Variables\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Variables\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Variables\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\OverridableActions\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\OverridableActions\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\OverridableActions\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\OverridableActions\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

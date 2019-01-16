@@ -92,7 +92,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                     }
 
-                    if (overridableActionRows.TryGetValue(actionRow.Id.Id, out var collidingActionRow))
+                    if (requiredActionRows.TryGetValue(actionRow.Id.Id, out var collidingActionRow))
                     {
                         this.Messaging.Write(ErrorMessages.ActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
                         if (null != collidingActionRow.SourceLineNumbers)

@@ -66,7 +66,7 @@ namespace WixToolset.Core.Link
             {
                 // If we're building a Merge Module, ignore all references to the Media table
                 // because Merge Modules don't have Media tables.
-                if (this.BuildingMergeModule && wixSimpleReferenceRow.Table== "Media")
+                if (this.BuildingMergeModule && wixSimpleReferenceRow.Table == "Media")
                 {
                     continue;
                 }
@@ -77,7 +77,7 @@ namespace WixToolset.Core.Link
                 }
                 else // see if the symbol (and any of its duplicates) are appropriately accessible.
                 {
-                    IList<Symbol> accessible = DetermineAccessibleSymbols(section, symbol);
+                    IList<Symbol> accessible = this.DetermineAccessibleSymbols(section, symbol);
                     if (!accessible.Any())
                     {
                         this.Messaging.Write(ErrorMessages.UnresolvedReference(wixSimpleReferenceRow.SourceLineNumbers, wixSimpleReferenceRow.SymbolicName, symbol.Access));
@@ -89,7 +89,7 @@ namespace WixToolset.Core.Link
 
                         if (null != accessibleSymbol.Section)
                         {
-                            RecursivelyResolveReferences(accessibleSymbol.Section);
+                            this.RecursivelyResolveReferences(accessibleSymbol.Section);
                         }
                     }
                     else // display errors for the duplicate symbols.
@@ -125,14 +125,22 @@ namespace WixToolset.Core.Link
         {
             List<Symbol> symbols = new List<Symbol>();
 
-            if (AccessibleSymbol(referencingSection, symbol))
+            if (this.AccessibleSymbol(referencingSection, symbol))
             {
                 symbols.Add(symbol);
             }
 
             foreach (Symbol dupe in symbol.PossiblyConflictingSymbols)
             {
-                if (AccessibleSymbol(referencingSection, dupe))
+                // don't count overridable WixActionTuples
+                WixActionTuple symbolAction = symbol.Row as WixActionTuple;
+                WixActionTuple dupeAction = dupe.Row as WixActionTuple;
+                if (symbolAction?.Overridable != dupeAction?.Overridable)
+                {
+                    continue;
+                }
+
+                if (this.AccessibleSymbol(referencingSection, dupe))
                 {
                     symbols.Add(dupe);
                 }
@@ -140,7 +148,7 @@ namespace WixToolset.Core.Link
 
             foreach (Symbol dupe in symbol.RedundantSymbols)
             {
-                if (AccessibleSymbol(referencingSection, dupe))
+                if (this.AccessibleSymbol(referencingSection, dupe))
                 {
                     symbols.Add(dupe);
                 }
