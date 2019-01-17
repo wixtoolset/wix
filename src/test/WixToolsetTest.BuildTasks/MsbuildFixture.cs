@@ -39,6 +39,9 @@ namespace WixToolsetTest.BuildTasks
                 });
                 result.AssertSuccess();
 
+                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
+                Assert.Single(platformSwitches);
+
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Equal(4, warnings.Count());
 
@@ -52,6 +55,31 @@ namespace WixToolsetTest.BuildTasks
                     @"bin\en-US\MsiPackage.msi",
                     @"bin\en-US\MsiPackage.wixpdb",
                 }, paths);
+            }
+        }
+
+        [Fact]
+        public void CanBuild64BitMsiPackage()
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+
+                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                    $"-p:InstallerPlatform=x64",
+                });
+                result.AssertSuccess();
+
+                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x64"));
+                Assert.Single(platformSwitches);
             }
         }
 

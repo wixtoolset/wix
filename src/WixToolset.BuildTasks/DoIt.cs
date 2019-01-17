@@ -159,6 +159,7 @@ namespace WixToolset.BuildTasks
 
             commandLineBuilder.AppendTextUnquoted("build");
 
+            commandLineBuilder.AppendSwitchIfNotNull("-platform ", this.InstallerPlatform);
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-outputType ", this.OutputType);
             commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
