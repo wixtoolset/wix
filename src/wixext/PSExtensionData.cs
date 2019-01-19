@@ -1,34 +1,30 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.PowerShell
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
     /// <summary>
     /// The WiX Toolset PowerShell Extension.
     /// </summary>
-    public sealed class PSExtensionData : ExtensionData
+    public sealed class PSExtensionData : BaseExtensionData
     {
         /// <summary>
-        /// Gets the library associated with this extension.
+        /// Gets the default culture.
         /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
-        /// <returns>The loaded library.</returns>
-        public override Library GetLibrary(TableDefinitionCollection tableDefinitions)
+        /// <value>The default culture.</value>
+        public override string DefaultCulture => "en-US";
+
+        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            return PSExtensionData.GetExtensionLibrary(tableDefinitions);
+            tupleDefinition = null;
+            return tupleDefinition != null;
         }
 
-        /// <summary>
-        /// Internal mechanism to access the extension's library.
-        /// </summary>
-        /// <returns>Extension's library.</returns>
-        internal static Library GetExtensionLibrary(TableDefinitionCollection tableDefinitions)
+        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            return ExtensionData.LoadLibraryHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.ps.wixlib", tableDefinitions);
+            return Intermediate.Load(typeof(PSExtensionData).Assembly, "WixToolset.PowerShell.powershell.wixlib", tupleDefinitions);
         }
     }
 }

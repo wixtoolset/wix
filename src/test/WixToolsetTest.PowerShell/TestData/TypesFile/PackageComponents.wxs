@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:powershell="http://wixtoolset.org/schemas/v4/wxs/powershell">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+       <Component>
+           <File Source="example.txt">
+               <powershell:TypesFile />
+           </File>
+       </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

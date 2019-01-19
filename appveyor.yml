@@ -1,0 +1,40 @@
+# Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+#
+#  Do NOT modify this file. Update the canonical version in Home\repo-template\src\appveyor.yml
+#  then update all of the repos.
+
+branches:
+  only:
+    - master
+    - develop
+
+image: Visual Studio 2017
+
+version: 0.0.0.{build}
+configuration: Release
+
+environment:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  NUGET_XMLDOC_MODE: skip
+
+build_script:
+  - appveyor.cmd
+
+pull_requests:
+  do_not_increment_build_number: true
+
+nuget:
+  disable_publish_on_pr: true
+
+skip_branch_with_pr: true
+skip_tags: true
+
+artifacts:
+- path: build\Release\**\*.nupkg
+  name: nuget
+
+notifications:
+- provider: Slack
+  incoming_webhook:
+    secure: p5xuu+4x2JHfwGDMDe5KcG1k7gZxqYc4jWVwvyNZv5cvkubPD2waJs5yXMAXZNN7Z63/3PWHb7q4KoY/99AjauYa1nZ4c5qYqRPFRBKTHfA=
