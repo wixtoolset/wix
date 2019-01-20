@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,9 +40,10 @@ namespace MessagesToMessages
 
             foreach (var m in messages.GroupBy(m => m.Level))
             {
-                var result = GenerateCs(m.Key, m);
+                var className = m.First().ClassName;
+                var result = GenerateCs(className, m.Key, m);
 
-                var path = Path.Combine(args[1], m.Key + "Messages.cs");
+                var path = Path.Combine(args[1], className + ".cs");
                 File.WriteAllText(path, result);
             }
         }
@@ -53,7 +54,28 @@ namespace MessagesToMessages
 
             foreach (var xClass in doc.Root.Descendants(ClassDefinition))
             {
-                var level = xClass.Attribute(Level).Value;
+                var name = xClass.Attribute(Name)?.Value;
+                var level = xClass.Attribute(Level)?.Value;
+
+                if (String.IsNullOrEmpty(name))
+                {
+                    name = level + "Messages";
+                }
+                if (String.IsNullOrEmpty(level))
+                {
+                    if (name.EndsWith("Errors", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        level = "Error";
+                    }
+                    else if (name.EndsWith("Verboses", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        level = "Verbose";
+                    }
+                    else if (name.EndsWith("Warnings", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        level = "Warning";
+                    }
+                }
 
                 var unique = new HashSet<string>();
                 var lastNumber = 0;
@@ -81,7 +103,7 @@ namespace MessagesToMessages
 
                         var parameters = xInstance.Elements(ParameterDefinition).Select(ReadParameter).ToList();
 
-                        yield return new Message { Id = id, Level = level, Number = number, Parameters = parameters, SourceLineNumbers = sln, Value = value, Suffix = suffix == 0 ? String.Empty : suffix.ToString() };
+                        yield return new Message { Id = id, ClassName = name, Level = level, Number = number, Parameters = parameters, SourceLineNumbers = sln, Value = value, Suffix = suffix == 0 ? String.Empty : suffix.ToString() };
 
                         ++suffix;
                     }
@@ -117,7 +139,7 @@ namespace MessagesToMessages
             return new Parameter { Name = name, Type = type };
         }
 
-        private static string GenerateCs(string level, IEnumerable<Message> messages)
+        private static string GenerateCs(string className, string level, IEnumerable<Message> messages)
         {
             var header = String.Join(Environment.NewLine,
                 "// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.",
@@ -127,7 +149,7 @@ namespace MessagesToMessages
                 "    using System;",
                 "    using System.Resources;",
                 "",
-                "    public static class {0}Messages",
+                "    public static class {0}",
                 "    {");
 
             var messageFormat = String.Join(Environment.NewLine,
@@ -162,7 +184,7 @@ namespace MessagesToMessages
 
             var sb = new StringBuilder();
 
-            sb.AppendLine(header.Replace("{0}", level));
+            sb.AppendLine(header.Replace("{0}", className));
 
             foreach (var message in messages.OrderBy(m => m.Id))
             {
@@ -214,6 +236,8 @@ namespace MessagesToMessages
             public string Id { get; set; }
 
             public string Suffix { get; set; }
+
+            public string ClassName { get; set; }
 
             public string Level { get; set; }
 
