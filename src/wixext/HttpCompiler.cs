@@ -1,26 +1,20 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Http
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Http.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset Http Extension.
     /// </summary>
-    public sealed class HttpCompiler : CompilerExtension
+    public sealed class HttpCompiler : BaseCompilerExtension
     {
-        /// <summary>
-        /// Instantiate a new HttpCompiler.
-        /// </summary>
-        public HttpCompiler()
-        {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/http";
-        }
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/http";
 
         /// <summary>
         /// Processes an element for the Compiler.
@@ -29,7 +23,7 @@ namespace WixToolset.Extensions
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             switch (parentElement.Name.LocalName)
             {
@@ -41,10 +35,10 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "UrlReservation":
-                            this.ParseUrlReservationElement(element, serviceComponentId, serviceUser);
+                            this.ParseUrlReservationElement(intermediate, section, element, serviceComponentId, serviceUser);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
@@ -54,15 +48,15 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "UrlReservation":
-                            this.ParseUrlReservationElement(element, componentId, null);
+                            this.ParseUrlReservationElement(intermediate, section, element, componentId, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
         }
@@ -73,9 +67,9 @@ namespace WixToolset.Extensions
         /// <param name="node">The element to parse.</param>
         /// <param name="componentId">Identifier of the component that owns this URL reservation.</param>
         /// <param name="securityPrincipal">The security principal of the parent element (null if nested under Component).</param>
-        private void ParseUrlReservationElement(XElement node, string componentId, string securityPrincipal)
+        private void ParseUrlReservationElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, string securityPrincipal)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
             int handleExisting = HttpConstants.heReplace;
             string handleExistingValue = null;
@@ -90,10 +84,10 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "HandleExisting":
-                            handleExistingValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            handleExistingValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (handleExistingValue)
                             {
                                 case "replace":
@@ -106,31 +100,31 @@ namespace WixToolset.Extensions
                                     handleExisting = HttpConstants.heFail;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "HandleExisting", handleExistingValue, "replace", "ignore", "fail"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "HandleExisting", handleExistingValue, "replace", "ignore", "fail"));
                                     break;
                             }
                             break;
                         case "Sddl":
-                            sddl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            sddl = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Url":
-                            url = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            url = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             // Need the element ID for child element processing, so generate now if not authored.
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("url", componentId, securityPrincipal, url);
+                id = this.ParseHelper.CreateIdentifier("url", componentId, securityPrincipal, url);
             }
 
             // Parse UrlAce children.
@@ -143,57 +137,56 @@ namespace WixToolset.Extensions
                         case "UrlAce":
                             if (null != sddl)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalParentAttributeWhenNested(sourceLineNumbers, "UrlReservation", "Sddl", "UrlAce"));
+                                this.Messaging.Write(ErrorMessages.IllegalParentAttributeWhenNested(sourceLineNumbers, "UrlReservation", "Sddl", "UrlAce"));
                             }
                             else
                             {
                                 foundACE = true;
-                                this.ParseUrlAceElement(child, id.Id, securityPrincipal);
+                                this.ParseUrlAceElement(intermediate, section, child, id.Id, securityPrincipal);
                             }
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
             // Url is required.
             if (null == url)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Url"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Url"));
             }
 
             // Security is required.
             if (null == sddl && !foundACE)
             {
-                this.Core.OnMessage(HttpErrors.NoSecuritySpecified(sourceLineNumbers));
+                this.Messaging.Write(HttpErrors.NoSecuritySpecified(sourceLineNumbers));
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "WixHttpUrlReservation");
-                row[0] = id.Id;
-                row[1] = handleExisting;
-                row[2] = sddl;
-                row[3] = url;
-                row[4] = componentId;
+                var row = (WixHttpUrlReservationTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixHttpUrlReservation", id);
+                row.HandleExisting = handleExisting;
+                row.Sddl = sddl;
+                row.Url = url;
+                row.Component_ = componentId;
 
-                if (this.Core.CurrentPlatform == Platform.ARM)
+                if (this.Context.Platform == Platform.ARM)
                 {
                     // Ensure ARM version of the CA is referenced.
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsInstall_ARM");
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsUninstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsInstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsUninstall_ARM");
                 }
                 else
                 {
                     // All other supported platforms use x86.
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsInstall");
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsUninstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsInstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsUninstall");
                 }
             }
         }
@@ -204,9 +197,9 @@ namespace WixToolset.Extensions
         /// <param name="node">The element to parse.</param>
         /// <param name="urlReservationId">The URL reservation ID.</param>
         /// <param name="defaultSecurityPrincipal">The default security principal.</param>
-        private void ParseUrlAceElement(XElement node, string urlReservationId, string defaultSecurityPrincipal)
+        private void ParseUrlAceElement(Intermediate intermediate, IntermediateSection section, XElement node, string urlReservationId, string defaultSecurityPrincipal)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
             string securityPrincipal = defaultSecurityPrincipal;
             int rights = HttpConstants.GENERIC_ALL;
@@ -219,13 +212,13 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "SecurityPrincipal":
-                            securityPrincipal = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            securityPrincipal = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Rights":
-                            rightsValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            rightsValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (rightsValue)
                             {
                                 case "all":
@@ -238,42 +231,41 @@ namespace WixToolset.Extensions
                                     rights = HttpConstants.GENERIC_EXECUTE;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Rights", rightsValue, "all", "delegate", "register"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Rights", rightsValue, "all", "delegate", "register"));
                                     break;
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             // Generate Id now if not authored.
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("ace", urlReservationId, securityPrincipal, rightsValue);
+                id = this.ParseHelper.CreateIdentifier("ace", urlReservationId, securityPrincipal, rightsValue);
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
             // SecurityPrincipal is required.
             if (null == securityPrincipal)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SecurityPrincipal"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SecurityPrincipal"));
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "WixHttpUrlAce");
-                row[0] = id.Id;
-                row[1] = urlReservationId;
-                row[2] = securityPrincipal;
-                row[3] = rights;
+                var row = (WixHttpUrlAceTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixHttpUrlAce", id);
+                row.WixHttpUrlReservation_ = urlReservationId;
+                row.SecurityPrincipal = securityPrincipal;
+                row.Rights = rights;
             }
         }
     }

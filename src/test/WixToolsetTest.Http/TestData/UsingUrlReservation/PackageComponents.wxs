@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:http="http://wixtoolset.org/schemas/v4/wxs/http">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+            <ServiceInstall Name="TestService" Type="ownProcess" Start="auto" ErrorControl="ignore">
+                <http:UrlReservation Url="http://+:80/vroot/">
+                    <http:UrlAce Rights="all" />
+                </http:UrlReservation>
+            </ServiceInstall>
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
