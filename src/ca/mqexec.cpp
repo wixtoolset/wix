@@ -2,28 +2,6 @@
 
 #include "precomp.h"
 
-/********************************************************************
- DllMain - standard entry point for all WiX CustomActions
-
-********************************************************************/
-extern "C" BOOL WINAPI DllMain(
-    IN HINSTANCE hInst,
-    IN ULONG ulReason,
-    IN LPVOID)
-{
-    switch(ulReason)
-    {
-    case DLL_PROCESS_ATTACH:
-        WcaGlobalInitialize(hInst);
-        break;
-
-    case DLL_PROCESS_DETACH:
-        WcaGlobalFinalize();
-        break;
-    }
-
-    return TRUE;
-}
 
 /********************************************************************
  MessageQueuingExecuteInstall - CUSTOM ACTION ENTRY POINT
@@ -42,7 +20,7 @@ extern "C" UINT __stdcall MessageQueuingExecuteInstall(MSIHANDLE hInstall)
     hr = WcaInitialize(hInstall, "MessageQueuingExecuteInstall");
     ExitOnFailure(hr, "Failed to initialize MessageQueuingExecuteInstall");
 
-    hr = MqiInitialize();
+    hr = MqiExecInitialize();
     ExitOnFailure(hr, "Failed to initialize");
 
     // get custom action data
@@ -67,7 +45,7 @@ LExit:
     ReleaseStr(pwzCustomActionData);
 
     // uninitialize
-    MqiUninitialize();
+    MqiExecUninitialize();
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
@@ -90,7 +68,7 @@ extern "C" UINT __stdcall MessageQueuingRollbackInstall(MSIHANDLE hInstall)
     hr = WcaInitialize(hInstall, "MessageQueuingRollbackInstall");
     ExitOnFailure(hr, "Failed to initialize MessageQueuingRollbackInstall");
 
-    hr = MqiInitialize();
+    hr = MqiExecInitialize();
     ExitOnFailure(hr, "Failed to initialize");
 
     // get custom action data
@@ -113,7 +91,7 @@ LExit:
     ReleaseStr(pwzCustomActionData);
 
     // uninitialize
-    MqiUninitialize();
+    MqiExecUninitialize();
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
@@ -136,7 +114,7 @@ extern "C" UINT __stdcall MessageQueuingExecuteUninstall(MSIHANDLE hInstall)
     hr = WcaInitialize(hInstall, "MessageQueuingExecuteUninstall");
     ExitOnFailure(hr, "Failed to initialize MessageQueuingExecuteUninstall");
 
-    hr = MqiInitialize();
+    hr = MqiExecInitialize();
     ExitOnFailure(hr, "Failed to initialize");
 
     // get custom action data
@@ -161,7 +139,7 @@ LExit:
     ReleaseStr(pwzCustomActionData);
 
     // uninitialize
-    MqiUninitialize();
+    MqiExecUninitialize();
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
@@ -184,7 +162,7 @@ extern "C" UINT __stdcall MessageQueuingRollbackUninstall(MSIHANDLE hInstall)
     hr = WcaInitialize(hInstall, "MessageQueuingRollbackUninstall");
     ExitOnFailure(hr, "Failed to initialize MessageQueuingRollbackUninstall");
 
-    hr = MqiInitialize();
+    hr = MqiExecInitialize();
     ExitOnFailure(hr, "Failed to initialize");
 
     // get custom action data
@@ -207,7 +185,7 @@ LExit:
     ReleaseStr(pwzCustomActionData);
 
     // uninitialize
-    MqiUninitialize();
+    MqiExecUninitialize();
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);

@@ -1,30 +1,19 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Msmq
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.Reflection;
-    using System.Xml;
     using System.Xml.Linq;
-    using System.Xml.Schema;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
     /// <summary>
-    /// The compiler for the WiX Toolset Internet Information Services Extension.
+    /// The compiler for the WiX Toolset MSMQ Extension.
     /// </summary>
-    public sealed class MsmqCompiler : CompilerExtension
+    public sealed class MsmqCompiler : BaseCompilerExtension
     {
-        /// <summary>
-        /// Instantiate a new MsmqCompiler.
-        /// </summary>
-        public MsmqCompiler()
-        {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/msmq";
-        }
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/msmq";
 
         /// <summary>
         /// </summary>
@@ -75,7 +64,7 @@ namespace WixToolset.Extensions
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             switch (parentElement.Name.LocalName)
             {
@@ -86,18 +75,18 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "MessageQueue":
-                            this.ParseMessageQueueElement(element, componentId);
+                            this.ParseMessageQueueElement(intermediate, section, element, componentId);
                             break;
                         case "MessageQueuePermission":
-                            this.ParseMessageQueuePermissionElement(element, componentId, null);
+                            this.ParseMessageQueuePermissionElement(intermediate, section, element, componentId, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
         }
@@ -107,11 +96,11 @@ namespace WixToolset.Extensions
         ///	</summary>
         ///	<param name="node">Element to parse.</param>
         ///	<param name="componentKey">Identifier of parent component.</param>
-        private void ParseMessageQueueElement(XElement node, string componentId)
+        private void ParseMessageQueueElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
-            string id = null;
+            Identifier id = null;
             int basePriority = CompilerConstants.IntegerNotSet;
             int journalQuota = CompilerConstants.IntegerNotSet;
             string label = null;
@@ -129,10 +118,10 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Authenticate":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= (int)MqiMessageQueueAttributes.Authenticate;
                             }
@@ -142,10 +131,10 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "BasePriority":
-                            basePriority = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
+                            basePriority = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
                             break;
                         case "Journal":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= (int)MqiMessageQueueAttributes.Journal;
                             }
@@ -155,19 +144,19 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "JournalQuota":
-                            journalQuota = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            journalQuota = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "Label":
-                            label = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            label = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MulticastAddress":
-                            multicastAddress = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            multicastAddress = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PathName":
-                            pathName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            pathName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PrivLevel":
-                            string privLevelAttr = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string privLevelAttr = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (privLevelAttr)
                             {
                                 case "none":
@@ -180,15 +169,15 @@ namespace WixToolset.Extensions
                                     privLevel = (int)MqiMessageQueuePrivacyLevel.Body;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "MessageQueue", "PrivLevel", privLevelAttr, "none", "body", "optional"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "MessageQueue", "PrivLevel", privLevelAttr, "none", "body", "optional"));
                                     break;
                             }
                             break;
                         case "Quota":
-                            quota = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            quota = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "Transactional":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= (int)MqiMessageQueueAttributes.Transactional;
                             }
@@ -198,16 +187,16 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "ServiceTypeGuid":
-                            serviceTypeGuid = TryFormatGuidValue(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            serviceTypeGuid = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
@@ -218,46 +207,45 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "MessageQueuePermission":
-                            this.ParseMessageQueuePermissionElement(child, componentId, id);
+                            this.ParseMessageQueuePermissionElement(intermediate, section, child, componentId, id?.Id);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "MessageQueue");
-            row[0] = id;
-            row[1] = componentId;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "MessageQueue", id);
+            row.Set(1, componentId);
             if (CompilerConstants.IntegerNotSet != basePriority)
             {
-                row[2] = basePriority;
+                row.Set(2, basePriority);
             }
             if (CompilerConstants.IntegerNotSet != journalQuota)
             {
-                row[3] = journalQuota;
+                row.Set(3, journalQuota);
             }
-            row[4] = label;
-            row[5] = multicastAddress;
-            row[6] = pathName;
+            row.Set(4, label);
+            row.Set(5, multicastAddress);
+            row.Set(6, pathName);
             if (CompilerConstants.IntegerNotSet != privLevel)
             {
-                row[7] = privLevel;
+                row.Set(7, privLevel);
             }
             if (CompilerConstants.IntegerNotSet != quota)
             {
-                row[8] = quota;
+                row.Set(8, quota);
             }
-            row[9] = serviceTypeGuid;
-            row[10] = attributes;
+            row.Set(9, serviceTypeGuid);
+            row.Set(10, attributes);
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "MessageQueuingInstall");
-            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "MessageQueuingUninstall");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MessageQueuingInstall");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MessageQueuingUninstall");
         }
 
         ///	<summary>
@@ -266,11 +254,11 @@ namespace WixToolset.Extensions
         ///	<param name="node">Element to parse.</param>
         ///	<param name="componentKey">Identifier of parent component.</param>
         ///	<param name="applicationKey">Optional identifier of parent message queue.</param>
-        private void ParseMessageQueuePermissionElement(XElement node, string componentId, string messageQueueId)
+        private void ParseMessageQueuePermissionElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, string messageQueueId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
-            string id = null;
+            Identifier id = null;
             string user = null;
             string group = null;
             int permissions = 0;
@@ -282,34 +270,34 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "MessageQueue":
                             if (null != messageQueueId)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            messageQueueId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "MessageQueue", messageQueueId);
+                            messageQueueId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "MessageQueue", messageQueueId);
                             break;
                         case "User":
                             if (null != group)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "User", "Group"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "User", "Group"));
                             }
-                            user = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
                         case "Group":
                             if (null != user)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Group", "User"));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Group", "User"));
                             }
-                            group = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Group", group);
+                            group = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Group", group);
                             break;
                         case "DeleteMessage":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.DeleteMessage;
                             }
@@ -319,7 +307,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "PeekMessage":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.PeekMessage;
                             }
@@ -329,7 +317,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "WriteMessage":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.WriteMessage;
                             }
@@ -339,7 +327,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "DeleteJournalMessage":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.DeleteJournalMessage;
                             }
@@ -349,7 +337,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "SetQueueProperties":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.SetQueueProperties;
                             }
@@ -359,7 +347,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "GetQueueProperties":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.GetQueueProperties;
                             }
@@ -369,7 +357,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "DeleteQueue":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.DeleteQueue;
                             }
@@ -379,7 +367,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "GetQueuePermissions":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.GetQueuePermissions;
                             }
@@ -389,7 +377,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "ChangeQueuePermissions":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.ChangeQueuePermissions;
                             }
@@ -399,7 +387,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "TakeQueueOwnership":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.TakeQueueOwnership;
                             }
@@ -409,7 +397,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "ReceiveMessage":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.ReceiveMessage;
                             }
@@ -419,7 +407,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "ReceiveJournalMessage":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.ReceiveJournalMessage;
                             }
@@ -429,7 +417,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "QueueGenericRead":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.QueueGenericRead;
                             }
@@ -439,7 +427,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "QueueGenericWrite":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.QueueGenericWrite;
                             }
@@ -449,7 +437,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "QueueGenericExecute":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.QueueGenericExecute;
                             }
@@ -459,7 +447,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "QueueGenericAll":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 permissions |= (int)MqiMessageQueuePermission.QueueGenericAll;
                             }
@@ -469,44 +457,42 @@ namespace WixToolset.Extensions
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == messageQueueId)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "MessageQueue"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "MessageQueue"));
             }
             if (null == user && null == group)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "User", "Group"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "User", "Group"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
             if (null != user)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "MessageQueueUserPermission");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = messageQueueId;
-                row[3] = user;
-                row[4] = permissions;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "MessageQueueUserPermission", id);
+                row.Set(1, componentId);
+                row.Set(2, messageQueueId);
+                row.Set(3, user);
+                row.Set(4, permissions);
             }
             if (null != group)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "MessageQueueGroupPermission");
-                row[0] = id;
-                row[1] = componentId;
-                row[2] = messageQueueId;
-                row[3] = group;
-                row[4] = permissions;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "MessageQueueGroupPermission", id);
+                row.Set(1, componentId);
+                row.Set(2, messageQueueId);
+                row.Set(3, group);
+                row.Set(4, permissions);
             }
         }
 

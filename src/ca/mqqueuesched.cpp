@@ -51,7 +51,7 @@ static MQPathNameToFormatNameFunc gpfnMQPathNameToFormatName;
 
 // function definitions
 
-HRESULT MqiInitialize()
+HRESULT MqiSchedInitialize()
 {
     HRESULT hr = S_OK;
 
@@ -72,7 +72,7 @@ LExit:
     return hr;
 }
 
-void MqiUninitialize()
+void MqiSchedUninitialize()
 {
     if (ghMQRT)
     {

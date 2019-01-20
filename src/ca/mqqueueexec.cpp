@@ -119,7 +119,7 @@ static MQSetQueueSecurityFunc gpfnMQSetQueueSecurity;
 
 // function definitions
 
-HRESULT MqiInitialize()
+HRESULT MqiExecInitialize()
 {
     HRESULT hr = S_OK;
 
@@ -153,7 +153,7 @@ LExit:
     return hr;
 }
 
-void MqiUninitialize()
+void MqiExecUninitialize()
 {
     if (ghMQRT)
         ::FreeLibrary(ghMQRT);

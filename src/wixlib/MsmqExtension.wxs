@@ -11,12 +11,12 @@
       <ProgressText Action="MessageQueuingExecuteUninstall" Template="!(loc.MessageQueuingExecuteUninstallTemplate)">!(loc.MessageQueuingExecuteUninstall)</ProgressText>
     </UI>
 
-    <CustomAction Id="MessageQueuingInstall" BinaryKey="WixMsmqSched" DllEntry="MessageQueuingInstall" Execute="immediate" Return="check" SuppressModularization="yes"/>
-    <CustomAction Id="MessageQueuingUninstall" BinaryKey="WixMsmqSched" DllEntry="MessageQueuingUninstall" Execute="immediate" Return="check" SuppressModularization="yes"/>
-    <CustomAction Id="MessageQueuingExecuteInstall" BinaryKey="WixMsmqExec" DllEntry="MessageQueuingExecuteInstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes"/>
-    <CustomAction Id="MessageQueuingRollbackInstall" BinaryKey="WixMsmqExec" DllEntry="MessageQueuingRollbackInstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes"/>
-    <CustomAction Id="MessageQueuingExecuteUninstall" BinaryKey="WixMsmqExec" DllEntry="MessageQueuingExecuteUninstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes"/>
-    <CustomAction Id="MessageQueuingRollbackUninstall" BinaryKey="WixMsmqExec" DllEntry="MessageQueuingRollbackUninstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes"/>
+    <CustomAction Id="MessageQueuingInstall" BinaryKey="MsmqCA" DllEntry="MessageQueuingInstall" Execute="immediate" Return="check" SuppressModularization="yes"/>
+    <CustomAction Id="MessageQueuingUninstall" BinaryKey="MsmqCA" DllEntry="MessageQueuingUninstall" Execute="immediate" Return="check" SuppressModularization="yes"/>
+    <CustomAction Id="MessageQueuingExecuteInstall" BinaryKey="MsmqCA" DllEntry="MessageQueuingExecuteInstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes"/>
+    <CustomAction Id="MessageQueuingRollbackInstall" BinaryKey="MsmqCA" DllEntry="MessageQueuingRollbackInstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes"/>
+    <CustomAction Id="MessageQueuingExecuteUninstall" BinaryKey="MsmqCA" DllEntry="MessageQueuingExecuteUninstall" Execute="deferred" Return="check" Impersonate="no" SuppressModularization="yes"/>
+    <CustomAction Id="MessageQueuingRollbackUninstall" BinaryKey="MsmqCA" DllEntry="MessageQueuingRollbackUninstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes"/>
 
     <InstallExecuteSequence>
       <Custom Action="MessageQueuingUninstall" After="DeleteServices" Overridable="yes">VersionNT >= 500</Custom>
@@ -25,7 +25,6 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="WixMsmqExec" SourceFile="mqexec.dll"/>
-    <Binary Id="WixMsmqSched" SourceFile="mqsched.dll"/>
+    <Binary Id="MsmqCA" SourceFile="msmqca.dll"/>
   </Fragment>
 </Wix>

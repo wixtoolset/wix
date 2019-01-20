@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:msmq="http://wixtoolset.org/schemas/v4/wxs/msmq">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+            <msmq:MessageQueue Id="TestMQ" Label="MQLabel" PathName="MQPath" />
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

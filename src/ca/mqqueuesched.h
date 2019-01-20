@@ -54,8 +54,8 @@ struct MQI_MESSAGE_QUEUE_PERMISSION_LIST
 
 // function prototypes
 
-HRESULT MqiInitialize();
-void MqiUninitialize();
+HRESULT MqiSchedInitialize();
+void MqiSchedUninitialize();
 HRESULT MqiMessageQueueRead(
     MQI_MESSAGE_QUEUE_LIST* pList
     );

@@ -4,29 +4,6 @@
 
 
 /********************************************************************
- DllMain - standard entry point for all WiX CustomActions
-
-********************************************************************/
-extern "C" BOOL WINAPI DllMain(
-    IN HINSTANCE hInst,
-    IN ULONG ulReason,
-    IN LPVOID)
-{
-    switch(ulReason)
-    {
-    case DLL_PROCESS_ATTACH:
-        WcaGlobalInitialize(hInst);
-        break;
-
-    case DLL_PROCESS_DETACH:
-        WcaGlobalFinalize();
-        break;
-    }
-
-    return TRUE;
-}
-
-/********************************************************************
  MessageQueuingInstall - CUSTOM ACTION ENTRY POINT for installing MSMQ message queues
 
 ********************************************************************/
@@ -51,7 +28,7 @@ extern "C" UINT __stdcall MessageQueuingInstall(MSIHANDLE hInstall)
 
     do
     {
-        hr = MqiInitialize();
+        hr = MqiSchedInitialize();
         if (S_FALSE == hr)
         {
             WcaLog(LOGMSG_STANDARD, "Failed to load mqrt.dll.");
@@ -118,7 +95,7 @@ LExit:
     ReleaseStr(pwzExecuteActionData);
 
     // uninitialize
-    MqiUninitialize();
+    MqiSchedUninitialize();
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
@@ -150,7 +127,7 @@ extern "C" UINT __stdcall MessageQueuingUninstall(MSIHANDLE hInstall)
 
     do
     {
-        hr = MqiInitialize();
+        hr = MqiSchedInitialize();
         if (S_FALSE == hr)
         {
             WcaLog(LOGMSG_STANDARD, "Failed to load mqrt.dll.");
@@ -212,7 +189,7 @@ LExit:
     ReleaseStr(pwzExecuteActionData);
 
     // uninitialize
-    MqiUninitialize();
+    MqiSchedUninitialize();
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
