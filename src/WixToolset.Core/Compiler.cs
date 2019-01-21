@@ -5739,7 +5739,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "FileId", id.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
+                    var context = new Dictionary<string, string>() { { "FileId", id.Id }, { "ComponentId", componentId }, { "DirectoryId", directoryId }, { "Win64", win64Component.ToString() } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
             }
