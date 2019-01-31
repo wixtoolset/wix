@@ -302,7 +302,7 @@ extern "C" HRESULT DAPI CabCBegin(
     // case is we'll leave a zero byte file behind in the temp folder.
     pcd->hEmptyFile = ::CreateFileW(pcd->wzEmptyFile, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
 
-    hr = DictCreateWithEmbeddedKey(&pcd->shDictHandle, dwMaxFiles, reinterpret_cast<void **>(&pcd->prgFiles), offsetof(CABC_FILE, pwzSourcePath), DICT_FLAG_NONE);
+    hr = DictCreateWithEmbeddedKey(&pcd->shDictHandle, dwMaxFiles, reinterpret_cast<void **>(&pcd->prgFiles), offsetof(CABC_FILE, pwzSourcePath), DICT_FLAG_CASEINSENSITIVE);
     ExitOnFailure(hr, "Failed to create dictionary to keep track of duplicate files");
 
     // Make sure to allocate at least some space, or we won't be able to realloc later if they "lied" about having zero files
@@ -383,15 +383,8 @@ extern "C" HRESULT DAPI CabCAddFile(
     HRESULT hr = S_OK;
     CABC_DATA *pcd = reinterpret_cast<CABC_DATA*>(hContext);
     CABC_FILE *pcfDuplicate = NULL;
-    LPWSTR sczUpperCaseFile = NULL;
     LONGLONG llFileSize = 0;
     PMSIFILEHASHINFO pmfLocalHash = pmfHash;
-
-    hr = StrAllocString(&sczUpperCaseFile, wzFile, 0);
-    ExitOnFailure(hr, "Failed to allocate new string for file %ls", wzFile);
-
-    // Modifies the string in-place
-    StrStringToUpper(sczUpperCaseFile);
 
     // Use Smart Cabbing if there are duplicates and if Cabinet Splitting is not desired
     // For Cabinet Spliting avoid hashing as Smart Cabbing is disabled
@@ -401,7 +394,7 @@ extern "C" HRESULT DAPI CabCAddFile(
         hr = FileSize(wzFile, &llFileSize);
         ExitOnFailure(hr, "Failed to check size of file %ls", wzFile);
 
-        hr = CheckForDuplicateFile(pcd, &pcfDuplicate, sczUpperCaseFile, &pmfLocalHash, llFileSize);
+        hr = CheckForDuplicateFile(pcd, &pcfDuplicate, wzFile, &pmfLocalHash, llFileSize);
         ExitOnFailure(hr, "Failed while checking for duplicate of file: %ls", wzFile);
     }
 
@@ -411,20 +404,18 @@ extern "C" HRESULT DAPI CabCAddFile(
         hr = ::PtrdiffTToDWord(pcfDuplicate - pcd->prgFiles, &index);
         ExitOnFailure(hr, "Failed to calculate index of file name: %ls", pcfDuplicate->pwzSourcePath);
 
-        hr = AddDuplicateFile(pcd, index, sczUpperCaseFile, wzToken, pcd->dwLastFileIndex);
+        hr = AddDuplicateFile(pcd, index, wzFile, wzToken, pcd->dwLastFileIndex);
         ExitOnFailure(hr, "Failed to add duplicate of file name: %ls", pcfDuplicate->pwzSourcePath);
     }
     else
     {
-        hr = AddNonDuplicateFile(pcd, sczUpperCaseFile, wzToken, pmfLocalHash, llFileSize, pcd->dwLastFileIndex);
+        hr = AddNonDuplicateFile(pcd, wzFile, wzToken, pmfLocalHash, llFileSize, pcd->dwLastFileIndex);
         ExitOnFailure(hr, "Failed to add non-duplicated file: %ls", wzFile);
     }
 
     ++pcd->dwLastFileIndex;
 
 LExit:
-    ReleaseStr(sczUpperCaseFile);
-
     // If we allocated a hash struct ourselves, free it
     if (pmfHash != pmfLocalHash)
     {
