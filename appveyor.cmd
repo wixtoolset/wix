@@ -2,6 +2,8 @@
 @pushd %~dp0
 @set _P=%~dp0build\Release\publish
 
+nuget restore
+
 dotnet build -c Release src\test\WixToolsetTest.BuildTasks
 dotnet build -c Release src\test\WixToolsetTest.WixCop
 
@@ -15,7 +17,9 @@ dotnet publish -c Release -o %_P%\WixToolset.MSBuild\netcoreapp2.1\ -f netcoreap
 
 dotnet pack -c Release src\dotnet-wix
 dotnet pack -c Release src\WixToolset.MSBuild
-@rem dotnet pack -c Release src\WixToolset.Core.InternalPackage
+
+@rem Enable this build when WixToolset.Core is fixed to build the setup code correctly.
+@rem msbuild -p:Configuration=Release .\src\ThmViewerPackage\ThmViewerPackage.wixproj
 
 @popd
 @endlocal

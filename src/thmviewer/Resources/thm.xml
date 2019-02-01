@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Theme>
+    <Font Id="0" Height="-48" Weight="700" Foreground="$windowtext">Consolas</Font>
+    <Font Id="1" Height="-12" Weight="700" Foreground="$windowtext" Background="$window">Consolas</Font>
+    <Window Width="220" Height="200" FontId="0" Caption="Theme Viewer">
+        <TreeView Name="Tree" X="0" Y="0" Width="0" Height="0" FontId="1" Visible="yes" FullRowSelect="yes" HasButtons="yes" AlwaysShowSelect="yes" HasLines="yes" LinesAtRoot="yes"/>
+    </Window>
+</Theme>
