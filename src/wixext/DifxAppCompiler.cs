@@ -1,26 +1,27 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.DifxApp
 {
     using System;
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.DifxApp.Tuples;
     using WixToolset.Extensibility;
 
     /// <summary>
     /// The compiler for the WiX Toolset Driver Install Frameworks for Applications Extension.
     /// </summary>
-    public sealed class DifxAppCompiler : CompilerExtension
+    public sealed class DifxAppCompiler : BaseCompilerExtension
     {
         private HashSet<string> components;
 
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/difxapp";
         /// <summary>
         /// Instantiate a new DifxAppCompiler.
         /// </summary>
         public DifxAppCompiler()
         {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/difxapp";
             this.components = new HashSet<string>();
         }
 
@@ -31,26 +32,27 @@ namespace WixToolset.Extensions
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             switch (parentElement.Name.LocalName)
             {
                 case "Component":
                     string componentId = context["ComponentId"];
                     string directoryId = context["DirectoryId"];
+                    bool componentWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
                         case "Driver":
-                            this.ParseDriverElement(element, componentId);
+                            this.ParseDriverElement(intermediate, section, element, componentId, componentWin64);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
         }
@@ -60,9 +62,9 @@ namespace WixToolset.Extensions
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="componentId">Identifier for parent component.</param>
-        private void ParseDriverElement(XElement node, string componentId)
+        private void ParseDriverElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, bool win64)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             int attributes = 0;
             int sequence = CompilerConstants.IntegerNotSet;
 
@@ -71,7 +73,7 @@ namespace WixToolset.Extensions
             {
                 if (this.components.Contains(componentId))
                 {
-                    this.Core.OnMessage(WixErrors.TooManyElements(sourceLineNumbers, "Component", node.Name.LocalName, 1));
+                    this.Messaging.Write(ErrorMessages.TooManyElements(sourceLineNumbers, "Component", node.Name.LocalName, 1));
                 }
                 else
                 {
@@ -86,62 +88,74 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                     case "AddRemovePrograms":
-                        if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
                             attributes |= 0x4;
                         }
                         break;
                     case "DeleteFiles":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
                             attributes |= 0x10;
                         }
                         break;
                     case "ForceInstall":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
                             attributes |= 0x1;
                         }
                         break;
                     case "Legacy":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
                             attributes |= 0x8;
                         }
                         break;
                     case "PlugAndPlayPrompt":
-                        if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
                             attributes |= 0x2;
                         }
                         break;
                     case "Sequence":
-                        sequence = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                        sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                         break;
                     default:
-                        this.Core.UnexpectedAttribute(node, attrib);
+                        this.ParseHelper.UnexpectedAttribute(node, attrib);
                         break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
-                Row row = this.Core.CreateRow(sourceLineNumbers, "MsiDriverPackages");
-                row[0] = componentId;
-                row[1] = attributes;
-                if (CompilerConstants.IntegerNotSet != sequence)
+                switch (this.Context.Platform)
                 {
-                    row[2] = sequence;
+                    case Platform.X86:
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MsiProcessDrivers");
+                        break;
+                    case Platform.X64:
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MsiProcessDrivers_x64");
+                        break;
+                    case Platform.IA64:
+                    case Platform.ARM:
+                        this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), node.Name.LocalName));
+                        break;
                 }
 
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "MsiProcessDrivers");
+                var row = (MsiDriverPackagesTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "MsiDriverPackages");
+                row.Set(0, componentId);
+                row.Set(1, attributes);
+                if (CompilerConstants.IntegerNotSet != sequence)
+                {
+                    row.Set(2, sequence);
+                }
             }
         }
     }

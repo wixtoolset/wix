@@ -1,43 +1,23 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.DifxApp
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
-    /// <summary>
-    /// The WiX Toolset Driver Install Frameworks for Applications Extension.
-    /// </summary>
-    public sealed class DifxAppExtensionData : ExtensionData
+    public sealed class DifxAppExtensionData : BaseExtensionData
     {
-        private static TableDefinitionCollection tableDefinitions;
+        public override string DefaultCulture => "en-US";
 
-        /// <summary>
-        /// Gets the optional table definitions for this extension.
-        /// </summary>
-        /// <value>The optional table definitions for this extension.</value>
-        public override TableDefinitionCollection TableDefinitions
+        public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            get
-            {
-                return DifxAppExtensionData.GetExtensionTableDefinitions();
-            }
+            tupleDefinition = DifxAppTupleDefinitions.ByName(name);
+            return tupleDefinition != null;
         }
 
-        /// <summary>
-        /// Internal mechanism to access the extension's table definitions.
-        /// </summary>
-        /// <returns>Extension's table definitions.</returns>
-        internal static TableDefinitionCollection GetExtensionTableDefinitions()
+        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            if (null == DifxAppExtensionData.tableDefinitions)
-            {
-                DifxAppExtensionData.tableDefinitions = ExtensionData.LoadTableDefinitionHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.tables.xml");
-            }
-
-            return DifxAppExtensionData.tableDefinitions;
+            return Intermediate.Load(typeof(DifxAppExtensionData).Assembly, "WixToolset.DifxApp.difxapp.wixlib", tupleDefinitions);
         }
     }
 }
