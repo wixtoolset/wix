@@ -1,34 +1,24 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.DirectX
 {
-    using System;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility;
 
     /// <summary>
     /// The WiX Toolset DirectX Extension.
     /// </summary>
-    public sealed class DirectXExtensionData : ExtensionData
+    public sealed class DirectXExtensionData : BaseExtensionData
     {
         /// <summary>
-        /// Gets the library associated with this extension.
+        /// Gets the default culture.
         /// </summary>
-        /// <param name="tableDefinitions">The table definitions to use while loading the library.</param>
-        /// <returns>The loaded library.</returns>
-        public override Library GetLibrary(TableDefinitionCollection tableDefinitions)
-        {
-            return DirectXExtensionData.GetExtensionLibrary(tableDefinitions);
-        }
+        /// <value>The default culture.</value>
+        public override string DefaultCulture => "en-US";
 
-        /// <summary>
-        /// Internal mechanism to access the extension's library.
-        /// </summary>
-        /// <returns>Extension's library.</returns>
-        internal static Library GetExtensionLibrary(TableDefinitionCollection tableDefinitions)
+        public override Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            return ExtensionData.LoadLibraryHelper(Assembly.GetExecutingAssembly(), "WixToolset.Extensions.Data.DirectX.wixlib", tableDefinitions);
+            return Intermediate.Load(typeof(DirectXExtensionData).Assembly, "WixToolset.DirectX.directx.wixlib", tupleDefinitions);
         }
     }
 }

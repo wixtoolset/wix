@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <PropertyRef Id="WIX_DIRECTX_PIXELSHADERVERSION" />
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

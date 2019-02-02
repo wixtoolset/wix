@@ -7,11 +7,11 @@
 
     <!-- DirectX Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="WixDirectXCA" SourceFile="directx.dll" />
+        <Binary Id="DirectXCA" SourceFile="directxca.dll" />
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="WixQueryDirectXCaps" BinaryKey="WixDirectXCA" DllEntry="WixQueryDirectXCaps" Return="ignore" />
+        <CustomAction Id="WixQueryDirectXCaps" BinaryKey="DirectXCA" DllEntry="WixQueryDirectXCaps" Return="ignore" />
         
         <InstallUISequence>
             <Custom Action="WixQueryDirectXCaps" Before="LaunchConditions" Overridable="yes">VersionNT &gt; 400</Custom>

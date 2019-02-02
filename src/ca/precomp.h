@@ -7,8 +7,5 @@
 #include <msiquery.h>
 #include <D3D9.h>
 
-#include "wixstrsafe.h"
 #include "wcautil.h"
 #include "strutil.h"
-
-#include "CustomMsiErrors.h"
