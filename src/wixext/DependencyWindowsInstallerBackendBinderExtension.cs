@@ -1,24 +1,35 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Dependency
 {
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Globalization;
-    using WixToolset.Data;
+    using System.Linq;
+    using System.Xml;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    /// <summary>
-    /// The compiler for the WiX toolset dependency extension.
-    /// </summary>
-    public sealed class DependencyBinder : BinderExtension
+    public class DependencyWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
+        private static readonly TableDefinition[] Tables = LoadTables();
+
+        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
+
+        private static TableDefinition[] LoadTables()
+        {
+            using (var resourceStream = typeof(DependencyWindowsInstallerBackendBinderExtension).Assembly.GetManifestResourceStream("WixToolset.Dependency.tables.xml"))
+            using (var reader = XmlReader.Create(resourceStream))
+            {
+                var tables = TableDefinitionCollection.Load(reader);
+                return tables.ToArray();
+            }
+        }
+
+#if TODO_TAG_BINDER_EXTENSION
         private Output output;
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
         /// </summary>
-        public override void Finish(Output output)
+        public void Finish(Output output)
         {
             // Only process MSI packages.
             if (OutputType.Product != output.Type)
@@ -165,5 +176,6 @@ namespace WixToolset.Extensions
                 return row.GetPrimaryKey('/');
             }
         }
+#endif
     }
 }

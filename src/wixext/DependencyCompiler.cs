@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.Dependency
 {
     using System;
     using System.Collections.Generic;
@@ -9,11 +9,12 @@ namespace WixToolset.Extensions
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
-    /// The compiler for the WiX toolset dependency extension.
+    /// The compiler for the WiX Toolset Dependency Extension.
     /// </summary>
-    public sealed class DependencyCompiler : CompilerExtension
+    public sealed class DependencyCompiler : BaseCompilerExtension
     {
         /// <summary>
         /// Package type when parsing the Provides element.
@@ -27,10 +28,7 @@ namespace WixToolset.Extensions
             MsuPackage
         }
 
-        public DependencyCompiler()
-        {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/dependency";
-        }
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/dependency";
 
         /// <summary>
         /// Processes an attribute for the Compiler.
@@ -38,24 +36,24 @@ namespace WixToolset.Extensions
         /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
         /// <param name="parentElement">Parent element of attribute.</param>
         /// <param name="attribute">Attribute to process.</param>
-        public override void ParseAttribute(XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
+        public override void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(parentElement);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
             switch (parentElement.Name.LocalName)
             {
                 case "Bundle":
                     switch (attribute.Name.LocalName)
                     {
                         case "ProviderKey":
-                            this.ParseProviderKeyAttribute(sourceLineNumbers, parentElement, attribute);
+                            this.ParseProviderKeyAttribute(section, sourceLineNumbers, parentElement, attribute);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(parentElement, attribute);
+                            this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedAttribute(parentElement, attribute);
+                    this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
                     break;
             }
         }
@@ -67,7 +65,7 @@ namespace WixToolset.Extensions
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             PackageType packageType = PackageType.None;
 
@@ -80,10 +78,10 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "Requires":
-                            this.ParseRequiresElement(element, null, false);
+                            this.ParseRequiresElement(intermediate, section, element, null, false);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
@@ -100,7 +98,7 @@ namespace WixToolset.Extensions
                     packageType = PackageType.MsuPackage;
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
 
@@ -111,10 +109,10 @@ namespace WixToolset.Extensions
                 switch (element.Name.LocalName)
                 {
                     case "Provides":
-                        this.ParseProvidesElement(element, packageType, packageId);
+                        this.ParseProvidesElement(intermediate, section, element, packageType, packageId);
                         break;
                     default:
-                        this.Core.UnexpectedElement(parentElement, element);
+                        this.ParseHelper.UnexpectedElement(parentElement, element);
                         break;
                 }
             }
@@ -127,9 +125,9 @@ namespace WixToolset.Extensions
         /// <param name="element">Element to process.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         /// <returns>The component key path type if set.</returns>
-        public override ComponentKeyPath ParsePossibleKeyPathElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override ComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(parentElement);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
             ComponentKeyPath keyPath = null;
 
             switch (parentElement.Name.LocalName)
@@ -146,18 +144,18 @@ namespace WixToolset.Extensions
                         case "Provides":
                             if (win64)
                             {
-                                this.Core.OnMessage(DependencyWarnings.Win64Component(sourceLineNumbers, componentId));
+                                this.Messaging.Write(DependencyWarnings.Win64Component(sourceLineNumbers, componentId));
                             }
 
-                            keyPath = this.ParseProvidesElement(element, PackageType.None, componentId);
+                            keyPath = this.ParseProvidesElement(intermediate, section, element, PackageType.None, componentId);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
 
@@ -170,7 +168,7 @@ namespace WixToolset.Extensions
         /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
         /// <param name="parentElement">Parent element of attribute.</param>
         /// <param name="attribute">The XML attribute for the ProviderKey attribute.</param>
-        private void ParseProviderKeyAttribute(SourceLineNumber sourceLineNumbers, XElement parentElement, XAttribute attribute)
+        private void ParseProviderKeyAttribute(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement parentElement, XAttribute attribute)
         {
             Identifier id = null;
             string providerKey = null;
@@ -179,41 +177,41 @@ namespace WixToolset.Extensions
             switch (attribute.Name.LocalName)
             {
                 case "ProviderKey":
-                    providerKey = this.Core.GetAttributeValue(sourceLineNumbers, attribute);
+                    providerKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
                     break;
                 default:
-                    this.Core.UnexpectedAttribute(parentElement, attribute);
+                    this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
                     break;
             }
 
             // Make sure the key does not contain any illegal characters or values.
             if (String.IsNullOrEmpty(providerKey))
             {
-                this.Core.OnMessage(WixErrors.IllegalEmptyAttributeValue(sourceLineNumbers, parentElement.Name.LocalName, attribute.Name.LocalName));
+                this.Messaging.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, parentElement.Name.LocalName, attribute.Name.LocalName));
             }
             else if (0 <= (illegalChar = providerKey.IndexOfAny(DependencyCommon.InvalidCharacters)))
             {
                 StringBuilder sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
                 Array.ForEach<char>(DependencyCommon.InvalidCharacters, c => sb.Append(c).Append(" "));
 
-                this.Core.OnMessage(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "ProviderKey", providerKey[illegalChar], sb.ToString()));
+                this.Messaging.Write(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "ProviderKey", providerKey[illegalChar], sb.ToString()));
             }
             else if ("ALL" == providerKey)
             {
-                this.Core.OnMessage(DependencyErrors.ReservedValue(sourceLineNumbers, parentElement.Name.LocalName, "ProviderKey", providerKey));
+                this.Messaging.Write(DependencyErrors.ReservedValue(sourceLineNumbers, parentElement.Name.LocalName, "ProviderKey", providerKey));
             }
 
             // Generate the primary key for the row.
-            id = this.Core.CreateIdentifier("dep", attribute.Name.LocalName, providerKey);
+            id = this.ParseHelper.CreateIdentifier("dep", attribute.Name.LocalName, providerKey);
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
                 // Create the provider row for the bundle. The Component_ field is required
                 // in the table definition but unused for bundles, so just set it to the valid ID.
-                Row row = this.Core.CreateRow(sourceLineNumbers, "WixDependencyProvider", id);
-                row[1] = id.Id;
-                row[2] = providerKey;
-                row[5] = DependencyCommon.ProvidesAttributesBundle;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyProvider", id);
+                row.Set(1, id.Id);
+                row.Set(2, providerKey);
+                row.Set(5, DependencyCommon.ProvidesAttributesBundle);
             }
         }
 
@@ -225,9 +223,9 @@ namespace WixToolset.Extensions
         /// <param name="keyPath">Explicit key path.</param>
         /// <param name="parentId">The identifier of the parent component or package.</param>
         /// <returns>The type of key path if set.</returns>
-        private ComponentKeyPath ParseProvidesElement(XElement node, PackageType packageType, string parentId)
+        private ComponentKeyPath ParseProvidesElement(Intermediate intermediate, IntermediateSection section, XElement node, PackageType packageType, string parentId)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             ComponentKeyPath keyPath = null;
             Identifier id = null;
             string key = null;
@@ -243,25 +241,25 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Key":
-                            key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Version":
-                            version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            version = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
                             break;
                         case "DisplayName":
-                            displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            displayName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
@@ -275,22 +273,22 @@ namespace WixToolset.Extensions
                     StringBuilder sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
                     Array.ForEach<char>(DependencyCommon.InvalidCharacters, c => sb.Append(c).Append(" "));
 
-                    this.Core.OnMessage(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "Key", key[illegalChar], sb.ToString()));
+                    this.Messaging.Write(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "Key", key[illegalChar], sb.ToString()));
                 }
                 else if ("ALL" == key)
                 {
-                    this.Core.OnMessage(DependencyErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Key", key));
+                    this.Messaging.Write(DependencyErrors.ReservedValue(sourceLineNumbers, node.Name.LocalName, "Key", key));
                 }
             }
             else if (PackageType.ExePackage == packageType || PackageType.MsuPackage == packageType)
             {
                 // Must specify the provider key when authored for a package.
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
             else if (PackageType.None == packageType)
             {
                 // Make sure the ProductCode is authored and set the key.
-                this.Core.CreateSimpleReference(sourceLineNumbers, "Property", "ProductCode");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Property", "ProductCode");
                 key = "!(bind.property.ProductCode)";
             }
 
@@ -300,23 +298,23 @@ namespace WixToolset.Extensions
                 switch (packageType)
                 {
                     case PackageType.None:
-                        this.Core.OnMessage(DependencyWarnings.DiscouragedVersionAttribute(sourceLineNumbers));
+                        this.Messaging.Write(DependencyWarnings.DiscouragedVersionAttribute(sourceLineNumbers));
                         break;
                     case PackageType.MsiPackage:
-                        this.Core.OnMessage(DependencyWarnings.DiscouragedVersionAttribute(sourceLineNumbers, parentId));
+                        this.Messaging.Write(DependencyWarnings.DiscouragedVersionAttribute(sourceLineNumbers, parentId));
                         break;
                 }
             }
             else if (PackageType.MspPackage == packageType || PackageType.MsuPackage == packageType)
             {
                 // Must specify the Version when authored for packages that do not contain a version.
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
             }
 
             // Need the element ID for child element processing, so generate now if not authored.
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("dep", node.Name.LocalName, parentId, key);
+                id = this.ParseHelper.CreateIdentifier("dep", node.Name.LocalName, parentId, key);
             }
 
             foreach (XElement child in node.Elements())
@@ -326,94 +324,93 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "Requires":
-                            this.ParseRequiresElement(child, id.Id, PackageType.None == packageType);
+                            this.ParseRequiresElement(intermediate, section, child, id.Id, PackageType.None == packageType);
                             break;
                         case "RequiresRef":
-                            this.ParseRequiresRefElement(child, id.Id, PackageType.None == packageType);
+                            this.ParseRequiresRefElement(intermediate, section, child, id.Id, PackageType.None == packageType);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
                 // Create the row in the provider table.
-                Row row = this.Core.CreateRow(sourceLineNumbers, "WixDependencyProvider", id);
-                row[1] = parentId;
-                row[2] = key;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyProvider", id);
+                row.Set(1, parentId);
+                row.Set(2, key);
 
                 if (!String.IsNullOrEmpty(version))
                 {
-                    row[3] = version;
+                    row.Set(3, version);
                 }
 
                 if (!String.IsNullOrEmpty(displayName))
                 {
-                    row[4] = displayName;
+                    row.Set(4, displayName);
                 }
 
                 if (0 != attributes)
                 {
-                    row[5] = attributes;
+                    row.Set(5, attributes);
                 }
 
                 if (PackageType.None == packageType)
                 {
                     // Reference the Check custom action to check for dependencies on the current provider.
-                    if (Platform.ARM == this.Core.CurrentPlatform)
+                    if (Platform.ARM == this.Context.Platform)
                     {
                         // Ensure the ARM version of the CA is referenced.
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixDependencyCheck_ARM");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyCheck_ARM");
                     }
                     else
                     {
                         // All other supported platforms use x86.
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixDependencyCheck");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyCheck");
                     }
 
                     // Generate registry rows for the provider using binder properties.
                     string keyProvides = String.Concat(DependencyCommon.RegistryRoot, key);
 
-                    row = this.Core.CreateRow(sourceLineNumbers, "Registry", this.Core.CreateIdentifier("reg", id.Id, "(Default)"));
-                    row[1] = -1;
-                    row[2] = keyProvides;
-                    row[3] = null;
-                    row[4] = "[ProductCode]";
-                    row[5] = parentId;
+                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", this.ParseHelper.CreateIdentifier("reg", id.Id, "(Default)"));
+                    row.Set(1, -1);
+                    row.Set(2, keyProvides);
+                    row.Set(4, "[ProductCode]");
+                    row.Set(5, parentId);
 
                     // Use the Version registry value and use that as a potential key path.
-                    Identifier idVersion = this.Core.CreateIdentifier("reg", id.Id, "Version");
+                    Identifier idVersion = this.ParseHelper.CreateIdentifier("reg", id.Id, "Version");
                     keyPath = new ComponentKeyPath() { Id = idVersion.Id, Explicit = false, Type = ComponentKeyPathType.Registry };
 
-                    row = this.Core.CreateRow(sourceLineNumbers, "Registry", idVersion);
-                    row[1] = -1;
-                    row[2] = keyProvides;
-                    row[3] = "Version";
-                    row[4] = !String.IsNullOrEmpty(version) ? version : "[ProductVersion]";
-                    row[5] = parentId;
+                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", idVersion);
+                    row.Set(1, -1);
+                    row.Set(2, keyProvides);
+                    row.Set(3, "Version");
+                    row.Set(4, !String.IsNullOrEmpty(version) ? version : "[ProductVersion]");
+                    row.Set(5, parentId);
 
-                    row = this.Core.CreateRow(sourceLineNumbers, "Registry", this.Core.CreateIdentifier("reg", id.Id, "DisplayName"));
-                    row[1] = -1;
-                    row[2] = keyProvides;
-                    row[3] = "DisplayName";
-                    row[4] = !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]";
-                    row[5] = parentId;
+                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", this.ParseHelper.CreateIdentifier("reg", id.Id, "DisplayName"));
+                    row.Set(1, -1);
+                    row.Set(2, keyProvides);
+                    row.Set(3, "DisplayName");
+                    row.Set(4, !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]");
+                    row.Set(5, parentId);
 
                     if (0 != attributes)
                     {
-                        row = this.Core.CreateRow(sourceLineNumbers, "Registry", this.Core.CreateIdentifier("reg", id.Id, "Attributes"));
-                        row[1] = -1;
-                        row[2] = keyProvides;
-                        row[3] = "Attributes";
-                        row[4] = String.Concat("#", attributes.ToString(CultureInfo.InvariantCulture.NumberFormat));
-                        row[5] = parentId;
+                        row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", this.ParseHelper.CreateIdentifier("reg", id.Id, "Attributes"));
+                        row.Set(1, -1);
+                        row.Set(2, keyProvides);
+                        row.Set(3, "Attributes");
+                        row.Set(4, String.Concat("#", attributes.ToString(CultureInfo.InvariantCulture.NumberFormat)));
+                        row.Set(5, parentId);
                     }
                 }
             }
@@ -427,9 +424,9 @@ namespace WixToolset.Extensions
         /// <param name="node">The XML node for the Requires element.</param>
         /// <param name="providerId">The parent provider identifier.</param>
         /// <param name="requiresAction">Whether the Requires custom action should be referenced.</param>
-        private void ParseRequiresElement(XElement node, string providerId, bool requiresAction)
+        private void ParseRequiresElement(Intermediate intermediate, IntermediateSection section, XElement node, string providerId, bool requiresAction)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
             string providerKey = null;
             string minVersion = null;
@@ -444,41 +441,41 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "ProviderKey":
-                            providerKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            providerKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Minimum":
-                            minVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            minVersion = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
                             break;
                         case "Maximum":
-                            maxVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            maxVersion = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
                             break;
                         case "IncludeMinimum":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DependencyCommon.RequiresAttributesMinVersionInclusive;
                             }
                             break;
                         case "IncludeMaximum":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= DependencyCommon.RequiresAttributesMaxVersionInclusive;
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
             if (null == id)
             {
@@ -486,18 +483,18 @@ namespace WixToolset.Extensions
                 // element will be necessary and the Id attribute will be required.
                 if (!String.IsNullOrEmpty(providerId))
                 {
-                    id = this.Core.CreateIdentifier("dep", node.Name.LocalName, providerKey);
+                    id = this.ParseHelper.CreateIdentifier("dep", node.Name.LocalName, providerKey);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixErrors.ExpectedAttributeWhenElementNotUnderElement(sourceLineNumbers, node.Name.LocalName, "Id", "Provides"));
+                    this.Messaging.Write(ErrorMessages.ExpectedAttributeWhenElementNotUnderElement(sourceLineNumbers, node.Name.LocalName, "Id", "Provides"));
                     id = Identifier.Invalid;
                 }
             }
 
             if (String.IsNullOrEmpty(providerKey))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProviderKey"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProviderKey"));
             }
             // Make sure the key does not contain any illegal characters.
             else if (0 <= (illegalChar = providerKey.IndexOfAny(DependencyCommon.InvalidCharacters)))
@@ -505,44 +502,44 @@ namespace WixToolset.Extensions
                 StringBuilder sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
                 Array.ForEach<char>(DependencyCommon.InvalidCharacters, c => sb.Append(c).Append(" "));
 
-                this.Core.OnMessage(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "ProviderKey", providerKey[illegalChar], sb.ToString()));
+                this.Messaging.Write(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "ProviderKey", providerKey[illegalChar], sb.ToString()));
             }
 
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
                 // Reference the Require custom action if required.
                 if (requiresAction)
                 {
-                    if (Platform.ARM == this.Core.CurrentPlatform)
+                    if (Platform.ARM == this.Context.Platform)
                     {
                         // Ensure the ARM version of the CA is referenced.
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
                     }
                     else
                     {
                         // All other supported platforms use x86.
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixDependencyRequire");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire");
                     }
                 }
 
-                Row row = this.Core.CreateRow(sourceLineNumbers, "WixDependency", id);
-                row[1] = providerKey;
-                row[2] = minVersion;
-                row[3] = maxVersion;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependency", id);
+                row.Set(1, providerKey);
+                row.Set(2, minVersion);
+                row.Set(3, maxVersion);
 
                 if (0 != attributes)
                 {
-                    row[4] = attributes;
+                    row.Set(4, attributes);
                 }
 
                 // Create the relationship between this WixDependency row and the WixDependencyProvider row.
                 if (!String.IsNullOrEmpty(providerId))
                 {
                     // Create the relationship between the WixDependency row and the parent WixDependencyProvider row.
-                    row = this.Core.CreateRow(sourceLineNumbers, "WixDependencyRef");
-                    row[0] = providerId;
-                    row[1] = id.Id;
+                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyRef");
+                    row.Set(0, providerId);
+                    row.Set(1, id.Id);
                 }
             }
         }
@@ -553,9 +550,9 @@ namespace WixToolset.Extensions
         /// <param name="node">The XML node for the RequiresRef element.</param>
         /// <param name="providerId">The parent provider identifier.</param>
         /// <param name="requiresAction">Whether the Requires custom action should be referenced.</param>
-        private void ParseRequiresRefElement(XElement node, string providerId, bool requiresAction)
+        private void ParseRequiresRefElement(Intermediate intermediate, IntermediateSection section, XElement node, string providerId, bool requiresAction)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string id = null;
 
             foreach (XAttribute attrib in node.Attributes())
@@ -565,50 +562,50 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
             if (String.IsNullOrEmpty(id))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            if (!this.Core.EncounteredError)
+            if (!this.Messaging.EncounteredError)
             {
                 // Reference the Require custom action if required.
                 if (requiresAction)
                 {
-                    if (Platform.ARM == this.Core.CurrentPlatform)
+                    if (Platform.ARM == this.Context.Platform)
                     {
                         // Ensure the ARM version of the CA is referenced.
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
                     }
                     else
                     {
                         // All other supported platforms use x86.
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "WixDependencyRequire");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire");
                     }
                 }
 
                 // Create a link dependency on the row that contains information we'll need during bind.
-                this.Core.CreateSimpleReference(sourceLineNumbers, "WixDependency", id);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixDependency", id);
 
                 // Create the relationship between the WixDependency row and the parent WixDependencyProvider row.
-                Row row = this.Core.CreateRow(sourceLineNumbers, "WixDependencyRef");
-                row[0] = providerId;
-                row[1] = id;
+                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyRef");
+                row.Set(0, providerId);
+                row.Set(1, id);
             }
         }
     }
