@@ -3,9 +3,9 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
-    <WixToolsetDepedencyWixextPath Condition=" '$(WixToolsetDepedencyWixextPath)' == '' ">$(MSBuildThisFileDirectory)..\tools\WixToolset.Depedency.wixext.dll</WixToolsetDepedencyWixextPath>
+    <WixToolsetDependencyWixextPath Condition=" '$(WixToolsetDependencyWixextPath)' == '' ">$(MSBuildThisFileDirectory)..\tools\WixToolset.Dependency.wixext.dll</WixToolsetDependencyWixextPath>
   </PropertyGroup>
   <ItemGroup>
-    <WixExtension Include="$(WixToolsetDepedencyWixextPath)" />
+    <WixExtension Include="$(WixToolsetDependencyWixextPath)" />
   </ItemGroup>
 </Project>
