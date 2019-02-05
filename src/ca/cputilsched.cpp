@@ -43,7 +43,7 @@ static int giTables;
 
 // function definitions
 
-void CpiInitialize()
+void CpiSchedInitialize()
 {
     // collections
     gpiCatalog = NULL;
@@ -80,7 +80,7 @@ void CpiInitialize()
     if (S_OK == WcaTableExists(L"ComPlusSubscriptionProperty"))    giTables |= cptComPlusSubscriptionProperty;
 }
 
-void CpiFinalize()
+void CpiSchedFinalize()
 {
     // collections
     ReleaseObject(gpiCatalog);
@@ -95,7 +95,7 @@ BOOL CpiTableExists(
     return (giTables & iTable) == iTable;
 }
 
-HRESULT CpiGetAdminCatalog(
+HRESULT CpiSchedGetAdminCatalog(
     ICOMAdminCatalog** ppiCatalog
     )
 {
@@ -118,7 +118,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiSchedGetCatalogCollection(
     LPCWSTR pwzName,
     ICatalogCollection** ppiColl
     )
@@ -134,7 +134,7 @@ HRESULT CpiGetCatalogCollection(
     ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for collection name");
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiSchedGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get collecton from catalog
@@ -159,7 +159,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiSchedGetCatalogCollection(
     ICatalogCollection* piColl,
     ICatalogObject* piObj,
     LPCWSTR pwzName,
@@ -180,7 +180,7 @@ HRESULT CpiGetCatalogCollection(
     ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for collection name");
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiSchedGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get key
@@ -331,7 +331,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetPartitionsCollection(
+HRESULT CpiSchedGetPartitionsCollection(
     ICatalogCollection** ppiPartColl
     )
 {
@@ -340,7 +340,7 @@ HRESULT CpiGetPartitionsCollection(
     if (!gpiPartColl)
     {
         // get collection
-        hr = CpiGetCatalogCollection(L"Partitions", &gpiPartColl);
+        hr = CpiSchedGetCatalogCollection(L"Partitions", &gpiPartColl);
         ExitOnFailure(hr, "Failed to get partitions collection");
     }
 
@@ -354,7 +354,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetApplicationsCollection(
+HRESULT CpiSchedGetApplicationsCollection(
     ICatalogCollection** ppiAppColl
     )
 {
@@ -369,7 +369,7 @@ HRESULT CpiGetApplicationsCollection(
     if (!gpiAppColl)
     {
         // get catalog
-        hr = CpiGetAdminCatalog(&piCatalog);
+        hr = CpiSchedGetAdminCatalog(&piCatalog);
         ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
         // get ICOMAdminCatalog2 interface
@@ -385,7 +385,7 @@ HRESULT CpiGetApplicationsCollection(
             ExitOnFailure(hr, "Failed to get global partition id");
 
             // get partitions collection
-            hr = CpiGetPartitionsCollection(&piPartColl);
+            hr = CpiSchedGetPartitionsCollection(&piPartColl);
             ExitOnFailure(hr, "Failed to get partitions collection");
 
             // find object
@@ -396,7 +396,7 @@ HRESULT CpiGetApplicationsCollection(
                 ExitFunction(); // partition not found, exit with hr = S_FALSE
 
             // get applications collection
-            hr = CpiGetCatalogCollection(piPartColl, piPartObj, L"Applications", &gpiAppColl);
+            hr = CpiSchedGetCatalogCollection(piPartColl, piPartObj, L"Applications", &gpiAppColl);
             ExitOnFailure(hr, "Failed to get applications collection");
         }
 
@@ -404,7 +404,7 @@ HRESULT CpiGetApplicationsCollection(
         else
         {
             // get applications collection
-            hr = CpiGetCatalogCollection(L"Applications", &gpiAppColl);
+            hr = CpiSchedGetCatalogCollection(L"Applications", &gpiAppColl);
             ExitOnFailure(hr, "Failed to get applications collection");
         }
     }

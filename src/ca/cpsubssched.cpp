@@ -53,7 +53,7 @@ static HRESULT ComponentFindByKey(
     CPI_ASSEMBLY_LIST* pAsmList,
     LPCWSTR pwzKey,
     CPI_ASSEMBLY** ppAsmItm,
-    CPI_COMPONENT** ppCompItm
+    CPISCHED_COMPONENT** ppCompItm
     );
 
 
@@ -586,12 +586,12 @@ static HRESULT ComponentFindByKey(
     CPI_ASSEMBLY_LIST* pAsmList,
     LPCWSTR pwzKey,
     CPI_ASSEMBLY** ppAsmItm,
-    CPI_COMPONENT** ppCompItm
+    CPISCHED_COMPONENT** ppCompItm
     )
 {
     for (CPI_ASSEMBLY* pAsmItm = pAsmList->pFirst; pAsmItm; pAsmItm = pAsmItm->pNext)
     {
-        for (CPI_COMPONENT* pCompItm = pAsmItm->pComponents; pCompItm; pCompItm = pCompItm->pNext)
+        for (CPISCHED_COMPONENT* pCompItm = pAsmItm->pComponents; pCompItm; pCompItm = pCompItm->pNext)
         {
             if (0 == lstrcmpW(pCompItm->wzKey, pwzKey))
             {

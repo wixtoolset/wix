@@ -60,19 +60,19 @@
   <Fragment>
     <UIRef Id="ComPlusUI" />
 
-    <CustomAction Id="ConfigureComPlusInstall" BinaryKey="WixCPSched_x86" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigureComPlusUninstall" BinaryKey="WixCPSched_x86" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallPrepare" BinaryKey="WixCPExec_x86" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackInstallPrepare" BinaryKey="WixCPExec_x86" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallExecute" BinaryKey="WixCPExec_x86" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallExecuteCommit" BinaryKey="WixCPExec_x86" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackInstallExecute" BinaryKey="WixCPExec_x86" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallCommit" BinaryKey="WixCPExec_x86" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusUninstallPrepare" BinaryKey="WixCPExec_x86" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackUninstallPrepare" BinaryKey="WixCPExec_x86" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusUninstallExecute" BinaryKey="WixCPExec_x86" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackUninstallExecute" BinaryKey="WixCPExec_x86" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusUninstallCommit" BinaryKey="WixCPExec_x86" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureComPlusInstall" BinaryKey="ComPlusCA_x86" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureComPlusUninstall" BinaryKey="ComPlusCA_x86" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallPrepare" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackInstallPrepare" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallExecute" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallExecuteCommit" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackInstallExecute" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallCommit" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusUninstallPrepare" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackUninstallPrepare" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusUninstallExecute" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackUninstallExecute" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusUninstallCommit" BinaryKey="ComPlusCA_x86" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
 
     <Property Id="ComPlusInstallPrepare" Hidden="yes" SuppressModularization="yes" />
     <Property Id="ComPlusRollbackInstallPrepare" Hidden="yes" SuppressModularization="yes" />
@@ -95,19 +95,19 @@
   <Fragment>
     <UIRef Id="ComPlusUI" />
 
-    <CustomAction Id="ConfigureComPlusInstall_x64" BinaryKey="WixCPSched_x64" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigureComPlusUninstall_x64" BinaryKey="WixCPSched_x64" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallPrepare_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackInstallPrepare_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallExecute_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallExecuteCommit_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackInstallExecute_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusInstallCommit_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusUninstallPrepare_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackUninstallPrepare_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusUninstallExecute_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusRollbackUninstallExecute_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ComPlusUninstallCommit_64" BinaryKey="WixCPExec_x64" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureComPlusInstall_x64" BinaryKey="ComPlusCA_x64" DllEntry="ConfigureComPlusInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="ConfigureComPlusUninstall_x64" BinaryKey="ComPlusCA_x64" DllEntry="ConfigureComPlusUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallPrepare_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackInstallPrepare_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallExecute_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusInstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallExecuteCommit_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusInstallExecuteCommit" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackInstallExecute_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusRollbackInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusInstallCommit_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusUninstallPrepare_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusPrepare" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackUninstallPrepare_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusCleanup" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusUninstallExecute_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusUninstallExecute" Execute="deferred" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusRollbackUninstallExecute_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusInstallExecute" Execute="rollback" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="ComPlusUninstallCommit_64" BinaryKey="ComPlusCA_x64" DllEntry="ComPlusCleanup" Execute="commit" Return="check" Impersonate="no" HideTarget="yes" SuppressModularization="yes" />
 
     <Property Id="ComPlusInstallPrepare_64" Hidden="yes" SuppressModularization="yes" />
     <Property Id="ComPlusRollbackInstallPrepare_64" Hidden="yes" SuppressModularization="yes" />
@@ -128,12 +128,10 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="WixCPExec_x86" SourceFile="!(bindpath.x86)\cpexec.dll"/>
-    <Binary Id="WixCPSched_x86" SourceFile="!(bindpath.x86)\cpsched.dll"/>
+    <Binary Id="ComPlusCA_x86" SourceFile="!(bindpath.x86)complusca.dll"/>
   </Fragment>
 
   <Fragment>
-    <Binary Id="WixCPExec_x64" SourceFile="!(bindpath.x64)\cpexec.dll"/>
-    <Binary Id="WixCPSched_x64" SourceFile="!(bindpath.x64)\cpsched.dll"/>
+    <Binary Id="ComPlusCA_x64" SourceFile="!(bindpath.x64)complusca.dll"/>
   </Fragment>
 </Wix>

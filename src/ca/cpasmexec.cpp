@@ -75,58 +75,47 @@ enum eInstallationFlags {
 };
 
 
-// private constants
-
-enum eAssemblyAttributes
-{
-    aaEventClass     = (1 << 0),
-    aaDotNetAssembly = (1 << 1),
-    aaPathFromGAC    = (1 << 2),
-    aaRunInCommit    = (1 << 3)
-};
-
-
 // private structs
 
-struct CPI_ROLE_ASSIGNMENT
+struct CPIEXEC_ROLE_ASSIGNMENT
 {
     WCHAR wzKey[MAX_DARWIN_KEY + 1];
     WCHAR wzRoleName[MAX_DARWIN_COLUMN + 1];
 
-    CPI_ROLE_ASSIGNMENT* pNext;
+    CPIEXEC_ROLE_ASSIGNMENT* pNext;
 };
 
-struct CPI_METHOD
+struct CPIEXEC_METHOD
 {
     WCHAR wzIndex[11 + 1];
     WCHAR wzName[MAX_DARWIN_COLUMN + 1];
 
     CPI_PROPERTY* pPropertyList;
-    CPI_ROLE_ASSIGNMENT* pRoleAssignmentList;
+    CPIEXEC_ROLE_ASSIGNMENT* pRoleAssignmentList;
 
-    CPI_METHOD* pNext;
+    CPIEXEC_METHOD* pNext;
 };
 
-struct CPI_INTERFACE
+struct CPIEXEC_INTERFACE
 {
     WCHAR wzIID[CPI_MAX_GUID + 1];
 
     CPI_PROPERTY* pPropertyList;
-    CPI_ROLE_ASSIGNMENT* pRoleAssignmentList;
-    CPI_METHOD* pMethodList;
+    CPIEXEC_ROLE_ASSIGNMENT* pRoleAssignmentList;
+    CPIEXEC_METHOD* pMethodList;
 
-    CPI_INTERFACE* pNext;
+    CPIEXEC_INTERFACE* pNext;
 };
 
-struct CPI_COMPONENT
+struct CPIEXEC_COMPONENT
 {
     WCHAR wzCLSID[CPI_MAX_GUID + 1];
 
     CPI_PROPERTY* pPropertyList;
-    CPI_ROLE_ASSIGNMENT* pRoleAssignmentList;
-    CPI_INTERFACE* pInterfaceList;
+    CPIEXEC_ROLE_ASSIGNMENT* pRoleAssignmentList;
+    CPIEXEC_INTERFACE* pInterfaceList;
 
-    CPI_COMPONENT* pNext;
+    CPIEXEC_COMPONENT* pNext;
 };
 
 struct CPI_ASSEMBLY_ATTRIBUTES
@@ -141,7 +130,7 @@ struct CPI_ASSEMBLY_ATTRIBUTES
     LPWSTR pwzAppID;
     LPWSTR pwzPartID;
     int iAttributes;
-    CPI_COMPONENT* pCompList;
+    CPIEXEC_COMPONENT* pCompList;
 };
 
 struct CPI_ROLE_ASSIGNMENTS_ATTRIBUTES
@@ -152,7 +141,7 @@ struct CPI_ROLE_ASSIGNMENTS_ATTRIBUTES
     LPWSTR pwzAppID;
     LPWSTR pwzPartID;
     int iRoleCount;
-    CPI_COMPONENT* pCompList;
+    CPIEXEC_COMPONENT* pCompList;
 };
 
 
@@ -187,7 +176,7 @@ static HRESULT UnregisterDotNetAssembly(
     );
 static HRESULT RemoveComponents(
     ICatalogCollection* piCompColl,
-    CPI_COMPONENT* pCompList
+    CPIEXEC_COMPONENT* pCompList
     );
 static HRESULT ReadAssemblyAttributes(
     LPWSTR* ppwzData,
@@ -206,56 +195,56 @@ static void FreeRoleAssignmentsAttributes(
 static HRESULT ConfigureComponents(
     LPCWSTR pwzPartID,
     LPCWSTR pwzAppID,
-    CPI_COMPONENT* pCompList,
+    CPIEXEC_COMPONENT* pCompList,
     BOOL fCreate,
     BOOL fProgress
     );
 static HRESULT ConfigureInterfaces(
     ICatalogCollection* piCompColl,
     ICatalogObject* piCompObj,
-    CPI_INTERFACE* pIntfList,
+    CPIEXEC_INTERFACE* pIntfList,
     BOOL fCreate
     );
 static HRESULT ConfigureMethods(
     ICatalogCollection* piIntfColl,
     ICatalogObject* piIntfObj,
-    CPI_METHOD* pMethList,
+    CPIEXEC_METHOD* pMethList,
     BOOL fCreate
     );
 static HRESULT ConfigureRoleAssignments(
     LPCWSTR pwzCollName,
     ICatalogCollection* piCompColl,
     ICatalogObject* piCompObj,
-    CPI_ROLE_ASSIGNMENT* pRoleList,
+    CPIEXEC_ROLE_ASSIGNMENT* pRoleList,
     BOOL fCreate
     );
 static HRESULT ReadComponentList(
     LPWSTR* ppwzData,
-    CPI_COMPONENT** ppCompList
+    CPIEXEC_COMPONENT** ppCompList
     );
 static HRESULT ReadInterfaceList(
     LPWSTR* ppwzData,
-    CPI_INTERFACE** ppIntfList
+    CPIEXEC_INTERFACE** ppIntfList
     );
 static HRESULT ReadMethodList(
     LPWSTR* ppwzData,
-    CPI_METHOD** ppMethList
+    CPIEXEC_METHOD** ppMethList
     );
 static HRESULT ReadRoleAssignmentList(
     LPWSTR* ppwzData,
-    CPI_ROLE_ASSIGNMENT** ppRoleList
+    CPIEXEC_ROLE_ASSIGNMENT** ppRoleList
     );
 static void FreeComponentList(
-    CPI_COMPONENT* pList
+    CPIEXEC_COMPONENT* pList
     );
 static void FreeInterfaceList(
-    CPI_INTERFACE* pList
+    CPIEXEC_INTERFACE* pList
     );
 static void FreeMethodList(
-    CPI_METHOD* pList
+    CPIEXEC_METHOD* pList
     );
 static void FreeRoleAssignmentList(
-    CPI_ROLE_ASSIGNMENT* pList
+    CPIEXEC_ROLE_ASSIGNMENT* pList
     );
 
 
@@ -648,7 +637,7 @@ static HRESULT UnregisterAssembly(
             // TODO: handle rollbacks
 
             // get applications collection
-            hr = CpiGetApplicationsCollection(pAttrs->pwzPartID, &piColl);
+            hr = CpiExecGetApplicationsCollection(pAttrs->pwzPartID, &piColl);
             ExitOnFailure(hr, "Failed to get applications collection");
 
             if (S_FALSE == hr)
@@ -993,7 +982,7 @@ static HRESULT RegisterNativeAssembly(
     ExitOnNull(bstrPSDllPath, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for tlb path");
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiExecGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get ICOMAdminCatalog2 interface
@@ -1154,12 +1143,12 @@ LExit:
 
 static HRESULT RemoveComponents(
     ICatalogCollection* piCompColl,
-    CPI_COMPONENT* pCompList
+    CPIEXEC_COMPONENT* pCompList
     )
 {
     HRESULT hr = S_OK;
 
-    for (CPI_COMPONENT* pItm = pCompList; pItm; pItm = pItm->pNext)
+    for (CPIEXEC_COMPONENT* pItm = pCompList; pItm; pItm = pItm->pNext)
     {
         // remove
         hr = CpiRemoveCollectionObject(piCompColl, pItm->wzCLSID, NULL, FALSE);
@@ -1291,7 +1280,7 @@ static void FreeRoleAssignmentsAttributes(
 static HRESULT ConfigureComponents(
     LPCWSTR pwzPartID,
     LPCWSTR pwzAppID,
-    CPI_COMPONENT* pCompList,
+    CPIEXEC_COMPONENT* pCompList,
     BOOL fCreate,
     BOOL fProgress
     )
@@ -1313,7 +1302,7 @@ static HRESULT ConfigureComponents(
     ExitOnFailure(hr, "Failed to get components collection");
 
     // read components
-    for (CPI_COMPONENT* pItm = pCompList; pItm; pItm = pItm->pNext)
+    for (CPIEXEC_COMPONENT* pItm = pCompList; pItm; pItm = pItm->pNext)
     {
         // progress message
         if (fProgress)
@@ -1375,7 +1364,7 @@ LExit:
 static HRESULT ConfigureInterfaces(
     ICatalogCollection* piCompColl,
     ICatalogObject* piCompObj,
-    CPI_INTERFACE* pIntfList,
+    CPIEXEC_INTERFACE* pIntfList,
     BOOL fCreate
     )
 {
@@ -1396,7 +1385,7 @@ static HRESULT ConfigureInterfaces(
     ExitOnFailure(hr, "Failed to get interfaces collection");
 
     // read interfaces
-    for (CPI_INTERFACE* pItm = pIntfList; pItm; pItm = pItm->pNext)
+    for (CPIEXEC_INTERFACE* pItm = pIntfList; pItm; pItm = pItm->pNext)
     {
         // find interface
         hr = CpiFindCollectionObjectByStringKey(piIntfColl, pItm->wzIID, &piIntfObj);
@@ -1448,7 +1437,7 @@ LExit:
 static HRESULT ConfigureMethods(
     ICatalogCollection* piIntfColl,
     ICatalogObject* piIntfObj,
-    CPI_METHOD* pMethList,
+    CPIEXEC_METHOD* pMethList,
     BOOL fCreate
     )
 {
@@ -1469,7 +1458,7 @@ static HRESULT ConfigureMethods(
     ExitOnFailure(hr, "Failed to get methods collection");
 
     // read methods
-    for (CPI_METHOD* pItm = pMethList; pItm; pItm = pItm->pNext)
+    for (CPIEXEC_METHOD* pItm = pMethList; pItm; pItm = pItm->pNext)
     {
         // find method
         if (*pItm->wzIndex)
@@ -1519,7 +1508,7 @@ static HRESULT ConfigureRoleAssignments(
     LPCWSTR pwzCollName,
     ICatalogCollection* piCompColl,
     ICatalogObject* piCompObj,
-    CPI_ROLE_ASSIGNMENT* pRoleList,
+    CPIEXEC_ROLE_ASSIGNMENT* pRoleList,
     BOOL fCreate
     )
 {
@@ -1531,7 +1520,7 @@ static HRESULT ConfigureRoleAssignments(
     long lChanges = 0;
 
     // get roles collection
-    hr = CpiGetCatalogCollection(piCompColl, piCompObj, pwzCollName, &piRoleColl);
+    hr = CpiExecGetCatalogCollection(piCompColl, piCompObj, pwzCollName, &piRoleColl);
     if (S_FALSE == hr)
         if (fCreate)
             hr = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
@@ -1540,7 +1529,7 @@ static HRESULT ConfigureRoleAssignments(
     ExitOnFailure(hr, "Failed to get role assignments collection");
 
     // read roles
-    for (CPI_ROLE_ASSIGNMENT* pItm = pRoleList; pItm; pItm = pItm->pNext)
+    for (CPIEXEC_ROLE_ASSIGNMENT* pItm = pRoleList; pItm; pItm = pItm->pNext)
     {
         if (fCreate)
         {
@@ -1588,14 +1577,14 @@ LExit:
 
 static HRESULT ReadComponentList(
     LPWSTR* ppwzData,
-    CPI_COMPONENT** ppCompList
+    CPIEXEC_COMPONENT** ppCompList
     )
 {
     HRESULT hr = S_OK;
 
     LPWSTR pwzData = NULL;
 
-    CPI_COMPONENT* pItm = NULL;
+    CPIEXEC_COMPONENT* pItm = NULL;
 
     int iCnt = 0;
 
@@ -1606,7 +1595,7 @@ static HRESULT ReadComponentList(
     // read components
     for (int i = 0; i < iCnt; i++)
     {
-        pItm = (CPI_COMPONENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_COMPONENT));
+        pItm = (CPIEXEC_COMPONENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPIEXEC_COMPONENT));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1648,14 +1637,14 @@ LExit:
 
 static HRESULT ReadInterfaceList(
     LPWSTR* ppwzData,
-    CPI_INTERFACE** ppIntfList
+    CPIEXEC_INTERFACE** ppIntfList
     )
 {
     HRESULT hr = S_OK;
 
     LPWSTR pwzData = NULL;
 
-    CPI_INTERFACE* pItm = NULL;
+    CPIEXEC_INTERFACE* pItm = NULL;
 
     int iCnt = 0;
 
@@ -1666,7 +1655,7 @@ static HRESULT ReadInterfaceList(
     // read interfaces
     for (int i = 0; i < iCnt; i++)
     {
-        pItm = (CPI_INTERFACE*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_INTERFACE));
+        pItm = (CPIEXEC_INTERFACE*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPIEXEC_INTERFACE));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1708,14 +1697,14 @@ LExit:
 
 static HRESULT ReadMethodList(
     LPWSTR* ppwzData,
-    CPI_METHOD** ppMethList
+    CPIEXEC_METHOD** ppMethList
     )
 {
     HRESULT hr = S_OK;
 
     LPWSTR pwzData = NULL;
 
-    CPI_METHOD* pItm = NULL;
+    CPIEXEC_METHOD* pItm = NULL;
 
     int iCnt = 0;
 
@@ -1726,7 +1715,7 @@ static HRESULT ReadMethodList(
     // read methods
     for (int i = 0; i < iCnt; i++)
     {
-        pItm = (CPI_METHOD*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_METHOD));
+        pItm = (CPIEXEC_METHOD*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPIEXEC_METHOD));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1769,14 +1758,14 @@ LExit:
 
 static HRESULT ReadRoleAssignmentList(
     LPWSTR* ppwzData,
-    CPI_ROLE_ASSIGNMENT** ppRoleList
+    CPIEXEC_ROLE_ASSIGNMENT** ppRoleList
     )
 {
     HRESULT hr = S_OK;
 
     LPWSTR pwzData = NULL;
 
-    CPI_ROLE_ASSIGNMENT* pItm = NULL;
+    CPIEXEC_ROLE_ASSIGNMENT* pItm = NULL;
 
     int iCnt = 0;
 
@@ -1787,7 +1776,7 @@ static HRESULT ReadRoleAssignmentList(
     // read roles
     for (int i = 0; i < iCnt; i++)
     {
-        pItm = (CPI_ROLE_ASSIGNMENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_ROLE_ASSIGNMENT));
+        pItm = (CPIEXEC_ROLE_ASSIGNMENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPIEXEC_ROLE_ASSIGNMENT));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1821,7 +1810,7 @@ LExit:
 }
 
 static void FreeComponentList(
-    CPI_COMPONENT* pList
+    CPIEXEC_COMPONENT* pList
     )
 {
     while (pList)
@@ -1833,14 +1822,14 @@ static void FreeComponentList(
         if (pList->pInterfaceList)
             FreeInterfaceList(pList->pInterfaceList);
 
-        CPI_COMPONENT* pDelete = pList;
+        CPIEXEC_COMPONENT* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }
 }
 
 static void FreeInterfaceList(
-    CPI_INTERFACE* pList
+    CPIEXEC_INTERFACE* pList
     )
 {
     while (pList)
@@ -1852,14 +1841,14 @@ static void FreeInterfaceList(
         if (pList->pMethodList)
             FreeMethodList(pList->pMethodList);
 
-        CPI_INTERFACE* pDelete = pList;
+        CPIEXEC_INTERFACE* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }
 }
 
 static void FreeMethodList(
-    CPI_METHOD* pList
+    CPIEXEC_METHOD* pList
     )
 {
     while (pList)
@@ -1869,19 +1858,19 @@ static void FreeMethodList(
         if (pList->pRoleAssignmentList)
             FreeRoleAssignmentList(pList->pRoleAssignmentList);
 
-        CPI_METHOD* pDelete = pList;
+        CPIEXEC_METHOD* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }
 }
 
 static void FreeRoleAssignmentList(
-    CPI_ROLE_ASSIGNMENT* pList
+    CPIEXEC_ROLE_ASSIGNMENT* pList
     )
 {
     while (pList)
     {
-        CPI_ROLE_ASSIGNMENT* pDelete = pList;
+        CPIEXEC_ROLE_ASSIGNMENT* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }

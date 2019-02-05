@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:complus="http://wixtoolset.org/schemas/v4/wxs/complus">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+        <Component>
+            <File Source="example.txt" />
+            <complus:ComPlusPartition Id="MyPartition" Name="MyPartition" PartitionId="MyPartitionId" />
+        </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

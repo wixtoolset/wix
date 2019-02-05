@@ -18,7 +18,7 @@ struct CPI_SUBSCRIPTION
     INSTALLSTATE isInstalled, isAction;
 
     CPI_ASSEMBLY* pAssembly;
-    CPI_COMPONENT* pComponent;
+    CPISCHED_COMPONENT* pComponent;
 
     CPI_SUBSCRIPTION* pNext;
 };

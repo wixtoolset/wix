@@ -69,13 +69,13 @@ static ICOMAdminCatalog* gpiCatalog;
 
 // function definitions
 
-void CpiInitialize()
+void CpiExecInitialize()
 {
     // collections
     gpiCatalog = NULL;
 }
 
-void CpiFinalize()
+void CpiExecFinalize()
 {
     // collections
     ReleaseObject(gpiCatalog);
@@ -187,7 +187,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetAdminCatalog(
+HRESULT CpiExecGetAdminCatalog(
     ICOMAdminCatalog** ppiCatalog
     )
 {
@@ -225,11 +225,11 @@ HRESULT CpiLogCatalogErrorInfo()
     LPWSTR pwzMinorRef = NULL;
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiExecGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get error info collection
-    hr = CpiGetCatalogCollection(L"ErrorInfo", &piErrColl);
+    hr = CpiExecGetCatalogCollection(L"ErrorInfo", &piErrColl);
     ExitOnFailure(hr, "Failed to get error info collection");
 
     // loop objects
@@ -282,7 +282,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiExecGetCatalogCollection(
     LPCWSTR pwzName,
     ICatalogCollection** ppiColl
     )
@@ -299,7 +299,7 @@ HRESULT CpiGetCatalogCollection(
     ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for collection name");
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiExecGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get collecton from catalog
@@ -326,7 +326,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiExecGetCatalogCollection(
     ICatalogCollection* piColl,
     ICatalogObject* piObj,
     LPCWSTR pwzName,
@@ -348,7 +348,7 @@ HRESULT CpiGetCatalogCollection(
     ExitOnNull(bstrName, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for collection name");
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiExecGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get key
@@ -894,14 +894,14 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetPartitionsCollection(
+HRESULT CpiExecGetPartitionsCollection(
     ICatalogCollection** ppiPartColl
     )
 {
     HRESULT hr = S_OK;
 
     // get collection
-    hr = CpiGetCatalogCollection(L"Partitions", ppiPartColl);
+    hr = CpiExecGetCatalogCollection(L"Partitions", ppiPartColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -921,7 +921,7 @@ HRESULT CpiGetPartitionRolesCollection(
     ICatalogObject* piPartObj = NULL;
 
     // get partitions collection
-    hr = CpiGetPartitionsCollection(&piPartColl);
+    hr = CpiExecGetPartitionsCollection(&piPartColl);
     ExitOnFailure(hr, "Failed to get partitions collection");
 
     if (S_FALSE == hr)
@@ -935,7 +935,7 @@ HRESULT CpiGetPartitionRolesCollection(
         ExitFunction(); // partition not found, exit with hr = S_FALSE
 
     // get roles collection
-    hr = CpiGetCatalogCollection(piPartColl, piPartObj, L"RolesForPartition", ppiRolesColl);
+    hr = CpiExecGetCatalogCollection(piPartColl, piPartObj, L"RolesForPartition", ppiRolesColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -974,7 +974,7 @@ HRESULT CpiGetUsersInPartitionRoleCollection(
         ExitFunction(); // user not found, exit with hr = S_FALSE
 
     // get roles collection
-    hr = CpiGetCatalogCollection(piRoleColl, piRoleObj, L"UsersInPartitionRole", ppiUsrInRoleColl);
+    hr = CpiExecGetCatalogCollection(piRoleColl, piRoleObj, L"UsersInPartitionRole", ppiUsrInRoleColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -994,7 +994,7 @@ HRESULT CpiGetPartitionUsersCollection(
     HRESULT hr = S_OK;
 
     // get roles collection
-    hr = CpiGetCatalogCollection(L"PartitionUsers", ppiUserColl);
+    hr = CpiExecGetCatalogCollection(L"PartitionUsers", ppiUserColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -1003,7 +1003,7 @@ LExit:
     return hr;
 }
 
-HRESULT CpiGetApplicationsCollection(
+HRESULT CpiExecGetApplicationsCollection(
     LPCWSTR pwzPartID,
     ICatalogCollection** ppiAppColl
     )
@@ -1018,7 +1018,7 @@ HRESULT CpiGetApplicationsCollection(
     ICatalogObject* piPartObj = NULL;
 
     // get catalog
-    hr = CpiGetAdminCatalog(&piCatalog);
+    hr = CpiExecGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
     // get ICOMAdminCatalog2 interface
@@ -1038,7 +1038,7 @@ HRESULT CpiGetApplicationsCollection(
         }
 
         // get partitions collection
-        hr = CpiGetPartitionsCollection(&piPartColl);
+        hr = CpiExecGetPartitionsCollection(&piPartColl);
         ExitOnFailure(hr, "Failed to get partitions collection");
 
         // find object
@@ -1049,7 +1049,7 @@ HRESULT CpiGetApplicationsCollection(
             ExitFunction(); // partition not found, exit with hr = S_FALSE
 
         // get applications collection
-        hr = CpiGetCatalogCollection(piPartColl, piPartObj, L"Applications", ppiAppColl);
+        hr = CpiExecGetCatalogCollection(piPartColl, piPartObj, L"Applications", ppiAppColl);
         ExitOnFailure(hr, "Failed to get catalog collection for partition");
     }
 
@@ -1061,7 +1061,7 @@ HRESULT CpiGetApplicationsCollection(
             ExitOnFailure(hr = E_FAIL, "Partitions are not supported by this version of COM+");
 
         // get applications collection
-        hr = CpiGetCatalogCollection(L"Applications", ppiAppColl);
+        hr = CpiExecGetCatalogCollection(L"Applications", ppiAppColl);
         ExitOnFailure(hr, "Failed to get catalog collection");
     }
 
@@ -1091,7 +1091,7 @@ HRESULT CpiGetRolesCollection(
     ICatalogObject* piAppObj = NULL;
 
     // get applications collection
-    hr = CpiGetApplicationsCollection(pwzPartID, &piAppColl);
+    hr = CpiExecGetApplicationsCollection(pwzPartID, &piAppColl);
     ExitOnFailure(hr, "Failed to get applications collection");
 
     if (S_FALSE == hr)
@@ -1105,7 +1105,7 @@ HRESULT CpiGetRolesCollection(
         ExitFunction(); // application not found, exit with hr = S_FALSE
 
     // get roles collection
-    hr = CpiGetCatalogCollection(piAppColl, piAppObj, L"Roles", ppiRolesColl);
+    hr = CpiExecGetCatalogCollection(piAppColl, piAppObj, L"Roles", ppiRolesColl);
     ExitOnFailure(hr, "Failed to catalog collection");
 
     hr = S_OK;
@@ -1145,7 +1145,7 @@ HRESULT CpiGetUsersInRoleCollection(
         ExitFunction(); // role not found, exit with hr = S_FALSE
 
     // get roles collection
-    hr = CpiGetCatalogCollection(piRoleColl, piRoleObj, L"UsersInRole", ppiUsrInRoleColl);
+    hr = CpiExecGetCatalogCollection(piRoleColl, piRoleObj, L"UsersInRole", ppiUsrInRoleColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -1170,7 +1170,7 @@ HRESULT CpiGetComponentsCollection(
     ICatalogObject* piAppObj = NULL;
 
     // get applications collection
-    hr = CpiGetApplicationsCollection(pwzPartID, &piAppColl);
+    hr = CpiExecGetApplicationsCollection(pwzPartID, &piAppColl);
     ExitOnFailure(hr, "Failed to get applications collection");
 
     if (S_FALSE == hr)
@@ -1184,7 +1184,7 @@ HRESULT CpiGetComponentsCollection(
         ExitFunction(); // application not found, exit with hr = S_FALSE
 
     // get components collection
-    hr = CpiGetCatalogCollection(piAppColl, piAppObj, L"Components", ppiCompsColl);
+    hr = CpiExecGetCatalogCollection(piAppColl, piAppObj, L"Components", ppiCompsColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -1206,7 +1206,7 @@ HRESULT CpiGetInterfacesCollection(
     HRESULT hr = S_OK;
 
     // get interfaces collection
-    hr = CpiGetCatalogCollection(piCompColl, piCompObj, L"InterfacesForComponent", ppiIntfColl);
+    hr = CpiExecGetCatalogCollection(piCompColl, piCompObj, L"InterfacesForComponent", ppiIntfColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -1224,7 +1224,7 @@ HRESULT CpiGetMethodsCollection(
     HRESULT hr = S_OK;
 
     // get interfaces collection
-    hr = CpiGetCatalogCollection(piIntfColl, piIntfObj, L"MethodsForInterface", ppiMethColl);
+    hr = CpiExecGetCatalogCollection(piIntfColl, piIntfObj, L"MethodsForInterface", ppiMethColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;
@@ -1260,7 +1260,7 @@ HRESULT CpiGetSubscriptionsCollection(
         ExitFunction(); // component not found, exit with hr = S_FALSE
 
     // get subscriptions collection
-    hr = CpiGetCatalogCollection(piCompColl, piCompObj, L"SubscriptionsForComponent", ppiSubsColl);
+    hr = CpiExecGetCatalogCollection(piCompColl, piCompObj, L"SubscriptionsForComponent", ppiSubsColl);
     ExitOnFailure(hr, "Failed to get catalog collection");
 
     hr = S_OK;

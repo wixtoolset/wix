@@ -1,31 +1,22 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Extensions
+namespace WixToolset.ComPlus
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Reflection;
-    using System.Xml;
+    using System.Text;
     using System.Xml.Linq;
-    using System.Xml.Schema;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
-    /// The compiler for the WiX Toolset Internet Information Services Extension.
+    /// The compiler for the WiX Toolset COM+ Extension.
     /// </summary>
-    public sealed class ComPlusCompiler : CompilerExtension
+    public sealed class ComPlusCompiler : BaseCompilerExtension
     {
-        /// <summary>
-        /// Instantiate a new ComPlusCompiler.
-        /// </summary>
-        public ComPlusCompiler()
-        {
-            this.Namespace = "http://wixtoolset.org/schemas/v4/wxs/complus";
-        }
-
         /// <summary>
         /// </summary>
         /// <remarks></remarks>
@@ -37,6 +28,8 @@ namespace WixToolset.Extensions
             RegisterInCommit = (1 << 3)
         }
 
+        public override XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/complus";
+
         /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>
@@ -44,7 +37,7 @@ namespace WixToolset.Extensions
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override void ParseElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             switch (parentElement.Name.LocalName)
             {
@@ -56,49 +49,49 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "ComPlusPartition":
-                            this.ParseComPlusPartitionElement(element, componentId, win64);
+                            this.ParseComPlusPartitionElement(intermediate, section, element, componentId, win64);
                             break;
                         case "ComPlusPartitionRole":
-                            this.ParseComPlusPartitionRoleElement(element, componentId, null);
+                            this.ParseComPlusPartitionRoleElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusUserInPartitionRole":
-                            this.ParseComPlusUserInPartitionRoleElement(element, componentId, null);
+                            this.ParseComPlusUserInPartitionRoleElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusGroupInPartitionRole":
-                            this.ParseComPlusGroupInPartitionRoleElement(element, componentId, null);
+                            this.ParseComPlusGroupInPartitionRoleElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusPartitionUser":
-                            this.ParseComPlusPartitionUserElement(element, componentId, null);
+                            this.ParseComPlusPartitionUserElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusApplication":
-                            this.ParseComPlusApplicationElement(element, componentId, win64, null);
+                            this.ParseComPlusApplicationElement(intermediate, section, element, componentId, win64, null);
                             break;
                         case "ComPlusApplicationRole":
-                            this.ParseComPlusApplicationRoleElement(element, componentId, null);
+                            this.ParseComPlusApplicationRoleElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusUserInApplicationRole":
-                            this.ParseComPlusUserInApplicationRoleElement(element, componentId, null);
+                            this.ParseComPlusUserInApplicationRoleElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusGroupInApplicationRole":
-                            this.ParseComPlusGroupInApplicationRoleElement(element, componentId, null);
+                            this.ParseComPlusGroupInApplicationRoleElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusAssembly":
-                            this.ParseComPlusAssemblyElement(element, componentId, win64, null);
+                            this.ParseComPlusAssemblyElement(intermediate, section, element, componentId, win64, null);
                             break;
                         case "ComPlusRoleForComponent":
-                            this.ParseComPlusRoleForComponentElement(element, componentId, null);
+                            this.ParseComPlusRoleForComponentElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusRoleForInterface":
-                            this.ParseComPlusRoleForInterfaceElement(element, componentId, null);
+                            this.ParseComPlusRoleForInterfaceElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusRoleForMethod":
-                            this.ParseComPlusRoleForMethodElement(element, componentId, null);
+                            this.ParseComPlusRoleForMethodElement(intermediate, section, element, componentId, null);
                             break;
                         case "ComPlusSubscription":
-                            this.ParseComPlusSubscriptionElement(element, componentId, null);
+                            this.ParseComPlusSubscriptionElement(intermediate, section, element, componentId, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
@@ -108,24 +101,24 @@ namespace WixToolset.Extensions
                     switch (element.Name.LocalName)
                     {
                         case "ComPlusPartition":
-                            this.ParseComPlusPartitionElement(element, null, false);
+                            this.ParseComPlusPartitionElement(intermediate, section, element, null, false);
                             break;
                         case "ComPlusPartitionRole":
-                            this.ParseComPlusPartitionRoleElement(element, null, null);
+                            this.ParseComPlusPartitionRoleElement(intermediate, section, element, null, null);
                             break;
                         case "ComPlusApplication":
-                            this.ParseComPlusApplicationElement(element, null, false, null);
+                            this.ParseComPlusApplicationElement(intermediate, section, element, null, false, null);
                             break;
                         case "ComPlusApplicationRole":
-                            this.ParseComPlusApplicationRoleElement(element, null, null);
+                            this.ParseComPlusApplicationRoleElement(intermediate, section, element, null, null);
                             break;
                         default:
-                            this.Core.UnexpectedElement(parentElement, element);
+                            this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
                     }
                     break;
                 default:
-                    this.Core.UnexpectedElement(parentElement, element);
+                    this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
         }
@@ -135,9 +128,9 @@ namespace WixToolset.Extensions
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
-        private void ParseComPlusPartitionElement(XElement node, string componentKey, bool win64)
+        private void ParseComPlusPartitionElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, bool win64)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string id = null;
@@ -152,49 +145,49 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "PartitionId":
-                            id = TryFormatGuidValue(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            id = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Changeable":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Messaging.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "Deleteable":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Deleteable"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["Deleteable"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "Description":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null != componentKey && null == name)
             {
-                this.Core.OnMessage(ComPlusErrors.RequiredAttributeUnderComponent(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ComPlusErrors.RequiredAttributeUnderComponent(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             if (null == componentKey && null == id && null == name)
             {
-                this.Core.OnMessage(ComPlusErrors.RequiredAttributeNotUnderComponent(sourceLineNumbers, node.Name.LocalName, "Id", "Name"));
+                this.Messaging.Write(ComPlusErrors.RequiredAttributeNotUnderComponent(sourceLineNumbers, node.Name.LocalName, "Id", "Name"));
             }
 
             foreach (XElement child in node.Elements())
@@ -204,58 +197,58 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusPartitionRole":
-                            this.ParseComPlusPartitionRoleElement(child, componentKey, key);
+                            this.ParseComPlusPartitionRoleElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusPartitionUser":
-                            this.ParseComPlusPartitionUserElement(child, componentKey, key);
+                            this.ParseComPlusPartitionUserElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusApplication":
-                            this.ParseComPlusApplicationElement(child, componentKey, win64, key);
+                            this.ParseComPlusApplicationElement(intermediate, section, child, componentKey, win64, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusPartition");
-            row[0] = key;
-            row[1] = componentKey;
-            row[2] = id;
-            row[3] = name;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusPartition");
+            row.Set(0, key);
+            row.Set(1, componentKey);
+            row.Set(2, id);
+            row.Set(3, name);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusPartitionProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusPartitionProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
 
             if (componentKey != null)
             {
                 if (win64)
                 {
-                    if (this.Core.CurrentPlatform == Platform.IA64)
+                    if (this.Context.Platform == Platform.IA64)
                     {
-                        this.Core.OnMessage(WixErrors.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", node.Name.LocalName));
+                        this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", node.Name.LocalName));
                     }
                     else
                     {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
                     }
                 }
                 else
                 {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
                 }
             }
         }
@@ -266,9 +259,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application.</param>
-        private void ParseComPlusPartitionRoleElement(XElement node, string componentKey, string partitionKey)
+        private void ParseComPlusPartitionRoleElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string partitionKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string name = null;
@@ -280,33 +273,33 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Partition":
                             if (null != partitionKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            partitionKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusPartition", partitionKey);
+                            partitionKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusPartition", partitionKey);
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == partitionKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Partition"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Partition"));
             }
 
             foreach (XElement child in node.Elements())
@@ -316,27 +309,27 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusUserInPartitionRole":
-                            this.ParseComPlusUserInPartitionRoleElement(child, componentKey, key);
+                            this.ParseComPlusUserInPartitionRoleElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusGroupInPartitionRole":
-                            this.ParseComPlusGroupInPartitionRoleElement(child, componentKey, key);
+                            this.ParseComPlusGroupInPartitionRoleElement(intermediate, section, child, componentKey, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
             // add table row
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusPartitionRole");
-            row[0] = key;
-            row[1] = partitionKey;
-            row[3] = name;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusPartitionRole");
+            row.Set(0, key);
+            row.Set(1, partitionKey);
+            row.Set(3, name);
         }
 
         /// <summary>
@@ -345,9 +338,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application role.</param>
-        private void ParseComPlusUserInPartitionRoleElement(XElement node, string componentKey, string partitionRoleKey)
+        private void ParseComPlusUserInPartitionRoleElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string partitionRoleKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string user = null;
@@ -359,41 +352,41 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "PartitionRole":
                             if (null != partitionRoleKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            partitionRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusPartitionRole", partitionRoleKey);
+                            partitionRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusPartitionRole", partitionRoleKey);
                             break;
                         case "User":
-                            user = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == partitionRoleKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PartitionRole"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PartitionRole"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusUserInPartitionRole");
-            row[0] = key;
-            row[1] = partitionRoleKey;
-            row[2] = componentKey;
-            row[3] = user;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusUserInPartitionRole");
+            row.Set(0, key);
+            row.Set(1, partitionRoleKey);
+            row.Set(2, componentKey);
+            row.Set(3, user);
         }
 
         /// <summary>
@@ -402,9 +395,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application role.</param>
-        private void ParseComPlusGroupInPartitionRoleElement(XElement node, string componentKey, string partitionRoleKey)
+        private void ParseComPlusGroupInPartitionRoleElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string partitionRoleKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string group = null;
@@ -416,41 +409,41 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "PartitionRole":
                             if (null != partitionRoleKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            partitionRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusPartitionRole", partitionRoleKey);
+                            partitionRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusPartitionRole", partitionRoleKey);
                             break;
                         case "Group":
-                            group = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Group", group);
+                            group = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Group", group);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == partitionRoleKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PartitionRole"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PartitionRole"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusGroupInPartitionRole");
-            row[0] = key;
-            row[1] = partitionRoleKey;
-            row[2] = componentKey;
-            row[3] = group;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusGroupInPartitionRole");
+            row.Set(0, key);
+            row.Set(1, partitionRoleKey);
+            row.Set(2, componentKey);
+            row.Set(3, group);
         }
 
         /// <summary>
@@ -458,9 +451,9 @@ namespace WixToolset.Extensions
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
-        private void ParseComPlusPartitionUserElement(XElement node, string componentKey, string partitionKey)
+        private void ParseComPlusPartitionUserElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string partitionKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string user = null;
@@ -472,41 +465,41 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Partition":
                             if (null != partitionKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            partitionKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusPartition", partitionKey);
+                            partitionKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusPartition", partitionKey);
                             break;
                         case "User":
-                            user = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == partitionKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Partition"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Partition"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusPartitionUser");
-            row[0] = key;
-            row[1] = partitionKey;
-            row[2] = componentKey;
-            row[3] = user;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusPartitionUser");
+            row.Set(0, key);
+            row.Set(1, partitionKey);
+            row.Set(2, componentKey);
+            row.Set(3, user);
         }
 
         /// <summary>
@@ -515,9 +508,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="partitionKey">Optional identifier of parent partition.</param>
-        private void ParseComPlusApplicationElement(XElement node, string componentKey, bool win64, string partitionKey)
+        private void ParseComPlusApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, bool win64, string partitionKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string id = null;
@@ -532,35 +525,35 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Partition":
                             if (null != partitionKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            partitionKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusPartition", partitionKey);
+                            partitionKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusPartition", partitionKey);
                             break;
                         case "ApplicationId":
-                            id = TryFormatGuidValue(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            id = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ThreeGigSupportEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["3GigSupportEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["3GigSupportEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "AccessChecksLevel":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string accessChecksLevelValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string accessChecksLevelValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (accessChecksLevelValue)
                             {
                                 case "applicationLevel":
@@ -570,16 +563,16 @@ namespace WixToolset.Extensions
                                     properties["AccessChecksLevel"] = "1";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "AccessChecksLevel", accessChecksLevelValue, "applicationLevel", "applicationComponentLevel"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "AccessChecksLevel", accessChecksLevelValue, "applicationLevel", "applicationComponentLevel"));
                                     break;
                             }
                             break;
                         case "Activation":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string activationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string activationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (activationValue)
                             {
                                 case "inproc":
@@ -589,30 +582,30 @@ namespace WixToolset.Extensions
                                     properties["Activation"] = "Local";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "Activation", activationValue, "inproc", "local"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "Activation", activationValue, "inproc", "local"));
                                     break;
                             }
                             break;
                         case "ApplicationAccessChecksEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["ApplicationAccessChecksEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["ApplicationAccessChecksEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ApplicationDirectory":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["ApplicationDirectory"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["ApplicationDirectory"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Authentication":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string authenticationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string authenticationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (authenticationValue)
                             {
                                 case "default":
@@ -637,16 +630,16 @@ namespace WixToolset.Extensions
                                     properties["Authentication"] = "6";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "Authentication", authenticationValue, "default", "none", "connect", "call", "packet", "integrity", "privacy"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "Authentication", authenticationValue, "default", "none", "connect", "call", "packet", "integrity", "privacy"));
                                     break;
                             }
                             break;
                         case "AuthenticationCapability":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string authenticationCapabilityValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string authenticationCapabilityValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (authenticationCapabilityValue)
                             {
                                 case "none":
@@ -662,110 +655,110 @@ namespace WixToolset.Extensions
                                     properties["AuthenticationCapability"] = "64";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "AuthenticationCapability", authenticationCapabilityValue, "none", "secureReference", "staticCloaking", "dynamicCloaking"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "AuthenticationCapability", authenticationCapabilityValue, "none", "secureReference", "staticCloaking", "dynamicCloaking"));
                                     break;
                             }
                             break;
                         case "Changeable":
-                            this.Core.OnMessage(WixWarnings.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Messaging.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "CommandLine":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["CommandLine"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["CommandLine"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ConcurrentApps":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["ConcurrentApps"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["ConcurrentApps"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "CreatedBy":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["CreatedBy"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["CreatedBy"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "CRMEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["CRMEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["CRMEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "CRMLogFile":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["CRMLogFile"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["CRMLogFile"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Deleteable":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Deleteable"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["Deleteable"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "Description":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "DumpEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["DumpEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["DumpEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "DumpOnException":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["DumpOnException"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["DumpOnException"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "DumpOnFailfast":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["DumpOnFailfast"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["DumpOnFailfast"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "DumpPath":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["DumpPath"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["DumpPath"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "EventsEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["EventsEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["EventsEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "Identity":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Identity"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Identity"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ImpersonationLevel":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string impersonationLevelValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string impersonationLevelValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (impersonationLevelValue)
                             {
                                 case "anonymous":
@@ -781,37 +774,37 @@ namespace WixToolset.Extensions
                                     properties["ImpersonationLevel"] = "4";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "ImpersonationLevel", impersonationLevelValue, "anonymous", "identify", "impersonate", "delegate"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "ImpersonationLevel", impersonationLevelValue, "anonymous", "identify", "impersonate", "delegate"));
                                     break;
                             }
                             break;
                         case "IsEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["IsEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["IsEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "MaxDumpCount":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["MaxDumpCount"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["MaxDumpCount"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Password":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Password"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Password"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "QCAuthenticateMsgs":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string qcAuthenticateMsgsValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string qcAuthenticateMsgsValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (qcAuthenticateMsgsValue)
                             {
                                 case "secureApps":
@@ -824,128 +817,128 @@ namespace WixToolset.Extensions
                                     properties["QCAuthenticateMsgs"] = "2";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "QCAuthenticateMsgs", qcAuthenticateMsgsValue, "secureApps", "off", "on"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "QCAuthenticateMsgs", qcAuthenticateMsgsValue, "secureApps", "off", "on"));
                                     break;
                             }
                             break;
                         case "QCListenerMaxThreads":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["QCListenerMaxThreads"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["QCListenerMaxThreads"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "QueueListenerEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["QueueListenerEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["QueueListenerEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "QueuingEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["QueuingEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["QueuingEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "RecycleActivationLimit":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["RecycleActivationLimit"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["RecycleActivationLimit"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "RecycleCallLimit":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["RecycleCallLimit"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["RecycleCallLimit"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "RecycleExpirationTimeout":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["RecycleExpirationTimeout"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["RecycleExpirationTimeout"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "RecycleLifetimeLimit":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["RecycleLifetimeLimit"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["RecycleLifetimeLimit"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "RecycleMemoryLimit":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["RecycleMemoryLimit"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["RecycleMemoryLimit"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Replicable":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Replicable"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["Replicable"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "RunForever":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["RunForever"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["RunForever"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ShutdownAfter":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["ShutdownAfter"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["ShutdownAfter"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SoapActivated":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["SoapActivated"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["SoapActivated"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "SoapBaseUrl":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["SoapBaseUrl"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["SoapBaseUrl"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SoapMailTo":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["SoapMailTo"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["SoapMailTo"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SoapVRoot":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["SoapVRoot"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["SoapVRoot"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SRPEnabled":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["SRPEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["SRPEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "SRPTrustLevel":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            string srpTrustLevelValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string srpTrustLevelValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (srpTrustLevelValue)
                             {
                                 case "disallowed":
@@ -955,28 +948,28 @@ namespace WixToolset.Extensions
                                     properties["SRPTrustLevel"] = "262144";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "SRPTrustLevel", srpTrustLevelValue, "disallowed", "fullyTrusted"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusApplication", "SRPTrustLevel", srpTrustLevelValue, "disallowed", "fullyTrusted"));
                                     break;
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null != componentKey && null == name)
             {
-                this.Core.OnMessage(ComPlusErrors.RequiredAttributeUnderComponent(sourceLineNumbers, node.Name.LocalName, "Name"));
+                this.Messaging.Write(ComPlusErrors.RequiredAttributeUnderComponent(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
             if (null == componentKey && null == id && null == name)
             {
-                this.Core.OnMessage(ComPlusErrors.RequiredAttributeNotUnderComponent(sourceLineNumbers, node.Name.LocalName, "Id", "Name"));
+                this.Messaging.Write(ComPlusErrors.RequiredAttributeNotUnderComponent(sourceLineNumbers, node.Name.LocalName, "Id", "Name"));
             }
 
             foreach (XElement child in node.Elements())
@@ -986,56 +979,56 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusApplicationRole":
-                            this.ParseComPlusApplicationRoleElement(child, componentKey, key);
+                            this.ParseComPlusApplicationRoleElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusAssembly":
-                            this.ParseComPlusAssemblyElement(child, componentKey, win64, key);
+                            this.ParseComPlusAssemblyElement(intermediate, section, child, componentKey, win64, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusApplication");
-            row[0] = key;
-            row[1] = partitionKey;
-            row[2] = componentKey;
-            row[3] = id;
-            row[4] = name;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusApplication");
+            row.Set(0, key);
+            row.Set(1, partitionKey);
+            row.Set(2, componentKey);
+            row.Set(3, id);
+            row.Set(4, name);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusApplicationProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusApplicationProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
 
             if (componentKey != null)
             {
                 if (win64)
                 {
-                    if (this.Core.CurrentPlatform == Platform.IA64)
+                    if (this.Context.Platform == Platform.IA64)
                     {
-                        this.Core.OnMessage(WixErrors.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", node.Name.LocalName));
+                        this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", node.Name.LocalName));
                     }
                     else
                     {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
                     }
                 }
                 else
                 {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
                 }
             }
         }
@@ -1046,9 +1039,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application.</param>
-        private void ParseComPlusApplicationRoleElement(XElement node, string componentKey, string applicationKey)
+        private void ParseComPlusApplicationRoleElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string applicationKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string name = null;
@@ -1062,40 +1055,40 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Application":
                             if (null != applicationKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            applicationKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusApplication", applicationKey);
+                            applicationKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusApplication", applicationKey);
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Description":
                             if (null == componentKey)
                             {
-                                this.Core.OnMessage(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                                this.Messaging.Write(ComPlusErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             }
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == applicationKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Application"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Application"));
             }
 
             foreach (XElement child in node.Elements())
@@ -1105,35 +1098,35 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusUserInApplicationRole":
-                            this.ParseComPlusUserInApplicationRoleElement(child, componentKey, key);
+                            this.ParseComPlusUserInApplicationRoleElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusGroupInApplicationRole":
-                            this.ParseComPlusGroupInApplicationRoleElement(child, componentKey, key);
+                            this.ParseComPlusGroupInApplicationRoleElement(intermediate, section, child, componentKey, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusApplicationRole");
-            row[0] = key;
-            row[1] = applicationKey;
-            row[2] = componentKey;
-            row[3] = name;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusApplicationRole");
+            row.Set(0, key);
+            row.Set(1, applicationKey);
+            row.Set(2, componentKey);
+            row.Set(3, name);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusApplicationRoleProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusApplicationRoleProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
         }
 
@@ -1143,9 +1136,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application role.</param>
-        private void ParseComPlusUserInApplicationRoleElement(XElement node, string componentKey, string applicationRoleKey)
+        private void ParseComPlusUserInApplicationRoleElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string applicationRoleKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string user = null;
@@ -1157,41 +1150,41 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "ApplicationRole":
                             if (null != applicationRoleKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            applicationRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusApplicationRole", applicationRoleKey);
+                            applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusApplicationRole", applicationRoleKey);
                             break;
                         case "User":
-                            user = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "User", user);
+                            user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == applicationRoleKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ApplicationRole"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ApplicationRole"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusUserInApplicationRole");
-            row[0] = key;
-            row[1] = applicationRoleKey;
-            row[2] = componentKey;
-            row[3] = user;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusUserInApplicationRole");
+            row.Set(0, key);
+            row.Set(1, applicationRoleKey);
+            row.Set(2, componentKey);
+            row.Set(3, user);
         }
 
         /// <summary>
@@ -1200,9 +1193,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application role.</param>
-        private void ParseComPlusGroupInApplicationRoleElement(XElement node, string componentKey, string applicationRoleKey)
+        private void ParseComPlusGroupInApplicationRoleElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string applicationRoleKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string group = null;
@@ -1214,41 +1207,41 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "ApplicationRole":
                             if (null != applicationRoleKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            applicationRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusApplicationRole", applicationRoleKey);
+                            applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusApplicationRole", applicationRoleKey);
                             break;
                         case "Group":
-                            group = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Group", group);
+                            group = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Group", group);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == applicationRoleKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ApplicationRole"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ApplicationRole"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusGroupInApplicationRole");
-            row[0] = key;
-            row[1] = applicationRoleKey;
-            row[2] = componentKey;
-            row[3] = group;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusGroupInApplicationRole");
+            row.Set(0, key);
+            row.Set(1, applicationRoleKey);
+            row.Set(2, componentKey);
+            row.Set(3, group);
         }
 
         /// <summary>
@@ -1257,9 +1250,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="applicationKey">Optional identifier of parent application.</param>
-        private void ParseComPlusAssemblyElement(XElement node, string componentKey, bool win64, string applicationKey)
+        private void ParseComPlusAssemblyElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, bool win64, string applicationKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string assemblyName = null;
@@ -1277,30 +1270,30 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Application":
                             if (null != applicationKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            applicationKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusApplication", applicationKey);
+                            applicationKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusApplication", applicationKey);
                             break;
                         case "AssemblyName":
-                            assemblyName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            assemblyName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "DllPath":
-                            dllPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            dllPath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "TlbPath":
-                            tlbPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            tlbPath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PSDllPath":
-                            psDllPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            psDllPath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Type":
-                            string typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string typeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (typeValue)
                             {
                                 case ".net":
@@ -1310,12 +1303,12 @@ namespace WixToolset.Extensions
                                     attributes &= ~(int)CpiAssemblyAttributes.DotNetAssembly;
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusAssembly", "Type", typeValue, ".net", "native"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusAssembly", "Type", typeValue, ".net", "native"));
                                     break;
                             }
                             break;
                         case "EventClass":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= (int)CpiAssemblyAttributes.EventClass;
                             }
@@ -1325,7 +1318,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "DllPathFromGAC":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= (int)CpiAssemblyAttributes.DllPathFromGAC;
                             }
@@ -1335,7 +1328,7 @@ namespace WixToolset.Extensions
                             }
                             break;
                         case "RegisterInCommit":
-                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
                                 attributes |= (int)CpiAssemblyAttributes.RegisterInCommit;
                             }
@@ -1345,35 +1338,35 @@ namespace WixToolset.Extensions
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == applicationKey && 0 == (attributes & (int)CpiAssemblyAttributes.DotNetAssembly))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Application", "Type", "native"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Application", "Type", "native"));
             }
             if (null != assemblyName && 0 == (attributes & (int)CpiAssemblyAttributes.DllPathFromGAC))
             {
-                this.Core.OnMessage(ComPlusErrors.UnexpectedAttributeWithoutOtherValue(sourceLineNumbers, node.Name.LocalName, "AssemblyName", "DllPathFromGAC", "no"));
+                this.Messaging.Write(ComPlusErrors.UnexpectedAttributeWithoutOtherValue(sourceLineNumbers, node.Name.LocalName, "AssemblyName", "DllPathFromGAC", "no"));
             }
             if (null == tlbPath && 0 != (attributes & (int)CpiAssemblyAttributes.DotNetAssembly))
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "TlbPath", "Type", ".net"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "TlbPath", "Type", ".net"));
             }
             if (null != psDllPath && 0 != (attributes & (int)CpiAssemblyAttributes.DotNetAssembly))
             {
-                this.Core.OnMessage(ComPlusErrors.UnexpectedAttributeWithOtherValue(sourceLineNumbers, node.Name.LocalName, "PSDllPath", "Type", ".net"));
+                this.Messaging.Write(ComPlusErrors.UnexpectedAttributeWithOtherValue(sourceLineNumbers, node.Name.LocalName, "PSDllPath", "Type", ".net"));
             }
             if (0 != (attributes & (int)CpiAssemblyAttributes.EventClass) && 0 != (attributes & (int)CpiAssemblyAttributes.DotNetAssembly))
             {
-                this.Core.OnMessage(ComPlusErrors.UnexpectedAttributeWithOtherValue(sourceLineNumbers, node.Name.LocalName, "EventClass", "yes", "Type", ".net"));
+                this.Messaging.Write(ComPlusErrors.UnexpectedAttributeWithOtherValue(sourceLineNumbers, node.Name.LocalName, "EventClass", "yes", "Type", ".net"));
             }
 
             foreach (XElement child in node.Elements())
@@ -1383,54 +1376,54 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusAssemblyDependency":
-                            this.ParseComPlusAssemblyDependencyElement(child, key);
+                            this.ParseComPlusAssemblyDependencyElement(intermediate, section, child, key);
                             break;
                         case "ComPlusComponent":
-                            this.ParseComPlusComponentElement(child, componentKey, key);
+                            this.ParseComPlusComponentElement(intermediate, section, child, componentKey, key);
                             hasComponents = true;
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
             if (0 == (attributes & (int)CpiAssemblyAttributes.DotNetAssembly) && !hasComponents)
             {
-                this.Core.OnMessage(ComPlusWarnings.MissingComponents(sourceLineNumbers));
+                this.Messaging.Write(ComPlusWarnings.MissingComponents(sourceLineNumbers));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusAssembly");
-            row[0] = key;
-            row[1] = applicationKey;
-            row[2] = componentKey;
-            row[3] = assemblyName;
-            row[4] = dllPath;
-            row[5] = tlbPath;
-            row[6] = psDllPath;
-            row[7] = attributes;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusAssembly");
+            row.Set(0, key);
+            row.Set(1, applicationKey);
+            row.Set(2, componentKey);
+            row.Set(3, assemblyName);
+            row.Set(4, dllPath);
+            row.Set(5, tlbPath);
+            row.Set(6, psDllPath);
+            row.Set(7, attributes);
 
             if (win64)
             {
-                if (this.Core.CurrentPlatform == Platform.IA64)
+                if (this.Context.Platform == Platform.IA64)
                 {
-                    this.Core.OnMessage(WixErrors.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", node.Name.LocalName));
+                    this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", node.Name.LocalName));
                 }
                 else
                 {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall_x64");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall_x64");
                 }
             }
             else
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
-                this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusInstall");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureComPlusUninstall");
             }
         }
 
@@ -1439,9 +1432,9 @@ namespace WixToolset.Extensions
         /// </summary>
         /// <param name="node">Element to parse.</param>
         /// <param name="assemblyKey">Identifier of parent assembly.</param>
-        private void ParseComPlusAssemblyDependencyElement(XElement node, string assemblyKey)
+        private void ParseComPlusAssemblyDependencyElement(Intermediate intermediate, IntermediateSection section, XElement node, string assemblyKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string requiredAssemblyKey = null;
 
@@ -1452,22 +1445,22 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "RequiredAssembly":
-                            requiredAssemblyKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            requiredAssemblyKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusAssemblyDependency");
-            row[0] = assemblyKey;
-            row[1] = requiredAssemblyKey;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusAssemblyDependency");
+            row.Set(0, assemblyKey);
+            row.Set(1, requiredAssemblyKey);
         }
 
         /// <summary>
@@ -1476,9 +1469,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="assemblyKey">Identifier of parent assembly.</param>
-        private void ParseComPlusComponentElement(XElement node, string componentKey, string assemblyKey)
+        private void ParseComPlusComponentElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string assemblyKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string clsid = null;
@@ -1492,94 +1485,94 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "CLSID":
-                            clsid = "{" + this.Core.GetAttributeValue(sourceLineNumbers, attrib) + "}";
+                            clsid = "{" + this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib) + "}";
                             break;
                         case "AllowInprocSubscribers":
-                            properties["AllowInprocSubscribers"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["AllowInprocSubscribers"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ComponentAccessChecksEnabled":
-                            properties["ComponentAccessChecksEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["ComponentAccessChecksEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ComponentTransactionTimeout":
-                            properties["ComponentTransactionTimeout"] = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 3600).ToString();
+                            properties["ComponentTransactionTimeout"] = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 3600).ToString();
                             break;
                         case "ComponentTransactionTimeoutEnabled":
-                            properties["ComponentTransactionTimeoutEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["ComponentTransactionTimeoutEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "COMTIIntrinsics":
-                            properties["COMTIIntrinsics"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["COMTIIntrinsics"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ConstructionEnabled":
-                            properties["ConstructionEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["ConstructionEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ConstructorString":
-                            properties["ConstructorString"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["ConstructorString"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "CreationTimeout":
-                            properties["CreationTimeout"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["CreationTimeout"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Description":
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "EventTrackingEnabled":
-                            properties["EventTrackingEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["EventTrackingEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ExceptionClass":
-                            properties["ExceptionClass"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["ExceptionClass"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "FireInParallel":
-                            properties["FireInParallel"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["FireInParallel"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "IISIntrinsics":
-                            properties["IISIntrinsics"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["IISIntrinsics"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "InitializesServerApplication":
-                            properties["InitializesServerApplication"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["InitializesServerApplication"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "IsEnabled":
-                            properties["IsEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["IsEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "IsPrivateComponent":
-                            properties["IsPrivateComponent"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["IsPrivateComponent"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "JustInTimeActivation":
-                            properties["JustInTimeActivation"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["JustInTimeActivation"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "LoadBalancingSupported":
-                            properties["LoadBalancingSupported"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["LoadBalancingSupported"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "MaxPoolSize":
-                            properties["MaxPoolSize"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["MaxPoolSize"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MinPoolSize":
-                            properties["MinPoolSize"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["MinPoolSize"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MultiInterfacePublisherFilterCLSID":
-                            properties["MultiInterfacePublisherFilterCLSID"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["MultiInterfacePublisherFilterCLSID"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MustRunInClientContext":
-                            properties["MustRunInClientContext"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["MustRunInClientContext"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "MustRunInDefaultContext":
-                            properties["MustRunInDefaultContext"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["MustRunInDefaultContext"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "ObjectPoolingEnabled":
-                            properties["ObjectPoolingEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["ObjectPoolingEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "PublisherID":
-                            properties["PublisherID"] = TryFormatGuidValue(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            properties["PublisherID"] = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
                             break;
                         case "SoapAssemblyName":
-                            properties["SoapAssemblyName"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["SoapAssemblyName"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "SoapTypeName":
-                            properties["SoapTypeName"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["SoapTypeName"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Synchronization":
-                            string synchronizationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string synchronizationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (synchronizationValue)
                             {
                                 case "ignored":
@@ -1598,12 +1591,12 @@ namespace WixToolset.Extensions
                                     properties["Synchronization"] = "4";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusComponent", "Synchronization", synchronizationValue, "ignored", "none", "supported", "required", "requiresNew"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusComponent", "Synchronization", synchronizationValue, "ignored", "none", "supported", "required", "requiresNew"));
                                     break;
                             }
                             break;
                         case "Transaction":
-                            string transactionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string transactionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (transactionValue)
                             {
                                 case "ignored":
@@ -1622,12 +1615,12 @@ namespace WixToolset.Extensions
                                     properties["Transaction"] = "4";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusComponent", "Transaction", transactionValue, "ignored", "none", "supported", "required", "requiresNew"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusComponent", "Transaction", transactionValue, "ignored", "none", "supported", "required", "requiresNew"));
                                     break;
                             }
                             break;
                         case "TxIsolationLevel":
-                            string txIsolationLevelValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            string txIsolationLevelValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (txIsolationLevelValue)
                             {
                                 case "any":
@@ -1646,18 +1639,18 @@ namespace WixToolset.Extensions
                                     properties["TxIsolationLevel"] = "4";
                                     break;
                                 default:
-                                    this.Core.OnMessage(WixErrors.IllegalAttributeValue(sourceLineNumbers, "ComPlusComponent", "TxIsolationLevel", txIsolationLevelValue, "any", "readUnCommitted", "readCommitted", "repeatableRead", "serializable"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "ComPlusComponent", "TxIsolationLevel", txIsolationLevelValue, "any", "readUnCommitted", "readCommitted", "repeatableRead", "serializable"));
                                     break;
                             }
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
@@ -1668,37 +1661,37 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusRoleForComponent":
-                            this.ParseComPlusRoleForComponentElement(child, componentKey, key);
+                            this.ParseComPlusRoleForComponentElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusInterface":
-                            this.ParseComPlusInterfaceElement(child, componentKey, key);
+                            this.ParseComPlusInterfaceElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusSubscription":
-                            this.ParseComPlusSubscriptionElement(child, componentKey, key);
+                            this.ParseComPlusSubscriptionElement(intermediate, section, child, componentKey, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusComponent");
-            row[0] = key;
-            row[1] = assemblyKey;
-            row[2] = clsid;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusComponent");
+            row.Set(0, key);
+            row.Set(1, assemblyKey);
+            row.Set(2, clsid);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusComponentProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusComponentProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
         }
 
@@ -1708,9 +1701,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="cpcomponentKey">Identifier of parent COM+ component.</param>
-        private void ParseComPlusRoleForComponentElement(XElement node, string componentKey, string cpcomponentKey)
+        private void ParseComPlusRoleForComponentElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string cpcomponentKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string applicationRoleKey = null;
@@ -1722,40 +1715,40 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Component":
                             if (null != cpcomponentKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            cpcomponentKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusComponent", cpcomponentKey);
+                            cpcomponentKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusComponent", cpcomponentKey);
                             break;
                         case "ApplicationRole":
-                            applicationRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == cpcomponentKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Component"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Component"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusRoleForComponent");
-            row[0] = key;
-            row[1] = cpcomponentKey;
-            row[2] = applicationRoleKey;
-            row[3] = componentKey;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusRoleForComponent");
+            row.Set(0, key);
+            row.Set(1, cpcomponentKey);
+            row.Set(2, applicationRoleKey);
+            row.Set(3, componentKey);
         }
 
         /// <summary>
@@ -1764,9 +1757,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="cpcomponentKey">Identifier of parent COM+ component.</param>
-        private void ParseComPlusInterfaceElement(XElement node, string componentKey, string cpcomponentKey)
+        private void ParseComPlusInterfaceElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string cpcomponentKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             // parse attributes
             string key = null;
@@ -1781,25 +1774,25 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "IID":
-                            iid = "{" + this.Core.GetAttributeValue(sourceLineNumbers, attrib) + "}";
+                            iid = "{" + this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib) + "}";
                             break;
                         case "Description":
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "QueuingEnabled":
-                            properties["QueuingEnabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["QueuingEnabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
@@ -1810,34 +1803,34 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusRoleForInterface":
-                            this.ParseComPlusRoleForInterfaceElement(child, componentKey, key);
+                            this.ParseComPlusRoleForInterfaceElement(intermediate, section, child, componentKey, key);
                             break;
                         case "ComPlusMethod":
-                            this.ParseComPlusMethodElement(child, componentKey, key);
+                            this.ParseComPlusMethodElement(intermediate, section, child, componentKey, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusInterface");
-            row[0] = key;
-            row[1] = cpcomponentKey;
-            row[2] = iid;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusInterface");
+            row.Set(0, key);
+            row.Set(1, cpcomponentKey);
+            row.Set(2, iid);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusInterfaceProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusInterfaceProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
         }
 
@@ -1847,9 +1840,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="interfaceKey">Identifier of parent interface.</param>
-        private void ParseComPlusRoleForInterfaceElement(XElement node, string componentKey, string interfaceKey)
+        private void ParseComPlusRoleForInterfaceElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string interfaceKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string applicationRoleKey = null;
@@ -1861,40 +1854,40 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Interface":
                             if (null != interfaceKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            interfaceKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusInterface", interfaceKey);
+                            interfaceKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusInterface", interfaceKey);
                             break;
                         case "ApplicationRole":
-                            applicationRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == interfaceKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Interface"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Interface"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusRoleForInterface");
-            row[0] = key;
-            row[1] = interfaceKey;
-            row[2] = applicationRoleKey;
-            row[3] = componentKey;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusRoleForInterface");
+            row.Set(0, key);
+            row.Set(1, interfaceKey);
+            row.Set(2, applicationRoleKey);
+            row.Set(3, componentKey);
         }
 
         /// <summary>
@@ -1903,9 +1896,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="interfaceKey">Identifier of parent interface.</param>
-        private void ParseComPlusMethodElement(XElement node, string componentKey, string interfaceKey)
+        private void ParseComPlusMethodElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string interfaceKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             int index = CompilerConstants.IntegerNotSet;
@@ -1920,28 +1913,28 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Index":
-                            index = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            index = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "AutoComplete":
-                            properties["AutoComplete"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["AutoComplete"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "Description":
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
@@ -1952,40 +1945,40 @@ namespace WixToolset.Extensions
                     switch (child.Name.LocalName)
                     {
                         case "ComPlusRoleForMethod":
-                            this.ParseComPlusRoleForMethodElement(child, componentKey, key);
+                            this.ParseComPlusRoleForMethodElement(intermediate, section, child, componentKey, key);
                             break;
                         default:
-                            this.Core.UnexpectedElement(node, child);
+                            this.ParseHelper.UnexpectedElement(node, child);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, node, child);
                 }
             }
 
             if (CompilerConstants.IntegerNotSet == index && null == name)
             {
-                this.Core.OnMessage(ComPlusErrors.RequiredAttribute(sourceLineNumbers, node.Name.LocalName, "Index", "Name"));
+                this.Messaging.Write(ComPlusErrors.RequiredAttribute(sourceLineNumbers, node.Name.LocalName, "Index", "Name"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusMethod");
-            row[0] = key;
-            row[1] = interfaceKey;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusMethod");
+            row.Set(0, key);
+            row.Set(1, interfaceKey);
             if (CompilerConstants.IntegerNotSet != index)
             {
-                row[2] = index;
+                row.Set(2, index);
             }
-            row[3] = name;
+            row.Set(3, name);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusMethodProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusMethodProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
         }
 
@@ -1995,9 +1988,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="methodKey">Identifier of parent method.</param>
-        private void ParseComPlusRoleForMethodElement(XElement node, string componentKey, string methodKey)
+        private void ParseComPlusRoleForMethodElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string methodKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string applicationRoleKey = null;
@@ -2009,40 +2002,40 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Method":
                             if (null != methodKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            methodKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusMethod", methodKey);
+                            methodKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusMethod", methodKey);
                             break;
                         case "ApplicationRole":
-                            applicationRoleKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            applicationRoleKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == methodKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Method"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Method"));
             }
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusRoleForMethod");
-            row[0] = key;
-            row[1] = methodKey;
-            row[2] = applicationRoleKey;
-            row[3] = componentKey;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusRoleForMethod");
+            row.Set(0, key);
+            row.Set(1, methodKey);
+            row.Set(2, applicationRoleKey);
+            row.Set(3, componentKey);
         }
 
         /// <summary>
@@ -2051,9 +2044,9 @@ namespace WixToolset.Extensions
         /// <param name="node">Element to parse.</param>
         /// <param name="componentKey">Identifier of parent component.</param>
         /// <param name="cpcomponentKey">Identifier of parent COM+ component.</param>
-        private void ParseComPlusSubscriptionElement(XElement node, string componentKey, string cpcomponentKey)
+        private void ParseComPlusSubscriptionElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentKey, string cpcomponentKey)
         {
-            SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             string key = null;
             string id = null;
@@ -2070,95 +2063,95 @@ namespace WixToolset.Extensions
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            key = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            key = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Component":
                             if (null != cpcomponentKey)
                             {
-                                this.Core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
-                            cpcomponentKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "ComPlusComponent", cpcomponentKey);
+                            cpcomponentKey = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ComPlusComponent", cpcomponentKey);
                             break;
                         case "SubscriptionId":
-                            id = TryFormatGuidValue(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            id = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
                             break;
                         case "Name":
-                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "EventCLSID":
-                            eventCLSID = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            eventCLSID = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PublisherID":
-                            publisherID = TryFormatGuidValue(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
+                            publisherID = this.TryFormatGuidValue(this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib));
                             break;
                         case "Description":
-                            properties["Description"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["Description"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Enabled":
-                            properties["Enabled"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["Enabled"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "EventClassPartitionID":
-                            properties["EventClassPartitionID"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["EventClassPartitionID"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "FilterCriteria":
-                            properties["FilterCriteria"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["FilterCriteria"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "InterfaceID":
-                            properties["InterfaceID"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["InterfaceID"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MachineName":
-                            properties["MachineName"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["MachineName"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "MethodName":
-                            properties["MethodName"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["MethodName"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PerUser":
-                            properties["PerUser"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["PerUser"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "Queued":
-                            properties["Queued"] = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
+                            properties["Queued"] = YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) ? "1" : "0";
                             break;
                         case "SubscriberMoniker":
-                            properties["SubscriberMoniker"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["SubscriberMoniker"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "UserName":
-                            properties["UserName"] = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            properties["UserName"] = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.UnexpectedAttribute(node, attrib);
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
                             break;
                     }
                 }
                 else
                 {
-                    this.Core.ParseExtensionAttribute(node, attrib);
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
                 }
             }
 
             if (null == cpcomponentKey)
             {
-                this.Core.OnMessage(WixErrors.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Component"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Component"));
             }
 
-            this.Core.ParseForExtensionElements(node);
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            Row row = this.Core.CreateRow(sourceLineNumbers, "ComPlusSubscription");
-            row[0] = key;
-            row[1] = cpcomponentKey;
-            row[2] = componentKey;
-            row[3] = id;
-            row[4] = name;
-            row[5] = eventCLSID;
-            row[6] = publisherID;
+            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusSubscription");
+            row.Set(0, key);
+            row.Set(1, cpcomponentKey);
+            row.Set(2, componentKey);
+            row.Set(3, id);
+            row.Set(4, name);
+            row.Set(5, eventCLSID);
+            row.Set(6, publisherID);
 
             IDictionaryEnumerator propertiesEnumerator = properties.GetEnumerator();
             while (propertiesEnumerator.MoveNext())
             {
-                Row propertyRow = this.Core.CreateRow(sourceLineNumbers, "ComPlusSubscriptionProperty");
-                propertyRow[0] = key;
-                propertyRow[1] = (string)propertiesEnumerator.Key;
-                propertyRow[2] = (string)propertiesEnumerator.Value;
+                var propertyRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ComPlusSubscriptionProperty");
+                propertyRow.Set(0, key);
+                propertyRow.Set(1, (string)propertiesEnumerator.Key);
+                propertyRow.Set(2, (string)propertiesEnumerator.Value);
             }
         }
 

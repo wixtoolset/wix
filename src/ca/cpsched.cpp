@@ -29,30 +29,6 @@
 #define CP_COMPLUSINSTALLCOMMIT             L"ComPlusInstallCommit"
 #endif
 
-
-/********************************************************************
- DllMain - standard entry point for all WiX CustomActions
-
-********************************************************************/
-extern "C" BOOL WINAPI DllMain(
-    IN HINSTANCE hInst,
-    IN ULONG ulReason,
-    IN LPVOID)
-{
-    switch(ulReason)
-    {
-    case DLL_PROCESS_ATTACH:
-        WcaGlobalInitialize(hInst);
-        break;
-
-    case DLL_PROCESS_DETACH:
-        WcaGlobalFinalize();
-        break;
-    }
-
-    return TRUE;
-}
-
 /********************************************************************
  ConfigureComPlusInstall - CUSTOM ACTION ENTRY POINT for installing COM+ components
 
@@ -103,7 +79,7 @@ extern "C" UINT __stdcall ConfigureComPlusInstall(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiSchedInitialize();
 
     // check for the prerequsite tables
     if (!CpiTableExists(cptComPlusPartition) && !CpiTableExists(cptComPlusApplication) && !CpiTableExists(cptComPlusAssembly))
@@ -114,7 +90,7 @@ extern "C" UINT __stdcall ConfigureComPlusInstall(MSIHANDLE hInstall)
 
     // make sure we can access the COM+ admin catalog
     do {
-        hr = CpiGetAdminCatalog(&piCatalog);
+        hr = CpiSchedGetAdminCatalog(&piCatalog);
         if (FAILED(hr))
         {
             WcaLog(LOGMSG_STANDARD, "Failed to get COM+ admin catalog");
@@ -320,7 +296,7 @@ LExit:
     CpiSubscriptionListFree(&subList);
 
     // unitialize
-    CpiFinalize();
+    CpiSchedFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();
@@ -378,7 +354,7 @@ extern "C" UINT __stdcall ConfigureComPlusUninstall(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiSchedInitialize();
 
     // check for the prerequsite tables
     if (!CpiTableExists(cptComPlusPartition) && !CpiTableExists(cptComPlusApplication) && !CpiTableExists(cptComPlusAssembly))
@@ -389,7 +365,7 @@ extern "C" UINT __stdcall ConfigureComPlusUninstall(MSIHANDLE hInstall)
 
     // make sure we can access the COM+ admin catalog
     do {
-        hr = CpiGetAdminCatalog(&piCatalog);
+        hr = CpiSchedGetAdminCatalog(&piCatalog);
         if (FAILED(hr))
         {
             WcaLog(LOGMSG_STANDARD, "Failed to get COM+ admin catalog");
@@ -580,7 +556,7 @@ LExit:
     CpiSubscriptionListFree(&subList);
 
     // unitialize
-    CpiFinalize();
+    CpiSchedFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();

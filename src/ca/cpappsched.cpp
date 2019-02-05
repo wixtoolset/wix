@@ -579,7 +579,7 @@ HRESULT CpiGetRolesCollForApplication(
         if (pApp->pPartition)
             hr = CpiGetApplicationsCollForPartition(pApp->pPartition, &piAppColl);
         else
-            hr = CpiGetApplicationsCollection(&piAppColl);
+            hr = CpiSchedGetApplicationsCollection(&piAppColl);
         ExitOnFailure(hr, "Failed to get applications collection");
 
         if (S_FALSE == hr)
@@ -593,7 +593,7 @@ HRESULT CpiGetRolesCollForApplication(
             ExitFunction(); // exit with hr = S_FALSE
 
         // get roles collection
-        hr = CpiGetCatalogCollection(piAppColl, piAppObj, L"Roles", &pApp->piRolesColl);
+        hr = CpiSchedGetCatalogCollection(piAppColl, piAppObj, L"Roles", &pApp->piRolesColl);
         ExitOnFailure(hr, "Failed to get roles collection");
     }
 
@@ -632,7 +632,7 @@ HRESULT CpiGetComponentsCollForApplication(
         if (pApp->pPartition)
             hr = CpiGetApplicationsCollForPartition(pApp->pPartition, &piAppColl);
         else
-            hr = CpiGetApplicationsCollection(&piAppColl);
+            hr = CpiSchedGetApplicationsCollection(&piAppColl);
         ExitOnFailure(hr, "Failed to get applications collection");
 
         if (S_FALSE == hr)
@@ -646,7 +646,7 @@ HRESULT CpiGetComponentsCollForApplication(
             ExitFunction(); // exit with hr = S_FALSE
 
         // get roles collection
-        hr = CpiGetCatalogCollection(piAppColl, piAppObj, L"Components", &pApp->piCompsColl);
+        hr = CpiSchedGetCatalogCollection(piAppColl, piAppObj, L"Components", &pApp->piCompsColl);
         ExitOnFailure(hr, "Failed to get components collection");
     }
 
@@ -695,7 +695,7 @@ static HRESULT FindObjectForApplication(
     if (pItm->pPartition)
         hr = CpiGetApplicationsCollForPartition(pItm->pPartition, &piAppColl);
     else
-        hr = CpiGetApplicationsCollection(&piAppColl);
+        hr = CpiSchedGetApplicationsCollection(&piAppColl);
     ExitOnFailure(hr, "Failed to get applications collection");
 
     if (S_FALSE == hr)

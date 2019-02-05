@@ -2,11 +2,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
-#define CPI_MAX_GUID 38
-
 enum eRunMode { rmDeferred = 1, rmCommit, rmRollback };
-
-enum eActionType { atNoOp = 0, atCreate, atRemove };
 
 enum eComPlusPropertyType { cpptNone = 0, cpptBoolean, cpptInteger, cpptString, cpptUser };
 
@@ -42,14 +38,6 @@ enum eComPlusTables
 
 // structs
 
-struct CPI_PROPERTY
-{
-    WCHAR wzName[MAX_DARWIN_KEY + 1];
-    LPWSTR pwzValue;
-
-    CPI_PROPERTY* pNext;
-};
-
 struct CPI_PROPERTY_DEFINITION
 {
     LPCWSTR pwzName;
@@ -60,19 +48,19 @@ struct CPI_PROPERTY_DEFINITION
 
 // function prototypes
 
-void CpiInitialize();
-void CpiFinalize();
+void CpiSchedInitialize();
+void CpiSchedFinalize();
 BOOL CpiTableExists(
     int iTable
     );
-HRESULT CpiGetAdminCatalog(
+HRESULT CpiSchedGetAdminCatalog(
     ICOMAdminCatalog** ppiCatalog
     );
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiSchedGetCatalogCollection(
     LPCWSTR pwzName,
     ICatalogCollection** ppiColl
     );
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiSchedGetCatalogCollection(
     ICatalogCollection* piColl,
     ICatalogObject* piObj,
     LPCWSTR pwzName,
@@ -89,10 +77,10 @@ HRESULT CpiFindCollectionObject(
     LPCWSTR pwzName,
     ICatalogObject** ppiObj
     );
-HRESULT CpiGetPartitionsCollection(
+HRESULT CpiSchedGetPartitionsCollection(
     ICatalogCollection** ppiPartColl
     );
-HRESULT CpiGetApplicationsCollection(
+HRESULT CpiSchedGetApplicationsCollection(
     ICatalogCollection** ppiAppColl
     );
 HRESULT CpiAddActionTextToActionData(

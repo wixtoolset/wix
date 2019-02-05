@@ -13,7 +13,7 @@ enum eAssemblyAttributes
 
 // structs
 
-struct CPI_ROLE_ASSIGNMENT
+struct CPISCHED_ROLE_ASSIGNMENT
 {
     WCHAR wzKey[MAX_DARWIN_KEY + 1];
 
@@ -21,10 +21,10 @@ struct CPI_ROLE_ASSIGNMENT
 
     CPI_APPLICATION_ROLE* pApplicationRole;
 
-    CPI_ROLE_ASSIGNMENT* pNext;
+    CPISCHED_ROLE_ASSIGNMENT* pNext;
 };
 
-struct CPI_METHOD
+struct CPISCHED_METHOD
 {
     WCHAR wzKey[MAX_DARWIN_KEY + 1];
     WCHAR wzIndex[11 + 1];
@@ -35,12 +35,12 @@ struct CPI_METHOD
 
     int iRoleInstallCount;
     int iRoleUninstallCount;
-    CPI_ROLE_ASSIGNMENT* pRoles;
+    CPISCHED_ROLE_ASSIGNMENT* pRoles;
 
-    CPI_METHOD* pNext;
+    CPISCHED_METHOD* pNext;
 };
 
-struct CPI_INTERFACE
+struct CPISCHED_INTERFACE
 {
     WCHAR wzKey[MAX_DARWIN_KEY + 1];
     WCHAR wzIID[CPI_MAX_GUID + 1];
@@ -50,15 +50,15 @@ struct CPI_INTERFACE
 
     int iRoleInstallCount;
     int iRoleUninstallCount;
-    CPI_ROLE_ASSIGNMENT* pRoles;
+    CPISCHED_ROLE_ASSIGNMENT* pRoles;
 
     int iMethodCount;
-    CPI_METHOD* pMethods;
+    CPISCHED_METHOD* pMethods;
 
-    CPI_INTERFACE* pNext;
+    CPISCHED_INTERFACE* pNext;
 };
 
-struct CPI_COMPONENT
+struct CPISCHED_COMPONENT
 {
     WCHAR wzKey[MAX_DARWIN_KEY + 1];
     WCHAR wzCLSID[CPI_MAX_GUID + 1];
@@ -68,14 +68,14 @@ struct CPI_COMPONENT
 
     int iRoleInstallCount;
     int iRoleUninstallCount;
-    CPI_ROLE_ASSIGNMENT* pRoles;
+    CPISCHED_ROLE_ASSIGNMENT* pRoles;
 
     int iInterfaceCount;
-    CPI_INTERFACE* pInterfaces;
+    CPISCHED_INTERFACE* pInterfaces;
 
     ICatalogCollection* piSubsColl;
 
-    CPI_COMPONENT* pNext;
+    CPISCHED_COMPONENT* pNext;
 };
 
 struct CPI_ASSEMBLY
@@ -89,7 +89,7 @@ struct CPI_ASSEMBLY
     int iAttributes;
 
     int iComponentCount;
-    CPI_COMPONENT* pComponents;
+    CPISCHED_COMPONENT* pComponents;
 
     BOOL fReferencedForInstall;
     BOOL fReferencedForUninstall;
@@ -163,6 +163,6 @@ HRESULT CpiRoleAssignmentsUninstall(
     );
 HRESULT CpiGetSubscriptionsCollForComponent(
     CPI_ASSEMBLY* pAsm,
-    CPI_COMPONENT* pComp,
+    CPISCHED_COMPONENT* pComp,
     ICatalogCollection** ppiSubsColl
     );

@@ -28,8 +28,8 @@ struct CPI_ROLLBACK_DATA
 
 // function prototypes
 
-void CpiInitialize();
-void CpiFinalize();
+void CpiExecInitialize();
+void CpiExecFinalize();
 HRESULT CpiActionStartMessage(
     LPWSTR* ppwzActionData,
     BOOL fSuppress
@@ -38,15 +38,15 @@ HRESULT CpiActionDataMessage(
     DWORD cArgs,
     ...
     );
-HRESULT CpiGetAdminCatalog(
+HRESULT CpiExecGetAdminCatalog(
     ICOMAdminCatalog** ppiCatalog
     );
 HRESULT CpiLogCatalogErrorInfo();
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiExecGetCatalogCollection(
     LPCWSTR pwzName,
     ICatalogCollection** ppiColl
     );
-HRESULT CpiGetCatalogCollection(
+HRESULT CpiExecGetCatalogCollection(
     ICatalogCollection* piColl,
     ICatalogObject* piObj,
     LPCWSTR pwzName,
@@ -105,7 +105,7 @@ HRESULT CpiFindUserCollectionObject(
     PSID pSid,
     ICatalogObject** ppiObj
     );
-HRESULT CpiGetPartitionsCollection(
+HRESULT CpiExecGetPartitionsCollection(
     ICatalogCollection** ppiPartColl
     );
 HRESULT CpiGetPartitionRolesCollection(
@@ -120,7 +120,7 @@ HRESULT CpiGetUsersInPartitionRoleCollection(
 HRESULT CpiGetPartitionUsersCollection(
     ICatalogCollection** ppiUserColl
     );
-HRESULT CpiGetApplicationsCollection(
+HRESULT CpiExecGetApplicationsCollection(
     LPCWSTR pwzPartID,
     ICatalogCollection** ppiAppColl
     );

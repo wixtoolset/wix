@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\WixToolset.DUtil.4.0.16\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.16\build\WixToolset.DUtil.props')" />
+  <Import Project="..\..\packages\WixToolset.WcaUtil.4.0.2\build\WixToolset.WcaUtil.props" Condition="Exists('..\..\packages\WixToolset.WcaUtil.4.0.2\build\WixToolset.WcaUtil.props')" />
+
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BDEF51ED-E242-4FA2-801A-01B127DF851A}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <TargetName>complusca</TargetName>
+    <ProjectModuleDefinitionFile>complusca.def</ProjectModuleDefinitionFile>
+    <Description>WiX Toolset ComPlus CustomAction</Description>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>msi.lib</ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="cpappexec.cpp" />
+    <ClCompile Include="cpapproleexec.cpp" />
+    <ClCompile Include="cpapprolesched.cpp" />
+    <ClCompile Include="cpappsched.cpp" />
+    <ClCompile Include="cpasmexec.cpp" />
+    <ClCompile Include="cpasmsched.cpp" />
+    <ClCompile Include="cpexec.cpp" />
+    <ClCompile Include="cppartexec.cpp" />
+    <ClCompile Include="cppartroleexec.cpp" />
+    <ClCompile Include="cppartrolesched.cpp" />
+    <ClCompile Include="cppartsched.cpp" />
+    <ClCompile Include="cpsched.cpp" />
+    <ClCompile Include="cpsubsexec.cpp" />
+    <ClCompile Include="cpsubssched.cpp" />
+    <ClCompile Include="cputilexec.cpp" />
+    <ClCompile Include="cputilsched.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="cpappexec.h" />
+    <ClInclude Include="cpapproleexec.h" />
+    <ClInclude Include="cpapprolesched.h" />
+    <ClInclude Include="cpappsched.h" />
+    <ClInclude Include="cpasmexec.h" />
+    <ClInclude Include="cpasmsched.h" />
+    <ClInclude Include="cpcost.h" />
+    <ClInclude Include="cppartexec.h" />
+    <ClInclude Include="cppartroleexec.h" />
+    <ClInclude Include="cppartrolesched.h" />
+    <ClInclude Include="cppartsched.h" />
+    <ClInclude Include="cpsubsexec.h" />
+    <ClInclude Include="cpsubssched.h" />
+    <ClInclude Include="cputilexec.h" />
+    <ClInclude Include="cputilsched.h" />
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="complusca.def" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.16\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.16\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.WcaUtil.4.0.2\build\WixToolset.WcaUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.WcaUtil.4.0.2\build\WixToolset.WcaUtil.props'))" />
+  </Target>
+</Project>

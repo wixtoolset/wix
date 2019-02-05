@@ -3,29 +3,6 @@
 #include "precomp.h"
 
 /********************************************************************
- DllMain - standard entry point for all WiX CustomActions
-
-********************************************************************/
-extern "C" BOOL WINAPI DllMain(
-    IN HINSTANCE hInst,
-    IN ULONG ulReason,
-    IN LPVOID)
-{
-    switch(ulReason)
-    {
-    case DLL_PROCESS_ATTACH:
-        WcaGlobalInitialize(hInst);
-        break;
-
-    case DLL_PROCESS_DETACH:
-        WcaGlobalFinalize();
-        break;
-    }
-
-    return TRUE;
-}
-
-/********************************************************************
  ComPlusPrepare - CUSTOM ACTION ENTRY POINT
 
   Input:  deferred CustomActionData - ComPlusPrepare
@@ -133,7 +110,7 @@ extern "C" UINT __stdcall ComPlusInstallExecute(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiExecInitialize();
 
     // get custom action data
     hr = WcaGetProperty(L"CustomActionData", &pwzCustomActionData);
@@ -204,7 +181,7 @@ LExit:
         ::CloseHandle(hRollbackFile);
 
     // unitialize
-    CpiFinalize();
+    CpiExecFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();
@@ -239,7 +216,7 @@ extern "C" UINT __stdcall ComPlusInstallExecuteCommit(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiExecInitialize();
 
     // get custom action data
     hr = WcaGetProperty(L"CustomActionData", &pwzCustomActionData);
@@ -282,7 +259,7 @@ LExit:
         ::CloseHandle(hRollbackFile);
 
     // unitialize
-    CpiFinalize();
+    CpiExecFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();
@@ -327,7 +304,7 @@ extern "C" UINT __stdcall ComPlusRollbackInstallExecute(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiExecInitialize();
 
     // get custom action data
     hr = WcaGetProperty(L"CustomActionData", &pwzCustomActionData);
@@ -439,7 +416,7 @@ LExit:
         CpiFreeRollbackDataList(prdSubscriptions);
 
     // unitialize
-    CpiFinalize();
+    CpiExecFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();
@@ -474,7 +451,7 @@ extern "C" UINT __stdcall ComPlusUninstallExecute(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiExecInitialize();
 
     // get custom action data
     hr = WcaGetProperty(L"CustomActionData", &pwzCustomActionData);
@@ -545,7 +522,7 @@ LExit:
         ::CloseHandle(hRollbackFile);
 
     // unitialize
-    CpiFinalize();
+    CpiExecFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();
@@ -590,7 +567,7 @@ extern "C" UINT __stdcall ComPlusRollbackUninstallExecute(MSIHANDLE hInstall)
     ExitOnFailure(hr, "Failed to initialize COM");
     fInitializedCom = TRUE;
 
-    CpiInitialize();
+    CpiExecInitialize();
 
     // get custom action data
     hr = WcaGetProperty(L"CustomActionData", &pwzCustomActionData);
@@ -694,7 +671,7 @@ LExit:
         CpiFreeRollbackDataList(prdSubscriptions);
 
     // unitialize
-    CpiFinalize();
+    CpiExecFinalize();
 
     if (fInitializedCom)
         ::CoUninitialize();

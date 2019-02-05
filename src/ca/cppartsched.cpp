@@ -199,7 +199,7 @@ HRESULT CpiPartitionsVerifyInstall(
         // get partitions collection
         if (!piPartColl)
         {
-            hr = CpiGetPartitionsCollection(&piPartColl);
+            hr = CpiSchedGetPartitionsCollection(&piPartColl);
             ExitOnFailure(hr, "Failed to get partitions collection");
         }
 
@@ -336,7 +336,7 @@ HRESULT CpiPartitionsVerifyUninstall(
         // get partitions collection
         if (!piPartColl)
         {
-            hr = CpiGetPartitionsCollection(&piPartColl);
+            hr = CpiSchedGetPartitionsCollection(&piPartColl);
             ExitOnFailure(hr, "Failed to get partitions collection");
         }
 
@@ -526,7 +526,7 @@ HRESULT CpiGetApplicationsCollForPartition(
     if (!pPart->piApplicationsColl)
     {
         // get partitions collection from catalog
-        hr = CpiGetPartitionsCollection(&piPartColl);
+        hr = CpiSchedGetPartitionsCollection(&piPartColl);
         ExitOnFailure(hr, "Failed to get partitions collection");
 
         // find application object
@@ -540,7 +540,7 @@ HRESULT CpiGetApplicationsCollForPartition(
         }
 
         // get roles collection
-        hr = CpiGetCatalogCollection(piPartColl, piPartObj, L"Applications", &pPart->piApplicationsColl);
+        hr = CpiSchedGetCatalogCollection(piPartColl, piPartObj, L"Applications", &pPart->piApplicationsColl);
         ExitOnFailure(hr, "Failed to get applications collection");
     }
 
@@ -576,7 +576,7 @@ HRESULT CpiGetRolesCollForPartition(
     if (!pPart->piRolesColl)
     {
         // get partitions collection from catalog
-        hr = CpiGetPartitionsCollection(&piPartColl);
+        hr = CpiSchedGetPartitionsCollection(&piPartColl);
         ExitOnFailure(hr, "Failed to get partitions collection");
 
         // find partition object
@@ -587,7 +587,7 @@ HRESULT CpiGetRolesCollForPartition(
             ExitFunction(); // exit with hr = S_FALSE
 
         // get roles collection
-        hr = CpiGetCatalogCollection(piPartColl, piPartObj, L"RolesForPartition", &pPart->piRolesColl);
+        hr = CpiSchedGetCatalogCollection(piPartColl, piPartObj, L"RolesForPartition", &pPart->piRolesColl);
         ExitOnFailure(hr, "Failed to get roles collection");
     }
 

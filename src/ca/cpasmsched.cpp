@@ -169,19 +169,19 @@ static HRESULT InterfacesRead(
     LPCWSTR pwzCompKey,
     CPI_APPLICATION_ROLE_LIST* pAppRoleList,
     CPI_ASSEMBLY* pAsm,
-    CPI_COMPONENT* pComp
+    CPISCHED_COMPONENT* pComp
     );
 static HRESULT MethodsRead(
     LPCWSTR pwzIntfKey,
     CPI_APPLICATION_ROLE_LIST* pAppRoleList,
     CPI_ASSEMBLY* pAsm,
-    CPI_INTERFACE* pIntf
+    CPISCHED_INTERFACE* pIntf
     );
 static HRESULT RoleAssignmentsRead(
     LPCWSTR pwzQuery,
     LPCWSTR pwzKey,
     CPI_APPLICATION_ROLE_LIST* pAppRoleList,
-    CPI_ROLE_ASSIGNMENT** ppRoleList,
+    CPISCHED_ROLE_ASSIGNMENT** ppRoleList,
     int* piInstallCount,
     int* piUninstallCount
     );
@@ -238,21 +238,21 @@ static HRESULT AddRoleAssignmentsToActionData(
     LPWSTR* ppwzActionData
     );
 static HRESULT AddComponentToActionData(
-    CPI_COMPONENT* pItm,
+    CPISCHED_COMPONENT* pItm,
     BOOL fInstall,
     BOOL fProps,
     BOOL fRoles,
     LPWSTR* ppwzActionData
     );
 static HRESULT AddInterfaceToActionData(
-    CPI_INTERFACE* pItm,
+    CPISCHED_INTERFACE* pItm,
     BOOL fInstall,
     BOOL fProps,
     BOOL fRoles,
     LPWSTR* ppwzActionData
     );
 static HRESULT AddMethodToActionData(
-    CPI_METHOD* pItm,
+    CPISCHED_METHOD* pItm,
     BOOL fInstall,
     BOOL fProps,
     BOOL fRoles,
@@ -261,7 +261,7 @@ static HRESULT AddMethodToActionData(
 static HRESULT AddRolesToActionData(
     int iRoleInstallCount,
     int iRoleUninstallCount,
-    CPI_ROLE_ASSIGNMENT* pRoleList,
+    CPISCHED_ROLE_ASSIGNMENT* pRoleList,
     BOOL fInstall,
     BOOL fRoles,
     LPWSTR* ppwzActionData
@@ -284,16 +284,16 @@ static void ModuleFree(
     CPI_MODULE* pItm
     );
 static void ComponentsFreeList(
-    CPI_COMPONENT* pList
+    CPISCHED_COMPONENT* pList
     );
 static void InterfacesFreeList(
-    CPI_INTERFACE* pList
+    CPISCHED_INTERFACE* pList
     );
 static void MethodsFreeList(
-    CPI_METHOD* pList
+    CPISCHED_METHOD* pList
     );
 static void RoleAssignmentsFreeList(
-    CPI_ROLE_ASSIGNMENT* pList
+    CPISCHED_ROLE_ASSIGNMENT* pList
     );
 
 
@@ -686,7 +686,7 @@ LExit:
 
 HRESULT CpiGetSubscriptionsCollForComponent(
     CPI_ASSEMBLY* pAsm,
-    CPI_COMPONENT* pComp,
+    CPISCHED_COMPONENT* pComp,
     ICatalogCollection** ppiSubsColl
     )
 {
@@ -713,7 +713,7 @@ HRESULT CpiGetSubscriptionsCollForComponent(
             ExitFunction(); // exit with hr = S_FALSE
 
         // get roles collection
-        hr = CpiGetCatalogCollection(piCompColl, piCompObj, L"SubscriptionsForComponent", &pComp->piSubsColl);
+        hr = CpiSchedGetCatalogCollection(piCompColl, piCompObj, L"SubscriptionsForComponent", &pComp->piSubsColl);
         ExitOnFailure(hr, "Failed to get subscriptions collection");
     }
 
@@ -1372,7 +1372,7 @@ static HRESULT ComponentsRead(
     PMSIHANDLE hView;
     PMSIHANDLE hRec;
     PMSIHANDLE hRecKey;
-    CPI_COMPONENT* pItm = NULL;
+    CPISCHED_COMPONENT* pItm = NULL;
     LPWSTR pwzData = NULL;
 
     // create parameter record
@@ -1390,7 +1390,7 @@ static HRESULT ComponentsRead(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         // create entry
-        pItm = (CPI_COMPONENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_COMPONENT));
+        pItm = (CPISCHED_COMPONENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPISCHED_COMPONENT));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1455,14 +1455,14 @@ static HRESULT InterfacesRead(
     LPCWSTR pwzCompKey,
     CPI_APPLICATION_ROLE_LIST* pAppRoleList,
     CPI_ASSEMBLY* pAsm,
-    CPI_COMPONENT* pComp
+    CPISCHED_COMPONENT* pComp
     )
 {
     HRESULT hr = S_OK;
     PMSIHANDLE hView;
     PMSIHANDLE hRec;
     PMSIHANDLE hRecKey;
-    CPI_INTERFACE* pItm = NULL;
+    CPISCHED_INTERFACE* pItm = NULL;
     LPWSTR pwzData = NULL;
 
     // create parameter record
@@ -1480,7 +1480,7 @@ static HRESULT InterfacesRead(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         // create entry
-        pItm = (CPI_INTERFACE*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_INTERFACE));
+        pItm = (CPISCHED_INTERFACE*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPISCHED_INTERFACE));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1545,12 +1545,12 @@ static HRESULT MethodsRead(
     LPCWSTR pwzIntfKey,
     CPI_APPLICATION_ROLE_LIST* pAppRoleList,
     CPI_ASSEMBLY* pAsm,
-    CPI_INTERFACE* pIntf
+    CPISCHED_INTERFACE* pIntf
     )
 {
     HRESULT hr = S_OK;
     PMSIHANDLE hView, hRec, hRecKey;
-    CPI_METHOD* pItm = NULL;
+    CPISCHED_METHOD* pItm = NULL;
     LPWSTR pwzData = NULL;
 
     // create parameter record
@@ -1568,7 +1568,7 @@ static HRESULT MethodsRead(
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         // create entry
-        pItm = (CPI_METHOD*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_METHOD));
+        pItm = (CPISCHED_METHOD*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPISCHED_METHOD));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1635,7 +1635,7 @@ static HRESULT RoleAssignmentsRead(
     LPCWSTR pwzQuery,
     LPCWSTR pwzKey,
     CPI_APPLICATION_ROLE_LIST* pAppRoleList,
-    CPI_ROLE_ASSIGNMENT** ppRoleList,
+    CPISCHED_ROLE_ASSIGNMENT** ppRoleList,
     int* piInstallCount,
     int* piUninstallCount
     )
@@ -1645,7 +1645,7 @@ static HRESULT RoleAssignmentsRead(
 
     PMSIHANDLE hView, hRec, hRecKey;
 
-    CPI_ROLE_ASSIGNMENT* pItm = NULL;
+    CPISCHED_ROLE_ASSIGNMENT* pItm = NULL;
     LPWSTR pwzData = NULL;
     BOOL fMatchingArchitecture = FALSE;
 
@@ -1677,7 +1677,7 @@ static HRESULT RoleAssignmentsRead(
         }
 
         // create entry
-        pItm = (CPI_ROLE_ASSIGNMENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPI_ROLE_ASSIGNMENT));
+        pItm = (CPISCHED_ROLE_ASSIGNMENT*)::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CPISCHED_ROLE_ASSIGNMENT));
         if (!pItm)
             ExitFunction1(hr = E_OUTOFMEMORY);
 
@@ -1786,7 +1786,7 @@ static HRESULT AddAssemblyToActionData(
 
     if (iCompCount)
     {
-        for (CPI_COMPONENT* pComp = pItm->pComponents; pComp; pComp = pComp->pNext)
+        for (CPISCHED_COMPONENT* pComp = pItm->pComponents; pComp; pComp = pComp->pNext)
         {
             hr = AddComponentToActionData(pComp, fInstall, atCreate == iActionType, FALSE, ppwzActionData);
             ExitOnFailure(hr, "Failed to add component to custom action data, component: %S", pComp->wzKey);
@@ -1834,7 +1834,7 @@ static HRESULT AddRoleAssignmentsToActionData(
     hr = WcaWriteIntegerToCaData(pItm->iComponentCount, ppwzActionData);
     ExitOnFailure(hr, "Failed to add component count to custom action data");
 
-    for (CPI_COMPONENT* pComp = pItm->pComponents; pComp; pComp = pComp->pNext)
+    for (CPISCHED_COMPONENT* pComp = pItm->pComponents; pComp; pComp = pComp->pNext)
     {
         hr = AddComponentToActionData(pComp, fInstall, FALSE, TRUE, ppwzActionData);
         ExitOnFailure(hr, "Failed to add component to custom action data, component: %S", pComp->wzKey);
@@ -1847,7 +1847,7 @@ LExit:
 }
 
 static HRESULT AddComponentToActionData(
-    CPI_COMPONENT* pItm,
+    CPISCHED_COMPONENT* pItm,
     BOOL fInstall,
     BOOL fProps,
     BOOL fRoles,
@@ -1875,7 +1875,7 @@ static HRESULT AddComponentToActionData(
 
     if (iIntfCount)
     {
-        for (CPI_INTERFACE* pIntf = pItm->pInterfaces; pIntf; pIntf = pIntf->pNext)
+        for (CPISCHED_INTERFACE* pIntf = pItm->pInterfaces; pIntf; pIntf = pIntf->pNext)
         {
             hr = AddInterfaceToActionData(pIntf, fInstall, fProps, fRoles, ppwzActionData);
             ExitOnFailure(hr, "Failed to add interface custom action data, interface: %S", pIntf->wzKey);
@@ -1889,7 +1889,7 @@ LExit:
 }
 
 static HRESULT AddInterfaceToActionData(
-    CPI_INTERFACE* pItm,
+    CPISCHED_INTERFACE* pItm,
     BOOL fInstall,
     BOOL fProps,
     BOOL fRoles,
@@ -1914,7 +1914,7 @@ static HRESULT AddInterfaceToActionData(
     hr = WcaWriteIntegerToCaData(pItm->iMethodCount, ppwzActionData);
     ExitOnFailure(hr, "Failed to add method count to custom action data");
 
-    for (CPI_METHOD* pMeth = pItm->pMethods; pMeth; pMeth = pMeth->pNext)
+    for (CPISCHED_METHOD* pMeth = pItm->pMethods; pMeth; pMeth = pMeth->pNext)
     {
         hr = AddMethodToActionData(pMeth, fInstall, fProps, fRoles, ppwzActionData);
         ExitOnFailure(hr, "Failed to add method custom action data, method: %S", pMeth->wzKey);
@@ -1927,7 +1927,7 @@ LExit:
 }
 
 static HRESULT AddMethodToActionData(
-    CPI_METHOD* pItm,
+    CPISCHED_METHOD* pItm,
     BOOL fInstall,
     BOOL fProps,
     BOOL fRoles,
@@ -1960,7 +1960,7 @@ LExit:
 static HRESULT AddRolesToActionData(
     int iRoleInstallCount,
     int iRoleUninstallCount,
-    CPI_ROLE_ASSIGNMENT* pRoleList,
+    CPISCHED_ROLE_ASSIGNMENT* pRoleList,
     BOOL fInstall,
     BOOL fRoles,
     LPWSTR* ppwzActionData
@@ -1974,7 +1974,7 @@ static HRESULT AddRolesToActionData(
 
     if (iRoleCount)
     {
-        for (CPI_ROLE_ASSIGNMENT* pRole = pRoleList; pRole; pRole = pRole->pNext)
+        for (CPISCHED_ROLE_ASSIGNMENT* pRole = pRoleList; pRole; pRole = pRole->pNext)
         {
             // make sure the install state matches the create flag
             if (fInstall ? !WcaIsInstalling(pRole->isInstalled, pRole->isAction) : !WcaIsUninstalling(pRole->isInstalled, pRole->isAction))
@@ -2061,7 +2061,7 @@ static void ModuleFree(
 }
 
 static void ComponentsFreeList(
-    CPI_COMPONENT* pList
+    CPISCHED_COMPONENT* pList
     )
 {
     while (pList)
@@ -2077,14 +2077,14 @@ static void ComponentsFreeList(
 
         ReleaseObject(pList->piSubsColl);
 
-        CPI_COMPONENT* pDelete = pList;
+        CPISCHED_COMPONENT* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }
 }
 
 static void InterfacesFreeList(
-    CPI_INTERFACE* pList
+    CPISCHED_INTERFACE* pList
     )
 {
     while (pList)
@@ -2098,14 +2098,14 @@ static void InterfacesFreeList(
         if (pList->pMethods)
             MethodsFreeList(pList->pMethods);
 
-        CPI_INTERFACE* pDelete = pList;
+        CPISCHED_INTERFACE* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }
 }
 
 static void MethodsFreeList(
-    CPI_METHOD* pList
+    CPISCHED_METHOD* pList
     )
 {
     while (pList)
@@ -2116,19 +2116,19 @@ static void MethodsFreeList(
         if (pList->pRoles)
             RoleAssignmentsFreeList(pList->pRoles);
 
-        CPI_METHOD* pDelete = pList;
+        CPISCHED_METHOD* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }
 }
 
 static void RoleAssignmentsFreeList(
-    CPI_ROLE_ASSIGNMENT* pList
+    CPISCHED_ROLE_ASSIGNMENT* pList
     )
 {
     while (pList)
     {
-        CPI_ROLE_ASSIGNMENT* pDelete = pList;
+        CPISCHED_ROLE_ASSIGNMENT* pDelete = pList;
         pList = pList->pNext;
         ::HeapFree(::GetProcessHeap(), 0, pDelete);
     }

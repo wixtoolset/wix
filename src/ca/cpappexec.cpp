@@ -239,7 +239,7 @@ static HRESULT CreateApplication(
     WcaLog(LOGMSG_VERBOSE, "Creating application, key: %S", pAttrs->pwzKey);
 
     // get applications collection
-    hr = CpiGetApplicationsCollection(pAttrs->pwzPartID, &piAppColl);
+    hr = CpiExecGetApplicationsCollection(pAttrs->pwzPartID, &piAppColl);
     if (S_FALSE == hr)
         hr = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
     ExitOnFailure(hr, "Failed to get applications collection");
@@ -304,7 +304,7 @@ static HRESULT RemoveApplication(
     WcaLog(LOGMSG_VERBOSE, "Removing application, key: %S", pAttrs->pwzKey);
 
     // get applications collection
-    hr = CpiGetApplicationsCollection(pAttrs->pwzPartID, &piAppColl);
+    hr = CpiExecGetApplicationsCollection(pAttrs->pwzPartID, &piAppColl);
     ExitOnFailure(hr, "Failed to get applications collection");
 
     if (S_FALSE == hr)

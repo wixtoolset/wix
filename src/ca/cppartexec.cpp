@@ -399,7 +399,7 @@ static HRESULT CreatePartition(
     WcaLog(LOGMSG_VERBOSE, "Creating partition, key: %S", pAttrs->pwzKey);
 
     // get partitions collection
-    hr = CpiGetPartitionsCollection(&piPartColl);
+    hr = CpiExecGetPartitionsCollection(&piPartColl);
     ExitOnFailure(hr, "Failed to get partitions collection");
 
     // check if partition exists
@@ -456,7 +456,7 @@ static HRESULT RemovePartition(
     WcaLog(LOGMSG_VERBOSE, "Removing partition, key: %S", pAttrs->pwzKey);
 
     // get partitions collection
-    hr = CpiGetPartitionsCollection(&piPartColl);
+    hr = CpiExecGetPartitionsCollection(&piPartColl);
     ExitOnFailure(hr, "Failed to get partitions collection");
 
     // remove
