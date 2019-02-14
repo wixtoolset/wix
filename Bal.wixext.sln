@@ -13,6 +13,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "bal", "src\wixlib\bal.wixpr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Bal.wixext", "src\wixext\WixToolset.Bal.wixext.csproj", "{BF720A63-9D7B-456E-B60C-8122852D9FED}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WixToolsetTest.MbaHost", "src\test\WixToolsetTest.MbaHost\WixToolsetTest.MbaHost.vcxproj", "{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,14 @@ Global
 		{BF720A63-9D7B-456E-B60C-8122852D9FED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF720A63-9D7B-456E-B60C-8122852D9FED}.Release|x86.ActiveCfg = Release|Any CPU
 		{BF720A63-9D7B-456E-B60C-8122852D9FED}.Release|x86.Build.0 = Release|Any CPU
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Debug|Any CPU.Build.0 = Debug|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Debug|x86.ActiveCfg = Debug|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Debug|x86.Build.0 = Debug|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Release|Any CPU.Build.0 = Release|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Release|x86.ActiveCfg = Release|Win32
+		{8C131CB9-7B1C-4B06-A328-E69CE9EDC763}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,6 +11,10 @@
   <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'=='' AND '$(VisualStudioVersion)'=='15.0'">
     <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(CLRSupport)'=='true' ">
+    <DisableSpecificCompilerWarnings>4564;4691</DisableSpecificCompilerWarnings>
+  </PropertyGroup>
 
   <ItemDefinitionGroup>
     <ClCompile>
@@ -94,11 +98,5 @@
       <BasicRuntimeChecks></BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
     </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition=" '$(CLRSupport)'=='true' ">
-    <Link>
-      <KeyFile>$(LinkKeyFile)</KeyFile>
-      <DelaySign>$(LinkDelaySign)</DelaySign>
-    </Link>
   </ItemDefinitionGroup>
 </Project>
