@@ -17,6 +17,6 @@ using WixToolset.WixBA;
 [assembly: Guid("0ffc4944-9295-40b7-adac-3a6864b5219b")]
 [assembly: CLSCompliantAttribute(true)]
 
-// Identifies the class that derives from BootstrapperApplication and is the BA class that gets
+// Identifies the class that derives from IBootstrapperApplicationFactory and is the BAFactory class that gets
 // instantiated by the interop layer
-[assembly: BootstrapperApplication(typeof(WixBA))]
+[assembly: BootstrapperApplicationFactory(typeof(WixBAFactory))]

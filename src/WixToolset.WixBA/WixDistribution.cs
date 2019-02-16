@@ -41,7 +41,7 @@ namespace WixToolset
         /// <summary>
         /// Telemetry URL format for the distribution.
         /// </summary>
-        public static string TelemetryUrlFormat = "http://wixtoolset.org/telemetry/v{0}/?r={1}";
+        public static string TelemetryUrlFormat = "http://wixtoolset.org/integrationtelemetry/v{0}/?r={1}";
 
         /// <summary>
         /// VS Extensions Landing page Url for the distribution.
