@@ -403,9 +403,9 @@ namespace WixToolset.WixBA
                 this.Downgrade = true;
             }
 
-            if (!WixBA.Model.Bootstrapper.BAManifest.Bundle.Packages.ContainsKey(e.ProductCode))
+            if (!WixBA.Model.BAManifest.Bundle.Packages.ContainsKey(e.ProductCode))
             {
-                WixBA.Model.Bootstrapper.BAManifest.Bundle.AddRelatedBundleAsPackage(e);
+                WixBA.Model.BAManifest.Bundle.AddRelatedBundleAsPackage(e);
             }
         }
 
@@ -426,8 +426,8 @@ namespace WixToolset.WixBA
                 if (this.Downgrade)
                 {
                     this.root.DetectState = DetectionState.Newer;
-                    IEnumerable<PackageInfo> relatedPackages = WixBA.Model.Bootstrapper.BAManifest.Bundle.Packages.Values.Where(p => p.Type == PackageType.UpgradeBundle);
-                    Version installedVersion = relatedPackages.Any() ? new Version(relatedPackages.Max(p => p.Version)) : null;
+                    var relatedPackages = WixBA.Model.BAManifest.Bundle.Packages.Values.Where(p => p.Type == PackageType.UpgradeBundle);
+                    var installedVersion = relatedPackages.Any() ? new Version(relatedPackages.Max(p => p.Version)) : null;
                     if (installedVersion != null && installedVersion < new Version(4, 1) && installedVersion.Build > 10)
                     {
                         this.DowngradeMessage = "You must uninstall WiX v" + installedVersion + " before you can install this.";
@@ -641,7 +641,7 @@ namespace WixToolset.WixBA
         private void ParseCommandLine()
         {
             // Get array of arguments based on the system parsing algorithm.
-            string[] args = WixBA.Model.Command.GetCommandLineArgs();
+            string[] args = WixBA.Model.Command.CommandLineArgs;
             for (int i = 0; i < args.Length; ++i)
             {
                 if (args[i].StartsWith("InstallFolder=", StringComparison.InvariantCultureIgnoreCase))

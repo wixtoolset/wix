@@ -8,22 +8,29 @@ namespace WixToolset.WixBA
     using System.IO;
     using System.Net;
     using System.Text;
-    using System.Windows.Input;
+    using WixToolset.BootstrapperCore;
+
     using Threading = System.Windows.Threading;
     using WinForms = System.Windows.Forms;
 
-    using WixToolset.BootstrapperCore;
-
     /// <summary>
-    /// The WiX toolset user experience.
+    /// The WiX toolset bootstrapper application.
     /// </summary>
     public class WixBA : BootstrapperApplication
     {
-        public WixBA(Engine engine, Command command)
-            : base(engine, command)
+        public WixBA(IEngine engine, IBootstrapperCommand command)
+            : base(engine)
         {
+            this.Command = command;
 
+            this.BAManifest = new BootstrapperApplicationData();
         }
+
+        internal IBootstrapperApplicationData BAManifest { get; }
+
+        internal IBootstrapperCommand Command { get; }
+
+        internal IEngine Engine => this.engine;
 
         /// <summary>
         /// Gets the global model.
