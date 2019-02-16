@@ -6,7 +6,7 @@
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
                     xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
-                    xmlns:ux="clr-namespace:WixToolset.UX">
+                    xmlns:wixba="clr-namespace:WixToolset.WixBA">
 
     <!-- Converters -->
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -173,7 +173,7 @@
         <Setter Property="IsHitTestVisible" Value="False" />
         <Setter Property="Source" Value="{DynamicResource LogoOverLightBackground}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Path=IsLightBackground, Source={x:Static ux:WindowProperties.Instance}}" Value="false">
+            <DataTrigger Binding="{Binding Path=IsLightBackground, Source={x:Static wixba:WindowProperties.Instance}}" Value="false">
                 <Setter Property="Source" Value="{DynamicResource LogoOverDarkBackground}" />
             </DataTrigger>
         </Style.Triggers>

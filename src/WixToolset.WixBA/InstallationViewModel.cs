@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.UX
+namespace WixToolset.WixBA
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace WixToolset.UX
     using System.Windows;
     using System.Windows.Input;
     using IO = System.IO;
-    using WixToolset.Bootstrapper;
+    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// The states of detection.
@@ -606,10 +606,10 @@ namespace WixToolset.UX
             }
 
             // If we're not in Full UI mode, we need to alert the dispatcher to stop and close the window for passive.
-            if (Bootstrapper.Display.Full != WixBA.Model.Command.Display)
+            if (Display.Full != WixBA.Model.Command.Display)
             {
                 // If its passive, send a message to the window to close.
-                if (Bootstrapper.Display.Passive == WixBA.Model.Command.Display)
+                if (Display.Passive == WixBA.Model.Command.Display)
                 {
                     WixBA.Model.Engine.Log(LogLevel.Verbose, "Automatically closing the window for non-interactive install");
                     WixBA.Dispatcher.BeginInvoke(new Action(WixBA.View.Close));

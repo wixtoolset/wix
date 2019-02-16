@@ -3,12 +3,12 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using WixToolset.Bootstrapper;
-using WixToolset.UX;
+using WixToolset.BootstrapperCore;
+using WixToolset.WixBA;
 
 
-[assembly: AssemblyTitle("WixBA")]
-[assembly: AssemblyDescription("WiX User Experience")]
+[assembly: AssemblyTitle("WixToolset.WixBA")]
+[assembly: AssemblyDescription("WiX Bootstrapper Application")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -17,6 +17,6 @@ using WixToolset.UX;
 [assembly: Guid("0ffc4944-9295-40b7-adac-3a6864b5219b")]
 [assembly: CLSCompliantAttribute(true)]
 
-// Identifies the class that derives from UserExperience and is the UX class that gets
+// Identifies the class that derives from BootstrapperApplication and is the BA class that gets
 // instantiated by the interop layer
 [assembly: BootstrapperApplication(typeof(WixBA))]

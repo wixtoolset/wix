@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.UX
+namespace WixToolset.WixBA
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace WixToolset.UX
     using Threading = System.Windows.Threading;
     using WinForms = System.Windows.Forms;
 
-    using WixToolset.Bootstrapper;
+    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// The WiX toolset user experience.
@@ -142,7 +142,7 @@ namespace WixToolset.UX
         }
 
         /// <summary>
-        /// Thread entry point for WiX Toolset UX.
+        /// Thread entry point for WiX Toolset Bootstrapper Application.
         /// </summary>
         protected override void Run()
         {

@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.UX
+namespace WixToolset.WixBA
 {
     using System;
     using System.Diagnostics;
@@ -8,7 +8,7 @@ namespace WixToolset.UX
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Threading;
-    using WixToolset.Bootstrapper;
+    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// The errors returned from the engine

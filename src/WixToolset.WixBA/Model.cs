@@ -1,11 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.UX
+namespace WixToolset.WixBA
 {
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using WixToolset.Bootstrapper;
+    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// The model.
@@ -17,9 +17,9 @@ namespace WixToolset.UX
         private const string BurnBundleVersionVariable = "WixBundleVersion";
 
         /// <summary>
-        /// Creates a new model for the UX.
+        /// Creates a new model for the BA.
         /// </summary>
-        /// <param name="bootstrapper">Bootstrapper hosting the UX.</param>
+        /// <param name="bootstrapper">The BA.</param>
         public Model(BootstrapperApplication bootstrapper)
         {
             this.Bootstrapper = bootstrapper;
