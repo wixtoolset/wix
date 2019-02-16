@@ -16,6 +16,7 @@
     <Compile Include="ProgressViewModel.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="InstallationViewModel.cs" />
+    <Compile Include="WixBAFactory.cs" />
     <Compile Include="WixDistribution.cs" />
     <Page Include="Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -56,7 +57,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WixToolset.BootstrapperCore">
-      <HintPath>..\..\packages\WixToolset.BootstrapperCore.4.0.3\lib\net20\WixToolset.BootstrapperCore.dll</HintPath>
+      <HintPath>..\..\packages\WixToolset.BootstrapperCore.4.0.4\lib\net20\WixToolset.BootstrapperCore.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

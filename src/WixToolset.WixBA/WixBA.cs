@@ -19,6 +19,12 @@ namespace WixToolset.WixBA
     /// </summary>
     public class WixBA : BootstrapperApplication
     {
+        public WixBA(Engine engine, Command command)
+            : base(engine, command)
+        {
+
+        }
+
         /// <summary>
         /// Gets the global model.
         /// </summary>
