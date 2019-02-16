@@ -13,9 +13,9 @@ namespace Native
     public ref class TestManagedBootstrapperApplicationFactory : public BaseBootstrapperApplicationFactory
     {
     protected:
-        virtual IBootstrapperApplication^ Create(Engine^ engine, Command% command) override
+        virtual IBootstrapperApplication^ Create(IEngine^ engine, IBootstrapperCommand^ /*command*/) override
         {
-            return gcnew TestManagedBootstrapperApplication(engine, command);
+            return gcnew TestManagedBootstrapperApplication(engine);
         }
     };
 

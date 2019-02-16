@@ -13,8 +13,8 @@ namespace Native
     public ref class TestManagedBootstrapperApplication : BootstrapperApplication
     {
     public:
-        TestManagedBootstrapperApplication(WixToolset::BootstrapperCore::Engine^ engine, WixToolset::BootstrapperCore::Command command)
-            : BootstrapperApplication(engine, command)
+        TestManagedBootstrapperApplication(WixToolset::BootstrapperCore::IEngine^ engine)
+            : BootstrapperApplication(engine)
         {
 
         }
@@ -26,7 +26,7 @@ namespace Native
         virtual void OnShutdown(ShutdownEventArgs^ e) override
         {
             String^ message = "Shutdown," + e->Action.ToString() + "," + e->HResult.ToString();
-            this->Engine->Log(LogLevel::Standard, message);
+            this->engine->Log(LogLevel::Standard, message);
         }
     };
 }
