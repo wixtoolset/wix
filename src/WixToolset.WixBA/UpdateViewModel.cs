@@ -1,11 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.UX
+namespace WixToolset.WixBA
 {
     using System;
     using System.ComponentModel;
     using System.Windows.Input;
-    using WixToolset.Bootstrapper;
+    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// The states of the update view model.
@@ -151,7 +151,7 @@ namespace WixToolset.UX
             }
         }
 
-        private void DetectUpdateBegin(object sender, Bootstrapper.DetectUpdateBeginEventArgs e)
+        private void DetectUpdateBegin(object sender, DetectUpdateBeginEventArgs e)
         {
             // Don't check for updates if:
             //   the first check failed (no retry)
@@ -164,7 +164,7 @@ namespace WixToolset.UX
             }
         }
         
-        private void DetectUpdate(object sender, Bootstrapper.DetectUpdateEventArgs e)
+        private void DetectUpdate(object sender, DetectUpdateEventArgs e)
         {
             // The list of updates is sorted in descending version, so the first callback should be the largest update available.
             // This update should be either larger than ours (so we are out of date), the same as ours (so we are current)
@@ -186,7 +186,7 @@ namespace WixToolset.UX
             e.StopProcessingUpdates = true;
         }
 
-        private void DetectUpdateComplete(object sender, Bootstrapper.DetectUpdateCompleteEventArgs e)
+        private void DetectUpdateComplete(object sender, DetectUpdateCompleteEventArgs e)
         {
             // Failed to process an update, allow the existing bundle to still install.
             if ((UpdateState.Failed != this.State) && !Hresult.Succeeded(e.Status))
