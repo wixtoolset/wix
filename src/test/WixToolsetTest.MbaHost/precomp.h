@@ -13,3 +13,4 @@
 
 #include "EngineForTest.h"
 #include "TestManagedBootstrapperApplication.h"
+#include "TestManagedBootstrapperApplicationFactory.h"

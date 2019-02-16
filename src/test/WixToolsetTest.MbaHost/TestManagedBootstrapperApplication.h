@@ -13,6 +13,12 @@ namespace Native
     public ref class TestManagedBootstrapperApplication : BootstrapperApplication
     {
     public:
+        TestManagedBootstrapperApplication(WixToolset::BootstrapperCore::Engine^ engine, WixToolset::BootstrapperCore::Command command)
+            : BootstrapperApplication(engine, command)
+        {
+
+        }
+
         virtual void Run() override
         {
         }
@@ -23,8 +29,6 @@ namespace Native
             this->Engine->Log(LogLevel::Standard, message);
         }
     };
-
-    [assembly:BootstrapperApplication(TestManagedBootstrapperApplication::typeid)];
 }
 }
 }
