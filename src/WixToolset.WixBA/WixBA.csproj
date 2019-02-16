@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <ProjectGuid>{7C27518B-84AD-4679-8EF4-29DF552CF1AC}</ProjectGuid>
+    <AssemblyName>WixBA</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RootNamespace>WixToolset.UX</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Hresult.cs" />
+    <Compile Include="Model.cs" />
+    <Compile Include="BrowserProperties.cs" />
+    <Compile Include="NewsItem.cs" />
+    <Compile Include="ProgressViewModel.cs" />
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="InstallationViewModel.cs" />
+    <Page Include="Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RootView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="PropertyNotifyBase.cs" />
+    <Compile Include="RootView.xaml.cs">
+      <DependentUpon>RootView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RootViewModel.cs" />
+    <Compile Include="UpdateViewModel.cs" />
+    <Compile Include="WindowProperties.cs" />
+    <Compile Include="WixBA.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="WixBA.BootstrapperCore.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <ProjectReference Include="..\..\ext\BalExtension\mba\core\core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\logo-white-hollow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\logo-black-hollow.png" />
+  </ItemGroup>
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), wix.proj))\tools\WixBuild.targets" />
+</Project>
