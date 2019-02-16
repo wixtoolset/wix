@@ -20,27 +20,32 @@ namespace WixToolset.WixBA
         /// Creates a new model for the BA.
         /// </summary>
         /// <param name="bootstrapper">The BA.</param>
-        public Model(BootstrapperApplication bootstrapper)
+        public Model(WixBA bootstrapper)
         {
+            this.BAManifest = bootstrapper.BAManifest;
             this.Bootstrapper = bootstrapper;
+            this.Command = bootstrapper.Command;
+            this.Engine = bootstrapper.Engine;
             this.Telemetry = new List<KeyValuePair<string, string>>();
             this.Version = this.Engine.VersionVariables[BurnBundleVersionVariable];
         }
 
+        public IBootstrapperApplicationData BAManifest { get; }
+
         /// <summary>
         /// Gets the bootstrapper.
         /// </summary>
-        public BootstrapperApplication Bootstrapper { get; private set; }
+        public IDefaultBootstrapperApplication Bootstrapper { get; }
 
         /// <summary>
         /// Gets the bootstrapper command-line.
         /// </summary>
-        public Command Command { get { return this.Bootstrapper.Command; } }
+        public IBootstrapperCommand Command { get; }
 
         /// <summary>
         /// Gets the bootstrapper engine.
         /// </summary>
-        public Engine Engine { get { return this.Bootstrapper.Engine; } }
+        public IEngine Engine { get; }
 
         /// <summary>
         /// Gets the key/value pairs used in telemetry.
@@ -121,9 +126,7 @@ namespace WixToolset.WixBA
         /// <returns>Display name of the package if found or the package id if not.</returns>
         public string GetPackageName(string packageId)
         {
-            PackageInfo package;
-
-            return this.Bootstrapper.BAManifest.Bundle.Packages.TryGetValue(packageId, out package) ? package.DisplayName : packageId;
+            return this.BAManifest.Bundle.Packages.TryGetValue(packageId, out var package) ? package.DisplayName : packageId;
         }
     }
 }

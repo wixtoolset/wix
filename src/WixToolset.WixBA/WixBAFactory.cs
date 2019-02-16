@@ -6,7 +6,7 @@ namespace WixToolset.WixBA
 
     public class WixBAFactory : BaseBootstrapperApplicationFactory
     {
-        protected override IBootstrapperApplication Create(Engine engine, ref Command command)
+        protected override IBootstrapperApplication Create(IEngine engine, IBootstrapperCommand command)
         {
             return new WixBA(engine, command);
         }
