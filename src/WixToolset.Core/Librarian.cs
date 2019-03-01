@@ -106,7 +106,7 @@ namespace WixToolset.Core
             // Resolve paths to files that are to be embedded in the library.
             if (context.BindFiles)
             {
-                var variableResolver = new WixVariableResolver(this.Messaging);
+                var variableResolver = this.ServiceProvider.GetService<IVariableResolver>();
 
                 var fileResolver = new FileResolver(context.BindPaths, context.Extensions);
 

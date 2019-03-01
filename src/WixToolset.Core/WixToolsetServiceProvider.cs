@@ -49,8 +49,8 @@ namespace WixToolset.Core
             this.AddService<ILinker>((provider, singletons) => new Linker(provider));
             this.AddService<IResolver>((provider, singletons) => new Resolver(provider));
 
-            // Internal implementations.
             this.AddService<ILocalizer>((provider, singletons) => new Localizer(provider));
+            this.AddService<IVariableResolver>((provider, singletons) => new WixVariableResolver(provider));
         }
 
         private Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>> CreationFunctions { get; }

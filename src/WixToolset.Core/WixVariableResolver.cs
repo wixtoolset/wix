@@ -21,13 +21,14 @@ namespace WixToolset.Core
         /// <summary>
         /// Instantiate a new WixVariableResolver.
         /// </summary>
-        public WixVariableResolver(IMessaging messaging)
+        internal WixVariableResolver(IServiceProvider serviceProvider)
         {
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+
             this.locVariables = new Dictionary<string, BindVariable>();
             this.wixVariables = new Dictionary<string, BindVariable>();
             this.localizedControls = new Dictionary<string, LocalizedControl>();
             this.Codepage = -1;
-            this.Messaging = messaging;
         }
 
         private IMessaging Messaging { get; }
@@ -88,8 +89,6 @@ namespace WixToolset.Core
         /// <param name="value">The value to resolve.</param>
         /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
         /// <param name="errorOnUnknown">true if unknown variables should throw errors.</param>
-        /// <param name="isDefault">true if the resolved value was the default.</param>
-        /// <param name="delayedResolve">true if the value has variables that cannot yet be resolved.</param>
         /// <returns>The resolved value.</returns>
         internal VariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown)
         {

@@ -45,6 +45,7 @@ namespace WixToolset.Core
         private string activeName;
         private string activeLanguage;
 
+        // TODO: Implement this differently to not require the VariableResolver.
         private WixVariableResolver componentIdPlaceholdersResolver;
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace WixToolset.Core
 
                 this.Core = new CompilerCore(target, this.Messaging, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
-                this.componentIdPlaceholdersResolver = new WixVariableResolver(this.Messaging);
+                this.componentIdPlaceholdersResolver = new WixVariableResolver(this.ServiceProvider);
 
                 // parse the document
                 var source = this.Context.Source;
