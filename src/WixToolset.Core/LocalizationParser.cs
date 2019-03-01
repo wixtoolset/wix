@@ -11,33 +11,33 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    internal class Localizer : ILocalizer
+    internal class LocalizationParser : ILocalizationParser
     {
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
         private static string XmlElementName = "WixLocalization";
 
-        internal Localizer(IServiceProvider serviceProvider)
+        internal LocalizationParser(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
         private IMessaging Messaging { get; }
 
-        public Localization ParseLocalizationFile(string path)
+        public Localization ParseLocalization(string path)
         {
             var document = XDocument.Load(path);
-            return this.ParseLocalizationFile(document);
+            return this.ParseLocalization(document);
         }
 
-        public Localization ParseLocalizationFile(XDocument document)
+        public Localization ParseLocalization(XDocument document)
         {
             XElement root = document.Root;
             Localization localization = null;
 
             SourceLineNumber sourceLineNumbers = SourceLineNumber.CreateFromXObject(root);
-            if (Localizer.XmlElementName == root.Name.LocalName)
+            if (LocalizationParser.XmlElementName == root.Name.LocalName)
             {
-                if (Localizer.WxlNamespace == root.Name.Namespace)
+                if (LocalizationParser.WxlNamespace == root.Name.Namespace)
                 {
                     localization = ParseWixLocalizationElement(this.Messaging, root);
                 }
@@ -45,17 +45,17 @@ namespace WixToolset.Core
                 {
                     if (null == root.Name.Namespace)
                     {
-                        this.Messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, Localizer.XmlElementName, Localizer.WxlNamespace.NamespaceName));
+                        this.Messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, LocalizationParser.XmlElementName, LocalizationParser.WxlNamespace.NamespaceName));
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, Localizer.XmlElementName, root.Name.LocalName, Localizer.WxlNamespace.NamespaceName));
+                        this.Messaging.Write(ErrorMessages.InvalidWixXmlNamespace(sourceLineNumbers, LocalizationParser.XmlElementName, root.Name.LocalName, LocalizationParser.WxlNamespace.NamespaceName));
                     }
                 }
             }
             else
             {
-                this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, root.Name.LocalName, "localization", Localizer.XmlElementName));
+                this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, root.Name.LocalName, "localization", LocalizationParser.XmlElementName));
             }
 
             return localization;
@@ -90,7 +90,7 @@ namespace WixToolset.Core
 
             foreach (XAttribute attrib in node.Attributes())
             {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || Localizer.WxlNamespace == attrib.Name.Namespace)
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || LocalizationParser.WxlNamespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
@@ -119,16 +119,16 @@ namespace WixToolset.Core
 
             foreach (XElement child in node.Elements())
             {
-                if (Localizer.WxlNamespace == child.Name.Namespace)
+                if (LocalizationParser.WxlNamespace == child.Name.Namespace)
                 {
                     switch (child.Name.LocalName)
                     {
                         case "String":
-                            Localizer.ParseString(messaging, child, variables);
+                            LocalizationParser.ParseString(messaging, child, variables);
                             break;
 
                         case "UI":
-                            Localizer.ParseUI(messaging, child, localizedControls);
+                            LocalizationParser.ParseUI(messaging, child, localizedControls);
                             break;
 
                         default:
@@ -157,7 +157,7 @@ namespace WixToolset.Core
 
             foreach (XAttribute attrib in node.Attributes())
             {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || Localizer.WxlNamespace == attrib.Name.Namespace)
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || LocalizationParser.WxlNamespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
@@ -202,7 +202,7 @@ namespace WixToolset.Core
                     Value = value,
                 };
 
-                Localizer.AddWixVariable(messaging, variables, variable);
+                LocalizationParser.AddWixVariable(messaging, variables, variable);
             }
         }
 
@@ -225,7 +225,7 @@ namespace WixToolset.Core
 
             foreach (XAttribute attrib in node.Attributes())
             {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || Localizer.WxlNamespace == attrib.Name.Namespace)
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || LocalizationParser.WxlNamespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {

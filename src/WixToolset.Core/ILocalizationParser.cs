@@ -8,20 +8,20 @@ namespace WixToolset.Core
     /// <summary>
     /// Parses localization source files.
     /// </summary>
-    public interface ILocalizer
+    public interface ILocalizationParser
     {
         /// <summary>
         /// Loads a localization file from a path on disk.
         /// </summary>
         /// <param name="path">Path to localization file saved on disk.</param>
         /// <returns>Returns the loaded localization file.</returns>
-        Localization ParseLocalizationFile(string path);
+        Localization ParseLocalization(string path);
 
         /// <summary>
         /// Loads a localization file from memory.
         /// </summary>
         /// <param name="document">Document to parse as localization file.</param>
         /// <returns>Returns the loaded localization file.</returns>
-        Localization ParseLocalizationFile(XDocument document);
+        Localization ParseLocalization(XDocument document);
     }
 }

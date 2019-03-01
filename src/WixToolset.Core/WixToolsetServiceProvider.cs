@@ -49,7 +49,7 @@ namespace WixToolset.Core
             this.AddService<ILinker>((provider, singletons) => new Linker(provider));
             this.AddService<IResolver>((provider, singletons) => new Resolver(provider));
 
-            this.AddService<ILocalizer>((provider, singletons) => new Localizer(provider));
+            this.AddService<ILocalizationParser>((provider, singletons) => new LocalizationParser(provider));
             this.AddService<IVariableResolver>((provider, singletons) => new VariableResolver(provider));
         }
 

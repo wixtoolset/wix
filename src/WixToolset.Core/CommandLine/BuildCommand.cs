@@ -350,7 +350,7 @@ namespace WixToolset.Core.CommandLine
         private IEnumerable<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables)
         {
             var localizations = new List<Localization>();
-            var localizer = this.ServiceProvider.GetService<ILocalizer>();
+            var parser = this.ServiceProvider.GetService<ILocalizationParser>();
 
             foreach (var loc in locFiles)
             {
@@ -361,7 +361,7 @@ namespace WixToolset.Core.CommandLine
                     continue;
                 }
 
-                var localization = localizer.ParseLocalizationFile(document);
+                var localization = parser.ParseLocalization(document);
                 localizations.Add(localization);
             }
 
