@@ -4,8 +4,15 @@ namespace WixToolset.Core
 {
     using WixToolset.Extensibility.Data;
 
-    public interface IDecompiler
+    /// <summary>
+    /// Bind path representation.
+    /// </summary>
+    internal class BindPath : IBindPath
     {
-        IDecompileResult Decompile(IDecompileContext context);
+        public string Name { get; set; }
+
+        public string Path { get; set; }
+
+        public BindStage Stage { get; set; }
     }
 }

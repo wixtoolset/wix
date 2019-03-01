@@ -16,12 +16,12 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal class MspBackend : IBackend
     {
-        public BindResult Bind(IBindContext context)
+        public IBindResult Bind(IBindContext context)
         {
             throw new NotImplementedException();
         }
 
-        public DecompileResult Decompile(IDecompileContext context)
+        public IDecompileResult Decompile(IDecompileContext context)
         {
             throw new NotImplementedException();
         }

@@ -2,10 +2,13 @@
 
 namespace WixToolset.Core
 {
+    using System.Collections.Generic;
     using WixToolset.Extensibility.Data;
 
-    public interface IDecompiler
+    public class ResolveFileResult : IResolveFileResult
     {
-        IDecompileResult Decompile(IDecompileContext context);
+        public string Path { get; set; }
+
+        public IEnumerable<string> CheckedPaths { get; set; }
     }
 }

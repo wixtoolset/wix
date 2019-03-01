@@ -9,10 +9,11 @@ namespace WixToolset.Core.Burn
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class BundleBackend : IBackend
     {
-        public BindResult Bind(IBindContext context)
+        public IBindResult Bind(IBindContext context)
         {
             BindBundleCommand command = new BindBundleCommand(context);
             //command.DefaultCompressionLevel = context.DefaultCompressionLevel;
@@ -24,10 +25,14 @@ namespace WixToolset.Core.Burn
             //command.WixVariableResolver = context.WixVariableResolver;
             command.Execute();
 
-            return new BindResult { FileTransfers = command.FileTransfers, TrackedFiles = command.TrackedFiles };
+            var result = context.ServiceProvider.GetService<IBindResult>();
+            result.FileTransfers = command.FileTransfers;
+            result.TrackedFiles = command.TrackedFiles;
+
+            return result;
         }
 
-        public DecompileResult Decompile(IDecompileContext context)
+        public IDecompileResult Decompile(IDecompileContext context)
         {
             throw new NotImplementedException();
         }

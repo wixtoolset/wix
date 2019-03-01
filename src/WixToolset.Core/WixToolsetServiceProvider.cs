@@ -40,6 +40,15 @@ namespace WixToolset.Core
             this.AddService<ILayoutContext>((provider, singletons) => new LayoutContext(provider));
             this.AddService<IInscribeContext>((provider, singletons) => new InscribeContext(provider));
 
+            this.AddService<IBindFileWithPath>((provider, singletons) => new BindFileWithPath());
+            this.AddService<IBindPath>((provider, singletons) => new BindPath());
+            this.AddService<IBindResult>((provider, singletons) => new BindResult());
+            this.AddService<IComponentKeyPath>((provider, singletons) => new ComponentKeyPath());
+            this.AddService<IDecompileResult>((provider, singletons) => new DecompileResult());
+            this.AddService<IResolveResult>((provider, singletons) => new ResolveResult());
+            this.AddService<IResolvedCabinet>((provider, singletons) => new ResolvedCabinet());
+            this.AddService<IVariableResolution>((provider, singletons) => new VariableResolution());
+
             this.AddService<IBinder>((provider, singletons) => new Binder(provider));
             this.AddService<ICompiler>((provider, singletons) => new Compiler(provider));
             this.AddService<IDecompiler>((provider, singletons) => new Decompiler(provider));
@@ -59,7 +68,10 @@ namespace WixToolset.Core
 
         public bool TryGetService(Type serviceType, out object service)
         {
-            if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));
+            if (serviceType == null)
+            {
+                throw new ArgumentNullException(nameof(serviceType));
+            }
 
             if (!this.Singletons.TryGetValue(serviceType, out service))
             {

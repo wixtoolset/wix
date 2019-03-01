@@ -21,7 +21,7 @@ namespace WixToolset.Core.CommandLine
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.ExtensionManager = serviceProvider.GetService<IExtensionManager>();
-            this.commandLine = new CommandLine(this.Messaging);
+            this.commandLine = new CommandLine(this.ServiceProvider, this.Messaging);
         }
 
         public bool ShowLogo => this.commandLine.ShowLogo;
@@ -214,7 +214,7 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations, bool bindFiles, IEnumerable<BindPath> bindPaths)
+        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations, bool bindFiles, IEnumerable<IBindPath> bindPaths)
         {
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
@@ -257,7 +257,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<BindPath> bindPaths)
+        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<IBindPath> bindPaths)
         {
             var intermediateFolder = this.IntermediateFolder;
             if (String.IsNullOrEmpty(intermediateFolder))
@@ -265,7 +265,7 @@ namespace WixToolset.Core.CommandLine
                 intermediateFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             }
 
-            ResolveResult resolveResult;
+            IResolveResult resolveResult;
             {
                 var context = this.ServiceProvider.GetService<IResolveContext>();
                 context.BindPaths = bindPaths;
@@ -286,7 +286,7 @@ namespace WixToolset.Core.CommandLine
                 return;
             }
 
-            BindResult bindResult;
+            IBindResult bindResult;
             {
                 var context = this.ServiceProvider.GetService<IBindContext>();
                 //context.CabbingThreadCount = this.CabbingThreadCount;
@@ -397,7 +397,7 @@ namespace WixToolset.Core.CommandLine
 
             public bool BindFiles { get; private set; }
 
-            public List<BindPath> BindPaths { get; } = new List<BindPath>();
+            public List<IBindPath> BindPaths { get; } = new List<IBindPath>();
 
             public string CabCachePath { get; private set; }
 
@@ -431,10 +431,13 @@ namespace WixToolset.Core.CommandLine
 
             public string BuiltOutputsFile { get; private set; }
 
-            public CommandLine(IMessaging messaging)
+            public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
             {
+                this.ServiceProvider = serviceProvider;
                 this.Messaging = messaging;
             }
+
+            private IServiceProvider ServiceProvider { get; }
 
             private IMessaging Messaging { get; }
 
@@ -445,109 +448,109 @@ namespace WixToolset.Core.CommandLine
                     var parameter = arg.Substring(1);
                     switch (parameter.ToLowerInvariant())
                     {
-                    case "?":
-                    case "h":
-                    case "help":
-                        this.ShowHelp = true;
-                        return true;
-
-                    case "arch":
-                    case "platform":
-                    {
-                        var value = parser.GetNextArgumentOrError(arg);
-                        if (Enum.TryParse(value, true, out Platform platform))
-                        {
-                            this.Platform = platform;
+                        case "?":
+                        case "h":
+                        case "help":
+                            this.ShowHelp = true;
                             return true;
-                        }
-                        break;
-                    }
 
-                    case "bindfiles":
-                        this.BindFiles = true;
-                        return true;
-
-                    case "bindpath":
-                    {
-                        var value = parser.GetNextArgumentOrError(arg);
-                        if (this.TryParseBindPath(value, out var bindPath))
+                        case "arch":
+                        case "platform":
                         {
-                            this.BindPaths.Add(bindPath);
+                            var value = parser.GetNextArgumentOrError(arg);
+                            if (Enum.TryParse(value, true, out Platform platform))
+                            {
+                                this.Platform = platform;
+                                return true;
+                            }
+                            break;
+                        }
+
+                        case "bindfiles":
+                            this.BindFiles = true;
                             return true;
-                        }
-                        break;
-                    }
-                    case "cc":
-                        this.CabCachePath = parser.GetNextArgumentOrError(arg);
-                        return true;
 
-                    case "culture":
-                        parser.GetNextArgumentOrError(arg, this.Cultures);
-                        return true;
-
-                    case "contentsfile":
-                        this.ContentsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-                    case "outputsfile":
-                        this.OutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-                    case "builtoutputsfile":
-                        this.BuiltOutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-
-                    case "d":
-                    case "define":
-                        parser.GetNextArgumentOrError(arg, this.Defines);
-                        return true;
-
-                    case "i":
-                    case "includepath":
-                        parser.GetNextArgumentOrError(arg, this.IncludeSearchPaths);
-                        return true;
-
-                    case "intermediatefolder":
-                        this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(arg);
-                        return true;
-
-                    case "loc":
-                        parser.GetNextArgumentAsFilePathOrError(arg, "localization files", this.LocalizationFilePaths);
-                        return true;
-
-                    case "lib":
-                        parser.GetNextArgumentAsFilePathOrError(arg, "library files", this.LibraryFilePaths);
-                        return true;
-
-                    case "o":
-                    case "out":
-                        this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg);
-                        return true;
-
-                    case "outputtype":
-                        this.OutputType = parser.GetNextArgumentOrError(arg);
-                        return true;
-
-                    case "nologo":
-                        this.ShowLogo = false;
-                        return true;
-
-                    case "v":
-                    case "verbose":
-                        this.Messaging.ShowVerboseMessages = true;
-                        return true;
-
-                    case "sval":
-                        // todo: implement
-                        return true;
-
-                    case "sw":
-                    case "suppresswarning":
-                        var warning = parser.GetNextArgumentOrError(arg);
-                        if (!String.IsNullOrEmpty(warning))
+                        case "bindpath":
                         {
-                            var warningNumber = Convert.ToInt32(warning);
-                            this.Messaging.SuppressWarningMessage(warningNumber);
+                            var value = parser.GetNextArgumentOrError(arg);
+                            if (this.TryParseBindPath(value, out var bindPath))
+                            {
+                                this.BindPaths.Add(bindPath);
+                                return true;
+                            }
+                            break;
                         }
-                        return true;
+                        case "cc":
+                            this.CabCachePath = parser.GetNextArgumentOrError(arg);
+                            return true;
+
+                        case "culture":
+                            parser.GetNextArgumentOrError(arg, this.Cultures);
+                            return true;
+
+                        case "contentsfile":
+                            this.ContentsFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            return true;
+                        case "outputsfile":
+                            this.OutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            return true;
+                        case "builtoutputsfile":
+                            this.BuiltOutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            return true;
+
+                        case "d":
+                        case "define":
+                            parser.GetNextArgumentOrError(arg, this.Defines);
+                            return true;
+
+                        case "i":
+                        case "includepath":
+                            parser.GetNextArgumentOrError(arg, this.IncludeSearchPaths);
+                            return true;
+
+                        case "intermediatefolder":
+                            this.IntermediateFolder = parser.GetNextArgumentAsDirectoryOrError(arg);
+                            return true;
+
+                        case "loc":
+                            parser.GetNextArgumentAsFilePathOrError(arg, "localization files", this.LocalizationFilePaths);
+                            return true;
+
+                        case "lib":
+                            parser.GetNextArgumentAsFilePathOrError(arg, "library files", this.LibraryFilePaths);
+                            return true;
+
+                        case "o":
+                        case "out":
+                            this.OutputFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            return true;
+
+                        case "outputtype":
+                            this.OutputType = parser.GetNextArgumentOrError(arg);
+                            return true;
+
+                        case "nologo":
+                            this.ShowLogo = false;
+                            return true;
+
+                        case "v":
+                        case "verbose":
+                            this.Messaging.ShowVerboseMessages = true;
+                            return true;
+
+                        case "sval":
+                            // todo: implement
+                            return true;
+
+                        case "sw":
+                        case "suppresswarning":
+                            var warning = parser.GetNextArgumentOrError(arg);
+                            if (!String.IsNullOrEmpty(warning))
+                            {
+                                var warningNumber = Convert.ToInt32(warning);
+                                this.Messaging.SuppressWarningMessage(warningNumber);
+                            }
+                            return true;
                     }
 
                     return false;
@@ -573,37 +576,37 @@ namespace WixToolset.Core.CommandLine
 
                 switch (this.OutputType.ToLowerInvariant())
                 {
-                case "bundle":
-                case ".exe":
-                    return Data.OutputType.Bundle;
+                    case "bundle":
+                    case ".exe":
+                        return Data.OutputType.Bundle;
 
-                case "library":
-                case ".wixlib":
-                    return Data.OutputType.Library;
+                    case "library":
+                    case ".wixlib":
+                        return Data.OutputType.Library;
 
-                case "module":
-                case ".msm":
-                    return Data.OutputType.Module;
+                    case "module":
+                    case ".msm":
+                        return Data.OutputType.Module;
 
-                case "patch":
-                case ".msp":
-                    return Data.OutputType.Patch;
+                    case "patch":
+                    case ".msp":
+                        return Data.OutputType.Patch;
 
-                case ".pcp":
-                    return Data.OutputType.PatchCreation;
+                    case ".pcp":
+                        return Data.OutputType.PatchCreation;
 
-                case "product":
-                case "package":
-                case ".msi":
-                    return Data.OutputType.Product;
+                    case "product":
+                    case "package":
+                    case ".msi":
+                        return Data.OutputType.Product;
 
-                case "transform":
-                case ".mst":
-                    return Data.OutputType.Transform;
+                    case "transform":
+                    case ".mst":
+                        return Data.OutputType.Transform;
 
-                case "intermediatepostlink":
-                case ".wixipl":
-                    return Data.OutputType.IntermediatePostLink;
+                    case "intermediatepostlink":
+                    case ".wixipl":
+                        return Data.OutputType.IntermediatePostLink;
                 }
 
                 return Data.OutputType.Unknown;
@@ -656,7 +659,6 @@ namespace WixToolset.Core.CommandLine
                 return variables;
             }
 
-
             public IEnumerable<SourceFile> GatherSourceFiles(string intermediateDirectory)
             {
                 var files = new List<SourceFile>();
@@ -672,10 +674,21 @@ namespace WixToolset.Core.CommandLine
                 return files;
             }
 
-            private bool TryParseBindPath(string bindPath, out BindPath bp)
+            private bool TryParseBindPath(string bindPath, out IBindPath bp)
             {
                 var namedPath = bindPath.Split(BindPathSplit, 2);
-                bp = (1 == namedPath.Length) ? new BindPath(namedPath[0]) : new BindPath(namedPath[0], namedPath[1]);
+
+                bp = this.ServiceProvider.GetService<IBindPath>();
+
+                if (1 == namedPath.Length)
+                {
+                    bp.Path = namedPath[0];
+                }
+                else
+                {
+                    bp.Name = namedPath[0];
+                    bp.Path = namedPath[1];
+                }
 
                 if (File.Exists(bp.Path))
                 {

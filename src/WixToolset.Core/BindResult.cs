@@ -2,10 +2,13 @@
 
 namespace WixToolset.Core
 {
+    using System.Collections.Generic;
     using WixToolset.Extensibility.Data;
 
-    public interface IDecompiler
+    internal class BindResult : IBindResult
     {
-        IDecompileResult Decompile(IDecompileContext context);
+        public IEnumerable<IFileTransfer> FileTransfers { get; set; }
+
+        public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
     }
 }

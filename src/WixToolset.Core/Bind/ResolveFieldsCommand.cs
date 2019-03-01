@@ -20,7 +20,7 @@ namespace WixToolset.Core.Bind
 
         public IVariableResolver VariableResolver { private get; set; }
 
-        public IEnumerable<BindPath> BindPaths { private get; set; }
+        public IEnumerable<IBindPath> BindPaths { private get; set; }
 
         public IEnumerable<IResolverExtension> Extensions { private get; set; }
 

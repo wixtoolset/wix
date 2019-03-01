@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
@@ -11,25 +11,30 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     public class CabinetResolver
     {
-        public CabinetResolver(string cabCachePath, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
+        public CabinetResolver(IServiceProvider serviceProvider, string cabCachePath, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
+            this.ServiceProvider = serviceProvider;
+
             this.CabCachePath = cabCachePath;
 
             this.BackendExtensions = backendExtensions;
         }
 
+        private IServiceProvider ServiceProvider { get; }
+
         private string CabCachePath { get; }
 
         private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
 
-        public ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<FileFacade> fileFacades)
+        public IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<FileFacade> fileFacades)
         {
-            var filesWithPath = fileFacades.Select(f => new BindFileWithPath() { Id = f.File.File, Path = f.WixFile.Source.Path }).ToList();
+            var filesWithPath = fileFacades.Select(this.CreateBindFileWithPath).ToList();
 
-            ResolvedCabinet resolved = null;
+            IResolvedCabinet resolved = null;
 
             foreach (var extension in this.BackendExtensions)
             {
@@ -42,7 +47,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // By default cabinet should be built and moved to the suggested location.
-            resolved = new ResolvedCabinet() { BuildOption = CabinetBuildOption.BuildAndMove, Path = cabinetPath };
+            resolved = this.ServiceProvider.GetService<IResolvedCabinet>();
+            resolved.BuildOption = CabinetBuildOption.BuildAndMove;
+            resolved.Path = cabinetPath;
 
             // If a cabinet cache path was provided, change the location for the cabinet
             // to be built to and check if there is a cabinet that can be reused.
@@ -100,6 +107,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return resolved;
+        }
+
+        private IBindFileWithPath CreateBindFileWithPath(FileFacade facade)
+        {
+            var result = this.ServiceProvider.GetService<IBindFileWithPath>();
+            result.Id = facade.File.File;
+            result.Path = facade.WixFile.Source.Path;
+
+            return result;
         }
 
         private static bool CheckFileExists(string path)

@@ -10,7 +10,7 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal class MstBackend : IBackend
     {
-        public BindResult Bind(IBindContext context)
+        public IBindResult Bind(IBindContext context)
         {
 #if REVISIT_FOR_PATCHING
             var command = new BindTransformCommand();
@@ -25,7 +25,7 @@ namespace WixToolset.Core.WindowsInstaller
             throw new NotImplementedException();
         }
 
-        public DecompileResult Decompile(IDecompileContext context)
+        public IDecompileResult Decompile(IDecompileContext context)
         {
             throw new NotImplementedException();
         }

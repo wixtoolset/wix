@@ -24,7 +24,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public BindResult Bind(IBindContext context)
+        public IBindResult Bind(IBindContext context)
         {
             // Prebind.
             //
@@ -52,7 +52,7 @@ namespace WixToolset.Core
             return bindResult;
         }
 
-        private BindResult BackendBind(IBindContext context)
+        private IBindResult BackendBind(IBindContext context)
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 

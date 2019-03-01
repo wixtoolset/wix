@@ -23,6 +23,7 @@ namespace WixToolset.Core
         /// </summary>
         internal VariableResolver(IServiceProvider serviceProvider)
         {
+            this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
 
             this.locVariables = new Dictionary<string, BindVariable>();
@@ -30,6 +31,8 @@ namespace WixToolset.Core
             this.localizedControls = new Dictionary<string, LocalizedControl>();
             this.Codepage = -1;
         }
+
+        private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -71,7 +74,7 @@ namespace WixToolset.Core
             }
         }
 
-        public VariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly)
+        public IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly)
         {
             return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, true);
         }
@@ -90,12 +93,14 @@ namespace WixToolset.Core
         /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
         /// <param name="errorOnUnknown">true if unknown variables should throw errors.</param>
         /// <returns>The resolved value.</returns>
-        internal VariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown)
+        internal IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown)
         {
             var matches = Common.WixVariableRegex.Matches(value);
 
             // the value is the default unless its substituted further down
-            var result = new VariableResolution { IsDefault = true, Value = value };
+            var result = this.ServiceProvider.GetService<IVariableResolution>();
+            result.IsDefault = true;
+            result.Value = value;
 
             if (0 < matches.Count)
             {

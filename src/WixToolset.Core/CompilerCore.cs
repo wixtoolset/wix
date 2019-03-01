@@ -534,7 +534,7 @@ namespace WixToolset.Core
             string value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             // allow for localization of code page names and values
-            if (IsValidLocIdentifier(value))
+            if (this.IsValidLocIdentifier(value))
             {
                 return value;
             }
@@ -648,7 +648,7 @@ namespace WixToolset.Core
 
             if (0 < value.Length)
             {
-                if (IsValidLocIdentifier(value) || Common.IsValidBinderVariable(value))
+                if (this.IsValidLocIdentifier(value) || Common.IsValidBinderVariable(value))
                 {
                     return value;
                 }
@@ -1010,7 +1010,7 @@ namespace WixToolset.Core
         /// <param name="parentElement">Element containing element to be parsed.</param>
         /// <param name="element">Element to be parsed.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public ComponentKeyPath ParsePossibleKeyPathExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context)
+        public IComponentKeyPath ParsePossibleKeyPathExtensionElement(XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             return this.parseHelper.ParsePossibleKeyPathExtensionElement(this.extensions.Values, this.intermediate, this.ActiveSection, parentElement, element, context);
         }

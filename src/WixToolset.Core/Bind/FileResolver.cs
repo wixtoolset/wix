@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.Bind
 {
@@ -14,24 +14,24 @@ namespace WixToolset.Core.Bind
     {
         private const string BindPathOpenString = "!(bindpath.";
 
-        private FileResolver(IEnumerable<BindPath> bindPaths)
+        private FileResolver(IEnumerable<IBindPath> bindPaths)
         {
-            this.BindPaths = (bindPaths ?? Array.Empty<BindPath>()).ToLookup(b => b.Stage);
+            this.BindPaths = (bindPaths ?? Array.Empty<IBindPath>()).ToLookup(b => b.Stage);
             this.RebaseTarget = this.BindPaths[BindStage.Target].Any();
             this.RebaseUpdated = this.BindPaths[BindStage.Updated].Any();
         }
 
-        public FileResolver(IEnumerable<BindPath> bindPaths, IEnumerable<IResolverExtension> extensions) : this(bindPaths)
+        public FileResolver(IEnumerable<IBindPath> bindPaths, IEnumerable<IResolverExtension> extensions) : this(bindPaths)
         {
             this.ResolverExtensions = extensions ?? Array.Empty<IResolverExtension>();
         }
 
-        public FileResolver(IEnumerable<BindPath> bindPaths, IEnumerable<ILibrarianExtension> extensions) : this(bindPaths)
+        public FileResolver(IEnumerable<IBindPath> bindPaths, IEnumerable<ILibrarianExtension> extensions) : this(bindPaths)
         {
             this.LibrarianExtensions = extensions ?? Array.Empty<ILibrarianExtension>();
         }
 
-        private ILookup<BindStage, BindPath> BindPaths { get; }
+        private ILookup<BindStage, IBindPath> BindPaths { get; }
 
         public bool RebaseTarget { get; }
 

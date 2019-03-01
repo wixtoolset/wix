@@ -28,9 +28,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private IMessaging Messaging { get; }
 
-        public DecompileResult Execute()
+        public IDecompileResult Execute()
         {
-            var result = new DecompileResult();
+            var result = this.Context.ServiceProvider.GetService<IDecompileResult>();
 
             try
             {

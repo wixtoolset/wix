@@ -28,7 +28,7 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
-        public IEnumerable<BindPath> BindPaths { get; set; }
+        public IEnumerable<IBindPath> BindPaths { get; set; }
 
         public string IntermediateFolder { get; set; }
 
@@ -38,7 +38,7 @@ namespace WixToolset.Core
 
         public IEnumerable<string> FilterCultures { get; set; }
 
-        public ResolveResult Resolve(IResolveContext context)
+        public IResolveResult Resolve(IResolveContext context)
         {
 
             foreach (var extension in context.Extensions)

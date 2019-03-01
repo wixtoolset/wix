@@ -19,7 +19,7 @@ namespace WixToolset.Core
 
         public IServiceProvider ServiceProvider { get; }
 
-        public DecompileResult Decompile(IDecompileContext context)
+        public IDecompileResult Decompile(IDecompileContext context)
         {
             // Pre-decompile.
             //
@@ -45,7 +45,7 @@ namespace WixToolset.Core
             return result;
         }
 
-        private DecompileResult BackendDecompile(IDecompileContext context)
+        private IDecompileResult BackendDecompile(IDecompileContext context)
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 

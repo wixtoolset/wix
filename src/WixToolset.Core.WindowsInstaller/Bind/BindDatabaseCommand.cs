@@ -24,6 +24,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator)
         {
+            this.ServiceProvider = context.ServiceProvider;
+
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
@@ -45,6 +47,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.BackendExtensions = backendExtension;
         }
+
+        public IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -383,7 +387,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                var command = new CreateCabinetsCommand(this.BackendHelper);
+                var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper);
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
