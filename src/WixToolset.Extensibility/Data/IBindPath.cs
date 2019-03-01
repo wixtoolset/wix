@@ -2,19 +2,21 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    /// <summary>
-    /// Bind file with its path.
-    /// </summary>
-    public class BindFileWithPath
+    public interface IBindPath
     {
         /// <summary>
-        /// Gets or sets the identifier of the file with this path.
+        /// Name of the bind path or String.Empty if the path is unnamed.
         /// </summary>
-        public string Id { get; set; }
+        string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the file path.
+        /// Path for the bind path.
         /// </summary>
-        public string Path { get; set; }
+        string Path { get; set; }
+
+        /// <summary>
+        /// Stage for the bind path.
+        /// </summary>
+        BindStage Stage { get; set; }
     }
 }

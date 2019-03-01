@@ -2,13 +2,12 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using System.Collections.Generic;
-    using System.Xml.Linq;
-
-    public class DecompileResult
+    public interface IComponentKeyPath
     {
-        public XDocument Document { get; set; }
+        bool Explicit { get; set; }
 
-        public IEnumerable<string> ExtractedFilePaths { get; set; }
+        string Id { get; set; }
+
+        ComponentKeyPathType Type { get; set; }
     }
 }

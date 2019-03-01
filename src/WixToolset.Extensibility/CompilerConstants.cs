@@ -7,7 +7,7 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Constants used by compiler.
     /// </summary>
-    public class CompilerConstants
+    public static class CompilerConstants
     {
         public const int IntegerNotSet = int.MinValue;
         public const int IllegalInteger = int.MinValue + 1;

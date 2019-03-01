@@ -5,7 +5,7 @@ namespace WixToolset.Extensibility
     /// <summary>
     /// Constants used by decompiler.
     /// </summary>
-    public class DecompilerConstants
+    public static class DecompilerConstants
     {
         public const char PrimaryKeyDelimiter = '/';
         public const string PrimaryKeyDelimiterString = "/";

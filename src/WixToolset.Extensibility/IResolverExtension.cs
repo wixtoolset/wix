@@ -15,11 +15,11 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreResolve(IResolveContext context);
 
-        ResolveFileResult ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage);
+        IResolveFileResult ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage);
 
         /// <summary>
         /// Called after all resolving occurs.
         /// </summary>
-        void PostResolve(ResolveResult result);
+        void PostResolve(IResolveResult result);
     }
 }

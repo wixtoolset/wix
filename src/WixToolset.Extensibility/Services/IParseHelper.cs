@@ -326,7 +326,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="parentElement">Element containing element to be parsed.</param>
         /// <param name="element">Element to be parsed.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        ComponentKeyPath ParsePossibleKeyPathExtensionElement(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context);
+        IComponentKeyPath ParsePossibleKeyPathExtensionElement(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context);
 
         /// <summary>
         /// Process all children of the element looking for extensions and erroring on the unexpected.

@@ -17,6 +17,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after all binding occurs.
         /// </summary>
-        void PostBind(BindResult result);
+        void PostBind(IBindResult result);
     }
 }

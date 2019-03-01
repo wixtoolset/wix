@@ -40,7 +40,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the end of bind.
         /// </summary>
-        public virtual void PostBind(BindResult result)
+        public virtual void PostBind(IBindResult result)
         {
         }
     }

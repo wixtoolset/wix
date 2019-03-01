@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Extensibility.Services
 {
@@ -33,7 +33,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="value">The value to resolve.</param>
         /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
         /// <returns>The resolved result.</returns>
-        VariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly);
+        IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly);
 
         /// <summary>
         /// Try to find localization information for dialog and (optional) control.

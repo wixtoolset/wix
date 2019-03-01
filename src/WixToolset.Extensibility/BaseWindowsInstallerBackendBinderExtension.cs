@@ -34,6 +34,11 @@ namespace WixToolset.Extensibility
         /// </summary>
         protected virtual TableDefinition[] TableDefinitionsForTuples { get; }
 
+        /// <summary>
+        /// Creates a resolved cabinet result.
+        /// </summary>
+        protected IResolvedCabinet CreateResolvedCabinet() => this.Context.ServiceProvider.GetService<IResolvedCabinet>();
+
         public virtual void PreBackendBind(IBindContext context)
         {
             this.Context = context;
@@ -43,7 +48,7 @@ namespace WixToolset.Extensibility
             this.BackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
         }
 
-        public virtual ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<BindFileWithPath> files)
+        public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files)
         {
             return null;
         }
@@ -63,7 +68,7 @@ namespace WixToolset.Extensibility
             return false;
         }
 
-        public virtual void PostBackendBind(BindResult result, Pdb pdb)
+        public virtual void PostBackendBind(IBindResult result, Pdb pdb)
         {
         }
     }

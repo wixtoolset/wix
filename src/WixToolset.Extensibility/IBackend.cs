@@ -7,9 +7,9 @@ namespace WixToolset.Extensibility
 
     public interface IBackend
     {
-        BindResult Bind(IBindContext context);
+        IBindResult Bind(IBindContext context);
 
-        DecompileResult Decompile(IDecompileContext context);
+        IDecompileResult Decompile(IDecompileContext context);
 
         Intermediate Unbind(IUnbindContext context);
 

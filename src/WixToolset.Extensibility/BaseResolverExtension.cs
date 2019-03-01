@@ -22,6 +22,11 @@ namespace WixToolset.Extensibility
         protected IMessaging Messaging { get; private set; }
 
         /// <summary>
+        /// Creates a resolve file result.
+        /// </summary>
+        protected IResolveFileResult CreateResolveFileResult() => this.Context.ServiceProvider.GetService<IResolveFileResult>();
+
+        /// <summary>
         /// Called at the beginning of the resolving variables and files.
         /// </summary>
         public virtual void PreResolve(IResolveContext context)
@@ -31,7 +36,7 @@ namespace WixToolset.Extensibility
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
-        public virtual ResolveFileResult ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
+        public virtual IResolveFileResult ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage)
         {
             return null;
         }
@@ -39,7 +44,7 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the end of resolve.
         /// </summary>
-        public virtual void PostResolve(ResolveResult result)
+        public virtual void PostResolve(IResolveResult result)
         {
         }
     }

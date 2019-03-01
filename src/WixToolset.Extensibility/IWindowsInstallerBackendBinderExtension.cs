@@ -18,7 +18,7 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreBackendBind(IBindContext context);
 
-        ResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<BindFileWithPath> files);
+        IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files);
 
         string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory);
 
@@ -27,6 +27,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
         /// </summary>
-        void PostBackendBind(BindResult result, Pdb wixpdb);
+        void PostBackendBind(IBindResult result, Pdb wixpdb);
     }
 }

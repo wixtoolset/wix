@@ -17,6 +17,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after all decompiling occurs.
         /// </summary>
-        void PostDecompile(DecompileResult result);
+        void PostDecompile(IDecompileResult result);
     }
 }

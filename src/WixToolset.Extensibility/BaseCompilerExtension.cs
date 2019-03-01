@@ -35,6 +35,11 @@ namespace WixToolset.Extensibility
         public abstract XNamespace Namespace { get; }
 
         /// <summary>
+        /// Creates a component key path.
+        /// </summary>
+        protected IComponentKeyPath CreateComponentKeyPath() => this.Context.ServiceProvider.GetService<IComponentKeyPath>();
+
+        /// <summary>
         /// Called at the beginning of the compilation of a source file.
         /// </summary>
         public virtual void PreCompile(ICompileContext context)
@@ -75,7 +80,7 @@ namespace WixToolset.Extensibility
         /// <param name="element">Element to process.</param>
         /// <param name="keyPath">Explicit key path.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public virtual ComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
+        public virtual IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             this.ParseElement(intermediate, section, parentElement, element, context);
             return null;
