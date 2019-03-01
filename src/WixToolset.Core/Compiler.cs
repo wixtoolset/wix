@@ -46,7 +46,7 @@ namespace WixToolset.Core
         private string activeLanguage;
 
         // TODO: Implement this differently to not require the VariableResolver.
-        private WixVariableResolver componentIdPlaceholdersResolver;
+        private VariableResolver componentIdPlaceholdersResolver;
 
         /// <summary>
         /// Type of RadioButton element in a group.
@@ -132,7 +132,7 @@ namespace WixToolset.Core
 
                 this.Core = new CompilerCore(target, this.Messaging, parseHelper, extensionsByNamespace);
                 this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
-                this.componentIdPlaceholdersResolver = new WixVariableResolver(this.ServiceProvider);
+                this.componentIdPlaceholdersResolver = new VariableResolver(this.ServiceProvider);
 
                 // parse the document
                 var source = this.Context.Source;

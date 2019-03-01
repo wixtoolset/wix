@@ -12,16 +12,16 @@ namespace WixToolset.Core
     /// <summary>
     /// WiX variable resolver.
     /// </summary>
-    internal class WixVariableResolver : IVariableResolver
+    internal class VariableResolver : IVariableResolver
     {
         private readonly Dictionary<string, BindVariable> locVariables;
         private readonly Dictionary<string, BindVariable> wixVariables;
         private readonly Dictionary<string, LocalizedControl> localizedControls;
 
         /// <summary>
-        /// Instantiate a new WixVariableResolver.
+        /// Instantiate a new VariableResolver.
         /// </summary>
-        internal WixVariableResolver(IServiceProvider serviceProvider)
+        internal VariableResolver(IServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
 

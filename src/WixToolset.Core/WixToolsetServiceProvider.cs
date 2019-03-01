@@ -50,7 +50,7 @@ namespace WixToolset.Core
             this.AddService<IResolver>((provider, singletons) => new Resolver(provider));
 
             this.AddService<ILocalizer>((provider, singletons) => new Localizer(provider));
-            this.AddService<IVariableResolver>((provider, singletons) => new WixVariableResolver(provider));
+            this.AddService<IVariableResolver>((provider, singletons) => new VariableResolver(provider));
         }
 
         private Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>> CreationFunctions { get; }
