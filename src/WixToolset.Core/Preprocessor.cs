@@ -48,18 +48,6 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
-        private IPreprocessContext Context { get; set; }
-
-        private Stack<string> CurrentFileStack { get; } = new Stack<string>();
-
-        private Dictionary<string, IPreprocessorExtension> ExtensionsByPrefix { get; } = new Dictionary<string, IPreprocessorExtension>();
-
-        private Stack<bool> IncludeNextStack { get; } = new Stack<bool>();
-
-        private Stack<SourceLineNumber> SourceStack { get; } = new Stack<SourceLineNumber>();
-
-        private IPreprocessHelper Helper { get; set; }
-
         /// <summary>
         /// Event for ifdef/ifndef directives.
         /// </summary>
@@ -100,21 +88,21 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="context">The preprocessing context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        public XDocument Preprocess(IPreprocessContext context)
+        public IPreprocessResult Preprocess(IPreprocessContext context)
         {
-            this.Context = context;
-            this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
-            this.Context.Variables = this.Context.Variables == null ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
+            var state = new ProcessingState(this.ServiceProvider, context);
 
-            this.PreProcess();
+            this.PreProcess(state);
 
-            XDocument document;
-            using (var reader = XmlReader.Create(this.Context.SourcePath, DocumentXmlReaderSettings))
+            IPreprocessResult result;
+            using (var reader = XmlReader.Create(state.Context.SourcePath, DocumentXmlReaderSettings))
             {
-                document = this.Process(reader);
+                result = this.Process(state, reader);
             }
 
-            return this.PostProcess(document);
+            this.PostProcess(state, result);
+
+            return result;
         }
 
         /// <summary>
@@ -123,7 +111,7 @@ namespace WixToolset.Core
         /// <param name="context">The preprocessing context.</param>
         /// <param name="reader">XmlReader to processing the context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        public XDocument Preprocess(IPreprocessContext context, XmlReader reader)
+        public IPreprocessResult Preprocess(IPreprocessContext context, XmlReader reader)
         {
             if (String.IsNullOrEmpty(context.SourcePath) && !String.IsNullOrEmpty(reader.BaseURI))
             {
@@ -131,15 +119,15 @@ namespace WixToolset.Core
                 context.SourcePath = uri.AbsolutePath;
             }
 
-            this.Context = context;
-            this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
-            this.Context.Variables = (this.Context.Variables == null) ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
+            var state = new ProcessingState(this.ServiceProvider, context);
 
-            this.PreProcess();
+            this.PreProcess(state);
 
-            var document = this.Process(reader);
+            var result = this.Process(state, reader);
 
-            return this.PostProcess(document);
+            this.PostProcess(state, result);
+
+            return result;
         }
 
         /// <summary>
@@ -148,29 +136,33 @@ namespace WixToolset.Core
         /// <param name="context">The preprocessing context.</param>
         /// <param name="reader">XmlReader to processing the context.</param>
         /// <returns>XDocument with the postprocessed data.</returns>
-        private XDocument Process(XmlReader reader)
+        private IPreprocessResult Process(ProcessingState state, XmlReader reader)
         {
-            this.Helper = this.ServiceProvider.GetService<IPreprocessHelper>();
-
-            this.CurrentFileStack.Clear();
-            this.CurrentFileStack.Push(this.Helper.GetVariableValue(this.Context, "sys", "SOURCEFILEDIR"));
+            state.CurrentFileStack.Push(state.Helper.GetVariableValue(state.Context, "sys", "SOURCEFILEDIR"));
 
             // Process the reader into the output.
-            var output = new XDocument();
+            IPreprocessResult result = null;
             try
             {
-                this.PreprocessReader(false, reader, output, 0);
+                this.PreprocessReader(state, false, reader, state.Output, 0);
 
                 // Fire event with post-processed document.
-                this.ProcessedStream?.Invoke(this, new ProcessedStreamEventArgs(this.Context.SourcePath, output));
+                this.ProcessedStream?.Invoke(this, new ProcessedStreamEventArgs(state.Context.SourcePath, state.Output));
+
+                if (!this.Messaging.EncounteredError)
+                {
+                    result = this.ServiceProvider.GetService<IPreprocessResult>();
+                    result.Document = state.Output;
+                    result.IncludedFiles = state.IncludedFiles;
+                }
             }
             catch (XmlException e)
             {
-                this.UpdateCurrentLineNumber(reader, 0);
-                throw new WixException(ErrorMessages.InvalidXml(this.Context.CurrentSourceLineNumber, "source", e.Message));
+                this.UpdateCurrentLineNumber(state, reader, 0);
+                throw new WixException(ErrorMessages.InvalidXml(state.Context.CurrentSourceLineNumber, "source", e.Message));
             }
 
-            return this.Messaging.EncounteredError ? null : output;
+            return result;
         }
 
         /// <summary>
@@ -277,7 +269,7 @@ namespace WixToolset.Core
         /// <param name="reader">Reader for the source document.</param>
         /// <param name="container">Node where content should be added.</param>
         /// <param name="offset">Original offset for the line numbers being processed.</param>
-        private void PreprocessReader(bool include, XmlReader reader, XContainer container, int offset)
+        private void PreprocessReader(ProcessingState state, bool include, XmlReader reader, XContainer container, int offset)
         {
             var currentContainer = container;
             var containerStack = new Stack<XContainer>();
@@ -289,9 +281,9 @@ namespace WixToolset.Core
             while (reader.Read())
             {
                 // update information here in case an error occurs before the next read
-                this.UpdateCurrentLineNumber(reader, offset);
+                this.UpdateCurrentLineNumber(state, reader, offset);
 
-                var sourceLineNumbers = this.Context.CurrentSourceLineNumber;
+                var sourceLineNumbers = state.Context.CurrentSourceLineNumber;
 
                 // check for changes in conditional processing
                 if (XmlNodeType.ProcessingInstruction == reader.NodeType)
@@ -305,7 +297,7 @@ namespace WixToolset.Core
                         ifStack.Push(ifContext);
                         if (ifContext.IsTrue)
                         {
-                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, this.EvaluateExpression(reader.Value), IfState.If);
+                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, this.EvaluateExpression(state, reader.Value), IfState.If);
                         }
                         else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
                         {
@@ -319,7 +311,7 @@ namespace WixToolset.Core
                         name = reader.Value.Trim();
                         if (ifContext.IsTrue)
                         {
-                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null != this.Helper.GetVariableValue(this.Context, name, true)), IfState.If);
+                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null != state.Helper.GetVariableValue(state.Context, name, true)), IfState.If);
                         }
                         else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
                         {
@@ -334,7 +326,7 @@ namespace WixToolset.Core
                         name = reader.Value.Trim();
                         if (ifContext.IsTrue)
                         {
-                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null == this.Helper.GetVariableValue(this.Context, name, true)), IfState.If);
+                            ifContext = new IfContext(ifContext.IsTrue & ifContext.Active, (null == state.Helper.GetVariableValue(state.Context, name, true)), IfState.If);
                         }
                         else // Use a default IfContext object so we don't try to evaluate the expression if the context isn't true
                         {
@@ -358,7 +350,7 @@ namespace WixToolset.Core
                         ifContext.IfState = IfState.ElseIf;   // we're now in an elseif
                         if (!ifContext.WasEverTrue)   // if we've never evaluated the if context to true, then we can try this test
                         {
-                            ifContext.IsTrue = this.EvaluateExpression(reader.Value);
+                            ifContext.IsTrue = this.EvaluateExpression(state, reader.Value);
                         }
                         else if (ifContext.IsTrue)
                         {
@@ -441,35 +433,35 @@ namespace WixToolset.Core
                     switch (reader.LocalName)
                     {
                     case "define":
-                        this.PreprocessDefine(reader.Value);
+                        this.PreprocessDefine(state, reader.Value);
                         break;
 
                     case "error":
-                        this.PreprocessError(reader.Value);
+                        this.PreprocessError(state, reader.Value);
                         break;
 
                     case "warning":
-                        this.PreprocessWarning(reader.Value);
+                        this.PreprocessWarning(state, reader.Value);
                         break;
 
                     case "undef":
-                        this.PreprocessUndef(reader.Value);
+                        this.PreprocessUndef(state, reader.Value);
                         break;
 
                     case "include":
-                        this.UpdateCurrentLineNumber(reader, offset);
-                        this.PreprocessInclude(reader.Value, currentContainer);
+                        this.UpdateCurrentLineNumber(state, reader, offset);
+                        this.PreprocessInclude(state, reader.Value, currentContainer);
                         break;
 
                     case "foreach":
-                        this.PreprocessForeach(reader, currentContainer, offset);
+                        this.PreprocessForeach(state, reader, currentContainer, offset);
                         break;
 
                     case "endforeach": // endforeach is handled in PreprocessForeach, so seeing it here is an error
                         throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
 
                     case "pragma":
-                        this.PreprocessPragma(reader.Value, currentContainer);
+                        this.PreprocessPragma(state, reader.Value, currentContainer);
                         break;
 
                     default:
@@ -479,15 +471,15 @@ namespace WixToolset.Core
                     break;
 
                 case XmlNodeType.Element:
-                    if (0 < this.IncludeNextStack.Count && this.IncludeNextStack.Peek())
+                    if (0 < state.IncludeNextStack.Count && state.IncludeNextStack.Peek())
                     {
                         if ("Include" != reader.LocalName)
                         {
                             this.Messaging.Write(ErrorMessages.InvalidDocumentElement(sourceLineNumbers, reader.Name, "include", "Include"));
                         }
 
-                        this.IncludeNextStack.Pop();
-                        this.IncludeNextStack.Push(false);
+                        state.IncludeNextStack.Pop();
+                        state.IncludeNextStack.Push(false);
                         break;
                     }
 
@@ -496,12 +488,12 @@ namespace WixToolset.Core
                     var element = new XElement(ns + reader.LocalName);
                     currentContainer.Add(element);
 
-                    this.UpdateCurrentLineNumber(reader, offset);
+                    this.UpdateCurrentLineNumber(state, reader, offset);
                     element.AddAnnotation(sourceLineNumbers);
 
                     while (reader.MoveToNextAttribute())
                     {
-                        var value = this.Helper.PreprocessString(this.Context, reader.Value);
+                        var value = state.Helper.PreprocessString(state.Context, reader.Value);
 
                         var attribNamespace = XNamespace.Get(reader.NamespaceURI);
                         attribNamespace = XNamespace.Xmlns == attribNamespace && reader.LocalName.Equals("xmlns") ? XNamespace.None : attribNamespace;
@@ -524,12 +516,12 @@ namespace WixToolset.Core
                     break;
 
                 case XmlNodeType.Text:
-                    var postprocessedText = this.Helper.PreprocessString(this.Context, reader.Value);
+                    var postprocessedText = state.Helper.PreprocessString(state.Context, reader.Value);
                     currentContainer.Add(postprocessedText);
                     break;
 
                 case XmlNodeType.CDATA:
-                    var postprocessedValue = this.Helper.PreprocessString(this.Context, reader.Value);
+                    var postprocessedValue = state.Helper.PreprocessString(state.Context, reader.Value);
                     currentContainer.Add(new XCData(postprocessedValue));
                     break;
 
@@ -540,13 +532,13 @@ namespace WixToolset.Core
 
             if (0 != ifStack.Count)
             {
-                throw new WixException(ErrorMessages.NonterminatedPreprocessorInstruction(this.Context.CurrentSourceLineNumber, "if", "endif"));
+                throw new WixException(ErrorMessages.NonterminatedPreprocessorInstruction(state.Context.CurrentSourceLineNumber, "if", "endif"));
             }
 
             // TODO: can this actually happen?
             if (0 != containerStack.Count)
             {
-                throw new WixException(ErrorMessages.NonterminatedPreprocessorInstruction(this.Context.CurrentSourceLineNumber, "nodes", "nodes"));
+                throw new WixException(ErrorMessages.NonterminatedPreprocessorInstruction(state.Context.CurrentSourceLineNumber, "nodes", "nodes"));
             }
         }
 
@@ -554,37 +546,37 @@ namespace WixToolset.Core
         /// Processes an error processing instruction.
         /// </summary>
         /// <param name="errorMessage">Text from source.</param>
-        private void PreprocessError(string errorMessage)
+        private void PreprocessError(ProcessingState state, string errorMessage)
         {
             // Resolve other variables in the error message.
-            errorMessage = this.Helper.PreprocessString(this.Context, errorMessage);
+            errorMessage = state.Helper.PreprocessString(state.Context, errorMessage);
 
-            throw new WixException(ErrorMessages.PreprocessorError(this.Context.CurrentSourceLineNumber, errorMessage));
+            throw new WixException(ErrorMessages.PreprocessorError(state.Context.CurrentSourceLineNumber, errorMessage));
         }
 
         /// <summary>
         /// Processes a warning processing instruction.
         /// </summary>
         /// <param name="warningMessage">Text from source.</param>
-        private void PreprocessWarning(string warningMessage)
+        private void PreprocessWarning(ProcessingState state, string warningMessage)
         {
             // Resolve other variables in the warning message.
-            warningMessage = this.Helper.PreprocessString(this.Context, warningMessage);
+            warningMessage = state.Helper.PreprocessString(state.Context, warningMessage);
 
-            this.Messaging.Write(WarningMessages.PreprocessorWarning(this.Context.CurrentSourceLineNumber, warningMessage));
+            this.Messaging.Write(WarningMessages.PreprocessorWarning(state.Context.CurrentSourceLineNumber, warningMessage));
         }
 
         /// <summary>
         /// Processes a define processing instruction and creates the appropriate parameter.
         /// </summary>
         /// <param name="originalDefine">Text from source.</param>
-        private void PreprocessDefine(string originalDefine)
+        private void PreprocessDefine(ProcessingState state, string originalDefine)
         {
             var match = DefineRegex.Match(originalDefine);
 
             if (!match.Success)
             {
-                throw new WixException(ErrorMessages.IllegalDefineStatement(this.Context.CurrentSourceLineNumber, originalDefine));
+                throw new WixException(ErrorMessages.IllegalDefineStatement(state.Context.CurrentSourceLineNumber, originalDefine));
             }
 
             var defineName = match.Groups["varName"].Value;
@@ -599,15 +591,15 @@ namespace WixToolset.Core
             }
 
             // resolve other variables in the variable value
-            defineValue = this.Helper.PreprocessString(this.Context, defineValue);
+            defineValue = state.Helper.PreprocessString(state.Context, defineValue);
 
             if (defineName.StartsWith("var.", StringComparison.Ordinal))
             {
-                this.Helper.AddVariable(this.Context, defineName.Substring(4), defineValue);
+                state.Helper.AddVariable(state.Context, defineName.Substring(4), defineValue);
             }
             else
             {
-                this.Helper.AddVariable(this.Context, defineName, defineValue);
+                state.Helper.AddVariable(state.Context, defineName, defineValue);
             }
         }
 
@@ -615,17 +607,17 @@ namespace WixToolset.Core
         /// Processes an undef processing instruction and creates the appropriate parameter.
         /// </summary>
         /// <param name="originalDefine">Text from source.</param>
-        private void PreprocessUndef(string originalDefine)
+        private void PreprocessUndef(ProcessingState state, string originalDefine)
         {
-            var name = this.Helper.PreprocessString(this.Context, originalDefine.Trim());
+            var name = state.Helper.PreprocessString(state.Context, originalDefine.Trim());
 
             if (name.StartsWith("var.", StringComparison.Ordinal))
             {
-                this.Helper.RemoveVariable(this.Context, name.Substring(4));
+                state.Helper.RemoveVariable(state.Context, name.Substring(4));
             }
             else
             {
-                this.Helper.RemoveVariable(this.Context, name);
+                state.Helper.RemoveVariable(state.Context, name);
             }
         }
 
@@ -634,14 +626,14 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="includePath">Path to included file.</param>
         /// <param name="parent">Parent container for included content.</param>
-        private void PreprocessInclude(string includePath, XContainer parent)
+        private void PreprocessInclude(ProcessingState state, string includePath, XContainer parent)
         {
-            var sourceLineNumbers = this.Context.CurrentSourceLineNumber;
+            var sourceLineNumbers = state.Context.CurrentSourceLineNumber;
 
             // Preprocess variables in the path.
-            includePath = this.Helper.PreprocessString(this.Context, includePath);
+            includePath = state.Helper.PreprocessString(state.Context, includePath);
 
-            var includeFile = this.GetIncludeFile(includePath);
+            var includeFile = this.GetIncludeFile(state, includePath);
 
             if (null == includeFile)
             {
@@ -650,22 +642,28 @@ namespace WixToolset.Core
 
             using (var reader = XmlReader.Create(includeFile, DocumentXmlReaderSettings))
             {
-                this.PushInclude(includeFile);
+                this.PushInclude(state, includeFile);
 
                 // process the included reader into the writer
                 try
                 {
-                    this.PreprocessReader(true, reader, parent, 0);
+                    this.PreprocessReader(state, true, reader, parent, 0);
                 }
                 catch (XmlException e)
                 {
-                    this.UpdateCurrentLineNumber(reader, 0);
+                    this.UpdateCurrentLineNumber(state, reader, 0);
                     throw new WixException(ErrorMessages.InvalidXml(sourceLineNumbers, "source", e.Message));
                 }
 
                 this.IncludedFile?.Invoke(this, new IncludedFileEventArgs(sourceLineNumbers, includeFile));
 
-                this.PopInclude();
+                var includedFile = this.ServiceProvider.GetService<IIncludedFile>();
+                includedFile.Path = includeFile;
+                includedFile.SourceLineNumbers = sourceLineNumbers;
+
+                state.IncludedFiles.Add(includedFile);
+
+                this.PopInclude(state);
             }
         }
 
@@ -675,13 +673,13 @@ namespace WixToolset.Core
         /// <param name="reader">The xml reader.</param>
         /// <param name="container">The container where to output processed data.</param>
         /// <param name="offset">Offset for the line numbers.</param>
-        private void PreprocessForeach(XmlReader reader, XContainer container, int offset)
+        private void PreprocessForeach(ProcessingState state, XmlReader reader, XContainer container, int offset)
         {
             // Find the "in" token.
             var indexOfInToken = reader.Value.IndexOf(" in ", StringComparison.Ordinal);
             if (0 > indexOfInToken)
             {
-                throw new WixException(ErrorMessages.IllegalForeach(this.Context.CurrentSourceLineNumber, reader.Value));
+                throw new WixException(ErrorMessages.IllegalForeach(state.Context.CurrentSourceLineNumber, reader.Value));
             }
 
             // parse out the variable name
@@ -689,7 +687,7 @@ namespace WixToolset.Core
             var varValuesString = reader.Value.Substring(indexOfInToken + 4).Trim();
 
             // preprocess the variable values string because it might be a variable itself
-            varValuesString = this.Helper.PreprocessString(this.Context, varValuesString);
+            varValuesString = state.Helper.PreprocessString(state.Context, varValuesString);
 
             var varValues = varValuesString.Split(';');
 
@@ -751,7 +749,7 @@ namespace WixToolset.Core
                 }
                 else if (reader.NodeType == XmlNodeType.None)
                 {
-                    throw new WixException(ErrorMessages.ExpectedEndforeach(this.Context.CurrentSourceLineNumber));
+                    throw new WixException(ErrorMessages.ExpectedEndforeach(state.Context.CurrentSourceLineNumber));
                 }
 
                 reader.Read();
@@ -765,16 +763,16 @@ namespace WixToolset.Core
                     using (var loopReader = XmlReader.Create(fragmentStream, FragmentXmlReaderSettings))
                     {
                         // Always overwrite foreach variables.
-                        this.Helper.AddVariable(this.Context, varName, varValue, false);
+                        state.Helper.AddVariable(state.Context, varName, varValue, false);
 
                         try
                         {
-                            this.PreprocessReader(false, loopReader, container, offset);
+                            this.PreprocessReader(state, false, loopReader, container, offset);
                         }
                         catch (XmlException e)
                         {
-                            this.UpdateCurrentLineNumber(loopReader, offset);
-                            throw new WixException(ErrorMessages.InvalidXml(this.Context.CurrentSourceLineNumber, "source", e.Message));
+                            this.UpdateCurrentLineNumber(state, loopReader, offset);
+                            throw new WixException(ErrorMessages.InvalidXml(state.Context.CurrentSourceLineNumber, "source", e.Message));
                         }
 
                         fragmentStream.Position = 0; // seek back to the beginning for the next loop.
@@ -787,25 +785,25 @@ namespace WixToolset.Core
         /// Processes a pragma processing instruction
         /// </summary>
         /// <param name="pragmaText">Text from source.</param>
-        private void PreprocessPragma(string pragmaText, XContainer parent)
+        private void PreprocessPragma(ProcessingState state, string pragmaText, XContainer parent)
         {
             var match = PragmaRegex.Match(pragmaText);
 
             if (!match.Success)
             {
-                throw new WixException(ErrorMessages.InvalidPreprocessorPragma(this.Context.CurrentSourceLineNumber, pragmaText));
+                throw new WixException(ErrorMessages.InvalidPreprocessorPragma(state.Context.CurrentSourceLineNumber, pragmaText));
             }
 
             // resolve other variables in the pragma argument(s)
-            var pragmaArgs = this.Helper.PreprocessString(this.Context, match.Groups["pragmaValue"].Value).Trim();
+            var pragmaArgs = state.Helper.PreprocessString(state.Context, match.Groups["pragmaValue"].Value).Trim();
 
             try
             {
-                this.Helper.PreprocessPragma(this.Context, match.Groups["pragmaName"].Value.Trim(), pragmaArgs, parent);
+                state.Helper.PreprocessPragma(state.Context, match.Groups["pragmaName"].Value.Trim(), pragmaArgs, parent);
             }
             catch (Exception e)
             {
-                throw new WixException(ErrorMessages.PreprocessorExtensionPragmaFailed(this.Context.CurrentSourceLineNumber, pragmaText, e.Message));
+                throw new WixException(ErrorMessages.PreprocessorExtensionPragmaFailed(state.Context.CurrentSourceLineNumber, pragmaText, e.Message));
             }
         }
 
@@ -816,7 +814,7 @@ namespace WixToolset.Core
         /// <param name="expression">Expression with token removed.</param>
         /// <param name="stringLiteral">Flag if token is a string literal instead of a variable.</param>
         /// <returns>Next token.</returns>
-        private string GetNextToken(string originalExpression, ref string expression, out bool stringLiteral)
+        private string GetNextToken(ProcessingState state, string originalExpression, ref string expression, out bool stringLiteral)
         {
             stringLiteral = false;
             var token = String.Empty;
@@ -832,11 +830,11 @@ namespace WixToolset.Core
                 var endingQuotes = expression.IndexOf('\"', 1);
                 if (-1 == endingQuotes)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 // cut the quotes off the string
-                token = this.Helper.PreprocessString(this.Context, expression.Substring(1, endingQuotes - 1));
+                token = state.Helper.PreprocessString(state.Context, expression.Substring(1, endingQuotes - 1));
 
                 // advance past this string
                 expression = expression.Substring(endingQuotes + 1).Trim();
@@ -866,7 +864,7 @@ namespace WixToolset.Core
 
                 if (-1 == endingParen)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
                 token = expression.Substring(0, endingParen + 1);
 
@@ -962,7 +960,7 @@ namespace WixToolset.Core
         /// <param name="originalExpression">Original expression for error message.</param>
         /// <param name="variable">Variable to evaluate.</param>
         /// <returns>Value of variable.</returns>
-        private string EvaluateVariable(string originalExpression, string variable)
+        private string EvaluateVariable(ProcessingState state, string originalExpression, string variable)
         {
             // By default it's a literal and will only be evaluated if it
             // matches the variable format
@@ -972,7 +970,7 @@ namespace WixToolset.Core
             {
                 try
                 {
-                    varValue = this.Helper.PreprocessString(this.Context, variable);
+                    varValue = state.Helper.PreprocessString(state.Context, variable);
                 }
                 catch (ArgumentNullException)
                 {
@@ -983,12 +981,12 @@ namespace WixToolset.Core
             else if (variable.IndexOf("(", StringComparison.Ordinal) != -1 || variable.IndexOf(")", StringComparison.Ordinal) != -1)
             {
                 // make sure it doesn't contain parenthesis
-                throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
             }
             else if (variable.IndexOf("\"", StringComparison.Ordinal) != -1)
             {
                 // shouldn't contain quotes
-                throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
             }
 
             return varValue;
@@ -1002,31 +1000,31 @@ namespace WixToolset.Core
         /// <param name="leftValue">Left side value from expression.</param>
         /// <param name="operation">Operation in expression.</param>
         /// <param name="rightValue">Right side value from expression.</param>
-        private void GetNameValuePair(string originalExpression, ref string expression, out string leftValue, out string operation, out string rightValue)
+        private void GetNameValuePair(ProcessingState state, string originalExpression, ref string expression, out string leftValue, out string operation, out string rightValue)
         {
-            leftValue = this.GetNextToken(originalExpression, ref expression, out var stringLiteral);
+            leftValue = this.GetNextToken(state, originalExpression, ref expression, out var stringLiteral);
 
             // If it wasn't a string literal, evaluate it
             if (!stringLiteral)
             {
-                leftValue = this.EvaluateVariable(originalExpression, leftValue);
+                leftValue = this.EvaluateVariable(state, originalExpression, leftValue);
             }
 
             // Get the operation
-            operation = this.GetNextToken(originalExpression, ref expression, out stringLiteral);
+            operation = this.GetNextToken(state, originalExpression, ref expression, out stringLiteral);
             if (IsOperator(operation))
             {
                 if (stringLiteral)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
-                rightValue = this.GetNextToken(originalExpression, ref expression, out stringLiteral);
+                rightValue = this.GetNextToken(state, originalExpression, ref expression, out stringLiteral);
 
                 // If it wasn't a string literal, evaluate it
                 if (!stringLiteral)
                 {
-                    rightValue = this.EvaluateVariable(originalExpression, rightValue);
+                    rightValue = this.EvaluateVariable(state, originalExpression, rightValue);
                 }
             }
             else
@@ -1052,11 +1050,11 @@ namespace WixToolset.Core
         /// <param name="originalExpression">Original expression to evaluate.</param>
         /// <param name="expression">Expression modified while processing.</param>
         /// <returns>true if expression evaluates to true.</returns>
-        private bool EvaluateAtomicExpression(string originalExpression, ref string expression)
+        private bool EvaluateAtomicExpression(ProcessingState state, string originalExpression, ref string expression)
         {
             // Quick test to see if the first token is a variable
             var startsWithVariable = expression.StartsWith("$(", StringComparison.Ordinal);
-            this.GetNameValuePair(originalExpression, ref expression, out var leftValue, out var operation, out var rightValue);
+            this.GetNameValuePair(state, originalExpression, ref expression, out var leftValue, out var operation, out var rightValue);
 
             var expressionValue = false;
 
@@ -1065,7 +1063,7 @@ namespace WixToolset.Core
             {
                 if (operation.Length > 0)
                 {
-                    throw new WixException(ErrorMessages.ExpectedVariable(this.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(ErrorMessages.ExpectedVariable(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 // false expression
@@ -1080,7 +1078,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    throw new WixException(ErrorMessages.UnexpectedLiteral(this.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(ErrorMessages.UnexpectedLiteral(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
             }
             else
@@ -1120,11 +1118,11 @@ namespace WixToolset.Core
                     }
                     catch (FormatException)
                     {
-                        throw new WixException(ErrorMessages.IllegalIntegerInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                        throw new WixException(ErrorMessages.IllegalIntegerInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                     }
                     catch (OverflowException)
                     {
-                        throw new WixException(ErrorMessages.IllegalIntegerInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                        throw new WixException(ErrorMessages.IllegalIntegerInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                     }
 
                     // Compare the numbers
@@ -1148,7 +1146,7 @@ namespace WixToolset.Core
         /// <param name="expression">Expression modified while processing.</param>
         /// <param name="endSubExpression">Index of end of sub-expression.</param>
         /// <returns>Sub-expression in parenthesis.</returns>
-        private string GetParenthesisExpression(string originalExpression, string expression, out int endSubExpression)
+        private string GetParenthesisExpression(ProcessingState state, string originalExpression, string expression, out int endSubExpression)
         {
             endSubExpression = 0;
 
@@ -1166,7 +1164,7 @@ namespace WixToolset.Core
                 closeParenIndex = expression.IndexOf(')', closeParenIndex);
                 if (closeParenIndex == -1)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 if (InsideQuotes(expression, closeParenIndex))
@@ -1201,7 +1199,7 @@ namespace WixToolset.Core
         /// <param name="currentValue">State to update.</param>
         /// <param name="operation">Operation to apply to current value.</param>
         /// <param name="prevResult">Previous result.</param>
-        private void UpdateExpressionValue(ref bool currentValue, PreprocessorOperation operation, bool prevResult)
+        private void UpdateExpressionValue(ProcessingState state, ref bool currentValue, PreprocessorOperation operation, bool prevResult)
         {
             switch (operation)
             {
@@ -1215,7 +1213,7 @@ namespace WixToolset.Core
                 currentValue = !currentValue;
                 break;
             default:
-                throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(this.Context.CurrentSourceLineNumber, operation.ToString()));
+                throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(state.Context.CurrentSourceLineNumber, operation.ToString()));
             }
         }
 
@@ -1224,10 +1222,10 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="expression">Expression to evaluate.</param>
         /// <returns>Boolean result of expression.</returns>
-        private bool EvaluateExpression(string expression)
+        private bool EvaluateExpression(ProcessingState state, string expression)
         {
             var tmpExpression = expression;
-            return this.EvaluateExpressionRecurse(expression, ref tmpExpression, PreprocessorOperation.And, true);
+            return this.EvaluateExpressionRecurse(state, expression, ref tmpExpression, PreprocessorOperation.And, true);
         }
 
         /// <summary>
@@ -1258,20 +1256,20 @@ namespace WixToolset.Core
         /// <param name="prevResultOperation">The operation to apply to this result</param>
         /// <param name="prevResult">The previous result to apply to this result</param>
         /// <returns>Boolean to indicate if the expression is true or false</returns>
-        private bool EvaluateExpressionRecurse(string originalExpression, ref string expression, PreprocessorOperation prevResultOperation, bool prevResult)
+        private bool EvaluateExpressionRecurse(ProcessingState state, string originalExpression, ref string expression, PreprocessorOperation prevResultOperation, bool prevResult)
         {
             var expressionValue = false;
             expression = expression.Trim();
             if (expression.Length == 0)
             {
-                throw new WixException(ErrorMessages.UnexpectedEmptySubexpression(this.Context.CurrentSourceLineNumber, originalExpression));
+                throw new WixException(ErrorMessages.UnexpectedEmptySubexpression(state.Context.CurrentSourceLineNumber, originalExpression));
             }
 
             // If the expression starts with parenthesis, evaluate it
             if (expression.IndexOf('(') == 0)
             {
-                var subExpression = this.GetParenthesisExpression(originalExpression, expression, out var endSubExpressionIndex);
-                expressionValue = this.EvaluateExpressionRecurse(originalExpression, ref subExpression, PreprocessorOperation.And, true);
+                var subExpression = this.GetParenthesisExpression(state, originalExpression, expression, out var endSubExpressionIndex);
+                expressionValue = this.EvaluateExpressionRecurse(state, originalExpression, ref subExpression, PreprocessorOperation.And, true);
 
                 // Now get the rest of the expression that hasn't been evaluated
                 expression = expression.Substring(endSubExpressionIndex).Trim();
@@ -1284,19 +1282,19 @@ namespace WixToolset.Core
                     expression = expression.Substring(3).Trim();
                     if (expression.Length == 0)
                     {
-                        throw new WixException(ErrorMessages.ExpectedExpressionAfterNot(this.Context.CurrentSourceLineNumber, originalExpression));
+                        throw new WixException(ErrorMessages.ExpectedExpressionAfterNot(state.Context.CurrentSourceLineNumber, originalExpression));
                     }
 
-                    expressionValue = this.EvaluateExpressionRecurse(originalExpression, ref expression, PreprocessorOperation.Not, true);
+                    expressionValue = this.EvaluateExpressionRecurse(state, originalExpression, ref expression, PreprocessorOperation.Not, true);
                 }
                 else // Expect a literal
                 {
-                    expressionValue = this.EvaluateAtomicExpression(originalExpression, ref expression);
+                    expressionValue = this.EvaluateAtomicExpression(state, originalExpression, ref expression);
 
                     // Expect the literal that was just evaluated to already be cut off
                 }
             }
-            this.UpdateExpressionValue(ref expressionValue, prevResultOperation, prevResult);
+            this.UpdateExpressionValue(state, ref expressionValue, prevResultOperation, prevResult);
 
             // If there's still an expression left, it must start with AND or OR.
             if (expression.Trim().Length > 0)
@@ -1304,16 +1302,16 @@ namespace WixToolset.Core
                 if (StartsWithKeyword(expression, PreprocessorOperation.And))
                 {
                     expression = expression.Substring(3);
-                    return this.EvaluateExpressionRecurse(originalExpression, ref expression, PreprocessorOperation.And, expressionValue);
+                    return this.EvaluateExpressionRecurse(state, originalExpression, ref expression, PreprocessorOperation.And, expressionValue);
                 }
                 else if (StartsWithKeyword(expression, PreprocessorOperation.Or))
                 {
                     expression = expression.Substring(2);
-                    return this.EvaluateExpressionRecurse(originalExpression, ref expression, PreprocessorOperation.Or, expressionValue);
+                    return this.EvaluateExpressionRecurse(state, originalExpression, ref expression, PreprocessorOperation.Or, expressionValue);
                 }
                 else
                 {
-                    throw new WixException(ErrorMessages.InvalidSubExpression(this.Context.CurrentSourceLineNumber, expression, originalExpression));
+                    throw new WixException(ErrorMessages.InvalidSubExpression(state.Context.CurrentSourceLineNumber, expression, originalExpression));
                 }
             }
 
@@ -1325,16 +1323,16 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="reader">The xml reader for the preprocessor.</param>
         /// <param name="offset">This is the artificial offset of the line numbers from the reader.  Used for the foreach processing.</param>
-        private void UpdateCurrentLineNumber(XmlReader reader, int offset)
+        private void UpdateCurrentLineNumber(ProcessingState state, XmlReader reader, int offset)
         {
             var lineInfoReader = reader as IXmlLineInfo;
             if (null != lineInfoReader)
             {
                 var newLine = lineInfoReader.LineNumber + offset;
 
-                if (this.Context.CurrentSourceLineNumber.LineNumber != newLine)
+                if (state.Context.CurrentSourceLineNumber.LineNumber != newLine)
                 {
-                    this.Context.CurrentSourceLineNumber = new SourceLineNumber(this.Context.CurrentSourceLineNumber.FileName, newLine);
+                    state.Context.CurrentSourceLineNumber = new SourceLineNumber(state.Context.CurrentSourceLineNumber.FileName, newLine);
                 }
             }
         }
@@ -1343,28 +1341,28 @@ namespace WixToolset.Core
         /// Pushes a file name on the stack of included files.
         /// </summary>
         /// <param name="fileName">Name to push on to the stack of included files.</param>
-        private void PushInclude(string fileName)
+        private void PushInclude(ProcessingState state, string fileName)
         {
-            if (1023 < this.CurrentFileStack.Count)
+            if (1023 < state.CurrentFileStack.Count)
             {
-                throw new WixException(ErrorMessages.TooDeeplyIncluded(this.Context.CurrentSourceLineNumber, this.CurrentFileStack.Count));
+                throw new WixException(ErrorMessages.TooDeeplyIncluded(state.Context.CurrentSourceLineNumber, state.CurrentFileStack.Count));
             }
 
-            this.CurrentFileStack.Push(fileName);
-            this.SourceStack.Push(this.Context.CurrentSourceLineNumber);
-            this.Context.CurrentSourceLineNumber = new SourceLineNumber(fileName);
-            this.IncludeNextStack.Push(true);
+            state.CurrentFileStack.Push(fileName);
+            state.SourceStack.Push(state.Context.CurrentSourceLineNumber);
+            state.Context.CurrentSourceLineNumber = new SourceLineNumber(fileName);
+            state.IncludeNextStack.Push(true);
         }
 
         /// <summary>
         /// Pops a file name from the stack of included files.
         /// </summary>
-        private void PopInclude()
+        private void PopInclude(ProcessingState state)
         {
-            this.Context.CurrentSourceLineNumber = this.SourceStack.Pop();
+            state.Context.CurrentSourceLineNumber = state.SourceStack.Pop();
 
-            this.CurrentFileStack.Pop();
-            this.IncludeNextStack.Pop();
+            state.CurrentFileStack.Pop();
+            state.IncludeNextStack.Pop();
         }
 
         /// <summary>
@@ -1375,7 +1373,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="includePath">User-specified path to the included file (usually just the file name).</param>
         /// <returns>Returns a FileInfo for the found include file, or null if the file cannot be found.</returns>
-        private string GetIncludeFile(string includePath)
+        private string GetIncludeFile(ProcessingState state, string includePath)
         {
             string finalIncludePath = null;
 
@@ -1399,7 +1397,7 @@ namespace WixToolset.Core
             else // relative path
             {
                 // build a string to test the directory containing the source file first
-                var currentFolder = this.CurrentFileStack.Peek();
+                var currentFolder = state.CurrentFileStack.Peek();
                 var includeTestPath = Path.Combine(Path.GetDirectoryName(currentFolder), includePath);
 
                 // test the source file directory
@@ -1407,9 +1405,9 @@ namespace WixToolset.Core
                 {
                     finalIncludePath = includeTestPath;
                 }
-                else // test all search paths in the order specified on the command line
+                else if (state.Context.IncludeSearchPaths != null) // test all search paths in the order specified on the command line
                 {
-                    foreach (var includeSearchPath in this.Context.IncludeSearchPaths)
+                    foreach (var includeSearchPath in state.Context.IncludeSearchPaths)
                     {
                         // if the path exists, we have found the final string
                         includeTestPath = Path.Combine(includeSearchPath, includePath);
@@ -1425,17 +1423,22 @@ namespace WixToolset.Core
             return finalIncludePath;
         }
 
-        private void PreProcess()
+        private void PreProcess(ProcessingState state)
         {
-            foreach (var extension in this.Context.Extensions)
+            if (state.Context.Extensions == null)
+            {
+                return;
+            }
+
+            foreach (var extension in state.Context.Extensions)
             {
                 if (extension.Prefixes != null)
                 {
                     foreach (var prefix in extension.Prefixes)
                     {
-                        if (!this.ExtensionsByPrefix.TryGetValue(prefix, out var collidingExtension))
+                        if (!state.ExtensionsByPrefix.TryGetValue(prefix, out var collidingExtension))
                         {
-                            this.ExtensionsByPrefix.Add(prefix, extension);
+                            state.ExtensionsByPrefix.Add(prefix, extension);
                         }
                         else
                         {
@@ -1444,18 +1447,49 @@ namespace WixToolset.Core
                     }
                 }
 
-                extension.PrePreprocess(this.Context);
+                extension.PrePreprocess(state.Context);
             }
         }
 
-        private XDocument PostProcess(XDocument document)
+        private void PostProcess(ProcessingState state, IPreprocessResult result)
         {
-            foreach (var extension in this.Context.Extensions)
+            if (state.Context.Extensions == null)
             {
-                extension.PostPreprocess(document);
+                return;
             }
 
-            return document;
+            foreach (var extension in state.Context.Extensions)
+            {
+                extension.PostPreprocess(result);
+            }
+        }
+
+        private class ProcessingState
+        {
+            public ProcessingState(IServiceProvider serviceProvider, IPreprocessContext context)
+            {
+                this.Context = context;
+                this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
+                this.Context.Variables = this.Context.Variables == null ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
+
+                this.Helper = serviceProvider.GetService<IPreprocessHelper>();
+            }
+
+            public IPreprocessContext Context { get; }
+
+            public IPreprocessHelper Helper { get; }
+
+            public List<IIncludedFile> IncludedFiles { get; } = new List<IIncludedFile>();
+
+            public XDocument Output { get; } = new XDocument();
+
+            public Stack<string> CurrentFileStack { get; } = new Stack<string>();
+
+            public Dictionary<string, IPreprocessorExtension> ExtensionsByPrefix { get; } = new Dictionary<string, IPreprocessorExtension>();
+
+            public Stack<bool> IncludeNextStack { get; } = new Stack<bool>();
+
+            public Stack<SourceLineNumber> SourceStack { get; } = new Stack<SourceLineNumber>();
         }
     }
 }

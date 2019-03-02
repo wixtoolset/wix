@@ -45,6 +45,8 @@ namespace WixToolset.Core
             this.AddService<IBindResult>((provider, singletons) => new BindResult());
             this.AddService<IComponentKeyPath>((provider, singletons) => new ComponentKeyPath());
             this.AddService<IDecompileResult>((provider, singletons) => new DecompileResult());
+            this.AddService<IIncludedFile>((provider, singletons) => new IncludedFile());
+            this.AddService<IPreprocessResult>((provider, singletons) => new PreprocessResult());
             this.AddService<IResolveFileResult>((provider, singletons) => new ResolveFileResult());
             this.AddService<IResolveResult>((provider, singletons) => new ResolveResult());
             this.AddService<IResolvedCabinet>((provider, singletons) => new ResolvedCabinet());

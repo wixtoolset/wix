@@ -1,18 +1,43 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core;
     using WixToolset.Core.TestPackage;
-    using WixToolset.Data;
-    using WixToolset.Data.Tuples;
-    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Extensibility.Data;
     using Xunit;
 
     public class PreprocessorFixture
     {
+        [Fact]
+        public void PreprocessDirectly()
+        {
+            var folder = TestData.Get(@"TestData\IncludePath");
+            var sourcePath = Path.Combine(folder, "Package.wxs");
+            var includeFolder = Path.Combine(folder, "data");
+            var includeFile = Path.Combine(includeFolder, "Package.wxi");
+
+            var serviceProvider = new WixToolsetServiceProvider();
+
+            var context = (IPreprocessContext)serviceProvider.GetService(typeof(IPreprocessContext));
+            context.SourcePath = sourcePath;
+            context.IncludeSearchPaths = new[] { includeFolder };
+
+            var preprocessor = (IPreprocessor)serviceProvider.GetService(typeof(IPreprocessor));
+            var result = preprocessor.Preprocess(context);
+
+            var includedFile = result.IncludedFiles.Single();
+            Assert.NotNull(result.Document);
+            Assert.Equal(includeFile, includedFile.Path);
+            Assert.Equal(sourcePath, includedFile.SourceLineNumbers.FileName);
+            Assert.Equal(2, includedFile.SourceLineNumbers.LineNumber.Value);
+            Assert.Equal($"{sourcePath}*2", includedFile.SourceLineNumbers.QualifiedFileName);
+            Assert.Null(includedFile.SourceLineNumbers.Parent);
+        }
+
         [Fact]
         public void VariableRedefinitionIsAWarning()
         {

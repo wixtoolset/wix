@@ -2,13 +2,14 @@
 
 namespace WixToolset.Core
 {
-    using System.Xml;
+    using System.Collections.Generic;
+    using System.Xml.Linq;
     using WixToolset.Extensibility.Data;
 
-    public interface IPreprocessor
+    public class PreprocessResult : IPreprocessResult
     {
-        IPreprocessResult Preprocess(IPreprocessContext context);
+        public XDocument Document { get; set; }
 
-        IPreprocessResult Preprocess(IPreprocessContext context, XmlReader reader);
+        public IEnumerable<IIncludedFile> IncludedFiles { get; set; }
     }
 }

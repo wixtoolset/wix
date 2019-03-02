@@ -377,18 +377,18 @@ namespace WixToolset.Core.CommandLine
             context.SourcePath = sourcePath;
             context.Variables = preprocessorVariables;
 
-            XDocument document = null;
+            IPreprocessResult result = null;
             try
             {
                 var preprocessor = this.ServiceProvider.GetService<IPreprocessor>();
-                document = preprocessor.Preprocess(context);
+                result = preprocessor.Preprocess(context);
             }
             catch (WixException e)
             {
                 this.Messaging.Write(e.Error);
             }
 
-            return document;
+            return result?.Document;
         }
 
         private class CommandLine

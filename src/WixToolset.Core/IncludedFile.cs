@@ -2,13 +2,13 @@
 
 namespace WixToolset.Core
 {
-    using System.Xml;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
-    public interface IPreprocessor
+    internal class IncludedFile : IIncludedFile
     {
-        IPreprocessResult Preprocess(IPreprocessContext context);
+        public string Path { get; set; }
 
-        IPreprocessResult Preprocess(IPreprocessContext context, XmlReader reader);
+        public SourceLineNumber SourceLineNumbers { get; set; }
     }
 }

@@ -63,11 +63,11 @@ namespace WixToolset.Core.CommandLine
                 context.SourcePath = sourceFile.SourcePath;
                 context.Variables = this.PreprocessorVariables;
 
-                XDocument document = null;
+                IPreprocessResult result = null;
                 try
                 {
                     var preprocessor = this.ServiceProvider.GetService<IPreprocessor>();
-                    document = preprocessor.Preprocess(context);
+                    result = preprocessor.Preprocess(context);
                 }
                 catch (WixException e)
                 {
@@ -83,7 +83,7 @@ namespace WixToolset.Core.CommandLine
                 compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
                 compileContext.OutputPath = sourceFile.OutputPath;
                 compileContext.Platform = this.Platform;
-                compileContext.Source = document;
+                compileContext.Source = result?.Document;
 
                 var compiler = this.ServiceProvider.GetService<ICompiler>();
                 var intermediate = compiler.Compile(compileContext);
