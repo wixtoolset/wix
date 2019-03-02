@@ -53,6 +53,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called at the end of the preprocessing of a source file.
         /// </summary>
-        void PostPreprocess(XDocument document);
+        void PostPreprocess(IPreprocessResult result);
     }
 }
