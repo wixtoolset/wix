@@ -13445,7 +13445,7 @@ namespace WixToolset.Core
                 {
                     if (suppress)
                     {
-                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixSuppressAction);
+                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixSuppressAction, new Identifier(AccessModifier.Public, sequenceTable, actionName));
                         row.Set(0, sequenceTable);
                         row.Set(1, actionName);
                     }

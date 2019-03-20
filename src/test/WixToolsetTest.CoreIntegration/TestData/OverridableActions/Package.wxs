@@ -7,6 +7,10 @@
         <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
         <MediaTemplate />
 
+        <InstallExecuteSequence>
+            <ValidateProductID Suppress="yes" />
+        </InstallExecuteSequence>
+
         <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
             <ComponentGroupRef Id="ProductComponents" />
             <ComponentGroupRef Id="Foo1" />
