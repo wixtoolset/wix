@@ -64,8 +64,11 @@ HRESULT SmartCabCommand(
     hr = CabCBegin(wzCabName, sczCabDir, uiFileCount, uiMaxSize, uiMaxThresh, ct, &hCab);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "failed to initialize cabinet: %ls", wzCabPath);
 
-    hr = CompressFiles(hCab);
-    ExitOnFailure(hr, "failed to compress files into cabinet: %ls", wzCabPath);
+    if (uiFileCount > 0)
+    {
+        hr = CompressFiles(hCab);
+        ExitOnFailure(hr, "failed to compress files into cabinet: %ls", wzCabPath);
+    }
 
     hr = CabCFinish(hCab, CabNamesCallback);
     hCab = NULL; // once finish is called, the handle is invalid.
