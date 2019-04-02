@@ -539,6 +539,45 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildVersionIndependentProgId()
+        {
+            var folder = TestData.Get(@"TestData\ProgId");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\Foo.exe")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var progids = section.Tuples.OfType<ProgIdTuple>().OrderBy(tuple => tuple.ProgId).ToList();
+                Assert.Equal(2, progids.Count);
+                Assert.Equal("Foo.File.hol", progids[0].ProgId);
+                Assert.Equal("Foo.File.hol.15", progids[0].ProgId_Parent);
+                Assert.Equal("Foo.File.hol.15", progids[1].ProgId);
+                Assert.Null(progids[1].ProgId_Parent);
+            }
+        }
+
         [Fact(Skip = "Not implemented yet.")]
         public void CanBuildInstanceTransform()
         {
