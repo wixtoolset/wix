@@ -51,7 +51,7 @@ static HRESULT ProcessVS2019(
     __in_opt ISetupInstance* pInstance,
     __in DWORD64 qwVersion,
     __in BOOL fComplete
-);
+    );
 
 static HRESULT SetPropertyForComponent(
     __in DWORD cComponents,
@@ -157,11 +157,8 @@ extern "C" UINT __stdcall FindInstances(
     {
         const VS_INSTANCE* pElem = &vrgInstances[i];
 
-        if (pElem->qwMinVersion <= qwVersion && qwVersion <= pElem->qwMaxVersion)
-        {
-            hr = pElem->pfnProcessInstance(NULL, 0, TRUE);
-            ExitOnFailure(hr, "Failed to process latest instance.");
-        }
+        hr = pElem->pfnProcessInstance(NULL, 0, TRUE);
+        ExitOnFailure(hr, "Failed to process latest instance.");
     }
 
 LExit:
@@ -418,7 +415,7 @@ static HRESULT ProcessVS2019(
     __in_opt ISetupInstance* pInstance,
     __in DWORD64 qwVersion,
     __in BOOL fComplete
-)
+    )
 {
     static ISetupInstance* pLatest = NULL;
     static DWORD64 qwLatest = 0;
@@ -436,7 +433,7 @@ static HRESULT ProcessVS2019(
         { L"Microsoft.VisualStudio.Component.FSharp", L"VS2019_IDE_FSHARP_PROJECTSYSTEM_INSTALLED" },
         { L"Microsoft.VisualStudio.Component.Roslyn.LanguageServices", L"VS2019_IDE_VB_PROJECTSYSTEM_INSTALLED" },
         { L"Microsoft.VisualStudio.Component.Roslyn.LanguageServices", L"VS2019_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED" },
-        { L"Microsoft.VisualStudio.Component.TestTools.Core", L"VS2019_IDE_VSTS_TESTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.PackageGroup.TestTools.Core", L"VS2019_IDE_VSTS_TESTSYSTEM_INSTALLED" },
         { L"Microsoft.VisualStudio.Component.VC.CoreIde", L"VS2019_IDE_VC_PROJECTSYSTEM_INSTALLED" },
         { L"Microsoft.VisualStudio.Component.Web", L"VS2019_IDE_VWD_PROJECTSYSTEM_INSTALLED" },
         { L"Microsoft.VisualStudio.PackageGroup.DslRuntime", L"VS2019_IDE_MODELING_PROJECTSYSTEM_INSTALLED" },
