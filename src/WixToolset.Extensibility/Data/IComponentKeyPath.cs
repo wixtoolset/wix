@@ -8,6 +8,6 @@ namespace WixToolset.Extensibility.Data
 
         string Id { get; set; }
 
-        ComponentKeyPathType Type { get; set; }
+        PossibleKeyPathType Type { get; set; }
     }
 }

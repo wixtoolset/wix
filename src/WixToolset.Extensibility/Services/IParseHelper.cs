@@ -6,6 +6,7 @@ namespace WixToolset.Extensibility.Services
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Data;
 
     /// <summary>
@@ -89,7 +90,7 @@ namespace WixToolset.Extensibility.Services
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
-        Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId, bool escapeLeadingHash);
+        Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
 
         /// <summary>
         /// Creates a short file/directory name using an identifier and long file/directory name as input.
@@ -220,13 +221,13 @@ namespace WixToolset.Extensibility.Services
         string GetAttributeLongFilename(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowWildcards = false, bool allowRelative = false);
 
         /// <summary>
-        /// Gets a RegistryRoot as a MsiInterop.MsidbRegistryRoot value and displays an error for an illegal value.
+        /// Gets a RegistryRootType value and displays an error for an illegal value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
         /// <param name="attribute">The attribute containing the value to get.</param>
         /// <param name="allowHkmu">Whether HKMU is returned as -1 (true), or treated as an error (false).</param>
         /// <returns>The attribute's RegisitryRootType value.</returns>
-        int GetAttributeMsidbRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu);
+        RegistryRootType? GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu);
 
         /// <summary>
         /// Gets a version value or possibly a binder variable and displays an error for an illegal version value.
