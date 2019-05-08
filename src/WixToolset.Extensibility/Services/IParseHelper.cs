@@ -65,20 +65,23 @@ namespace WixToolset.Extensibility.Services
         /// <param name="id">Optional identifier for the new row.</param>
         /// <param name="parentId">Optional identifier for the parent row.</param>
         /// <param name="name">Long name of the directory.</param>
+        /// <param name="sectionInlinedDirectoryIds">Inline directory ids for the section.</param>
         /// <param name="shortName">Optional short name of the directory.</param>
         /// <param name="sourceName">Optional source name for the directory.</param>
         /// <param name="shortSourceName">Optional short source name for the directory.</param>
         /// <returns>Identifier for the newly created row.</returns>
-        Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null, ISet<string> sectionInlinedDirectoryIds = null);
+        Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
 
         /// <summary>
         /// Creates directories using the inline directory syntax.
         /// </summary>
+        /// <param name="section">Section to add the new tuple to.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="attribute">The attribute to parse.</param>
         /// <param name="parentId">Optional identifier of parent directory.</param>
+        /// <param name="attribute">The attribute to parse.</param>
+        /// <param name="sectionInlinedDirectoryIds">Inline directory ids for the section.</param>
         /// <returns>Identifier of the leaf directory created.</returns>
-        string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId);
+        string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds);
 
         /// <summary>
         /// Creates a Registry row in the active section.
