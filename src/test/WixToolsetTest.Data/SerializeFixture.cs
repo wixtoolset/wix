@@ -23,7 +23,7 @@ namespace WixToolsetTest.Data
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 Directory_ = "TestFolder",
-                Attributes = 2,
+                Location = ComponentLocation.Either,
             });
 
             var intermediate = new Intermediate("TestIntermediate", new[] { section }, null, null);
@@ -38,7 +38,7 @@ namespace WixToolsetTest.Data
             Assert.Equal("TestComponent", tuple.Id.Id);
             Assert.Equal(AccessModifier.Public, tuple.Id.Access);
             Assert.Equal("TestFolder", tuple.Directory_);
-            Assert.Equal(2, tuple.Attributes);
+            Assert.Equal(ComponentLocation.Either, tuple.Location);
         }
 
         [Fact]
@@ -178,8 +178,8 @@ namespace WixToolsetTest.Data
 
             var controls = new[]
             {
-                new LocalizedControl("TestDlg1", "TestControl1", 10, 10, 100, 100, 0, null),
-                new LocalizedControl("TestDlg1", "TestControl2", 100, 90, 50, 70, 0, "localized"),
+                new LocalizedControl("TestDlg1", "TestControl1", 10, 10, 100, 100, false, false, false, null),
+                new LocalizedControl("TestDlg1", "TestControl2", 100, 90, 50, 70, false, false, false, "localized"),
             };
 
             var localizations = new[]
@@ -193,7 +193,7 @@ namespace WixToolsetTest.Data
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 Directory_ = "TestFolder",
-                Attributes = 2,
+                Location = ComponentLocation.Either,
             });
 
             var intermediate = new Intermediate("TestIntermediate", new[] { section }, localizations.ToDictionary(l => l.Culture), null);

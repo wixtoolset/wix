@@ -10,14 +10,16 @@ namespace WixToolset.Data
             TupleDefinitionType.Feature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Feature), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Feature_Parent), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Title), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Display), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Level), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Directory_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FeatureTupleFields.DisallowAbsent), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FeatureTupleFields.DisallowAdvertise), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FeatureTupleFields.InstallDefault), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FeatureTupleFields.TypicalDefault), IntermediateFieldType.Number),
             },
             typeof(FeatureTuple));
     }
@@ -27,14 +29,29 @@ namespace WixToolset.Data.Tuples
 {
     public enum FeatureTupleFields
     {
-        Feature,
         Feature_Parent,
         Title,
         Description,
         Display,
         Level,
         Directory_,
-        Attributes,
+        DisallowAbsent,
+        DisallowAdvertise,
+        InstallDefault,
+        TypicalDefault,
+    }
+
+    public enum FeatureInstallDefault
+    {
+        Local,
+        Source,
+        FollowParent,
+    }
+
+    public enum FeatureTypicalDefault
+    {
+        Install,
+        Advertise
     }
 
     public class FeatureTuple : IntermediateTuple
@@ -48,12 +65,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[FeatureTupleFields index] => this.Fields[(int)index];
-
-        public string Feature
-        {
-            get => (string)this.Fields[(int)FeatureTupleFields.Feature]?.Value;
-            set => this.Set((int)FeatureTupleFields.Feature, value);
-        }
 
         public string Feature_Parent
         {
@@ -91,10 +102,28 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)FeatureTupleFields.Directory_, value);
         }
 
-        public int Attributes
+        public bool DisallowAbsent
         {
-            get => (int)this.Fields[(int)FeatureTupleFields.Attributes]?.Value;
-            set => this.Set((int)FeatureTupleFields.Attributes, value);
+            get => this.Fields[(int)FeatureTupleFields.DisallowAbsent].AsBool();
+            set => this.Set((int)FeatureTupleFields.DisallowAbsent, value);
+        }
+
+        public bool DisallowAdvertise
+        {
+            get => this.Fields[(int)FeatureTupleFields.DisallowAdvertise].AsBool();
+            set => this.Set((int)FeatureTupleFields.DisallowAdvertise, value);
+        }
+
+        public FeatureInstallDefault InstallDefault
+        {
+            get => (FeatureInstallDefault)this.Fields[(int)FeatureTupleFields.InstallDefault].AsNumber();
+            set => this.Set((int)FeatureTupleFields.InstallDefault, (int)value);
+        }
+
+        public FeatureTypicalDefault TypicalDefault
+        {
+            get => (FeatureTypicalDefault)this.Fields[(int)FeatureTupleFields.TypicalDefault].AsNumber();
+            set => this.Set((int)FeatureTupleFields.TypicalDefault, (int)value);
         }
     }
 }

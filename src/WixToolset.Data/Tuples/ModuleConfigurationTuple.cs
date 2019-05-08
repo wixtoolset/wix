@@ -10,12 +10,12 @@ namespace WixToolset.Data
             TupleDefinitionType.ModuleConfiguration,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Format), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Type), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.ContextData), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.DefaultValue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.KeyNoOrphan), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.NonNullable), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ModuleConfigurationTupleFields.HelpLocation), IntermediateFieldType.String),
@@ -29,12 +29,12 @@ namespace WixToolset.Data.Tuples
 {
     public enum ModuleConfigurationTupleFields
     {
-        Name,
         Format,
         Type,
         ContextData,
         DefaultValue,
-        Attributes,
+        KeyNoOrphan,
+        NonNullable,
         DisplayName,
         Description,
         HelpLocation,
@@ -52,12 +52,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ModuleConfigurationTupleFields index] => this.Fields[(int)index];
-
-        public string Name
-        {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Name]?.Value;
-            set => this.Set((int)ModuleConfigurationTupleFields.Name, value);
-        }
 
         public int Format
         {
@@ -83,10 +77,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ModuleConfigurationTupleFields.DefaultValue, value);
         }
 
-        public int Attributes
+        public bool KeyNoOrphan
         {
-            get => (int)this.Fields[(int)ModuleConfigurationTupleFields.Attributes]?.Value;
-            set => this.Set((int)ModuleConfigurationTupleFields.Attributes, value);
+            get => this.Fields[(int)ModuleConfigurationTupleFields.KeyNoOrphan].AsBool();
+            set => this.Set((int)ModuleConfigurationTupleFields.KeyNoOrphan, value);
+        }
+
+        public bool NonNullable
+        {
+            get => this.Fields[(int)ModuleConfigurationTupleFields.NonNullable].AsBool();
+            set => this.Set((int)ModuleConfigurationTupleFields.NonNullable, value);
         }
 
         public string DisplayName

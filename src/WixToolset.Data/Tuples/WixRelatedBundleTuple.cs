@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixRelatedBundle,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRelatedBundleTupleFields.Id), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRelatedBundleTupleFields.BundleId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRelatedBundleTupleFields.Action), IntermediateFieldType.Number),
             },
             typeof(WixRelatedBundleTuple));
@@ -21,8 +21,16 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixRelatedBundleTupleFields
     {
-        Id,
+        BundleId,
         Action,
+    }
+
+    public enum RelatedBundleActionType
+    {
+        Detect,
+        Upgrade,
+        Addon,
+        Patch
     }
 
     public class WixRelatedBundleTuple : IntermediateTuple
@@ -37,16 +45,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixRelatedBundleTupleFields index] => this.Fields[(int)index];
 
-        public string Id
+        public string BundleId
         {
-            get => (string)this.Fields[(int)WixRelatedBundleTupleFields.Id]?.Value;
-            set => this.Set((int)WixRelatedBundleTupleFields.Id, value);
+            get => (string)this.Fields[(int)WixRelatedBundleTupleFields.BundleId]?.Value;
+            set => this.Set((int)WixRelatedBundleTupleFields.BundleId, value);
         }
 
-        public int Action
+        public RelatedBundleActionType Action
         {
-            get => (int)this.Fields[(int)WixRelatedBundleTupleFields.Action]?.Value;
-            set => this.Set((int)WixRelatedBundleTupleFields.Action, value);
+            get => (RelatedBundleActionType)this.Fields[(int)WixRelatedBundleTupleFields.Action].AsNumber();
+            set => this.Set((int)WixRelatedBundleTupleFields.Action, (int)value);
         }
     }
 }

@@ -96,7 +96,7 @@ namespace WixToolset.Data.Tuples
 
         public bool Overridable
         {
-            get => (bool)this.Fields[(int)WixActionTupleFields.Overridable]?.Value;
+            get => this.Fields[(int)WixActionTupleFields.Overridable].AsBool();
             set => this.Set((int)WixActionTupleFields.Overridable, value);
         }
     }

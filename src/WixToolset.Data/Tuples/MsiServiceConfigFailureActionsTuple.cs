@@ -10,9 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiServiceConfigFailureActions,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.MsiServiceConfigFailureActions), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.Event), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnInstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnReinstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnUninstall), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.ResetPeriod), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.RebootMessage), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.Command), IntermediateFieldType.String),
@@ -28,9 +29,10 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiServiceConfigFailureActionsTupleFields
     {
-        MsiServiceConfigFailureActions,
         Name,
-        Event,
+        OnInstall,
+        OnReinstall,
+        OnUninstall,
         ResetPeriod,
         RebootMessage,
         Command,
@@ -51,27 +53,33 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiServiceConfigFailureActionsTupleFields index] => this.Fields[(int)index];
 
-        public string MsiServiceConfigFailureActions
-        {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.MsiServiceConfigFailureActions]?.Value;
-            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.MsiServiceConfigFailureActions, value);
-        }
-
         public string Name
         {
             get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Name]?.Value;
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Name, value);
         }
 
-        public int Event
+        public bool OnInstall
         {
-            get => (int)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Event]?.Value;
-            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Event, value);
+            get => this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.OnInstall].AsBool();
+            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.OnInstall, value);
         }
 
-        public int ResetPeriod
+        public bool OnReinstall
         {
-            get => (int)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.ResetPeriod]?.Value;
+            get => this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.OnReinstall].AsBool();
+            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.OnReinstall, value);
+        }
+
+        public bool OnUninstall
+        {
+            get => this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.OnUninstall].AsBool();
+            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.OnUninstall, value);
+        }
+
+        public int? ResetPeriod
+        {
+            get => (int)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.ResetPeriod].AsNullableNumber();
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.ResetPeriod, value);
         }
 

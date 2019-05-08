@@ -13,9 +13,17 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Component), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.ComponentId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Directory_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Location), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.DisableRegistryReflection), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.NeverOverwrite), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Permanent), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.SharedDllRefCount), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Transitive), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.UninstallWhenSuperseded), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Win64), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Condition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.KeyPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.KeyPathType), IntermediateFieldType.Number),
             },
             typeof(ComponentTuple));
     }
@@ -28,9 +36,24 @@ namespace WixToolset.Data.Tuples
         Component,
         ComponentId,
         Directory_,
-        Attributes,
+        Location,
+        DisableRegistryReflection,
+        NeverOverwrite,
+        Permanent,
+        SharedDllRefCount,
+        Transitive,
+        UninstallWhenSuperseded,
+        Win64,
         Condition,
         KeyPath,
+        KeyPathType,
+    }
+
+    public enum ComponentLocation
+    {
+        LocalOnly,
+        SourceOnly,
+        Either
     }
 
     public class ComponentTuple : IntermediateTuple
@@ -63,10 +86,52 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ComponentTupleFields.Directory_, value);
         }
 
-        public int Attributes
+        public ComponentLocation Location
         {
-            get => (int)this.Fields[(int)ComponentTupleFields.Attributes]?.Value;
-            set => this.Set((int)ComponentTupleFields.Attributes, value);
+            get => (ComponentLocation)this.Fields[(int)ComponentTupleFields.Location].AsNumber();
+            set => this.Set((int)ComponentTupleFields.Location, (int)value);
+        }
+
+        public bool DisableRegistryReflection
+        {
+            get => this.Fields[(int)ComponentTupleFields.DisableRegistryReflection].AsBool();
+            set => this.Set((int)ComponentTupleFields.DisableRegistryReflection, value);
+        }
+
+        public bool NeverOverwrite
+        {
+            get => this.Fields[(int)ComponentTupleFields.NeverOverwrite].AsBool();
+            set => this.Set((int)ComponentTupleFields.NeverOverwrite, value);
+        }
+
+        public bool Permanent
+        {
+            get => this.Fields[(int)ComponentTupleFields.Permanent].AsBool();
+            set => this.Set((int)ComponentTupleFields.Permanent, value);
+        }
+
+        public bool SharedDllRefCount
+        {
+            get => this.Fields[(int)ComponentTupleFields.SharedDllRefCount].AsBool();
+            set => this.Set((int)ComponentTupleFields.SharedDllRefCount, value);
+        }
+
+        public bool Transitive
+        {
+            get => this.Fields[(int)ComponentTupleFields.Transitive].AsBool();
+            set => this.Set((int)ComponentTupleFields.Transitive, value);
+        }
+
+        public bool UninstallWhenSuperseded
+        {
+            get => this.Fields[(int)ComponentTupleFields.UninstallWhenSuperseded].AsBool();
+            set => this.Set((int)ComponentTupleFields.UninstallWhenSuperseded, value);
+        }
+
+        public bool Win64
+        {
+            get => this.Fields[(int)ComponentTupleFields.Win64].AsBool();
+            set => this.Set((int)ComponentTupleFields.Win64, value);
         }
 
         public string Condition
@@ -79,6 +144,12 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)ComponentTupleFields.KeyPath]?.Value;
             set => this.Set((int)ComponentTupleFields.KeyPath, value);
+        }
+
+        public ComponentKeyPathType KeyPathType
+        {
+            get => (ComponentKeyPathType)this.Fields[(int)ComponentTupleFields.KeyPathType].AsNumber();
+            set => this.Set((int)ComponentTupleFields.KeyPathType, (int)value);
         }
     }
 }

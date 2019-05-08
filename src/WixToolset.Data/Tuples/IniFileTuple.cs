@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.IniFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IniFileTupleFields.IniFile), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileTupleFields.FileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileTupleFields.DirProperty), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileTupleFields.Section), IntermediateFieldType.String),
@@ -27,7 +26,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum IniFileTupleFields
     {
-        IniFile,
         FileName,
         DirProperty,
         Section,
@@ -48,12 +46,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[IniFileTupleFields index] => this.Fields[(int)index];
-
-        public string IniFile
-        {
-            get => (string)this.Fields[(int)IniFileTupleFields.IniFile]?.Value;
-            set => this.Set((int)IniFileTupleFields.IniFile, value);
-        }
 
         public string FileName
         {
@@ -85,10 +77,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)IniFileTupleFields.Value, value);
         }
 
-        public int Action
+        public InifFileActionType Action
         {
-            get => (int)this.Fields[(int)IniFileTupleFields.Action]?.Value;
-            set => this.Set((int)IniFileTupleFields.Action, value);
+            get => (InifFileActionType)this.Fields[(int)IniFileTupleFields.Action]?.AsNumber();
+            set => this.Set((int)IniFileTupleFields.Action, (int)value);
         }
 
         public string Component_

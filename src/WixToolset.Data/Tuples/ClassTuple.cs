@@ -22,7 +22,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.DefInprocHandler), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.Argument), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.Feature_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ClassTupleFields.RelativePath), IntermediateFieldType.Bool),
             },
             typeof(ClassTuple));
     }
@@ -44,7 +44,7 @@ namespace WixToolset.Data.Tuples
         DefInprocHandler,
         Argument,
         Feature_,
-        Attributes,
+        RelativePath,
     }
 
     public class ClassTuple : IntermediateTuple
@@ -131,10 +131,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ClassTupleFields.Feature_, value);
         }
 
-        public int Attributes
+        public bool RelativePath
         {
-            get => (int)this.Fields[(int)ClassTupleFields.Attributes]?.Value;
-            set => this.Set((int)ClassTupleFields.Attributes, value);
+            get => this.Fields[(int)ClassTupleFields.RelativePath].AsBool();
+            set => this.Set((int)ClassTupleFields.RelativePath, value);
         }
     }
 }

@@ -10,11 +10,11 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiEmbeddedUI,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.MsiEmbeddedUI), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.FileName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.EntryPoint), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.SupportsBasicUI), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.MessageFilter), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.Data), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(MsiEmbeddedUITupleFields.Source), IntermediateFieldType.Path),
             },
             typeof(MsiEmbeddedUITuple));
     }
@@ -24,11 +24,11 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiEmbeddedUITupleFields
     {
-        MsiEmbeddedUI,
         FileName,
-        Attributes,
+        EntryPoint,
+        SupportsBasicUI,
         MessageFilter,
-        Data,
+        Source,
     }
 
     public class MsiEmbeddedUITuple : IntermediateTuple
@@ -43,22 +43,22 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiEmbeddedUITupleFields index] => this.Fields[(int)index];
 
-        public string MsiEmbeddedUI
-        {
-            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.MsiEmbeddedUI]?.Value;
-            set => this.Set((int)MsiEmbeddedUITupleFields.MsiEmbeddedUI, value);
-        }
-
         public string FileName
         {
             get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.FileName]?.Value;
             set => this.Set((int)MsiEmbeddedUITupleFields.FileName, value);
         }
 
-        public int Attributes
+        public bool EntryPoint
         {
-            get => (int)this.Fields[(int)MsiEmbeddedUITupleFields.Attributes]?.Value;
-            set => this.Set((int)MsiEmbeddedUITupleFields.Attributes, value);
+            get => this.Fields[(int)MsiEmbeddedUITupleFields.EntryPoint].AsBool();
+            set => this.Set((int)MsiEmbeddedUITupleFields.EntryPoint, value);
+        }
+
+        public bool SupportsBasicUI
+        {
+            get => this.Fields[(int)MsiEmbeddedUITupleFields.SupportsBasicUI].AsBool();
+            set => this.Set((int)MsiEmbeddedUITupleFields.SupportsBasicUI, value);
         }
 
         public int MessageFilter
@@ -67,10 +67,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiEmbeddedUITupleFields.MessageFilter, value);
         }
 
-        public string Data
+        public string Source
         {
-            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.Data]?.Value;
-            set => this.Set((int)MsiEmbeddedUITupleFields.Data, value);
+            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.Source]?.Value;
+            set => this.Set((int)MsiEmbeddedUITupleFields.Source, value);
         }
     }
 }

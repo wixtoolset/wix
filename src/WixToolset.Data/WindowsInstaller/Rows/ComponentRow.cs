@@ -2,8 +2,6 @@
 
 namespace WixToolset.Data.WindowsInstaller.Rows
 {
-    using WixToolset.Data.Msi;
-
     /// <summary>
     /// Specialization of a row for the Component table.
     /// </summary>
@@ -57,16 +55,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>Local only attribute of the component.</value>
         public bool IsLocalOnly
         {
-            get { return MsiInterop.MsidbComponentAttributesLocalOnly == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesLocalOnly); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesLocalOnly == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesLocalOnly); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesLocalOnly;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesLocalOnly;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesLocalOnly;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesLocalOnly;
                 }
             }
         }
@@ -77,16 +75,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>Source only attribute of the component.</value>
         public bool IsSourceOnly
         {
-            get { return MsiInterop.MsidbComponentAttributesSourceOnly == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesSourceOnly); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesSourceOnly == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesSourceOnly); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesSourceOnly;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesSourceOnly;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesSourceOnly;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesSourceOnly;
                 }
             }
         }
@@ -97,16 +95,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>Optional attribute of the component.</value>
         public bool IsOptional
         {
-            get { return MsiInterop.MsidbComponentAttributesOptional == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesOptional); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesOptional == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesOptional); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesOptional;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesOptional;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesOptional;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesOptional;
                 }
             }
         }
@@ -117,16 +115,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>Registry key path attribute of the component.</value>
         public bool IsRegistryKeyPath
         {
-            get { return MsiInterop.MsidbComponentAttributesRegistryKeyPath == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesRegistryKeyPath); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesRegistryKeyPath;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesRegistryKeyPath;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath;
                 }
             }
         }
@@ -137,16 +135,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>Shared dll ref countattribute of the component.</value>
         public bool IsSharedDll
         {
-            get { return MsiInterop.MsidbComponentAttributesSharedDllRefCount == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesSharedDllRefCount); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesSharedDllRefCount;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesSharedDllRefCount;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount;
                 }
             }
         }
@@ -157,16 +155,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>Permanent attribute of the component.</value>
         public bool IsPermanent
         {
-            get { return MsiInterop.MsidbComponentAttributesPermanent == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesPermanent); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesPermanent == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesPermanent); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesPermanent;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesPermanent;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesPermanent;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesPermanent;
                 }
             }
         }
@@ -177,16 +175,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>ODBC data source key path attribute of the component.</value>
         public bool IsOdbcDataSourceKeyPath
         {
-            get { return MsiInterop.MsidbComponentAttributesODBCDataSource == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributesODBCDataSource); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributesODBCDataSource;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributesODBCDataSource;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource;
                 }
             }
         }
@@ -197,16 +195,16 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// <value>64-bitness of the component.</value>
         public bool Is64Bit
         {
-            get { return MsiInterop.MsidbComponentAttributes64bit == ((int)this.Fields[3].Data & MsiInterop.MsidbComponentAttributes64bit); }
+            get { return WindowsInstallerConstants.MsidbComponentAttributes64bit == ((int)this.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributes64bit); }
             set
             {
                 if (value)
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data | MsiInterop.MsidbComponentAttributes64bit;
+                    this.Fields[3].Data = (int)this.Fields[3].Data | WindowsInstallerConstants.MsidbComponentAttributes64bit;
                 }
                 else
                 {
-                    this.Fields[3].Data = (int)this.Fields[3].Data & ~MsiInterop.MsidbComponentAttributes64bit;
+                    this.Fields[3].Data = (int)this.Fields[3].Data & ~WindowsInstallerConstants.MsidbComponentAttributes64bit;
                 }
             }
         }

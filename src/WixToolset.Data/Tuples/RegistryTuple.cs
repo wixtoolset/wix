@@ -10,11 +10,12 @@ namespace WixToolset.Data
             TupleDefinitionType.Registry,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.Registry), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.Root), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RegistryTupleFields.ValueType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RegistryTupleFields.ValueAction), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.Component_), IntermediateFieldType.String),
             },
             typeof(RegistryTuple));
@@ -25,12 +26,29 @@ namespace WixToolset.Data.Tuples
 {
     public enum RegistryTupleFields
     {
-        Registry,
         Root,
         Key,
         Name,
         Value,
+        ValueType,
+        ValueAction,
         Component_,
+    }
+
+    public enum RegistryValueType
+    {
+        String,
+        Binary,
+        Expandable,
+        Integer,
+        MultiString,
+    }
+
+    public enum RegistryValueActionType
+    {
+        Write,
+        Append,
+        Prepend,
     }
 
     public class RegistryTuple : IntermediateTuple
@@ -45,16 +63,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[RegistryTupleFields index] => this.Fields[(int)index];
 
-        public string Registry
+        public RegistryRootType Root
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Registry]?.Value;
-            set => this.Set((int)RegistryTupleFields.Registry, value);
-        }
-
-        public int Root
-        {
-            get => (int)this.Fields[(int)RegistryTupleFields.Root]?.Value;
-            set => this.Set((int)RegistryTupleFields.Root, value);
+            get => (RegistryRootType)this.Fields[(int)RegistryTupleFields.Root].AsNumber();
+            set => this.Set((int)RegistryTupleFields.Root, (int)value);
         }
 
         public string Key
@@ -71,8 +83,20 @@ namespace WixToolset.Data.Tuples
 
         public string Value
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Value]?.Value;
+            get => this.Fields[(int)RegistryTupleFields.Value].AsString();
             set => this.Set((int)RegistryTupleFields.Value, value);
+        }
+
+        public RegistryValueType ValueType
+        {
+            get => (RegistryValueType)this.Fields[(int)RegistryTupleFields.ValueType].AsNumber();
+            set => this.Set((int)RegistryTupleFields.ValueType, (int)value);
+        }
+
+        public RegistryValueActionType ValueAction
+        {
+            get => (RegistryValueActionType)this.Fields[(int)RegistryTupleFields.ValueAction].AsNumber();
+            set => this.Set((int)RegistryTupleFields.ValueAction, (int)value);
         }
 
         public string Component_

@@ -3,6 +3,7 @@
 namespace WixToolset.Data
 {
     using System;
+    using WixToolset.Data.Tuples;
 
     public enum TupleDefinitionType
     {
@@ -130,7 +131,6 @@ namespace WixToolset.Data
         Verb,
         WixAction,
         WixApprovedExeForElevation,
-        WixBBControl,
         WixBindUpdatedFiles,
         WixBootstrapperApplication,
         WixBuildInfo,
@@ -161,7 +161,6 @@ namespace WixToolset.Data
         WixComplexReference,
         WixComponentGroup,
         WixComponentSearch,
-        WixControl,
         WixCustomRow,
         WixCustomTable,
         WixDeltaPatchFile,
@@ -594,9 +593,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixApprovedExeForElevation:
                     return TupleDefinitions.WixApprovedExeForElevation;
 
-                case TupleDefinitionType.WixBBControl:
-                    return TupleDefinitions.WixBBControl;
-
                 case TupleDefinitionType.WixBindUpdatedFiles:
                     return TupleDefinitions.WixBindUpdatedFiles;
 
@@ -686,9 +682,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixComponentSearch:
                     return TupleDefinitions.WixComponentSearch;
-
-                case TupleDefinitionType.WixControl:
-                    return TupleDefinitions.WixControl;
 
                 case TupleDefinitionType.WixCustomRow:
                     return TupleDefinitions.WixCustomRow;

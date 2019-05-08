@@ -10,9 +10,13 @@ namespace WixToolset.Data
             TupleDefinitionType.Environment,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Environment), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Separator), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Action), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Part), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Permanent), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.System), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Component_), IntermediateFieldType.String),
             },
             typeof(EnvironmentTuple));
@@ -23,10 +27,28 @@ namespace WixToolset.Data.Tuples
 {
     public enum EnvironmentTupleFields
     {
-        Environment,
         Name,
         Value,
+        Separator,
+        Action,
+        Part,
+        Permanent,
+        System,
         Component_,
+    }
+
+    public enum EnvironmentActionType
+    {
+        Set,
+        Create,
+        Remove
+    }
+
+    public enum EnvironmentPartType
+    {
+        All,
+        First,
+        Last
     }
 
     public class EnvironmentTuple : IntermediateTuple
@@ -41,12 +63,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[EnvironmentTupleFields index] => this.Fields[(int)index];
 
-        public string Environment
-        {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Environment]?.Value;
-            set => this.Set((int)EnvironmentTupleFields.Environment, value);
-        }
-
         public string Name
         {
             get => (string)this.Fields[(int)EnvironmentTupleFields.Name]?.Value;
@@ -57,6 +73,36 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)EnvironmentTupleFields.Value]?.Value;
             set => this.Set((int)EnvironmentTupleFields.Value, value);
+        }
+
+        public string Separator
+        {
+            get => (string)this.Fields[(int)EnvironmentTupleFields.Separator]?.Value;
+            set => this.Set((int)EnvironmentTupleFields.Separator, value);
+        }
+
+        public EnvironmentActionType? Action
+        {
+            get => (EnvironmentActionType?)this.Fields[(int)EnvironmentTupleFields.Action].AsNullableNumber();
+            set => this.Set((int)EnvironmentTupleFields.Action, (int)value);
+        }
+
+        public EnvironmentPartType? Part
+        {
+            get => (EnvironmentPartType?)this.Fields[(int)EnvironmentTupleFields.Part].AsNullableNumber();
+            set => this.Set((int)EnvironmentTupleFields.Part, (int)value);
+        }
+
+        public bool Permanent
+        {
+            get => this.Fields[(int)EnvironmentTupleFields.Permanent].AsBool();
+            set => this.Set((int)EnvironmentTupleFields.Permanent, value);
+        }
+
+        public bool System
+        {
+            get => this.Fields[(int)EnvironmentTupleFields.System].AsBool();
+            set => this.Set((int)EnvironmentTupleFields.System, value);
         }
 
         public string Component_

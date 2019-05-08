@@ -10,12 +10,21 @@ namespace WixToolset.Data
             TupleDefinitionType.Dialog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Dialog), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.HCentering), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.VCentering), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.Width), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.Height), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.CustomPalette), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.ErrorDialog), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.Visible), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.Modal), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.KeepModeless), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.LeftScroll), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.Minimize), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.RightAligned), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.RightToLeft), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.SystemModal), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.TrackDiskSpace), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.Title), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.Control_First), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.Control_Default), IntermediateFieldType.String),
@@ -29,12 +38,21 @@ namespace WixToolset.Data.Tuples
 {
     public enum DialogTupleFields
     {
-        Dialog,
         HCentering,
         VCentering,
         Width,
         Height,
-        Attributes,
+        CustomPalette,
+        ErrorDialog,
+        Visible,
+        Modal,
+        KeepModeless,
+        LeftScroll,
+        Minimize,
+        RightAligned,
+        RightToLeft,
+        SystemModal,
+        TrackDiskSpace,
         Title,
         Control_First,
         Control_Default,
@@ -52,12 +70,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[DialogTupleFields index] => this.Fields[(int)index];
-
-        public string Dialog
-        {
-            get => (string)this.Fields[(int)DialogTupleFields.Dialog]?.Value;
-            set => this.Set((int)DialogTupleFields.Dialog, value);
-        }
 
         public int HCentering
         {
@@ -83,10 +95,70 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)DialogTupleFields.Height, value);
         }
 
-        public int Attributes
+        public bool CustomPalette
         {
-            get => (int)this.Fields[(int)DialogTupleFields.Attributes]?.Value;
-            set => this.Set((int)DialogTupleFields.Attributes, value);
+            get => this.Fields[(int)DialogTupleFields.CustomPalette].AsBool();
+            set => this.Set((int)DialogTupleFields.CustomPalette, value);
+        }
+
+        public bool ErrorDialog
+        {
+            get => this.Fields[(int)DialogTupleFields.ErrorDialog].AsBool();
+            set => this.Set((int)DialogTupleFields.ErrorDialog, value);
+        }
+
+        public bool Visible
+        {
+            get => this.Fields[(int)DialogTupleFields.Visible].AsBool();
+            set => this.Set((int)DialogTupleFields.Visible, value);
+        }
+
+        public bool Modal
+        {
+            get => this.Fields[(int)DialogTupleFields.Modal].AsBool();
+            set => this.Set((int)DialogTupleFields.Modal, value);
+        }
+
+        public bool KeepModeless
+        {
+            get => this.Fields[(int)DialogTupleFields.KeepModeless].AsBool();
+            set => this.Set((int)DialogTupleFields.KeepModeless, value);
+        }
+
+        public bool LeftScroll
+        {
+            get => this.Fields[(int)DialogTupleFields.LeftScroll].AsBool();
+            set => this.Set((int)DialogTupleFields.LeftScroll, value);
+        }
+
+        public bool Minimize
+        {
+            get => this.Fields[(int)DialogTupleFields.Minimize].AsBool();
+            set => this.Set((int)DialogTupleFields.Minimize, value);
+        }
+
+        public bool RightAligned
+        {
+            get => this.Fields[(int)DialogTupleFields.RightAligned].AsBool();
+            set => this.Set((int)DialogTupleFields.RightAligned, value);
+        }
+
+        public bool RightToLeft
+        {
+            get => this.Fields[(int)DialogTupleFields.RightToLeft].AsBool();
+            set => this.Set((int)DialogTupleFields.RightToLeft, value);
+        }
+
+        public bool TrackDiskSpace
+        {
+            get => this.Fields[(int)DialogTupleFields.TrackDiskSpace].AsBool();
+            set => this.Set((int)DialogTupleFields.TrackDiskSpace, value);
+        }
+
+        public bool SystemModal
+        {
+            get => this.Fields[(int)DialogTupleFields.SystemModal].AsBool();
+            set => this.Set((int)DialogTupleFields.SystemModal, value);
         }
 
         public string Title

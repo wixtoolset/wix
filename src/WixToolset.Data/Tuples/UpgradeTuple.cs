@@ -14,7 +14,12 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMin), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMax), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UpgradeTupleFields.Language), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.ExcludeLanguages), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.IgnoreRemoveFailures), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.MigrateFeatures), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.OnlyDetect), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMaxInclusive), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradeTupleFields.VersionMinInclusive), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(UpgradeTupleFields.Remove), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UpgradeTupleFields.ActionProperty), IntermediateFieldType.String),
             },
@@ -30,7 +35,12 @@ namespace WixToolset.Data.Tuples
         VersionMin,
         VersionMax,
         Language,
-        Attributes,
+        ExcludeLanguages,
+        IgnoreRemoveFailures,
+        MigrateFeatures,
+        OnlyDetect,
+        VersionMaxInclusive,
+        VersionMinInclusive,
         Remove,
         ActionProperty,
     }
@@ -71,10 +81,40 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)UpgradeTupleFields.Language, value);
         }
 
-        public int Attributes
+        public bool ExcludeLanguages
         {
-            get => (int)this.Fields[(int)UpgradeTupleFields.Attributes]?.Value;
-            set => this.Set((int)UpgradeTupleFields.Attributes, value);
+            get => this.Fields[(int)UpgradeTupleFields.ExcludeLanguages].AsBool();
+            set => this.Set((int)UpgradeTupleFields.ExcludeLanguages, value);
+        }
+
+        public bool IgnoreRemoveFailures
+        {
+            get => this.Fields[(int)UpgradeTupleFields.IgnoreRemoveFailures].AsBool();
+            set => this.Set((int)UpgradeTupleFields.IgnoreRemoveFailures, value);
+        }
+
+        public bool MigrateFeatures
+        {
+            get => this.Fields[(int)UpgradeTupleFields.MigrateFeatures].AsBool();
+            set => this.Set((int)UpgradeTupleFields.MigrateFeatures, value);
+        }
+
+        public bool OnlyDetect
+        {
+            get => this.Fields[(int)UpgradeTupleFields.OnlyDetect].AsBool();
+            set => this.Set((int)UpgradeTupleFields.OnlyDetect, value);
+        }
+
+        public bool VersionMaxInclusive
+        {
+            get => this.Fields[(int)UpgradeTupleFields.VersionMaxInclusive].AsBool();
+            set => this.Set((int)UpgradeTupleFields.VersionMaxInclusive, value);
+        }
+
+        public bool VersionMinInclusive
+        {
+            get => this.Fields[(int)UpgradeTupleFields.VersionMinInclusive].AsBool();
+            set => this.Set((int)UpgradeTupleFields.VersionMinInclusive, value);
         }
 
         public string Remove

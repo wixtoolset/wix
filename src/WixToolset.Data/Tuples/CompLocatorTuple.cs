@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.CompLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CompLocatorTupleFields.Signature_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CompLocatorTupleFields.ComponentId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CompLocatorTupleFields.Type), IntermediateFieldType.Number),
             },
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum CompLocatorTupleFields
     {
-        Signature_,
         ComponentId,
         Type,
     }
@@ -39,22 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[CompLocatorTupleFields index] => this.Fields[(int)index];
 
-        public string Signature_
-        {
-            get => (string)this.Fields[(int)CompLocatorTupleFields.Signature_]?.Value;
-            set => this.Set((int)CompLocatorTupleFields.Signature_, value);
-        }
-
         public string ComponentId
         {
             get => (string)this.Fields[(int)CompLocatorTupleFields.ComponentId]?.Value;
             set => this.Set((int)CompLocatorTupleFields.ComponentId, value);
         }
 
-        public int Type
+        public LocatorType Type
         {
-            get => (int)this.Fields[(int)CompLocatorTupleFields.Type]?.Value;
-            set => this.Set((int)CompLocatorTupleFields.Type, value);
+            get => (LocatorType)this.Fields[(int)CompLocatorTupleFields.Type].AsNumber();
+            set => this.Set((int)CompLocatorTupleFields.Type, (int)value);
         }
     }
 }

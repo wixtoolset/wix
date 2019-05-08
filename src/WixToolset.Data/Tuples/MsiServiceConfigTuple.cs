@@ -10,9 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiServiceConfig,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.MsiServiceConfig), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Event), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnInstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnReinstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnUninstall), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.ConfigType), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Argument), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Component_), IntermediateFieldType.String),
@@ -27,10 +28,21 @@ namespace WixToolset.Data.Tuples
     {
         MsiServiceConfig,
         Name,
-        Event,
+        OnInstall,
+        OnReinstall,
+        OnUninstall,
         ConfigType,
         Argument,
         Component_,
+    }
+
+    public enum MsiServiceConfigType
+    {
+        DelayedAutoStart = 3,
+        FailureActionsFlag,
+        ServiceSidInfo,
+        RequiredPrivilegesInfo,
+        PreshutdownInfo,
     }
 
     public class MsiServiceConfigTuple : IntermediateTuple
@@ -45,28 +57,34 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiServiceConfigTupleFields index] => this.Fields[(int)index];
 
-        public string MsiServiceConfig
-        {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.MsiServiceConfig]?.Value;
-            set => this.Set((int)MsiServiceConfigTupleFields.MsiServiceConfig, value);
-        }
-
         public string Name
         {
             get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Name]?.Value;
             set => this.Set((int)MsiServiceConfigTupleFields.Name, value);
         }
 
-        public int Event
+        public bool OnInstall
         {
-            get => (int)this.Fields[(int)MsiServiceConfigTupleFields.Event]?.Value;
-            set => this.Set((int)MsiServiceConfigTupleFields.Event, value);
+            get => this.Fields[(int)MsiServiceConfigTupleFields.OnInstall].AsBool();
+            set => this.Set((int)MsiServiceConfigTupleFields.OnInstall, value);
         }
 
-        public int ConfigType
+        public bool OnReinstall
         {
-            get => (int)this.Fields[(int)MsiServiceConfigTupleFields.ConfigType]?.Value;
-            set => this.Set((int)MsiServiceConfigTupleFields.ConfigType, value);
+            get => this.Fields[(int)MsiServiceConfigTupleFields.OnReinstall].AsBool();
+            set => this.Set((int)MsiServiceConfigTupleFields.OnReinstall, value);
+        }
+
+        public bool OnUninstall
+        {
+            get => this.Fields[(int)MsiServiceConfigTupleFields.OnUninstall].AsBool();
+            set => this.Set((int)MsiServiceConfigTupleFields.OnUninstall, value);
+        }
+
+        public MsiServiceConfigType ConfigType
+        {
+            get => (MsiServiceConfigType)this.Fields[(int)MsiServiceConfigTupleFields.ConfigType].AsNumber();
+            set => this.Set((int)MsiServiceConfigTupleFields.ConfigType, (int)value);
         }
 
         public string Argument

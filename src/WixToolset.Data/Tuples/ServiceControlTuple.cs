@@ -12,9 +12,14 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.ServiceControl), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Event), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallRemove), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallRemove), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallStart), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallStart), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallStop), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallStop), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Arguments), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Wait), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Wait), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Component_), IntermediateFieldType.String),
             },
             typeof(ServiceControlTuple));
@@ -27,7 +32,12 @@ namespace WixToolset.Data.Tuples
     {
         ServiceControl,
         Name,
-        Event,
+        InstallRemove,
+        UninstallRemove,
+        InstallStart,
+        UninstallStart,
+        InstallStop,
+        UninstallStop,
         Arguments,
         Wait,
         Component_,
@@ -57,10 +67,40 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ServiceControlTupleFields.Name, value);
         }
 
-        public int Event
+        public bool InstallRemove
         {
-            get => (int)this.Fields[(int)ServiceControlTupleFields.Event]?.Value;
-            set => this.Set((int)ServiceControlTupleFields.Event, value);
+            get => this.Fields[(int)ServiceControlTupleFields.InstallRemove].AsBool();
+            set => this.Set((int)ServiceControlTupleFields.InstallRemove, value);
+        }
+
+        public bool UninstallRemove
+        {
+            get => this.Fields[(int)ServiceControlTupleFields.UninstallRemove].AsBool();
+            set => this.Set((int)ServiceControlTupleFields.UninstallRemove, value);
+        }
+
+        public bool InstallStart
+        {
+            get => this.Fields[(int)ServiceControlTupleFields.InstallStart].AsBool();
+            set => this.Set((int)ServiceControlTupleFields.InstallStart, value);
+        }
+
+        public bool UninstallStart
+        {
+            get => this.Fields[(int)ServiceControlTupleFields.UninstallStart].AsBool();
+            set => this.Set((int)ServiceControlTupleFields.UninstallStart, value);
+        }
+
+        public bool InstallStop
+        {
+            get => this.Fields[(int)ServiceControlTupleFields.InstallStop].AsBool();
+            set => this.Set((int)ServiceControlTupleFields.InstallStop, value);
+        }
+
+        public bool UninstallStop
+        {
+            get => this.Fields[(int)ServiceControlTupleFields.UninstallStop].AsBool();
+            set => this.Set((int)ServiceControlTupleFields.UninstallStop, value);
         }
 
         public string Arguments
@@ -69,9 +109,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ServiceControlTupleFields.Arguments, value);
         }
 
-        public int Wait
+        public bool? Wait
         {
-            get => (int)this.Fields[(int)ServiceControlTupleFields.Wait]?.Value;
+            get => this.Fields[(int)ServiceControlTupleFields.Wait].AsNullableBool();
             set => this.Set((int)ServiceControlTupleFields.Wait, value);
         }
 

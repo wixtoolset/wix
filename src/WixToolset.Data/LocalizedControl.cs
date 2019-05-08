@@ -7,7 +7,7 @@ namespace WixToolset.Data
 
     public class LocalizedControl
     {
-        public LocalizedControl(string dialog, string control, int x, int y, int width, int height, int attribs, string text)
+        public LocalizedControl(string dialog, string control, int x, int y, int width, int height, bool rightToLeft, bool rightAligned, bool leftScroll, string text)
         {
             this.Dialog = dialog;
             this.Control = control;
@@ -15,7 +15,9 @@ namespace WixToolset.Data
             this.Y = y;
             this.Width = width;
             this.Height = height;
-            this.Attributes = attribs;
+            this.RightToLeft = rightToLeft;
+            this.RightAligned = rightAligned;
+            this.LeftScroll = leftScroll;
             this.Text = text;
         }
 
@@ -31,7 +33,11 @@ namespace WixToolset.Data
 
         public int Height { get; }
 
-        public int Attributes { get; }
+        public bool RightToLeft { get; }
+
+        public bool RightAligned { get; }
+
+        public bool LeftScroll { get; }
 
         public string Text { get; }
 
@@ -57,11 +63,13 @@ namespace WixToolset.Data
             };
 
             jsonObject.AddIsNotNullOrEmpty("control", this.Control);
-            jsonObject.AddNonDefaultValue("x", this.X, 0);
-            jsonObject.AddNonDefaultValue("y", this.Y, 0);
-            jsonObject.AddNonDefaultValue("width", this.Width, 0);
-            jsonObject.AddNonDefaultValue("height", this.Height, 0);
-            jsonObject.AddNonDefaultValue("attribs", this.Attributes, 0);
+            jsonObject.AddNonDefaultValue("x", this.X);
+            jsonObject.AddNonDefaultValue("y", this.Y);
+            jsonObject.AddNonDefaultValue("width", this.Width);
+            jsonObject.AddNonDefaultValue("height", this.Height);
+            jsonObject.AddNonDefaultValue("rightToLeft", this.RightToLeft);
+            jsonObject.AddNonDefaultValue("rightAligned", this.RightAligned);
+            jsonObject.AddNonDefaultValue("leftScroll", this.LeftScroll);
             jsonObject.AddIsNotNullOrEmpty("text", this.Text);
 
             return jsonObject;
@@ -75,10 +83,12 @@ namespace WixToolset.Data
             var y = jsonObject.GetValueOrDefault("y", 0);
             var width = jsonObject.GetValueOrDefault("width", 0);
             var height = jsonObject.GetValueOrDefault("height", 0);
-            var attribs = jsonObject.GetValueOrDefault("attribs", 0);
+            var rightToLeft = jsonObject.GetValueOrDefault("rightToLeft", false);
+            var rightAligned = jsonObject.GetValueOrDefault("rightAligned", false);
+            var leftScroll = jsonObject.GetValueOrDefault("leftScroll", false);
             var text = jsonObject.GetValueOrDefault<string>("text");
 
-            return new LocalizedControl(dialog, control, x, y, width, height, attribs, text);
+            return new LocalizedControl(dialog, control, x, y, width, height, rightToLeft, rightAligned, leftScroll, text);
         }
     }
 }

@@ -10,10 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.RemoveRegistry,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.RemoveRegistry), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Root), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Action), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Component_), IntermediateFieldType.String),
             },
             typeof(RemoveRegistryTuple));
@@ -24,12 +24,18 @@ namespace WixToolset.Data.Tuples
 {
     public enum RemoveRegistryTupleFields
     {
-        RemoveRegistry,
         Root,
         Key,
         Name,
+        Action,
         Component_,
     }
+
+    public enum RemoveRegistryActionType
+    {
+        RemoveOnInstall,
+        RemoveOnUninstall
+    };
 
     public class RemoveRegistryTuple : IntermediateTuple
     {
@@ -43,16 +49,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[RemoveRegistryTupleFields index] => this.Fields[(int)index];
 
-        public string RemoveRegistry
+        public RegistryRootType Root
         {
-            get => (string)this.Fields[(int)RemoveRegistryTupleFields.RemoveRegistry]?.Value;
-            set => this.Set((int)RemoveRegistryTupleFields.RemoveRegistry, value);
-        }
-
-        public int Root
-        {
-            get => (int)this.Fields[(int)RemoveRegistryTupleFields.Root]?.Value;
-            set => this.Set((int)RemoveRegistryTupleFields.Root, value);
+            get => (RegistryRootType)this.Fields[(int)RemoveRegistryTupleFields.Key]?.AsNumber();
+            set => this.Set((int)RemoveRegistryTupleFields.Root, (int)value);
         }
 
         public string Key
@@ -65,6 +65,12 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)RemoveRegistryTupleFields.Name]?.Value;
             set => this.Set((int)RemoveRegistryTupleFields.Name, value);
+        }
+
+        public RemoveRegistryActionType Action
+        {
+            get => (RemoveRegistryActionType)this.Fields[(int)RemoveRegistryTupleFields.Action].AsNumber();
+            set => this.Set((int)RemoveRegistryTupleFields.Action, (int)value);
         }
 
         public string Component_

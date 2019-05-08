@@ -5,7 +5,6 @@ namespace WixToolset.Data.WindowsInstaller.Rows
     using System;
     using System.Diagnostics;
     using System.Globalization;
-    using WixToolset.Data.Msi;
 
     /// <summary>
     /// Specialization of a row for the file table.
@@ -174,8 +173,8 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
             get
             {
-                bool compressedFlag = (0 < (this.Attributes & MsiInterop.MsidbFileAttributesCompressed));
-                bool noncompressedFlag = (0 < (this.Attributes & MsiInterop.MsidbFileAttributesNoncompressed));
+                bool compressedFlag = (0 < (this.Attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed));
+                bool noncompressedFlag = (0 < (this.Attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed));
 
                 if (compressedFlag && noncompressedFlag)
                 {
@@ -200,22 +199,22 @@ namespace WixToolset.Data.WindowsInstaller.Rows
                 if (YesNoType.Yes == value)
                 {
                     // these are mutually exclusive
-                    this.Attributes |= MsiInterop.MsidbFileAttributesCompressed;
-                    this.Attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                    this.Attributes |= WindowsInstallerConstants.MsidbFileAttributesCompressed;
+                    this.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                 }
                 else if (YesNoType.No == value)
                 {
                     // these are mutually exclusive
-                    this.Attributes |= MsiInterop.MsidbFileAttributesNoncompressed;
-                    this.Attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
+                    this.Attributes |= WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
+                    this.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
                 }
                 else // not specified
                 {
                     Debug.Assert(YesNoType.NotSet == value);
 
                     // clear any compression bits
-                    this.Attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
-                    this.Attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                    this.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
+                    this.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                 }
             }
         }

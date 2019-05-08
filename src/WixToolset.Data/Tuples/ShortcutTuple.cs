@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Shortcut,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Shortcut), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Directory_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Component_), IntermediateFieldType.String),
@@ -20,7 +19,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Hotkey), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Icon_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.IconIndex), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.ShowCmd), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Show), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.WkDir), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.DisplayResourceDLL), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.DisplayResourceId), IntermediateFieldType.Number),
@@ -35,7 +34,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ShortcutTupleFields
     {
-        Shortcut,
         Directory_,
         Name,
         Component_,
@@ -45,12 +43,19 @@ namespace WixToolset.Data.Tuples
         Hotkey,
         Icon_,
         IconIndex,
-        ShowCmd,
+        Show,
         WkDir,
         DisplayResourceDLL,
         DisplayResourceId,
         DescriptionResourceDLL,
         DescriptionResourceId,
+    }
+
+    public enum ShortcutShowType
+    {
+        Normal = 1,
+        Maximized = 3,
+        Minimized = 7
     }
 
     public class ShortcutTuple : IntermediateTuple
@@ -64,12 +69,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ShortcutTupleFields index] => this.Fields[(int)index];
-
-        public string Shortcut
-        {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Shortcut]?.Value;
-            set => this.Set((int)ShortcutTupleFields.Shortcut, value);
-        }
 
         public string Directory_
         {
@@ -107,9 +106,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ShortcutTupleFields.Description, value);
         }
 
-        public int Hotkey
+        public int? Hotkey
         {
-            get => (int)this.Fields[(int)ShortcutTupleFields.Hotkey]?.Value;
+            get => this.Fields[(int)ShortcutTupleFields.Hotkey].AsNullableNumber();
             set => this.Set((int)ShortcutTupleFields.Hotkey, value);
         }
 
@@ -119,45 +118,45 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ShortcutTupleFields.Icon_, value);
         }
 
-        public int IconIndex
+        public int? IconIndex
         {
-            get => (int)this.Fields[(int)ShortcutTupleFields.IconIndex]?.Value;
+            get => this.Fields[(int)ShortcutTupleFields.IconIndex].AsNullableNumber();
             set => this.Set((int)ShortcutTupleFields.IconIndex, value);
         }
 
-        public int ShowCmd
+        public ShortcutShowType? Show
         {
-            get => (int)this.Fields[(int)ShortcutTupleFields.ShowCmd]?.Value;
-            set => this.Set((int)ShortcutTupleFields.ShowCmd, value);
+            get => (ShortcutShowType?)this.Fields[(int)ShortcutTupleFields.Show].AsNullableNumber();
+            set => this.Set((int)ShortcutTupleFields.Show, (int?)value);
         }
 
-        public string WkDir
+        public string WorkingDirectory
         {
             get => (string)this.Fields[(int)ShortcutTupleFields.WkDir]?.Value;
             set => this.Set((int)ShortcutTupleFields.WkDir, value);
         }
 
-        public string DisplayResourceDLL
+        public string DisplayResourceDll
         {
             get => (string)this.Fields[(int)ShortcutTupleFields.DisplayResourceDLL]?.Value;
             set => this.Set((int)ShortcutTupleFields.DisplayResourceDLL, value);
         }
 
-        public int DisplayResourceId
+        public int? DisplayResourceId
         {
-            get => (int)this.Fields[(int)ShortcutTupleFields.DisplayResourceId]?.Value;
+            get => this.Fields[(int)ShortcutTupleFields.DisplayResourceId].AsNullableNumber();
             set => this.Set((int)ShortcutTupleFields.DisplayResourceId, value);
         }
 
-        public string DescriptionResourceDLL
+        public string DescriptionResourceDll
         {
             get => (string)this.Fields[(int)ShortcutTupleFields.DescriptionResourceDLL]?.Value;
             set => this.Set((int)ShortcutTupleFields.DescriptionResourceDLL, value);
         }
 
-        public int DescriptionResourceId
+        public int? DescriptionResourceId
         {
-            get => (int)this.Fields[(int)ShortcutTupleFields.DescriptionResourceId]?.Value;
+            get => this.Fields[(int)ShortcutTupleFields.DescriptionResourceId].AsNullableNumber();
             set => this.Set((int)ShortcutTupleFields.DescriptionResourceId, value);
         }
     }

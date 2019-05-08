@@ -18,7 +18,16 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.Width), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.Height), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.Enabled), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.Indirect), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.Integer), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.LeftScroll), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.RightAligned), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.RightToLeft), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.Sunken), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.Visible), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.Text), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.SourceFile), IntermediateFieldType.Path),
             },
             typeof(BBControlTuple));
     }
@@ -36,7 +45,16 @@ namespace WixToolset.Data.Tuples
         Width,
         Height,
         Attributes,
+        Enabled,
+        Indirect,
+        Integer,
+        LeftScroll,
+        RightAligned,
+        RightToLeft,
+        Sunken,
+        Visible,
         Text,
+        SourceFile
     }
 
     public class BBControlTuple : IntermediateTuple
@@ -83,7 +101,7 @@ namespace WixToolset.Data.Tuples
 
         public int Width
         {
-            get => (int)this.Fields[(int)BBControlTupleFields.Width]?.Value;
+            get => (int)this.Fields[(int)BBControlTupleFields.Width].AsNumber();
             set => this.Set((int)BBControlTupleFields.Width, value);
         }
 
@@ -95,14 +113,68 @@ namespace WixToolset.Data.Tuples
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)BBControlTupleFields.Attributes]?.Value;
+            get => this.Fields[(int)BBControlTupleFields.Attributes].AsNumber();
             set => this.Set((int)BBControlTupleFields.Attributes, value);
+        }
+
+        public bool Enabled
+        {
+            get => this.Fields[(int)BBControlTupleFields.Enabled].AsBool();
+            set => this.Set((int)BBControlTupleFields.Enabled, value);
+        }
+
+        public bool Indirect
+        {
+            get => this.Fields[(int)BBControlTupleFields.Indirect].AsBool();
+            set => this.Set((int)BBControlTupleFields.Indirect, value);
+        }
+
+        public bool Integer
+        {
+            get => this.Fields[(int)BBControlTupleFields.Integer].AsBool();
+            set => this.Set((int)BBControlTupleFields.Integer, value);
+        }
+
+        public bool LeftScroll
+        {
+            get => this.Fields[(int)BBControlTupleFields.LeftScroll].AsBool();
+            set => this.Set((int)BBControlTupleFields.LeftScroll, value);
+        }
+
+        public bool RightAligned
+        {
+            get => this.Fields[(int)BBControlTupleFields.RightAligned].AsBool();
+            set => this.Set((int)BBControlTupleFields.RightAligned, value);
+        }
+
+        public bool RightToLeft
+        {
+            get => this.Fields[(int)BBControlTupleFields.RightToLeft].AsBool();
+            set => this.Set((int)BBControlTupleFields.RightToLeft, value);
+        }
+
+        public bool Sunken
+        {
+            get => this.Fields[(int)BBControlTupleFields.Sunken].AsBool();
+            set => this.Set((int)BBControlTupleFields.Sunken, value);
+        }
+
+        public bool Visible
+        {
+            get => this.Fields[(int)BBControlTupleFields.Visible].AsBool();
+            set => this.Set((int)BBControlTupleFields.Visible, value);
         }
 
         public string Text
         {
             get => (string)this.Fields[(int)BBControlTupleFields.Text]?.Value;
             set => this.Set((int)BBControlTupleFields.Text, value);
+        }
+
+        public string SourceFile
+        {
+            get => (string)this.Fields[(int)BBControlTupleFields.SourceFile]?.Value;
+            set => this.Set((int)BBControlTupleFields.SourceFile, value);
         }
     }
 }

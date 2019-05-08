@@ -30,7 +30,7 @@ namespace WixToolset.Data
             this.FieldDefinitions = fieldDefinitions;
             this.StrongTupleType = strongTupleType ?? typeof(IntermediateTuple);
 #if DEBUG
-            if (this.StrongTupleType != typeof(IntermediateTuple) && !this.StrongTupleType.IsSubclassOf(typeof(IntermediateTuple))) throw new ArgumentException(nameof(strongTupleType));
+            if (this.StrongTupleType != typeof(IntermediateTuple) && !this.StrongTupleType.IsSubclassOf(typeof(IntermediateTuple))) { throw new ArgumentException(nameof(strongTupleType)); }
 #endif
         }
 
