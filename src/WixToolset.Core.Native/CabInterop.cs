@@ -4,10 +4,7 @@ namespace WixToolset.Core.Native
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text;
     using System.Runtime.InteropServices;
-    // using WixToolset.Msi;
-    // using WixToolset.Msi.Interop;
 
     /// <summary>
     /// The native methods.
@@ -34,7 +31,7 @@ namespace WixToolset.Core.Native
         /// <param name="token">Name of file in cabinet.</param>
         /// <param name="contextHandle">Handle to open cabinet.</param>
         [DllImport("winterop.dll", EntryPoint = "CreateCabAddFile", CharSet = CharSet.Unicode, ExactSpelling = true, PreserveSig = false)]
-        public static extern void CreateCabAddFile(string file, string token, MsiInterop.MSIFILEHASHINFO fileHash, IntPtr contextHandle);
+        public static extern void CreateCabAddFile(string file, string token, MSIFILEHASHINFO fileHash, IntPtr contextHandle);
 
         /// <summary>
         /// Closes a cabinet.
