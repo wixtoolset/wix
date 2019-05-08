@@ -5,7 +5,6 @@ namespace WixToolset.Core
     using System;
     using System.Collections.Generic;
     using System.Xml.Linq;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
@@ -14,7 +13,7 @@ namespace WixToolset.Core
     internal class LocalizationParser : ILocalizationParser
     {
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
-        private static string XmlElementName = "WixLocalization";
+        private const string XmlElementName = "WixLocalization";
 
         internal LocalizationParser(IServiceProvider serviceProvider)
         {
@@ -215,13 +214,14 @@ namespace WixToolset.Core
         {
             string dialog = null;
             string control = null;
-            int x = CompilerConstants.IntegerNotSet;
-            int y = CompilerConstants.IntegerNotSet;
-            int width = CompilerConstants.IntegerNotSet;
-            int height = CompilerConstants.IntegerNotSet;
-            int attribs = 0;
-            string text = null;
-            SourceLineNumber sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
+            var x = CompilerConstants.IntegerNotSet;
+            var y = CompilerConstants.IntegerNotSet;
+            var width = CompilerConstants.IntegerNotSet;
+            var height = CompilerConstants.IntegerNotSet;
+            var sourceLineNumbers = SourceLineNumber.CreateFromXObject(node);
+            var rightToLeft = false;
+            var rightAligned = false;
+            var leftScroll = false;
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -236,34 +236,37 @@ namespace WixToolset.Core
                             control = Common.GetAttributeIdentifierValue(messaging, sourceLineNumbers, attrib);
                             break;
                         case "X":
-                            x = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, short.MaxValue);
+                            x = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, Int16.MaxValue);
                             break;
                         case "Y":
-                            y = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, short.MaxValue);
+                            y = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, Int16.MaxValue);
                             break;
                         case "Width":
-                            width = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, short.MaxValue);
+                            width = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, Int16.MaxValue);
                             break;
                         case "Height":
-                            height = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, short.MaxValue);
+                            height = Common.GetAttributeIntegerValue(messaging, sourceLineNumbers, attrib, 0, Int16.MaxValue);
                             break;
                         case "RightToLeft":
-                            if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
-                            {
-                                attribs |= MsiInterop.MsidbControlAttributesRTLRO;
-                            }
+                            rightToLeft = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
+                            //if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
+                            //{
+                            //    attribs |= MsiInterop.MsidbControlAttributesRTLRO;
+                            //}
                             break;
                         case "RightAligned":
-                            if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
-                            {
-                                attribs |= MsiInterop.MsidbControlAttributesRightAligned;
-                            }
+                            rightAligned = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
+                            //if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
+                            //{
+                            //    attribs |= MsiInterop.MsidbControlAttributesRightAligned;
+                            //}
                             break;
                         case "LeftScroll":
-                            if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
-                            {
-                                attribs |= MsiInterop.MsidbControlAttributesLeftScroll;
-                            }
+                            leftScroll = YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib);
+                            //if (YesNoType.Yes == Common.GetAttributeYesNoValue(messaging, sourceLineNumbers, attrib))
+                            //{
+                            //    attribs |= MsiInterop.MsidbControlAttributesLeftScroll;
+                            //}
                             break;
                         default:
                             Common.UnexpectedAttribute(messaging, sourceLineNumbers, attrib);
@@ -276,19 +279,21 @@ namespace WixToolset.Core
                 }
             }
 
-            text = Common.GetInnerText(node);
+            var text = Common.GetInnerText(node);
 
-            if (String.IsNullOrEmpty(control) && 0 < attribs)
+            if (String.IsNullOrEmpty(control) && (rightToLeft || rightAligned || leftScroll))
             {
-                if (MsiInterop.MsidbControlAttributesRTLRO == (attribs & MsiInterop.MsidbControlAttributesRTLRO))
+                if (rightToLeft)
                 {
                     messaging.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.ToString(), "RightToLeft", "Control"));
                 }
-                else if (MsiInterop.MsidbControlAttributesRightAligned == (attribs & MsiInterop.MsidbControlAttributesRightAligned))
+
+                if (rightAligned)
                 {
                     messaging.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.ToString(), "RightAligned", "Control"));
                 }
-                else if (MsiInterop.MsidbControlAttributesLeftScroll == (attribs & MsiInterop.MsidbControlAttributesLeftScroll))
+
+                if (leftScroll)
                 {
                     messaging.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.ToString(), "LeftScroll", "Control"));
                 }
@@ -301,8 +306,8 @@ namespace WixToolset.Core
 
             if (!messaging.EncounteredError)
             {
-                LocalizedControl localizedControl = new LocalizedControl(dialog, control, x, y, width, height, attribs, text);
-                string key = localizedControl.GetKey();
+                var localizedControl = new LocalizedControl(dialog, control, x, y, width, height, rightToLeft, rightAligned, leftScroll, text);
+                var key = localizedControl.GetKey();
                 if (localizedControls.ContainsKey(key))
                 {
                     if (String.IsNullOrEmpty(localizedControl.Control))

@@ -13,7 +13,6 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Core;
-    using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Rows;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
@@ -29,6 +28,21 @@ namespace WixToolset.Core.WindowsInstaller
     internal class Decompiler
     {
         private static readonly Regex NullSplitter = new Regex(@"\[~]");
+
+        // NameToBit arrays
+        private static readonly string[] TextControlAttributes = { "Transparent", "NoPrefix", "NoWrap", "FormatSize", "UserLanguage" };
+        private static readonly string[] HyperlinkControlAttributes = { "Transparent" };
+        private static readonly string[] EditControlAttributes = { "Multiline", null, null, null, null, "Password" };
+        private static readonly string[] ProgressControlAttributes = { "ProgressBlocks" };
+        private static readonly string[] VolumeControlAttributes = { "Removable", "Fixed", "Remote", "CDROM", "RAMDisk", "Floppy", "ShowRollbackCost" };
+        private static readonly string[] ListboxControlAttributes = { "Sorted", null, null, null, "UserLanguage" };
+        private static readonly string[] ListviewControlAttributes = { "Sorted", null, null, null, "FixedSize", "Icon16", "Icon32" };
+        private static readonly string[] ComboboxControlAttributes = { "Sorted", "ComboList", null, null, "UserLanguage" };
+        private static readonly string[] RadioControlAttributes = { "Image", "PushLike", "Bitmap", "Icon", "FixedSize", "Icon16", "Icon32", null, "HasBorder" };
+        private static readonly string[] ButtonControlAttributes = { "Image", null, "Bitmap", "Icon", "FixedSize", "Icon16", "Icon32", "ElevationShield" };
+        private static readonly string[] IconControlAttributes = { "Image", null, null, null, "FixedSize", "Icon16", "Icon32" };
+        private static readonly string[] BitmapControlAttributes = { "Image", null, null, null, "FixedSize" };
+        private static readonly string[] CheckboxControlAttributes = { null, "PushLike", "Bitmap", "Icon", "FixedSize", "Icon16", "Icon32" };
 
         private bool compressed;
         private bool shortNames;
@@ -205,42 +219,42 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="control">The control element.</param>
         private static void SetControlAttributes(int attributes, Wix.Control control)
         {
-            if (0 == (attributes & MsiInterop.MsidbControlAttributesEnabled))
+            if (0 == (attributes & WindowsInstallerConstants.MsidbControlAttributesEnabled))
             {
                 control.Disabled = Wix.YesNoType.yes;
             }
 
-            if (MsiInterop.MsidbControlAttributesIndirect == (attributes & MsiInterop.MsidbControlAttributesIndirect))
+            if (WindowsInstallerConstants.MsidbControlAttributesIndirect == (attributes & WindowsInstallerConstants.MsidbControlAttributesIndirect))
             {
                 control.Indirect = Wix.YesNoType.yes;
             }
 
-            if (MsiInterop.MsidbControlAttributesInteger == (attributes & MsiInterop.MsidbControlAttributesInteger))
+            if (WindowsInstallerConstants.MsidbControlAttributesInteger == (attributes & WindowsInstallerConstants.MsidbControlAttributesInteger))
             {
                 control.Integer = Wix.YesNoType.yes;
             }
 
-            if (MsiInterop.MsidbControlAttributesLeftScroll == (attributes & MsiInterop.MsidbControlAttributesLeftScroll))
+            if (WindowsInstallerConstants.MsidbControlAttributesLeftScroll == (attributes & WindowsInstallerConstants.MsidbControlAttributesLeftScroll))
             {
                 control.LeftScroll = Wix.YesNoType.yes;
             }
 
-            if (MsiInterop.MsidbControlAttributesRightAligned == (attributes & MsiInterop.MsidbControlAttributesRightAligned))
+            if (WindowsInstallerConstants.MsidbControlAttributesRightAligned == (attributes & WindowsInstallerConstants.MsidbControlAttributesRightAligned))
             {
                 control.RightAligned = Wix.YesNoType.yes;
             }
 
-            if (MsiInterop.MsidbControlAttributesRTLRO == (attributes & MsiInterop.MsidbControlAttributesRTLRO))
+            if (WindowsInstallerConstants.MsidbControlAttributesRTLRO == (attributes & WindowsInstallerConstants.MsidbControlAttributesRTLRO))
             {
                 control.RightToLeft = Wix.YesNoType.yes;
             }
 
-            if (MsiInterop.MsidbControlAttributesSunken == (attributes & MsiInterop.MsidbControlAttributesSunken))
+            if (WindowsInstallerConstants.MsidbControlAttributesSunken == (attributes & WindowsInstallerConstants.MsidbControlAttributesSunken))
             {
                 control.Sunken = Wix.YesNoType.yes;
             }
 
-            if (0 == (attributes & MsiInterop.MsidbControlAttributesVisible))
+            if (0 == (attributes & WindowsInstallerConstants.MsidbControlAttributesVisible))
             {
                 control.Hidden = Wix.YesNoType.yes;
             }
@@ -873,7 +887,7 @@ namespace WixToolset.Core.WindowsInstaller
 
                         component.KeyPath = Wix.YesNoType.yes;
                     }
-                    else if (MsiInterop.MsidbComponentAttributesRegistryKeyPath == (attributes & MsiInterop.MsidbComponentAttributesRegistryKeyPath))
+                    else if (WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath == (attributes & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath))
                     {
                         object registryObject = this.core.GetIndexedElement("Registry", Convert.ToString(row[5]));
 
@@ -895,7 +909,7 @@ namespace WixToolset.Core.WindowsInstaller
                             this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, "Component", row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "KeyPath", Convert.ToString(row[5]), "Registry"));
                         }
                     }
-                    else if (MsiInterop.MsidbComponentAttributesODBCDataSource == (attributes & MsiInterop.MsidbComponentAttributesODBCDataSource))
+                    else if (WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource == (attributes & WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource))
                     {
                         var odbcDataSource = (Wix.ODBCDataSource)this.core.GetIndexedElement("ODBCDataSource", Convert.ToString(row[5]));
 
@@ -1765,8 +1779,8 @@ namespace WixToolset.Core.WindowsInstaller
                 foreach (var row in customActionTable.Rows)
                 {
                     var bits = Convert.ToInt32(row[1]);
-                    if (MsiInterop.MsidbCustomActionTypeHideTarget == (bits & MsiInterop.MsidbCustomActionTypeHideTarget) &&
-                        MsiInterop.MsidbCustomActionTypeInScript == (bits & MsiInterop.MsidbCustomActionTypeInScript))
+                    if (WindowsInstallerConstants.MsidbCustomActionTypeHideTarget == (bits & WindowsInstallerConstants.MsidbCustomActionTypeHideTarget) &&
+                        WindowsInstallerConstants.MsidbCustomActionTypeInScript == (bits & WindowsInstallerConstants.MsidbCustomActionTypeInScript))
                     {
                         var property = (Wix.Property)this.core.GetIndexedElement("Property", Convert.ToString(row[0]));
 
@@ -2674,17 +2688,17 @@ namespace WixToolset.Core.WindowsInstaller
                         var attr = upgradeRow.Attributes;
                         var removeFeatures = upgradeRow.Remove;
 
-                        if (MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive == (attr & MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive))
+                        if (WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive == (attr & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive))
                         {
                             majorUpgrade.AllowSameVersionUpgrades = Wix.YesNoType.yes;
                         }
 
-                        if (MsiInterop.MsidbUpgradeAttributesMigrateFeatures != (attr & MsiInterop.MsidbUpgradeAttributesMigrateFeatures))
+                        if (WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures != (attr & WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures))
                         {
                             majorUpgrade.MigrateFeatures = Wix.YesNoType.no;
                         }
 
-                        if (MsiInterop.MsidbUpgradeAttributesIgnoreRemoveFailure == (attr & MsiInterop.MsidbUpgradeAttributesIgnoreRemoveFailure))
+                        if (WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure == (attr & WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure))
                         {
                             majorUpgrade.IgnoreRemoveFailure = Wix.YesNoType.yes;
                         }
@@ -4064,52 +4078,52 @@ namespace WixToolset.Core.WindowsInstaller
                     switch (control.Type)
                     {
                     case "Bitmap":
-                        specialAttributes = MsiInterop.BitmapControlAttributes;
+                        specialAttributes = BitmapControlAttributes;
                         break;
                     case "CheckBox":
-                        specialAttributes = MsiInterop.CheckboxControlAttributes;
+                        specialAttributes = CheckboxControlAttributes;
                         break;
                     case "ComboBox":
-                        specialAttributes = MsiInterop.ComboboxControlAttributes;
+                        specialAttributes = ComboboxControlAttributes;
                         break;
                     case "DirectoryCombo":
-                        specialAttributes = MsiInterop.VolumeControlAttributes;
+                        specialAttributes = VolumeControlAttributes;
                         break;
                     case "Edit":
-                        specialAttributes = MsiInterop.EditControlAttributes;
+                        specialAttributes = EditControlAttributes;
                         break;
                     case "Icon":
-                        specialAttributes = MsiInterop.IconControlAttributes;
+                        specialAttributes = IconControlAttributes;
                         break;
                     case "ListBox":
-                        specialAttributes = MsiInterop.ListboxControlAttributes;
+                        specialAttributes = ListboxControlAttributes;
                         break;
                     case "ListView":
-                        specialAttributes = MsiInterop.ListviewControlAttributes;
+                        specialAttributes = ListviewControlAttributes;
                         break;
                     case "MaskedEdit":
-                        specialAttributes = MsiInterop.EditControlAttributes;
+                        specialAttributes = EditControlAttributes;
                         break;
                     case "PathEdit":
-                        specialAttributes = MsiInterop.EditControlAttributes;
+                        specialAttributes = EditControlAttributes;
                         break;
                     case "ProgressBar":
-                        specialAttributes = MsiInterop.ProgressControlAttributes;
+                        specialAttributes = ProgressControlAttributes;
                         break;
                     case "PushButton":
-                        specialAttributes = MsiInterop.ButtonControlAttributes;
+                        specialAttributes = ButtonControlAttributes;
                         break;
                     case "RadioButtonGroup":
-                        specialAttributes = MsiInterop.RadioControlAttributes;
+                        specialAttributes = RadioControlAttributes;
                         break;
                     case "Text":
-                        specialAttributes = MsiInterop.TextControlAttributes;
+                        specialAttributes = TextControlAttributes;
                         break;
                     case "VolumeCostList":
-                        specialAttributes = MsiInterop.VolumeControlAttributes;
+                        specialAttributes = VolumeControlAttributes;
                         break;
                     case "VolumeSelectCombo":
-                        specialAttributes = MsiInterop.VolumeControlAttributes;
+                        specialAttributes = VolumeControlAttributes;
                         break;
                     default:
                         specialAttributes = null;
@@ -4644,52 +4658,52 @@ namespace WixToolset.Core.WindowsInstaller
 
                 var type = Convert.ToInt32(row[1]);
 
-                if (MsiInterop.MsidbCustomActionTypeHideTarget == (type & MsiInterop.MsidbCustomActionTypeHideTarget))
+                if (WindowsInstallerConstants.MsidbCustomActionTypeHideTarget == (type & WindowsInstallerConstants.MsidbCustomActionTypeHideTarget))
                 {
                     customAction.HideTarget = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbCustomActionTypeNoImpersonate == (type & MsiInterop.MsidbCustomActionTypeNoImpersonate))
+                if (WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate == (type & WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate))
                 {
                     customAction.Impersonate = Wix.YesNoType.no;
                 }
 
-                if (MsiInterop.MsidbCustomActionTypeTSAware == (type & MsiInterop.MsidbCustomActionTypeTSAware))
+                if (WindowsInstallerConstants.MsidbCustomActionTypeTSAware == (type & WindowsInstallerConstants.MsidbCustomActionTypeTSAware))
                 {
                     customAction.TerminalServerAware = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbCustomActionType64BitScript == (type & MsiInterop.MsidbCustomActionType64BitScript))
+                if (WindowsInstallerConstants.MsidbCustomActionType64BitScript == (type & WindowsInstallerConstants.MsidbCustomActionType64BitScript))
                 {
                     customAction.Win64 = Wix.YesNoType.yes;
                 }
-                else if (MsiInterop.MsidbCustomActionTypeVBScript == (type & MsiInterop.MsidbCustomActionTypeVBScript) ||
-                    MsiInterop.MsidbCustomActionTypeJScript == (type & MsiInterop.MsidbCustomActionTypeJScript))
+                else if (WindowsInstallerConstants.MsidbCustomActionTypeVBScript == (type & WindowsInstallerConstants.MsidbCustomActionTypeVBScript) ||
+                    WindowsInstallerConstants.MsidbCustomActionTypeJScript == (type & WindowsInstallerConstants.MsidbCustomActionTypeJScript))
                 {
                     customAction.Win64 = Wix.YesNoType.no;
                 }
 
-                switch (type & MsiInterop.MsidbCustomActionTypeExecuteBits)
+                switch (type & WindowsInstallerConstants.MsidbCustomActionTypeExecuteBits)
                 {
                 case 0:
                     // this is the default value
                     break;
-                case MsiInterop.MsidbCustomActionTypeFirstSequence:
+                case WindowsInstallerConstants.MsidbCustomActionTypeFirstSequence:
                     customAction.Execute = Wix.CustomAction.ExecuteType.firstSequence;
                     break;
-                case MsiInterop.MsidbCustomActionTypeOncePerProcess:
+                case WindowsInstallerConstants.MsidbCustomActionTypeOncePerProcess:
                     customAction.Execute = Wix.CustomAction.ExecuteType.oncePerProcess;
                     break;
-                case MsiInterop.MsidbCustomActionTypeClientRepeat:
+                case WindowsInstallerConstants.MsidbCustomActionTypeClientRepeat:
                     customAction.Execute = Wix.CustomAction.ExecuteType.secondSequence;
                     break;
-                case MsiInterop.MsidbCustomActionTypeInScript:
+                case WindowsInstallerConstants.MsidbCustomActionTypeInScript:
                     customAction.Execute = Wix.CustomAction.ExecuteType.deferred;
                     break;
-                case MsiInterop.MsidbCustomActionTypeInScript + MsiInterop.MsidbCustomActionTypeRollback:
+                case WindowsInstallerConstants.MsidbCustomActionTypeInScript + WindowsInstallerConstants.MsidbCustomActionTypeRollback:
                     customAction.Execute = Wix.CustomAction.ExecuteType.rollback;
                     break;
-                case MsiInterop.MsidbCustomActionTypeInScript + MsiInterop.MsidbCustomActionTypeCommit:
+                case WindowsInstallerConstants.MsidbCustomActionTypeInScript + WindowsInstallerConstants.MsidbCustomActionTypeCommit:
                     customAction.Execute = Wix.CustomAction.ExecuteType.commit;
                     break;
                 default:
@@ -4697,18 +4711,18 @@ namespace WixToolset.Core.WindowsInstaller
                     break;
                 }
 
-                switch (type & MsiInterop.MsidbCustomActionTypeReturnBits)
+                switch (type & WindowsInstallerConstants.MsidbCustomActionTypeReturnBits)
                 {
                 case 0:
                     // this is the default value
                     break;
-                case MsiInterop.MsidbCustomActionTypeContinue:
+                case WindowsInstallerConstants.MsidbCustomActionTypeContinue:
                     customAction.Return = Wix.CustomAction.ReturnType.ignore;
                     break;
-                case MsiInterop.MsidbCustomActionTypeAsync:
+                case WindowsInstallerConstants.MsidbCustomActionTypeAsync:
                     customAction.Return = Wix.CustomAction.ReturnType.asyncWait;
                     break;
-                case MsiInterop.MsidbCustomActionTypeAsync + MsiInterop.MsidbCustomActionTypeContinue:
+                case WindowsInstallerConstants.MsidbCustomActionTypeAsync + WindowsInstallerConstants.MsidbCustomActionTypeContinue:
                     customAction.Return = Wix.CustomAction.ReturnType.asyncNoWait;
                     break;
                 default:
@@ -4716,25 +4730,25 @@ namespace WixToolset.Core.WindowsInstaller
                     break;
                 }
 
-                var source = type & MsiInterop.MsidbCustomActionTypeSourceBits;
+                var source = type & WindowsInstallerConstants.MsidbCustomActionTypeSourceBits;
                 switch (source)
                 {
-                case MsiInterop.MsidbCustomActionTypeBinaryData:
+                case WindowsInstallerConstants.MsidbCustomActionTypeBinaryData:
                     customAction.BinaryKey = Convert.ToString(row[2]);
                     break;
-                case MsiInterop.MsidbCustomActionTypeSourceFile:
+                case WindowsInstallerConstants.MsidbCustomActionTypeSourceFile:
                     if (null != row[2])
                     {
                         customAction.FileKey = Convert.ToString(row[2]);
                     }
                     break;
-                case MsiInterop.MsidbCustomActionTypeDirectory:
+                case WindowsInstallerConstants.MsidbCustomActionTypeDirectory:
                     if (null != row[2])
                     {
                         customAction.Directory = Convert.ToString(row[2]);
                     }
                     break;
-                case MsiInterop.MsidbCustomActionTypeProperty:
+                case WindowsInstallerConstants.MsidbCustomActionTypeProperty:
                     customAction.Property = Convert.ToString(row[2]);
                     break;
                 default:
@@ -4742,16 +4756,16 @@ namespace WixToolset.Core.WindowsInstaller
                     break;
                 }
 
-                switch (type & MsiInterop.MsidbCustomActionTypeTargetBits)
+                switch (type & WindowsInstallerConstants.MsidbCustomActionTypeTargetBits)
                 {
-                case MsiInterop.MsidbCustomActionTypeDll:
+                case WindowsInstallerConstants.MsidbCustomActionTypeDll:
                     customAction.DllEntry = Convert.ToString(row[3]);
                     break;
-                case MsiInterop.MsidbCustomActionTypeExe:
+                case WindowsInstallerConstants.MsidbCustomActionTypeExe:
                     customAction.ExeCommand = Convert.ToString(row[3]);
                     break;
-                case MsiInterop.MsidbCustomActionTypeTextData:
-                    if (MsiInterop.MsidbCustomActionTypeSourceFile == source)
+                case WindowsInstallerConstants.MsidbCustomActionTypeTextData:
+                    if (WindowsInstallerConstants.MsidbCustomActionTypeSourceFile == source)
                     {
                         customAction.Error = Convert.ToString(row[3]);
                     }
@@ -4760,8 +4774,8 @@ namespace WixToolset.Core.WindowsInstaller
                         customAction.Value = Convert.ToString(row[3]);
                     }
                     break;
-                case MsiInterop.MsidbCustomActionTypeJScript:
-                    if (MsiInterop.MsidbCustomActionTypeDirectory == source)
+                case WindowsInstallerConstants.MsidbCustomActionTypeJScript:
+                    if (WindowsInstallerConstants.MsidbCustomActionTypeDirectory == source)
                     {
                         customAction.Script = Wix.CustomAction.ScriptType.jscript;
                         customAction.Content = Convert.ToString(row[3]);
@@ -4771,8 +4785,8 @@ namespace WixToolset.Core.WindowsInstaller
                         customAction.JScriptCall = Convert.ToString(row[3]);
                     }
                     break;
-                case MsiInterop.MsidbCustomActionTypeVBScript:
-                    if (MsiInterop.MsidbCustomActionTypeDirectory == source)
+                case WindowsInstallerConstants.MsidbCustomActionTypeVBScript:
+                    if (WindowsInstallerConstants.MsidbCustomActionTypeDirectory == source)
                     {
                         customAction.Script = Wix.CustomAction.ScriptType.vbscript;
                         customAction.Content = Convert.ToString(row[3]);
@@ -4782,7 +4796,7 @@ namespace WixToolset.Core.WindowsInstaller
                         customAction.VBScriptCall = Convert.ToString(row[3]);
                     }
                     break;
-                case MsiInterop.MsidbCustomActionTypeInstall:
+                case WindowsInstallerConstants.MsidbCustomActionTypeInstall:
                     this.Messaging.Write(WarningMessages.NestedInstall(row.SourceLineNumbers, table.Name, row.Fields[1].Column.Name, row[1]));
                     continue;
                 default:
@@ -4791,7 +4805,7 @@ namespace WixToolset.Core.WindowsInstaller
                 }
 
                 var extype = 4 < row.Fields.Length && null != row[4] ? Convert.ToInt32(row[4]) : 0;
-                if (MsiInterop.MsidbCustomActionTypePatchUninstall == (extype & MsiInterop.MsidbCustomActionTypePatchUninstall))
+                if (WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall == (extype & WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall))
                 {
                     customAction.PatchUninstall = Wix.YesNoType.yes;
                 }
@@ -4819,10 +4833,10 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     switch (Convert.ToInt32(row[2]))
                     {
-                    case MsiInterop.MsidbLocatorTypeDirectory:
+                    case WindowsInstallerConstants.MsidbLocatorTypeDirectory:
                         componentSearch.Type = Wix.ComponentSearch.TypeType.directory;
                         break;
-                    case MsiInterop.MsidbLocatorTypeFileName:
+                    case WindowsInstallerConstants.MsidbLocatorTypeFileName:
                         // this is the default value
                         break;
                     default:
@@ -4875,36 +4889,36 @@ namespace WixToolset.Core.WindowsInstaller
 
                 var attributes = Convert.ToInt32(row[3]);
 
-                if (MsiInterop.MsidbComponentAttributesSourceOnly == (attributes & MsiInterop.MsidbComponentAttributesSourceOnly))
+                if (WindowsInstallerConstants.MsidbComponentAttributesSourceOnly == (attributes & WindowsInstallerConstants.MsidbComponentAttributesSourceOnly))
                 {
                     component.Location = Wix.Component.LocationType.source;
                 }
-                else if (MsiInterop.MsidbComponentAttributesOptional == (attributes & MsiInterop.MsidbComponentAttributesOptional))
+                else if (WindowsInstallerConstants.MsidbComponentAttributesOptional == (attributes & WindowsInstallerConstants.MsidbComponentAttributesOptional))
                 {
                     component.Location = Wix.Component.LocationType.either;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesSharedDllRefCount == (attributes & MsiInterop.MsidbComponentAttributesSharedDllRefCount))
+                if (WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount == (attributes & WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount))
                 {
                     component.SharedDllRefCount = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesPermanent == (attributes & MsiInterop.MsidbComponentAttributesPermanent))
+                if (WindowsInstallerConstants.MsidbComponentAttributesPermanent == (attributes & WindowsInstallerConstants.MsidbComponentAttributesPermanent))
                 {
                     component.Permanent = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesTransitive == (attributes & MsiInterop.MsidbComponentAttributesTransitive))
+                if (WindowsInstallerConstants.MsidbComponentAttributesTransitive == (attributes & WindowsInstallerConstants.MsidbComponentAttributesTransitive))
                 {
                     component.Transitive = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesNeverOverwrite == (attributes & MsiInterop.MsidbComponentAttributesNeverOverwrite))
+                if (WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite == (attributes & WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite))
                 {
                     component.NeverOverwrite = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbComponentAttributes64bit == (attributes & MsiInterop.MsidbComponentAttributes64bit))
+                if (WindowsInstallerConstants.MsidbComponentAttributes64bit == (attributes & WindowsInstallerConstants.MsidbComponentAttributes64bit))
                 {
                     component.Win64 = Wix.YesNoType.yes;
                 }
@@ -4913,17 +4927,17 @@ namespace WixToolset.Core.WindowsInstaller
                     component.Win64 = Wix.YesNoType.no;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesDisableRegistryReflection == (attributes & MsiInterop.MsidbComponentAttributesDisableRegistryReflection))
+                if (WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection == (attributes & WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection))
                 {
                     component.DisableRegistryReflection = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesUninstallOnSupersedence == (attributes & MsiInterop.MsidbComponentAttributesUninstallOnSupersedence))
+                if (WindowsInstallerConstants.MsidbComponentAttributesUninstallOnSupersedence == (attributes & WindowsInstallerConstants.MsidbComponentAttributesUninstallOnSupersedence))
                 {
                     component.UninstallWhenSuperseded = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbComponentAttributesShared == (attributes & MsiInterop.MsidbComponentAttributesShared))
+                if (WindowsInstallerConstants.MsidbComponentAttributesShared == (attributes & WindowsInstallerConstants.MsidbComponentAttributesShared))
                 {
                     component.Shared = Wix.YesNoType.yes;
                 }
@@ -5003,57 +5017,57 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     var attributes = Convert.ToInt32(row[5]);
 
-                    if (0 == (attributes & MsiInterop.MsidbDialogAttributesVisible))
+                    if (0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesVisible))
                     {
                         dialog.Hidden = Wix.YesNoType.yes;
                     }
 
-                    if (0 == (attributes & MsiInterop.MsidbDialogAttributesModal))
+                    if (0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesModal))
                     {
                         dialog.Modeless = Wix.YesNoType.yes;
                     }
 
-                    if (0 == (attributes & MsiInterop.MsidbDialogAttributesMinimize))
+                    if (0 == (attributes & WindowsInstallerConstants.MsidbDialogAttributesMinimize))
                     {
                         dialog.NoMinimize = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesSysModal == (attributes & MsiInterop.MsidbDialogAttributesSysModal))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesSysModal == (attributes & WindowsInstallerConstants.MsidbDialogAttributesSysModal))
                     {
                         dialog.SystemModal = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesKeepModeless == (attributes & MsiInterop.MsidbDialogAttributesKeepModeless))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesKeepModeless == (attributes & WindowsInstallerConstants.MsidbDialogAttributesKeepModeless))
                     {
                         dialog.KeepModeless = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesTrackDiskSpace == (attributes & MsiInterop.MsidbDialogAttributesTrackDiskSpace))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace == (attributes & WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace))
                     {
                         dialog.TrackDiskSpace = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesUseCustomPalette == (attributes & MsiInterop.MsidbDialogAttributesUseCustomPalette))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette == (attributes & WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette))
                     {
                         dialog.CustomPalette = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesRTLRO == (attributes & MsiInterop.MsidbDialogAttributesRTLRO))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesRTLRO == (attributes & WindowsInstallerConstants.MsidbDialogAttributesRTLRO))
                     {
                         dialog.RightToLeft = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesRightAligned == (attributes & MsiInterop.MsidbDialogAttributesRightAligned))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesRightAligned == (attributes & WindowsInstallerConstants.MsidbDialogAttributesRightAligned))
                     {
                         dialog.RightAligned = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesLeftScroll == (attributes & MsiInterop.MsidbDialogAttributesLeftScroll))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesLeftScroll == (attributes & WindowsInstallerConstants.MsidbDialogAttributesLeftScroll))
                     {
                         dialog.LeftScroll = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbDialogAttributesError == (attributes & MsiInterop.MsidbDialogAttributesError))
+                    if (WindowsInstallerConstants.MsidbDialogAttributesError == (attributes & WindowsInstallerConstants.MsidbDialogAttributesError))
                     {
                         dialog.ErrorDialog = Wix.YesNoType.yes;
                     }
@@ -5558,40 +5572,40 @@ namespace WixToolset.Core.WindowsInstaller
 
                 var attributes = Convert.ToInt32(row[7]);
 
-                if (MsiInterop.MsidbFeatureAttributesFavorSource == (attributes & MsiInterop.MsidbFeatureAttributesFavorSource) && MsiInterop.MsidbFeatureAttributesFollowParent == (attributes & MsiInterop.MsidbFeatureAttributesFollowParent))
+                if (WindowsInstallerConstants.MsidbFeatureAttributesFavorSource == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesFavorSource) && WindowsInstallerConstants.MsidbFeatureAttributesFollowParent == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesFollowParent))
                 {
                     // TODO: display a warning for setting favor local and follow parent together
                 }
-                else if (MsiInterop.MsidbFeatureAttributesFavorSource == (attributes & MsiInterop.MsidbFeatureAttributesFavorSource))
+                else if (WindowsInstallerConstants.MsidbFeatureAttributesFavorSource == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesFavorSource))
                 {
                     feature.InstallDefault = Wix.Feature.InstallDefaultType.source;
                 }
-                else if (MsiInterop.MsidbFeatureAttributesFollowParent == (attributes & MsiInterop.MsidbFeatureAttributesFollowParent))
+                else if (WindowsInstallerConstants.MsidbFeatureAttributesFollowParent == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesFollowParent))
                 {
                     feature.InstallDefault = Wix.Feature.InstallDefaultType.followParent;
                 }
 
-                if (MsiInterop.MsidbFeatureAttributesFavorAdvertise == (attributes & MsiInterop.MsidbFeatureAttributesFavorAdvertise))
+                if (WindowsInstallerConstants.MsidbFeatureAttributesFavorAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesFavorAdvertise))
                 {
                     feature.TypicalDefault = Wix.Feature.TypicalDefaultType.advertise;
                 }
 
-                if (MsiInterop.MsidbFeatureAttributesDisallowAdvertise == (attributes & MsiInterop.MsidbFeatureAttributesDisallowAdvertise) &&
-                    MsiInterop.MsidbFeatureAttributesNoUnsupportedAdvertise == (attributes & MsiInterop.MsidbFeatureAttributesNoUnsupportedAdvertise))
+                if (WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise) &&
+                    WindowsInstallerConstants.MsidbFeatureAttributesNoUnsupportedAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesNoUnsupportedAdvertise))
                 {
                     this.Messaging.Write(WarningMessages.InvalidAttributeCombination(row.SourceLineNumbers, "msidbFeatureAttributesDisallowAdvertise", "msidbFeatureAttributesNoUnsupportedAdvertise", "Feature.AllowAdvertiseType", "no"));
                     feature.AllowAdvertise = Wix.Feature.AllowAdvertiseType.no;
                 }
-                else if (MsiInterop.MsidbFeatureAttributesDisallowAdvertise == (attributes & MsiInterop.MsidbFeatureAttributesDisallowAdvertise))
+                else if (WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise))
                 {
                     feature.AllowAdvertise = Wix.Feature.AllowAdvertiseType.no;
                 }
-                else if (MsiInterop.MsidbFeatureAttributesNoUnsupportedAdvertise == (attributes & MsiInterop.MsidbFeatureAttributesNoUnsupportedAdvertise))
+                else if (WindowsInstallerConstants.MsidbFeatureAttributesNoUnsupportedAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesNoUnsupportedAdvertise))
                 {
                     feature.AllowAdvertise = Wix.Feature.AllowAdvertiseType.system;
                 }
 
-                if (MsiInterop.MsidbFeatureAttributesUIDisallowAbsent == (attributes & MsiInterop.MsidbFeatureAttributesUIDisallowAbsent))
+                if (WindowsInstallerConstants.MsidbFeatureAttributesUIDisallowAbsent == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesUIDisallowAbsent))
                 {
                     feature.Absent = Wix.Feature.AbsentType.disallow;
                 }
@@ -5687,41 +5701,41 @@ namespace WixToolset.Core.WindowsInstaller
                     }
                 }
 
-                if (MsiInterop.MsidbFileAttributesReadOnly == (fileRow.Attributes & MsiInterop.MsidbFileAttributesReadOnly))
+                if (WindowsInstallerConstants.MsidbFileAttributesReadOnly == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesReadOnly))
                 {
                     file.ReadOnly = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbFileAttributesHidden == (fileRow.Attributes & MsiInterop.MsidbFileAttributesHidden))
+                if (WindowsInstallerConstants.MsidbFileAttributesHidden == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesHidden))
                 {
                     file.Hidden = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbFileAttributesSystem == (fileRow.Attributes & MsiInterop.MsidbFileAttributesSystem))
+                if (WindowsInstallerConstants.MsidbFileAttributesSystem == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesSystem))
                 {
                     file.System = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbFileAttributesVital != (fileRow.Attributes & MsiInterop.MsidbFileAttributesVital))
+                if (WindowsInstallerConstants.MsidbFileAttributesVital != (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesVital))
                 {
                     file.Vital = Wix.YesNoType.no;
                 }
 
-                if (MsiInterop.MsidbFileAttributesChecksum == (fileRow.Attributes & MsiInterop.MsidbFileAttributesChecksum))
+                if (WindowsInstallerConstants.MsidbFileAttributesChecksum == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesChecksum))
                 {
                     file.Checksum = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbFileAttributesNoncompressed == (fileRow.Attributes & MsiInterop.MsidbFileAttributesNoncompressed) &&
-                    MsiInterop.MsidbFileAttributesCompressed == (fileRow.Attributes & MsiInterop.MsidbFileAttributesCompressed))
+                if (WindowsInstallerConstants.MsidbFileAttributesNoncompressed == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) &&
+                    WindowsInstallerConstants.MsidbFileAttributesCompressed == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed))
                 {
                     // TODO: error
                 }
-                else if (MsiInterop.MsidbFileAttributesNoncompressed == (fileRow.Attributes & MsiInterop.MsidbFileAttributesNoncompressed))
+                else if (WindowsInstallerConstants.MsidbFileAttributesNoncompressed == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed))
                 {
                     file.Compressed = Wix.YesNoDefaultType.no;
                 }
-                else if (MsiInterop.MsidbFileAttributesCompressed == (fileRow.Attributes & MsiInterop.MsidbFileAttributesCompressed))
+                else if (WindowsInstallerConstants.MsidbFileAttributesCompressed == (fileRow.Attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed))
                 {
                     file.Compressed = Wix.YesNoDefaultType.yes;
                 }
@@ -5886,13 +5900,13 @@ namespace WixToolset.Core.WindowsInstaller
 
                 switch (Convert.ToInt32(row[6]))
                 {
-                case MsiInterop.MsidbIniFileActionAddLine:
+                case WindowsInstallerConstants.MsidbIniFileActionAddLine:
                     iniFile.Action = Wix.IniFile.ActionType.addLine;
                     break;
-                case MsiInterop.MsidbIniFileActionCreateLine:
+                case WindowsInstallerConstants.MsidbIniFileActionCreateLine:
                     iniFile.Action = Wix.IniFile.ActionType.createLine;
                     break;
-                case MsiInterop.MsidbIniFileActionAddTag:
+                case WindowsInstallerConstants.MsidbIniFileActionAddTag:
                     iniFile.Action = Wix.IniFile.ActionType.addTag;
                     break;
                 default:
@@ -5953,13 +5967,13 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     switch (Convert.ToInt32(row[5]))
                     {
-                    case MsiInterop.MsidbLocatorTypeDirectory:
+                    case WindowsInstallerConstants.MsidbLocatorTypeDirectory:
                         iniFileSearch.Type = Wix.IniFileSearch.TypeType.directory;
                         break;
-                    case MsiInterop.MsidbLocatorTypeFileName:
+                    case WindowsInstallerConstants.MsidbLocatorTypeFileName:
                         // this is the default value
                         break;
-                    case MsiInterop.MsidbLocatorTypeRawValue:
+                    case WindowsInstallerConstants.MsidbLocatorTypeRawValue:
                         iniFileSearch.Type = Wix.IniFileSearch.TypeType.raw;
                         break;
                     default:
@@ -6371,12 +6385,12 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     var attributes = Convert.ToInt32(row[5]);
 
-                    if (MsiInterop.MsidbMsmConfigurableOptionKeyNoOrphan == (attributes & MsiInterop.MsidbMsmConfigurableOptionKeyNoOrphan))
+                    if (WindowsInstallerConstants.MsidbMsmConfigurableOptionKeyNoOrphan == (attributes & WindowsInstallerConstants.MsidbMsmConfigurableOptionKeyNoOrphan))
                     {
                         configuration.KeyNoOrphan = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbMsmConfigurableOptionNonNullable == (attributes & MsiInterop.MsidbMsmConfigurableOptionNonNullable))
+                    if (WindowsInstallerConstants.MsidbMsmConfigurableOptionNonNullable == (attributes & WindowsInstallerConstants.MsidbMsmConfigurableOptionNonNullable))
                     {
                         configuration.NonNullable = Wix.YesNoType.yes;
                     }
@@ -6579,7 +6593,7 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                 case 0:
                     break;
-                case MsiInterop.MsidbMoveFileOptionsMove:
+                case WindowsInstallerConstants.MsidbMoveFileOptionsMove:
                     copyFile.Delete = Wix.YesNoType.yes;
                     break;
                 default:
@@ -6676,13 +6690,13 @@ namespace WixToolset.Core.WindowsInstaller
 
                 switch (Convert.ToInt32(row[4]))
                 {
-                case MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeBinaryData:
+                case WindowsInstallerConstants.MsidbCustomActionTypeExe + WindowsInstallerConstants.MsidbCustomActionTypeBinaryData:
                     embeddedChainer.BinarySource = Convert.ToString(row[3]);
                     break;
-                case MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeSourceFile:
+                case WindowsInstallerConstants.MsidbCustomActionTypeExe + WindowsInstallerConstants.MsidbCustomActionTypeSourceFile:
                     embeddedChainer.FileSource = Convert.ToString(row[3]);
                     break;
-                case MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeProperty:
+                case WindowsInstallerConstants.MsidbCustomActionTypeExe + WindowsInstallerConstants.MsidbCustomActionTypeProperty:
                     embeddedChainer.PropertySource = Convert.ToString(row[3]);
                     break;
                 default:
@@ -6708,7 +6722,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 var attributes = Convert.ToInt32(row[2]);
 
-                if (MsiInterop.MsidbEmbeddedUI == (attributes & MsiInterop.MsidbEmbeddedUI))
+                if (WindowsInstallerConstants.MsidbEmbeddedUI == (attributes & WindowsInstallerConstants.MsidbEmbeddedUI))
                 {
                     if (foundEmbeddedUI)
                     {
@@ -6720,97 +6734,97 @@ namespace WixToolset.Core.WindowsInstaller
                         embeddedUI.Name = Convert.ToString(row[1]);
 
                         var messageFilter = Convert.ToInt32(row[3]);
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_FATALEXIT))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_FATALEXIT))
                         {
                             embeddedUI.IgnoreFatalExit = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_ERROR))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_ERROR))
                         {
                             embeddedUI.IgnoreError = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_WARNING))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_WARNING))
                         {
                             embeddedUI.IgnoreWarning = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_USER))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_USER))
                         {
                             embeddedUI.IgnoreUser = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_INFO))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_INFO))
                         {
                             embeddedUI.IgnoreInfo = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_FILESINUSE))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_FILESINUSE))
                         {
                             embeddedUI.IgnoreFilesInUse = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_RESOLVESOURCE))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_RESOLVESOURCE))
                         {
                             embeddedUI.IgnoreResolveSource = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_OUTOFDISKSPACE))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_OUTOFDISKSPACE))
                         {
                             embeddedUI.IgnoreOutOfDiskSpace = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_ACTIONSTART))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_ACTIONSTART))
                         {
                             embeddedUI.IgnoreActionStart = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_ACTIONDATA))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_ACTIONDATA))
                         {
                             embeddedUI.IgnoreActionData = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_PROGRESS))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_PROGRESS))
                         {
                             embeddedUI.IgnoreProgress = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_COMMONDATA))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_COMMONDATA))
                         {
                             embeddedUI.IgnoreCommonData = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_INITIALIZE))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_INITIALIZE))
                         {
                             embeddedUI.IgnoreInitialize = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_TERMINATE))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_TERMINATE))
                         {
                             embeddedUI.IgnoreTerminate = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_SHOWDIALOG))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_SHOWDIALOG))
                         {
                             embeddedUI.IgnoreShowDialog = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_RMFILESINUSE))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_RMFILESINUSE))
                         {
                             embeddedUI.IgnoreRMFilesInUse = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_INSTALLSTART))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_INSTALLSTART))
                         {
                             embeddedUI.IgnoreInstallStart = Wix.YesNoType.yes;
                         }
 
-                        if (0 == (messageFilter & MsiInterop.INSTALLLOGMODE_INSTALLEND))
+                        if (0 == (messageFilter & WindowsInstallerConstants.INSTALLLOGMODE_INSTALLEND))
                         {
                             embeddedUI.IgnoreInstallEnd = Wix.YesNoType.yes;
                         }
 
-                        if (MsiInterop.MsidbEmbeddedHandlesBasic == (attributes & MsiInterop.MsidbEmbeddedHandlesBasic))
+                        if (WindowsInstallerConstants.MsidbEmbeddedHandlesBasic == (attributes & WindowsInstallerConstants.MsidbEmbeddedHandlesBasic))
                         {
                             embeddedUI.SupportBasicUI = Wix.YesNoType.yes;
                         }
@@ -6997,10 +7011,10 @@ namespace WixToolset.Core.WindowsInstaller
 
                 switch (Convert.ToInt32(row[4]))
                 {
-                case MsiInterop.MsidbODBCDataSourceRegistrationPerMachine:
+                case WindowsInstallerConstants.MsidbODBCDataSourceRegistrationPerMachine:
                     odbcDataSource.Registration = Wix.ODBCDataSource.RegistrationType.machine;
                     break;
-                case MsiInterop.MsidbODBCDataSourceRegistrationPerUser:
+                case WindowsInstallerConstants.MsidbODBCDataSourceRegistrationPerUser:
                     odbcDataSource.Registration = Wix.ODBCDataSource.RegistrationType.user;
                     break;
                 default:
@@ -7782,16 +7796,16 @@ namespace WixToolset.Core.WindowsInstaller
 
                 switch (Convert.ToInt32(row[1]))
                 {
-                case MsiInterop.MsidbRegistryRootClassesRoot:
+                case WindowsInstallerConstants.MsidbRegistryRootClassesRoot:
                     registrySearch.Root = Wix.RegistrySearch.RootType.HKCR;
                     break;
-                case MsiInterop.MsidbRegistryRootCurrentUser:
+                case WindowsInstallerConstants.MsidbRegistryRootCurrentUser:
                     registrySearch.Root = Wix.RegistrySearch.RootType.HKCU;
                     break;
-                case MsiInterop.MsidbRegistryRootLocalMachine:
+                case WindowsInstallerConstants.MsidbRegistryRootLocalMachine:
                     registrySearch.Root = Wix.RegistrySearch.RootType.HKLM;
                     break;
-                case MsiInterop.MsidbRegistryRootUsers:
+                case WindowsInstallerConstants.MsidbRegistryRootUsers:
                     registrySearch.Root = Wix.RegistrySearch.RootType.HKU;
                     break;
                 default:
@@ -7814,10 +7828,10 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     var type = Convert.ToInt32(row[4]);
 
-                    if (MsiInterop.MsidbLocatorType64bit == (type & MsiInterop.MsidbLocatorType64bit))
+                    if (WindowsInstallerConstants.MsidbLocatorType64bit == (type & WindowsInstallerConstants.MsidbLocatorType64bit))
                     {
                         registrySearch.Win64 = Wix.YesNoType.yes;
-                        type &= ~MsiInterop.MsidbLocatorType64bit;
+                        type &= ~WindowsInstallerConstants.MsidbLocatorType64bit;
                     }
                     else
                     {
@@ -7826,13 +7840,13 @@ namespace WixToolset.Core.WindowsInstaller
 
                     switch (type)
                     {
-                    case MsiInterop.MsidbLocatorTypeDirectory:
+                    case WindowsInstallerConstants.MsidbLocatorTypeDirectory:
                         registrySearch.Type = Wix.RegistrySearch.TypeType.directory;
                         break;
-                    case MsiInterop.MsidbLocatorTypeFileName:
+                    case WindowsInstallerConstants.MsidbLocatorTypeFileName:
                         registrySearch.Type = Wix.RegistrySearch.TypeType.file;
                         break;
-                    case MsiInterop.MsidbLocatorTypeRawValue:
+                    case WindowsInstallerConstants.MsidbLocatorTypeRawValue:
                         registrySearch.Type = Wix.RegistrySearch.TypeType.raw;
                         break;
                     default:
@@ -7863,13 +7877,13 @@ namespace WixToolset.Core.WindowsInstaller
 
                     switch (Convert.ToInt32(row[4]))
                     {
-                    case MsiInterop.MsidbRemoveFileInstallModeOnInstall:
+                    case WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall:
                         removeFolder.On = Wix.InstallUninstallType.install;
                         break;
-                    case MsiInterop.MsidbRemoveFileInstallModeOnRemove:
+                    case WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove:
                         removeFolder.On = Wix.InstallUninstallType.uninstall;
                         break;
-                    case MsiInterop.MsidbRemoveFileInstallModeOnBoth:
+                    case WindowsInstallerConstants.MsidbRemoveFileInstallModeOnBoth:
                         removeFolder.On = Wix.InstallUninstallType.both;
                         break;
                     default:
@@ -7909,13 +7923,13 @@ namespace WixToolset.Core.WindowsInstaller
 
                     switch (Convert.ToInt32(row[4]))
                     {
-                    case MsiInterop.MsidbRemoveFileInstallModeOnInstall:
+                    case WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall:
                         removeFile.On = Wix.InstallUninstallType.install;
                         break;
-                    case MsiInterop.MsidbRemoveFileInstallModeOnRemove:
+                    case WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove:
                         removeFile.On = Wix.InstallUninstallType.uninstall;
                         break;
-                    case MsiInterop.MsidbRemoveFileInstallModeOnBoth:
+                    case WindowsInstallerConstants.MsidbRemoveFileInstallModeOnBoth:
                         removeFile.On = Wix.InstallUninstallType.both;
                         break;
                     default:
@@ -7976,10 +7990,10 @@ namespace WixToolset.Core.WindowsInstaller
 
                 switch (Convert.ToInt32(row[6]))
                 {
-                case MsiInterop.MsidbIniFileActionRemoveLine:
+                case WindowsInstallerConstants.MsidbIniFileActionRemoveLine:
                     iniFile.Action = Wix.IniFile.ActionType.removeLine;
                     break;
-                case MsiInterop.MsidbIniFileActionRemoveTag:
+                case WindowsInstallerConstants.MsidbIniFileActionRemoveTag:
                     iniFile.Action = Wix.IniFile.ActionType.removeTag;
                     break;
                 default:
@@ -8139,44 +8153,44 @@ namespace WixToolset.Core.WindowsInstaller
                 serviceControl.Name = Convert.ToString(row[1]);
 
                 var eventValue = Convert.ToInt32(row[2]);
-                if (MsiInterop.MsidbServiceControlEventStart == (eventValue & MsiInterop.MsidbServiceControlEventStart) &&
-                    MsiInterop.MsidbServiceControlEventUninstallStart == (eventValue & MsiInterop.MsidbServiceControlEventUninstallStart))
+                if (WindowsInstallerConstants.MsidbServiceControlEventStart == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventStart) &&
+                    WindowsInstallerConstants.MsidbServiceControlEventUninstallStart == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventUninstallStart))
                 {
                     serviceControl.Start = Wix.InstallUninstallType.both;
                 }
-                else if (MsiInterop.MsidbServiceControlEventStart == (eventValue & MsiInterop.MsidbServiceControlEventStart))
+                else if (WindowsInstallerConstants.MsidbServiceControlEventStart == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventStart))
                 {
                     serviceControl.Start = Wix.InstallUninstallType.install;
                 }
-                else if (MsiInterop.MsidbServiceControlEventUninstallStart == (eventValue & MsiInterop.MsidbServiceControlEventUninstallStart))
+                else if (WindowsInstallerConstants.MsidbServiceControlEventUninstallStart == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventUninstallStart))
                 {
                     serviceControl.Start = Wix.InstallUninstallType.uninstall;
                 }
 
-                if (MsiInterop.MsidbServiceControlEventStop == (eventValue & MsiInterop.MsidbServiceControlEventStop) &&
-                    MsiInterop.MsidbServiceControlEventUninstallStop == (eventValue & MsiInterop.MsidbServiceControlEventUninstallStop))
+                if (WindowsInstallerConstants.MsidbServiceControlEventStop == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventStop) &&
+                    WindowsInstallerConstants.MsidbServiceControlEventUninstallStop == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventUninstallStop))
                 {
                     serviceControl.Stop = Wix.InstallUninstallType.both;
                 }
-                else if (MsiInterop.MsidbServiceControlEventStop == (eventValue & MsiInterop.MsidbServiceControlEventStop))
+                else if (WindowsInstallerConstants.MsidbServiceControlEventStop == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventStop))
                 {
                     serviceControl.Stop = Wix.InstallUninstallType.install;
                 }
-                else if (MsiInterop.MsidbServiceControlEventUninstallStop == (eventValue & MsiInterop.MsidbServiceControlEventUninstallStop))
+                else if (WindowsInstallerConstants.MsidbServiceControlEventUninstallStop == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventUninstallStop))
                 {
                     serviceControl.Stop = Wix.InstallUninstallType.uninstall;
                 }
 
-                if (MsiInterop.MsidbServiceControlEventDelete == (eventValue & MsiInterop.MsidbServiceControlEventDelete) &&
-                    MsiInterop.MsidbServiceControlEventUninstallDelete == (eventValue & MsiInterop.MsidbServiceControlEventUninstallDelete))
+                if (WindowsInstallerConstants.MsidbServiceControlEventDelete == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventDelete) &&
+                    WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete))
                 {
                     serviceControl.Remove = Wix.InstallUninstallType.both;
                 }
-                else if (MsiInterop.MsidbServiceControlEventDelete == (eventValue & MsiInterop.MsidbServiceControlEventDelete))
+                else if (WindowsInstallerConstants.MsidbServiceControlEventDelete == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventDelete))
                 {
                     serviceControl.Remove = Wix.InstallUninstallType.install;
                 }
-                else if (MsiInterop.MsidbServiceControlEventUninstallDelete == (eventValue & MsiInterop.MsidbServiceControlEventUninstallDelete))
+                else if (WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete == (eventValue & WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete))
                 {
                     serviceControl.Remove = Wix.InstallUninstallType.uninstall;
                 }
@@ -8239,35 +8253,35 @@ namespace WixToolset.Core.WindowsInstaller
                 }
 
                 var serviceType = Convert.ToInt32(row[3]);
-                if (MsiInterop.MsidbServiceInstallInteractive == (serviceType & MsiInterop.MsidbServiceInstallInteractive))
+                if (WindowsInstallerConstants.MsidbServiceInstallInteractive == (serviceType & WindowsInstallerConstants.MsidbServiceInstallInteractive))
                 {
                     serviceInstall.Interactive = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbServiceInstallOwnProcess == (serviceType & MsiInterop.MsidbServiceInstallOwnProcess) &&
-                    MsiInterop.MsidbServiceInstallShareProcess == (serviceType & MsiInterop.MsidbServiceInstallShareProcess))
+                if (WindowsInstallerConstants.MsidbServiceInstallOwnProcess == (serviceType & WindowsInstallerConstants.MsidbServiceInstallOwnProcess) &&
+                    WindowsInstallerConstants.MsidbServiceInstallShareProcess == (serviceType & WindowsInstallerConstants.MsidbServiceInstallShareProcess))
                 {
                     // TODO: warn
                 }
-                else if (MsiInterop.MsidbServiceInstallOwnProcess == (serviceType & MsiInterop.MsidbServiceInstallOwnProcess))
+                else if (WindowsInstallerConstants.MsidbServiceInstallOwnProcess == (serviceType & WindowsInstallerConstants.MsidbServiceInstallOwnProcess))
                 {
                     serviceInstall.Type = Wix.ServiceInstall.TypeType.ownProcess;
                 }
-                else if (MsiInterop.MsidbServiceInstallShareProcess == (serviceType & MsiInterop.MsidbServiceInstallShareProcess))
+                else if (WindowsInstallerConstants.MsidbServiceInstallShareProcess == (serviceType & WindowsInstallerConstants.MsidbServiceInstallShareProcess))
                 {
                     serviceInstall.Type = Wix.ServiceInstall.TypeType.shareProcess;
                 }
 
                 var startType = Convert.ToInt32(row[4]);
-                if (MsiInterop.MsidbServiceInstallDisabled == startType)
+                if (WindowsInstallerConstants.MsidbServiceInstallDisabled == startType)
                 {
                     serviceInstall.Start = Wix.ServiceInstall.StartType.disabled;
                 }
-                else if (MsiInterop.MsidbServiceInstallDemandStart == startType)
+                else if (WindowsInstallerConstants.MsidbServiceInstallDemandStart == startType)
                 {
                     serviceInstall.Start = Wix.ServiceInstall.StartType.demand;
                 }
-                else if (MsiInterop.MsidbServiceInstallAutoStart == startType)
+                else if (WindowsInstallerConstants.MsidbServiceInstallAutoStart == startType)
                 {
                     serviceInstall.Start = Wix.ServiceInstall.StartType.auto;
                 }
@@ -8277,11 +8291,11 @@ namespace WixToolset.Core.WindowsInstaller
                 }
 
                 var errorControl = Convert.ToInt32(row[5]);
-                if (MsiInterop.MsidbServiceInstallErrorCritical == (errorControl & MsiInterop.MsidbServiceInstallErrorCritical))
+                if (WindowsInstallerConstants.MsidbServiceInstallErrorCritical == (errorControl & WindowsInstallerConstants.MsidbServiceInstallErrorCritical))
                 {
                     serviceInstall.ErrorControl = Wix.ServiceInstall.ErrorControlType.critical;
                 }
-                else if (MsiInterop.MsidbServiceInstallErrorNormal == (errorControl & MsiInterop.MsidbServiceInstallErrorNormal))
+                else if (WindowsInstallerConstants.MsidbServiceInstallErrorNormal == (errorControl & WindowsInstallerConstants.MsidbServiceInstallErrorNormal))
                 {
                     serviceInstall.ErrorControl = Wix.ServiceInstall.ErrorControlType.normal;
                 }
@@ -8290,7 +8304,7 @@ namespace WixToolset.Core.WindowsInstaller
                     serviceInstall.ErrorControl = Wix.ServiceInstall.ErrorControlType.ignore;
                 }
 
-                if (MsiInterop.MsidbServiceInstallErrorControlVital == (errorControl & MsiInterop.MsidbServiceInstallErrorControlVital))
+                if (WindowsInstallerConstants.MsidbServiceInstallErrorControlVital == (errorControl & WindowsInstallerConstants.MsidbServiceInstallErrorControlVital))
                 {
                     serviceInstall.Vital = Wix.YesNoType.yes;
                 }
@@ -8768,22 +8782,22 @@ namespace WixToolset.Core.WindowsInstaller
                 {
                     var styleBits = Convert.ToInt32(row[4]);
 
-                    if (MsiInterop.MsidbTextStyleStyleBitsBold == (styleBits & MsiInterop.MsidbTextStyleStyleBitsBold))
+                    if (WindowsInstallerConstants.MsidbTextStyleStyleBitsBold == (styleBits & WindowsInstallerConstants.MsidbTextStyleStyleBitsBold))
                     {
                         textStyle.Bold = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbTextStyleStyleBitsItalic == (styleBits & MsiInterop.MsidbTextStyleStyleBitsItalic))
+                    if (WindowsInstallerConstants.MsidbTextStyleStyleBitsItalic == (styleBits & WindowsInstallerConstants.MsidbTextStyleStyleBitsItalic))
                     {
                         textStyle.Italic = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbTextStyleStyleBitsUnderline == (styleBits & MsiInterop.MsidbTextStyleStyleBitsUnderline))
+                    if (WindowsInstallerConstants.MsidbTextStyleStyleBitsUnderline == (styleBits & WindowsInstallerConstants.MsidbTextStyleStyleBitsUnderline))
                     {
                         textStyle.Underline = Wix.YesNoType.yes;
                     }
 
-                    if (MsiInterop.MsidbTextStyleStyleBitsStrike == (styleBits & MsiInterop.MsidbTextStyleStyleBitsStrike))
+                    if (WindowsInstallerConstants.MsidbTextStyleStyleBitsStrike == (styleBits & WindowsInstallerConstants.MsidbTextStyleStyleBitsStrike))
                     {
                         textStyle.Strike = Wix.YesNoType.yes;
                     }
@@ -8887,32 +8901,32 @@ namespace WixToolset.Core.WindowsInstaller
                     upgradeVersion.Language = upgradeRow.Language;
                 }
 
-                if (MsiInterop.MsidbUpgradeAttributesMigrateFeatures == (upgradeRow.Attributes & MsiInterop.MsidbUpgradeAttributesMigrateFeatures))
+                if (WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures == (upgradeRow.Attributes & WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures))
                 {
                     upgradeVersion.MigrateFeatures = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbUpgradeAttributesOnlyDetect == (upgradeRow.Attributes & MsiInterop.MsidbUpgradeAttributesOnlyDetect))
+                if (WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect == (upgradeRow.Attributes & WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect))
                 {
                     upgradeVersion.OnlyDetect = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbUpgradeAttributesIgnoreRemoveFailure == (upgradeRow.Attributes & MsiInterop.MsidbUpgradeAttributesIgnoreRemoveFailure))
+                if (WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure == (upgradeRow.Attributes & WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure))
                 {
                     upgradeVersion.IgnoreRemoveFailure = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbUpgradeAttributesVersionMinInclusive == (upgradeRow.Attributes & MsiInterop.MsidbUpgradeAttributesVersionMinInclusive))
+                if (WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive == (upgradeRow.Attributes & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive))
                 {
                     upgradeVersion.IncludeMinimum = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive == (upgradeRow.Attributes & MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive))
+                if (WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive == (upgradeRow.Attributes & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive))
                 {
                     upgradeVersion.IncludeMaximum = Wix.YesNoType.yes;
                 }
 
-                if (MsiInterop.MsidbUpgradeAttributesLanguagesExclusive == (upgradeRow.Attributes & MsiInterop.MsidbUpgradeAttributesLanguagesExclusive))
+                if (WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive == (upgradeRow.Attributes & WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive))
                 {
                     upgradeVersion.ExcludeLanguages = Wix.YesNoType.yes;
                 }
@@ -9121,16 +9135,16 @@ namespace WixToolset.Core.WindowsInstaller
             case (-1):
                 registryRootType = Wix.RegistryRootType.HKMU;
                 return true;
-            case MsiInterop.MsidbRegistryRootClassesRoot:
+            case WindowsInstallerConstants.MsidbRegistryRootClassesRoot:
                 registryRootType = Wix.RegistryRootType.HKCR;
                 return true;
-            case MsiInterop.MsidbRegistryRootCurrentUser:
+            case WindowsInstallerConstants.MsidbRegistryRootCurrentUser:
                 registryRootType = Wix.RegistryRootType.HKCU;
                 return true;
-            case MsiInterop.MsidbRegistryRootLocalMachine:
+            case WindowsInstallerConstants.MsidbRegistryRootLocalMachine:
                 registryRootType = Wix.RegistryRootType.HKLM;
                 return true;
-            case MsiInterop.MsidbRegistryRootUsers:
+            case WindowsInstallerConstants.MsidbRegistryRootUsers:
                 registryRootType = Wix.RegistryRootType.HKU;
                 return true;
             default:

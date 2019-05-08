@@ -7,14 +7,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Text.RegularExpressions;
-    using WixToolset.Core.Native;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     internal class UnbindDatabaseCommand
     {

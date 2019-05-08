@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Msi
+namespace WixToolset.Core.WindowsInstaller.Msi
 {
     using System;
     using System.Diagnostics;
@@ -281,7 +281,7 @@ namespace WixToolset.Msi
         /// <param name="hash">Int array that receives the returned file hash information.</param>
         internal static void GetFileHash(string filePath, int options, out int[] hash)
         {
-            MsiInterop.MSIFILEHASHINFO hashInterop = new MsiInterop.MSIFILEHASHINFO();
+            MSIFILEHASHINFO hashInterop = new MSIFILEHASHINFO();
             hashInterop.FileHashInfoSize = 20;
 
             int error = MsiInterop.MsiGetFileHash(filePath, Convert.ToUInt32(options), hashInterop);

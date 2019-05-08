@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core
 {
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
     internal class ComponentKeyPath : IComponentKeyPath
@@ -19,6 +20,6 @@ namespace WixToolset.Core
         /// <summary>
         /// Type of resource to be the key path.
         /// </summary>
-        public ComponentKeyPathType Type { get; set; }
+        public PossibleKeyPathType Type { get; set; }
     }
 }

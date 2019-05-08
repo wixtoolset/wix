@@ -126,73 +126,72 @@ namespace WixToolset.Core
         {
             foreach (var section in context.IntermediateRepresentation.Sections)
             {
-                foreach (var row in section.Tuples.OfType<DialogTuple>())
+                foreach (var tuple in section.Tuples.OfType<DialogTuple>())
                 {
-                    string dialog = row.Dialog;
-
-                    if (context.VariableResolver.TryGetLocalizedControl(dialog, null, out LocalizedControl localizedControl))
+                    if (context.VariableResolver.TryGetLocalizedControl(tuple.Id.Id, null, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
-                            row.HCentering = localizedControl.X;
+                            tuple.HCentering = localizedControl.X;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Y)
                         {
-                            row.VCentering = localizedControl.Y;
+                            tuple.VCentering = localizedControl.Y;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Width)
                         {
-                            row.Width = localizedControl.Width;
+                            tuple.Width = localizedControl.Width;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Height)
                         {
-                            row.Height = localizedControl.Height;
+                            tuple.Height = localizedControl.Height;
                         }
 
-                        row.Attributes = row.Attributes | localizedControl.Attributes;
+                        tuple.RightAligned |= localizedControl.RightAligned;
+                        tuple.RightToLeft |= localizedControl.RightToLeft;
+                        tuple.LeftScroll |= localizedControl.LeftScroll;
 
                         if (!String.IsNullOrEmpty(localizedControl.Text))
                         {
-                            row.Title = localizedControl.Text;
+                            tuple.Title = localizedControl.Text;
                         }
                     }
                 }
 
-                foreach (var row in section.Tuples.OfType<ControlTuple>())
+                foreach (var tuple in section.Tuples.OfType<ControlTuple>())
                 {
-                    string dialog = row.Dialog_;
-                    string control = row.Control;
-
-                    if (context.VariableResolver.TryGetLocalizedControl(dialog, control, out LocalizedControl localizedControl))
+                    if (context.VariableResolver.TryGetLocalizedControl(tuple.Dialog_, tuple.Control, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
-                            row.X = localizedControl.X;
+                            tuple.X = localizedControl.X;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Y)
                         {
-                            row.Y = localizedControl.Y;
+                            tuple.Y = localizedControl.Y;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Width)
                         {
-                            row.Width = localizedControl.Width;
+                            tuple.Width = localizedControl.Width;
                         }
 
                         if (CompilerConstants.IntegerNotSet != localizedControl.Height)
                         {
-                            row.Height = localizedControl.Height;
+                            tuple.Height = localizedControl.Height;
                         }
 
-                        row.Attributes = row.Attributes | localizedControl.Attributes;
+                        tuple.RightAligned |= localizedControl.RightAligned;
+                        tuple.RightToLeft |= localizedControl.RightToLeft;
+                        tuple.LeftScroll |= localizedControl.LeftScroll;
 
                         if (!String.IsNullOrEmpty(localizedControl.Text))
                         {
-                            row.Text = localizedControl.Text;
+                            tuple.Text = localizedControl.Text;
                         }
                     }
                 }

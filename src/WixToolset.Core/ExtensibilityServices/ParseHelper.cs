@@ -16,7 +16,6 @@ namespace WixToolset.Core.ExtensibilityServices
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using Wix = WixToolset.Data.Serialize;
 
     internal class ParseHelper : IParseHelper
     {
@@ -179,23 +178,21 @@ namespace WixToolset.Core.ExtensibilityServices
             return new Identifier(id, AccessModifier.Private);
         }
 
-        public Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId, bool escapeLeadingHash)
+        public Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
         {
-            Identifier id = null;
-
-            if (-1 > root || 3 < root)
+            if (RegistryRootType.Unknown == root)
             {
-                throw new ArgumentOutOfRangeException("root");
+                throw new ArgumentOutOfRangeException(nameof(root));
             }
 
             if (null == key)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             }
 
             if (null == componentId)
             {
-                throw new ArgumentNullException("componentId");
+                throw new ArgumentNullException(nameof(componentId));
             }
 
             // Escape the leading '#' character for string registry values.
@@ -204,26 +201,31 @@ namespace WixToolset.Core.ExtensibilityServices
                 value = String.Concat("#", value);
             }
 
-            id = this.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
+            var id = this.CreateIdentifier("reg", componentId, ((int)root).ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
 
-            var row = this.CreateRow(section, sourceLineNumbers, TupleDefinitionType.Registry, id);
-            row.Set(1, root);
-            row.Set(2, key);
-            row.Set(3, name);
-            row.Set(4, value);
-            row.Set(5, componentId);
+            var tuple = new RegistryTuple(sourceLineNumbers, id)
+            {
+                Root = root,
+                Key = key,
+                Name = name,
+                Value = value,
+                Component_ = componentId,
+            };
+
+            section.Tuples.Add(tuple);
 
             return id;
         }
 
         public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys)
         {
-            var joinedKeys = String.Join("/", primaryKeys);
-            var id = String.Concat(tableName, ":", joinedKeys);
+            var tuple = new WixSimpleReferenceTuple(sourceLineNumbers)
+            {
+                Table = tableName,
+                PrimaryKeys = String.Join("/", primaryKeys)
+            };
 
-            var wixSimpleReferenceRow = (WixSimpleReferenceTuple)this.CreateRow(section, sourceLineNumbers, TupleDefinitionType.WixSimpleReference);
-            wixSimpleReferenceRow.Table = tableName;
-            wixSimpleReferenceRow.PrimaryKeys = joinedKeys;
+            section.Tuples.Add(tuple);
         }
 
         public void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
@@ -238,11 +240,15 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentNullException("childId");
             }
 
-            var row = (WixGroupTuple)this.CreateRow(section, sourceLineNumbers, TupleDefinitionType.WixGroup);
-            row.ParentId = parentId;
-            row.ParentType = parentType;
-            row.ChildId = childId;
-            row.ChildType = childType;
+            var tuple = new WixGroupTuple(sourceLineNumbers)
+            {
+                ParentId = parentId,
+                ParentType = parentType,
+                ChildId = childId,
+                ChildType = childType,
+            };
+
+            section.Tuples.Add(tuple);
         }
 
         public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
@@ -573,35 +579,46 @@ namespace WixToolset.Core.ExtensibilityServices
             return Common.GetAttributeValue(this.Messaging, sourceLineNumbers, attribute, emptyRule);
         }
 
-        public int GetAttributeMsidbRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
+        public RegistryRootType? GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
         {
-            Wix.RegistryRootType registryRoot = this.GetAttributeRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
-
-            switch (registryRoot)
+            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            if (String.IsNullOrEmpty(value))
             {
-                case Wix.RegistryRootType.NotSet:
-                    return CompilerConstants.IntegerNotSet;
-                case Wix.RegistryRootType.HKCR:
-                    return Core.Native.MsiInterop.MsidbRegistryRootClassesRoot;
-                case Wix.RegistryRootType.HKCU:
-                    return Core.Native.MsiInterop.MsidbRegistryRootCurrentUser;
-                case Wix.RegistryRootType.HKLM:
-                    return Core.Native.MsiInterop.MsidbRegistryRootLocalMachine;
-                case Wix.RegistryRootType.HKU:
-                    return Core.Native.MsiInterop.MsidbRegistryRootUsers;
-                case Wix.RegistryRootType.HKMU:
-                    // This is gross, but there was *one* registry root parsing instance
-                    // (in Compiler.ParseRegistrySearchElement()) that did not explicitly
-                    // handle HKMU and it fell through to the default error case. The
-                    // others treated it as -1, which is what we do here.
+                return null;
+            }
+
+            switch (value)
+            {
+                case "HKCR":
+                    return RegistryRootType.ClassesRoot;
+
+                case "HKCU":
+                    return RegistryRootType.CurrentUser;
+
+                case "HKLM":
+                    return RegistryRootType.LocalMachine;
+
+                case "HKU":
+                    return RegistryRootType.Users;
+
+                case "HKMU":
                     if (allowHkmu)
                     {
-                        return -1;
+                        return RegistryRootType.MachineUser;
                     }
                     break;
             }
 
-            return CompilerConstants.IntegerNotSet;
+            if (allowHkmu)
+            {
+                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, "HKMU", "HKCR", "HKCU", "HKLM", "HKU"));
+            }
+            else
+            {
+                this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, "HKCR", "HKCU", "HKLM", "HKU"));
+            }
+
+            return RegistryRootType.Unknown;
         }
 
         public string GetAttributeVersionValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
@@ -845,34 +862,6 @@ namespace WixToolset.Core.ExtensibilityServices
             section.Tuples.Add(row);
 
             return row;
-        }
-
-        private Wix.RegistryRootType GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
-        {
-            Wix.RegistryRootType registryRoot = Wix.RegistryRootType.NotSet;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                registryRoot = Wix.Enums.ParseRegistryRootType(value);
-
-                if (Wix.RegistryRootType.IllegalValue == registryRoot || (!allowHkmu && Wix.RegistryRootType.HKMU == registryRoot))
-                {
-                    // TODO: Find a way to expose the valid values programatically!
-                    if (allowHkmu)
-                    {
-                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
-                            "HKMU", "HKCR", "HKCU", "HKLM", "HKU"));
-                    }
-                    else
-                    {
-                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
-                            "HKCR", "HKCU", "HKLM", "HKU"));
-                    }
-                }
-            }
-
-            return registryRoot;
         }
 
         private static bool TryFindExtension(IEnumerable<ICompilerExtension> extensions, XNamespace ns, out ICompilerExtension extension)

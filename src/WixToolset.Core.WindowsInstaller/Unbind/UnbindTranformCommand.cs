@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
@@ -8,13 +8,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Bind;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     internal class UnbindTransformCommand
     {

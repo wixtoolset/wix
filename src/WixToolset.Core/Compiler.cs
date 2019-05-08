@@ -3,7 +3,6 @@
 namespace WixToolset.Core
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -11,30 +10,19 @@ namespace WixToolset.Core
     using System.IO;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using Wix = WixToolset.Data.Serialize;
 
     /// <summary>
     /// Compiler of the WiX toolset.
     /// </summary>
-    internal class Compiler : ICompiler
+    internal partial class Compiler : ICompiler
     {
         public const string DefaultComponentIdPlaceholderFormat = "WixComponentIdPlaceholder{0}";
         public const string DefaultComponentIdPlaceholderWixVariableFormat = "!(wix.{0})";
-        public const string BurnUXContainerId = "WixUXContainer";
-        public const string BurnDefaultAttachedContainerId = "WixAttachedContainer";
-
-        // The following constants must stay in sync with src\burn\engine\core.h
-        private const string BURN_BUNDLE_NAME = "WixBundleName";
-        private const string BURN_BUNDLE_ORIGINAL_SOURCE = "WixBundleOriginalSource";
-        private const string BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER = "WixBundleOriginalSourceFolder";
-        private const string BURN_BUNDLE_LAST_USED_SOURCE = "WixBundleLastUsedSource";
-
         // If these are true you know you are building a module or product
         // but if they are false you cannot not be sure they will not end
         // up a product or module.  Use these flags carefully.
@@ -367,7 +355,7 @@ namespace WixToolset.Core
         /// <param name="componentId">Identifier of parent component.</param>
         private void RegisterImplementedCategories(SourceLineNumber sourceLineNumbers, string categoryId, string classId, string componentId)
         {
-            this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\Implemented Categories\\", categoryId), "*", null, componentId);
+            this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\Implemented Categories\\", categoryId), "*", null, componentId);
         }
 
         /// <summary>
@@ -506,41 +494,41 @@ namespace WixToolset.Core
             {
                 if (null != description)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), null, description, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), null, description, componentId);
                 }
                 else
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "+", null, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "+", null, componentId);
                 }
 
                 if (null != remoteServerName)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "RemoteServerName", remoteServerName, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "RemoteServerName", remoteServerName, componentId);
                 }
 
                 if (null != localService)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "LocalService", localService, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "LocalService", localService, componentId);
                 }
 
                 if (null != serviceParameters)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "ServiceParameters", serviceParameters, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "ServiceParameters", serviceParameters, componentId);
                 }
 
                 if (null != dllSurrogate)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "DllSurrogate", dllSurrogate, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "DllSurrogate", dllSurrogate, componentId);
                 }
 
                 if (YesNoType.Yes == activateAtStorage)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "ActivateAtStorage", "Y", componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "ActivateAtStorage", "Y", componentId);
                 }
 
                 if (YesNoType.Yes == runAsInteractiveUser)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("AppID\\", appId), "RunAs", "Interactive User", componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("AppID\\", appId), "RunAs", "Interactive User", componentId);
                 }
             }
         }
@@ -1150,7 +1138,7 @@ namespace WixToolset.Core
                         else if (YesNoType.No == advertise)
                         {
                             var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.CreateRegistryRow(childSourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("FileType\\", classId, "\\", fileTypeMaskIndex.ToString()), String.Empty, this.ParseFileTypeMaskElement(child), componentId);
+                            this.Core.CreateRegistryRow(childSourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("FileType\\", classId, "\\", fileTypeMaskIndex.ToString()), String.Empty, this.ParseFileTypeMaskElement(child), componentId);
                             fileTypeMaskIndex++;
                         }
                         break;
@@ -1202,34 +1190,38 @@ namespace WixToolset.Core
                 {
                     foreach (var context in contexts)
                     {
-                        var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Class);
-                        row.Set(0, classId);
-                        row.Set(1, context);
-                        row.Set(2, componentId);
-                        row.Set(3, defaultProgId);
-                        row.Set(4, description);
+                        var tuple = new ClassTuple(sourceLineNumbers)
+                        {
+                            CLSID = classId,
+                            Context = context,
+                            Component_ = componentId,
+                            ProgId_Default = defaultProgId,
+                            Description = description,
+                            FileTypeMask = fileTypeMask,
+                            DefInprocHandler = defaultInprocHandler,
+                            Argument = argument,
+                            Feature_ = Guid.Empty.ToString("B"),
+                            RelativePath = YesNoType.Yes == relativePath,
+                        };
+
                         if (null != appId)
                         {
-                            row.Set(5, appId);
+                            tuple.AppId_ = appId;
                             this.Core.CreateSimpleReference(sourceLineNumbers, "AppId", appId);
                         }
-                        row.Set(6, fileTypeMask);
+
                         if (null != icon)
                         {
-                            row.Set(7, icon);
+                            tuple.Icon_ = icon;
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
                         }
+
                         if (CompilerConstants.IntegerNotSet != iconIndex)
                         {
-                            row.Set(8, iconIndex);
+                            tuple.IconIndex = iconIndex;
                         }
-                        row.Set(9, defaultInprocHandler);
-                        row.Set(10, argument);
-                        row.Set(11, Guid.Empty.ToString("B"));
-                        if (YesNoType.Yes == relativePath)
-                        {
-                            row.Set(12, MsiInterop.MsidbClassAttributesRelativePath);
-                        }
+
+                        this.Core.AddTuple(tuple);
                     }
                 }
             }
@@ -1305,7 +1297,7 @@ namespace WixToolset.Core
                         this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Context", context, "InprocServer", "InprocServer32", "LocalServer", "LocalServer32"));
                     }
 
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\", context), String.Empty, formattedContextString, componentId); // ClassId context
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\", context), String.Empty, formattedContextString, componentId); // ClassId context
 
                     if (null != icon) // ClassId default icon
                     {
@@ -1317,18 +1309,18 @@ namespace WixToolset.Core
                         {
                             icon = String.Concat(icon, ",", iconIndex);
                         }
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\DefaultIcon"), String.Empty, icon, componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\DefaultIcon"), String.Empty, icon, componentId);
                     }
                 }
 
                 if (null != parentAppId) // ClassId AppId (must be specified via nesting, not with the AppId attribute)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId), "AppID", parentAppId, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId), "AppID", parentAppId, componentId);
                 }
 
                 if (null != description) // ClassId description
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId), String.Empty, description, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId), String.Empty, description, componentId);
                 }
 
                 if (null != defaultInprocHandler)
@@ -1336,17 +1328,17 @@ namespace WixToolset.Core
                     switch (defaultInprocHandler) // ClassId Default Inproc Handler
                     {
                     case "1":
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
                         break;
                     case "2":
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
                         break;
                     case "3":
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
                         break;
                     default:
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, defaultInprocHandler, componentId);
+                        this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, defaultInprocHandler, componentId);
                         break;
                     }
                 }
@@ -1364,36 +1356,36 @@ namespace WixToolset.Core
                 // add a threading model for each context in the class
                 foreach (var context in contexts)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\", context), "ThreadingModel", threadingModel, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\", context), "ThreadingModel", threadingModel, componentId);
                 }
             }
 
             if (null != typeLibId)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\TypeLib"), null, typeLibId, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\TypeLib"), null, typeLibId, componentId);
             }
 
             if (null != version)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\Version"), null, version, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\Version"), null, version, componentId);
             }
 
             if (null != insertable)
             {
                 // Add "*" for name so that any subkeys (shouldn't be any) are removed on uninstall.
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\", insertable), "*", null, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\", insertable), "*", null, componentId);
             }
 
             if (control)
             {
                 // Add "*" for name so that any subkeys (shouldn't be any) are removed on uninstall.
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\Control"), "*", null, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\Control"), "*", null, componentId);
             }
 
             if (programmable)
             {
                 // Add "*" for name so that any subkeys (shouldn't be any) are removed on uninstall.
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\Programmable"), "*", null, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\Programmable"), "*", null, componentId);
             }
 
             if (safeForInit)
@@ -1475,34 +1467,34 @@ namespace WixToolset.Core
 
             this.Core.ParseForExtensionElements(node);
 
-            this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId), null, name, componentId);
+            this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId), null, name, componentId);
             if (null != typeLibId)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId, "\\TypeLib"), null, typeLibId, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId, "\\TypeLib"), null, typeLibId, componentId);
                 if (versioned)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId, "\\TypeLib"), "Version", typelibVersion, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId, "\\TypeLib"), "Version", typelibVersion, componentId);
                 }
             }
 
             if (null != baseInterface)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId, "\\BaseInterface"), null, baseInterface, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId, "\\BaseInterface"), null, baseInterface, componentId);
             }
 
             if (CompilerConstants.IntegerNotSet != numMethods)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId, "\\NumMethods"), null, numMethods.ToString(), componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId, "\\NumMethods"), null, numMethods.ToString(), componentId);
             }
 
             if (null != proxyId)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId, "\\ProxyStubClsid"), null, proxyId, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId, "\\ProxyStubClsid"), null, proxyId, componentId);
             }
 
             if (null != proxyId32)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("Interface\\", interfaceId, "\\ProxyStubClsid32"), null, proxyId32, componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("Interface\\", interfaceId, "\\ProxyStubClsid32"), null, proxyId32, componentId);
             }
         }
 
@@ -1588,7 +1580,9 @@ namespace WixToolset.Core
             string language = null;
             string maximum = null;
             string minimum = null;
-            var options = MsiInterop.MsidbUpgradeAttributesVersionMinInclusive | MsiInterop.MsidbUpgradeAttributesOnlyDetect;
+            var excludeLanguages = false;
+            var maxInclusive = false; 
+            var minInclusive = true;
 
             foreach (var attrib in node.Attributes())
             {
@@ -1597,22 +1591,13 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                     case "ExcludeLanguages":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesLanguagesExclusive;
-                        }
+                        excludeLanguages = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "IncludeMaximum":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive;
-                        }
+                        maxInclusive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
-                    case "IncludeMinimum": // this is "yes" by default
-                        if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options &= ~MsiInterop.MsidbUpgradeAttributesVersionMinInclusive;
-                        }
+                    case "IncludeMinimum":
+                        minInclusive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "Language":
                         language = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1646,13 +1631,20 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Upgrade);
-                row.Set(0, upgradeCode);
-                row.Set(1, minimum);
-                row.Set(2, maximum);
-                row.Set(3, language);
-                row.Set(4, options);
-                row.Set(6, propertyId);
+                var tuple = new UpgradeTuple(sourceLineNumbers)
+                {
+                    UpgradeCode = upgradeCode,
+                    VersionMin = minimum,
+                    VersionMax = maximum,
+                    Language = language,
+                    ActionProperty = propertyId,
+                    OnlyDetect = true,
+                    ExcludeLanguages = excludeLanguages,
+                    VersionMaxInclusive = maxInclusive,
+                    VersionMinInclusive = minInclusive,
+                };
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -1669,7 +1661,7 @@ namespace WixToolset.Core
             string key = null;
             string name = null;
             string signature = null;
-            var root = CompilerConstants.IntegerNotSet;
+            RegistryRootType? root = null;
             var type = CompilerConstants.IntegerNotSet;
             var search64bit = false;
 
@@ -1689,28 +1681,26 @@ namespace WixToolset.Core
                         name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Root":
-                        root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, false);
+                        root = this.Core.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, false);
                         break;
                     case "Type":
                         var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < typeValue.Length)
+                        switch (typeValue)
                         {
-                            var typeType = Wix.RegistrySearch.ParseTypeType(typeValue);
-                            switch (typeType)
-                            {
-                            case Wix.RegistrySearch.TypeType.directory:
-                                type = 0;
-                                break;
-                            case Wix.RegistrySearch.TypeType.file:
-                                type = 1;
-                                break;
-                            case Wix.RegistrySearch.TypeType.raw:
-                                type = 2;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "raw"));
-                                break;
-                            }
+                        case "directory":
+                            type = 0;
+                            break;
+                        case "file":
+                            type = 1;
+                            break;
+                        case "raw":
+                            type = 2;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "raw"));
+                            break;
                         }
                         break;
                     case "Win64":
@@ -1743,7 +1733,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
-            if (CompilerConstants.IntegerNotSet == root)
+            if (!root.HasValue)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
             }
@@ -1813,7 +1803,7 @@ namespace WixToolset.Core
             if (!this.Core.EncounteredError)
             {
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RegLocator, id);
-                row.Set(1, root);
+                row.Set(1, (int)root);
                 row.Set(2, key);
                 row.Set(3, name);
                 row.Set(4, search64bit ? (type | 16) : type);
@@ -2047,21 +2037,31 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
 
-            var bits = 0;
             var comPlusBits = CompilerConstants.IntegerNotSet;
             string condition = null;
             var encounteredODBCDataSource = false;
-            var explicitWin64 = false;
             var files = 0;
             var guid = "*";
             var componentIdPlaceholder = String.Format(Compiler.DefaultComponentIdPlaceholderFormat, this.componentIdPlaceholdersResolver.VariableCount); // placeholder id for defaulting Component/@Id to keypath id.
             var componentIdPlaceholderWixVariable = String.Format(Compiler.DefaultComponentIdPlaceholderWixVariableFormat, componentIdPlaceholder);
             var id = new Identifier(componentIdPlaceholderWixVariable, AccessModifier.Private);
-            var keyBits = 0;
             var keyFound = false;
             string keyPath = null;
             var shouldAddCreateFolder = false;
+
+            var keyPathType = ComponentKeyPathType.Directory;
+            var location = ComponentLocation.LocalOnly;
+            var disableRegistryReflection = false;
+
+            var neverOverwrite = false;
+            var permanent = false;
+            var shared = false;
+            var sharedDllRefCount = false;
+            var transitive = false;
+            var uninstallWhenSuperseded = false;
+            var explicitWin64 = false;
             var win64 = false;
+
             var multiInstance = false;
             var symbols = new List<string>();
             string feature = null;
@@ -2079,10 +2079,11 @@ namespace WixToolset.Core
                         comPlusBits = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                         break;
                     case "DisableRegistryReflection":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesDisableRegistryReflection;
-                        }
+                        disableRegistryReflection = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesDisableRegistryReflection;
+                        //}
                         break;
                     case "Directory":
                         directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, directoryId);
@@ -2101,77 +2102,84 @@ namespace WixToolset.Core
                         {
                             keyFound = true;
                             keyPath = null;
-                            keyBits = 0;
                             shouldAddCreateFolder = true;
                         }
                         break;
                     case "Location":
-                        var location = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < location.Length)
+                        var locationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (locationValue)
                         {
-                            var locationType = Wix.Component.ParseLocationType(location);
-                            switch (locationType)
-                            {
-                            case Wix.Component.LocationType.either:
-                                bits |= MsiInterop.MsidbComponentAttributesOptional;
-                                break;
-                            case Wix.Component.LocationType.local: // this is the default
-                                break;
-                            case Wix.Component.LocationType.source:
-                                bits |= MsiInterop.MsidbComponentAttributesSourceOnly;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "either", "local", "source"));
-                                break;
-                            }
+                        case "either":
+                            location = ComponentLocation.Either;
+                            //bits |= MsiInterop.MsidbComponentAttributesOptional;
+                            break;
+                        case "local": // this is the default
+                            location = ComponentLocation.LocalOnly;
+                            break;
+                        case "source":
+                            location = ComponentLocation.SourceOnly;
+                            //bits |= MsiInterop.MsidbComponentAttributesSourceOnly;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, locationValue, "either", "local", "source"));
+                            break;
                         }
                         break;
                     case "MultiInstance":
                         multiInstance = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "NeverOverwrite":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesNeverOverwrite;
-                        }
+                        neverOverwrite = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesNeverOverwrite;
+                        //}
                         break;
                     case "Permanent":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesPermanent;
-                        }
+                        permanent = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesPermanent;
+                        //}
                         break;
                     case "Shared":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesShared;
-                        }
+                        shared = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesShared;
+                        //}
                         break;
                     case "SharedDllRefCount":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesSharedDllRefCount;
-                        }
+                        sharedDllRefCount = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesSharedDllRefCount;
+                        //}
                         break;
                     case "Transitive":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesTransitive;
-                        }
+                        transitive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesTransitive;
+                        //}
                         break;
                     case "UninstallWhenSuperseded":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributesUninstallOnSupersedence;
-                        }
+                        uninstallWhenSuperseded = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributesUninstallOnSupersedence;
+                        //}
                         break;
                     case "Win64":
                         explicitWin64 = true;
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbComponentAttributes64bit;
-                            win64 = true;
-                        }
+                        win64 = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbComponentAttributes64bit;
+                        //    win64 = true;
+                        //}
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2186,7 +2194,7 @@ namespace WixToolset.Core
 
             if (!explicitWin64 && (Platform.IA64 == this.CurrentPlatform || Platform.X64 == this.CurrentPlatform))
             {
-                bits |= MsiInterop.MsidbComponentAttributes64bit;
+                //bits |= MsiInterop.MsidbComponentAttributes64bit;
                 win64 = true;
             }
 
@@ -2195,12 +2203,12 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Directory"));
             }
 
-            if (String.IsNullOrEmpty(guid) && MsiInterop.MsidbComponentAttributesShared == (bits & MsiInterop.MsidbComponentAttributesShared))
+            if (String.IsNullOrEmpty(guid) && shared /*MsiInterop.MsidbComponentAttributesShared == (bits & MsiInterop.MsidbComponentAttributesShared)*/)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Shared", "yes", "Guid", ""));
             }
 
-            if (String.IsNullOrEmpty(guid) && MsiInterop.MsidbComponentAttributesPermanent == (bits & MsiInterop.MsidbComponentAttributesPermanent))
+            if (String.IsNullOrEmpty(guid) && permanent /*MsiInterop.MsidbComponentAttributesPermanent == (bits & MsiInterop.MsidbComponentAttributesPermanent)*/)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Permanent", "yes", "Guid", ""));
             }
@@ -2228,7 +2236,7 @@ namespace WixToolset.Core
             {
                 var keyPathSet = YesNoType.NotSet;
                 string keyPossible = null;
-                var keyBit = 0;
+                ComponentKeyPathType? keyBit = null;
 
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
                 {
@@ -2269,10 +2277,7 @@ namespace WixToolset.Core
                         break;
                     case "File":
                         keyPathSet = this.ParseFileElement(child, id.Id, directoryId, diskId, srcPath, out keyPossible, win64, guid);
-                        if (null != keyPossible)
-                        {
-                            keyBit = 0;
-                        }
+                        keyBit = ComponentKeyPathType.File;
                         files++;
                         break;
                     case "IniFile":
@@ -2286,7 +2291,7 @@ namespace WixToolset.Core
                         break;
                     case "ODBCDataSource":
                         keyPathSet = this.ParseODBCDataSource(child, id.Id, null, out keyPossible);
-                        keyBit = MsiInterop.MsidbComponentAttributesODBCDataSource;
+                        keyBit = ComponentKeyPathType.OdbcDataSource;
                         encounteredODBCDataSource = true;
                         break;
                     case "ODBCDriver":
@@ -2300,12 +2305,12 @@ namespace WixToolset.Core
                         this.ParseProgIdElement(child, id.Id, YesNoType.NotSet, null, null, null, ref foundExtension, YesNoType.NotSet);
                         break;
                     case "RegistryKey":
-                        keyPathSet = this.ParseRegistryKeyElement(child, id.Id, CompilerConstants.IntegerNotSet, null, win64, out keyPossible);
-                        keyBit = MsiInterop.MsidbComponentAttributesRegistryKeyPath;
+                        keyPathSet = this.ParseRegistryKeyElement(child, id.Id, null, null, win64, out keyPossible);
+                        keyBit = ComponentKeyPathType.Registry;
                         break;
                     case "RegistryValue":
-                        keyPathSet = this.ParseRegistryValueElement(child, id.Id, CompilerConstants.IntegerNotSet, null, win64, out keyPossible);
-                        keyBit = MsiInterop.MsidbComponentAttributesRegistryKeyPath;
+                        keyPathSet = this.ParseRegistryValueElement(child, id.Id, null, null, win64, out keyPossible);
+                        keyBit = ComponentKeyPathType.Registry;
                         break;
                     case "RemoveFile":
                         this.ParseRemoveFileElement(child, id.Id, directoryId);
@@ -2354,7 +2359,7 @@ namespace WixToolset.Core
                     var possibleKeyPath = this.Core.ParsePossibleKeyPathExtensionElement(node, child, context);
                     if (null != possibleKeyPath)
                     {
-                        if (ComponentKeyPathType.None == possibleKeyPath.Type)
+                        if (PossibleKeyPathType.None == possibleKeyPath.Type)
                         {
                             keyPathSet = YesNoType.No;
                         }
@@ -2367,9 +2372,9 @@ namespace WixToolset.Core
                                 keyPossible = possibleKeyPath.Id;
                             }
 
-                            if (ComponentKeyPathType.Registry == possibleKeyPath.Type || ComponentKeyPathType.RegistryFormatted == possibleKeyPath.Type)
+                            if (PossibleKeyPathType.Registry == possibleKeyPath.Type || PossibleKeyPathType.RegistryFormatted == possibleKeyPath.Type)
                             {
-                                keyBit = MsiInterop.MsidbComponentAttributesRegistryKeyPath;
+                                keyBit = ComponentKeyPathType.Registry; //MsiInterop.MsidbComponentAttributesRegistryKeyPath;
                             }
                         }
                     }
@@ -2391,10 +2396,9 @@ namespace WixToolset.Core
                 {
                     keyFound = YesNoType.Yes == keyPathSet;
                     keyPath = keyPossible;
-                    keyBits = keyBit;
+                    keyPathType = keyBit.Value;
                 }
             }
-
 
             if (shouldAddCreateFolder)
             {
@@ -2413,7 +2417,7 @@ namespace WixToolset.Core
                     isGeneratableGuidOk = false;
                 }
 
-                if (0 != files && MsiInterop.MsidbComponentAttributesRegistryKeyPath == keyBits)
+                if (0 < files && ComponentKeyPathType.Registry == keyPathType)
                 {
                     this.Core.Write(ErrorMessages.IllegalComponentWithAutoGeneratedGuid(sourceLineNumbers, true));
                     isGeneratableGuidOk = false;
@@ -2452,16 +2456,43 @@ namespace WixToolset.Core
             // finally add the Component table row
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Component, id);
-                row.Set(1, guid);
-                row.Set(2, directoryId);
-                row.Set(3, bits | keyBits);
-                row.Set(4, condition);
-                row.Set(5, keyPath);
+                var tuple = new ComponentTuple(sourceLineNumbers, id)
+                {
+                    Component = id.Id,
+                    ComponentId = guid,
+                    Directory_ = directoryId,
+                    Location = location,
+                    Condition = condition,
+                    KeyPath = keyPath,
+                    KeyPathType = keyPathType,
+                    DisableRegistryReflection = disableRegistryReflection,
+                    NeverOverwrite = neverOverwrite,
+                    Permanent = permanent,
+                    SharedDllRefCount = sharedDllRefCount,
+                    Transitive = transitive,
+                    UninstallWhenSuperseded = uninstallWhenSuperseded,
+                    Win64 = win64,
+                };
+
+                this.Core.AddTuple(tuple);
+
+                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Component, id);
+                //row.Set(1, guid);
+                //row.Set(2, directoryId);
+                //row.Set(3, bits | keyBits);
+                //row.Set(4, condition);
+                //row.Set(5, keyPath);
 
                 if (multiInstance)
                 {
-                    var instanceComponentRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixInstanceComponent, id);
+                    //var instanceComponentRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixInstanceComponent, id);
+
+                    var instanceComponentTuple = new WixInstanceComponentTuple(sourceLineNumbers, id)
+                    {
+                        Component_ = id.Id,
+                    };
+
+                    this.Core.AddTuple(instanceComponentTuple);
                 }
 
                 if (0 < symbols.Count)
@@ -2474,8 +2505,13 @@ namespace WixToolset.Core
                 // Complus
                 if (CompilerConstants.IntegerNotSet != comPlusBits)
                 {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Complus, id);
-                    row.Set(1, comPlusBits);
+                    var complusTuple = new ComplusTuple(sourceLineNumbers)
+                    {
+                        Component_ = id.Id,
+                        ExpType = comPlusBits,
+                    };
+
+                    this.Core.AddTuple(complusTuple);
                 }
 
                 // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
@@ -2685,8 +2721,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
             string componentId = null;
-            var type = MsiInterop.MsidbLocatorTypeFileName;
-            string signature = null;
+            var type = LocatorType.Filename;
 
             foreach (var attrib in node.Attributes())
             {
@@ -2702,21 +2737,19 @@ namespace WixToolset.Core
                         break;
                     case "Type":
                         var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < typeValue.Length)
+                        switch (typeValue)
                         {
-                            var typeType = Wix.ComponentSearch.ParseTypeType(typeValue);
-                            switch (typeType)
-                            {
-                            case Wix.ComponentSearch.TypeType.directory:
-                                type = MsiInterop.MsidbLocatorTypeDirectory;
-                                break;
-                            case Wix.ComponentSearch.TypeType.file:
-                                type = MsiInterop.MsidbLocatorTypeFileName;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue, "directory", "file"));
-                                break;
-                            }
+                        case "directory":
+                            type = LocatorType.Directory;
+                            break;
+                        case "file":
+                            type = LocatorType.Filename;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue, "directory", "file"));
+                            break;
                         }
                         break;
                     default:
@@ -2735,7 +2768,7 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("cmp", componentId, type.ToString());
             }
 
-            signature = id.Id;
+            var signature = id.Id;
             var oneChild = false;
             foreach (var child in node.Elements())
             {
@@ -2793,9 +2826,17 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CompLocator, id);
-                row.Set(1, componentId);
-                row.Set(2, type);
+                var tuple = new CompLocatorTuple(sourceLineNumbers, id)
+                {
+                    ComponentId = componentId,
+                    Type = type,
+                };
+
+                this.Core.AddTuple(tuple);
+
+                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CompLocator, id);
+                //row.Set(1, componentId);
+                //row.Set(2, type);
             }
 
             return signature;
@@ -3070,16 +3111,22 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            var bits = 0;
-            var extendedBits = 0;
             var inlineScript = false;
-            string innerText = null;
-            string source = null;
-            var sourceBits = 0;
             var suppressModularization = YesNoType.NotSet;
+            string source = null;
             string target = null;
-            var targetBits = 0;
             var explicitWin64 = false;
+
+            CustomActionSourceType? sourceType = null;
+            CustomActionTargetType? targetType = null;
+            var executionType = CustomActionExecutionType.Immediate;
+            var hidden = false;
+            var impersonate = true;
+            var patchUninstall = false;
+            var tsAware = false;
+            var win64 = false;
+            var async = false;
+            var ignoreResult = false;
 
             foreach (var attrib in node.Attributes())
             {
@@ -3096,7 +3143,8 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        sourceBits = MsiInterop.MsidbCustomActionTypeBinaryData;
+                        //sourceBits = MsiInterop.MsidbCustomActionTypeBinaryData;
+                        sourceType = CustomActionSourceType.Binary;
                         this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", source); // add a reference to the appropriate Binary
                         break;
                     case "Directory":
@@ -3105,7 +3153,8 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
-                        sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
+                        //sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
+                        sourceType = CustomActionSourceType.Directory;
                         break;
                     case "DllEntry":
                         if (null != target)
@@ -3113,7 +3162,8 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        targetBits = MsiInterop.MsidbCustomActionTypeDll;
+                        //targetBits = MsiInterop.MsidbCustomActionTypeDll;
+                        targetType = CustomActionTargetType.Dll;
                         break;
                     case "Error":
                         if (null != target)
@@ -3121,27 +3171,14 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        targetBits = MsiInterop.MsidbCustomActionTypeTextData | MsiInterop.MsidbCustomActionTypeSourceFile;
+                        //targetBits = MsiInterop.MsidbCustomActionTypeTextData | MsiInterop.MsidbCustomActionTypeSourceFile;
+                        sourceType = CustomActionSourceType.File;
+                        targetType = CustomActionTargetType.TextData;
 
-                        var errorReference = true;
-
-                        try
-                        {
-                            // The target can be either a formatted error string or a literal 
-                            // error number. Try to convert to error number to determine whether
-                            // to add a reference. No need to look at the value.
-                            Convert.ToInt32(target, CultureInfo.InvariantCulture.NumberFormat);
-                        }
-                        catch (FormatException)
-                        {
-                            errorReference = false;
-                        }
-                        catch (OverflowException)
-                        {
-                            errorReference = false;
-                        }
-
-                        if (errorReference)
+                        // The target can be either a formatted error string or a literal 
+                        // error number. Try to convert to error number to determine whether
+                        // to add a reference. No need to look at the value.
+                        if (Int32.TryParse(target, out var ignored))
                         {
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Error", target);
                         }
@@ -3152,39 +3189,43 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetBits = MsiInterop.MsidbCustomActionTypeExe;
+                        //targetBits = MsiInterop.MsidbCustomActionTypeExe;
+                        targetType = CustomActionTargetType.Exe;
                         break;
                     case "Execute":
                         var execute = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < execute.Length)
+                        switch (execute)
                         {
-                            var executeType = Wix.CustomAction.ParseExecuteType(execute);
-                            switch (executeType)
-                            {
-                            case Wix.CustomAction.ExecuteType.commit:
-                                bits |= MsiInterop.MsidbCustomActionTypeInScript | MsiInterop.MsidbCustomActionTypeCommit;
-                                break;
-                            case Wix.CustomAction.ExecuteType.deferred:
-                                bits |= MsiInterop.MsidbCustomActionTypeInScript;
-                                break;
-                            case Wix.CustomAction.ExecuteType.firstSequence:
-                                bits |= MsiInterop.MsidbCustomActionTypeFirstSequence;
-                                break;
-                            case Wix.CustomAction.ExecuteType.immediate:
-                                break;
-                            case Wix.CustomAction.ExecuteType.oncePerProcess:
-                                bits |= MsiInterop.MsidbCustomActionTypeOncePerProcess;
-                                break;
-                            case Wix.CustomAction.ExecuteType.rollback:
-                                bits |= MsiInterop.MsidbCustomActionTypeInScript | MsiInterop.MsidbCustomActionTypeRollback;
-                                break;
-                            case Wix.CustomAction.ExecuteType.secondSequence:
-                                bits |= MsiInterop.MsidbCustomActionTypeClientRepeat;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, execute, "commit", "deferred", "firstSequence", "immediate", "oncePerProcess", "rollback", "secondSequence"));
-                                break;
-                            }
+                        case "commit":
+                            //bits |= MsiInterop.MsidbCustomActionTypeInScript | MsiInterop.MsidbCustomActionTypeCommit;
+                            executionType = CustomActionExecutionType.Commit;
+                            break;
+                        case "deferred":
+                            //bits |= MsiInterop.MsidbCustomActionTypeInScript;
+                            executionType = CustomActionExecutionType.Deferred;
+                            break;
+                        case "firstSequence":
+                            //bits |= MsiInterop.MsidbCustomActionTypeFirstSequence;
+                            executionType = CustomActionExecutionType.FirstSequence;
+                            break;
+                        case "immediate":
+                            executionType = CustomActionExecutionType.Immediate;
+                            break;
+                        case "oncePerProcess":
+                            //bits |= MsiInterop.MsidbCustomActionTypeOncePerProcess;
+                            executionType = CustomActionExecutionType.OncePerProcess;
+                            break;
+                        case "rollback":
+                            //bits |= MsiInterop.MsidbCustomActionTypeInScript | MsiInterop.MsidbCustomActionTypeRollback;
+                            executionType = CustomActionExecutionType.Rollback;
+                            break;
+                        case "secondSequence":
+                            //bits |= MsiInterop.MsidbCustomActionTypeClientRepeat;
+                            executionType = CustomActionExecutionType.ClientRepeat;
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, execute, "commit", "deferred", "firstSequence", "immediate", "oncePerProcess", "rollback", "secondSequence"));
+                            break;
                         }
                         break;
                     case "FileKey":
@@ -3193,20 +3234,23 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        sourceBits = MsiInterop.MsidbCustomActionTypeSourceFile;
+                        //sourceBits = MsiInterop.MsidbCustomActionTypeSourceFile;
+                        sourceType = CustomActionSourceType.File;
                         this.Core.CreateSimpleReference(sourceLineNumbers, "File", source); // add a reference to the appropriate File
                         break;
                     case "HideTarget":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbCustomActionTypeHideTarget;
-                        }
+                        hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbCustomActionTypeHideTarget;
+                        //}
                         break;
                     case "Impersonate":
-                        if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbCustomActionTypeNoImpersonate;
-                        }
+                        impersonate = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbCustomActionTypeNoImpersonate;
+                        //}
                         break;
                     case "JScriptCall":
                         if (null != target)
@@ -3214,13 +3258,15 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetBits = MsiInterop.MsidbCustomActionTypeJScript;
+                        //targetBits = MsiInterop.MsidbCustomActionTypeJScript;
+                        targetType = CustomActionTargetType.JScript;
                         break;
                     case "PatchUninstall":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            extendedBits |= MsiInterop.MsidbCustomActionTypePatchUninstall;
-                        }
+                        patchUninstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    extendedBits |= MsiInterop.MsidbCustomActionTypePatchUninstall;
+                        //}
                         break;
                     case "Property":
                         if (null != source)
@@ -3228,30 +3274,33 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        sourceBits = MsiInterop.MsidbCustomActionTypeProperty;
+                        //sourceBits = MsiInterop.MsidbCustomActionTypeProperty;
+                        sourceType = CustomActionSourceType.Property;
                         break;
                     case "Return":
                         var returnValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < returnValue.Length)
+                        switch (returnValue)
                         {
-                            var returnType = Wix.CustomAction.ParseReturnType(returnValue);
-                            switch (returnType)
-                            {
-                            case Wix.CustomAction.ReturnType.asyncNoWait:
-                                bits |= MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue;
-                                break;
-                            case Wix.CustomAction.ReturnType.asyncWait:
-                                bits |= MsiInterop.MsidbCustomActionTypeAsync;
-                                break;
-                            case Wix.CustomAction.ReturnType.check:
-                                break;
-                            case Wix.CustomAction.ReturnType.ignore:
-                                bits |= MsiInterop.MsidbCustomActionTypeContinue;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, returnValue, "asyncNoWait", "asyncWait", "check", "ignore"));
-                                break;
-                            }
+                        case "asyncNoWait":
+                            //bits |= MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue;
+                            async = true;
+                            ignoreResult = true;
+                            break;
+                        case "asyncWait":
+                            //bits |= MsiInterop.MsidbCustomActionTypeAsync;
+                            async = true;
+                            break;
+                        case "check":
+                            break;
+                        case "ignore":
+                            //bits |= MsiInterop.MsidbCustomActionTypeContinue;
+                            ignoreResult = true;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, returnValue, "asyncNoWait", "asyncWait", "check", "ignore"));
+                            break;
                         }
                         break;
                     case "Script":
@@ -3272,33 +3321,36 @@ namespace WixToolset.Core
                         inlineScript = true;
 
                         var script = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < script.Length)
+                        switch (script)
                         {
-                            var scriptType = Wix.CustomAction.ParseScriptType(script);
-                            switch (scriptType)
-                            {
-                            case Wix.CustomAction.ScriptType.jscript:
-                                sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
-                                targetBits = MsiInterop.MsidbCustomActionTypeJScript;
-                                break;
-                            case Wix.CustomAction.ScriptType.vbscript:
-                                sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
-                                targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, script, "jscript", "vbscript"));
-                                break;
-                            }
+                        case "jscript":
+                            //sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
+                            sourceType = CustomActionSourceType.Directory;
+                            //targetBits = MsiInterop.MsidbCustomActionTypeJScript;
+                            targetType = CustomActionTargetType.JScript;
+                            break;
+                        case "vbscript":
+                            //sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
+                            sourceType = CustomActionSourceType.Directory;
+                            //targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
+                            targetType = CustomActionTargetType.VBScript;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, script, "jscript", "vbscript"));
+                            break;
                         }
                         break;
                     case "SuppressModularization":
                         suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "TerminalServerAware":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbCustomActionTypeTSAware;
-                        }
+                        tsAware = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbCustomActionTypeTSAware;
+                        //}
                         break;
                     case "Value":
                         if (null != target)
@@ -3306,7 +3358,8 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetBits = MsiInterop.MsidbCustomActionTypeTextData;
+                        //targetBits = MsiInterop.MsidbCustomActionTypeTextData;
+                        targetType = CustomActionTargetType.TextData;
                         break;
                     case "VBScriptCall":
                         if (null != target)
@@ -3314,14 +3367,16 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
+                        //targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
+                        targetType = CustomActionTargetType.VBScript;
                         break;
                     case "Win64":
                         explicitWin64 = true;
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbCustomActionType64BitScript;
-                        }
+                        win64 = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        //{
+                        //    bits |= MsiInterop.MsidbCustomActionType64BitScript;
+                        //}
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3340,49 +3395,49 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            if (!explicitWin64 && (MsiInterop.MsidbCustomActionTypeVBScript == targetBits || MsiInterop.MsidbCustomActionTypeJScript == targetBits) && (Platform.IA64 == this.CurrentPlatform || Platform.X64 == this.CurrentPlatform))
+            if (!explicitWin64 && (CustomActionTargetType.VBScript == targetType || CustomActionTargetType.JScript == targetType) && (Platform.IA64 == this.CurrentPlatform || Platform.X64 == this.CurrentPlatform))
             {
-                bits |= MsiInterop.MsidbCustomActionType64BitScript;
+                win64 = true;
             }
 
             // get the inner text if any exists
-            innerText = this.Core.GetTrimmedInnerText(node);
+            var innerText = this.Core.GetTrimmedInnerText(node);
 
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
             if (inlineScript)
             {
                 target = innerText;
             }
-            else if (MsiInterop.MsidbCustomActionTypeVBScript == targetBits) // non-inline vbscript
+            else if (CustomActionTargetType.VBScript == targetType) // non-inline vbscript
             {
                 if (null == source)
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "BinaryKey", "FileKey", "Property"));
                 }
-                else if (MsiInterop.MsidbCustomActionTypeDirectory == sourceBits)
+                else if (CustomActionSourceType.Directory == sourceType)
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "VBScriptCall", "Directory"));
                 }
             }
-            else if (MsiInterop.MsidbCustomActionTypeJScript == targetBits) // non-inline jscript
+            else if (CustomActionTargetType.JScript == targetType) // non-inline jscript
             {
                 if (null == source)
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "BinaryKey", "FileKey", "Property"));
                 }
-                else if (MsiInterop.MsidbCustomActionTypeDirectory == sourceBits)
+                else if (CustomActionSourceType.Directory == sourceType)
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "JScriptCall", "Directory"));
                 }
             }
-            else if (MsiInterop.MsidbCustomActionTypeExe == targetBits) // exe-command
+            else if (CustomActionTargetType.Exe == targetType) // exe-command
             {
                 if (null == source)
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ExeCommand", "BinaryKey", "Directory", "FileKey", "Property"));
                 }
             }
-            else if (MsiInterop.MsidbCustomActionTypeTextData == (bits | sourceBits | targetBits))
+            else if (CustomActionTargetType.TextData == targetType && CustomActionSourceType.Directory != sourceType && CustomActionSourceType.Property != sourceType)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Value", "Directory", "Property"));
             }
@@ -3391,34 +3446,36 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.CustomActionIllegalInnerText(sourceLineNumbers, node.Name.LocalName, innerText, "Script"));
             }
 
-            if (MsiInterop.MsidbCustomActionType64BitScript == (bits & MsiInterop.MsidbCustomActionType64BitScript) && MsiInterop.MsidbCustomActionTypeVBScript != targetBits && MsiInterop.MsidbCustomActionTypeJScript != targetBits)
+            if (win64 && CustomActionTargetType.VBScript != targetType && CustomActionTargetType.JScript != targetType)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Win64", "Script", "VBScriptCall", "JScriptCall"));
             }
 
-            if ((MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue) == (bits & (MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue)) && MsiInterop.MsidbCustomActionTypeExe != targetBits)
+            if (async && ignoreResult && CustomActionTargetType.Exe != targetType)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Return", "asyncNoWait", "ExeCommand"));
             }
 
-            if (MsiInterop.MsidbCustomActionTypeTSAware == (bits & MsiInterop.MsidbCustomActionTypeTSAware))
+            // TS-aware CAs are valid only when deferred.
+            if (tsAware &
+                CustomActionExecutionType.Deferred != executionType &&
+                CustomActionExecutionType.Rollback != executionType &&
+                CustomActionExecutionType.Commit != executionType)
             {
-                // TS-aware CAs are valid only when deferred so require the in-script Type bit...
-                if (0 == (bits & MsiInterop.MsidbCustomActionTypeInScript))
-                {
-                    this.Core.Write(ErrorMessages.IllegalTerminalServerCustomActionAttributes(sourceLineNumbers));
-                }
+                this.Core.Write(ErrorMessages.IllegalTerminalServerCustomActionAttributes(sourceLineNumbers));
             }
 
             // MSI doesn't support in-script property setting, so disallow it
-            if (MsiInterop.MsidbCustomActionTypeProperty == sourceBits &&
-                MsiInterop.MsidbCustomActionTypeTextData == targetBits &&
-                0 != (bits & MsiInterop.MsidbCustomActionTypeInScript))
+            if (CustomActionSourceType.Property == sourceType &&
+                CustomActionTargetType.TextData == targetType &&
+                (CustomActionExecutionType.Deferred == executionType ||
+                 CustomActionExecutionType.Rollback == executionType ||
+                 CustomActionExecutionType.Commit == executionType))
             {
                 this.Core.Write(ErrorMessages.IllegalPropertyCustomActionAttributes(sourceLineNumbers));
             }
 
-            if (0 == targetBits)
+            if (!targetType.HasValue /*0 == targetBits*/)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
             }
@@ -3427,14 +3484,30 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction, id);
-                row.Set(1, bits | sourceBits | targetBits);
-                row.Set(2, source);
-                row.Set(3, target);
-                if (0 != extendedBits)
+                var tuple = new CustomActionTuple(sourceLineNumbers, id)
                 {
-                    row.Set(4, extendedBits);
-                }
+                    ExecutionType = executionType,
+                    Source = source,
+                    SourceType = sourceType.Value,
+                    Target = target,
+                    TargetType = targetType.Value,
+                    Async = async,
+                    IgnoreResult = ignoreResult,
+                    Impersonate = impersonate,
+                    PatchUninstall = patchUninstall,
+                    TSAware = tsAware,
+                    Win64 = win64,
+                };
+                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction, id);
+                //row.Set(1, bits | sourceBits | targetBits);
+                //row.Set(2, source);
+                //row.Set(3, target);
+                //if (0 != extendedBits)
+                //{
+                //    row.Set(4, extendedBits);
+                //}
+
+                this.Core.AddTuple(tuple);
 
                 if (YesNoType.Yes == suppressModularization)
                 {
@@ -3442,10 +3515,12 @@ namespace WixToolset.Core
                 }
 
                 // For deferred CAs that specify HideTarget we should also hide the CA data property for the action.
-                if (MsiInterop.MsidbCustomActionTypeHideTarget == (bits & MsiInterop.MsidbCustomActionTypeHideTarget) &&
-                    MsiInterop.MsidbCustomActionTypeInScript == (bits & MsiInterop.MsidbCustomActionTypeInScript))
+                if (hidden &&
+                    (CustomActionExecutionType.Deferred == executionType ||
+                     CustomActionExecutionType.Commit == executionType ||
+                     CustomActionExecutionType.Rollback == executionType))
                 {
-                    this.AddWixPropertyRow(sourceLineNumbers, id, false, false, true);
+                    this.AddWixPropertyRow(sourceLineNumbers, id, false, false, hidden);
                 }
             }
         }
@@ -3827,24 +3902,22 @@ namespace WixToolset.Core
                                 break;
                             case "Type":
                                 var typeValue = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
-                                if (0 < typeValue.Length)
+                                switch (typeValue)
                                 {
-                                    var typeType = Wix.Column.ParseTypeType(typeValue);
-                                    switch (typeType)
-                                    {
-                                    case Wix.Column.TypeType.binary:
-                                        typeName = "OBJECT";
-                                        break;
-                                    case Wix.Column.TypeType.@int:
-                                        typeName = "SHORT";
-                                        break;
-                                    case Wix.Column.TypeType.@string:
-                                        typeName = "CHAR";
-                                        break;
-                                    default:
-                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Type", typeValue, "binary", "int", "string"));
-                                        break;
-                                    }
+                                case "binary":
+                                    typeName = "OBJECT";
+                                    break;
+                                case "int":
+                                    typeName = "SHORT";
+                                    break;
+                                case "string":
+                                    typeName = "CHAR";
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Type", typeValue, "binary", "int", "string"));
+                                    break;
                                 }
                                 break;
                             case "Width":
@@ -4615,16 +4688,17 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            string allowAdvertise = null;
-            var bits = 0;
             string configurableDirectory = null;
             string description = null;
-            var display = "collapse";
-            var followParent = YesNoType.NotSet;
-            string installDefault = null;
+            var displayValue = "collapse";
             var level = 1;
             string title = null;
-            string typicalDefault = null;
+
+            var installDefault = FeatureInstallDefault.Local;
+            var typicalDefault = FeatureTypicalDefault.Install;
+            var disallowAbsent = false;
+            var disallowAdvertise = false;
+            var display = 0;
 
             foreach (var attrib in node.Attributes())
             {
@@ -4636,42 +4710,39 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Absent":
-                        var absent = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < absent.Length)
+                        var absentValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (absentValue)
                         {
-                            var absentType = Wix.Feature.ParseAbsentType(absent);
-                            switch (absentType)
-                            {
-                            case Wix.Feature.AbsentType.allow: // this is the default
-                                break;
-                            case Wix.Feature.AbsentType.disallow:
-                                bits = bits | MsiInterop.MsidbFeatureAttributesUIDisallowAbsent;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, absent, "allow", "disallow"));
-                                break;
-                            }
+                        case "allow": // this is the default
+                            break;
+                        case "disallow":
+                            //bits |= MsiInterop.MsidbFeatureAttributesUIDisallowAbsent;
+                            disallowAbsent = true;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, absentValue, "allow", "disallow"));
+                            break;
                         }
                         break;
                     case "AllowAdvertise":
-                        allowAdvertise = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < allowAdvertise.Length)
+                        var advertiseValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (advertiseValue)
                         {
-                            var allowAdvertiseType = Wix.Feature.ParseAllowAdvertiseType(allowAdvertise);
-                            switch (allowAdvertiseType)
-                            {
-                            case Wix.Feature.AllowAdvertiseType.no:
-                                bits |= MsiInterop.MsidbFeatureAttributesDisallowAdvertise;
-                                break;
-                            case Wix.Feature.AllowAdvertiseType.system:
-                                bits |= MsiInterop.MsidbFeatureAttributesNoUnsupportedAdvertise;
-                                break;
-                            case Wix.Feature.AllowAdvertiseType.yes: // this is the default
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, allowAdvertise, "no", "system", "yes"));
-                                break;
-                            }
+                        case "disallow":
+                        case "no":
+                            //bits |= MsiInterop.MsidbFeatureAttributesDisallowAdvertise;
+                            disallowAdvertise = true;
+                            break;
+                        case "allow":
+                        case "yes": // this is the default
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, advertiseValue, "no", "system", "yes"));
+                            break;
                         }
                         break;
                     case "ConfigurableDirectory":
@@ -4681,31 +4752,32 @@ namespace WixToolset.Core
                         description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Display":
-                        display = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        displayValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "InstallDefault":
-                        installDefault = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < installDefault.Length)
+                        var installDefaultValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (installDefaultValue)
                         {
-                            var installDefaultType = Wix.Feature.ParseInstallDefaultType(installDefault);
-                            switch (installDefaultType)
+                        case "followParent":
+                            if (ComplexReferenceParentType.Product == parentType)
                             {
-                            case Wix.Feature.InstallDefaultType.followParent:
-                                if (ComplexReferenceParentType.Product == parentType)
-                                {
-                                    this.Core.Write(ErrorMessages.RootFeatureCannotFollowParent(sourceLineNumbers));
-                                }
-                                bits = bits | MsiInterop.MsidbFeatureAttributesFollowParent;
-                                break;
-                            case Wix.Feature.InstallDefaultType.local: // this is the default
-                                break;
-                            case Wix.Feature.InstallDefaultType.source:
-                                bits = bits | MsiInterop.MsidbFeatureAttributesFavorSource;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installDefault, "followParent", "local", "source"));
-                                break;
+                                this.Core.Write(ErrorMessages.RootFeatureCannotFollowParent(sourceLineNumbers));
                             }
+                            //bits = bits | MsiInterop.MsidbFeatureAttributesFollowParent;
+                            installDefault = FeatureInstallDefault.FollowParent;
+                            break;
+                        case "local": // this is the default
+                            installDefault = FeatureInstallDefault.Local;
+                            break;
+                        case "source":
+                            //bits = bits | MsiInterop.MsidbFeatureAttributesFavorSource;
+                            installDefault = FeatureInstallDefault.Source;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installDefaultValue, "followParent", "local", "source"));
+                            break;
                         }
                         break;
                     case "Level":
@@ -4719,21 +4791,19 @@ namespace WixToolset.Core
                         }
                         break;
                     case "TypicalDefault":
-                        typicalDefault = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < typicalDefault.Length)
+                        var typicalValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (typicalValue)
                         {
-                            var typicalDefaultType = Wix.Feature.ParseTypicalDefaultType(typicalDefault);
-                            switch (typicalDefaultType)
-                            {
-                            case Wix.Feature.TypicalDefaultType.advertise:
-                                bits = bits | MsiInterop.MsidbFeatureAttributesFavorAdvertise;
-                                break;
-                            case Wix.Feature.TypicalDefaultType.install: // this is the default
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typicalDefault, "advertise", "install"));
-                                break;
-                            }
+                        case "advertise":
+                            //bits |= MsiInterop.MsidbFeatureAttributesFavorAdvertise;
+                            typicalDefault = FeatureTypicalDefault.Advertise;
+                            break;
+                        case "install": // this is the default
+                            typicalDefault = FeatureTypicalDefault.Install;
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typicalValue, "advertise", "install"));
+                            break;
                         }
                         break;
                     default:
@@ -4762,14 +4832,9 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.FeatureConfigurableDirectoryNotUppercase(sourceLineNumbers, node.Name.LocalName, "ConfigurableDirectory", configurableDirectory));
             }
 
-            if ("advertise" == typicalDefault && "no" == allowAdvertise)
+            if (FeatureTypicalDefault.Advertise == typicalDefault && disallowAdvertise)
             {
-                this.Core.Write(ErrorMessages.FeatureCannotFavorAndDisallowAdvertise(sourceLineNumbers, node.Name.LocalName, "TypicalDefault", typicalDefault, "AllowAdvertise", allowAdvertise));
-            }
-
-            if (YesNoType.Yes == followParent && ("local" == installDefault || "source" == installDefault))
-            {
-                this.Core.Write(ErrorMessages.FeatureCannotFollowParentAndFavorLocalOrSource(sourceLineNumbers, node.Name.LocalName, "InstallDefault", "FollowParent", "yes"));
+                this.Core.Write(ErrorMessages.FeatureCannotFavorAndDisallowAdvertise(sourceLineNumbers, node.Name.LocalName, "TypicalDefault", "advertise", "AllowAdvertise", "no"));
             }
 
             var childDisplay = 0;
@@ -4814,48 +4879,91 @@ namespace WixToolset.Core
                 }
             }
 
-            if (!this.Core.EncounteredError)
+            switch (displayValue)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Feature, id);
-                // row.Set(1, null); - this column is set in the linker
-                row.Set(2, title);
-                row.Set(3, description);
-                if (0 < display.Length)
+            case "collapse":
+                lastDisplay = (lastDisplay | 1) + 1;
+                display = lastDisplay;
+                break;
+            case "expand":
+                lastDisplay = (lastDisplay + 1) | 1;
+                display = lastDisplay;
+                break;
+            case "hidden":
+                display = 0;
+                break;
+            default:
+                if (!Int32.TryParse(displayValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out display))
                 {
-                    switch (display)
+                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", displayValue, "collapse", "expand", "hidden"));
+                }
+                else
+                {
+                    // Save the display value (if its not hidden) for subsequent rows
+                    if (0 != display)
                     {
-                    case "collapse":
-                        lastDisplay = (lastDisplay | 1) + 1;
-                        row.Set(4, lastDisplay);
-                        break;
-                    case "expand":
-                        lastDisplay = (lastDisplay + 1) | 1;
-                        row.Set(4, lastDisplay);
-                        break;
-                    case "hidden":
-                        row.Set(4, 0);
-                        break;
-                    default:
-                        int value;
-                        if (!Int32.TryParse(display, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", display, "collapse", "expand", "hidden"));
-                        }
-                        else
-                        {
-                            row.Set(4, value);
-                            // save the display value of this row (if its not hidden) for subsequent rows
-                            if (0 != (int)row[4])
-                            {
-                                lastDisplay = (int)row[4];
-                            }
-                        }
-                        break;
+                        lastDisplay = display;
                     }
                 }
-                row.Set(5, level);
-                row.Set(6, configurableDirectory);
-                row.Set(7, bits);
+                break;
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                var tuple = new FeatureTuple(sourceLineNumbers, id)
+                {
+                    Title = title,
+                    Description = description,
+                    Display = display,
+                    Level = level,
+                    Directory_ = configurableDirectory,
+                    DisallowAbsent = disallowAbsent,
+                    DisallowAdvertise = disallowAdvertise,
+                    InstallDefault = installDefault,
+                    TypicalDefault = typicalDefault,
+                };
+
+                this.Core.AddTuple(tuple);
+                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Feature, id);
+                //// row.Set(1, null); - this column is set in the linker
+                //row.Set(2, title);
+                //row.Set(3, description);
+                //if (0 < display.Length)
+                //{
+                //    switch (display)
+                //    {
+                //    case "collapse":
+                //        lastDisplay = (lastDisplay | 1) + 1;
+                //        row.Set(4, lastDisplay);
+                //        break;
+                //    case "expand":
+                //        lastDisplay = (lastDisplay + 1) | 1;
+                //        row.Set(4, lastDisplay);
+                //        break;
+                //    case "hidden":
+                //        row.Set(4, 0);
+                //        break;
+                //    default:
+                //        int value;
+                //        if (!Int32.TryParse(display, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+                //        {
+                //            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", display, "collapse", "expand", "hidden"));
+                //        }
+                //        else
+                //        {
+                //            row.Set(4, value);
+                //            // save the display value of this row (if its not hidden) for subsequent rows
+                //            if (0 != (int)row[4])
+                //            {
+                //                lastDisplay = (int)row[4];
+                //            }
+                //        }
+                //        break;
+                //    }
+                //}
+                //row.Set(5, level);
+                //row.Set(6, configurableDirectory);
+                //row.Set(7, bits);
 
                 if (ComplexReferenceParentType.Unknown != parentType)
                 {
@@ -5109,15 +5217,13 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            string action = null;
             string name = null;
-            var partType = Wix.Environment.PartType.NotSet;
-            string part = null;
+            EnvironmentActionType? action = null;
+            EnvironmentPartType? part = null;
             var permanent = false;
             var separator = ";"; // default to ';'
             var system = false;
-            string text = null;
-            var uninstall = "-"; // default to remove at uninstall
+            string value = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -5129,35 +5235,44 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Action":
-                        var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < value.Length)
+                        var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (actionValue)
                         {
-                            var actionType = Wix.Environment.ParseActionType(value);
-                            switch (actionType)
-                            {
-                            case Wix.Environment.ActionType.create:
-                                action = "+";
-                                break;
-                            case Wix.Environment.ActionType.set:
-                                action = "=";
-                                break;
-                            case Wix.Environment.ActionType.remove:
-                                action = "!";
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "create", "set", "remove"));
-                                break;
-                            }
+                        case "create":
+                            action = EnvironmentActionType.Create;
+                            break;
+                        case "set":
+                            action = EnvironmentActionType.Set;
+                            break;
+                        case "remove":
+                            action = EnvironmentActionType.Remove;
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "create", "set", "remove"));
+                            break;
                         }
                         break;
                     case "Name":
                         name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Part":
-                        part = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (!Wix.Environment.TryParsePartType(part, out partType))
+                        var partValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (partValue)
                         {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Part", part, "all", "first", "last"));
+                        case "all":
+                            part = EnvironmentPartType.All;
+                            break;
+                        case "first":
+                            part = EnvironmentPartType.First;
+                            break;
+                        case "last":
+                            part = EnvironmentPartType.Last;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Part", partValue, "all", "first", "last"));
+                            break;
                         }
                         break;
                     case "Permanent":
@@ -5170,7 +5285,7 @@ namespace WixToolset.Core
                         system = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "Value":
-                        text = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -5185,7 +5300,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                id = this.Core.CreateIdentifier("env", action, name, part, system.ToString());
+                id = this.Core.CreateIdentifier("env", ((int?)action)?.ToString(), name, ((int?)part)?.ToString(), system.ToString());
             }
 
             if (null == name)
@@ -5193,39 +5308,58 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
-            if (Wix.Environment.PartType.NotSet != partType)
+            if (!part.HasValue && action == EnvironmentActionType.Create)
             {
-                if ("+" == action)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Part", "Action", "create"));
-                }
-
-                switch (partType)
-                {
-                case Wix.Environment.PartType.all:
-                    break;
-                case Wix.Environment.PartType.first:
-                    text = String.Concat(text, separator, "[~]");
-                    break;
-                case Wix.Environment.PartType.last:
-                    text = String.Concat("[~]", separator, text);
-                    break;
-                }
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Part", "Action", "create"));
             }
 
-            if (permanent)
-            {
-                uninstall = null;
-            }
+            //if (Wix.Environment.PartType.NotSet != partType)
+            //{
+            //    if ("+" == action)
+            //    {
+            //        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Part", "Action", "create"));
+            //    }
+
+            //    switch (partType)
+            //    {
+            //    case Wix.Environment.PartType.all:
+            //        break;
+            //    case Wix.Environment.PartType.first:
+            //        text = String.Concat(text, separator, "[~]");
+            //        break;
+            //    case Wix.Environment.PartType.last:
+            //        text = String.Concat("[~]", separator, text);
+            //        break;
+            //    }
+            //}
+
+            //if (permanent)
+            //{
+            //    uninstall = null;
+            //}
 
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Environment, id);
-                row.Set(1, String.Concat(action, uninstall, system ? "*" : String.Empty, name));
-                row.Set(2, text);
-                row.Set(3, componentId);
+                var tuple = new EnvironmentTuple(sourceLineNumbers, id)
+                {
+                    Name = name,
+                    Value = value,
+                    Separator = separator,
+                    Action = action,
+                    Part = part,
+                    Permanent = permanent,
+                    System = system,
+                    Component_ = componentId
+                };
+
+                this.Core.AddTuple(tuple);
+
+                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Environment, id);
+                //row.Set(1, String.Concat(action, uninstall, system ? "*" : String.Empty, name));
+                //row.Set(2, text);
+                //row.Set(3, componentId);
             }
         }
 
@@ -5367,10 +5501,10 @@ namespace WixToolset.Core
             }
             else if (YesNoType.No == advertise)
             {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(".", extension), String.Empty, progId, componentId); // Extension
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(".", extension), String.Empty, progId, componentId); // Extension
                 if (null != mime)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(".", extension), "Content Type", mime, componentId); // Extension's MIME ContentType
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat(".", extension), "Content Type", mime, componentId); // Extension's MIME ContentType
                 }
             }
         }
@@ -5387,7 +5521,7 @@ namespace WixToolset.Core
         /// <param name="possibleKeyPath">This will be set with the possible keyPath for the parent component.</param>
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, bool win64Component, string componentGuid)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
@@ -5441,24 +5575,20 @@ namespace WixToolset.Core
                         break;
                     case "Assembly":
                         var assemblyValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < assemblyValue.Length)
+                        switch (assemblyValue)
                         {
-                            var parsedAssemblyType = Wix.File.ParseAssemblyType(assemblyValue);
-                            switch (parsedAssemblyType)
-                            {
-                            case Wix.File.AssemblyType.net:
-                                assemblyType = FileAssemblyType.DotNetAssembly;
-                                break;
-                            case Wix.File.AssemblyType.no:
-                                assemblyType = FileAssemblyType.NotAnAssembly;
-                                break;
-                            case Wix.File.AssemblyType.win32:
-                                assemblyType = FileAssemblyType.Win32Assembly;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
-                                break;
-                            }
+                        case ".net":
+                            assemblyType = FileAssemblyType.DotNetAssembly;
+                            break;
+                        case "no":
+                            assemblyType = FileAssemblyType.NotAnAssembly;
+                            break;
+                        case "win32":
+                            assemblyType = FileAssemblyType.Win32Assembly;
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
+                            break;
                         }
                         break;
                     case "AssemblyApplication":
@@ -5538,27 +5668,25 @@ namespace WixToolset.Core
                         break;
                     case "ProcessorArchitecture":
                         var procArchValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < procArchValue.Length)
+                        switch (procArchValue)
                         {
-                            var procArchType = Wix.File.ParseProcessorArchitectureType(procArchValue);
-                            switch (procArchType)
-                            {
-                            case Wix.File.ProcessorArchitectureType.msil:
-                                procArch = "MSIL";
-                                break;
-                            case Wix.File.ProcessorArchitectureType.x86:
-                                procArch = "x86";
-                                break;
-                            case Wix.File.ProcessorArchitectureType.x64:
-                                procArch = "amd64";
-                                break;
-                            case Wix.File.ProcessorArchitectureType.ia64:
-                                procArch = "ia64";
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64", "ia64"));
-                                break;
-                            }
+                        case "msil":
+                            procArch = "MSIL";
+                            break;
+                        case "x86":
+                            procArch = "x86";
+                            break;
+                        case "x64":
+                            procArch = "amd64";
+                            break;
+                        case "ia64":
+                            procArch = "ia64";
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64", "ia64"));
+                            break;
                         }
                         break;
                     case "ReadOnly":
@@ -6287,16 +6415,28 @@ namespace WixToolset.Core
                         if ("Control" == parentElementLocalName)
                         {
                             action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            if (0 < action.Length)
+                            switch (action)
                             {
-                                if (Wix.Condition.TryParseActionType(action, out var actionType))
-                                {
-                                    action = Compiler.UppercaseFirstChar(action);
-                                }
-                                else
-                                {
-                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "default", "disable", "enable", "hide", "show"));
-                                }
+                            case "default":
+                                action = "Default";
+                                break;
+                            case "disnable":
+                                action = "Disable";
+                                break;
+                            case "enable":
+                                action = "Enable";
+                                break;
+                            case "hide":
+                                action = "Hide";
+                                break;
+                            case "show":
+                                action = "Show";
+                                break;
+                            case "":
+                                break;
+                            default:
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "default", "disable", "enable", "hide", "show"));
+                                break;
                             }
                         }
                         else
@@ -6407,13 +6547,12 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            var action = CompilerConstants.IntegerNotSet;
+            InifFileActionType? action = null;
             string directory = null;
             string key = null;
             string name = null;
             string section = null;
             string shortName = null;
-            TupleDefinitionType tableName;
             string value = null;
 
             foreach (var attrib in node.Attributes())
@@ -6427,30 +6566,25 @@ namespace WixToolset.Core
                         break;
                     case "Action":
                         var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < actionValue.Length)
+                        switch (actionValue)
                         {
-                            var actionType = Wix.IniFile.ParseActionType(actionValue);
-                            switch (actionType)
-                            {
-                            case Wix.IniFile.ActionType.addLine:
-                                action = MsiInterop.MsidbIniFileActionAddLine;
+                            case "addLine":
+                                action = InifFileActionType.AddLine;
                                 break;
-                            case Wix.IniFile.ActionType.addTag:
-                                action = MsiInterop.MsidbIniFileActionAddTag;
+                            case "addTag":
+                                action = InifFileActionType.AddTag;
                                 break;
-                            case Wix.IniFile.ActionType.createLine:
-                                action = MsiInterop.MsidbIniFileActionCreateLine;
+                            case "removeLine":
+                                action = InifFileActionType.RemoveLine;
                                 break;
-                            case Wix.IniFile.ActionType.removeLine:
-                                action = MsiInterop.MsidbIniFileActionRemoveLine;
+                            case "removeTag":
+                                action = InifFileActionType.RemoveTag;
                                 break;
-                            case Wix.IniFile.ActionType.removeTag:
-                                action = MsiInterop.MsidbIniFileActionRemoveTag;
+                            case "": // error case handled by GetAttributeValue()
                                 break;
                             default:
                                 this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", actionValue, "addLine", "addTag", "createLine", "removeLine", "removeTag"));
                                 break;
-                            }
                         }
                         break;
                     case "Directory":
@@ -6482,10 +6616,16 @@ namespace WixToolset.Core
                 }
             }
 
-            if (CompilerConstants.IntegerNotSet == action)
+            if (!action.HasValue)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
-                action = CompilerConstants.IllegalInteger;
+            }
+            else if (InifFileActionType.AddLine == action || InifFileActionType.AddTag == action || InifFileActionType.CreateLine == action)
+            {
+                if (null == value)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+                }
             }
 
             if (null == key)
@@ -6532,30 +6672,20 @@ namespace WixToolset.Core
 
             this.Core.ParseForExtensionElements(node);
 
-            if (MsiInterop.MsidbIniFileActionRemoveLine == action || MsiInterop.MsidbIniFileActionRemoveTag == action)
-            {
-                tableName = TupleDefinitionType.RemoveIniFile;
-            }
-            else
-            {
-                if (null == value)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-                }
-
-                tableName = TupleDefinitionType.IniFile;
-            }
-
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, tableName, id);
-                row.Set(1, this.GetMsiFilenameValue(shortName, name));
-                row.Set(2, directory);
-                row.Set(3, section);
-                row.Set(4, key);
-                row.Set(5, value);
-                row.Set(6, action);
-                row.Set(7, componentId);
+                var tuple = new IniFileTuple(sourceLineNumbers, id)
+                {
+                    FileName = this.GetMsiFilenameValue(shortName, name),
+                    DirProperty = directory,
+                    Section = section,
+                    Key = key,
+                    Value = value,
+                    Action = action.Value,
+                    Component_ = componentId
+                };
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -6602,24 +6732,22 @@ namespace WixToolset.Core
                         break;
                     case "Type":
                         var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < typeValue.Length)
+                        switch (typeValue)
                         {
-                            var typeType = Wix.IniFileSearch.ParseTypeType(typeValue);
-                            switch (typeType)
-                            {
-                            case Wix.IniFileSearch.TypeType.directory:
-                                type = 0;
-                                break;
-                            case Wix.IniFileSearch.TypeType.file:
-                                type = 1;
-                                break;
-                            case Wix.IniFileSearch.TypeType.raw:
-                                type = 2;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "registry"));
-                                break;
-                            }
+                        case "directory":
+                            type = 0;
+                            break;
+                        case "file":
+                            type = 1;
+                            break;
+                        case "raw":
+                            type = 2;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "registry"));
+                            break;
                         }
                         break;
                     default:
@@ -6984,7 +7112,8 @@ namespace WixToolset.Core
         private void ParseMajorUpgradeElement(XElement node, IDictionary<string, string> contextValues)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var options = MsiInterop.MsidbUpgradeAttributesMigrateFeatures;
+            var migrateFeatures = true;
+            var ignoreRemoveFailure = false;
             var allowDowngrades = false;
             var allowSameVersionUpgrades = false;
             var blockUpgrades = false;
@@ -7029,10 +7158,7 @@ namespace WixToolset.Core
                         disallowUpgradeErrorMessage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "MigrateFeatures":
-                        if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options &= ~MsiInterop.MsidbUpgradeAttributesMigrateFeatures;
-                        }
+                        migrateFeatures = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
                         break;
                     case "IgnoreLanguage":
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
@@ -7041,10 +7167,7 @@ namespace WixToolset.Core
                         }
                         break;
                     case "IgnoreRemoveFailure":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesIgnoreRemoveFailure;
-                        }
+                        ignoreRemoveFailure = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
                         break;
                     case "RemoveFeatures":
                         removeFeatures = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -7093,25 +7216,29 @@ namespace WixToolset.Core
             if (!this.Core.EncounteredError)
             {
                 // create the row that performs the upgrade (or downgrade)
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Upgrade);
-                row.Set(0, upgradeCode);
+                var tuple = new UpgradeTuple(sourceLineNumbers)
+                {
+                    UpgradeCode = upgradeCode,
+                    Remove = removeFeatures,
+                    MigrateFeatures = migrateFeatures,
+                    IgnoreRemoveFailures = ignoreRemoveFailure,
+                    ActionProperty = Common.UpgradeDetectedProperty
+                };
+
                 if (allowDowngrades)
                 {
-                    row.Set(1, "0"); // let any version satisfy
-                    // row.Set(2, maximum version; omit so we don't have to fake a version like "255.255.65535";
-                    row.Set(3, productLanguage);
-                    row.Set(4, options | MsiInterop.MsidbUpgradeAttributesVersionMinInclusive);
+                    tuple.VersionMin = "0";
+                    tuple.Language = productLanguage;
+                    tuple.VersionMinInclusive = true;
                 }
                 else
                 {
-                    // row.Set(1, minimum version; skip it so we detect all prior versions.
-                    row.Set(2, productVersion);
-                    row.Set(3, productLanguage);
-                    row.Set(4, allowSameVersionUpgrades ? (options | MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive) : options);
+                    tuple.VersionMax = productVersion;
+                    tuple.Language = productLanguage;
+                    tuple.VersionMaxInclusive = allowSameVersionUpgrades;
                 }
 
-                row.Set(5, removeFeatures);
-                row.Set(6, Common.UpgradeDetectedProperty);
+                this.Core.AddTuple(tuple);
 
                 // Ensure the action property is secure.
                 this.AddWixPropertyRow(sourceLineNumbers, new Identifier(Common.UpgradeDetectedProperty, AccessModifier.Public), false, true, false);
@@ -7119,63 +7246,72 @@ namespace WixToolset.Core
                 // Add launch condition that blocks upgrades
                 if (blockUpgrades)
                 {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.LaunchCondition);
-                    row.Set(0, Common.UpgradePreventedCondition);
-                    row.Set(1, disallowUpgradeErrorMessage);
+                    var conditionTuple = new LaunchConditionTuple(sourceLineNumbers)
+                    {
+                        Condition = Common.UpgradePreventedCondition,
+                        Description = downgradeErrorMessage
+                    };
+
+                    this.Core.AddTuple(conditionTuple);
                 }
 
                 // now create the Upgrade row and launch conditions to prevent downgrades (unless explicitly permitted)
                 if (!allowDowngrades)
                 {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Upgrade);
-                    row.Set(0, upgradeCode);
-                    row.Set(1, productVersion);
-                    // row.Set(2, maximum version; skip it so we detect all future versions.
-                    row.Set(3, productLanguage);
-                    row.Set(4, MsiInterop.MsidbUpgradeAttributesOnlyDetect);
-                    // row.Set(5, removeFeatures);
-                    row.Set(6, Common.DowngradeDetectedProperty);
+                    var upgradeTuple = new UpgradeTuple(sourceLineNumbers)
+                    {
+                        UpgradeCode = upgradeCode,
+                        VersionMin = productVersion,
+                        Language = productLanguage,
+                        OnlyDetect = true,
+                        MigrateFeatures = migrateFeatures,
+                        IgnoreRemoveFailures = ignoreRemoveFailure,
+                        ActionProperty = Common.DowngradeDetectedProperty
+                    };
+
+                    this.Core.AddTuple(upgradeTuple);
 
                     // Ensure the action property is secure.
                     this.AddWixPropertyRow(sourceLineNumbers, new Identifier(Common.DowngradeDetectedProperty, AccessModifier.Public), false, true, false);
 
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.LaunchCondition);
-                    row.Set(0, Common.DowngradePreventedCondition);
-                    row.Set(1, downgradeErrorMessage);
+                    var conditionTuple = new LaunchConditionTuple(sourceLineNumbers)
+                    {
+                        Condition = Common.DowngradePreventedCondition,
+                        Description = downgradeErrorMessage
+                    };
+
+                    this.Core.AddTuple(conditionTuple);
                 }
 
                 // finally, schedule RemoveExistingProducts
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction, new Identifier(AccessModifier.Public, "InstallExecuteSequence", "RemoveExistingProducts"));
-                row.Set(0, "InstallExecuteSequence");
-                row.Set(1, "RemoveExistingProducts");
-                // row.Set(2, condition);
-                // row.Set(3, sequence);
-                row.Set(6, false); // overridable
+                var actionTuple = new WixActionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "InstallExecuteSequence", "RemoveExistingProducts"))
+                {
+                    SequenceTable = SequenceTable.InstallExecuteSequence,
+                    Action = "RemoveExistingProducts",
+                    Overridable = false,
+                };
 
                 switch (schedule)
                 {
-                case null:
-                case "afterInstallValidate":
-                    // row.Set(4, beforeAction;
-                    row.Set(5, "InstallValidate");
-                    break;
-                case "afterInstallInitialize":
-                    // row.Set(4, beforeAction;
-                    row.Set(5, "InstallInitialize");
-                    break;
-                case "afterInstallExecute":
-                    // row.Set(4, beforeAction;
-                    row.Set(5, "InstallExecute");
-                    break;
-                case "afterInstallExecuteAgain":
-                    // row.Set(4, beforeAction;
-                    row.Set(5, "InstallExecuteAgain");
-                    break;
-                case "afterInstallFinalize":
-                    // row.Set(4, beforeAction;
-                    row.Set(5, "InstallFinalize");
-                    break;
+                    case null:
+                    case "afterInstallValidate":
+                        actionTuple.After = "InstallValidate";
+                        break;
+                    case "afterInstallInitialize":
+                        actionTuple.After = "InstallInitialize";
+                        break;
+                    case "afterInstallExecute":
+                        actionTuple.After = "InstallExecute";
+                        break;
+                    case "afterInstallExecuteAgain":
+                        actionTuple.After = "InstallExecuteAgain";
+                        break;
+                    case "afterInstallFinalize":
+                        actionTuple.After = "InstallFinalize";
+                        break;
                 }
+
+                this.Core.AddTuple(actionTuple);
             }
         }
 
@@ -7212,18 +7348,7 @@ namespace WixToolset.Core
                         cabinet = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "CompressionLevel":
-                        var compressionLevelString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < compressionLevelString.Length)
-                        {
-                            if (!Wix.Enums.TryParseCompressionLevelType(compressionLevelString, out var compressionLevelType))
-                            {
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, compressionLevelString, "high", "low", "medium", "mszip", "none"));
-                            }
-                            else
-                            {
-                                compressionLevel = (CompressionLevel)Enum.Parse(typeof(CompressionLevel), compressionLevelString, true);
-                            }
-                        }
+                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, node, attrib);
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -7233,16 +7358,6 @@ namespace WixToolset.Core
                         embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "Layout":
-                    case "src":
-                        if (null != layout)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Layout", "src"));
-                        }
-
-                        if ("src" == attrib.Name.LocalName)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Layout"));
-                        }
                         layout = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "VolumeLabel":
@@ -7300,7 +7415,7 @@ namespace WixToolset.Core
                 }
             }
 
-            if (null != compressionLevel && null == cabinet)
+            if (!compressionLevel.HasValue && null == cabinet)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Cabinet", "CompressionLevel"));
             }
@@ -7366,8 +7481,6 @@ namespace WixToolset.Core
                 }
             }
 
-
-
             // add the row to the section
             if (!this.Core.EncounteredError)
             {
@@ -7407,13 +7520,12 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var cabinetTemplate = "cab{0}.cab";
-            string compressionLevel = null; // this defaults to mszip in Binder
             string diskPrompt = null;
             var patch = null != patchId;
             string volumeLabel = null;
             var maximumUncompressedMediaSize = CompilerConstants.IntegerNotSet;
             var maximumCabinetSizeForLargeFileSplitting = CompilerConstants.IntegerNotSet;
-            var compressionLevelType = Wix.CompressionLevelType.NotSet;
+            CompressionLevel? compressionLevel = null; // this defaults to mszip in Binder
 
             var embedCab = patch ? YesNoType.Yes : YesNoType.NotSet;
 
@@ -7447,14 +7559,7 @@ namespace WixToolset.Core
                         }
                         break;
                     case "CompressionLevel":
-                        compressionLevel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < compressionLevel.Length)
-                        {
-                            if (!Wix.Enums.TryParseCompressionLevelType(compressionLevel, out compressionLevelType))
-                            {
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, compressionLevel, "high", "low", "medium", "mszip", "none"));
-                            }
-                        }
+                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, node, attrib);
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -7521,23 +7626,9 @@ namespace WixToolset.Core
                     mediaTemplateRow.MaximumCabinetSizeForLargeFileSplitting = 0; // Default value of 0 corresponds to max size of 2048 MB (i.e. 2 GB)
                 }
 
-                switch (compressionLevelType)
+                if (compressionLevel.HasValue)
                 {
-                case Wix.CompressionLevelType.high:
-                    mediaTemplateRow.CompressionLevel = CompressionLevel.High;
-                    break;
-                case Wix.CompressionLevelType.low:
-                    mediaTemplateRow.CompressionLevel = CompressionLevel.Low;
-                    break;
-                case Wix.CompressionLevelType.medium:
-                    mediaTemplateRow.CompressionLevel = CompressionLevel.Medium;
-                    break;
-                case Wix.CompressionLevelType.none:
-                    mediaTemplateRow.CompressionLevel = CompressionLevel.None;
-                    break;
-                case Wix.CompressionLevelType.mszip:
-                    mediaTemplateRow.CompressionLevel = CompressionLevel.Mszip;
-                    break;
+                    mediaTemplateRow.CompressionLevel = compressionLevel.Value;
                 }
             }
         }
@@ -7849,220 +7940,14 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.CannotDefaultMismatchedAdvertiseStates(sourceLineNumbers));
                 }
 
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("MIME\\Database\\Content Type\\", contentType), "Extension", String.Concat(".", extension), componentId);
+                this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("MIME\\Database\\Content Type\\", contentType), "Extension", String.Concat(".", extension), componentId);
                 if (null != classId)
                 {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("MIME\\Database\\Content Type\\", contentType), "CLSID", classId, componentId);
+                    this.Core.CreateRegistryRow(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("MIME\\Database\\Content Type\\", contentType), "CLSID", classId, componentId);
                 }
             }
 
             return YesNoType.Yes == returnContentType ? contentType : null;
-        }
-
-        /// <summary>
-        /// Parses a module element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseModuleElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var codepage = 0;
-            string moduleId = null;
-            string version = null;
-
-            this.activeName = null;
-            this.activeLanguage = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        this.activeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if ("PUT-MODULE-NAME-HERE" == this.activeName)
-                        {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
-                        }
-                        else
-                        {
-                            this.activeName = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        }
-                        break;
-                    case "Codepage":
-                        codepage = this.Core.GetAttributeCodePageValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Guid":
-                        moduleId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        this.Core.Write(WarningMessages.DeprecatedModuleGuidAttribute(sourceLineNumbers));
-                        break;
-                    case "Language":
-                        this.activeLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Version":
-                        version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == this.activeName)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null == this.activeLanguage)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
-            }
-
-            if (null == version)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
-            }
-            else if (!CompilerCore.IsValidModuleOrBundleVersion(version))
-            {
-                this.Core.Write(WarningMessages.InvalidModuleOrBundleVersion(sourceLineNumbers, "Module", version));
-            }
-
-            try
-            {
-                this.compilingModule = true; // notice that we are actually building a Merge Module here
-                this.Core.CreateActiveSection(this.activeName, SectionType.Module, codepage, this.Context.CompilationId);
-
-                foreach (var child in node.Elements())
-                {
-                    if (CompilerCore.WixNamespace == child.Name.Namespace)
-                    {
-                        switch (child.Name.LocalName)
-                        {
-                        case "AdminExecuteSequence":
-                        case "AdminUISequence":
-                        case "AdvertiseExecuteSequence":
-                        case "InstallExecuteSequence":
-                        case "InstallUISequence":
-                            this.ParseSequenceElement(child, child.Name.LocalName);
-                            break;
-                        case "AppId":
-                            this.ParseAppIdElement(child, null, YesNoType.Yes, null, null, null);
-                            break;
-                        case "Binary":
-                            this.ParseBinaryElement(child);
-                            break;
-                        case "Component":
-                            this.ParseComponentElement(child, ComplexReferenceParentType.Module, this.activeName, this.activeLanguage, CompilerConstants.IntegerNotSet, null, null);
-                            break;
-                        case "ComponentGroupRef":
-                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Module, this.activeName, this.activeLanguage);
-                            break;
-                        case "ComponentRef":
-                            this.ParseComponentRefElement(child, ComplexReferenceParentType.Module, this.activeName, this.activeLanguage);
-                            break;
-                        case "Configuration":
-                            this.ParseConfigurationElement(child);
-                            break;
-                        case "CustomAction":
-                            this.ParseCustomActionElement(child);
-                            break;
-                        case "CustomActionRef":
-                            this.ParseSimpleRefElement(child, "CustomAction");
-                            break;
-                        case "CustomTable":
-                            this.ParseCustomTableElement(child);
-                            break;
-                        case "Dependency":
-                            this.ParseDependencyElement(child);
-                            break;
-                        case "Directory":
-                            this.ParseDirectoryElement(child, null, CompilerConstants.IntegerNotSet, String.Empty);
-                            break;
-                        case "DirectoryRef":
-                            this.ParseDirectoryRefElement(child);
-                            break;
-                        case "EmbeddedChainer":
-                            this.ParseEmbeddedChainerElement(child);
-                            break;
-                        case "EmbeddedChainerRef":
-                            this.ParseSimpleRefElement(child, "MsiEmbeddedChainer");
-                            break;
-                        case "EnsureTable":
-                            this.ParseEnsureTableElement(child);
-                            break;
-                        case "Exclusion":
-                            this.ParseExclusionElement(child);
-                            break;
-                        case "Icon":
-                            this.ParseIconElement(child);
-                            break;
-                        case "IgnoreModularization":
-                            this.ParseIgnoreModularizationElement(child);
-                            break;
-                        case "IgnoreTable":
-                            this.ParseIgnoreTableElement(child);
-                            break;
-                        case "Package":
-                            this.ParsePackageElement(child, null, moduleId);
-                            break;
-                        case "Property":
-                            this.ParsePropertyElement(child);
-                            break;
-                        case "PropertyRef":
-                            this.ParseSimpleRefElement(child, "Property");
-                            break;
-                        case "SetDirectory":
-                            this.ParseSetDirectoryElement(child);
-                            break;
-                        case "SetProperty":
-                            this.ParseSetPropertyElement(child);
-                            break;
-                        case "SFPCatalog":
-                            string parentName = null;
-                            this.ParseSFPCatalogElement(child, ref parentName);
-                            break;
-                        case "Substitution":
-                            this.ParseSubstitutionElement(child);
-                            break;
-                        case "UI":
-                            this.ParseUIElement(child);
-                            break;
-                        case "UIRef":
-                            this.ParseSimpleRefElement(child, "WixUI");
-                            break;
-                        case "WixVariable":
-                            this.ParseWixVariableElement(child);
-                            break;
-                        default:
-                            this.Core.UnexpectedElement(node, child);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        this.Core.ParseExtensionElement(node, child);
-                    }
-                }
-
-
-                if (!this.Core.EncounteredError)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleSignature);
-                    row.Set(0, this.activeName);
-                    row.Set(1, this.activeLanguage);
-                    row.Set(2, version);
-                }
-            }
-            finally
-            {
-                this.compilingModule = false; // notice that we are no longer building a Merge Module here
-            }
         }
 
         /// <summary>
@@ -9934,17 +9819,21 @@ namespace WixToolset.Core
                     case "ProductVersion":
                         var check = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         validationFlags &= ~TransformFlags.ProductVersionMask;
-                        var productVersionType = Wix.Validate.ParseProductVersionType(check);
-                        switch (productVersionType)
+                        switch (check)
                         {
-                        case Wix.Validate.ProductVersionType.Major:
+                        case "Major":
+                        case "major":
                             validationFlags |= TransformFlags.ValidateMajorVersion;
                             break;
-                        case Wix.Validate.ProductVersionType.Minor:
+                        case "Minor":
+                        case "minor":
                             validationFlags |= TransformFlags.ValidateMinorVersion;
                             break;
-                        case Wix.Validate.ProductVersionType.Update:
+                        case "Update":
+                        case "update":
                             validationFlags |= TransformFlags.ValidateUpdateVersion;
+                            break;
+                        case "":
                             break;
                         default:
                             this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Version", check, "Major", "Minor", "Update"));
@@ -9954,23 +9843,29 @@ namespace WixToolset.Core
                     case "ProductVersionOperator":
                         var op = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         validationFlags &= ~TransformFlags.ProductVersionOperatorMask;
-                        var opType = Wix.Validate.ParseProductVersionOperatorType(op);
-                        switch (opType)
+                        switch (op)
                         {
-                        case Wix.Validate.ProductVersionOperatorType.Lesser:
+                        case "Lesser":
+                        case "lesser":
                             validationFlags |= TransformFlags.ValidateNewLessBaseVersion;
                             break;
-                        case Wix.Validate.ProductVersionOperatorType.LesserOrEqual:
+                        case "LesserOrEqual":
+                        case "lesserOrEqual":
                             validationFlags |= TransformFlags.ValidateNewLessEqualBaseVersion;
                             break;
-                        case Wix.Validate.ProductVersionOperatorType.Equal:
+                        case "Equal":
+                        case "equal":
                             validationFlags |= TransformFlags.ValidateNewEqualBaseVersion;
                             break;
-                        case Wix.Validate.ProductVersionOperatorType.GreaterOrEqual:
+                        case "GreaterOrEqual":
+                        case "greaterOrEqual":
                             validationFlags |= TransformFlags.ValidateNewGreaterEqualBaseVersion;
                             break;
-                        case Wix.Validate.ProductVersionOperatorType.Greater:
+                        case "Greater":
+                        case "greater":
                             validationFlags |= TransformFlags.ValidateNewGreaterBaseVersion;
+                            break;
+                        case "":
                             break;
                         default:
                             this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Operator", op, "Lesser", "LesserOrEqual", "Equal", "GreaterOrEqual", "Greater"));
@@ -10057,7 +9952,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
             }
-
         }
 
         /// <summary>
@@ -10073,10521 +9967,6 @@ namespace WixToolset.Core
                 var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Properties);
                 row.Set(0, name);
                 row.Set(1, value);
-            }
-        }
-
-        /// <summary>
-        /// Parses a dependency element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseDependencyElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string requiredId = null;
-            var requiredLanguage = CompilerConstants.IntegerNotSet;
-            string requiredVersion = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "RequiredId":
-                        requiredId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "RequiredLanguage":
-                        requiredLanguage = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "RequiredVersion":
-                        requiredVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == requiredId)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RequiredId"));
-                requiredId = String.Empty;
-            }
-
-            if (CompilerConstants.IntegerNotSet == requiredLanguage)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RequiredLanguage"));
-                requiredLanguage = CompilerConstants.IllegalInteger;
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleDependency);
-                row.Set(0, this.activeName);
-                row.Set(1, this.activeLanguage);
-                row.Set(2, requiredId);
-                row.Set(3, requiredLanguage.ToString(CultureInfo.InvariantCulture));
-                row.Set(4, requiredVersion);
-            }
-        }
-
-        /// <summary>
-        /// Parses an exclusion element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseExclusionElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string excludedId = null;
-            var excludeExceptLanguage = CompilerConstants.IntegerNotSet;
-            var excludeLanguage = CompilerConstants.IntegerNotSet;
-            var excludedLanguageField = "0";
-            string excludedMaxVersion = null;
-            string excludedMinVersion = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "ExcludedId":
-                        excludedId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ExcludeExceptLanguage":
-                        excludeExceptLanguage = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "ExcludeLanguage":
-                        excludeLanguage = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "ExcludedMaxVersion":
-                        excludedMaxVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ExcludedMinVersion":
-                        excludedMinVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == excludedId)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ExcludedId"));
-                excludedId = String.Empty;
-            }
-
-            if (CompilerConstants.IntegerNotSet != excludeExceptLanguage && CompilerConstants.IntegerNotSet != excludeLanguage)
-            {
-                this.Core.Write(ErrorMessages.IllegalModuleExclusionLanguageAttributes(sourceLineNumbers));
-            }
-            else if (CompilerConstants.IntegerNotSet != excludeExceptLanguage)
-            {
-                excludedLanguageField = Convert.ToString(-excludeExceptLanguage, CultureInfo.InvariantCulture);
-            }
-            else if (CompilerConstants.IntegerNotSet != excludeLanguage)
-            {
-                excludedLanguageField = Convert.ToString(excludeLanguage, CultureInfo.InvariantCulture);
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleExclusion);
-                row.Set(0, this.activeName);
-                row.Set(1, this.activeLanguage);
-                row.Set(2, excludedId);
-                row.Set(3, excludedLanguageField);
-                row.Set(4, excludedMinVersion);
-                row.Set(5, excludedMaxVersion);
-            }
-        }
-
-        /// <summary>
-        /// Parses a configuration element for a configurable merge module.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseConfigurationElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var attributes = 0;
-            string contextData = null;
-            string defaultValue = null;
-            string description = null;
-            string displayName = null;
-            var format = CompilerConstants.IntegerNotSet;
-            string helpKeyword = null;
-            string helpLocation = null;
-            string name = null;
-            string type = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Name":
-                        name = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ContextData":
-                        contextData = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DefaultValue":
-                        defaultValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayName":
-                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Format":
-                        var formatStr = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < formatStr.Length)
-                        {
-                            var formatType = Wix.Configuration.ParseFormatType(formatStr);
-                            switch (formatType)
-                            {
-                            case Wix.Configuration.FormatType.Text:
-                                format = 0;
-                                break;
-                            case Wix.Configuration.FormatType.Key:
-                                format = 1;
-                                break;
-                            case Wix.Configuration.FormatType.Integer:
-                                format = 2;
-                                break;
-                            case Wix.Configuration.FormatType.Bitfield:
-                                format = 3;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Format", formatStr, "Text", "Key", "Integer", "Bitfield"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "HelpKeyword":
-                        helpKeyword = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "HelpLocation":
-                        helpLocation = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "KeyNoOrphan":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= MsiInterop.MsidbMsmConfigurableOptionKeyNoOrphan;
-                        }
-                        break;
-                    case "NonNullable":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= MsiInterop.MsidbMsmConfigurableOptionNonNullable;
-                        }
-                        break;
-                    case "Type":
-                        type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-                name = String.Empty;
-            }
-
-            if (CompilerConstants.IntegerNotSet == format)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Format"));
-                format = CompilerConstants.IllegalInteger;
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleConfiguration);
-                row.Set(0, name);
-                row.Set(1, format);
-                row.Set(2, type);
-                row.Set(3, contextData);
-                row.Set(4, defaultValue);
-                row.Set(5, attributes);
-                row.Set(6, displayName);
-                row.Set(7, description);
-                row.Set(8, helpLocation);
-                row.Set(9, helpKeyword);
-            }
-        }
-
-        /// <summary>
-        /// Parses a substitution element for a configurable merge module.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseSubstitutionElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string column = null;
-            string rowKeys = null;
-            string table = null;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Column":
-                        column = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Row":
-                        rowKeys = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Table":
-                        table = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == column)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Column"));
-                column = String.Empty;
-            }
-
-            if (null == table)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Table"));
-                table = String.Empty;
-            }
-
-            if (null == rowKeys)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Row"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleSubstitution);
-                row.Set(0, table);
-                row.Set(1, rowKeys);
-                row.Set(2, column);
-                row.Set(3, value);
-            }
-        }
-
-        /// <summary>
-        /// Parses an IgnoreTable element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseIgnoreTableElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleIgnoreTable);
-                row.Set(0, id);
-            }
-        }
-
-        /// <summary>
-        /// Parses an odbc driver or translator element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="fileId">Default identifer for driver/translator file.</param>
-        /// <param name="table">Table we're processing for.</param>
-        private void ParseODBCDriverOrTranslator(XElement node, string componentId, string fileId, TupleDefinitionType tableName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var driver = fileId;
-            string name = null;
-            var setup = fileId;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "File":
-                        driver = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", driver);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SetupFile":
-                        setup = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", setup);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("odb", name, fileId, setup);
-            }
-
-            // drivers have a few possible children
-            if (TupleDefinitionType.ODBCDriver == tableName)
-            {
-                // process any data sources for the driver
-                foreach (var child in node.Elements())
-                {
-                    if (CompilerCore.WixNamespace == child.Name.Namespace)
-                    {
-                        switch (child.Name.LocalName)
-                        {
-                        case "ODBCDataSource":
-                            string ignoredKeyPath = null;
-                            this.ParseODBCDataSource(child, componentId, name, out ignoredKeyPath);
-                            break;
-                        case "Property":
-                            this.ParseODBCProperty(child, id.Id, TupleDefinitionType.ODBCAttribute);
-                            break;
-                        default:
-                            this.Core.UnexpectedElement(node, child);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        this.Core.ParseExtensionElement(node, child);
-                    }
-                }
-            }
-            else
-            {
-                this.Core.ParseForExtensionElements(node);
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, tableName, id);
-                row.Set(1, componentId);
-                row.Set(2, name);
-                row.Set(3, driver);
-                row.Set(4, setup);
-            }
-        }
-
-        /// <summary>
-        /// Parses a Property element underneath an ODBC driver or translator.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentId">Identifier of parent driver or translator.</param>
-        /// <param name="tableName">Name of the table to create property in.</param>
-        private void ParseODBCProperty(XElement node, string parentId, TupleDefinitionType tableName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            string propertyValue = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        propertyValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, tableName);
-                row.Set(0, parentId);
-                row.Set(1, id);
-                row.Set(2, propertyValue);
-            }
-        }
-
-        /// <summary>
-        /// Parse an odbc data source element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="driverName">Default name of driver.</param>
-        /// <param name="possibleKeyPath">Identifier of this element in case it is a keypath.</param>
-        /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseODBCDataSource(XElement node, string componentId, string driverName, out string possibleKeyPath)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var keyPath = YesNoType.NotSet;
-            string name = null;
-            var registration = CompilerConstants.IntegerNotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "DriverName":
-                        driverName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "KeyPath":
-                        keyPath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Registration":
-                        var registrationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < registrationValue.Length)
-                        {
-                            var registrationType = Wix.ODBCDataSource.ParseRegistrationType(registrationValue);
-                            switch (registrationType)
-                            {
-                            case Wix.ODBCDataSource.RegistrationType.machine:
-                                registration = 0;
-                                break;
-                            case Wix.ODBCDataSource.RegistrationType.user:
-                                registration = 1;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Registration", registrationValue, "machine", "user"));
-                                break;
-                            }
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (CompilerConstants.IntegerNotSet == registration)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Registration"));
-                registration = CompilerConstants.IllegalInteger;
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("odc", name, driverName, registration.ToString());
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Property":
-                        this.ParseODBCProperty(child, id.Id, TupleDefinitionType.ODBCSourceAttribute);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ODBCDataSource, id);
-                row.Set(1, componentId);
-                row.Set(2, name);
-                row.Set(3, driverName);
-                row.Set(4, registration);
-            }
-
-            possibleKeyPath = id.Id;
-            return keyPath;
-        }
-
-        /// <summary>
-        /// Parses a package element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="productAuthor">Default package author.</param>
-        /// <param name="moduleId">The module guid - this is necessary until Module/@Guid is removed.</param>
-        private void ParsePackageElement(XElement node, string productAuthor, string moduleId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var codepage = "1252";
-            var comments = String.Format(CultureInfo.InvariantCulture, "This installer database contains the logic and data required to install {0}.", this.activeName);
-            var keywords = "Installer";
-            var msiVersion = 100; // lowest released version, really should be specified
-            var packageAuthor = productAuthor;
-            string packageCode = null;
-            var packageLanguages = this.activeLanguage;
-            var packageName = this.activeName;
-            string platform = null;
-            string platformValue = null;
-            var security = YesNoDefaultType.Default;
-            var sourceBits = (this.compilingModule ? 2 : 0);
-            IntermediateTuple row;
-            var installPrivilegeSeen = false;
-            var installScopeSeen = false;
-
-            switch (this.CurrentPlatform)
-            {
-            case Platform.X86:
-                platform = "Intel";
-                break;
-            case Platform.X64:
-                platform = "x64";
-                msiVersion = 200;
-                break;
-            case Platform.IA64:
-                platform = "Intel64";
-                msiVersion = 200;
-                break;
-            case Platform.ARM:
-                platform = "Arm";
-                msiVersion = 500;
-                break;
-            default:
-                throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", this.CurrentPlatform.ToString());
-            }
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        packageCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, this.compilingProduct);
-                        break;
-                    case "AdminImage":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits = sourceBits | 4;
-                        }
-                        break;
-                    case "Comments":
-                        comments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Compressed":
-                        // merge modules must always be compressed, so this attribute is invalid
-                        if (this.compilingModule)
-                        {
-                            this.Core.Write(WarningMessages.DeprecatedPackageCompressedAttribute(sourceLineNumbers));
-                            // this.core.OnMessage(WixErrors.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Compressed", "Module"));
-                        }
-                        else if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits = sourceBits | 2;
-                        }
-                        break;
-                    case "Description":
-                        packageName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "InstallPrivileges":
-                        var installPrivileges = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < installPrivileges.Length)
-                        {
-                            installPrivilegeSeen = true;
-                            var installPrivilegesType = Wix.Package.ParseInstallPrivilegesType(installPrivileges);
-                            switch (installPrivilegesType)
-                            {
-                            case Wix.Package.InstallPrivilegesType.elevated:
-                                // this is the default setting
-                                break;
-                            case Wix.Package.InstallPrivilegesType.limited:
-                                sourceBits = sourceBits | 8;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installPrivileges, "elevated", "limited"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "InstallScope":
-                        var installScope = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < installScope.Length)
-                        {
-                            installScopeSeen = true;
-                            var installScopeType = Wix.Package.ParseInstallScopeType(installScope);
-                            switch (installScopeType)
-                            {
-                            case Wix.Package.InstallScopeType.perMachine:
-                            {
-                                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Property, new Identifier("ALLUSERS", AccessModifier.Public));
-                                row.Set(1, "1");
-                            }
-                            break;
-                            case Wix.Package.InstallScopeType.perUser:
-                                sourceBits = sourceBits | 8;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "InstallerVersion":
-                        msiVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "Keywords":
-                        keywords = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Languages":
-                        packageLanguages = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Manufacturer":
-                        packageAuthor = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if ("PUT-COMPANY-NAME-HERE" == packageAuthor)
-                        {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, packageAuthor));
-                        }
-                        break;
-                    case "Platform":
-                        if (null != platformValue)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platforms"));
-                        }
-
-                        platformValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        var platformType = Wix.Package.ParsePlatformType(platformValue);
-                        switch (platformType)
-                        {
-                        case Wix.Package.PlatformType.intel:
-                            this.Core.Write(WarningMessages.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "x86"));
-                            goto case Wix.Package.PlatformType.x86;
-                        case Wix.Package.PlatformType.x86:
-                            platform = "Intel";
-                            break;
-                        case Wix.Package.PlatformType.x64:
-                            platform = "x64";
-                            break;
-                        case Wix.Package.PlatformType.intel64:
-                            this.Core.Write(WarningMessages.DeprecatedAttributeValue(sourceLineNumbers, platformValue, node.Name.LocalName, attrib.Name.LocalName, "ia64"));
-                            goto case Wix.Package.PlatformType.ia64;
-                        case Wix.Package.PlatformType.ia64:
-                            platform = "Intel64";
-                            break;
-                        case Wix.Package.PlatformType.arm:
-                            platform = "Arm";
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.InvalidPlatformValue(sourceLineNumbers, platformValue));
-                            break;
-                        }
-                        break;
-                    case "Platforms":
-                        if (null != platformValue)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
-                        }
-
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Platform"));
-                        platformValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        platform = platformValue;
-                        break;
-                    case "ReadOnly":
-                        security = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortNames":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            sourceBits = sourceBits | 1;
-                            this.useShortFileNames = true;
-                        }
-                        break;
-                    case "SummaryCodepage":
-                        codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib, true);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (installPrivilegeSeen && installScopeSeen)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "InstallPrivileges", "InstallScope"));
-            }
-
-            if ((0 != String.Compare(platform, "Intel", StringComparison.OrdinalIgnoreCase)) && 200 > msiVersion)
-            {
-                msiVersion = 200;
-                this.Core.Write(WarningMessages.RequiresMsi200for64bitPackage(sourceLineNumbers));
-            }
-
-            if ((0 == String.Compare(platform, "Arm", StringComparison.OrdinalIgnoreCase)) && 500 > msiVersion)
-            {
-                msiVersion = 500;
-                this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));
-            }
-
-            if (null == packageAuthor)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
-            }
-
-            if (this.compilingModule)
-            {
-                if (null == packageCode)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                }
-
-                // merge modules use the modularization guid as the package code
-                if (null != moduleId)
-                {
-                    packageCode = moduleId;
-                }
-
-                // merge modules are always compressed
-                sourceBits = 2;
-            }
-            else // product
-            {
-                if (null == packageCode)
-                {
-                    packageCode = "*";
-                }
-
-                if ("*" != packageCode)
-                {
-                    this.Core.Write(WarningMessages.PackageCodeSet(sourceLineNumbers));
-                }
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 1);
-                row.Set(1, codepage);
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 2);
-                row.Set(1, "Installation Database");
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 3);
-                row.Set(1, packageName);
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 4);
-                row.Set(1, packageAuthor);
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 5);
-                row.Set(1, keywords);
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 6);
-                row.Set(1, comments);
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 7);
-                row.Set(1, String.Format(CultureInfo.InvariantCulture, "{0};{1}", platform, packageLanguages));
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 9);
-                row.Set(1, packageCode);
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 14);
-                row.Set(1, msiVersion.ToString(CultureInfo.InvariantCulture));
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 15);
-                row.Set(1, sourceBits.ToString(CultureInfo.InvariantCulture));
-
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 19);
-                switch (security)
-                {
-                case YesNoDefaultType.No: // no restriction
-                    row.Set(1, "0");
-                    break;
-                case YesNoDefaultType.Default: // read-only recommended
-                    row.Set(1, "2");
-                    break;
-                case YesNoDefaultType.Yes: // read-only enforced
-                    row.Set(1, "4");
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a patch metadata element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParsePatchMetadataElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var allowRemoval = YesNoType.NotSet;
-            string classification = null;
-            string creationTimeUtc = null;
-            string description = null;
-            string displayName = null;
-            string manufacturerName = null;
-            string minorUpdateTargetRTM = null;
-            string moreInfoUrl = null;
-            var optimizeCA = CompilerConstants.IntegerNotSet;
-            var optimizedInstallMode = YesNoType.NotSet;
-            string targetProductName = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "AllowRemoval":
-                        allowRemoval = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Classification":
-                        classification = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CreationTimeUTC":
-                        creationTimeUtc = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayName":
-                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ManufacturerName":
-                        manufacturerName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MinorUpdateTargetRTM":
-                        minorUpdateTargetRTM = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MoreInfoURL":
-                        moreInfoUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "OptimizedInstallMode":
-                        optimizedInstallMode = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "TargetProductName":
-                        targetProductName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (YesNoType.NotSet == allowRemoval)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "AllowRemoval"));
-            }
-
-            if (null == classification)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Classification"));
-            }
-
-            if (null == description)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
-            }
-
-            if (null == displayName)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayName"));
-            }
-
-            if (null == manufacturerName)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ManufacturerName"));
-            }
-
-            if (null == moreInfoUrl)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "MoreInfoURL"));
-            }
-
-            if (null == targetProductName)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "TargetProductName"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "CustomProperty":
-                        this.ParseCustomPropertyElement(child);
-                        break;
-                    case "OptimizeCustomActions":
-                        optimizeCA = this.ParseOptimizeCustomActionsElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                if (YesNoType.NotSet != allowRemoval)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "AllowRemoval");
-                    row.Set(2, YesNoType.Yes == allowRemoval ? "1" : "0");
-                }
-
-                if (null != classification)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "Classification");
-                    row.Set(2, classification);
-                }
-
-                if (null != creationTimeUtc)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "CreationTimeUTC");
-                    row.Set(2, creationTimeUtc);
-                }
-
-                if (null != description)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "Description");
-                    row.Set(2, description);
-                }
-
-                if (null != displayName)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "DisplayName");
-                    row.Set(2, displayName);
-                }
-
-                if (null != manufacturerName)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "ManufacturerName");
-                    row.Set(2, manufacturerName);
-                }
-
-                if (null != minorUpdateTargetRTM)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "MinorUpdateTargetRTM");
-                    row.Set(2, minorUpdateTargetRTM);
-                }
-
-                if (null != moreInfoUrl)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "MoreInfoURL");
-                    row.Set(2, moreInfoUrl);
-                }
-
-                if (CompilerConstants.IntegerNotSet != optimizeCA)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "OptimizeCA");
-                    row.Set(2, optimizeCA.ToString(CultureInfo.InvariantCulture));
-                }
-
-                if (YesNoType.NotSet != optimizedInstallMode)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "OptimizedInstallMode");
-                    row.Set(2, YesNoType.Yes == optimizedInstallMode ? "1" : "0");
-                }
-
-                if (null != targetProductName)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                    row.Set(1, "TargetProductName");
-                    row.Set(2, targetProductName);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a custom property element for the PatchMetadata table.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseCustomPropertyElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string company = null;
-            string property = null;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Company":
-                        company = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Property":
-                        property = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == company)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Company"));
-            }
-
-            if (null == property)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.PatchMetadata);
-                row.Set(0, company);
-                row.Set(1, property);
-                row.Set(2, value);
-            }
-        }
-
-        /// <summary>
-        /// Parses the OptimizeCustomActions element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <returns>The combined integer value for callers to store as appropriate.</returns>
-        private int ParseOptimizeCustomActionsElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var optimizeCA = OptimizeCA.None;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "SkipAssignment":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            optimizeCA |= OptimizeCA.SkipAssignment;
-                        }
-                        break;
-                    case "SkipImmediate":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            optimizeCA |= OptimizeCA.SkipImmediate;
-                        }
-                        break;
-                    case "SkipDeferred":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            optimizeCA |= OptimizeCA.SkipDeferred;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            return (int)optimizeCA;
-        }
-
-        /// <summary>
-        /// Parses a patch information element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParsePatchInformationElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var codepage = "1252";
-            string comments = null;
-            var keywords = "Installer,Patching,PCP,Database";
-            var msiVersion = 1; // Should always be 1 for patches
-            string packageAuthor = null;
-            var packageName = this.activeName;
-            var security = YesNoDefaultType.Default;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "AdminImage":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "Comments":
-                        comments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Compressed":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "Description":
-                        packageName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Keywords":
-                        keywords = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Languages":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "Manufacturer":
-                        packageAuthor = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Platforms":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "ReadOnly":
-                        security = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortNames":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "SummaryCodepage":
-                        codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                // PID_CODEPAGE
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 1);
-                row.Set(1, codepage);
-
-                // PID_TITLE
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 2);
-                row.Set(1, "Patch");
-
-                // PID_SUBJECT
-                if (null != packageName)
-                {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                    row.Set(0, 3);
-                    row.Set(1, packageName);
-                }
-
-                // PID_AUTHOR
-                if (null != packageAuthor)
-                {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                    row.Set(0, 4);
-                    row.Set(1, packageAuthor);
-                }
-
-                // PID_KEYWORDS
-                if (null != keywords)
-                {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                    row.Set(0, 5);
-                    row.Set(1, keywords);
-                }
-
-                // PID_COMMENTS
-                if (null != comments)
-                {
-                    row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                    row.Set(0, 6);
-                    row.Set(1, comments);
-                }
-
-                // PID_PAGECOUNT
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 14);
-                row.Set(1, msiVersion.ToString(CultureInfo.InvariantCulture));
-
-                // PID_WORDCOUNT
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 15);
-                row.Set(1, "0");
-
-                // PID_SECURITY
-                row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType._SummaryInformation);
-                row.Set(0, 19);
-                switch (security)
-                {
-                case YesNoDefaultType.No: // no restriction
-                    row.Set(1, "0");
-                    break;
-                case YesNoDefaultType.Default: // read-only recommended
-                    row.Set(1, "2");
-                    break;
-                case YesNoDefaultType.Yes: // read-only enforced
-                    row.Set(1, "4");
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses an ignore modularization element.
-        /// </summary>
-        /// <param name="node">XmlNode on an IgnoreModulatization element.</param>
-        private void ParseIgnoreModularizationElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string name = null;
-
-            this.Core.Write(WarningMessages.DeprecatedIgnoreModularizationElement(sourceLineNumbers));
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Name":
-                        name = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Type":
-                        // this is actually not used
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSuppressModularization);
-                row.Set(0, name);
-            }
-        }
-
-        /// <summary>
-        /// Parses a permission element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="objectId">Identifier of object to be secured.</param>
-        /// <param name="tableName">Name of table that contains objectId.</param>
-        private void ParsePermissionElement(XElement node, string objectId, string tableName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var bits = new BitArray(32);
-            string domain = null;
-            var permission = 0;
-            string[] specialPermissions = null;
-            string user = null;
-
-            switch (tableName)
-            {
-            case "CreateFolder":
-                specialPermissions = Common.FolderPermissions;
-                break;
-            case "File":
-                specialPermissions = Common.FilePermissions;
-                break;
-            case "Registry":
-                specialPermissions = Common.RegistryPermissions;
-                break;
-            default:
-                this.Core.UnexpectedElement(node.Parent, node);
-                return; // stop processing this element since no valid permissions are available
-            }
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Domain":
-                        domain = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "User":
-                        user = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "FileAllRights":
-                        // match the WinNT.h mask FILE_ALL_ACCESS for value 0x001F01FF (aka 1 1111 0000 0001 1111 1111 or 2032127)
-                        bits[0] = bits[1] = bits[2] = bits[3] = bits[4] = bits[5] = bits[6] = bits[7] = bits[8] = bits[16] = bits[17] = bits[18] = bits[19] = bits[20] = true;
-                        break;
-                    case "SpecificRightsAll":
-                        // match the WinNT.h mask SPECIFIC_RIGHTS_ALL for value 0x0000FFFF (aka 1111 1111 1111 1111)
-                        bits[0] = bits[1] = bits[2] = bits[3] = bits[4] = bits[5] = bits[6] = bits[7] = bits[8] = bits[9] = bits[10] = bits[11] = bits[12] = bits[13] = bits[14] = bits[15] = true;
-                        break;
-                    default:
-                        var attribValue = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (!this.Core.TrySetBitFromName(Common.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
-                        {
-                            if (!this.Core.TrySetBitFromName(Common.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
-                            {
-                                if (!this.Core.TrySetBitFromName(specialPermissions, attrib.Name.LocalName, attribValue, bits, 0))
-                                {
-                                    this.Core.UnexpectedAttribute(node, attrib);
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            permission = this.Core.CreateIntegerFromBitArray(bits);
-
-            if (null == user)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "User"));
-            }
-
-            if (Int32.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
-            {
-                this.Core.Write(ErrorMessages.GenericReadNotAllowed(sourceLineNumbers));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.LockPermissions);
-                row.Set(0, objectId);
-                row.Set(1, tableName);
-                row.Set(2, domain);
-                row.Set(3, user);
-                row.Set(4, permission);
-            }
-        }
-
-        /// <summary>
-        /// Parses an extended permission element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="objectId">Identifier of object to be secured.</param>
-        /// <param name="tableName">Name of table that contains objectId.</param>
-        private void ParsePermissionExElement(XElement node, string objectId, string tableName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string condition = null;
-            Identifier id = null;
-            string sddl = null;
-
-            switch (tableName)
-            {
-            case "CreateFolder":
-            case "File":
-            case "Registry":
-            case "ServiceInstall":
-                break;
-            default:
-                this.Core.UnexpectedElement(node.Parent, node);
-                return; // stop processing this element since nothing will be valid.
-            }
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Sddl":
-                        sddl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == sddl)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Sddl"));
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("pme", objectId, tableName, sddl);
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Condition":
-                        if (null != condition)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                        }
-
-                        condition = this.ParseConditionElement(child, node.Name.LocalName, null, null);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiLockPermissionsEx, id);
-                row.Set(1, objectId);
-                row.Set(2, tableName);
-                row.Set(3, sddl);
-                row.Set(4, condition);
-            }
-        }
-
-        /// <summary>
-        /// Parses a product element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
-        private void ParseProductElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var codepage = 65001;
-            string productCode = null;
-            string upgradeCode = null;
-            string manufacturer = null;
-            string version = null;
-            string symbols = null;
-
-            this.activeName = null;
-            this.activeLanguage = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        productCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
-                        break;
-                    case "Codepage":
-                        codepage = this.Core.GetAttributeCodePageValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Language":
-                        this.activeLanguage = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Manufacturer":
-                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
-                        if ("PUT-COMPANY-NAME-HERE" == manufacturer)
-                        {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, manufacturer));
-                        }
-                        break;
-                    case "Name":
-                        this.activeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
-                        if ("PUT-PRODUCT-NAME-HERE" == this.activeName)
-                        {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
-                        }
-                        break;
-                    case "UpgradeCode":
-                        upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Version": // if the attribute is valid version, use the attribute value as is (so "1.0000.01.01" would *not* get translated to "1.0.1.1").
-                        var verifiedVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        if (!String.IsNullOrEmpty(verifiedVersion))
-                        {
-                            version = attrib.Value;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == productCode)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null == this.activeLanguage)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
-            }
-
-            if (null == manufacturer)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Manufacturer"));
-            }
-
-            if (null == this.activeName)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            if (null == upgradeCode)
-            {
-                this.Core.Write(WarningMessages.MissingUpgradeCode(sourceLineNumbers));
-            }
-
-            if (null == version)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
-            }
-            else if (!CompilerCore.IsValidProductVersion(version))
-            {
-                this.Core.Write(ErrorMessages.InvalidProductVersion(sourceLineNumbers, version));
-            }
-
-            if (this.Core.EncounteredError)
-            {
-                return;
-            }
-
-            try
-            {
-                this.compilingProduct = true;
-                this.Core.CreateActiveSection(productCode, SectionType.Product, codepage, this.Context.CompilationId);
-
-                this.AddProperty(sourceLineNumbers, new Identifier("Manufacturer", AccessModifier.Public), manufacturer, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier("ProductCode", AccessModifier.Public), productCode, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier("ProductLanguage", AccessModifier.Public), this.activeLanguage, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier("ProductName", AccessModifier.Public), this.activeName, false, false, false, true);
-                this.AddProperty(sourceLineNumbers, new Identifier("ProductVersion", AccessModifier.Public), version, false, false, false, true);
-                if (null != upgradeCode)
-                {
-                    this.AddProperty(sourceLineNumbers, new Identifier("UpgradeCode", AccessModifier.Public), upgradeCode, false, false, false, true);
-                }
-
-                var contextValues = new Dictionary<string, string>
-                {
-                    ["ProductLanguage"] = this.activeLanguage,
-                    ["ProductVersion"] = version,
-                    ["UpgradeCode"] = upgradeCode
-                };
-
-                var featureDisplay = 0;
-                foreach (var child in node.Elements())
-                {
-                    if (CompilerCore.WixNamespace == child.Name.Namespace)
-                    {
-                        switch (child.Name.LocalName)
-                        {
-                        case "_locDefinition":
-                            break;
-                        case "AdminExecuteSequence":
-                        case "AdminUISequence":
-                        case "AdvertiseExecuteSequence":
-                        case "InstallExecuteSequence":
-                        case "InstallUISequence":
-                            this.ParseSequenceElement(child, child.Name.LocalName);
-                            break;
-                        case "AppId":
-                            this.ParseAppIdElement(child, null, YesNoType.Yes, null, null, null);
-                            break;
-                        case "Binary":
-                            this.ParseBinaryElement(child);
-                            break;
-                        case "ComplianceCheck":
-                            this.ParseComplianceCheckElement(child);
-                            break;
-                        case "Component":
-                            this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, CompilerConstants.IntegerNotSet, null, null);
-                            break;
-                        case "ComponentGroup":
-                            this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, null);
-                            break;
-                        case "Condition":
-                            this.ParseConditionElement(child, node.Name.LocalName, null, null);
-                            break;
-                        case "CustomAction":
-                            this.ParseCustomActionElement(child);
-                            break;
-                        case "CustomActionRef":
-                            this.ParseSimpleRefElement(child, "CustomAction");
-                            break;
-                        case "CustomTable":
-                            this.ParseCustomTableElement(child);
-                            break;
-                        case "Directory":
-                            this.ParseDirectoryElement(child, null, CompilerConstants.IntegerNotSet, String.Empty);
-                            break;
-                        case "DirectoryRef":
-                            this.ParseDirectoryRefElement(child);
-                            break;
-                        case "EmbeddedChainer":
-                            this.ParseEmbeddedChainerElement(child);
-                            break;
-                        case "EmbeddedChainerRef":
-                            this.ParseSimpleRefElement(child, "MsiEmbeddedChainer");
-                            break;
-                        case "EnsureTable":
-                            this.ParseEnsureTableElement(child);
-                            break;
-                        case "Feature":
-                            this.ParseFeatureElement(child, ComplexReferenceParentType.Product, productCode, ref featureDisplay);
-                            break;
-                        case "FeatureRef":
-                            this.ParseFeatureRefElement(child, ComplexReferenceParentType.Product, productCode);
-                            break;
-                        case "FeatureGroupRef":
-                            this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.Product, productCode);
-                            break;
-                        case "Icon":
-                            this.ParseIconElement(child);
-                            break;
-                        case "InstanceTransforms":
-                            this.ParseInstanceTransformsElement(child);
-                            break;
-                        case "MajorUpgrade":
-                            this.ParseMajorUpgradeElement(child, contextValues);
-                            break;
-                        case "Media":
-                            this.ParseMediaElement(child, null);
-                            break;
-                        case "MediaTemplate":
-                            this.ParseMediaTemplateElement(child, null);
-                            break;
-                        case "Package":
-                            this.ParsePackageElement(child, manufacturer, null);
-                            break;
-                        case "PackageCertificates":
-                        case "PatchCertificates":
-                            this.ParseCertificatesElement(child);
-                            break;
-                        case "Property":
-                            this.ParsePropertyElement(child);
-                            break;
-                        case "PropertyRef":
-                            this.ParseSimpleRefElement(child, "Property");
-                            break;
-                        case "SetDirectory":
-                            this.ParseSetDirectoryElement(child);
-                            break;
-                        case "SetProperty":
-                            this.ParseSetPropertyElement(child);
-                            break;
-                        case "SFPCatalog":
-                            string parentName = null;
-                            this.ParseSFPCatalogElement(child, ref parentName);
-                            break;
-                        case "SymbolPath":
-                            if (null != symbols)
-                            {
-                                symbols += ";" + this.ParseSymbolPathElement(child);
-                            }
-                            else
-                            {
-                                symbols = this.ParseSymbolPathElement(child);
-                            }
-                            break;
-                        case "UI":
-                            this.ParseUIElement(child);
-                            break;
-                        case "UIRef":
-                            this.ParseSimpleRefElement(child, "WixUI");
-                            break;
-                        case "Upgrade":
-                            this.ParseUpgradeElement(child);
-                            break;
-                        case "WixVariable":
-                            this.ParseWixVariableElement(child);
-                            break;
-                        default:
-                            this.Core.UnexpectedElement(node, child);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        this.Core.ParseExtensionElement(node, child);
-                    }
-                }
-
-                if (!this.Core.EncounteredError)
-                {
-                    if (null != symbols)
-                    {
-                        var symbolRow = (WixDeltaPatchSymbolPathsTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixDeltaPatchSymbolPaths);
-                        symbolRow.Id = productCode;
-                        symbolRow.Type = SymbolPathType.Product;
-                        symbolRow.SymbolPaths = symbols;
-                    }
-                }
-            }
-            finally
-            {
-                this.compilingProduct = false;
-            }
-        }
-
-        /// <summary>
-        /// Parses a progid element
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="advertise">Flag if progid is advertised.</param>
-        /// <param name="classId">CLSID related to ProgId.</param>
-        /// <param name="description">Default description of ProgId</param>
-        /// <param name="parent">Optional parent ProgId</param>
-        /// <param name="foundExtension">Set to true if an extension is found; used for error-checking.</param>
-        /// <param name="firstProgIdForClass">Whether or not this ProgId is the first one found in the parent class.</param>
-        /// <returns>This element's Id.</returns>
-        private string ParseProgIdElement(XElement node, string componentId, YesNoType advertise, string classId, string description, string parent, ref bool foundExtension, YesNoType firstProgIdForClass)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string icon = null;
-            var iconIndex = CompilerConstants.IntegerNotSet;
-            string noOpen = null;
-            string progId = null;
-            var progIdAdvertise = YesNoType.NotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        progId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Advertise":
-                        progIdAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Icon":
-                        icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IconIndex":
-                        iconIndex = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int16.MinValue + 1, Int16.MaxValue);
-                        break;
-                    case "NoOpen":
-                        noOpen = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if ((YesNoType.No == advertise && YesNoType.Yes == progIdAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == progIdAdvertise))
-            {
-                this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), progIdAdvertise.ToString()));
-            }
-            else
-            {
-                advertise = progIdAdvertise;
-            }
-
-            if (YesNoType.NotSet == advertise)
-            {
-                advertise = YesNoType.No;
-            }
-
-            if (null != parent && (null != icon || CompilerConstants.IntegerNotSet != iconIndex))
-            {
-                this.Core.Write(ErrorMessages.VersionIndependentProgIdsCannotHaveIcons(sourceLineNumbers));
-            }
-
-            var firstProgIdForNestedClass = YesNoType.Yes;
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Extension":
-                        this.ParseExtensionElement(child, componentId, advertise, progId);
-                        foundExtension = true;
-                        break;
-                    case "ProgId":
-                        // Only allow one nested ProgId.  If we have a child, we should not have a parent.
-                        if (null == parent)
-                        {
-                            if (YesNoType.Yes == advertise)
-                            {
-                                this.ParseProgIdElement(child, componentId, advertise, null, description, progId, ref foundExtension, firstProgIdForNestedClass);
-                            }
-                            else if (YesNoType.No == advertise)
-                            {
-                                this.ParseProgIdElement(child, componentId, advertise, classId, description, progId, ref foundExtension, firstProgIdForNestedClass);
-                            }
-
-                            firstProgIdForNestedClass = YesNoType.No; // any ProgId after this one is definitely not the first.
-                        }
-                        else
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.ProgIdNestedTooDeep(childSourceLineNumbers));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (YesNoType.Yes == advertise)
-            {
-                if (!this.Core.EncounteredError)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ProgId);
-                    row.Set(0, progId);
-                    row.Set(1, parent);
-                    row.Set(2, classId);
-                    row.Set(3, description);
-                    if (null != icon)
-                    {
-                        row.Set(4, icon);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
-                    }
-
-                    if (CompilerConstants.IntegerNotSet != iconIndex)
-                    {
-                        row.Set(5, iconIndex);
-                    }
-
-                    this.Core.EnsureTable(sourceLineNumbers, "Class");
-                }
-            }
-            else if (YesNoType.No == advertise)
-            {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, progId, String.Empty, description, componentId);
-                if (null != classId)
-                {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(progId, "\\CLSID"), String.Empty, classId, componentId);
-                    if (null != parent)   // if this is a version independent ProgId
-                    {
-                        if (YesNoType.Yes == firstProgIdForClass)
-                        {
-                            this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\VersionIndependentProgID"), String.Empty, progId, componentId);
-                        }
-
-                        this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(progId, "\\CurVer"), String.Empty, parent, componentId);
-                    }
-                    else
-                    {
-                        if (YesNoType.Yes == firstProgIdForClass)
-                        {
-                            this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat("CLSID\\", classId, "\\ProgID"), String.Empty, progId, componentId);
-                        }
-                    }
-                }
-
-                if (null != icon)   // ProgId's Default Icon
-                {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "File", icon);
-
-                    icon = String.Format(CultureInfo.InvariantCulture, "\"[#{0}]\"", icon);
-
-                    if (CompilerConstants.IntegerNotSet != iconIndex)
-                    {
-                        icon = String.Concat(icon, ",", iconIndex);
-                    }
-
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(progId, "\\DefaultIcon"), String.Empty, icon, componentId);
-                }
-            }
-
-            if (null != noOpen)
-            {
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, progId, "NoOpen", noOpen, componentId); // ProgId NoOpen name
-            }
-
-            // raise an error for an orphaned ProgId
-            if (YesNoType.Yes == advertise && !foundExtension && null == parent && null == classId)
-            {
-                this.Core.Write(WarningMessages.OrphanedProgId(sourceLineNumbers, progId));
-            }
-
-            return progId;
-        }
-
-        /// <summary>
-        /// Parses a property element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParsePropertyElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var admin = false;
-            var complianceCheck = false;
-            var hidden = false;
-            var secure = false;
-            var suppressModularization = YesNoType.NotSet;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Admin":
-                        admin = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ComplianceCheck":
-                        complianceCheck = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Hidden":
-                        hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Secure":
-                        secure = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SuppressModularization":
-                        suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                id = Identifier.Invalid;
-            }
-            else if ("ProductID" == id.Id)
-            {
-                this.Core.Write(WarningMessages.ProductIdAuthored(sourceLineNumbers));
-            }
-            else if ("SecureCustomProperties" == id.Id || "AdminProperties" == id.Id || "MsiHiddenProperties" == id.Id)
-            {
-                this.Core.Write(ErrorMessages.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
-            }
-
-            var innerText = this.Core.GetTrimmedInnerText(node);
-            if (null != value)
-            {
-                // cannot specify both the value attribute and inner text
-                if (!String.IsNullOrEmpty(innerText))
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
-                }
-            }
-            else // value attribute not specified, use inner text if any.
-            {
-                value = innerText;
-            }
-
-            if ("ErrorDialog" == id.Id)
-            {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "Dialog", value);
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    {
-                        switch (child.Name.LocalName)
-                        {
-                        case "ProductSearch":
-                            this.ParseProductSearchElement(child, id.Id);
-                            secure = true;
-                            break;
-                        default:
-                            // let ParseSearchSignatures handle standard AppSearch children and unknown elements
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // see if this property is used for appSearch
-            var signatures = this.ParseSearchSignatures(node);
-
-            // If we're doing CCP then there must be a signature.
-            if (complianceCheck && 0 == signatures.Count)
-            {
-                this.Core.Write(ErrorMessages.SearchElementRequiredWithAttribute(sourceLineNumbers, node.Name.LocalName, "ComplianceCheck", "yes"));
-            }
-
-            foreach (var sig in signatures)
-            {
-                if (complianceCheck && !this.Core.EncounteredError)
-                {
-                    this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CCPSearch, new Identifier(sig, AccessModifier.Private));
-                }
-
-                this.AddAppSearch(sourceLineNumbers, id, sig);
-            }
-
-            // If we're doing AppSearch get that setup.
-            if (0 < signatures.Count)
-            {
-                this.AddProperty(sourceLineNumbers, id, value, admin, secure, hidden, false);
-            }
-            else // just a normal old property.
-            {
-                // If the property value is empty and none of the flags are set, print out a warning that we're ignoring
-                // the element.
-                if (String.IsNullOrEmpty(value) && !admin && !secure && !hidden)
-                {
-                    this.Core.Write(WarningMessages.PropertyUseless(sourceLineNumbers, id.Id));
-                }
-                else // there is a value and/or a flag set, do that.
-                {
-                    this.AddProperty(sourceLineNumbers, id, value, admin, secure, hidden, false);
-                }
-            }
-
-            if (!this.Core.EncounteredError && YesNoType.Yes == suppressModularization)
-            {
-                this.Core.Write(WarningMessages.PropertyModularizationSuppressed(sourceLineNumbers));
-
-                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSuppressModularization, id);
-            }
-        }
-
-        /// <summary>
-        /// Parses a RegistryKey element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier for parent component.</param>
-        /// <param name="root">Root specified when element is nested under another Registry element, otherwise CompilerConstants.IntegerNotSet.</param>
-        /// <param name="parentKey">Parent key for this Registry element when nested.</param>
-        /// <param name="win64Component">true if the component is 64-bit.</param>
-        /// <param name="possibleKeyPath">Identifier of this registry key since it could be the component's keypath.</param>
-        /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
-        private YesNoType ParseRegistryKeyElement(XElement node, string componentId, int root, string parentKey, bool win64Component, out string possibleKeyPath)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var key = parentKey; // default to parent key path
-            string action = null;
-            var forceCreateOnInstall = false;
-            var forceDeleteOnUninstall = false;
-            var actionType = Wix.RegistryKey.ActionType.NotSet;
-            var keyPath = YesNoType.NotSet;
-
-            possibleKeyPath = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Action":
-                        this.Core.Write(WarningMessages.DeprecatedRegistryKeyActionAttribute(sourceLineNumbers));
-                        action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < action.Length)
-                        {
-                            actionType = Wix.RegistryKey.ParseActionType(action);
-                            switch (actionType)
-                            {
-                            case Wix.RegistryKey.ActionType.create:
-                                forceCreateOnInstall = true;
-                                break;
-                            case Wix.RegistryKey.ActionType.createAndRemoveOnUninstall:
-                                forceCreateOnInstall = true;
-                                forceDeleteOnUninstall = true;
-                                break;
-                            case Wix.RegistryKey.ActionType.none:
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "create", "createAndRemoveOnUninstall", "none"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "ForceCreateOnInstall":
-                        forceCreateOnInstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ForceDeleteOnUninstall":
-                        forceDeleteOnUninstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (null != parentKey)
-                        {
-                            key = Path.Combine(parentKey, key);
-                        }
-                        break;
-                    case "Root":
-                        if (CompilerConstants.IntegerNotSet != root)
-                        {
-                            this.Core.Write(ErrorMessages.RegistryRootInvalid(sourceLineNumbers));
-                        }
-
-                        root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, true);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            var name = forceCreateOnInstall ? (forceDeleteOnUninstall ? "*" : "+") : (forceDeleteOnUninstall ? "-" : null);
-
-            if (forceCreateOnInstall || forceDeleteOnUninstall) // generates a Registry row, so an Id must be present
-            {
-                // generate the identifier if it wasn't provided
-                if (null == id)
-                {
-                    id = this.Core.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), LowercaseOrNull(key), LowercaseOrNull(name));
-                }
-            }
-            else // does not generate a Registry row, so no Id should be present
-            {
-                if (null != id)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Id", "ForceCreateOnInstall", "ForceDeleteOnUninstall", "yes", true));
-                }
-            }
-
-            if (CompilerConstants.IntegerNotSet == root)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
-                root = CompilerConstants.IllegalInteger;
-            }
-
-            if (null == key)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
-                key = String.Empty; // set the key to something to prevent null reference exceptions
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    string possibleChildKeyPath = null;
-
-                    switch (child.Name.LocalName)
-                    {
-                    case "RegistryKey":
-                        if (YesNoType.Yes == this.ParseRegistryKeyElement(child, componentId, root, key, win64Component, out possibleChildKeyPath))
-                        {
-                            if (YesNoType.Yes == keyPath)
-                            {
-                                this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
-                            }
-
-                            possibleKeyPath = possibleChildKeyPath; // the child is the key path
-                            keyPath = YesNoType.Yes;
-                        }
-                        else if (null == possibleKeyPath && null != possibleChildKeyPath)
-                        {
-                            possibleKeyPath = possibleChildKeyPath;
-                        }
-                        break;
-                    case "RegistryValue":
-                        if (YesNoType.Yes == this.ParseRegistryValueElement(child, componentId, root, key, win64Component, out possibleChildKeyPath))
-                        {
-                            if (YesNoType.Yes == keyPath)
-                            {
-                                this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
-                            }
-
-                            possibleKeyPath = possibleChildKeyPath; // the child is the key path
-                            keyPath = YesNoType.Yes;
-                        }
-                        else if (null == possibleKeyPath && null != possibleChildKeyPath)
-                        {
-                            possibleKeyPath = possibleChildKeyPath;
-                        }
-                        break;
-                    case "Permission":
-                        if (!forceCreateOnInstall)
-                        {
-                            this.Core.Write(ErrorMessages.UnexpectedElementWithAttributeValue(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "ForceCreateOnInstall", "yes"));
-                        }
-                        this.ParsePermissionElement(child, id.Id, "Registry");
-                        break;
-                    case "PermissionEx":
-                        if (!forceCreateOnInstall)
-                        {
-                            this.Core.Write(ErrorMessages.UnexpectedElementWithAttributeValue(sourceLineNumbers, node.Name.LocalName, child.Name.LocalName, "ForceCreateOnInstall", "yes"));
-                        }
-                        this.ParsePermissionExElement(child, id.Id, "Registry");
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    var context = new Dictionary<string, string>() { { "RegistryId", id.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
-                    this.Core.ParseExtensionElement(node, child, context);
-                }
-            }
-
-
-            if (!this.Core.EncounteredError && null != name)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Registry, id);
-                row.Set(1, root);
-                row.Set(2, key);
-                row.Set(3, name);
-                //row.Set(4, null);
-                row.Set(5, componentId);
-            }
-
-            return keyPath;
-        }
-
-        /// <summary>
-        /// Parses a RegistryValue element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier for parent component.</param>
-        /// <param name="root">Root specified when element is nested under a RegistryKey element, otherwise CompilerConstants.IntegerNotSet.</param>
-        /// <param name="parentKey">Root specified when element is nested under a RegistryKey element, otherwise CompilerConstants.IntegerNotSet.</param>
-        /// <param name="win64Component">true if the component is 64-bit.</param>
-        /// <param name="possibleKeyPath">Identifier of this registry key since it could be the component's keypath.</param>
-        /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
-        private YesNoType ParseRegistryValueElement(XElement node, string componentId, int root, string parentKey, bool win64Component, out string possibleKeyPath)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var key = parentKey; // default to parent key path
-            string name = null;
-            string value = null;
-            string type = null;
-            var typeType = Wix.RegistryValue.TypeType.NotSet;
-            string action = null;
-            var actionType = Wix.RegistryValue.ActionType.NotSet;
-            var keyPath = YesNoType.NotSet;
-            var couldBeKeyPath = true; // assume that this is a regular registry key that could become the key path
-
-            possibleKeyPath = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Action":
-                        action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < action.Length)
-                        {
-                            if (!Wix.RegistryValue.TryParseActionType(action, out actionType))
-                            {
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "append", "prepend", "write"));
-                            }
-                        }
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (null != parentKey)
-                        {
-                            if (parentKey.EndsWith("\\", StringComparison.Ordinal))
-                            {
-                                key = String.Concat(parentKey, key);
-                            }
-                            else
-                            {
-                                key = String.Concat(parentKey, "\\", key);
-                            }
-                        }
-                        break;
-                    case "KeyPath":
-                        keyPath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Root":
-                        if (CompilerConstants.IntegerNotSet != root)
-                        {
-                            this.Core.Write(ErrorMessages.RegistryRootInvalid(sourceLineNumbers));
-                        }
-
-                        root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, true);
-                        break;
-                    case "Type":
-                        type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < type.Length)
-                        {
-                            if (!Wix.RegistryValue.TryParseTypeType(type, out typeType))
-                            {
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, type, "binary", "expandable", "integer", "multiString", "string"));
-                            }
-                        }
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // generate the identifier if it wasn't provided
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), LowercaseOrNull(key), LowercaseOrNull(name));
-            }
-
-            if ((Wix.RegistryValue.ActionType.append == actionType || Wix.RegistryValue.ActionType.prepend == actionType) &&
-                Wix.RegistryValue.TypeType.multiString != typeType)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Action", action, "Type", "multiString"));
-            }
-
-            if (null == key)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
-            }
-
-            if (CompilerConstants.IntegerNotSet == root)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
-            }
-
-            if (null == type)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "MultiStringValue":
-                        if (Wix.RegistryValue.TypeType.multiString != typeType && null != value)
-                        {
-                            this.Core.Write(ErrorMessages.RegistryMultipleValuesWithoutMultiString(sourceLineNumbers, node.Name.LocalName, "Value", child.Name.LocalName, "Type"));
-                        }
-                        else if (null == value)
-                        {
-                            value = Common.GetInnerText(child);
-                        }
-                        else
-                        {
-                            value = String.Concat(value, "[~]", Common.GetInnerText(child));
-                        }
-                        break;
-                    case "Permission":
-                        this.ParsePermissionElement(child, id.Id, "Registry");
-                        break;
-                    case "PermissionEx":
-                        this.ParsePermissionExElement(child, id.Id, "Registry");
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    var context = new Dictionary<string, string>() { { "RegistryId", id.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
-                    this.Core.ParseExtensionElement(node, child, context);
-                }
-            }
-
-
-            switch (typeType)
-            {
-            case Wix.RegistryValue.TypeType.binary:
-                value = String.Concat("#x", value);
-                break;
-            case Wix.RegistryValue.TypeType.expandable:
-                value = String.Concat("#%", value);
-                break;
-            case Wix.RegistryValue.TypeType.integer:
-                value = String.Concat("#", value);
-                break;
-            case Wix.RegistryValue.TypeType.multiString:
-                switch (actionType)
-                {
-                case Wix.RegistryValue.ActionType.append:
-                    value = String.Concat("[~]", value);
-                    break;
-                case Wix.RegistryValue.ActionType.prepend:
-                    value = String.Concat(value, "[~]");
-                    break;
-                case Wix.RegistryValue.ActionType.write:
-                default:
-                    if (null != value && -1 == value.IndexOf("[~]", StringComparison.Ordinal))
-                    {
-                        value = String.Format(CultureInfo.InvariantCulture, "[~]{0}[~]", value);
-                    }
-                    break;
-                }
-                break;
-            case Wix.RegistryValue.TypeType.@string:
-                // escape the leading '#' character for string registry keys
-                if (null != value && value.StartsWith("#", StringComparison.Ordinal))
-                {
-                    value = String.Concat("#", value);
-                }
-                break;
-            }
-
-            // value may be set by child MultiStringValue elements, so it must be checked here
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-            else if (0 == value.Length && ("+" == name || "-" == name || "*" == name)) // prevent accidental authoring of special name values
-            {
-                this.Core.Write(ErrorMessages.RegistryNameValueIncorrect(sourceLineNumbers, node.Name.LocalName, "Name", name));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Registry, id);
-                row.Set(1, root);
-                row.Set(2, key);
-                row.Set(3, name);
-                row.Set(4, value);
-                row.Set(5, componentId);
-            }
-
-            // If this was just a regular registry key (that could be the key path)
-            // and no child registry key set the possible key path, let's make this
-            // Registry/@Id a possible key path.
-            if (couldBeKeyPath && null == possibleKeyPath)
-            {
-                possibleKeyPath = id.Id;
-            }
-
-            return keyPath;
-        }
-
-        /// <summary>
-        /// Parses a RemoveRegistryKey element.
-        /// </summary>
-        /// <param name="node">The element to parse.</param>
-        /// <param name="componentId">The component identifier of the parent element.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
-        private void ParseRemoveRegistryKeyElement(XElement node, string componentId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string action = null;
-            var actionType = Wix.RemoveRegistryKey.ActionType.NotSet;
-            string key = null;
-            var name = "-";
-            var root = CompilerConstants.IntegerNotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Action":
-                        action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < action.Length)
-                        {
-                            if (!Wix.RemoveRegistryKey.TryParseActionType(action, out actionType))
-                            {
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "removeOnInstall", "removeOnUninstall"));
-                            }
-                        }
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Root":
-                        root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, true);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // generate the identifier if it wasn't provided
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), LowercaseOrNull(key), LowercaseOrNull(name));
-            }
-
-            if (null == action)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
-            }
-
-            if (null == key)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
-            }
-
-            if (CompilerConstants.IntegerNotSet == root)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, (Wix.RemoveRegistryKey.ActionType.removeOnUninstall == actionType ? TupleDefinitionType.Registry : TupleDefinitionType.RemoveRegistry), id);
-                row.Set(1, root);
-                row.Set(2, key);
-                row.Set(3, name);
-                if (Wix.RemoveRegistryKey.ActionType.removeOnUninstall == actionType) // Registry table
-                {
-                    //row.Set(4, null);
-                    row.Set(5, componentId);
-                }
-                else // RemoveRegistry table
-                {
-                    row.Set(4, componentId);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a RemoveRegistryValue element.
-        /// </summary>
-        /// <param name="node">The element to parse.</param>
-        /// <param name="componentId">The component identifier of the parent element.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Changing the way this string normalizes would result " +
-                         "in a change to the way the Registry table is generated, potentially causing extra churn in patches on an MSI built from an older version of WiX. " +
-                         "Furthermore, there is no security hole here, as the strings won't need to make a round trip")]
-        private void ParseRemoveRegistryValueElement(XElement node, string componentId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string key = null;
-            string name = null;
-            var root = CompilerConstants.IntegerNotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Root":
-                        root = this.Core.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, true);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // generate the identifier if it wasn't provided
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("reg", componentId, root.ToString(CultureInfo.InvariantCulture.NumberFormat), LowercaseOrNull(key), LowercaseOrNull(name));
-            }
-
-            if (null == key)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
-            }
-
-            if (CompilerConstants.IntegerNotSet == root)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Root"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RemoveRegistry, id);
-                row.Set(1, root);
-                row.Set(2, key);
-                row.Set(3, name);
-                row.Set(4, componentId);
-            }
-        }
-
-        /// <summary>
-        /// Parses a remove file element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="parentDirectory">Identifier of the parent component's directory.</param>
-        private void ParseRemoveFileElement(XElement node, string componentId, string parentDirectory)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string directory = null;
-            string name = null;
-            var on = CompilerConstants.IntegerNotSet;
-            string property = null;
-            string shortName = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Directory":
-                        directory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, parentDirectory);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, true);
-                        break;
-                    case "On":
-                        var onValue = this.Core.GetAttributeInstallUninstallValue(sourceLineNumbers, attrib);
-                        switch (onValue)
-                        {
-                        case Wix.InstallUninstallType.install:
-                            on = 1;
-                            break;
-                        case Wix.InstallUninstallType.uninstall:
-                            on = 2;
-                            break;
-                        case Wix.InstallUninstallType.both:
-                            on = 3;
-                            break;
-                        default:
-                            on = CompilerConstants.IllegalInteger;
-                            break;
-                        }
-                        break;
-                    case "Property":
-                        property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, true);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-            else if (0 < name.Length)
-            {
-                if (this.Core.IsValidShortFilename(name, true))
-                {
-                    if (null == shortName)
-                    {
-                        shortName = name;
-                        name = null;
-                    }
-                    else
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
-                    }
-                }
-                else if (null == shortName) // generate a short file name.
-                {
-                    shortName = this.Core.CreateShortName(name, true, true, node.Name.LocalName, componentId);
-                }
-            }
-
-            if (CompilerConstants.IntegerNotSet == on)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
-                on = CompilerConstants.IllegalInteger;
-            }
-
-            if (null != directory && null != property)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("rmf", directory ?? property ?? parentDirectory, LowercaseOrNull(shortName), LowercaseOrNull(name), on.ToString());
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RemoveFile, id);
-                row.Set(1, componentId);
-                row.Set(2, this.GetMsiFilenameValue(shortName, name));
-                if (null != directory)
-                {
-                    row.Set(3, directory);
-                }
-                else if (null != property)
-                {
-                    row.Set(3, property);
-                }
-                else
-                {
-                    row.Set(3, parentDirectory);
-                }
-                row.Set(4, on);
-            }
-        }
-
-        /// <summary>
-        /// Parses a RemoveFolder element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="parentDirectory">Identifier of parent component's directory.</param>
-        private void ParseRemoveFolderElement(XElement node, string componentId, string parentDirectory)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string directory = null;
-            var on = CompilerConstants.IntegerNotSet;
-            string property = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Directory":
-                        directory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, parentDirectory);
-                        break;
-                    case "On":
-                        var onValue = this.Core.GetAttributeInstallUninstallValue(sourceLineNumbers, attrib);
-                        switch (onValue)
-                        {
-                        case Wix.InstallUninstallType.install:
-                            on = 1;
-                            break;
-                        case Wix.InstallUninstallType.uninstall:
-                            on = 2;
-                            break;
-                        case Wix.InstallUninstallType.both:
-                            on = 3;
-                            break;
-                        default:
-                            on = CompilerConstants.IllegalInteger;
-                            break;
-                        }
-                        break;
-                    case "Property":
-                        property = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (CompilerConstants.IntegerNotSet == on)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "On"));
-                on = CompilerConstants.IllegalInteger;
-            }
-
-            if (null != directory && null != property)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "Directory", directory));
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("rmf", directory ?? property ?? parentDirectory, on.ToString());
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RemoveFile, id);
-                row.Set(1, componentId);
-                //row.Set(2, null);
-                if (null != directory)
-                {
-                    row.Set(3, directory);
-                }
-                else if (null != property)
-                {
-                    row.Set(3, property);
-                }
-                else
-                {
-                    row.Set(3, parentDirectory);
-                }
-                row.Set(4, on);
-            }
-        }
-
-        /// <summary>
-        /// Parses a reserve cost element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="directoryId">Optional and default identifier of referenced directory.</param>
-        private void ParseReserveCostElement(XElement node, string componentId, string directoryId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var runFromSource = CompilerConstants.IntegerNotSet;
-            var runLocal = CompilerConstants.IntegerNotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Directory":
-                        directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, directoryId);
-                        break;
-                    case "RunFromSource":
-                        runFromSource = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "RunLocal":
-                        runLocal = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("rc", componentId, directoryId);
-            }
-
-            if (CompilerConstants.IntegerNotSet == runFromSource)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RunFromSource"));
-            }
-
-            if (CompilerConstants.IntegerNotSet == runLocal)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "RunLocal"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ReserveCost, id);
-                row.Set(1, componentId);
-                row.Set(2, directoryId);
-                row.Set(3, runLocal);
-                row.Set(4, runFromSource);
-            }
-        }
-
-        /// <summary>
-        /// Parses a sequence element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="sequenceTable">Name of sequence table.</param>
-        private void ParseSequenceElement(XElement node, string sequenceTable)
-        {
-            // use the proper table name internally
-            if ("AdvertiseExecuteSequence" == sequenceTable)
-            {
-                sequenceTable = "AdvtExecuteSequence";
-            }
-
-            // Parse each action in the sequence.
-            foreach (var child in node.Elements())
-            {
-                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                var actionName = child.Name.LocalName;
-                string afterAction = null;
-                string beforeAction = null;
-                string condition = null;
-                var customAction = "Custom" == actionName;
-                var overridable = false;
-                var exitSequence = CompilerConstants.IntegerNotSet;
-                var sequence = CompilerConstants.IntegerNotSet;
-                var showDialog = "Show" == actionName;
-                var specialAction = "InstallExecute" == actionName || "InstallExecuteAgain" == actionName || "RemoveExistingProducts" == actionName || "DisableRollback" == actionName || "ScheduleReboot" == actionName || "ForceReboot" == actionName || "ResolveSource" == actionName;
-                var specialStandardAction = "AppSearch" == actionName || "CCPSearch" == actionName || "RMCCPSearch" == actionName || "LaunchConditions" == actionName || "FindRelatedProducts" == actionName;
-                var suppress = false;
-
-                foreach (var attrib in child.Attributes())
-                {
-                    if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                    {
-                        switch (attrib.Name.LocalName)
-                        {
-                        case "Action":
-                            if (customAction)
-                            {
-                                actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "CustomAction", actionName);
-                            }
-                            else
-                            {
-                                this.Core.UnexpectedAttribute(child, attrib);
-                            }
-                            break;
-                        case "After":
-                            if (customAction || showDialog || specialAction || specialStandardAction)
-                            {
-                                afterAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "WixAction", sequenceTable, afterAction);
-                            }
-                            else
-                            {
-                                this.Core.UnexpectedAttribute(child, attrib);
-                            }
-                            break;
-                        case "Before":
-                            if (customAction || showDialog || specialAction || specialStandardAction)
-                            {
-                                beforeAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "WixAction", sequenceTable, beforeAction);
-                            }
-                            else
-                            {
-                                this.Core.UnexpectedAttribute(child, attrib);
-                            }
-                            break;
-                        case "Dialog":
-                            if (showDialog)
-                            {
-                                actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "Dialog", actionName);
-                            }
-                            else
-                            {
-                                this.Core.UnexpectedAttribute(child, attrib);
-                            }
-                            break;
-                        case "OnExit":
-                            if (customAction || showDialog || specialAction)
-                            {
-                                var exitValue = this.Core.GetAttributeExitValue(childSourceLineNumbers, attrib);
-                                switch (exitValue)
-                                {
-                                case Wix.ExitType.success:
-                                    exitSequence = -1;
-                                    break;
-                                case Wix.ExitType.cancel:
-                                    exitSequence = -2;
-                                    break;
-                                case Wix.ExitType.error:
-                                    exitSequence = -3;
-                                    break;
-                                case Wix.ExitType.suspend:
-                                    exitSequence = -4;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                this.Core.UnexpectedAttribute(child, attrib);
-                            }
-                            break;
-                        case "Overridable":
-                            overridable = YesNoType.Yes == this.Core.GetAttributeYesNoValue(childSourceLineNumbers, attrib);
-                            break;
-                        case "Sequence":
-                            sequence = this.Core.GetAttributeIntegerValue(childSourceLineNumbers, attrib, 1, Int16.MaxValue);
-                            break;
-                        case "Suppress":
-                            suppress = YesNoType.Yes == this.Core.GetAttributeYesNoValue(childSourceLineNumbers, attrib);
-                            break;
-                        default:
-                            this.Core.UnexpectedAttribute(node, attrib);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        this.Core.ParseExtensionAttribute(node, attrib);
-                    }
-                }
-
-
-                // Get the condition from the inner text of the element.
-                condition = this.Core.GetConditionInnerText(child);
-
-                if (customAction && "Custom" == actionName)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Action"));
-                }
-                else if (showDialog && "Show" == actionName)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Dialog"));
-                }
-
-                if (CompilerConstants.IntegerNotSet != sequence)
-                {
-                    if (CompilerConstants.IntegerNotSet != exitSequence)
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "Sequence", "OnExit"));
-                    }
-                    else if (null != beforeAction || null != afterAction)
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "Sequence", "Before", "After"));
-                    }
-                }
-                else // sequence not specified use OnExit (which may also be not set).
-                {
-                    sequence = exitSequence;
-                }
-
-                if (null != beforeAction && null != afterAction)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "After", "Before"));
-                }
-                else if ((customAction || showDialog || specialAction) && !suppress && CompilerConstants.IntegerNotSet == sequence && null == beforeAction && null == afterAction)
-                {
-                    this.Core.Write(ErrorMessages.NeedSequenceBeforeOrAfter(childSourceLineNumbers, child.Name.LocalName));
-                }
-
-                // action that is scheduled to occur before/after itself
-                if (beforeAction == actionName)
-                {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "Before", beforeAction));
-                }
-                else if (afterAction == actionName)
-                {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "After", afterAction));
-                }
-
-                // normal standard actions cannot be set overridable by the user (since they are overridable by default)
-                if (overridable && WindowsInstallerStandard.IsStandardAction(actionName) && !specialAction)
-                {
-                    this.Core.Write(ErrorMessages.UnexpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Overridable"));
-                }
-
-                // suppress cannot be specified at the same time as Before, After, or Sequence
-                if (suppress && (null != afterAction || null != beforeAction || CompilerConstants.IntegerNotSet != sequence || overridable))
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(childSourceLineNumbers, child.Name.LocalName, "Suppress", "Before", "After", "Sequence", "Overridable"));
-                }
-
-                this.Core.ParseForExtensionElements(child);
-
-                // add the row and any references needed
-                if (!this.Core.EncounteredError)
-                {
-                    if (suppress)
-                    {
-                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixSuppressAction, new Identifier(AccessModifier.Public, sequenceTable, actionName));
-                        row.Set(0, sequenceTable);
-                        row.Set(1, actionName);
-                    }
-                    else
-                    {
-                        var row = this.Core.CreateRow(childSourceLineNumbers, TupleDefinitionType.WixAction, new Identifier(AccessModifier.Public, sequenceTable, actionName));
-                        row.Set(0, sequenceTable);
-                        row.Set(1, actionName);
-                        row.Set(2, condition);
-                        if (CompilerConstants.IntegerNotSet != sequence)
-                        {
-                            row.Set(3, sequence);
-                        }
-                        row.Set(4, beforeAction);
-                        row.Set(5, afterAction);
-                        row.Set(6, overridable ? 1 : 0);
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Parses a service config element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="serviceName">Optional element containing parent's service name.</param>
-        private void ParseServiceConfigElement(XElement node, string componentId, string serviceName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string delayedAutoStart = null;
-            string failureActionsWhen = null;
-            var events = 0;
-            var name = serviceName;
-            string preShutdownDelay = null;
-            string requiredPrivileges = null;
-            string sid = null;
-
-            this.Core.Write(WarningMessages.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "DelayedAutoStart":
-                        delayedAutoStart = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < delayedAutoStart.Length)
-                        {
-                            switch (delayedAutoStart)
-                            {
-                            case "no":
-                                delayedAutoStart = "0";
-                                break;
-                            case "yes":
-                                delayedAutoStart = "1";
-                                break;
-                            default:
-                                // allow everything else to pass through that are hopefully "formatted" Properties.
-                                break;
-                            }
-                        }
-                        break;
-                    case "FailureActionsWhen":
-                        failureActionsWhen = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < failureActionsWhen.Length)
-                        {
-                            switch (failureActionsWhen)
-                            {
-                            case "failedToStop":
-                                failureActionsWhen = "0";
-                                break;
-                            case "failedToStopOrReturnedError":
-                                failureActionsWhen = "1";
-                                break;
-                            default:
-                                // allow everything else to pass through that are hopefully "formatted" Properties.
-                                break;
-                            }
-                        }
-                        break;
-                    case "OnInstall":
-                        var install = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == install)
-                        {
-                            events |= MsiInterop.MsidbServiceConfigEventInstall;
-                        }
-                        break;
-                    case "OnReinstall":
-                        var reinstall = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == reinstall)
-                        {
-                            events |= MsiInterop.MsidbServiceConfigEventReinstall;
-                        }
-                        break;
-                    case "OnUninstall":
-                        var uninstall = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == uninstall)
-                        {
-                            events |= MsiInterop.MsidbServiceConfigEventUninstall;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    case "PreShutdownDelay":
-                        preShutdownDelay = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "ServiceName":
-                        if (!String.IsNullOrEmpty(serviceName))
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ServiceInstall"));
-                        }
-
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ServiceSid":
-                        sid = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < sid.Length)
-                        {
-                            switch (sid)
-                            {
-                            case "none":
-                                sid = "0";
-                                break;
-                            case "restricted":
-                                sid = "3";
-                                break;
-                            case "unrestricted":
-                                sid = "1";
-                                break;
-                            default:
-                                // allow everything else to pass through that are hopefully "formatted" Properties.
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // Get the ServiceConfig required privilegs.
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "RequiredPrivilege":
-                        var privilege = this.Core.GetTrimmedInnerText(child);
-                        switch (privilege)
-                        {
-                        case "assignPrimaryToken":
-                            privilege = "SeAssignPrimaryTokenPrivilege";
-                            break;
-                        case "audit":
-                            privilege = "SeAuditPrivilege";
-                            break;
-                        case "backup":
-                            privilege = "SeBackupPrivilege";
-                            break;
-                        case "changeNotify":
-                            privilege = "SeChangeNotifyPrivilege";
-                            break;
-                        case "createGlobal":
-                            privilege = "SeCreateGlobalPrivilege";
-                            break;
-                        case "createPagefile":
-                            privilege = "SeCreatePagefilePrivilege";
-                            break;
-                        case "createPermanent":
-                            privilege = "SeCreatePermanentPrivilege";
-                            break;
-                        case "createSymbolicLink":
-                            privilege = "SeCreateSymbolicLinkPrivilege";
-                            break;
-                        case "createToken":
-                            privilege = "SeCreateTokenPrivilege";
-                            break;
-                        case "debug":
-                            privilege = "SeDebugPrivilege";
-                            break;
-                        case "enableDelegation":
-                            privilege = "SeEnableDelegationPrivilege";
-                            break;
-                        case "impersonate":
-                            privilege = "SeImpersonatePrivilege";
-                            break;
-                        case "increaseBasePriority":
-                            privilege = "SeIncreaseBasePriorityPrivilege";
-                            break;
-                        case "increaseQuota":
-                            privilege = "SeIncreaseQuotaPrivilege";
-                            break;
-                        case "increaseWorkingSet":
-                            privilege = "SeIncreaseWorkingSetPrivilege";
-                            break;
-                        case "loadDriver":
-                            privilege = "SeLoadDriverPrivilege";
-                            break;
-                        case "lockMemory":
-                            privilege = "SeLockMemoryPrivilege";
-                            break;
-                        case "machineAccount":
-                            privilege = "SeMachineAccountPrivilege";
-                            break;
-                        case "manageVolume":
-                            privilege = "SeManageVolumePrivilege";
-                            break;
-                        case "profileSingleProcess":
-                            privilege = "SeProfileSingleProcessPrivilege";
-                            break;
-                        case "relabel":
-                            privilege = "SeRelabelPrivilege";
-                            break;
-                        case "remoteShutdown":
-                            privilege = "SeRemoteShutdownPrivilege";
-                            break;
-                        case "restore":
-                            privilege = "SeRestorePrivilege";
-                            break;
-                        case "security":
-                            privilege = "SeSecurityPrivilege";
-                            break;
-                        case "shutdown":
-                            privilege = "SeShutdownPrivilege";
-                            break;
-                        case "syncAgent":
-                            privilege = "SeSyncAgentPrivilege";
-                            break;
-                        case "systemEnvironment":
-                            privilege = "SeSystemEnvironmentPrivilege";
-                            break;
-                        case "systemProfile":
-                            privilege = "SeSystemProfilePrivilege";
-                            break;
-                        case "systemTime":
-                        case "modifySystemTime":
-                            privilege = "SeSystemtimePrivilege";
-                            break;
-                        case "takeOwnership":
-                            privilege = "SeTakeOwnershipPrivilege";
-                            break;
-                        case "tcb":
-                        case "trustedComputerBase":
-                            privilege = "SeTcbPrivilege";
-                            break;
-                        case "timeZone":
-                        case "modifyTimeZone":
-                            privilege = "SeTimeZonePrivilege";
-                            break;
-                        case "trustedCredManAccess":
-                        case "trustedCredentialManagerAccess":
-                            privilege = "SeTrustedCredManAccessPrivilege";
-                            break;
-                        case "undock":
-                            privilege = "SeUndockPrivilege";
-                            break;
-                        case "unsolicitedInput":
-                            privilege = "SeUnsolicitedInputPrivilege";
-                            break;
-                        default:
-                            // allow everything else to pass through that are hopefully "formatted" Properties.
-                            break;
-                        }
-
-                        if (null != requiredPrivileges)
-                        {
-                            requiredPrivileges = String.Concat(requiredPrivileges, "[~]");
-                        }
-                        requiredPrivileges = String.Concat(requiredPrivileges, privilege);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (String.IsNullOrEmpty(name))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ServiceName"));
-            }
-            else if (null == id)
-            {
-                id = this.Core.CreateIdentifierFromFilename(name);
-            }
-
-            if (0 == events)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "OnInstall", "OnReinstall", "OnUninstall"));
-            }
-
-            if (String.IsNullOrEmpty(delayedAutoStart) && String.IsNullOrEmpty(failureActionsWhen) && String.IsNullOrEmpty(preShutdownDelay) && String.IsNullOrEmpty(requiredPrivileges) && String.IsNullOrEmpty(sid))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "DelayedAutoStart", "FailureActionsWhen", "PreShutdownDelay", "ServiceSid", "RequiredPrivilege"));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                if (!String.IsNullOrEmpty(delayedAutoStart))
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".DS"), id.Access));
-                    row.Set(1, name);
-                    row.Set(2, events);
-                    row.Set(3, 3);
-                    row.Set(4, delayedAutoStart);
-                    row.Set(5, componentId);
-                }
-
-                if (!String.IsNullOrEmpty(failureActionsWhen))
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".FA"), id.Access));
-                    row.Set(1, name);
-                    row.Set(2, events);
-                    row.Set(3, 4);
-                    row.Set(4, failureActionsWhen);
-                    row.Set(5, componentId);
-                }
-
-                if (!String.IsNullOrEmpty(sid))
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".SS"), id.Access));
-                    row.Set(1, name);
-                    row.Set(2, events);
-                    row.Set(3, 5);
-                    row.Set(4, sid);
-                    row.Set(5, componentId);
-                }
-
-                if (!String.IsNullOrEmpty(requiredPrivileges))
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".RP"), id.Access));
-                    row.Set(1, name);
-                    row.Set(2, events);
-                    row.Set(3, 6);
-                    row.Set(4, requiredPrivileges);
-                    row.Set(5, componentId);
-                }
-
-                if (!String.IsNullOrEmpty(preShutdownDelay))
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".PD"), id.Access));
-                    row.Set(1, name);
-                    row.Set(2, events);
-                    row.Set(3, 7);
-                    row.Set(4, preShutdownDelay);
-                    row.Set(5, componentId);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a service config failure actions element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="serviceName">Optional element containing parent's service name.</param>
-        private void ParseServiceConfigFailureActionsElement(XElement node, string componentId, string serviceName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var events = 0;
-            var name = serviceName;
-            var resetPeriod = CompilerConstants.IntegerNotSet;
-            string rebootMessage = null;
-            string command = null;
-            string actions = null;
-            string actionsDelays = null;
-
-            this.Core.Write(WarningMessages.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Command":
-                        command = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "OnInstall":
-                        var install = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == install)
-                        {
-                            events |= MsiInterop.MsidbServiceConfigEventInstall;
-                        }
-                        break;
-                    case "OnReinstall":
-                        var reinstall = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == reinstall)
-                        {
-                            events |= MsiInterop.MsidbServiceConfigEventReinstall;
-                        }
-                        break;
-                    case "OnUninstall":
-                        var uninstall = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == uninstall)
-                        {
-                            events |= MsiInterop.MsidbServiceConfigEventUninstall;
-                        }
-                        break;
-                    case "RebootMessage":
-                        rebootMessage = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "ResetPeriod":
-                        resetPeriod = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "ServiceName":
-                        if (!String.IsNullOrEmpty(serviceName))
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ServiceInstall"));
-                        }
-
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // Get the ServiceConfigFailureActions actions.
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Failure":
-                        string action = null;
-                        string delay = null;
-                        var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-
-                        foreach (var childAttrib in child.Attributes())
-                        {
-                            if (String.IsNullOrEmpty(childAttrib.Name.NamespaceName) || CompilerCore.WixNamespace == childAttrib.Name.Namespace)
-                            {
-                                switch (childAttrib.Name.LocalName)
-                                {
-                                case "Action":
-                                    action = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
-                                    switch (action)
-                                    {
-                                    case "none":
-                                        action = "0";
-                                        break;
-                                    case "restartComputer":
-                                        action = "2";
-                                        break;
-                                    case "restartService":
-                                        action = "1";
-                                        break;
-                                    case "runCommand":
-                                        action = "3";
-                                        break;
-                                    default:
-                                        // allow everything else to pass through that are hopefully "formatted" Properties.
-                                        break;
-                                    }
-                                    break;
-                                case "Delay":
-                                    delay = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
-                                    break;
-                                default:
-                                    this.Core.UnexpectedAttribute(child, childAttrib);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (String.IsNullOrEmpty(action))
-                        {
-                            this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, child.Name.LocalName, "Action"));
-                        }
-
-                        if (String.IsNullOrEmpty(delay))
-                        {
-                            this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, child.Name.LocalName, "Delay"));
-                        }
-
-                        if (!String.IsNullOrEmpty(actions))
-                        {
-                            actions = String.Concat(actions, "[~]");
-                        }
-                        actions = String.Concat(actions, action);
-
-                        if (!String.IsNullOrEmpty(actionsDelays))
-                        {
-                            actionsDelays = String.Concat(actionsDelays, "[~]");
-                        }
-                        actionsDelays = String.Concat(actionsDelays, delay);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (String.IsNullOrEmpty(name))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ServiceName"));
-            }
-            else if (null == id)
-            {
-                id = this.Core.CreateIdentifierFromFilename(name);
-            }
-
-            if (0 == events)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "OnInstall", "OnReinstall", "OnUninstall"));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfigFailureActions, id);
-                row.Set(1, name);
-                row.Set(2, events);
-                if (CompilerConstants.IntegerNotSet != resetPeriod)
-                {
-                    row.Set(3, resetPeriod);
-                }
-                row.Set(4, rebootMessage ?? "[~]");
-                row.Set(5, command ?? "[~]");
-                row.Set(6, actions);
-                row.Set(7, actionsDelays);
-                row.Set(8, componentId);
-            }
-        }
-
-        /// <summary>
-        /// Parses a service control element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        private void ParseServiceControlElement(XElement node, string componentId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string arguments = null;
-            var events = 0; // default is to do nothing
-            Identifier id = null;
-            string name = null;
-            var wait = YesNoType.NotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Remove":
-                        var removeValue = this.Core.GetAttributeInstallUninstallValue(sourceLineNumbers, attrib);
-                        switch (removeValue)
-                        {
-                        case Wix.InstallUninstallType.install:
-                            events |= MsiInterop.MsidbServiceControlEventDelete;
-                            break;
-                        case Wix.InstallUninstallType.uninstall:
-                            events |= MsiInterop.MsidbServiceControlEventUninstallDelete;
-                            break;
-                        case Wix.InstallUninstallType.both:
-                            events |= MsiInterop.MsidbServiceControlEventDelete | MsiInterop.MsidbServiceControlEventUninstallDelete;
-                            break;
-                        }
-                        break;
-                    case "Start":
-                        var startValue = this.Core.GetAttributeInstallUninstallValue(sourceLineNumbers, attrib);
-                        switch (startValue)
-                        {
-                        case Wix.InstallUninstallType.install:
-                            events |= MsiInterop.MsidbServiceControlEventStart;
-                            break;
-                        case Wix.InstallUninstallType.uninstall:
-                            events |= MsiInterop.MsidbServiceControlEventUninstallStart;
-                            break;
-                        case Wix.InstallUninstallType.both:
-                            events |= MsiInterop.MsidbServiceControlEventStart | MsiInterop.MsidbServiceControlEventUninstallStart;
-                            break;
-                        }
-                        break;
-                    case "Stop":
-                        var stopValue = this.Core.GetAttributeInstallUninstallValue(sourceLineNumbers, attrib);
-                        switch (stopValue)
-                        {
-                        case Wix.InstallUninstallType.install:
-                            events |= MsiInterop.MsidbServiceControlEventStop;
-                            break;
-                        case Wix.InstallUninstallType.uninstall:
-                            events |= MsiInterop.MsidbServiceControlEventUninstallStop;
-                            break;
-                        case Wix.InstallUninstallType.both:
-                            events |= MsiInterop.MsidbServiceControlEventStop | MsiInterop.MsidbServiceControlEventUninstallStop;
-                            break;
-                        }
-                        break;
-                    case "Wait":
-                        wait = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifierFromFilename(name);
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            // get the ServiceControl arguments
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "ServiceArgument":
-                        if (null != arguments)
-                        {
-                            arguments = String.Concat(arguments, "[~]");
-                        }
-                        arguments = String.Concat(arguments, this.Core.GetTrimmedInnerText(child));
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ServiceControl, id);
-                row.Set(1, name);
-                row.Set(2, events);
-                row.Set(3, arguments);
-                if (YesNoType.NotSet != wait)
-                {
-                    row.Set(4, YesNoType.Yes == wait ? 1 : 0);
-                }
-                row.Set(5, componentId);
-            }
-        }
-
-        /// <summary>
-        /// Parses a service dependency element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <returns>Parsed sevice dependency name.</returns>
-        private string ParseServiceDependencyElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string dependency = null;
-            var group = false;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        dependency = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Group":
-                        group = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == dependency)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            return group ? String.Concat("+", dependency) : dependency;
-        }
-
-        /// <summary>
-        /// Parses a service install element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        private void ParseServiceInstallElement(XElement node, string componentId, bool win64Component)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string account = null;
-            string arguments = null;
-            string dependencies = null;
-            string description = null;
-            string displayName = null;
-            var eraseDescription = false;
-            var errorbits = 0;
-            string loadOrderGroup = null;
-            string name = null;
-            string password = null;
-            var startType = 0;
-            var typebits = 0;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Account":
-                        account = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Arguments":
-                        arguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayName":
-                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "EraseDescription":
-                        eraseDescription = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ErrorControl":
-                        var errorControlValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < errorControlValue.Length)
-                        {
-                            var errorControlType = Wix.ServiceInstall.ParseErrorControlType(errorControlValue);
-                            switch (errorControlType)
-                            {
-                            case Wix.ServiceInstall.ErrorControlType.ignore:
-                                errorbits |= MsiInterop.MsidbServiceInstallErrorIgnore;
-                                break;
-                            case Wix.ServiceInstall.ErrorControlType.normal:
-                                errorbits |= MsiInterop.MsidbServiceInstallErrorNormal;
-                                break;
-                            case Wix.ServiceInstall.ErrorControlType.critical:
-                                errorbits |= MsiInterop.MsidbServiceInstallErrorCritical;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, errorControlValue, "ignore", "normal", "critical"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "Interactive":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            typebits |= MsiInterop.MsidbServiceInstallInteractive;
-                        }
-                        break;
-                    case "LoadOrderGroup":
-                        loadOrderGroup = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Password":
-                        password = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Start":
-                        var startValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < startValue.Length)
-                        {
-                            var start = Wix.ServiceInstall.ParseStartType(startValue);
-                            switch (start)
-                            {
-                            case Wix.ServiceInstall.StartType.auto:
-                                startType = MsiInterop.MsidbServiceInstallAutoStart;
-                                break;
-                            case Wix.ServiceInstall.StartType.demand:
-                                startType = MsiInterop.MsidbServiceInstallDemandStart;
-                                break;
-                            case Wix.ServiceInstall.StartType.disabled:
-                                startType = MsiInterop.MsidbServiceInstallDisabled;
-                                break;
-                            case Wix.ServiceInstall.StartType.boot:
-                            case Wix.ServiceInstall.StartType.system:
-                                this.Core.Write(ErrorMessages.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue));
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue, "auto", "demand", "disabled"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "Type":
-                        var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < typeValue.Length)
-                        {
-                            var typeType = Wix.ServiceInstall.ParseTypeType(typeValue);
-                            switch (typeType)
-                            {
-                            case Wix.ServiceInstall.TypeType.ownProcess:
-                                typebits |= MsiInterop.MsidbServiceInstallOwnProcess;
-                                break;
-                            case Wix.ServiceInstall.TypeType.shareProcess:
-                                typebits |= MsiInterop.MsidbServiceInstallShareProcess;
-                                break;
-                            case Wix.ServiceInstall.TypeType.kernelDriver:
-                            case Wix.ServiceInstall.TypeType.systemDriver:
-                                this.Core.Write(ErrorMessages.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue));
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, node.Name.LocalName, typeValue, "ownProcess", "shareProcess"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "Vital":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            errorbits |= MsiInterop.MsidbServiceInstallErrorControlVital;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(name))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-            else if (null == id)
-            {
-                id = this.Core.CreateIdentifierFromFilename(name);
-            }
-
-            if (0 == startType)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Start"));
-            }
-
-            if (eraseDescription)
-            {
-                description = "[~]";
-            }
-
-            // get the ServiceInstall dependencies and config
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "PermissionEx":
-                        this.ParsePermissionExElement(child, id.Id, "ServiceInstall");
-                        break;
-                    case "ServiceConfig":
-                        this.ParseServiceConfigElement(child, componentId, name);
-                        break;
-                    case "ServiceConfigFailureActions":
-                        this.ParseServiceConfigFailureActionsElement(child, componentId, name);
-                        break;
-                    case "ServiceDependency":
-                        dependencies = String.Concat(dependencies, this.ParseServiceDependencyElement(child), "[~]");
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    var context = new Dictionary<string, string>() { { "ServiceInstallId", id.Id }, { "ServiceInstallName", name }, { "ServiceInstallComponentId", componentId }, { "Win64", win64Component.ToString() } };
-                    this.Core.ParseExtensionElement(node, child, context);
-                }
-            }
-
-            if (null != dependencies)
-            {
-                dependencies = String.Concat(dependencies, "[~]");
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ServiceInstall, id);
-                row.Set(1, name);
-                row.Set(2, displayName);
-                row.Set(3, typebits);
-                row.Set(4, startType);
-                row.Set(5, errorbits);
-                row.Set(6, loadOrderGroup);
-                row.Set(7, dependencies);
-                row.Set(8, account);
-                row.Set(9, password);
-                row.Set(10, arguments);
-                row.Set(11, componentId);
-                row.Set(12, description);
-            }
-        }
-
-        /// <summary>
-        /// Parses a SetDirectory element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseSetDirectoryElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string actionName = null;
-            string id = null;
-            string condition = null;
-            var sequences = new string[] { "InstallUISequence", "InstallExecuteSequence" }; // default to "both"
-            var extraBits = 0;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Action":
-                        actionName = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Directory", id);
-                        break;
-                    case "Sequence":
-                        var sequenceValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < sequenceValue.Length)
-                        {
-                            var sequenceType = Wix.Enums.ParseSequenceType(sequenceValue);
-                            switch (sequenceType)
-                            {
-                            case Wix.SequenceType.execute:
-                                sequences = new string[] { "InstallExecuteSequence" };
-                                break;
-                            case Wix.SequenceType.ui:
-                                sequences = new string[] { "InstallUISequence" };
-                                break;
-                            case Wix.SequenceType.first:
-                                extraBits = MsiInterop.MsidbCustomActionTypeFirstSequence;
-                                // default puts it in both sequence which is what we want
-                                break;
-                            case Wix.SequenceType.both:
-                                // default so no work necessary.
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            condition = this.Core.GetConditionInnerText(node);
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-            else if (String.IsNullOrEmpty(actionName))
-            {
-                actionName = String.Concat("Set", id);
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            // add the row and any references needed
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction, new Identifier(AccessModifier.Public, actionName));
-                row.Set(1, MsiInterop.MsidbCustomActionTypeProperty | MsiInterop.MsidbCustomActionTypeTextData | extraBits);
-                row.Set(2, id);
-                row.Set(3, value);
-
-                foreach (var sequence in sequences)
-                {
-                    var sequenceRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction);
-                    sequenceRow.Set(0, sequence);
-                    sequenceRow.Set(1, actionName);
-                    sequenceRow.Set(2, condition);
-                    // no explicit sequence
-                    // no before action
-                    sequenceRow.Set(5, "CostInitialize");
-                    sequenceRow.Set(6, 0); // not overridable
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a SetProperty element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseSetPropertyElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string actionName = null;
-            string id = null;
-            string afterAction = null;
-            string beforeAction = null;
-            string condition = null;
-            var sequences = new string[] { "InstallUISequence", "InstallExecuteSequence" }; // default to "both"
-            var extraBits = 0;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Action":
-                        actionName = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "After":
-                        afterAction = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Before":
-                        beforeAction = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Sequence":
-                        var sequenceValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (0 < sequenceValue.Length)
-                        {
-                            var sequenceType = Wix.Enums.ParseSequenceType(sequenceValue);
-                            switch (sequenceType)
-                            {
-                            case Wix.SequenceType.execute:
-                                sequences = new string[] { "InstallExecuteSequence" };
-                                break;
-                            case Wix.SequenceType.ui:
-                                sequences = new string[] { "InstallUISequence" };
-                                break;
-                            case Wix.SequenceType.first:
-                                extraBits = MsiInterop.MsidbCustomActionTypeFirstSequence;
-                                // default puts it in both sequence which is what we want
-                                break;
-                            case Wix.SequenceType.both:
-                                // default so no work necessary.
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
-                                break;
-                            }
-                        }
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            condition = this.Core.GetConditionInnerText(node);
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-            else if (String.IsNullOrEmpty(actionName))
-            {
-                actionName = String.Concat("Set", id);
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            if (null != beforeAction && null != afterAction)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "After", "Before"));
-            }
-            else if (null == beforeAction && null == afterAction)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "After", "Before", "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            // add the row and any references needed
-            if (!this.Core.EncounteredError)
-            {
-                // action that is scheduled to occur before/after itself
-                if (beforeAction == actionName)
-                {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "Before", beforeAction));
-                }
-                else if (afterAction == actionName)
-                {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
-                }
-
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CustomAction, new Identifier(AccessModifier.Public, actionName));
-                row.Set(1, MsiInterop.MsidbCustomActionTypeProperty | MsiInterop.MsidbCustomActionTypeTextData | extraBits);
-                row.Set(2, id);
-                row.Set(3, value);
-
-                foreach (var sequence in sequences)
-                {
-                    var sequenceRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixAction, new Identifier(AccessModifier.Public, sequence, actionName));
-                    sequenceRow.Set(0, sequence);
-                    sequenceRow.Set(1, actionName);
-                    sequenceRow.Set(2, condition);
-                    // no explicit sequence
-                    sequenceRow.Set(4, beforeAction);
-                    sequenceRow.Set(5, afterAction);
-                    sequenceRow.Set(6, 0); // not overridable
-
-                    if (null != beforeAction)
-                    {
-                        if (WindowsInstallerStandard.IsStandardAction(beforeAction))
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", sequence, beforeAction);
-                        }
-                        else
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", beforeAction);
-                        }
-                    }
-
-                    if (null != afterAction)
-                    {
-                        if (WindowsInstallerStandard.IsStandardAction(afterAction))
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", sequence, afterAction);
-                        }
-                        else
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", afterAction);
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a SFP catalog element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentSFPCatalog">Parent SFPCatalog.</param>
-        private void ParseSFPFileElement(XElement node, string parentSFPCatalog)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.FileSFPCatalog);
-                row.Set(0, id);
-                row.Set(1, parentSFPCatalog);
-            }
-        }
-
-        /// <summary>
-        /// Parses a SFP catalog element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentSFPCatalog">Parent SFPCatalog.</param>
-        private void ParseSFPCatalogElement(XElement node, ref string parentSFPCatalog)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string parentName = null;
-            string dependency = null;
-            string name = null;
-            string sourceFile = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Dependency":
-                        dependency = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        parentSFPCatalog = name;
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            if (null == sourceFile)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "SFPCatalog":
-                        this.ParseSFPCatalogElement(child, ref parentName);
-                        if (null != dependency && parentName == dependency)
-                        {
-                            this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dependency"));
-                        }
-                        dependency = parentName;
-                        break;
-                    case "SFPFile":
-                        this.ParseSFPFileElement(child, name);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (null == dependency)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dependency"));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.SFPCatalog);
-                row.Set(0, name);
-                row.Set(1, sourceFile);
-                row.Set(2, dependency);
-            }
-        }
-
-        /// <summary>
-        /// Parses a shortcut element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifer for parent component.</param>
-        /// <param name="parentElementLocalName">Local name of parent element.</param>
-        /// <param name="defaultTarget">Default identifier of parent (which is usually the target).</param>
-        /// <param name="parentKeyPath">Flag to indicate whether the parent element is the keypath of a component or not (will only be true for file parent elements).</param>
-        private void ParseShortcutElement(XElement node, string componentId, string parentElementLocalName, string defaultTarget, YesNoType parentKeyPath)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var advertise = false;
-            string arguments = null;
-            string description = null;
-            string descriptionResourceDll = null;
-            var descriptionResourceId = CompilerConstants.IntegerNotSet;
-            string directory = null;
-            string displayResourceDll = null;
-            var displayResourceId = CompilerConstants.IntegerNotSet;
-            var hotkey = CompilerConstants.IntegerNotSet;
-            string icon = null;
-            var iconIndex = CompilerConstants.IntegerNotSet;
-            string name = null;
-            string shortName = null;
-            var show = CompilerConstants.IntegerNotSet;
-            string target = null;
-            string workingDirectory = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Advertise":
-                        advertise = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Arguments":
-                        arguments = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DescriptionResourceDll":
-                        descriptionResourceDll = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DescriptionResourceId":
-                        descriptionResourceId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Directory":
-                        directory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
-                        break;
-                    case "DisplayResourceDll":
-                        displayResourceDll = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayResourceId":
-                        displayResourceId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Hotkey":
-                        hotkey = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Icon":
-                        icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
-                        break;
-                    case "IconIndex":
-                        iconIndex = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int16.MinValue + 1, Int16.MaxValue);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Show":
-                        var showValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (showValue.Length == 0)
-                        {
-                            show = CompilerConstants.IllegalInteger;
-                        }
-                        else
-                        {
-                            var showType = Wix.Shortcut.ParseShowType(showValue);
-                            switch (showType)
-                            {
-                            case Wix.Shortcut.ShowType.normal:
-                                show = 1;
-                                break;
-                            case Wix.Shortcut.ShowType.maximized:
-                                show = 3;
-                                break;
-                            case Wix.Shortcut.ShowType.minimized:
-                                show = 7;
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Show", showValue, "normal", "maximized", "minimized"));
-                                show = CompilerConstants.IllegalInteger;
-                                break;
-                            }
-                        }
-                        break;
-                    case "Target":
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "WorkingDirectory":
-                        workingDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (advertise && null != target)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "Advertise", "yes"));
-            }
-
-            if (null == directory)
-            {
-                if ("Component" == parentElementLocalName)
-                {
-                    directory = defaultTarget;
-                }
-                else
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributeWhenElementNotUnderElement(sourceLineNumbers, node.Name.LocalName, "Directory", "Component"));
-                }
-            }
-
-            if (null != descriptionResourceDll)
-            {
-                if (CompilerConstants.IntegerNotSet == descriptionResourceId)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DescriptionResourceDll", "DescriptionResourceId"));
-                }
-            }
-            else
-            {
-                if (CompilerConstants.IntegerNotSet != descriptionResourceId)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DescriptionResourceId", "DescriptionResourceDll"));
-                }
-            }
-
-            if (null != displayResourceDll)
-            {
-                if (CompilerConstants.IntegerNotSet == displayResourceId)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayResourceDll", "DisplayResourceId"));
-                }
-            }
-            else
-            {
-                if (CompilerConstants.IntegerNotSet != displayResourceId)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "DisplayResourceId", "DisplayResourceDll"));
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-            else if (0 < name.Length)
-            {
-                if (this.Core.IsValidShortFilename(name, false))
-                {
-                    if (null == shortName)
-                    {
-                        shortName = name;
-                        name = null;
-                    }
-                    else
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", name, "ShortName"));
-                    }
-                }
-                else if (null == shortName) // generate a short file name.
-                {
-                    shortName = this.Core.CreateShortName(name, true, false, node.Name.LocalName, componentId, directory);
-                }
-            }
-
-            if ("Component" != parentElementLocalName && null != target)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "Target", parentElementLocalName));
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("sct", directory, LowercaseOrNull(name) ?? LowercaseOrNull(shortName));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Icon":
-                        icon = this.ParseIconElement(child);
-                        break;
-                    case "ShortcutProperty":
-                        this.ParseShortcutPropertyElement(child, id.Id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Shortcut, id);
-                row.Set(1, directory);
-                row.Set(2, this.GetMsiFilenameValue(shortName, name));
-                row.Set(3, componentId);
-                if (advertise)
-                {
-                    if (YesNoType.Yes != parentKeyPath && "Component" != parentElementLocalName)
-                    {
-                        this.Core.Write(WarningMessages.UnclearShortcut(sourceLineNumbers, id.Id, componentId, defaultTarget));
-                    }
-                    row.Set(4, Guid.Empty.ToString("B"));
-                }
-                else if (null != target)
-                {
-                    row.Set(4, target);
-                }
-                else if ("Component" == parentElementLocalName || "CreateFolder" == parentElementLocalName)
-                {
-                    row.Set(4, String.Format(CultureInfo.InvariantCulture, "[{0}]", defaultTarget));
-                }
-                else if ("File" == parentElementLocalName)
-                {
-                    row.Set(4, String.Format(CultureInfo.InvariantCulture, "[#{0}]", defaultTarget));
-                }
-                row.Set(5, arguments);
-                row.Set(6, description);
-                if (CompilerConstants.IntegerNotSet != hotkey)
-                {
-                    row.Set(7, hotkey);
-                }
-                row.Set(8, icon);
-                if (CompilerConstants.IntegerNotSet != iconIndex)
-                {
-                    row.Set(9, iconIndex);
-                }
-
-                if (CompilerConstants.IntegerNotSet != show)
-                {
-                    row.Set(10, show);
-                }
-                row.Set(11, workingDirectory);
-                row.Set(12, displayResourceDll);
-                if (CompilerConstants.IntegerNotSet != displayResourceId)
-                {
-                    row.Set(13, displayResourceId);
-                }
-                row.Set(14, descriptionResourceDll);
-                if (CompilerConstants.IntegerNotSet != descriptionResourceId)
-                {
-                    row.Set(15, descriptionResourceId);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a shortcut property element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseShortcutPropertyElement(XElement node, string shortcutId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string key = null;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(key))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
-            }
-            else if (null == id)
-            {
-                id = this.Core.CreateIdentifier("scp", shortcutId, key.ToUpperInvariant());
-            }
-
-            var innerText = this.Core.GetTrimmedInnerText(node);
-            if (!String.IsNullOrEmpty(innerText))
-            {
-                if (String.IsNullOrEmpty(value))
-                {
-                    value = innerText;
-                }
-                else // cannot specify both the value attribute and inner text
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
-                }
-            }
-
-            if (String.IsNullOrEmpty(value))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiShortcutProperty, id);
-                row.Set(1, shortcutId);
-                row.Set(2, key);
-                row.Set(3, value);
-            }
-        }
-
-        /// <summary>
-        /// Parses a typelib element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="componentId">Identifier of parent component.</param>
-        /// <param name="fileServer">Identifier of file that acts as typelib server.</param>
-        /// <param name="win64Component">true if the component is 64-bit.</param>
-        private void ParseTypeLibElement(XElement node, string componentId, string fileServer, bool win64Component)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            var advertise = YesNoType.NotSet;
-            var cost = CompilerConstants.IntegerNotSet;
-            string description = null;
-            var flags = 0;
-            string helpDirectory = null;
-            var language = CompilerConstants.IntegerNotSet;
-            var majorVersion = CompilerConstants.IntegerNotSet;
-            var minorVersion = CompilerConstants.IntegerNotSet;
-            var resourceId = CompilerConstants.LongNotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Advertise":
-                        advertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Control":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            flags |= 2;
-                        }
-                        break;
-                    case "Cost":
-                        cost = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "HasDiskImage":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            flags |= 8;
-                        }
-                        break;
-                    case "HelpDirectory":
-                        helpDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
-                        break;
-                    case "Hidden":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            flags |= 4;
-                        }
-                        break;
-                    case "Language":
-                        language = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "MajorVersion":
-                        majorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, UInt16.MaxValue);
-                        break;
-                    case "MinorVersion":
-                        minorVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
-                        break;
-                    case "ResourceId":
-                        resourceId = this.Core.GetAttributeLongValue(sourceLineNumbers, attrib, Int32.MinValue, Int32.MaxValue);
-                        break;
-                    case "Restricted":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            flags |= 1;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (CompilerConstants.IntegerNotSet == language)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Language"));
-                language = CompilerConstants.IllegalInteger;
-            }
-
-            // build up the typelib version string for the registry if the major or minor version was specified
-            string registryVersion = null;
-            if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
-            {
-                if (CompilerConstants.IntegerNotSet != majorVersion)
-                {
-                    registryVersion = majorVersion.ToString("x", CultureInfo.InvariantCulture.NumberFormat);
-                }
-                else
-                {
-                    registryVersion = "0";
-                }
-
-                if (CompilerConstants.IntegerNotSet != minorVersion)
-                {
-                    registryVersion = String.Concat(registryVersion, ".", minorVersion.ToString("x", CultureInfo.InvariantCulture.NumberFormat));
-                }
-                else
-                {
-                    registryVersion = String.Concat(registryVersion, ".0");
-                }
-            }
-
-            // if the advertise state has not been set, default to non-advertised
-            if (YesNoType.NotSet == advertise)
-            {
-                advertise = YesNoType.No;
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "AppId":
-                        this.ParseAppIdElement(child, componentId, YesNoType.NotSet, fileServer, id, registryVersion);
-                        break;
-                    case "Class":
-                        this.ParseClassElement(child, componentId, YesNoType.NotSet, fileServer, id, registryVersion, null);
-                        break;
-                    case "Interface":
-                        this.ParseInterfaceElement(child, componentId, null, null, id, registryVersion);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (YesNoType.Yes == advertise)
-            {
-                if (CompilerConstants.LongNotSet != resourceId)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "ResourceId"));
-                }
-
-                if (0 != flags)
-                {
-                    if (0x1 == (flags & 0x1))
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Restricted", "Advertise", "yes"));
-                    }
-
-                    if (0x2 == (flags & 0x2))
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Control", "Advertise", "yes"));
-                    }
-
-                    if (0x4 == (flags & 0x4))
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Hidden", "Advertise", "yes"));
-                    }
-
-                    if (0x8 == (flags & 0x8))
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "HasDiskImage", "Advertise", "yes"));
-                    }
-                }
-
-                if (!this.Core.EncounteredError)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.TypeLib);
-                    row.Set(0, id);
-                    row.Set(1, language);
-                    row.Set(2, componentId);
-                    if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
-                    {
-                        row.Set(3, (CompilerConstants.IntegerNotSet != majorVersion ? majorVersion * 256 : 0) + (CompilerConstants.IntegerNotSet != minorVersion ? minorVersion : 0));
-                    }
-                    row.Set(4, description);
-                    row.Set(5, helpDirectory);
-                    row.Set(6, Guid.Empty.ToString("B"));
-                    if (CompilerConstants.IntegerNotSet != cost)
-                    {
-                        row.Set(7, cost);
-                    }
-                }
-            }
-            else if (YesNoType.No == advertise)
-            {
-                if (CompilerConstants.IntegerNotSet != cost && CompilerConstants.IllegalInteger != cost)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Cost", "Advertise", "no"));
-                }
-
-                if (null == fileServer)
-                {
-                    this.Core.Write(ErrorMessages.MissingTypeLibFile(sourceLineNumbers, node.Name.LocalName, "File"));
-                }
-
-                if (null == registryVersion)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "MajorVersion", "MinorVersion", "Advertise", "no"));
-                }
-
-                // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion], (Default) = [Description]
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}", id, registryVersion), null, description, componentId);
-
-                // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\[Language]\[win16|win32|win64], (Default) = [TypeLibPath]\[ResourceId]
-                var path = String.Concat("[#", fileServer, "]");
-                if (CompilerConstants.LongNotSet != resourceId)
-                {
-                    path = String.Concat(path, Path.DirectorySeparatorChar, resourceId.ToString(CultureInfo.InvariantCulture.NumberFormat));
-                }
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\{2}\{3}", id, registryVersion, language, (win64Component ? "win64" : "win32")), null, path, componentId);
-
-                // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\FLAGS, (Default) = [TypeLibFlags]
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\FLAGS", id, registryVersion), null, flags.ToString(CultureInfo.InvariantCulture.NumberFormat), componentId);
-
-                if (null != helpDirectory)
-                {
-                    // HKCR\TypeLib\[ID]\[MajorVersion].[MinorVersion]\HELPDIR, (Default) = [HelpDirectory]
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Format(CultureInfo.InvariantCulture, @"TypeLib\{0}\{1}\HELPDIR", id, registryVersion), null, String.Concat("[", helpDirectory, "]"), componentId);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses an EmbeddedChaniner element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseEmbeddedChainerElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string commandLine = null;
-            string condition = null;
-            string source = null;
-            var type = 0;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "BinarySource":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "FileSource", "PropertySource"));
-                        }
-                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        type = MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeBinaryData;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", source); // add a reference to the appropriate Binary
-                        break;
-                    case "CommandLine":
-                        commandLine = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "FileSource":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinarySource", "PropertySource"));
-                        }
-                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        type = MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeSourceFile;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", source); // add a reference to the appropriate File
-                        break;
-                    case "PropertySource":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinarySource", "FileSource"));
-                        }
-                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        type = MsiInterop.MsidbCustomActionTypeExe + MsiInterop.MsidbCustomActionTypeProperty;
-                        // cannot add a reference to a Property because it may be created at runtime.
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // Get the condition from the inner text of the element.
-            condition = this.Core.GetConditionInnerText(node);
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("mec", source, type.ToString());
-            }
-
-            if (null == source)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "BinarySource", "FileSource", "PropertySource"));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiEmbeddedChainer, id);
-                row.Set(1, condition);
-                row.Set(2, commandLine);
-                row.Set(3, source);
-                row.Set(4, type);
-            }
-        }
-
-        /// <summary>
-        /// Parses UI elements.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseUIElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var embeddedUICount = 0;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "BillboardAction":
-                        this.ParseBillboardActionElement(child);
-                        break;
-                    case "ComboBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ComboBox, "ListItem");
-                        break;
-                    case "Dialog":
-                        this.ParseDialogElement(child);
-                        break;
-                    case "DialogRef":
-                        this.ParseSimpleRefElement(child, "Dialog");
-                        break;
-                    case "EmbeddedUI":
-                        if (0 < embeddedUICount) // there can be only one embedded UI
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                        }
-                        this.ParseEmbeddedUIElement(child);
-                        ++embeddedUICount;
-                        break;
-                    case "Error":
-                        this.ParseErrorElement(child);
-                        break;
-                    case "ListBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListBox, "ListItem");
-                        break;
-                    case "ListView":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListView, "ListItem");
-                        break;
-                    case "ProgressText":
-                        this.ParseActionTextElement(child);
-                        break;
-                    case "Publish":
-                        var order = 0;
-                        this.ParsePublishElement(child, null, null, ref order);
-                        break;
-                    case "RadioButtonGroup":
-                        var radioButtonType = this.ParseRadioButtonGroupElement(child, null, RadioButtonType.NotSet);
-                        if (RadioButtonType.Bitmap == radioButtonType || RadioButtonType.Icon == radioButtonType)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.RadioButtonBitmapAndIconDisallowed(childSourceLineNumbers));
-                        }
-                        break;
-                    case "TextStyle":
-                        this.ParseTextStyleElement(child);
-                        break;
-                    case "UIText":
-                        this.ParseUITextElement(child);
-                        break;
-
-                    // the following are available indentically under the UI and Product elements for document organization use only
-                    case "AdminUISequence":
-                    case "InstallUISequence":
-                        this.ParseSequenceElement(child, child.Name.LocalName);
-                        break;
-                    case "Binary":
-                        this.ParseBinaryElement(child);
-                        break;
-                    case "Property":
-                        this.ParsePropertyElement(child);
-                        break;
-                    case "PropertyRef":
-                        this.ParseSimpleRefElement(child, "Property");
-                        break;
-                    case "UIRef":
-                        this.ParseSimpleRefElement(child, "WixUI");
-                        break;
-
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (null != id && !this.Core.EncounteredError)
-            {
-                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixUI, id);
-            }
-        }
-
-        /// <summary>
-        /// Parses a list item element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="table">Table to add row to.</param>
-        /// <param name="property">Identifier of property referred to by list item.</param>
-        /// <param name="order">Relative order of list items.</param>
-        private void ParseListItemElement(XElement node, TupleDefinitionType tableName, string property, ref int order)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string icon = null;
-            string text = null;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Icon":
-                        if (TupleDefinitionType.ListView == tableName)
-                        {
-                            icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", icon);
-                        }
-                        else
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeExceptOnElement(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "ListView"));
-                        }
-                        break;
-                    case "Text":
-                        text = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, tableName);
-                row.Set(0, property);
-                row.Set(1, ++order);
-                row.Set(2, value);
-                row.Set(3, text);
-                if (null != icon)
-                {
-                    row.Set(4, icon);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a radio button element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="property">Identifier of property referred to by radio button.</param>
-        /// <param name="order">Relative order of radio buttons.</param>
-        /// <returns>Type of this radio button.</returns>
-        private RadioButtonType ParseRadioButtonElement(XElement node, string property, ref int order)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var type = RadioButtonType.NotSet;
-            string value = null;
-            string x = null;
-            string y = null;
-            string width = null;
-            string height = null;
-            string text = null;
-            string tooltip = null;
-            string help = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Bitmap":
-                        if (RadioButtonType.NotSet != type)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Icon", "Text"));
-                        }
-                        text = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", text);
-                        type = RadioButtonType.Bitmap;
-                        break;
-                    case "Height":
-                        height = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Help":
-                        help = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Icon":
-                        if (RadioButtonType.NotSet != type)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Text"));
-                        }
-                        text = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", text);
-                        type = RadioButtonType.Icon;
-                        break;
-                    case "Text":
-                        if (RadioButtonType.NotSet != type)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Bitmap", "Icon"));
-                        }
-                        text = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        type = RadioButtonType.Text;
-                        break;
-                    case "ToolTip":
-                        tooltip = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Width":
-                        width = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "X":
-                        x = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Y":
-                        y = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            if (null == x)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "X"));
-            }
-
-            if (null == y)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Y"));
-            }
-
-            if (null == width)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Width"));
-            }
-
-            if (null == height)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Height"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RadioButton);
-                row.Set(0, property);
-                row.Set(1, ++order);
-                row.Set(2, value);
-                row.Set(3, x);
-                row.Set(4, y);
-                row.Set(5, width);
-                row.Set(6, height);
-                row.Set(7, text);
-                if (null != tooltip || null != help)
-                {
-                    row.Set(8, String.Concat(tooltip, "|", help));
-                }
-            }
-
-            return type;
-        }
-
-        /// <summary>
-        /// Parses a billboard element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseBillboardActionElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string action = null;
-            var order = 0;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        action = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", "InstallExecuteSequence", action);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == action)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Billboard":
-                        order = order + 1;
-                        this.ParseBillboardElement(child, action, order);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a billboard element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="action">Action for the billboard.</param>
-        /// <param name="order">Order of the billboard.</param>
-        private void ParseBillboardElement(XElement node, string action, int order)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string feature = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Feature":
-                        feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Feature", feature);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("bil", action, order.ToString(), feature);
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Control":
-                        // These are all thrown away.
-                        IntermediateTuple lastTabRow = null;
-                        string firstControl = null;
-                        string defaultControl = null;
-                        string cancelControl = null;
-
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.BBControl, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl, false);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Billboard, id);
-                row.Set(1, feature);
-                row.Set(2, action);
-                row.Set(3, order);
-            }
-        }
-
-        /// <summary>
-        /// Parses a control group element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="table">Table referred to by control group.</param>
-        /// <param name="childTag">Expected child elements.</param>
-        private void ParseControlGroupElement(XElement node, TupleDefinitionType tableName, string childTag)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var order = 0;
-            string property = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Property":
-                        property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == property)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    if (childTag != child.Name.LocalName)
-                    {
-                        this.Core.UnexpectedElement(node, child);
-                    }
-
-                    switch (child.Name.LocalName)
-                    {
-                    case "ListItem":
-                        this.ParseListItemElement(child, tableName, property, ref order);
-                        break;
-                    case "Property":
-                        this.ParsePropertyElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Parses a radio button control group element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="property">Property associated with this radio button group.</param>
-        /// <param name="groupType">Specifies the current type of radio buttons in the group.</param>
-        /// <returns>The current type of radio buttons in the group.</returns>
-        private RadioButtonType ParseRadioButtonGroupElement(XElement node, string property, RadioButtonType groupType)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var order = 0;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Property":
-                        property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Property", property);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == property)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "RadioButton":
-                        var type = this.ParseRadioButtonElement(child, property, ref order);
-                        if (RadioButtonType.NotSet == groupType)
-                        {
-                            groupType = type;
-                        }
-                        else if (groupType != type)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.RadioButtonTypeInconsistent(childSourceLineNumbers));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            return groupType;
-        }
-
-        /// <summary>
-        /// Parses an action text element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseActionTextElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string action = null;
-            string template = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Action":
-                        action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Template":
-                        template = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == action)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ActionText);
-                row.Set(0, action);
-                row.Set(1, Common.GetInnerText(node));
-                row.Set(2, template);
-            }
-        }
-
-        /// <summary>
-        /// Parses an ui text element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseUITextElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string text = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            text = Common.GetInnerText(node);
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("txt", text);
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.UIText, id);
-                row.Set(1, text);
-            }
-        }
-
-        /// <summary>
-        /// Parses a text style element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseTextStyleElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var bits = 0;
-            var color = CompilerConstants.IntegerNotSet;
-            string faceName = null;
-            var size = "0";
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-
-                    // RGB Values
-                    case "Red":
-                        var redColor = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
-                        if (CompilerConstants.IllegalInteger != redColor)
-                        {
-                            if (CompilerConstants.IntegerNotSet == color)
-                            {
-                                color = redColor;
-                            }
-                            else
-                            {
-                                color += redColor;
-                            }
-                        }
-                        break;
-                    case "Green":
-                        var greenColor = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
-                        if (CompilerConstants.IllegalInteger != greenColor)
-                        {
-                            if (CompilerConstants.IntegerNotSet == color)
-                            {
-                                color = greenColor * 256;
-                            }
-                            else
-                            {
-                                color += greenColor * 256;
-                            }
-                        }
-                        break;
-                    case "Blue":
-                        var blueColor = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
-                        if (CompilerConstants.IllegalInteger != blueColor)
-                        {
-                            if (CompilerConstants.IntegerNotSet == color)
-                            {
-                                color = blueColor * 65536;
-                            }
-                            else
-                            {
-                                color += blueColor * 65536;
-                            }
-                        }
-                        break;
-
-                    // Style values
-                    case "Bold":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbTextStyleStyleBitsBold;
-                        }
-                        break;
-                    case "Italic":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbTextStyleStyleBitsItalic;
-                        }
-                        break;
-                    case "Strike":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbTextStyleStyleBitsStrike;
-                        }
-                        break;
-                    case "Underline":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits |= MsiInterop.MsidbTextStyleStyleBitsUnderline;
-                        }
-                        break;
-
-                    // Font values
-                    case "FaceName":
-                        faceName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Size":
-                        size = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.CreateIdentifier("txs", faceName, size.ToString(), color.ToString(), bits.ToString());
-            }
-
-            if (null == faceName)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "FaceName"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.TextStyle, id);
-                row.Set(1, faceName);
-                row.Set(2, size);
-                if (0 <= color)
-                {
-                    row.Set(3, color);
-                }
-
-                if (0 < bits)
-                {
-                    row.Set(4, bits);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a dialog element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseDialogElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var bits = MsiInterop.MsidbDialogAttributesVisible | MsiInterop.MsidbDialogAttributesModal | MsiInterop.MsidbDialogAttributesMinimize;
-            var height = 0;
-            string title = null;
-            var trackDiskSpace = false;
-            var width = 0;
-            var x = 50;
-            var y = 50;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Height":
-                        height = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Title":
-                        title = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Width":
-                        width = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "X":
-                        x = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 100);
-                        break;
-                    case "Y":
-                        y = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 100);
-                        break;
-
-                    case "CustomPalette":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesUseCustomPalette;
-                        }
-                        break;
-                    case "ErrorDialog":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesError;
-                        }
-                        break;
-                    case "Hidden":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesVisible;
-                        }
-                        break;
-                    case "KeepModeless":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesKeepModeless;
-                        }
-                        break;
-                    case "LeftScroll":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesLeftScroll;
-                        }
-                        break;
-                    case "Modeless":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesModal;
-                        }
-                        break;
-                    case "NoMinimize":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesMinimize;
-                        }
-                        break;
-                    case "RightAligned":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesRightAligned;
-                        }
-                        break;
-                    case "RightToLeft":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesRTLRO;
-                        }
-                        break;
-                    case "SystemModal":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesSysModal;
-                        }
-                        break;
-                    case "TrackDiskSpace":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            bits ^= MsiInterop.MsidbDialogAttributesTrackDiskSpace;
-                            trackDiskSpace = true;
-                        }
-                        break;
-
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                id = Identifier.Invalid;
-            }
-
-            IntermediateTuple lastTabRow = null;
-            string cancelControl = null;
-            string defaultControl = null;
-            string firstControl = null;
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Control":
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.Control, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl, trackDiskSpace);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (null != lastTabRow && null != lastTabRow[1])
-            {
-                if (firstControl != lastTabRow[1].ToString())
-                {
-                    lastTabRow.Set(10, firstControl);
-                }
-            }
-
-            if (null == firstControl)
-            {
-                this.Core.Write(ErrorMessages.NoFirstControlSpecified(sourceLineNumbers, id.Id));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Dialog, id);
-                row.Set(1, x);
-                row.Set(2, y);
-                row.Set(3, width);
-                row.Set(4, height);
-                row.Set(5, bits);
-                row.Set(6, title);
-                row.Set(7, firstControl);
-                row.Set(8, defaultControl);
-                row.Set(9, cancelControl);
-            }
-        }
-
-        /// <summary>
-        /// Parses an EmbeddedUI element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseEmbeddedUIElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string name = null;
-            var attributes = MsiInterop.MsidbEmbeddedUI; // by default this is the primary DLL that does not support basic UI.
-            var messageFilter = MsiInterop.INSTALLLOGMODE_FATALEXIT | MsiInterop.INSTALLLOGMODE_ERROR | MsiInterop.INSTALLLOGMODE_WARNING | MsiInterop.INSTALLLOGMODE_USER
-                                    | MsiInterop.INSTALLLOGMODE_INFO | MsiInterop.INSTALLLOGMODE_FILESINUSE | MsiInterop.INSTALLLOGMODE_RESOLVESOURCE
-                                    | MsiInterop.INSTALLLOGMODE_OUTOFDISKSPACE | MsiInterop.INSTALLLOGMODE_ACTIONSTART | MsiInterop.INSTALLLOGMODE_ACTIONDATA
-                                    | MsiInterop.INSTALLLOGMODE_PROGRESS | MsiInterop.INSTALLLOGMODE_COMMONDATA | MsiInterop.INSTALLLOGMODE_INITIALIZE
-                                    | MsiInterop.INSTALLLOGMODE_TERMINATE | MsiInterop.INSTALLLOGMODE_SHOWDIALOG | MsiInterop.INSTALLLOGMODE_RMFILESINUSE
-                                    | MsiInterop.INSTALLLOGMODE_INSTALLSTART | MsiInterop.INSTALLLOGMODE_INSTALLEND;
-            string sourceFile = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "IgnoreFatalExit":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_FATALEXIT;
-                        }
-                        break;
-                    case "IgnoreError":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_ERROR;
-                        }
-                        break;
-                    case "IgnoreWarning":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_WARNING;
-                        }
-                        break;
-                    case "IgnoreUser":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_USER;
-                        }
-                        break;
-                    case "IgnoreInfo":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_INFO;
-                        }
-                        break;
-                    case "IgnoreFilesInUse":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_FILESINUSE;
-                        }
-                        break;
-                    case "IgnoreResolveSource":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_RESOLVESOURCE;
-                        }
-                        break;
-                    case "IgnoreOutOfDiskSpace":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_OUTOFDISKSPACE;
-                        }
-                        break;
-                    case "IgnoreActionStart":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_ACTIONSTART;
-                        }
-                        break;
-                    case "IgnoreActionData":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_ACTIONDATA;
-                        }
-                        break;
-                    case "IgnoreProgress":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_PROGRESS;
-                        }
-                        break;
-                    case "IgnoreCommonData":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_COMMONDATA;
-                        }
-                        break;
-                    case "IgnoreInitialize":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_INITIALIZE;
-                        }
-                        break;
-                    case "IgnoreTerminate":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_TERMINATE;
-                        }
-                        break;
-                    case "IgnoreShowDialog":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_SHOWDIALOG;
-                        }
-                        break;
-                    case "IgnoreRMFilesInUse":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_RMFILESINUSE;
-                        }
-                        break;
-                    case "IgnoreInstallStart":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_INSTALLSTART;
-                        }
-                        break;
-                    case "IgnoreInstallEnd":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            messageFilter ^= MsiInterop.INSTALLLOGMODE_INSTALLEND;
-                        }
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SupportBasicUI":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= MsiInterop.MsidbEmbeddedHandlesBasic;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(sourceFile))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
-            }
-            else if (String.IsNullOrEmpty(name))
-            {
-                name = Path.GetFileName(sourceFile);
-                if (!this.Core.IsValidLongFilename(name, false))
-                {
-                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
-                }
-            }
-
-            if (null == id)
-            {
-                if (!String.IsNullOrEmpty(name))
-                {
-                    id = this.Core.CreateIdentifierFromFilename(name);
-                }
-
-                if (null == id)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                }
-                else if (!Common.IsIdentifier(id.Id))
-                {
-                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                }
-            }
-            else if (String.IsNullOrEmpty(name))
-            {
-                name = id.Id;
-            }
-
-            if (!name.Contains("."))
-            {
-                this.Core.Write(ErrorMessages.InvalidEmbeddedUIFileName(sourceLineNumbers, name));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "EmbeddedUIResource":
-                        this.ParseEmbeddedUIResourceElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiEmbeddedUI, id);
-                row.Set(1, name);
-                row.Set(2, attributes);
-                row.Set(3, messageFilter);
-                row.Set(4, sourceFile);
-            }
-        }
-
-        /// <summary>
-        /// Parses a embedded UI resource element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentId">Identifier of parent EmbeddedUI element.</param>
-        private void ParseEmbeddedUIResourceElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string name = null;
-            string sourceFile = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(sourceFile))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
-            }
-            else if (String.IsNullOrEmpty(name))
-            {
-                name = Path.GetFileName(sourceFile);
-                if (!this.Core.IsValidLongFilename(name, false))
-                {
-                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
-                }
-            }
-
-            if (null == id)
-            {
-                if (!String.IsNullOrEmpty(name))
-                {
-                    id = this.Core.CreateIdentifierFromFilename(name);
-                }
-
-                if (null == id)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                }
-                else if (!Common.IsIdentifier(id.Id))
-                {
-                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                }
-            }
-            else if (String.IsNullOrEmpty(name))
-            {
-                name = id.Id;
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiEmbeddedUI, id);
-                row.Set(1, name);
-                row.Set(2, 0); // embedded UI resources always set this to 0
-                //row.Set(3, null);
-                row.Set(4, sourceFile);
-            }
-        }
-
-        /// <summary>
-        /// Parses a control element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="dialog">Identifier for parent dialog.</param>
-        /// <param name="table">Table control belongs in.</param>
-        /// <param name="lastTabRow">Last row in the tab order.</param>
-        /// <param name="firstControl">Name of the first control in the tab order.</param>
-        /// <param name="defaultControl">Name of the default control.</param>
-        /// <param name="cancelControl">Name of the candle control.</param>
-        /// <param name="trackDiskSpace">True if the containing dialog tracks disk space.</param>
-        private void ParseControlElement(XElement node, string dialog, TupleDefinitionType tableName, ref IntermediateTuple lastTabRow, ref string firstControl, ref string defaultControl, ref string cancelControl, bool trackDiskSpace)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var bits = new BitArray(32);
-            var attributes = 0;
-            string checkBoxPropertyRef = null;
-            string checkboxValue = null;
-            string controlType = null;
-            var disabled = false;
-            string height = null;
-            string help = null;
-            var isCancel = false;
-            var isDefault = false;
-            var notTabbable = false;
-            string property = null;
-            var publishOrder = 0;
-            string[] specialAttributes = null;
-            string sourceFile = null;
-            string text = null;
-            string tooltip = null;
-            var radioButtonsType = RadioButtonType.NotSet;
-            string width = null;
-            string x = null;
-            string y = null;
-
-            // The rest of the method relies on the control's Type, so we have to get that first.
-            var typeAttribute = node.Attribute("Type");
-            if (null == typeAttribute)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
-            }
-            else
-            {
-                controlType = this.Core.GetAttributeValue(sourceLineNumbers, typeAttribute);
-            }
-
-            switch (controlType)
-            {
-            case "Billboard":
-                specialAttributes = null;
-                notTabbable = true;
-                disabled = true;
-
-                this.Core.EnsureTable(sourceLineNumbers, "Billboard");
-                break;
-            case "Bitmap":
-                specialAttributes = MsiInterop.BitmapControlAttributes;
-                notTabbable = true;
-                disabled = true;
-                break;
-            case "CheckBox":
-                specialAttributes = MsiInterop.CheckboxControlAttributes;
-                break;
-            case "ComboBox":
-                specialAttributes = MsiInterop.ComboboxControlAttributes;
-                break;
-            case "DirectoryCombo":
-                specialAttributes = MsiInterop.VolumeControlAttributes;
-                break;
-            case "DirectoryList":
-                specialAttributes = null;
-                break;
-            case "Edit":
-                specialAttributes = MsiInterop.EditControlAttributes;
-                break;
-            case "GroupBox":
-                specialAttributes = null;
-                notTabbable = true;
-                break;
-            case "Hyperlink":
-                specialAttributes = MsiInterop.HyperlinkControlAttributes;
-                break;
-            case "Icon":
-                specialAttributes = MsiInterop.IconControlAttributes;
-                notTabbable = true;
-                disabled = true;
-                break;
-            case "Line":
-                specialAttributes = null;
-                notTabbable = true;
-                disabled = true;
-                break;
-            case "ListBox":
-                specialAttributes = MsiInterop.ListboxControlAttributes;
-                break;
-            case "ListView":
-                specialAttributes = MsiInterop.ListviewControlAttributes;
-                break;
-            case "MaskedEdit":
-                specialAttributes = MsiInterop.EditControlAttributes;
-                break;
-            case "PathEdit":
-                specialAttributes = MsiInterop.EditControlAttributes;
-                break;
-            case "ProgressBar":
-                specialAttributes = MsiInterop.ProgressControlAttributes;
-                notTabbable = true;
-                disabled = true;
-                break;
-            case "PushButton":
-                specialAttributes = MsiInterop.ButtonControlAttributes;
-                break;
-            case "RadioButtonGroup":
-                specialAttributes = MsiInterop.RadioControlAttributes;
-                break;
-            case "ScrollableText":
-                specialAttributes = null;
-                break;
-            case "SelectionTree":
-                specialAttributes = null;
-                break;
-            case "Text":
-                specialAttributes = MsiInterop.TextControlAttributes;
-                notTabbable = true;
-                break;
-            case "VolumeCostList":
-                specialAttributes = MsiInterop.VolumeControlAttributes;
-                notTabbable = true;
-                break;
-            case "VolumeSelectCombo":
-                specialAttributes = MsiInterop.VolumeControlAttributes;
-                break;
-            default:
-                specialAttributes = null;
-                notTabbable = true;
-                break;
-            }
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Type": // already processed
-                        break;
-                    case "Cancel":
-                        isCancel = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CheckBoxPropertyRef":
-                        checkBoxPropertyRef = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CheckBoxValue":
-                        checkboxValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Default":
-                        isDefault = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Height":
-                        height = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Help":
-                        help = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IconSize":
-                        var iconSizeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (null != specialAttributes)
-                        {
-                            if (0 < iconSizeValue.Length)
-                            {
-                                var iconsSizeType = Wix.Control.ParseIconSizeType(iconSizeValue);
-                                switch (iconsSizeType)
-                                {
-                                case Wix.Control.IconSizeType.Item16:
-                                    this.Core.TrySetBitFromName(specialAttributes, "Icon16", YesNoType.Yes, bits, 16);
-                                    break;
-                                case Wix.Control.IconSizeType.Item32:
-                                    this.Core.TrySetBitFromName(specialAttributes, "Icon32", YesNoType.Yes, bits, 16);
-                                    break;
-                                case Wix.Control.IconSizeType.Item48:
-                                    this.Core.TrySetBitFromName(specialAttributes, "Icon16", YesNoType.Yes, bits, 16);
-                                    this.Core.TrySetBitFromName(specialAttributes, "Icon32", YesNoType.Yes, bits, 16);
-                                    break;
-                                default:
-                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "16", "32", "48"));
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "Type"));
-                        }
-                        break;
-                    case "Property":
-                        property = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "TabSkip":
-                        notTabbable = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Text":
-                        text = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ToolTip":
-                        tooltip = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Width":
-                        width = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "X":
-                        x = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Y":
-                        y = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    default:
-                        var attribValue = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (!this.Core.TrySetBitFromName(MsiInterop.CommonControlAttributes, attrib.Name.LocalName, attribValue, bits, 0))
-                        {
-                            if (null == specialAttributes || !this.Core.TrySetBitFromName(specialAttributes, attrib.Name.LocalName, attribValue, bits, 16))
-                            {
-                                this.Core.UnexpectedAttribute(node, attrib);
-                            }
-                        }
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            attributes = this.Core.CreateIntegerFromBitArray(bits);
-
-            if (disabled)
-            {
-                attributes |= MsiInterop.MsidbControlAttributesEnabled; // bit will be inverted when stored
-            }
-
-            if (null == height)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Height"));
-            }
-
-            if (null == width)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Width"));
-            }
-
-            if (null == x)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "X"));
-            }
-
-            if (null == y)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Y"));
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("ctl", dialog, x, y, height, width);
-            }
-
-            if (isCancel)
-            {
-                cancelControl = id.Id;
-            }
-
-            if (isDefault)
-            {
-                defaultControl = id.Id;
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                    switch (child.Name.LocalName)
-                    {
-                    case "Binary":
-                        this.ParseBinaryElement(child);
-                        break;
-                    case "ComboBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ComboBox, "ListItem");
-                        break;
-                    case "Condition":
-                        this.ParseConditionElement(child, node.Name.LocalName, id.Id, dialog);
-                        break;
-                    case "ListBox":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListBox, "ListItem");
-                        break;
-                    case "ListView":
-                        this.ParseControlGroupElement(child, TupleDefinitionType.ListView, "ListItem");
-                        break;
-                    case "Property":
-                        this.ParsePropertyElement(child);
-                        break;
-                    case "Publish":
-                        this.ParsePublishElement(child, dialog ?? String.Empty, id.Id, ref publishOrder);
-                        break;
-                    case "RadioButtonGroup":
-                        radioButtonsType = this.ParseRadioButtonGroupElement(child, property, radioButtonsType);
-                        break;
-                    case "Subscribe":
-                        this.ParseSubscribeElement(child, dialog, id.Id);
-                        break;
-                    case "Text":
-                        foreach (var attrib in child.Attributes())
-                        {
-                            if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                            {
-                                switch (attrib.Name.LocalName)
-                                {
-                                case "SourceFile":
-                                    sourceFile = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
-                                    break;
-                                default:
-                                    this.Core.UnexpectedAttribute(child, attrib);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                this.Core.ParseExtensionAttribute(child, attrib);
-                            }
-                        }
-
-                        text = Common.GetInnerText(child);
-                        if (!String.IsNullOrEmpty(text) && null != sourceFile)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(childSourceLineNumbers, child.Name.LocalName, "SourceFile"));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            // If the radio buttons have icons, then we need to add the icon attribute.
-            switch (radioButtonsType)
-            {
-            case RadioButtonType.Bitmap:
-                attributes |= MsiInterop.MsidbControlAttributesBitmap;
-                break;
-            case RadioButtonType.Icon:
-                attributes |= MsiInterop.MsidbControlAttributesIcon;
-                break;
-            case RadioButtonType.Text:
-                // Text is the default so nothing needs to be added bits
-                break;
-            }
-
-            // If we're tracking disk space, and this is a non-FormatSize Text control, and the text attribute starts with 
-            // '[' and ends with ']', add a space. It is not necessary for the whole string to be a property, just 
-            // those two characters matter.
-            if (trackDiskSpace && "Text" == controlType &&
-                MsiInterop.MsidbControlAttributesFormatSize != (attributes & MsiInterop.MsidbControlAttributesFormatSize) &&
-                null != text && text.StartsWith("[", StringComparison.Ordinal) && text.EndsWith("]", StringComparison.Ordinal))
-            {
-                text = String.Concat(text, " ");
-            }
-
-            // the logic for creating control rows is a little tricky because of the way tabable controls are set
-            IntermediateTuple row = null;
-            if (!this.Core.EncounteredError)
-            {
-                if ("CheckBox" == controlType)
-                {
-                    if (String.IsNullOrEmpty(property) && String.IsNullOrEmpty(checkBoxPropertyRef))
-                    {
-                        this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "CheckBoxPropertyRef", true));
-                    }
-                    else if (!String.IsNullOrEmpty(property) && !String.IsNullOrEmpty(checkBoxPropertyRef))
-                    {
-                        this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Property", "CheckBoxPropertyRef"));
-                    }
-                    else if (!String.IsNullOrEmpty(property))
-                    {
-                        row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CheckBox);
-                        row.Set(0, property);
-                        row.Set(1, checkboxValue);
-                    }
-                    else
-                    {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "CheckBox", checkBoxPropertyRef);
-                    }
-                }
-
-                var dialogId = new Identifier(dialog, id.Access);
-
-                row = this.Core.CreateRow(sourceLineNumbers, tableName, dialogId);
-                row.Set(1, id.Id);
-                row.Set(2, controlType);
-                row.Set(3, x);
-                row.Set(4, y);
-                row.Set(5, width);
-                row.Set(6, height);
-                row.Set(7, attributes ^ (MsiInterop.MsidbControlAttributesVisible | MsiInterop.MsidbControlAttributesEnabled));
-                if (TupleDefinitionType.BBControl == tableName)
-                {
-                    row.Set(8, text); // BBControl.Text
-
-                    if (null != sourceFile)
-                    {
-                        var wixBBControlRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBBControl, dialogId);
-                        wixBBControlRow.Set(1, id.Id);
-                        wixBBControlRow.Set(2, sourceFile);
-                    }
-                }
-                else
-                {
-                    row.Set(8, !String.IsNullOrEmpty(property) ? property : checkBoxPropertyRef);
-                    row.Set(9, text);
-                    if (null != tooltip || null != help)
-                    {
-                        row.Set(11, String.Concat(tooltip, "|", help)); // Separator is required, even if only one is non-null.
-                    }
-
-                    if (null != sourceFile)
-                    {
-                        var wixControlRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixControl, dialogId);
-                        wixControlRow.Set(1, id.Id);
-                        wixControlRow.Set(2, sourceFile);
-                    }
-                }
-            }
-
-            if (!notTabbable)
-            {
-                if (TupleDefinitionType.BBControl == tableName)
-                {
-                    this.Core.Write(ErrorMessages.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
-                }
-
-                if (null == firstControl)
-                {
-                    firstControl = id.Id;
-                }
-
-                if (null != lastTabRow)
-                {
-                    lastTabRow.Set(10, id.Id);
-                }
-                lastTabRow = row;
-            }
-
-            // bitmap and icon controls contain a foreign key into the binary table in the text column;
-            // add a reference if the identifier of the binary entry is known during compilation
-            if (("Bitmap" == controlType || "Icon" == controlType) && Common.IsIdentifier(text))
-            {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", text);
-            }
-        }
-
-        /// <summary>
-        /// Parses a publish control event element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="dialog">Identifier of parent dialog.</param>
-        /// <param name="control">Identifier of parent control.</param>
-        /// <param name="order">Relative order of controls.</param>
-        private void ParsePublishElement(XElement node, string dialog, string control, ref int order)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string argument = null;
-            string condition = null;
-            string controlEvent = null;
-            string property = null;
-
-            // give this control event a unique ordering
-            order++;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Control":
-                        if (null != control)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
-                        }
-                        control = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Dialog":
-                        if (null != dialog)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
-                        }
-                        dialog = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Dialog", dialog);
-                        break;
-                    case "Event":
-                        controlEvent = Compiler.UppercaseFirstChar(this.Core.GetAttributeValue(sourceLineNumbers, attrib));
-                        break;
-                    case "Order":
-                        order = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, 2147483647);
-                        break;
-                    case "Property":
-                        property = String.Concat("[", this.Core.GetAttributeValue(sourceLineNumbers, attrib), "]");
-                        break;
-                    case "Value":
-                        argument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            condition = this.Core.GetConditionInnerText(node);
-
-            if (null == control)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Control"));
-            }
-
-            if (null == dialog)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Dialog"));
-            }
-
-            if (null == controlEvent && null == property) // need to specify at least one
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Event", "Property"));
-            }
-            else if (null != controlEvent && null != property) // cannot specify both
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Event", "Property"));
-            }
-
-            if (null == argument)
-            {
-                if (null != controlEvent)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value", "Event"));
-                }
-                else if (null != property)
-                {
-                    // if this is setting a property to null, put a special value in the argument column
-                    argument = "{}";
-                }
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ControlEvent);
-                row.Set(0, dialog);
-                row.Set(1, control);
-                row.Set(2, (null != controlEvent ? controlEvent : property));
-                row.Set(3, argument);
-                row.Set(4, condition);
-                row.Set(5, order);
-            }
-
-            if ("DoAction" == controlEvent && null != argument)
-            {
-                // if we're not looking at a standard action or a formatted string then create a reference 
-                // to the custom action.
-                if (!WindowsInstallerStandard.IsStandardAction(argument) && !Common.ContainsProperty(argument))
-                {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", argument);
-                }
-            }
-
-            // if we're referring to a dialog but not through a property, add it to the references
-            if (("NewDialog" == controlEvent || "SpawnDialog" == controlEvent || "SpawnWaitDialog" == controlEvent || "SelectionBrowse" == controlEvent) && Common.IsIdentifier(argument))
-            {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "Dialog", argument);
-            }
-        }
-
-        /// <summary>
-        /// Parses a control subscription element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="dialog">Identifier of dialog.</param>
-        /// <param name="control">Identifier of control.</param>
-        private void ParseSubscribeElement(XElement node, string dialog, string control)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string controlAttribute = null;
-            string eventMapping = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Attribute":
-                        controlAttribute = Compiler.UppercaseFirstChar(this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib));
-                        break;
-                    case "Event":
-                        eventMapping = Compiler.UppercaseFirstChar(this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib));
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.EventMapping);
-                row.Set(0, dialog);
-                row.Set(1, control);
-                row.Set(2, eventMapping);
-                row.Set(3, controlAttribute);
-            }
-        }
-
-        /// <summary>
-        /// Parses an upgrade element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseUpgradeElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            // process the UpgradeVersion children here
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-
-                    switch (child.Name.LocalName)
-                    {
-                    case "Property":
-                        this.ParsePropertyElement(child);
-                        this.Core.Write(WarningMessages.DeprecatedUpgradeProperty(childSourceLineNumbers));
-                        break;
-                    case "UpgradeVersion":
-                        this.ParseUpgradeVersionElement(child, id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            // No rows created here. All row creation is done in ParseUpgradeVersionElement.
-        }
-
-        /// <summary>
-        /// Parse upgrade version element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="upgradeId">Upgrade code.</param>
-        private void ParseUpgradeVersionElement(XElement node, string upgradeId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-
-            string actionProperty = null;
-            string language = null;
-            string maximum = null;
-            string minimum = null;
-            var options = 256;
-            string removeFeatures = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "ExcludeLanguages":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesLanguagesExclusive;
-                        }
-                        break;
-                    case "IgnoreRemoveFailure":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesIgnoreRemoveFailure;
-                        }
-                        break;
-                    case "IncludeMaximum":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesVersionMaxInclusive;
-                        }
-                        break;
-                    case "IncludeMinimum": // this is "yes" by default
-                        if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options &= ~MsiInterop.MsidbUpgradeAttributesVersionMinInclusive;
-                        }
-                        break;
-                    case "Language":
-                        language = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Minimum":
-                        minimum = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Maximum":
-                        maximum = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MigrateFeatures":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesMigrateFeatures;
-                        }
-                        break;
-                    case "OnlyDetect":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            options |= MsiInterop.MsidbUpgradeAttributesOnlyDetect;
-                        }
-                        break;
-                    case "Property":
-                        actionProperty = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "RemoveFeatures":
-                        removeFeatures = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == actionProperty)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Property"));
-            }
-            else if (actionProperty.ToUpper(CultureInfo.InvariantCulture) != actionProperty)
-            {
-                this.Core.Write(ErrorMessages.SecurePropertyNotUppercase(sourceLineNumbers, node.Name.LocalName, "Property", actionProperty));
-            }
-
-            if (null == minimum && null == maximum)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Minimum", "Maximum"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Upgrade);
-                row.Set(0, upgradeId);
-                row.Set(1, minimum);
-                row.Set(2, maximum);
-                row.Set(3, language);
-                row.Set(4, options);
-                row.Set(5, removeFeatures);
-                row.Set(6, actionProperty);
-
-                // Ensure the action property is secure.
-                this.AddWixPropertyRow(sourceLineNumbers, new Identifier(actionProperty, AccessModifier.Private), false, true, false);
-
-                // Ensure that RemoveExistingProducts is authored in InstallExecuteSequence
-                // if at least one row in Upgrade table lacks the OnlyDetect attribute.
-                if (0 == (options & MsiInterop.MsidbUpgradeAttributesOnlyDetect))
-                {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", "InstallExecuteSequence", "RemoveExistingProducts");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a verb element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="extension">Extension verb is releated to.</param>
-        /// <param name="progId">Optional progId for extension.</param>
-        /// <param name="componentId">Identifier for parent component.</param>
-        /// <param name="advertise">Flag if verb is advertised.</param>
-        private void ParseVerbElement(XElement node, string extension, string progId, string componentId, YesNoType advertise)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            string argument = null;
-            string command = null;
-            var sequence = CompilerConstants.IntegerNotSet;
-            string target = null;
-            string targetFile = null;
-            string targetProperty = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Argument":
-                        argument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Command":
-                        command = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Sequence":
-                        sequence = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "Target":
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "TargetFile", "TargetProperty"));
-                        break;
-                    case "TargetFile":
-                        targetFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", targetFile);
-                        break;
-                    case "TargetProperty":
-                        targetProperty = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null != target && null != targetFile)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetFile"));
-            }
-
-            if (null != target && null != targetProperty)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Target", "TargetProperty"));
-            }
-
-            if (null != targetFile && null != targetProperty)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (YesNoType.Yes == advertise)
-            {
-                if (null != target)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "Target"));
-                }
-
-                if (null != targetFile)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetFile"));
-                }
-
-                if (null != targetProperty)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetProperty"));
-                }
-
-                if (!this.Core.EncounteredError)
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Verb);
-                    row.Set(0, extension);
-                    row.Set(1, id);
-                    if (CompilerConstants.IntegerNotSet != sequence)
-                    {
-                        row.Set(2, sequence);
-                    }
-                    row.Set(3, command);
-                    row.Set(4, argument);
-                }
-            }
-            else if (YesNoType.No == advertise)
-            {
-                if (CompilerConstants.IntegerNotSet != sequence)
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Sequence", "Advertise", "no"));
-                }
-
-                if (null == target && null == targetFile && null == targetProperty)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TargetFile", "TargetProperty", "Advertise", "no"));
-                }
-
-                if (null == target)
-                {
-                    if (null != targetFile)
-                    {
-                        target = String.Concat("\"[#", targetFile, "]\"");
-                    }
-
-                    if (null != targetProperty)
-                    {
-                        target = String.Concat("\"[", targetProperty, "]\"");
-                    }
-                }
-
-                if (null != argument)
-                {
-                    target = String.Concat(target, " ", argument);
-                }
-
-                var prefix = (null != progId ? progId : String.Concat(".", extension));
-
-                if (null != command)
-                {
-                    this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(prefix, "\\shell\\", id), String.Empty, command, componentId);
-                }
-
-                this.Core.CreateRegistryRow(sourceLineNumbers, MsiInterop.MsidbRegistryRootClassesRoot, String.Concat(prefix, "\\shell\\", id, "\\command"), String.Empty, target, componentId);
-            }
-        }
-
-
-        /// <summary>
-        /// Parses an ApprovedExeForElevation element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseApprovedExeForElevation(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string key = null;
-            string valueName = null;
-            var win64 = YesNoType.NotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        valueName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Win64":
-                        win64 = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null == key)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
-            }
-
-            var attributes = BundleApprovedExeForElevationAttributes.None;
-
-            if (win64 == YesNoType.Yes)
-            {
-                attributes |= BundleApprovedExeForElevationAttributes.Win64;
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var wixApprovedExeForElevationRow = (WixApprovedExeForElevationTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixApprovedExeForElevation, id);
-                wixApprovedExeForElevationRow.Key = key;
-                wixApprovedExeForElevationRow.Value = valueName;
-                wixApprovedExeForElevationRow.Attributes = (int)attributes;
-            }
-        }
-
-        /// <summary>
-        /// Parses a Bundle element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseBundleElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string copyright = null;
-            string aboutUrl = null;
-            var compressed = YesNoDefaultType.Default;
-            var disableModify = -1;
-            var disableRemove = YesNoType.NotSet;
-            string helpTelephone = null;
-            string helpUrl = null;
-            string manufacturer = null;
-            string name = null;
-            string tag = null;
-            string updateUrl = null;
-            string upgradeCode = null;
-            string version = null;
-            string condition = null;
-            string parentName = null;
-
-            string fileSystemSafeBundleName = null;
-            string logVariablePrefixAndExtension = null;
-            string iconSourceFile = null;
-            string splashScreenSourceFile = null;
-
-            // Process only standard attributes until the active section is initialized.
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "AboutUrl":
-                        aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Compressed":
-                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Copyright":
-                        copyright = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisableModify":
-                        var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (value)
-                        {
-                        case "button":
-                            disableModify = 2;
-                            break;
-                        case "yes":
-                            disableModify = 1;
-                            break;
-                        case "no":
-                            disableModify = 0;
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
-                            break;
-                        }
-                        break;
-                    case "DisableRemove":
-                        disableRemove = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisableRepair":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "HelpTelephone":
-                        helpTelephone = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "HelpUrl":
-                        helpUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Manufacturer":
-                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IconSourceFile":
-                        iconSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ParentName":
-                        parentName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SplashScreenSourceFile":
-                        splashScreenSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Tag":
-                        tag = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpdateUrl":
-                        updateUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpgradeCode":
-                        upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Version":
-                        version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-            }
-
-            if (String.IsNullOrEmpty(version))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
-            }
-            else if (!CompilerCore.IsValidModuleOrBundleVersion(version))
-            {
-                this.Core.Write(WarningMessages.InvalidModuleOrBundleVersion(sourceLineNumbers, "Bundle", version));
-            }
-
-            if (String.IsNullOrEmpty(upgradeCode))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpgradeCode"));
-            }
-
-            if (String.IsNullOrEmpty(copyright))
-            {
-                if (String.IsNullOrEmpty(manufacturer))
-                {
-                    copyright = "Copyright (c). All rights reserved.";
-                }
-                else
-                {
-                    copyright = String.Format("Copyright (c) {0}. All rights reserved.", manufacturer);
-                }
-            }
-
-            if (String.IsNullOrEmpty(name))
-            {
-                logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup.log");
-            }
-            else
-            {
-                // Ensure only allowable path characters are in "name" (and change spaces to underscores).
-                fileSystemSafeBundleName = CompilerCore.MakeValidLongFileName(name.Replace(' ', '_'), "_");
-                logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ".log");
-            }
-
-            this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;
-            this.Core.CreateActiveSection(this.activeName, SectionType.Bundle, 0, this.Context.CompilationId);
-
-            // Now that the active section is initialized, process only extension attributes.
-            foreach (var attrib in node.Attributes())
-            {
-                if (!String.IsNullOrEmpty(attrib.Name.NamespaceName) && CompilerCore.WixNamespace != attrib.Name.Namespace)
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            var baSeen = false;
-            var chainSeen = false;
-            var logSeen = false;
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "ApprovedExeForElevation":
-                        this.ParseApprovedExeForElevation(child);
-                        break;
-                    case "BootstrapperApplication":
-                        if (baSeen)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "BootstrapperApplication"));
-                        }
-                        this.ParseBootstrapperApplicationElement(child);
-                        baSeen = true;
-                        break;
-                    case "BootstrapperApplicationRef":
-                        this.ParseBootstrapperApplicationRefElement(child);
-                        break;
-                    case "OptionalUpdateRegistration":
-                        this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
-                        break;
-                    case "Catalog":
-                        this.ParseCatalogElement(child);
-                        break;
-                    case "Chain":
-                        if (chainSeen)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
-                        }
-                        this.ParseChainElement(child);
-                        chainSeen = true;
-                        break;
-                    case "Container":
-                        this.ParseContainerElement(child);
-                        break;
-                    case "ContainerRef":
-                        this.ParseSimpleRefElement(child, "WixBundleContainer");
-                        break;
-                    case "Log":
-                        if (logSeen)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
-                        }
-                        logVariablePrefixAndExtension = this.ParseLogElement(child, fileSystemSafeBundleName);
-                        logSeen = true;
-                        break;
-                    case "PayloadGroup":
-                        this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Layout, "BundleLayoutOnlyPayloads");
-                        break;
-                    case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, "BundleLayoutOnlyPayloads", ComplexReferenceChildType.Unknown, null);
-                        break;
-                    case "RelatedBundle":
-                        this.ParseRelatedBundleElement(child);
-                        break;
-                    case "Update":
-                        this.ParseUpdateElement(child);
-                        break;
-                    case "Variable":
-                        this.ParseVariableElement(child);
-                        break;
-                    case "WixVariable":
-                        this.ParseWixVariableElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (!chainSeen)
-            {
-                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Chain"));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                if (null != upgradeCode)
-                {
-                    var relatedBundleRow = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixRelatedBundle);
-                    relatedBundleRow.Set(0, upgradeCode);
-                    relatedBundleRow.Set(1, (int)Wix.RelatedBundle.ActionType.Upgrade);
-                }
-
-                var containerRow = (WixBundleContainerTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleContainer);
-                containerRow.WixBundleContainer = Compiler.BurnDefaultAttachedContainerId;
-                containerRow.Name = "bundle-attached.cab";
-                containerRow.Type = ContainerType.Attached;
-
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundle);
-                row.Set(0, version);
-                row.Set(1, copyright);
-                row.Set(2, name);
-                row.Set(3, aboutUrl);
-                if (-1 != disableModify)
-                {
-                    row.Set(4, disableModify);
-                }
-                if (YesNoType.NotSet != disableRemove)
-                {
-                    row.Set(5, (YesNoType.Yes == disableRemove) ? 1 : 0);
-                }
-                // row.Set(6] - (deprecated) "disable repair"
-                row.Set(7, helpTelephone);
-                row.Set(8, helpUrl);
-                row.Set(9, manufacturer);
-                row.Set(10, updateUrl);
-                if (YesNoDefaultType.Default != compressed)
-                {
-                    row.Set(11, (YesNoDefaultType.Yes == compressed) ? 1 : 0);
-                }
-
-                row.Set(12, logVariablePrefixAndExtension);
-                row.Set(13, iconSourceFile);
-                row.Set(14, splashScreenSourceFile);
-                row.Set(15, condition);
-                row.Set(16, tag);
-                row.Set(17, this.CurrentPlatform.ToString());
-                row.Set(18, parentName);
-                row.Set(19, upgradeCode);
-
-                // Ensure that the bundle stores the well-known persisted values.
-                var bundleNameWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
-                bundleNameWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_NAME;
-                bundleNameWellKnownVariable.Hidden = false;
-                bundleNameWellKnownVariable.Persisted = true;
-
-                var bundleOriginalSourceWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
-                bundleOriginalSourceWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_ORIGINAL_SOURCE;
-                bundleOriginalSourceWellKnownVariable.Hidden = false;
-                bundleOriginalSourceWellKnownVariable.Persisted = true;
-
-                var bundleOriginalSourceFolderWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
-                bundleOriginalSourceFolderWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER;
-                bundleOriginalSourceFolderWellKnownVariable.Hidden = false;
-                bundleOriginalSourceFolderWellKnownVariable.Persisted = true;
-
-                var bundleLastUsedSourceWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
-                bundleLastUsedSourceWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_LAST_USED_SOURCE;
-                bundleLastUsedSourceWellKnownVariable.Hidden = false;
-                bundleLastUsedSourceWellKnownVariable.Persisted = true;
-            }
-        }
-
-        /// <summary>
-        /// Parse a Container element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private string ParseLogElement(XElement node, string fileSystemSafeBundleName)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var disableLog = YesNoType.NotSet;
-            var variable = "WixBundleLog";
-            var logPrefix = fileSystemSafeBundleName ?? "Setup";
-            var logExtension = ".log";
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Disable":
-                        disableLog = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "PathVariable":
-                        variable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Prefix":
-                        logPrefix = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Extension":
-                        logExtension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (!logExtension.StartsWith(".", StringComparison.Ordinal))
-            {
-                logExtension = String.Concat(".", logExtension);
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            return YesNoType.Yes == disableLog ? null : String.Concat(variable, ":", logPrefix, logExtension);
-        }
-
-        /// <summary>
-        /// Parse a Catalog element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseCatalogElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string sourceFile = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null == sourceFile)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            // Create catalog row
-            if (!this.Core.EncounteredError)
-            {
-                this.CreatePayloadRow(sourceLineNumbers, id, Path.GetFileName(sourceFile), sourceFile, null, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, ComplexReferenceChildType.Unknown, null, YesNoDefaultType.Yes, YesNoType.Yes, null, null, null);
-
-                var wixCatalogRow = (WixBundleCatalogTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleCatalog, id);
-                wixCatalogRow.Payload_ = id.Id;
-            }
-        }
-
-        /// <summary>
-        /// Parse a Container element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseContainerElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string downloadUrl = null;
-            string name = null;
-            var type = ContainerType.Detached;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "DownloadUrl":
-                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Type":
-                        var typeString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (!Enum.TryParse<ContainerType>(typeString, out type))
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                if (!String.IsNullOrEmpty(name))
-                {
-                    id = this.Core.CreateIdentifierFromFilename(name);
-                }
-
-                if (null == id)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                    id = Identifier.Invalid;
-                }
-                else if (!Common.IsIdentifier(id.Id))
-                {
-                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                }
-            }
-            else if (null == name)
-            {
-                name = id.Id;
-            }
-
-            if (!String.IsNullOrEmpty(downloadUrl) && ContainerType.Detached != type)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "Type", "attached"));
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "PackageGroupRef":
-                        this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.Container, id.Id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixBundleContainerTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleContainer, id);
-                row.Name = name;
-                row.Type = type;
-                row.DownloadUrl = downloadUrl;
-            }
-        }
-
-        /// <summary>
-        /// Parse the BoostrapperApplication element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseBootstrapperApplicationElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            string previousId = null;
-            var previousType = ComplexReferenceChildType.Unknown;
-
-            // The BootstrapperApplication element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
-            id = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false);
-            if (null != id)
-            {
-                previousId = id;
-                previousType = ComplexReferenceChildType.Payload;
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Payload":
-                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Payload;
-                        break;
-                    case "PayloadGroupRef":
-                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PayloadGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-            if (null == previousId)
-            {
-                // We need *either* <Payload> or <PayloadGroupRef> or even just @SourceFile on the BA...
-                // but we just say there's a missing <Payload>.
-                // TODO: Is there a better message for this?
-                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
-            }
-
-            // Add the application as an attached container and if an Id was provided add that too.
-            if (!this.Core.EncounteredError)
-            {
-                var containerRow = (WixBundleContainerTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleContainer);
-                containerRow.WixBundleContainer = Compiler.BurnUXContainerId;
-                containerRow.Name = "bundle-ux.cab";
-                containerRow.Type = ContainerType.Attached;
-
-                if (!String.IsNullOrEmpty(id))
-                {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBootstrapperApplication);
-                    row.Set(0, id);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parse the BoostrapperApplicationRef element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseBootstrapperApplicationRefElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            string previousId = null;
-            var previousType = ComplexReferenceChildType.Unknown;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Payload":
-                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Payload;
-                        break;
-                    case "PayloadGroupRef":
-                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PayloadGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (String.IsNullOrEmpty(id))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-            else
-            {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "WixBootstrapperApplication", id);
-            }
-        }
-
-        /// <summary>
-        /// Parse the OptionalUpdateRegistration element.
-        /// </summary>
-        /// <param name="node">The element to parse.</param>
-        /// <param name="defaultManufacturer">The manufacturer.</param>
-        /// <param name="defaultProductFamily">The product family.</param>
-        /// <param name="defaultName">The bundle name.</param>
-        private void ParseOptionalUpdateRegistrationElement(XElement node, string defaultManufacturer, string defaultProductFamily, string defaultName)
-        {
-            const string defaultClassification = "Update";
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string manufacturer = null;
-            string department = null;
-            string productFamily = null;
-            string name = null;
-            var classification = defaultClassification;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Manufacturer":
-                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Department":
-                        department = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProductFamily":
-                        productFamily = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Classification":
-                        classification = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(manufacturer))
-            {
-                if (!String.IsNullOrEmpty(defaultManufacturer))
-                {
-                    manufacturer = defaultManufacturer;
-                }
-                else
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Manufacturer", node.Parent.Name.LocalName));
-                }
-            }
-
-            if (String.IsNullOrEmpty(productFamily))
-            {
-                if (!String.IsNullOrEmpty(defaultProductFamily))
-                {
-                    productFamily = defaultProductFamily;
-                }
-            }
-
-            if (String.IsNullOrEmpty(name))
-            {
-                if (!String.IsNullOrEmpty(defaultName))
-                {
-                    name = defaultName;
-                }
-                else
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Name", node.Parent.Name.LocalName));
-                }
-            }
-
-            if (String.IsNullOrEmpty(classification))
-            {
-                this.Core.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, node.Name.LocalName, "Classification", defaultClassification));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixUpdateRegistration);
-                row.Set(0, manufacturer);
-                row.Set(1, department);
-                row.Set(2, productFamily);
-                row.Set(3, name);
-                row.Set(4, classification);
-            }
-        }
-
-        /// <summary>
-        /// Parse Payload element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">ComplexReferenceParentType of parent element. (BA or PayloadGroup)</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        private string ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
-
-            var id = this.ParsePayloadElementContent(node, parentType, parentId, previousType, previousId, true);
-            var context = new Dictionary<string, string>
-            {
-                ["Id"] = id
-            };
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child, context);
-                }
-            }
-
-            return id;
-        }
-
-        /// <summary>
-        /// Parse the attributes of the Payload element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">ComplexReferenceParentType of parent element.</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        private string ParsePayloadElementContent(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId, bool required)
-        {
-            Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var compressed = YesNoDefaultType.Default;
-            var enableSignatureVerification = YesNoType.No;
-            Identifier id = null;
-            string name = null;
-            string sourceFile = null;
-            string downloadUrl = null;
-            Wix.RemotePayload remotePayload = null;
-
-            // This list lets us evaluate extension attributes *after* all core attributes
-            // have been parsed and dealt with, regardless of authoring order.
-            var extensionAttributes = new List<XAttribute>();
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Compressed":
-                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DownloadUrl":
-                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "EnableSignatureVerification":
-                        enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    extensionAttributes.Add(attrib);
-                }
-            }
-
-            if (!required && null == sourceFile)
-            {
-                // Nothing left to do!
-                return null;
-            }
-
-            if (null == id)
-            {
-                id = this.Core.CreateIdentifier("pay", (null != sourceFile) ? sourceFile.ToUpperInvariant() : String.Empty);
-            }
-
-            // Now that the PayloadId is known, we can parse the extension attributes.
-            var context = new Dictionary<string, string>
-            {
-                ["Id"] = id.Id
-            };
-
-            foreach (var extensionAttribute in extensionAttributes)
-            {
-                this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
-            }
-
-            // We only handle the elements we care about.  Let caller handle other children.
-            foreach (var child in node.Elements(CompilerCore.WixNamespace + "RemotePayload"))
-            {
-                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-
-                if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage")
-                {
-                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
-                    continue;
-                }
-
-                if (null != remotePayload)
-                {
-                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                }
-
-                remotePayload = this.ParseRemotePayloadElement(child);
-            }
-
-            if (null != sourceFile && null != remotePayload)
-            {
-                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
-            }
-            else if (null == sourceFile && null == remotePayload)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributeOrElement(sourceLineNumbers, node.Name.LocalName, "SourceFile", "RemotePayload"));
-            }
-            else if (null == sourceFile)
-            {
-                sourceFile = String.Empty;
-            }
-
-            if (null == downloadUrl && null != remotePayload)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
-            }
-
-            if (Compiler.BurnUXContainerId == parentId)
-            {
-                if (compressed == YesNoDefaultType.No)
-                {
-                    this.Core.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(sourceLineNumbers, sourceFile));
-                }
-
-                compressed = YesNoDefaultType.Yes;
-            }
-
-            this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, enableSignatureVerification, null, null, remotePayload);
-
-            return id.Id;
-        }
-
-        private Wix.RemotePayload ParseRemotePayloadElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var remotePayload = new Wix.RemotePayload();
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "CertificatePublicKey":
-                        remotePayload.CertificatePublicKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CertificateThumbprint":
-                        remotePayload.CertificateThumbprint = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        remotePayload.Description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Hash":
-                        remotePayload.Hash = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProductName":
-                        remotePayload.ProductName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Size":
-                        remotePayload.Size = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "Version":
-                        remotePayload.Version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.ProductName))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductName"));
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.Description))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.Hash))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Hash"));
-            }
-
-            if (0 == remotePayload.Size)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Size"));
-            }
-
-            if (String.IsNullOrEmpty(remotePayload.Version))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
-            }
-
-            return remotePayload;
-        }
-
-        /// <summary>
-        /// Creates the row for a Payload.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">ComplexReferenceParentType of parent element</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        private WixBundlePayloadTuple CreatePayloadRow(SourceLineNumber sourceLineNumbers, Identifier id, string name, string sourceFile, string downloadUrl, ComplexReferenceParentType parentType,
-            string parentId, ComplexReferenceChildType previousType, string previousId, YesNoDefaultType compressed, YesNoType enableSignatureVerification, string displayName, string description,
-            Wix.RemotePayload remotePayload)
-        {
-            WixBundlePayloadTuple row = null;
-
-            if (!this.Core.EncounteredError)
-            {
-                row = (WixBundlePayloadTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePayload, id);
-                row.Name = String.IsNullOrEmpty(name) ? Path.GetFileName(sourceFile) : name;
-                row.SourceFile = sourceFile;
-                row.DownloadUrl = downloadUrl;
-                row.Compressed = compressed;
-                row.UnresolvedSourceFile = sourceFile; // duplicate of sourceFile but in a string column so it won't get resolved to a full path during binding.
-                row.DisplayName = displayName;
-                row.Description = description;
-                row.EnableSignatureValidation = (YesNoType.Yes == enableSignatureVerification);
-
-                if (null != remotePayload)
-                {
-                    row.Description = remotePayload.Description;
-                    row.DisplayName = remotePayload.ProductName;
-                    row.Hash = remotePayload.Hash;
-                    row.PublicKey = remotePayload.CertificatePublicKey;
-                    row.Thumbprint = remotePayload.CertificateThumbprint;
-                    row.FileSize = remotePayload.Size;
-                    row.Version = remotePayload.Version;
-                }
-
-                this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Payload, id.Id, previousType, previousId);
-            }
-
-            return row;
-        }
-
-        /// <summary>
-        /// Parse PayloadGroup element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">Optional ComplexReferenceParentType of parent element. (typically another PayloadGroup)</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        private void ParsePayloadGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
-        {
-            Debug.Assert(ComplexReferenceParentType.Unknown == parentType || ComplexReferenceParentType.Layout == parentType || ComplexReferenceParentType.PayloadGroup == parentType);
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                id = Identifier.Invalid;
-            }
-
-            var previousType = ComplexReferenceChildType.Unknown;
-            string previousId = null;
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Payload":
-                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Payload;
-                        break;
-                    case "PayloadGroupRef":
-                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PayloadGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (!this.Core.EncounteredError)
-            {
-                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePayloadGroup, id);
-
-                this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PayloadGroup, id.Id, ComplexReferenceChildType.Unknown, null);
-            }
-        }
-
-        /// <summary>
-        /// Parses a payload group reference element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentType">ComplexReferenceParentType of parent element (BA or PayloadGroup).</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        private string ParsePayloadGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            Debug.Assert(ComplexReferenceParentType.Layout == parentType || ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePayloadGroup", id);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PayloadGroup, id, previousType, previousId);
-
-            return id;
-        }
-
-        /// <summary>
-        /// Creates group and ordering information.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line numbers.</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="type">Type of this item.</param>
-        /// <param name="id">Identifier for this item.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        private void CreateGroupAndOrderingRows(SourceLineNumber sourceLineNumbers,
-            ComplexReferenceParentType parentType, string parentId,
-            ComplexReferenceChildType type, string id,
-            ComplexReferenceChildType previousType, string previousId)
-        {
-            if (ComplexReferenceParentType.Unknown != parentType && null != parentId)
-            {
-                this.Core.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, type, id);
-            }
-
-            if (ComplexReferenceChildType.Unknown != previousType && null != previousId)
-            {
-                this.CreateWixOrderingRow(sourceLineNumbers, type, id, previousType, previousId);
-            }
-        }
-
-        /// <summary>
-        /// Parse ExitCode element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="packageId">Id of parent element</param>
-        private void ParseExitCodeElement(XElement node, string packageId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var value = CompilerConstants.IntegerNotSet;
-            var behavior = ExitCodeBehaviorType.NotSet;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Value":
-                        value = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
-                        break;
-                    case "Behavior":
-                        var behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (!Enum.TryParse<ExitCodeBehaviorType>(behaviorString, true, out behavior))
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (ExitCodeBehaviorType.NotSet == behavior)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Behavior"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixBundlePackageExitCodeTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackageExitCode);
-                row.ChainPackageId = packageId;
-                row.Code = value;
-                row.Behavior = behavior;
-            }
-        }
-
-        /// <summary>
-        /// Parse Chain element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseChainElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var attributes = WixChainAttributes.None;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "DisableRollback":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixChainAttributes.DisableRollback;
-                        }
-                        break;
-                    case "DisableSystemRestore":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixChainAttributes.DisableSystemRestore;
-                        }
-                        break;
-                    case "ParallelCache":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            attributes |= WixChainAttributes.ParallelCache;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // Ensure there is always a rollback boundary at the beginning of the chain.
-            this.CreateRollbackBoundary(sourceLineNumbers, new Identifier("WixDefaultBoundary", AccessModifier.Public), YesNoType.Yes, YesNoType.No, ComplexReferenceParentType.PackageGroup, "WixChain", ComplexReferenceChildType.Unknown, null);
-
-            var previousId = "WixDefaultBoundary";
-            var previousType = ComplexReferenceChildType.Package;
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "MsiPackage":
-                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MspPackage":
-                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MsuPackage":
-                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "ExePackage":
-                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "RollbackBoundary":
-                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "PackageGroupRef":
-                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
-                        previousType = ComplexReferenceChildType.PackageGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (null == previousId)
-            {
-                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "MsiPackage", "ExePackage", "PackageGroupRef"));
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixChainTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixChain);
-                row.Attributes = attributes;
-            }
-        }
-
-        /// <summary>
-        /// Parse MsiPackage element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <returns>Identifier for package element.</returns>
-        private string ParseMsiPackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            return this.ParseChainPackage(node, WixBundlePackageType.Msi, parentType, parentId, previousType, previousId);
-        }
-
-        /// <summary>
-        /// Parse MspPackage element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <returns>Identifier for package element.</returns>
-        private string ParseMspPackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            return this.ParseChainPackage(node, WixBundlePackageType.Msp, parentType, parentId, previousType, previousId);
-        }
-
-        /// <summary>
-        /// Parse MsuPackage element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <returns>Identifier for package element.</returns>
-        private string ParseMsuPackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            return this.ParseChainPackage(node, WixBundlePackageType.Msu, parentType, parentId, previousType, previousId);
-        }
-
-        /// <summary>
-        /// Parse ExePackage element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <returns>Identifier for package element.</returns>
-        private string ParseExePackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            return this.ParseChainPackage(node, WixBundlePackageType.Exe, parentType, parentId, previousType, previousId);
-        }
-
-        /// <summary>
-        /// Parse RollbackBoundary element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <returns>Identifier for package element.</returns>
-        private string ParseRollbackBoundaryElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            Debug.Assert(ComplexReferenceParentType.PackageGroup == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var vital = YesNoType.Yes;
-            var transaction = YesNoType.No;
-
-            // This list lets us evaluate extension attributes *after* all core attributes
-            // have been parsed and dealt with, regardless of authoring order.
-            var extensionAttributes = new List<XAttribute>();
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    var allowed = true;
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Vital":
-                        vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Transaction":
-                        transaction = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        allowed = false;
-                        break;
-                    }
-
-                    if (!allowed)
-                    {
-                        this.Core.UnexpectedAttribute(node, attrib);
-                    }
-                }
-                else
-                {
-                    // Save the extension attributes for later...
-                    extensionAttributes.Add(attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                if (!String.IsNullOrEmpty(previousId))
-                {
-                    id = this.Core.CreateIdentifier("rba", previousId);
-                }
-
-                if (null == id)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                    id = Identifier.Invalid;
-                }
-                else if (!Common.IsIdentifier(id.Id))
-                {
-                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                }
-            }
-
-            // Now that the rollback identifier is known, we can parse the extension attributes...
-            var contextValues = new Dictionary<string, string>
-            {
-                ["RollbackBoundaryId"] = id.Id
-            };
-            foreach (var attribute in extensionAttributes)
-            {
-                this.Core.ParseExtensionAttribute(node, attribute, contextValues);
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                this.CreateRollbackBoundary(sourceLineNumbers, id, vital, transaction, parentType, parentId, previousType, previousId);
-            }
-
-            return id.Id;
-        }
-
-        /// <summary>
-        /// Parses one of the ChainPackage elements
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="packageType">Type of package to parse</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <returns>Identifier for package element.</returns>
-        /// <remarks>This method contains the shared logic for parsing all of the ChainPackage
-        /// types, as there is more in common between them than different.</remarks>
-        private string ParseChainPackage(XElement node, WixBundlePackageType packageType, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            Debug.Assert(ComplexReferenceParentType.PackageGroup == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            string name = null;
-            string sourceFile = null;
-            string downloadUrl = null;
-            string after = null;
-            string installCondition = null;
-            var cache = YesNoAlwaysType.Yes; // the default is to cache everything in tradeoff for stability over disk space.
-            string cacheId = null;
-            string description = null;
-            string displayName = null;
-            var logPathVariable = (packageType == WixBundlePackageType.Msu) ? String.Empty : null;
-            var rollbackPathVariable = (packageType == WixBundlePackageType.Msu) ? String.Empty : null;
-            var permanent = YesNoType.NotSet;
-            var visible = YesNoType.NotSet;
-            var vital = YesNoType.Yes;
-            string installCommand = null;
-            string repairCommand = null;
-            var repairable = YesNoType.NotSet;
-            string uninstallCommand = null;
-            var perMachine = YesNoDefaultType.NotSet;
-            string detectCondition = null;
-            string protocol = null;
-            var installSize = CompilerConstants.IntegerNotSet;
-            string msuKB = null;
-            var suppressLooseFilePayloadGeneration = YesNoType.NotSet;
-            var enableSignatureVerification = YesNoType.No;
-            var compressed = YesNoDefaultType.Default;
-            var displayInternalUI = YesNoType.NotSet;
-            var enableFeatureSelection = YesNoType.NotSet;
-            var forcePerMachine = YesNoType.NotSet;
-            Wix.RemotePayload remotePayload = null;
-            var slipstream = YesNoType.NotSet;
-
-            var expectedNetFx4Args = new string[] { "/q", "/norestart", "/chainingpackage" };
-
-            // This list lets us evaluate extension attributes *after* all core attributes
-            // have been parsed and dealt with, regardless of authoring order.
-            var extensionAttributes = new List<XAttribute>();
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    var allowed = true;
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
-                        if (!this.Core.IsValidLongFilename(name, false, true))
-                        {
-                            this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Name", name));
-                        }
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DownloadUrl":
-                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "After":
-                        after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "InstallCondition":
-                        installCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Cache":
-                        cache = this.Core.GetAttributeYesNoAlwaysValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CacheId":
-                        cacheId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayName":
-                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayInternalUI":
-                        displayInternalUI = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
-                        break;
-                    case "EnableFeatureSelection":
-                        enableFeatureSelection = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "ForcePerMachine":
-                        forcePerMachine = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "LogPathVariable":
-                        logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "RollbackLogPathVariable":
-                        rollbackPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Permanent":
-                        permanent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Visible":
-                        visible = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "Vital":
-                        vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "InstallCommand":
-                        installCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "RepairCommand":
-                        repairCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        repairable = YesNoType.Yes;
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "UninstallCommand":
-                        uninstallCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "PerMachine":
-                        perMachine = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msp);
-                        break;
-                    case "DetectCondition":
-                        detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu);
-                        break;
-                    case "Protocol":
-                        protocol = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        break;
-                    case "InstallSize":
-                        installSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "KB":
-                        msuKB = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msu);
-                        break;
-                    case "Compressed":
-                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SuppressLooseFilePayloadGeneration":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        suppressLooseFilePayloadGeneration = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        break;
-                    case "EnableSignatureVerification":
-                        enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Slipstream":
-                        slipstream = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msp);
-                        break;
-                    default:
-                        allowed = false;
-                        break;
-                    }
-
-                    if (!allowed)
-                    {
-                        this.Core.UnexpectedAttribute(node, attrib);
-                    }
-                }
-                else
-                {
-                    // Save the extension attributes for later...
-                    extensionAttributes.Add(attrib);
-                }
-            }
-
-            // We need to handle RemotePayload up front because it effects value of sourceFile which is used in Id generation.  Id is needed by other child elements.
-            foreach (var child in node.Elements(CompilerCore.WixNamespace + "RemotePayload"))
-            {
-                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-
-                if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage" && node.Name.LocalName != "MsuPackage")
-                {
-                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
-                    continue;
-                }
-
-                if (null != remotePayload)
-                {
-                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                }
-
-                remotePayload = this.ParseRemotePayloadElement(child);
-            }
-
-            if (String.IsNullOrEmpty(sourceFile))
-            {
-                if (String.IsNullOrEmpty(name))
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile"));
-                }
-                else if (null == remotePayload)
-                {
-                    sourceFile = Path.Combine("SourceDir", name);
-                }
-            }
-            else if (null != remotePayload)
-            {
-                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
-            }
-            else if (sourceFile.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
-            {
-                if (String.IsNullOrEmpty(name))
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile", sourceFile));
-                }
-                else
-                {
-                    sourceFile = Path.Combine(sourceFile, Path.GetFileName(name));
-                }
-            }
-
-            if (null == downloadUrl && null != remotePayload)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
-            }
-
-            if (YesNoDefaultType.No != compressed && null != remotePayload)
-            {
-                compressed = YesNoDefaultType.No;
-                this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(sourceLineNumbers, node.Name.LocalName));
-            }
-
-            if (null == id)
-            {
-                if (!String.IsNullOrEmpty(name))
-                {
-                    id = this.Core.CreateIdentifierFromFilename(Path.GetFileName(name));
-                }
-                else if (!String.IsNullOrEmpty(sourceFile))
-                {
-                    id = this.Core.CreateIdentifierFromFilename(Path.GetFileName(sourceFile));
-                }
-
-                if (null == id)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                    id = Identifier.Invalid;
-                }
-                else if (!Common.IsIdentifier(id.Id))
-                {
-                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
-                }
-            }
-
-            if (null == logPathVariable)
-            {
-                logPathVariable = String.Concat("WixBundleLog_", id.Id);
-            }
-
-            if (null == rollbackPathVariable)
-            {
-                rollbackPathVariable = String.Concat("WixBundleRollbackLog_", id.Id);
-            }
-
-            if (!String.IsNullOrEmpty(protocol) && !protocol.Equals("burn", StringComparison.Ordinal) && !protocol.Equals("netfx4", StringComparison.Ordinal) && !protocol.Equals("none", StringComparison.Ordinal))
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
-            }
-
-            if (!String.IsNullOrEmpty(protocol) && protocol.Equals("netfx4", StringComparison.Ordinal))
-            {
-                foreach (var expectedArgument in expectedNetFx4Args)
-                {
-                    if (null == installCommand || -1 == installCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallCommand", installCommand, expectedArgument, "Protocol", "netfx4"));
-                    }
-
-                    if (null == repairCommand || -1 == repairCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairCommand", repairCommand, expectedArgument, "Protocol", "netfx4"));
-                    }
-
-                    if (null == uninstallCommand || -1 == uninstallCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallCommand", uninstallCommand, expectedArgument, "Protocol", "netfx4"));
-                    }
-                }
-            }
-
-            // Only set default scope for EXEs and MSPs if not already set.
-            if ((WixBundlePackageType.Exe == packageType || WixBundlePackageType.Msp == packageType) && YesNoDefaultType.NotSet == perMachine)
-            {
-                perMachine = YesNoDefaultType.Default;
-            }
-
-            // Now that the package ID is known, we can parse the extension attributes...
-            var contextValues = new Dictionary<string, string>() { { "PackageId", id.Id } };
-            foreach (var attribute in extensionAttributes)
-            {
-                this.Core.ParseExtensionAttribute(node, attribute, contextValues);
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    var allowed = true;
-                    switch (child.Name.LocalName)
-                    {
-                    case "SlipstreamMsp":
-                        allowed = (packageType == WixBundlePackageType.Msi);
-                        if (allowed)
-                        {
-                            this.ParseSlipstreamMspElement(child, id.Id);
-                        }
-                        break;
-                    case "MsiProperty":
-                        allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
-                        if (allowed)
-                        {
-                            this.ParseMsiPropertyElement(child, id.Id);
-                        }
-                        break;
-                    case "Payload":
-                        this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id.Id, ComplexReferenceChildType.Unknown, null);
-                        break;
-                    case "PayloadGroupRef":
-                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id.Id, ComplexReferenceChildType.Unknown, null);
-                        break;
-                    case "ExitCode":
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        if (allowed)
-                        {
-                            this.ParseExitCodeElement(child, id.Id);
-                        }
-                        break;
-                    case "CommandLine":
-                        allowed = (packageType == WixBundlePackageType.Exe);
-                        if (allowed)
-                        {
-                            this.ParseCommandLineElement(child, id.Id);
-                        }
-                        break;
-                    case "RemotePayload":
-                        // Handled previously
-                        break;
-                    default:
-                        allowed = false;
-                        break;
-                    }
-
-                    if (!allowed)
-                    {
-                        this.Core.UnexpectedElement(node, child);
-                    }
-                }
-                else
-                {
-                    var context = new Dictionary<string, string>() { { "Id", id.Id } };
-                    this.Core.ParseExtensionElement(node, child, context);
-                }
-            }
-
-            if (!this.Core.EncounteredError)
-            {
-                // We create the package contents as a payload with this package as the parent
-                this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, ComplexReferenceParentType.Package, id.Id,
-                    ComplexReferenceChildType.Unknown, null, compressed, enableSignatureVerification, displayName, description, remotePayload);
-
-                var chainItemRow = (WixChainItemTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixChainItem, id);
-
-                WixBundlePackageAttributes attributes = 0;
-                attributes |= (YesNoType.Yes == permanent) ? WixBundlePackageAttributes.Permanent : 0;
-                attributes |= (YesNoType.Yes == visible) ? WixBundlePackageAttributes.Visible : 0;
-
-                var chainPackageRow = (WixBundlePackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackage, id);
-                chainPackageRow.Type = packageType;
-                chainPackageRow.Payload_ = id.Id;
-                chainPackageRow.Attributes = attributes;
-
-                chainPackageRow.InstallCondition = installCondition;
-
-                if (YesNoAlwaysType.NotSet != cache)
-                {
-                    chainPackageRow.Cache = cache;
-                }
-
-                chainPackageRow.CacheId = cacheId;
-
-                if (YesNoType.NotSet != vital)
-                {
-                    chainPackageRow.Vital = (vital == YesNoType.Yes);
-                }
-
-                if (YesNoDefaultType.NotSet != perMachine)
-                {
-                    chainPackageRow.PerMachine = perMachine;
-                }
-
-                chainPackageRow.LogPathVariable = logPathVariable;
-                chainPackageRow.RollbackLogPathVariable = rollbackPathVariable;
-
-                if (CompilerConstants.IntegerNotSet != installSize)
-                {
-                    chainPackageRow.InstallSize = installSize;
-                }
-
-                switch (packageType)
-                {
-                case WixBundlePackageType.Exe:
-                    WixBundleExePackageAttributes exeAttributes = 0;
-                    exeAttributes |= (YesNoType.Yes == repairable) ? WixBundleExePackageAttributes.Repairable : 0;
-
-                    var exeRow = (WixBundleExePackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleExePackage, id);
-                    exeRow.Attributes = exeAttributes;
-                    exeRow.DetectCondition = detectCondition;
-                    exeRow.InstallCommand = installCommand;
-                    exeRow.RepairCommand = repairCommand;
-                    exeRow.UninstallCommand = uninstallCommand;
-                    exeRow.ExeProtocol = protocol;
-                    break;
-
-                case WixBundlePackageType.Msi:
-                    WixBundleMsiPackageAttributes msiAttributes = 0;
-                    msiAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMsiPackageAttributes.DisplayInternalUI : 0;
-                    msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
-                    msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
-                    msiAttributes |= (YesNoType.Yes == suppressLooseFilePayloadGeneration) ? WixBundleMsiPackageAttributes.SuppressLooseFilePayloadGeneration : 0;
-
-                    var msiRow = (WixBundleMsiPackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMsiPackage, id);
-                    msiRow.Attributes = msiAttributes;
-                    break;
-
-                case WixBundlePackageType.Msp:
-                    WixBundleMspPackageAttributes mspAttributes = 0;
-                    mspAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMspPackageAttributes.DisplayInternalUI : 0;
-                    mspAttributes |= (YesNoType.Yes == slipstream) ? WixBundleMspPackageAttributes.Slipstream : 0;
-
-                    var mspRow = (WixBundleMspPackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMspPackage, id);
-                    mspRow.Attributes = mspAttributes;
-                    break;
-
-                case WixBundlePackageType.Msu:
-                    var msuRow = (WixBundleMsuPackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMsuPackage, id);
-                    msuRow.DetectCondition = detectCondition;
-                    msuRow.MsuKB = msuKB;
-                    break;
-                }
-
-                this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, after);
-            }
-
-            return id.Id;
-        }
-
-        /// <summary>
-        /// Parse CommandLine element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseCommandLineElement(XElement node, string packageId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string installArgument = null;
-            string uninstallArgument = null;
-            string repairArgument = null;
-            string condition = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "InstallArgument":
-                        installArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UninstallArgument":
-                        uninstallArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "RepairArgument":
-                        repairArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (String.IsNullOrEmpty(condition))
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixBundlePackageCommandLineTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackageCommandLine);
-                row.WixBundlePackage_ = packageId;
-                row.InstallArgument = installArgument;
-                row.UninstallArgument = uninstallArgument;
-                row.RepairArgument = repairArgument;
-                row.Condition = condition;
-            }
-        }
-
-        /// <summary>
-        /// Parse PackageGroup element.
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParsePackageGroupElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-                id = Identifier.Invalid;
-            }
-
-            var previousType = ComplexReferenceChildType.Unknown;
-            string previousId = null;
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "MsiPackage":
-                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MspPackage":
-                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "MsuPackage":
-                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "ExePackage":
-                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "RollbackBoundary":
-                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.Package;
-                        break;
-                    case "PackageGroupRef":
-                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
-                        previousType = ComplexReferenceChildType.PackageGroup;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-
-
-            if (!this.Core.EncounteredError)
-            {
-                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackageGroup, id);
-            }
-        }
-
-        /// <summary>
-        /// Parses a package group reference element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentType">ComplexReferenceParentType of parent element (Unknown or PackageGroup).</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        /// <returns>Identifier for package group element.</rereturns>
-        private string ParsePackageGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId)
-        {
-            return this.ParsePackageGroupRefElement(node, parentType, parentId, ComplexReferenceChildType.Unknown, null);
-        }
-
-        /// <summary>
-        /// Parses a package group reference element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentType">ComplexReferenceParentType of parent element (Unknown or PackageGroup).</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        /// <param name="parentType">ComplexReferenceParentType of previous element (Unknown, Package, or PackageGroup).</param>
-        /// <param name="parentId">Identifier of parent element.</param>
-        /// <returns>Identifier for package group element.</rereturns>
-        private string ParsePackageGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            Debug.Assert(ComplexReferenceParentType.Unknown == parentType || ComplexReferenceParentType.PackageGroup == parentType || ComplexReferenceParentType.Container == parentType);
-            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
-
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            string after = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePackageGroup", id);
-                        break;
-                    case "After":
-                        after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null != after && ComplexReferenceParentType.Container == parentType)
-            {
-                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "After", parentId));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (ComplexReferenceParentType.Container == parentType)
-            {
-                this.Core.CreateWixGroupRow(sourceLineNumbers, ComplexReferenceParentType.Container, parentId, ComplexReferenceChildType.PackageGroup, id);
-            }
-            else
-            {
-                this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PackageGroup, id, previousType, previousId, after);
-            }
-
-            return id;
-        }
-
-        /// <summary>
-        /// Creates rollback boundary.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line numbers.</param>
-        /// <param name="id">Identifier for the rollback boundary.</param>
-        /// <param name="vital">Indicates whether the rollback boundary is vital or not.</param>
-        /// <param name="parentType">Type of parent group.</param>
-        /// <param name="parentId">Identifier of parent group.</param>
-        /// <param name="previousType">Type of previous item, if any.</param>
-        /// <param name="previousId">Identifier of previous item, if any.</param>
-        private void CreateRollbackBoundary(SourceLineNumber sourceLineNumbers, Identifier id, YesNoType vital, YesNoType transaction, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
-        {
-            var row = (WixChainItemTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixChainItem, id);
-
-            var rollbackBoundary = (WixBundleRollbackBoundaryTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleRollbackBoundary, id);
-
-            if (YesNoType.NotSet != vital)
-            {
-                rollbackBoundary.Vital = (vital == YesNoType.Yes);
-            }
-            if (YesNoType.NotSet != transaction)
-            {
-                rollbackBoundary.Transaction = (transaction == YesNoType.Yes);
-            }
-
-            this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, null);
-        }
-
-        /// <summary>
-        /// Creates group and ordering information for packages
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line numbers.</param>
-        /// <param name="parentType">Type of parent group, if known.</param>
-        /// <param name="parentId">Identifier of parent group, if known.</param>
-        /// <param name="type">Type of this item.</param>
-        /// <param name="id">Identifier for this item.</param>
-        /// <param name="previousType">Type of previous item, if known.</param>
-        /// <param name="previousId">Identifier of previous item, if known</param>
-        /// <param name="afterId">Identifier of explicit 'After' attribute, if given.</param>
-        private void CreateChainPackageMetaRows(SourceLineNumber sourceLineNumbers,
-            ComplexReferenceParentType parentType, string parentId,
-            ComplexReferenceChildType type, string id,
-            ComplexReferenceChildType previousType, string previousId, string afterId)
-        {
-            // If there's an explicit 'After' attribute, it overrides the inferred previous item.
-            if (null != afterId)
-            {
-                previousType = ComplexReferenceChildType.Package;
-                previousId = afterId;
-            }
-
-            this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, type, id, previousType, previousId);
-        }
-
-        // TODO: Should we define our own enum for this, just to ensure there's no "cross-contamination"?
-        // TODO: Also, we could potentially include an 'Attributes' field to track things like
-        // 'before' vs. 'after', and explicit vs. inferred dependencies.
-        private void CreateWixOrderingRow(SourceLineNumber sourceLineNumbers,
-            ComplexReferenceChildType itemType, string itemId,
-            ComplexReferenceChildType dependsOnType, string dependsOnId)
-        {
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixOrdering);
-                row.Set(0, itemType.ToString());
-                row.Set(1, itemId);
-                row.Set(2, dependsOnType.ToString());
-                row.Set(3, dependsOnId);
-            }
-        }
-
-        /// <summary>
-        /// Parse MsiProperty element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="packageId">Id of parent element</param>
-        private void ParseMsiPropertyElement(XElement node, string packageId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string name = null;
-            string value = null;
-            string condition = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Name":
-                        name = this.Core.GetAttributeMsiPropertyNameValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixBundleMsiPropertyTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMsiProperty);
-                row.WixBundlePackage_ = packageId;
-                row.Name = name;
-                row.Value = value;
-
-                if (!String.IsNullOrEmpty(condition))
-                {
-                    row.Condition = condition;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parse SlipstreamMsp element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        /// <param name="packageId">Id of parent element</param>
-        private void ParseSlipstreamMspElement(XElement node, string packageId)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePackage", id);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixBundleSlipstreamMspTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleSlipstreamMsp);
-                row.WixBundlePackage_ = packageId;
-                row.WixBundlePackage_Msp = id;
-            }
-        }
-
-        /// <summary>
-        /// Parse RelatedBundle element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseRelatedBundleElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
-            string action = null;
-            var actionType = Wix.RelatedBundle.ActionType.Detect;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Action":
-                        action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (!String.IsNullOrEmpty(action))
-            {
-                actionType = Wix.RelatedBundle.ParseActionType(action);
-                switch (actionType)
-                {
-                case Wix.RelatedBundle.ActionType.Detect:
-                    break;
-                case Wix.RelatedBundle.ActionType.Upgrade:
-                    break;
-                case Wix.RelatedBundle.ActionType.Addon:
-                    break;
-                case Wix.RelatedBundle.ActionType.Patch:
-                    break;
-                default:
-                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
-                    break;
-                }
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixRelatedBundle);
-                row.Set(0, id);
-                row.Set(1, (int)actionType);
-            }
-        }
-
-        /// <summary>
-        /// Parse Update element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseUpdateElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string location = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Location":
-                        location = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == location)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Location"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleUpdate);
-                row.Set(0, location);
-            }
-        }
-
-        /// <summary>
-        /// Parse Variable element
-        /// </summary>
-        /// <param name="node">Element to parse</param>
-        private void ParseVariableElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            var hidden = false;
-            string name = null;
-            var persisted = false;
-            string value = null;
-            string type = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Hidden":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            hidden = true;
-                        }
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeBundleVariableValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Persisted":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            persisted = true;
-                        }
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Type":
-                        type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == name)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-            }
-            else if (name.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
-            {
-                this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
-            }
-
-            if (null == type && null != value)
-            {
-                // Infer the type from the current value... 
-                if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Version constructor does not support simple "v#" syntax so check to see if the value is
-                    // non-negative real quick.
-                    if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var number))
-                    {
-                        type = "version";
-                    }
-                    else
-                    {
-                        // Sadly, Version doesn't have a TryParse() method until .NET 4, so we have to try/catch to see if it parses.
-                        try
-                        {
-                            var version = new Version(value.Substring(1));
-                            type = "version";
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
-
-                // Not a version, check for numeric.
-                if (null == type)
-                {
-                    if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var number))
-                    {
-                        type = "numeric";
-                    }
-                    else
-                    {
-                        type = "string";
-                    }
-                }
-            }
-
-            if (null == value && null != type)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var row = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
-                row.WixBundleVariable = name;
-                row.Value = value;
-                row.Type = type;
-                row.Hidden = hidden;
-                row.Persisted = persisted;
-            }
-        }
-
-
-
-        /// <summary>
-        /// Parses a Wix element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseWixElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string requiredVersion = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "RequiredVersion":
-                        requiredVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null != requiredVersion)
-            {
-                this.Core.VerifyRequiredVersion(sourceLineNumbers, requiredVersion);
-            }
-
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Bundle":
-                        this.ParseBundleElement(child);
-                        break;
-                    case "Fragment":
-                        this.ParseFragmentElement(child);
-                        break;
-                    case "Module":
-                        this.ParseModuleElement(child);
-                        break;
-                    case "PatchCreation":
-                        this.ParsePatchCreationElement(child);
-                        break;
-                    case "Product":
-                        this.ParseProductElement(child);
-                        break;
-                    case "Patch":
-                        this.ParsePatchElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Parses a WixVariable element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        private void ParseWixVariableElement(XElement node)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
-            var overridable = false;
-            string value = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Overridable":
-                        overridable = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            if (null == id)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
-            }
-
-            if (null == value)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
-            }
-
-            this.Core.ParseForExtensionElements(node);
-
-            if (!this.Core.EncounteredError)
-            {
-                var wixVariableRow = (WixVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixVariable, id);
-                wixVariableRow.Value = value;
-                wixVariableRow.Overridable = overridable;
             }
         }
     }

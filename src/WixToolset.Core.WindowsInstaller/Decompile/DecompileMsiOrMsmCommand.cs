@@ -6,12 +6,11 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
-    using WixToolset.Core.Native;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     internal class DecompileMsiOrMsmCommand
     {

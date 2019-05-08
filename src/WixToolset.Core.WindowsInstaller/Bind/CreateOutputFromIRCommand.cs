@@ -4,8 +4,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
@@ -46,39 +46,323 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 switch (tuple.Definition.Type)
                 {
-                    case TupleDefinitionType.File:
-                        this.AddFileTuple((FileTuple)tuple, output);
-                        break;
+                case TupleDefinitionType.BBControl:
+                    this.AddBBControlTuple((BBControlTuple)tuple, output);
+                    break;
 
-                    case TupleDefinitionType.Media:
-                        this.AddMediaTuple((MediaTuple)tuple, output);
-                        break;
+                case TupleDefinitionType.Control:
+                    this.AddControlTuple((ControlTuple)tuple, output);
+                    break;
 
-                    case TupleDefinitionType.Property:
-                        this.AddPropertyTuple((PropertyTuple)tuple, output);
-                        break;
+                case TupleDefinitionType.Component:
+                    this.AddComponentTuple((ComponentTuple)tuple, output);
+                    break;
 
-                    case TupleDefinitionType.WixAction:
-                        this.AddWixActionTuple((WixActionTuple)tuple, output);
-                        break;
+                case TupleDefinitionType.CustomAction:
+                    this.AddCustomActionTuple((CustomActionTuple)tuple, output);
+                    break;
 
-                    case TupleDefinitionType.WixMedia:
-                        // Ignored.
-                        break;
+                case TupleDefinitionType.Dialog:
+                    this.AddDialogTuple((DialogTuple)tuple, output);
+                    break;
 
-                    case TupleDefinitionType.WixMediaTemplate:
-                        this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple, output);
-                        break;
+                case TupleDefinitionType.Environment:
+                    this.AddEnvironmentTuple((EnvironmentTuple)tuple, output);
+                    break;
 
-                    case TupleDefinitionType.MustBeFromAnExtension:
-                        this.AddTupleFromExtension(tuple, output);
-                        break;
+                case TupleDefinitionType.Feature:
+                    this.AddFeatureTuple((FeatureTuple)tuple, output);
+                    break;
 
-                    default:
-                        this.AddTupleDefaultly(tuple, output);
-                        break;
+                case TupleDefinitionType.File:
+                    this.AddFileTuple((FileTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.IniFile:
+                    this.AddIniFileTuple((IniFileTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Media:
+                    this.AddMediaTuple((MediaTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.ModuleConfiguration:
+                    this.AddModuleConfigurationTuple((ModuleConfigurationTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.MsiEmbeddedUI:
+                    this.AddMsiEmbeddedUITuple((MsiEmbeddedUITuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.MsiServiceConfig:
+                    this.AddMsiServiceConfigTuple((MsiServiceConfigTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.MsiServiceConfigFailureActions:
+                    this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Property:
+                    this.AddPropertyTuple((PropertyTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Registry:
+                    this.AddRegistryTuple((RegistryTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.RemoveRegistry:
+                    this.AddRemoveRegistryTuple((RemoveRegistryTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.ServiceControl:
+                    this.AddServiceControlTuple((ServiceControlTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.ServiceInstall:
+                    this.AddServiceInstallTuple((ServiceInstallTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Shortcut:
+                    this.AddTupleDefaultly(tuple, output, true);
+                    break;
+
+                case TupleDefinitionType.TextStyle:
+                    this.AddTextStyleTuple((TextStyleTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Upgrade:
+                    this.AddUpgradeTuple((UpgradeTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.WixAction:
+                    this.AddWixActionTuple((WixActionTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.WixMedia:
+                    // Ignored.
+                    break;
+
+                case TupleDefinitionType.WixMediaTemplate:
+                    this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.MustBeFromAnExtension:
+                    this.AddTupleFromExtension(tuple, output);
+                    break;
+
+                default:
+                    this.AddTupleDefaultly(tuple, output);
+                    break;
                 }
             }
+        }
+
+        private void AddBBControlTuple(BBControlTuple tuple, Output output)
+        {
+            var attributes = tuple.Attributes;
+            attributes |= tuple.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
+            attributes |= tuple.Indirect ? WindowsInstallerConstants.MsidbControlAttributesIndirect : 0;
+            attributes |= tuple.Integer ? WindowsInstallerConstants.MsidbControlAttributesInteger : 0;
+            attributes |= tuple.LeftScroll ? WindowsInstallerConstants.MsidbControlAttributesLeftScroll : 0;
+            attributes |= tuple.RightAligned ? WindowsInstallerConstants.MsidbControlAttributesRightAligned : 0;
+            attributes |= tuple.RightToLeft ? WindowsInstallerConstants.MsidbControlAttributesRTLRO : 0;
+            attributes |= tuple.Sunken ? WindowsInstallerConstants.MsidbControlAttributesSunken : 0;
+            attributes |= tuple.Visible ? WindowsInstallerConstants.MsidbControlAttributesVisible : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["BBControl"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Billboard_;
+            row[1] = tuple.BBControl;
+            row[2] = tuple.Type;
+            row[3] = tuple.X;
+            row[4] = tuple.Y;
+            row[5] = tuple.Width;
+            row[6] = tuple.Height;
+            row[7] = attributes;
+            row[8] = tuple.Text;
+        }
+
+        private void AddControlTuple(ControlTuple tuple, Output output)
+        {
+            var text = tuple.Text;
+            var attributes = tuple.Attributes;
+            attributes |= tuple.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
+            attributes |= tuple.Indirect ? WindowsInstallerConstants.MsidbControlAttributesIndirect : 0;
+            attributes |= tuple.Integer ? WindowsInstallerConstants.MsidbControlAttributesInteger : 0;
+            attributes |= tuple.LeftScroll ? WindowsInstallerConstants.MsidbControlAttributesLeftScroll : 0;
+            attributes |= tuple.RightAligned ? WindowsInstallerConstants.MsidbControlAttributesRightAligned : 0;
+            attributes |= tuple.RightToLeft ? WindowsInstallerConstants.MsidbControlAttributesRTLRO : 0;
+            attributes |= tuple.Sunken ? WindowsInstallerConstants.MsidbControlAttributesSunken : 0;
+            attributes |= tuple.Visible ? WindowsInstallerConstants.MsidbControlAttributesVisible : 0;
+
+            // If we're tracking disk space, and this is a non-FormatSize Text control,
+            // and the text attribute starts with '[' and ends with ']', add a space.
+            // It is not necessary for the whole string to be a property, just those
+            // two characters matter.
+            if (tuple.TrackDiskSpace &&
+                "Text" == tuple.Type &&
+                WindowsInstallerConstants.MsidbControlAttributesFormatSize != (attributes & WindowsInstallerConstants.MsidbControlAttributesFormatSize) &&
+                null != text && text.StartsWith("[", StringComparison.Ordinal) && text.EndsWith("]", StringComparison.Ordinal))
+            {
+                text = String.Concat(text, " ");
+            }
+
+            var table = output.EnsureTable(this.TableDefinitions["Control"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Dialog_;
+            row[1] = tuple.Control;
+            row[2] = tuple.Type;
+            row[3] = tuple.X;
+            row[4] = tuple.Y;
+            row[5] = tuple.Width;
+            row[6] = tuple.Height;
+            row[7] = attributes;
+            row[8] = text;
+            row[9] = tuple.Control_Next;
+            row[10] = tuple.Help;
+        }
+
+        private void AddComponentTuple(ComponentTuple tuple, Output output)
+        {
+            var attributes = ComponentLocation.Either == tuple.Location ? WindowsInstallerConstants.MsidbComponentAttributesOptional : 0;
+            attributes |= ComponentLocation.SourceOnly == tuple.Location ? WindowsInstallerConstants.MsidbComponentAttributesSourceOnly : 0;
+            attributes |= ComponentKeyPathType.Registry == tuple.KeyPathType ? WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath : 0;
+            attributes |= ComponentKeyPathType.OdbcDataSource == tuple.KeyPathType ? WindowsInstallerConstants.MsidbComponentAttributesODBCDataSource : 0;
+            attributes |= tuple.DisableRegistryReflection ? WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection : 0;
+            attributes |= tuple.NeverOverwrite ? WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite : 0;
+            attributes |= tuple.Permanent ? WindowsInstallerConstants.MsidbComponentAttributesPermanent : 0;
+            attributes |= tuple.SharedDllRefCount ? WindowsInstallerConstants.MsidbComponentAttributesSharedDllRefCount : 0;
+            attributes |= tuple.Transitive ? WindowsInstallerConstants.MsidbComponentAttributesTransitive : 0;
+            attributes |= tuple.UninstallWhenSuperseded ? WindowsInstallerConstants.MsidbComponentAttributes64bit : 0;
+
+            attributes |= tuple.Win64 ? WindowsInstallerConstants.MsidbComponentAttributes64bit : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["Component"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.ComponentId;
+            row[2] = tuple.Directory_;
+            row[3] = attributes;
+            row[4] = tuple.Condition;
+            row[5] = tuple.KeyPath;
+        }
+
+        private void AddCustomActionTuple(CustomActionTuple tuple, Output output)
+        {
+            var type = tuple.Win64 ? WindowsInstallerConstants.MsidbCustomActionType64BitScript : 0;
+            type |= tuple.TSAware ? WindowsInstallerConstants.MsidbCustomActionTypeTSAware : 0;
+            type |= tuple.Impersonate ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate;
+            type |= tuple.IgnoreResult ? WindowsInstallerConstants.MsidbCustomActionTypeContinue : 0;
+            type |= tuple.Hidden ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeHideTarget;
+            type |= tuple.Async ? WindowsInstallerConstants.MsidbCustomActionTypeAsync : 0;
+            type |= CustomActionExecutionType.FirstSequence == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeFirstSequence : 0;
+            type |= CustomActionExecutionType.OncePerProcess == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeOncePerProcess : 0;
+            type |= CustomActionExecutionType.ClientRepeat == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeClientRepeat : 0;
+            type |= CustomActionExecutionType.Deferred == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript : 0;
+            type |= CustomActionExecutionType.Rollback == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript | WindowsInstallerConstants.MsidbCustomActionTypeRollback : 0;
+            type |= CustomActionExecutionType.Commit == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeInScript | WindowsInstallerConstants.MsidbCustomActionTypeCommit : 0;
+            type |= CustomActionSourceType.File == tuple.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeSourceFile : 0;
+            type |= CustomActionSourceType.Directory == tuple.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeDirectory : 0;
+            type |= CustomActionSourceType.Property == tuple.SourceType ? WindowsInstallerConstants.MsidbCustomActionTypeProperty : 0;
+            type |= CustomActionTargetType.Dll == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeDll : 0;
+            type |= CustomActionTargetType.Exe == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeExe : 0;
+            type |= CustomActionTargetType.TextData == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeTextData : 0;
+            type |= CustomActionTargetType.JScript == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeJScript : 0;
+            type |= CustomActionTargetType.VBScript == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeVBScript : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["CustomAction"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = type;
+            row[2] = tuple.Source;
+            row[3] = tuple.Target;
+            row[4] = tuple.PatchUninstall ? WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : 0;
+        }
+
+        private void AddDialogTuple(DialogTuple tuple, Output output)
+        {
+            var attributes = tuple.Visible ? WindowsInstallerConstants.MsidbDialogAttributesVisible : 0;
+            attributes|= tuple.Modal ? WindowsInstallerConstants.MsidbDialogAttributesModal : 0;
+            attributes|= tuple.Minimize ? WindowsInstallerConstants.MsidbDialogAttributesMinimize : 0;
+            attributes|= tuple.CustomPalette ? WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette: 0;
+            attributes|= tuple.ErrorDialog ? WindowsInstallerConstants.MsidbDialogAttributesError : 0;
+            attributes|= tuple.LeftScroll ? WindowsInstallerConstants.MsidbDialogAttributesLeftScroll : 0;
+            attributes|= tuple.KeepModeless ? WindowsInstallerConstants.MsidbDialogAttributesKeepModeless : 0;
+            attributes|= tuple.RightAligned ? WindowsInstallerConstants.MsidbDialogAttributesRightAligned : 0;
+            attributes|= tuple.RightToLeft ? WindowsInstallerConstants.MsidbDialogAttributesRTLRO : 0;
+            attributes|= tuple.SystemModal ? WindowsInstallerConstants.MsidbDialogAttributesSysModal : 0;
+            attributes|= tuple.TrackDiskSpace ? WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["Dialog"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.HCentering;
+            row[2] = tuple.VCentering;
+            row[3] = tuple.Width;
+            row[4] = tuple.Height;
+            row[5] = attributes;
+            row[6] = tuple.Title;
+            row[7] = tuple.Control_First;
+            row[8] = tuple.Control_Default;
+            row[9] = tuple.Control_Cancel;
+        }
+
+        private void AddEnvironmentTuple(EnvironmentTuple tuple, Output output)
+        {
+            var action = String.Empty;
+            var system = tuple.System ? "*" : String.Empty;
+            var uninstall = tuple.Permanent ? String.Empty : "-";
+            var value = tuple.Value;
+
+            switch (tuple.Action)
+            {
+            case EnvironmentActionType.Create:
+                action = "+";
+                break;
+            case EnvironmentActionType.Set:
+                action = "=";
+                break;
+            case EnvironmentActionType.Remove:
+                action = "!";
+                break;
+            }
+
+            switch (tuple.Part)
+            {
+            case EnvironmentPartType.First:
+                value = String.Concat(value, tuple.Separator, "[~]");
+                break;
+            case EnvironmentPartType.Last:
+                value = String.Concat("[~]", tuple.Separator, value);
+                break;
+            }
+
+            var table = output.EnsureTable(this.TableDefinitions["Environment"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = String.Concat(action, uninstall, system, tuple.Name);
+            row[2] = value;
+            row[3] = tuple.Component_;
+        }
+
+        private void AddFeatureTuple(FeatureTuple tuple, Output output)
+        {
+            var attributes = tuple.DisallowAbsent ? WindowsInstallerConstants.MsidbFeatureAttributesUIDisallowAbsent : 0;
+            attributes |= tuple.DisallowAdvertise ? WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise : 0;
+            attributes |= FeatureInstallDefault.FollowParent == tuple.InstallDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFollowParent : 0;
+            attributes |= FeatureInstallDefault.Source == tuple.InstallDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFavorSource : 0;
+            attributes |= FeatureTypicalDefault.Advertise == tuple.TypicalDefault ? WindowsInstallerConstants.MsidbFeatureAttributesFavorAdvertise : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["Feature"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Feature_Parent;
+            row[2] = tuple.Title;
+            row[3] = tuple.Description;
+            row[4] = tuple.Display;
+            row[5] = tuple.Level;
+            row[6] = tuple.Directory_;
+            row[7] = attributes;
         }
 
         private void AddFileTuple(FileTuple tuple, Output output)
@@ -92,14 +376,30 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.Version = tuple.Version;
             row.Language = tuple.Language;
 
-            var attributes = tuple.Checksum ? MsiInterop.MsidbFileAttributesChecksum : 0;
-            attributes |= (tuple.Compressed.HasValue && tuple.Compressed.Value) ? MsiInterop.MsidbFileAttributesCompressed : 0;
-            attributes |= (tuple.Compressed.HasValue && !tuple.Compressed.Value) ? MsiInterop.MsidbFileAttributesNoncompressed : 0;
-            attributes |= tuple.Hidden ? MsiInterop.MsidbFileAttributesHidden : 0;
-            attributes |= tuple.ReadOnly ? MsiInterop.MsidbFileAttributesReadOnly : 0;
-            attributes |= tuple.System ? MsiInterop.MsidbFileAttributesSystem : 0;
-            attributes |= tuple.Vital ? MsiInterop.MsidbFileAttributesVital : 0;
+            var attributes = tuple.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
+            attributes |= (tuple.Compressed.HasValue && tuple.Compressed.Value) ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;
+            attributes |= (tuple.Compressed.HasValue && !tuple.Compressed.Value) ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0;
+            attributes |= tuple.Hidden ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0;
+            attributes |= tuple.ReadOnly ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0;
+            attributes |= tuple.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
+            attributes |= tuple.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
+        }
+
+        private void AddIniFileTuple(IniFileTuple tuple, Output output)
+        {
+            string tableName = (InifFileActionType.AddLine == tuple.Action || InifFileActionType.AddTag == tuple.Action || InifFileActionType.CreateLine == tuple.Action) ? "IniFile" : "RemoveIniFile";
+
+            var table = output.EnsureTable(this.TableDefinitions[tableName]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.FileName;
+            row[2] = tuple.DirProperty;
+            row[3] = tuple.Section;
+            row[4] = tuple.Key;
+            row[5] = tuple.Value;
+            row[6] = tuple.Action;
+            row[7] = tuple.Component_;
         }
 
         private void AddMediaTuple(MediaTuple tuple, Output output)
@@ -117,6 +417,72 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
+        private void AddModuleConfigurationTuple(ModuleConfigurationTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["ModuleConfiguration"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Format;
+            row[2] = tuple.Type;
+            row[3] = tuple.ContextData;
+            row[4] = tuple.DefaultValue;
+            row[5] = (tuple.KeyNoOrphan ? WindowsInstallerConstants.MsidbMsmConfigurableOptionKeyNoOrphan : 0) |
+                     (tuple.NonNullable ? WindowsInstallerConstants.MsidbMsmConfigurableOptionNonNullable : 0);
+            row[6] = tuple.DisplayName;
+            row[7] = tuple.Description;
+            row[8] = tuple.HelpLocation;
+            row[9] = tuple.HelpKeyword;
+        }
+
+        private void AddMsiEmbeddedUITuple(MsiEmbeddedUITuple tuple, Output output)
+        {
+            var attributes = tuple.EntryPoint ? WindowsInstallerConstants.MsidbEmbeddedUI : 0;
+            attributes |= tuple.SupportsBasicUI ? WindowsInstallerConstants.MsidbEmbeddedHandlesBasic : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["MsiEmbeddedUI"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.FileName;
+            row[2] = attributes;
+            row[3] = tuple.MessageFilter;
+            row[4] = tuple.Source;
+        }
+
+        private void AddMsiServiceConfigTuple(MsiServiceConfigTuple tuple, Output output)
+        {
+            var events = tuple.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
+            events |= tuple.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
+            events |= tuple.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["MsiServiceConfigFailureActions"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Name;
+            row[2] = events;
+            row[3] = tuple.ConfigType;
+            row[4] = tuple.Argument;
+            row[5] = tuple.Component_;
+        }
+
+        private void AddMsiServiceConfigFailureActionsTuple(MsiServiceConfigFailureActionsTuple tuple, Output output)
+        {
+            var events = tuple.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
+            events |= tuple.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
+            events |= tuple.OnUninstall ? WindowsInstallerConstants.MsidbServiceConfigEventUninstall : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["MsiServiceConfig"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Name;
+            row[2] = events;
+            row[3] = tuple.ResetPeriod.HasValue ? tuple.ResetPeriod : null;
+            row[4] = tuple.RebootMessage ?? "[~]";
+            row[5] = tuple.Command ?? "[~]";
+            row[6] = tuple.Actions;
+            row[7] = tuple.DelayActions;
+            row[8] = tuple.Component_;
+        }
+
         private void AddPropertyTuple(PropertyTuple tuple, Output output)
         {
             if (String.IsNullOrEmpty(tuple.Value))
@@ -128,6 +494,162 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var row = (PropertyRow)table.CreateRow(tuple.SourceLineNumbers);
             row.Property = tuple.Property;
             row.Value = tuple.Value;
+        }
+
+        private void AddRegistryTuple(RegistryTuple tuple, Output output)
+        {
+            var value = tuple.Value;
+
+            switch (tuple.ValueType)
+            {
+            case RegistryValueType.Binary:
+                value = String.Concat("#x", value);
+                break;
+            case RegistryValueType.Expandable:
+                value = String.Concat("#%", value);
+                break;
+            case RegistryValueType.Integer:
+                value = String.Concat("#", value);
+                break;
+            case RegistryValueType.MultiString:
+                switch (tuple.ValueAction)
+                {
+                case RegistryValueActionType.Append:
+                    value = String.Concat("[~]", value);
+                    break;
+                case RegistryValueActionType.Prepend:
+                    value = String.Concat(value, "[~]");
+                    break;
+                case RegistryValueActionType.Write:
+                default:
+                    if (null != value && -1 == value.IndexOf("[~]", StringComparison.Ordinal))
+                    {
+                        value = String.Format(CultureInfo.InvariantCulture, "[~]{0}[~]", value);
+                    }
+                    break;
+                }
+                break;
+            case RegistryValueType.String:
+                // escape the leading '#' character for string registry keys
+                if (null != value && value.StartsWith("#", StringComparison.Ordinal))
+                {
+                    value = String.Concat("#", value);
+                }
+                break;
+            }
+
+            var table = output.EnsureTable(this.TableDefinitions["Registry"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Root;
+            row[2] = tuple.Key;
+            row[3] = tuple.Name;
+            row[4] = value;
+            row[5] = tuple.Component_;
+        }
+
+        private void AddRemoveRegistryTuple(RemoveRegistryTuple tuple, Output output)
+        {
+            if (tuple.Action == RemoveRegistryActionType.RemoveOnInstall)
+            {
+                var table = output.EnsureTable(this.TableDefinitions["RemoveRegistry"]);
+                var row = table.CreateRow(tuple.SourceLineNumbers);
+                row[0] = tuple.Id.Id;
+                row[1] = tuple.Root;
+                row[2] = tuple.Key;
+                row[3] = tuple.Name;
+                row[4] = tuple.Component_;
+            }
+            else // Registry table is used to remove registry keys on uninstall.
+            {
+                var table = output.EnsureTable(this.TableDefinitions["Registry"]);
+                var row = table.CreateRow(tuple.SourceLineNumbers);
+                row[0] = tuple.Id.Id;
+                row[1] = tuple.Root;
+                row[2] = tuple.Key;
+                row[3] = tuple.Name;
+                row[5] = tuple.Component_;
+            }
+        }
+
+        private void AddServiceControlTuple(ServiceControlTuple tuple, Output output)
+        {
+            var events = tuple.InstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventDelete : 0;
+            events |= tuple.UninstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete : 0;
+            events |= tuple.InstallStart ? WindowsInstallerConstants.MsidbServiceControlEventStart : 0;
+            events |= tuple.UninstallStart ? WindowsInstallerConstants.MsidbServiceControlEventUninstallStart : 0;
+            events |= tuple.InstallStop ? WindowsInstallerConstants.MsidbServiceControlEventStop : 0;
+            events |= tuple.UninstallStop ? WindowsInstallerConstants.MsidbServiceControlEventUninstallStop : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["ServiceControl"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Name;
+            row[2] = events;
+            row[3] = tuple.Arguments;
+            row[4] = tuple.Wait;
+            row[5] = tuple.Component_;
+        }
+
+        private void AddServiceInstallTuple(ServiceInstallTuple tuple, Output output)
+        {
+            var errorControl = (int)tuple.ErrorControl;
+            errorControl |= tuple.Vital ? WindowsInstallerConstants.MsidbServiceInstallErrorControlVital : 0;
+
+            var serviceType = (int)tuple.ServiceType;
+            serviceType |= tuple.Interactive ? WindowsInstallerConstants.MsidbServiceInstallInteractive : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["ServiceInstall"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Name;
+            row[2] = tuple.DisplayName;
+            row[3] = serviceType;
+            row[4] = (int)tuple.StartType;
+            row[5] = errorControl;
+            row[6] = tuple.LoadOrderGroup;
+            row[7] = tuple.Dependencies;
+            row[8] = tuple.StartName;
+            row[9] = tuple.Password;
+            row[10] = tuple.Arguments;
+            row[11] = tuple.Component_;
+            row[12] = tuple.Description;
+        }
+
+        private void AddTextStyleTuple(TextStyleTuple tuple, Output output)
+        {
+            var styleBits = tuple.Bold ? WindowsInstallerConstants.MsidbTextStyleStyleBitsBold : 0;
+            styleBits |= tuple.Italic ? WindowsInstallerConstants.MsidbTextStyleStyleBitsItalic : 0;
+            styleBits |= tuple.Strike ? WindowsInstallerConstants.MsidbTextStyleStyleBitsStrike : 0;
+            styleBits |= tuple.Underline ? WindowsInstallerConstants.MsidbTextStyleStyleBitsUnderline : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["TextStyle"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.FaceName;
+            row[2] = tuple.Size;
+            row[3] = tuple.Color;
+            row[4] = styleBits;
+        }
+
+        private void AddUpgradeTuple(UpgradeTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["Upgrade"]);
+            var row = (UpgradeRow)table.CreateRow(tuple.SourceLineNumbers);
+            row.UpgradeCode = tuple.UpgradeCode;
+            row.VersionMin = tuple.VersionMin;
+            row.VersionMax = tuple.VersionMax;
+            row.Language = tuple.Language;
+            row.Remove = tuple.Remove;
+            row.ActionProperty = tuple.ActionProperty;
+
+            var attributes = tuple.MigrateFeatures ? WindowsInstallerConstants.MsidbUpgradeAttributesMigrateFeatures : 0;
+            attributes |= tuple.OnlyDetect ? WindowsInstallerConstants.MsidbUpgradeAttributesOnlyDetect : 0;
+            attributes |= tuple.IgnoreRemoveFailures ? WindowsInstallerConstants.MsidbUpgradeAttributesIgnoreRemoveFailure : 0;
+            attributes |= tuple.VersionMinInclusive ? WindowsInstallerConstants.MsidbUpgradeAttributesVersionMinInclusive : 0;
+            attributes |= tuple.VersionMaxInclusive ? WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive : 0;
+            attributes |= tuple.ExcludeLanguages ? WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive : 0;
+            row.Attributes = attributes;
         }
 
         private void AddWixActionTuple(WixActionTuple tuple, Output output)
@@ -243,7 +765,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddTupleDefaultly(IntermediateTuple tuple, Output output)
+        private void AddTupleDefaultly(IntermediateTuple tuple, Output output, bool idIsPrimaryKey = false)
         {
             if (!this.TableDefinitions.TryGet(tuple.Definition.Name, out var tableDefinition))
             {
@@ -252,6 +774,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var table = output.EnsureTable(tableDefinition);
             var row = table.CreateRow(tuple.SourceLineNumbers);
+            var rowOffset = 0;
+
+            if (idIsPrimaryKey)
+            {
+                row[0] = tuple.Id.Id;
+                rowOffset = 1;
+            }
+
             for (var i = 0; i < tuple.Fields.Length; ++i)
             {
                 if (i < tableDefinition.Columns.Length)
@@ -261,11 +791,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     switch (column.Type)
                     {
                         case ColumnType.Number:
-                            row[i] = tuple.AsNumber(i);
+                            row[i + rowOffset] = tuple.AsNumber(i);
                             break;
 
                         default:
-                            row[i] = tuple.AsString(i);
+                            row[i + rowOffset] = tuple.AsString(i);
                             break;
                     }
                 }

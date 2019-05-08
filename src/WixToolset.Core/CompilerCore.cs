@@ -13,6 +13,7 @@ namespace WixToolset.Core
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -163,6 +164,15 @@ namespace WixToolset.Core
         /// </summary>
         /// <value>The option to show pedantic messages.</value>
         public bool ShowPedanticMessages { get; set; }
+
+        /// <summary>
+        /// Add a tuple to the active section.
+        /// </summary>
+        /// <param name="tuple">Tuple to add.</param>
+        public void AddTuple(IntermediateTuple tuple)
+        {
+            this.ActiveSection.Tuples.Add(tuple);
+        }
 
         /// <summary>
         /// Convert a bit array into an int value.
@@ -418,7 +428,7 @@ namespace WixToolset.Core
         /// <param name="name">The registry entry name.</param>
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
-        public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, int root, string key, string name, string value, string componentId)
+        public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId)
         {
             return this.parseHelper.CreateRegistryRow(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
         }
@@ -839,9 +849,9 @@ namespace WixToolset.Core
         /// <param name="allowHkmu">Whether HKMU is returned as -1 (true), or treated as an error (false).</param>
         /// <returns>The attribute's RegisitryRootType value.</returns>
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        public int GetAttributeMsidbRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
+        public RegistryRootType? GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
         {
-            return this.parseHelper.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
+            return this.parseHelper.GetAttributeRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
         }
 
         /// <summary>

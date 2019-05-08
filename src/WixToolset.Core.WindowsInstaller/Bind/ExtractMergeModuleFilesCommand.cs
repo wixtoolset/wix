@@ -10,12 +10,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using System.Runtime.InteropServices;
     using WixToolset.Data;
-    using WixToolset.MergeMod;
-    using WixToolset.Msi;
     using WixToolset.Core.Native;
     using WixToolset.Core.Bind;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Core.WindowsInstaller.Msi;
 
     /// <summary>
     /// Retrieve files information and extract them from merge modules.

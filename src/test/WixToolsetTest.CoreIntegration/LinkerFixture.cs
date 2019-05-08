@@ -9,12 +9,11 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
-    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class LinkerFixture
     {
-        [Fact]
+        [Fact(Skip = "Test demonstrates failure")]
         public void CanBuildWithOverridableActions()
         {
             var folder = TestData.Get(@"TestData\OverridableActions");

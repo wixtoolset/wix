@@ -541,7 +541,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             foreach (Row row in componentTable.Rows)
             {
                 if (null != row.Fields[5].Data &&
-                    0 != ((int)row.Fields[3].Data & MsiInterop.MsidbComponentAttributesRegistryKeyPath))
+                    0 != ((int)row.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath))
                 {
                     componentKeyPath.Add(row.Fields[0].Data.ToString(), row.Fields[5].Data.ToString());
                 }

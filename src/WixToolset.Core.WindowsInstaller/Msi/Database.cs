@@ -1,13 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Msi
+namespace WixToolset.Core.WindowsInstaller.Msi
 {
     using System;
     using System.Globalization;
     using System.IO;
     using System.Threading;
-    using WixToolset.Core.Native;
-    using WixToolset.Data;
 
     /// <summary>
     /// Wrapper class for managing MSI API database handles.

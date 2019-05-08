@@ -1,0 +1,2727 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+namespace WixToolset.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.Xml.Linq;
+    using WixToolset.Data;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility;
+
+    /// <summary>
+    /// Compiler of the WiX toolset.
+    /// </summary>
+    internal partial class Compiler : ICompiler
+    {
+        public const string BurnUXContainerId = "WixUXContainer";
+        public const string BurnDefaultAttachedContainerId = "WixAttachedContainer";
+
+        // The following constants must stay in sync with src\burn\engine\core.h
+        private const string BURN_BUNDLE_NAME = "WixBundleName";
+        private const string BURN_BUNDLE_ORIGINAL_SOURCE = "WixBundleOriginalSource";
+        private const string BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER = "WixBundleOriginalSourceFolder";
+        private const string BURN_BUNDLE_LAST_USED_SOURCE = "WixBundleLastUsedSource";
+
+        /// <summary>
+        /// Parses an ApprovedExeForElevation element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseApprovedExeForElevation(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+            string key = null;
+            string valueName = null;
+            var win64 = YesNoType.NotSet;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "Key":
+                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Value":
+                        valueName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Win64":
+                        win64 = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            if (null == key)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
+            }
+
+            var attributes = BundleApprovedExeForElevationAttributes.None;
+
+            if (win64 == YesNoType.Yes)
+            {
+                attributes |= BundleApprovedExeForElevationAttributes.Win64;
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var wixApprovedExeForElevationRow = (WixApprovedExeForElevationTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixApprovedExeForElevation, id);
+                wixApprovedExeForElevationRow.Key = key;
+                wixApprovedExeForElevationRow.Value = valueName;
+                wixApprovedExeForElevationRow.Attributes = (int)attributes;
+            }
+        }
+
+        /// <summary>
+        /// Parses a Bundle element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseBundleElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string copyright = null;
+            string aboutUrl = null;
+            var compressed = YesNoDefaultType.Default;
+            var disableModify = -1;
+            var disableRemove = YesNoType.NotSet;
+            string helpTelephone = null;
+            string helpUrl = null;
+            string manufacturer = null;
+            string name = null;
+            string tag = null;
+            string updateUrl = null;
+            string upgradeCode = null;
+            string version = null;
+            string condition = null;
+            string parentName = null;
+
+            string fileSystemSafeBundleName = null;
+            string logVariablePrefixAndExtension = null;
+            string iconSourceFile = null;
+            string splashScreenSourceFile = null;
+
+            // Process only standard attributes until the active section is initialized.
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "AboutUrl":
+                        aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Compressed":
+                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Copyright":
+                        copyright = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DisableModify":
+                        var value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (value)
+                        {
+                        case "button":
+                            disableModify = 2;
+                            break;
+                        case "yes":
+                            disableModify = 1;
+                            break;
+                        case "no":
+                            disableModify = 0;
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
+                            break;
+                        }
+                        break;
+                    case "DisableRemove":
+                        disableRemove = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DisableRepair":
+                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                        break;
+                    case "HelpTelephone":
+                        helpTelephone = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "HelpUrl":
+                        helpUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Manufacturer":
+                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "IconSourceFile":
+                        iconSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Name":
+                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "ParentName":
+                        parentName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "SplashScreenSourceFile":
+                        splashScreenSourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Tag":
+                        tag = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "UpdateUrl":
+                        updateUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "UpgradeCode":
+                        upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                        break;
+                    case "Version":
+                        version = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+            }
+
+            if (String.IsNullOrEmpty(version))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+            }
+            else if (!CompilerCore.IsValidModuleOrBundleVersion(version))
+            {
+                this.Core.Write(WarningMessages.InvalidModuleOrBundleVersion(sourceLineNumbers, "Bundle", version));
+            }
+
+            if (String.IsNullOrEmpty(upgradeCode))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpgradeCode"));
+            }
+
+            if (String.IsNullOrEmpty(copyright))
+            {
+                if (String.IsNullOrEmpty(manufacturer))
+                {
+                    copyright = "Copyright (c). All rights reserved.";
+                }
+                else
+                {
+                    copyright = String.Format("Copyright (c) {0}. All rights reserved.", manufacturer);
+                }
+            }
+
+            if (String.IsNullOrEmpty(name))
+            {
+                logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup.log");
+            }
+            else
+            {
+                // Ensure only allowable path characters are in "name" (and change spaces to underscores).
+                fileSystemSafeBundleName = CompilerCore.MakeValidLongFileName(name.Replace(' ', '_'), "_");
+                logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ".log");
+            }
+
+            this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;
+            this.Core.CreateActiveSection(this.activeName, SectionType.Bundle, 0, this.Context.CompilationId);
+
+            // Now that the active section is initialized, process only extension attributes.
+            foreach (var attrib in node.Attributes())
+            {
+                if (!String.IsNullOrEmpty(attrib.Name.NamespaceName) && CompilerCore.WixNamespace != attrib.Name.Namespace)
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            var baSeen = false;
+            var chainSeen = false;
+            var logSeen = false;
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "ApprovedExeForElevation":
+                        this.ParseApprovedExeForElevation(child);
+                        break;
+                    case "BootstrapperApplication":
+                        if (baSeen)
+                        {
+                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "BootstrapperApplication"));
+                        }
+                        this.ParseBootstrapperApplicationElement(child);
+                        baSeen = true;
+                        break;
+                    case "BootstrapperApplicationRef":
+                        this.ParseBootstrapperApplicationRefElement(child);
+                        break;
+                    case "OptionalUpdateRegistration":
+                        this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
+                        break;
+                    case "Catalog":
+                        this.ParseCatalogElement(child);
+                        break;
+                    case "Chain":
+                        if (chainSeen)
+                        {
+                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
+                        }
+                        this.ParseChainElement(child);
+                        chainSeen = true;
+                        break;
+                    case "Container":
+                        this.ParseContainerElement(child);
+                        break;
+                    case "ContainerRef":
+                        this.ParseSimpleRefElement(child, "WixBundleContainer");
+                        break;
+                    case "Log":
+                        if (logSeen)
+                        {
+                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
+                        }
+                        logVariablePrefixAndExtension = this.ParseLogElement(child, fileSystemSafeBundleName);
+                        logSeen = true;
+                        break;
+                    case "PayloadGroup":
+                        this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Layout, "BundleLayoutOnlyPayloads");
+                        break;
+                    case "PayloadGroupRef":
+                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, "BundleLayoutOnlyPayloads", ComplexReferenceChildType.Unknown, null);
+                        break;
+                    case "RelatedBundle":
+                        this.ParseRelatedBundleElement(child);
+                        break;
+                    case "Update":
+                        this.ParseUpdateElement(child);
+                        break;
+                    case "Variable":
+                        this.ParseVariableElement(child);
+                        break;
+                    case "WixVariable":
+                        this.ParseWixVariableElement(child);
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+            if (!chainSeen)
+            {
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Chain"));
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                if (null != upgradeCode)
+                {
+                    var tuple = new WixRelatedBundleTuple(sourceLineNumbers)
+                    {
+                        BundleId = upgradeCode,
+                        Action = RelatedBundleActionType.Upgrade,
+                    };
+
+                    this.Core.AddTuple(tuple);
+                }
+
+                var containerRow = (WixBundleContainerTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleContainer);
+                containerRow.WixBundleContainer = Compiler.BurnDefaultAttachedContainerId;
+                containerRow.Name = "bundle-attached.cab";
+                containerRow.Type = ContainerType.Attached;
+
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundle);
+                row.Set(0, version);
+                row.Set(1, copyright);
+                row.Set(2, name);
+                row.Set(3, aboutUrl);
+                if (-1 != disableModify)
+                {
+                    row.Set(4, disableModify);
+                }
+                if (YesNoType.NotSet != disableRemove)
+                {
+                    row.Set(5, (YesNoType.Yes == disableRemove) ? 1 : 0);
+                }
+                // row.Set(6] - (deprecated) "disable repair"
+                row.Set(7, helpTelephone);
+                row.Set(8, helpUrl);
+                row.Set(9, manufacturer);
+                row.Set(10, updateUrl);
+                if (YesNoDefaultType.Default != compressed)
+                {
+                    row.Set(11, (YesNoDefaultType.Yes == compressed) ? 1 : 0);
+                }
+
+                row.Set(12, logVariablePrefixAndExtension);
+                row.Set(13, iconSourceFile);
+                row.Set(14, splashScreenSourceFile);
+                row.Set(15, condition);
+                row.Set(16, tag);
+                row.Set(17, this.CurrentPlatform.ToString());
+                row.Set(18, parentName);
+                row.Set(19, upgradeCode);
+
+                // Ensure that the bundle stores the well-known persisted values.
+                var bundleNameWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
+                bundleNameWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_NAME;
+                bundleNameWellKnownVariable.Hidden = false;
+                bundleNameWellKnownVariable.Persisted = true;
+
+                var bundleOriginalSourceWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
+                bundleOriginalSourceWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_ORIGINAL_SOURCE;
+                bundleOriginalSourceWellKnownVariable.Hidden = false;
+                bundleOriginalSourceWellKnownVariable.Persisted = true;
+
+                var bundleOriginalSourceFolderWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
+                bundleOriginalSourceFolderWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER;
+                bundleOriginalSourceFolderWellKnownVariable.Hidden = false;
+                bundleOriginalSourceFolderWellKnownVariable.Persisted = true;
+
+                var bundleLastUsedSourceWellKnownVariable = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
+                bundleLastUsedSourceWellKnownVariable.WixBundleVariable = Compiler.BURN_BUNDLE_LAST_USED_SOURCE;
+                bundleLastUsedSourceWellKnownVariable.Hidden = false;
+                bundleLastUsedSourceWellKnownVariable.Persisted = true;
+            }
+        }
+
+        /// <summary>
+        /// Parse a Container element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private string ParseLogElement(XElement node, string fileSystemSafeBundleName)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var disableLog = YesNoType.NotSet;
+            var variable = "WixBundleLog";
+            var logPrefix = fileSystemSafeBundleName ?? "Setup";
+            var logExtension = ".log";
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Disable":
+                        disableLog = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "PathVariable":
+                        variable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                        break;
+                    case "Prefix":
+                        logPrefix = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Extension":
+                        logExtension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (!logExtension.StartsWith(".", StringComparison.Ordinal))
+            {
+                logExtension = String.Concat(".", logExtension);
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            return YesNoType.Yes == disableLog ? null : String.Concat(variable, ":", logPrefix, logExtension);
+        }
+
+        /// <summary>
+        /// Parse a Catalog element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseCatalogElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+            string sourceFile = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "SourceFile":
+                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            if (null == sourceFile)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            // Create catalog row
+            if (!this.Core.EncounteredError)
+            {
+                this.CreatePayloadRow(sourceLineNumbers, id, Path.GetFileName(sourceFile), sourceFile, null, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, ComplexReferenceChildType.Unknown, null, YesNoDefaultType.Yes, YesNoType.Yes, null, null, null);
+
+                var wixCatalogRow = (WixBundleCatalogTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleCatalog, id);
+                wixCatalogRow.Payload_ = id.Id;
+            }
+        }
+
+        /// <summary>
+        /// Parse a Container element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseContainerElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+            string downloadUrl = null;
+            string name = null;
+            var type = ContainerType.Detached;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "DownloadUrl":
+                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Name":
+                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Type":
+                        var typeString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        if (!Enum.TryParse<ContainerType>(typeString, out type))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Type", typeString, "attached, detached"));
+                        }
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                if (!String.IsNullOrEmpty(name))
+                {
+                    id = this.Core.CreateIdentifierFromFilename(name);
+                }
+
+                if (null == id)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    id = Identifier.Invalid;
+                }
+                else if (!Common.IsIdentifier(id.Id))
+                {
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                }
+            }
+            else if (null == name)
+            {
+                name = id.Id;
+            }
+
+            if (!String.IsNullOrEmpty(downloadUrl) && ContainerType.Detached != type)
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "Type", "attached"));
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "PackageGroupRef":
+                        this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.Container, id.Id);
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixBundleContainerTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleContainer, id);
+                row.Name = name;
+                row.Type = type;
+                row.DownloadUrl = downloadUrl;
+            }
+        }
+
+        /// <summary>
+        /// Parse the BoostrapperApplication element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseBootstrapperApplicationElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+            string previousId = null;
+            var previousType = ComplexReferenceChildType.Unknown;
+
+            // The BootstrapperApplication element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
+            id = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false);
+            if (null != id)
+            {
+                previousId = id;
+                previousType = ComplexReferenceChildType.Payload;
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "Payload":
+                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Payload;
+                        break;
+                    case "PayloadGroupRef":
+                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                        previousType = ComplexReferenceChildType.PayloadGroup;
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+            if (null == previousId)
+            {
+                // We need *either* <Payload> or <PayloadGroupRef> or even just @SourceFile on the BA...
+                // but we just say there's a missing <Payload>.
+                // TODO: Is there a better message for this?
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
+            }
+
+            // Add the application as an attached container and if an Id was provided add that too.
+            if (!this.Core.EncounteredError)
+            {
+                var containerRow = (WixBundleContainerTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleContainer);
+                containerRow.WixBundleContainer = Compiler.BurnUXContainerId;
+                containerRow.Name = "bundle-ux.cab";
+                containerRow.Type = ContainerType.Attached;
+
+                if (!String.IsNullOrEmpty(id))
+                {
+                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBootstrapperApplication);
+                    row.Set(0, id);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parse the BoostrapperApplicationRef element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseBootstrapperApplicationRefElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+            string previousId = null;
+            var previousType = ComplexReferenceChildType.Unknown;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "Payload":
+                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Payload;
+                        break;
+                    case "PayloadGroupRef":
+                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                        previousType = ComplexReferenceChildType.PayloadGroup;
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+
+            if (String.IsNullOrEmpty(id))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+            else
+            {
+                this.Core.CreateSimpleReference(sourceLineNumbers, "WixBootstrapperApplication", id);
+            }
+        }
+
+        /// <summary>
+        /// Parse the OptionalUpdateRegistration element.
+        /// </summary>
+        /// <param name="node">The element to parse.</param>
+        /// <param name="defaultManufacturer">The manufacturer.</param>
+        /// <param name="defaultProductFamily">The product family.</param>
+        /// <param name="defaultName">The bundle name.</param>
+        private void ParseOptionalUpdateRegistrationElement(XElement node, string defaultManufacturer, string defaultProductFamily, string defaultName)
+        {
+            const string defaultClassification = "Update";
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string manufacturer = null;
+            string department = null;
+            string productFamily = null;
+            string name = null;
+            var classification = defaultClassification;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Manufacturer":
+                        manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Department":
+                        department = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "ProductFamily":
+                        productFamily = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Name":
+                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Classification":
+                        classification = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (String.IsNullOrEmpty(manufacturer))
+            {
+                if (!String.IsNullOrEmpty(defaultManufacturer))
+                {
+                    manufacturer = defaultManufacturer;
+                }
+                else
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Manufacturer", node.Parent.Name.LocalName));
+                }
+            }
+
+            if (String.IsNullOrEmpty(productFamily))
+            {
+                if (!String.IsNullOrEmpty(defaultProductFamily))
+                {
+                    productFamily = defaultProductFamily;
+                }
+            }
+
+            if (String.IsNullOrEmpty(name))
+            {
+                if (!String.IsNullOrEmpty(defaultName))
+                {
+                    name = defaultName;
+                }
+                else
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "Name", node.Parent.Name.LocalName));
+                }
+            }
+
+            if (String.IsNullOrEmpty(classification))
+            {
+                this.Core.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, node.Name.LocalName, "Classification", defaultClassification));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixUpdateRegistration);
+                row.Set(0, manufacturer);
+                row.Set(1, department);
+                row.Set(2, productFamily);
+                row.Set(3, name);
+                row.Set(4, classification);
+            }
+        }
+
+        /// <summary>
+        /// Parse Payload element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element. (BA or PayloadGroup)</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        private string ParsePayloadElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
+            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
+
+            var id = this.ParsePayloadElementContent(node, parentType, parentId, previousType, previousId, true);
+            var context = new Dictionary<string, string>
+            {
+                ["Id"] = id
+            };
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
+
+            return id;
+        }
+
+        /// <summary>
+        /// Parse the attributes of the Payload element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element.</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        private string ParsePayloadElementContent(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId, bool required)
+        {
+            Debug.Assert(ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var compressed = YesNoDefaultType.Default;
+            var enableSignatureVerification = YesNoType.No;
+            Identifier id = null;
+            string name = null;
+            string sourceFile = null;
+            string downloadUrl = null;
+            RemotePayload remotePayload = null;
+
+            // This list lets us evaluate extension attributes *after* all core attributes
+            // have been parsed and dealt with, regardless of authoring order.
+            var extensionAttributes = new List<XAttribute>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "Compressed":
+                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Name":
+                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
+                        break;
+                    case "SourceFile":
+                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DownloadUrl":
+                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "EnableSignatureVerification":
+                        enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    extensionAttributes.Add(attrib);
+                }
+            }
+
+            if (!required && null == sourceFile)
+            {
+                // Nothing left to do!
+                return null;
+            }
+
+            if (null == id)
+            {
+                id = this.Core.CreateIdentifier("pay", (null != sourceFile) ? sourceFile.ToUpperInvariant() : String.Empty);
+            }
+
+            // Now that the PayloadId is known, we can parse the extension attributes.
+            var context = new Dictionary<string, string>
+            {
+                ["Id"] = id.Id
+            };
+
+            foreach (var extensionAttribute in extensionAttributes)
+            {
+                this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
+            }
+
+            // We only handle the elements we care about.  Let caller handle other children.
+            foreach (var child in node.Elements(CompilerCore.WixNamespace + "RemotePayload"))
+            {
+                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+
+                if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage")
+                {
+                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
+                    continue;
+                }
+
+                if (null != remotePayload)
+                {
+                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                }
+
+                remotePayload = this.ParseRemotePayloadElement(child);
+            }
+
+            if (null != sourceFile && null != remotePayload)
+            {
+                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
+            }
+            else if (null == sourceFile && null == remotePayload)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttributeOrElement(sourceLineNumbers, node.Name.LocalName, "SourceFile", "RemotePayload"));
+            }
+            else if (null == sourceFile)
+            {
+                sourceFile = String.Empty;
+            }
+
+            if (null == downloadUrl && null != remotePayload)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
+            }
+
+            if (Compiler.BurnUXContainerId == parentId)
+            {
+                if (compressed == YesNoDefaultType.No)
+                {
+                    this.Core.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(sourceLineNumbers, sourceFile));
+                }
+
+                compressed = YesNoDefaultType.Yes;
+            }
+
+            this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, parentType, parentId, previousType, previousId, compressed, enableSignatureVerification, null, null, remotePayload);
+
+            return id.Id;
+        }
+
+        private RemotePayload ParseRemotePayloadElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var remotePayload = new RemotePayload();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "CertificatePublicKey":
+                        remotePayload.CertificatePublicKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "CertificateThumbprint":
+                        remotePayload.CertificateThumbprint = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Description":
+                        remotePayload.Description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Hash":
+                        remotePayload.Hash = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "ProductName":
+                        remotePayload.ProductName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Size":
+                        remotePayload.Size = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                        break;
+                    case "Version":
+                        remotePayload.Version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (String.IsNullOrEmpty(remotePayload.ProductName))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ProductName"));
+            }
+
+            if (String.IsNullOrEmpty(remotePayload.Description))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Description"));
+            }
+
+            if (String.IsNullOrEmpty(remotePayload.Hash))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Hash"));
+            }
+
+            if (0 == remotePayload.Size)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Size"));
+            }
+
+            if (String.IsNullOrEmpty(remotePayload.Version))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Version"));
+            }
+
+            return remotePayload;
+        }
+
+        /// <summary>
+        /// Creates the row for a Payload.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        private WixBundlePayloadTuple CreatePayloadRow(SourceLineNumber sourceLineNumbers, Identifier id, string name, string sourceFile, string downloadUrl, ComplexReferenceParentType parentType,
+            string parentId, ComplexReferenceChildType previousType, string previousId, YesNoDefaultType compressed, YesNoType enableSignatureVerification, string displayName, string description,
+            RemotePayload remotePayload)
+        {
+            WixBundlePayloadTuple row = null;
+
+            if (!this.Core.EncounteredError)
+            {
+                row = (WixBundlePayloadTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePayload, id);
+                row.Name = String.IsNullOrEmpty(name) ? Path.GetFileName(sourceFile) : name;
+                row.SourceFile = sourceFile;
+                row.DownloadUrl = downloadUrl;
+                row.Compressed = compressed;
+                row.UnresolvedSourceFile = sourceFile; // duplicate of sourceFile but in a string column so it won't get resolved to a full path during binding.
+                row.DisplayName = displayName;
+                row.Description = description;
+                row.EnableSignatureValidation = (YesNoType.Yes == enableSignatureVerification);
+
+                if (null != remotePayload)
+                {
+                    row.Description = remotePayload.Description;
+                    row.DisplayName = remotePayload.ProductName;
+                    row.Hash = remotePayload.Hash;
+                    row.PublicKey = remotePayload.CertificatePublicKey;
+                    row.Thumbprint = remotePayload.CertificateThumbprint;
+                    row.FileSize = remotePayload.Size;
+                    row.Version = remotePayload.Version;
+                }
+
+                this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Payload, id.Id, previousType, previousId);
+            }
+
+            return row;
+        }
+
+        /// <summary>
+        /// Parse PayloadGroup element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Optional ComplexReferenceParentType of parent element. (typically another PayloadGroup)</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        private void ParsePayloadGroupElement(XElement node, ComplexReferenceParentType parentType, string parentId)
+        {
+            Debug.Assert(ComplexReferenceParentType.Unknown == parentType || ComplexReferenceParentType.Layout == parentType || ComplexReferenceParentType.PayloadGroup == parentType);
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                id = Identifier.Invalid;
+            }
+
+            var previousType = ComplexReferenceChildType.Unknown;
+            string previousId = null;
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "Payload":
+                        previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.PayloadGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Payload;
+                        break;
+                    case "PayloadGroupRef":
+                        previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.PayloadGroup;
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePayloadGroup, id);
+
+                this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PayloadGroup, id.Id, ComplexReferenceChildType.Unknown, null);
+            }
+        }
+
+        /// <summary>
+        /// Parses a payload group reference element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element (BA or PayloadGroup).</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        private string ParsePayloadGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            Debug.Assert(ComplexReferenceParentType.Layout == parentType || ComplexReferenceParentType.PayloadGroup == parentType || ComplexReferenceParentType.Package == parentType || ComplexReferenceParentType.Container == parentType);
+            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PayloadGroup == previousType || ComplexReferenceChildType.Payload == previousType);
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePayloadGroup", id);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PayloadGroup, id, previousType, previousId);
+
+            return id;
+        }
+
+        /// <summary>
+        /// Creates group and ordering information.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers.</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="type">Type of this item.</param>
+        /// <param name="id">Identifier for this item.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        private void CreateGroupAndOrderingRows(SourceLineNumber sourceLineNumbers,
+            ComplexReferenceParentType parentType, string parentId,
+            ComplexReferenceChildType type, string id,
+            ComplexReferenceChildType previousType, string previousId)
+        {
+            if (ComplexReferenceParentType.Unknown != parentType && null != parentId)
+            {
+                this.Core.CreateWixGroupRow(sourceLineNumbers, parentType, parentId, type, id);
+            }
+
+            if (ComplexReferenceChildType.Unknown != previousType && null != previousId)
+            {
+                this.CreateWixOrderingRow(sourceLineNumbers, type, id, previousType, previousId);
+            }
+        }
+
+        /// <summary>
+        /// Parse ExitCode element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="packageId">Id of parent element</param>
+        private void ParseExitCodeElement(XElement node, string packageId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var value = CompilerConstants.IntegerNotSet;
+            var behavior = ExitCodeBehaviorType.NotSet;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Value":
+                        value = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int32.MinValue + 2, Int32.MaxValue);
+                        break;
+                    case "Behavior":
+                        var behaviorString = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        if (!Enum.TryParse<ExitCodeBehaviorType>(behaviorString, true, out behavior))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Behavior", behaviorString, "success, error, scheduleReboot, forceReboot"));
+                        }
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (ExitCodeBehaviorType.NotSet == behavior)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Behavior"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixBundlePackageExitCodeTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackageExitCode);
+                row.ChainPackageId = packageId;
+                row.Code = value;
+                row.Behavior = behavior;
+            }
+        }
+
+        /// <summary>
+        /// Parse Chain element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseChainElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var attributes = WixChainAttributes.None;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "DisableRollback":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            attributes |= WixChainAttributes.DisableRollback;
+                        }
+                        break;
+                    case "DisableSystemRestore":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            attributes |= WixChainAttributes.DisableSystemRestore;
+                        }
+                        break;
+                    case "ParallelCache":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            attributes |= WixChainAttributes.ParallelCache;
+                        }
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            // Ensure there is always a rollback boundary at the beginning of the chain.
+            this.CreateRollbackBoundary(sourceLineNumbers, new Identifier("WixDefaultBoundary", AccessModifier.Public), YesNoType.Yes, YesNoType.No, ComplexReferenceParentType.PackageGroup, "WixChain", ComplexReferenceChildType.Unknown, null);
+
+            var previousId = "WixDefaultBoundary";
+            var previousType = ComplexReferenceChildType.Package;
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "MsiPackage":
+                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "MspPackage":
+                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "MsuPackage":
+                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "ExePackage":
+                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "RollbackBoundary":
+                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "PackageGroupRef":
+                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, "WixChain", previousType, previousId);
+                        previousType = ComplexReferenceChildType.PackageGroup;
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+
+            if (null == previousId)
+            {
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "MsiPackage", "ExePackage", "PackageGroupRef"));
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixChainTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixChain);
+                row.Attributes = attributes;
+            }
+        }
+
+        /// <summary>
+        /// Parse MsiPackage element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        private string ParseMsiPackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            return this.ParseChainPackage(node, WixBundlePackageType.Msi, parentType, parentId, previousType, previousId);
+        }
+
+        /// <summary>
+        /// Parse MspPackage element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        private string ParseMspPackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            return this.ParseChainPackage(node, WixBundlePackageType.Msp, parentType, parentId, previousType, previousId);
+        }
+
+        /// <summary>
+        /// Parse MsuPackage element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        private string ParseMsuPackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            return this.ParseChainPackage(node, WixBundlePackageType.Msu, parentType, parentId, previousType, previousId);
+        }
+
+        /// <summary>
+        /// Parse ExePackage element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        private string ParseExePackageElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            return this.ParseChainPackage(node, WixBundlePackageType.Exe, parentType, parentId, previousType, previousId);
+        }
+
+        /// <summary>
+        /// Parse RollbackBoundary element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        private string ParseRollbackBoundaryElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            Debug.Assert(ComplexReferenceParentType.PackageGroup == parentType);
+            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+            var vital = YesNoType.Yes;
+            var transaction = YesNoType.No;
+
+            // This list lets us evaluate extension attributes *after* all core attributes
+            // have been parsed and dealt with, regardless of authoring order.
+            var extensionAttributes = new List<XAttribute>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    var allowed = true;
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "Vital":
+                        vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Transaction":
+                        transaction = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        allowed = false;
+                        break;
+                    }
+
+                    if (!allowed)
+                    {
+                        this.Core.UnexpectedAttribute(node, attrib);
+                    }
+                }
+                else
+                {
+                    // Save the extension attributes for later...
+                    extensionAttributes.Add(attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                if (!String.IsNullOrEmpty(previousId))
+                {
+                    id = this.Core.CreateIdentifier("rba", previousId);
+                }
+
+                if (null == id)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    id = Identifier.Invalid;
+                }
+                else if (!Common.IsIdentifier(id.Id))
+                {
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                }
+            }
+
+            // Now that the rollback identifier is known, we can parse the extension attributes...
+            var contextValues = new Dictionary<string, string>
+            {
+                ["RollbackBoundaryId"] = id.Id
+            };
+            foreach (var attribute in extensionAttributes)
+            {
+                this.Core.ParseExtensionAttribute(node, attribute, contextValues);
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                this.CreateRollbackBoundary(sourceLineNumbers, id, vital, transaction, parentType, parentId, previousType, previousId);
+            }
+
+            return id.Id;
+        }
+
+        /// <summary>
+        /// Parses one of the ChainPackage elements
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="packageType">Type of package to parse</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <returns>Identifier for package element.</returns>
+        /// <remarks>This method contains the shared logic for parsing all of the ChainPackage
+        /// types, as there is more in common between them than different.</remarks>
+        private string ParseChainPackage(XElement node, WixBundlePackageType packageType, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            Debug.Assert(ComplexReferenceParentType.PackageGroup == parentType);
+            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+            string name = null;
+            string sourceFile = null;
+            string downloadUrl = null;
+            string after = null;
+            string installCondition = null;
+            var cache = YesNoAlwaysType.Yes; // the default is to cache everything in tradeoff for stability over disk space.
+            string cacheId = null;
+            string description = null;
+            string displayName = null;
+            var logPathVariable = (packageType == WixBundlePackageType.Msu) ? String.Empty : null;
+            var rollbackPathVariable = (packageType == WixBundlePackageType.Msu) ? String.Empty : null;
+            var permanent = YesNoType.NotSet;
+            var visible = YesNoType.NotSet;
+            var vital = YesNoType.Yes;
+            string installCommand = null;
+            string repairCommand = null;
+            var repairable = YesNoType.NotSet;
+            string uninstallCommand = null;
+            var perMachine = YesNoDefaultType.NotSet;
+            string detectCondition = null;
+            string protocol = null;
+            var installSize = CompilerConstants.IntegerNotSet;
+            string msuKB = null;
+            var suppressLooseFilePayloadGeneration = YesNoType.NotSet;
+            var enableSignatureVerification = YesNoType.No;
+            var compressed = YesNoDefaultType.Default;
+            var displayInternalUI = YesNoType.NotSet;
+            var enableFeatureSelection = YesNoType.NotSet;
+            var forcePerMachine = YesNoType.NotSet;
+            RemotePayload remotePayload = null;
+            var slipstream = YesNoType.NotSet;
+
+            var expectedNetFx4Args = new string[] { "/q", "/norestart", "/chainingpackage" };
+
+            // This list lets us evaluate extension attributes *after* all core attributes
+            // have been parsed and dealt with, regardless of authoring order.
+            var extensionAttributes = new List<XAttribute>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    var allowed = true;
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "Name":
+                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false, true);
+                        if (!this.Core.IsValidLongFilename(name, false, true))
+                        {
+                            this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Name", name));
+                        }
+                        break;
+                    case "SourceFile":
+                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DownloadUrl":
+                        downloadUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "After":
+                        after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "InstallCondition":
+                        installCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Cache":
+                        cache = this.Core.GetAttributeYesNoAlwaysValue(sourceLineNumbers, attrib);
+                        break;
+                    case "CacheId":
+                        cacheId = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Description":
+                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DisplayName":
+                        displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DisplayInternalUI":
+                        displayInternalUI = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
+                        break;
+                    case "EnableFeatureSelection":
+                        enableFeatureSelection = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msi);
+                        break;
+                    case "ForcePerMachine":
+                        forcePerMachine = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msi);
+                        break;
+                    case "LogPathVariable":
+                        logPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                        break;
+                    case "RollbackLogPathVariable":
+                        rollbackPathVariable = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                        break;
+                    case "Permanent":
+                        permanent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Visible":
+                        visible = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msi);
+                        break;
+                    case "Vital":
+                        vital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "InstallCommand":
+                        installCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Exe);
+                        break;
+                    case "RepairCommand":
+                        repairCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                        repairable = YesNoType.Yes;
+                        allowed = (packageType == WixBundlePackageType.Exe);
+                        break;
+                    case "UninstallCommand":
+                        uninstallCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Exe);
+                        break;
+                    case "PerMachine":
+                        perMachine = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msp);
+                        break;
+                    case "DetectCondition":
+                        detectCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Exe || packageType == WixBundlePackageType.Msu);
+                        break;
+                    case "Protocol":
+                        protocol = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Exe);
+                        break;
+                    case "InstallSize":
+                        installSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                        break;
+                    case "KB":
+                        msuKB = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msu);
+                        break;
+                    case "Compressed":
+                        compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                        break;
+                    case "SuppressLooseFilePayloadGeneration":
+                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                        suppressLooseFilePayloadGeneration = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msi);
+                        break;
+                    case "EnableSignatureVerification":
+                        enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Slipstream":
+                        slipstream = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        allowed = (packageType == WixBundlePackageType.Msp);
+                        break;
+                    default:
+                        allowed = false;
+                        break;
+                    }
+
+                    if (!allowed)
+                    {
+                        this.Core.UnexpectedAttribute(node, attrib);
+                    }
+                }
+                else
+                {
+                    // Save the extension attributes for later...
+                    extensionAttributes.Add(attrib);
+                }
+            }
+
+            // We need to handle RemotePayload up front because it effects value of sourceFile which is used in Id generation.  Id is needed by other child elements.
+            foreach (var child in node.Elements(CompilerCore.WixNamespace + "RemotePayload"))
+            {
+                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+
+                if (CompilerCore.WixNamespace == node.Name.Namespace && node.Name.LocalName != "ExePackage" && node.Name.LocalName != "MsuPackage")
+                {
+                    this.Core.Write(ErrorMessages.RemotePayloadUnsupported(childSourceLineNumbers));
+                    continue;
+                }
+
+                if (null != remotePayload)
+                {
+                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                }
+
+                remotePayload = this.ParseRemotePayloadElement(child);
+            }
+
+            if (String.IsNullOrEmpty(sourceFile))
+            {
+                if (String.IsNullOrEmpty(name))
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttributesWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile"));
+                }
+                else if (null == remotePayload)
+                {
+                    sourceFile = Path.Combine("SourceDir", name);
+                }
+            }
+            else if (null != remotePayload)
+            {
+                this.Core.Write(ErrorMessages.UnexpectedElementWithAttribute(sourceLineNumbers, node.Name.LocalName, "RemotePayload", "SourceFile"));
+            }
+            else if (sourceFile.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            {
+                if (String.IsNullOrEmpty(name))
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name", "SourceFile", sourceFile));
+                }
+                else
+                {
+                    sourceFile = Path.Combine(sourceFile, Path.GetFileName(name));
+                }
+            }
+
+            if (null == downloadUrl && null != remotePayload)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttributeWithElement(sourceLineNumbers, node.Name.LocalName, "DownloadUrl", "RemotePayload"));
+            }
+
+            if (YesNoDefaultType.No != compressed && null != remotePayload)
+            {
+                compressed = YesNoDefaultType.No;
+                this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(sourceLineNumbers, node.Name.LocalName));
+            }
+
+            if (null == id)
+            {
+                if (!String.IsNullOrEmpty(name))
+                {
+                    id = this.Core.CreateIdentifierFromFilename(Path.GetFileName(name));
+                }
+                else if (!String.IsNullOrEmpty(sourceFile))
+                {
+                    id = this.Core.CreateIdentifierFromFilename(Path.GetFileName(sourceFile));
+                }
+
+                if (null == id)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                    id = Identifier.Invalid;
+                }
+                else if (!Common.IsIdentifier(id.Id))
+                {
+                    this.Core.Write(ErrorMessages.IllegalIdentifier(sourceLineNumbers, node.Name.LocalName, "Id", id.Id));
+                }
+            }
+
+            if (null == logPathVariable)
+            {
+                logPathVariable = String.Concat("WixBundleLog_", id.Id);
+            }
+
+            if (null == rollbackPathVariable)
+            {
+                rollbackPathVariable = String.Concat("WixBundleRollbackLog_", id.Id);
+            }
+
+            if (!String.IsNullOrEmpty(protocol) && !protocol.Equals("burn", StringComparison.Ordinal) && !protocol.Equals("netfx4", StringComparison.Ordinal) && !protocol.Equals("none", StringComparison.Ordinal))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeValueWithLegalList(sourceLineNumbers, node.Name.LocalName, "Protocol", protocol, "none, burn, netfx4"));
+            }
+
+            if (!String.IsNullOrEmpty(protocol) && protocol.Equals("netfx4", StringComparison.Ordinal))
+            {
+                foreach (var expectedArgument in expectedNetFx4Args)
+                {
+                    if (null == installCommand || -1 == installCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallCommand", installCommand, expectedArgument, "Protocol", "netfx4"));
+                    }
+
+                    if (null == repairCommand || -1 == repairCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairCommand", repairCommand, expectedArgument, "Protocol", "netfx4"));
+                    }
+
+                    if (null == uninstallCommand || -1 == uninstallCommand.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallCommand", uninstallCommand, expectedArgument, "Protocol", "netfx4"));
+                    }
+                }
+            }
+
+            // Only set default scope for EXEs and MSPs if not already set.
+            if ((WixBundlePackageType.Exe == packageType || WixBundlePackageType.Msp == packageType) && YesNoDefaultType.NotSet == perMachine)
+            {
+                perMachine = YesNoDefaultType.Default;
+            }
+
+            // Now that the package ID is known, we can parse the extension attributes...
+            var contextValues = new Dictionary<string, string>() { { "PackageId", id.Id } };
+            foreach (var attribute in extensionAttributes)
+            {
+                this.Core.ParseExtensionAttribute(node, attribute, contextValues);
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    var allowed = true;
+                    switch (child.Name.LocalName)
+                    {
+                    case "SlipstreamMsp":
+                        allowed = (packageType == WixBundlePackageType.Msi);
+                        if (allowed)
+                        {
+                            this.ParseSlipstreamMspElement(child, id.Id);
+                        }
+                        break;
+                    case "MsiProperty":
+                        allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
+                        if (allowed)
+                        {
+                            this.ParseMsiPropertyElement(child, id.Id);
+                        }
+                        break;
+                    case "Payload":
+                        this.ParsePayloadElement(child, ComplexReferenceParentType.Package, id.Id, ComplexReferenceChildType.Unknown, null);
+                        break;
+                    case "PayloadGroupRef":
+                        this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id.Id, ComplexReferenceChildType.Unknown, null);
+                        break;
+                    case "ExitCode":
+                        allowed = (packageType == WixBundlePackageType.Exe);
+                        if (allowed)
+                        {
+                            this.ParseExitCodeElement(child, id.Id);
+                        }
+                        break;
+                    case "CommandLine":
+                        allowed = (packageType == WixBundlePackageType.Exe);
+                        if (allowed)
+                        {
+                            this.ParseCommandLineElement(child, id.Id);
+                        }
+                        break;
+                    case "RemotePayload":
+                        // Handled previously
+                        break;
+                    default:
+                        allowed = false;
+                        break;
+                    }
+
+                    if (!allowed)
+                    {
+                        this.Core.UnexpectedElement(node, child);
+                    }
+                }
+                else
+                {
+                    var context = new Dictionary<string, string>() { { "Id", id.Id } };
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                // We create the package contents as a payload with this package as the parent
+                this.CreatePayloadRow(sourceLineNumbers, id, name, sourceFile, downloadUrl, ComplexReferenceParentType.Package, id.Id,
+                    ComplexReferenceChildType.Unknown, null, compressed, enableSignatureVerification, displayName, description, remotePayload);
+
+                var chainItemRow = (WixChainItemTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixChainItem, id);
+
+                WixBundlePackageAttributes attributes = 0;
+                attributes |= (YesNoType.Yes == permanent) ? WixBundlePackageAttributes.Permanent : 0;
+                attributes |= (YesNoType.Yes == visible) ? WixBundlePackageAttributes.Visible : 0;
+
+                var chainPackageRow = (WixBundlePackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackage, id);
+                chainPackageRow.Type = packageType;
+                chainPackageRow.Payload_ = id.Id;
+                chainPackageRow.Attributes = attributes;
+
+                chainPackageRow.InstallCondition = installCondition;
+
+                if (YesNoAlwaysType.NotSet != cache)
+                {
+                    chainPackageRow.Cache = cache;
+                }
+
+                chainPackageRow.CacheId = cacheId;
+
+                if (YesNoType.NotSet != vital)
+                {
+                    chainPackageRow.Vital = (vital == YesNoType.Yes);
+                }
+
+                if (YesNoDefaultType.NotSet != perMachine)
+                {
+                    chainPackageRow.PerMachine = perMachine;
+                }
+
+                chainPackageRow.LogPathVariable = logPathVariable;
+                chainPackageRow.RollbackLogPathVariable = rollbackPathVariable;
+
+                if (CompilerConstants.IntegerNotSet != installSize)
+                {
+                    chainPackageRow.InstallSize = installSize;
+                }
+
+                switch (packageType)
+                {
+                case WixBundlePackageType.Exe:
+                    WixBundleExePackageAttributes exeAttributes = 0;
+                    exeAttributes |= (YesNoType.Yes == repairable) ? WixBundleExePackageAttributes.Repairable : 0;
+
+                    var exeRow = (WixBundleExePackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleExePackage, id);
+                    exeRow.Attributes = exeAttributes;
+                    exeRow.DetectCondition = detectCondition;
+                    exeRow.InstallCommand = installCommand;
+                    exeRow.RepairCommand = repairCommand;
+                    exeRow.UninstallCommand = uninstallCommand;
+                    exeRow.ExeProtocol = protocol;
+                    break;
+
+                case WixBundlePackageType.Msi:
+                    WixBundleMsiPackageAttributes msiAttributes = 0;
+                    msiAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMsiPackageAttributes.DisplayInternalUI : 0;
+                    msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
+                    msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
+                    msiAttributes |= (YesNoType.Yes == suppressLooseFilePayloadGeneration) ? WixBundleMsiPackageAttributes.SuppressLooseFilePayloadGeneration : 0;
+
+                    var msiRow = (WixBundleMsiPackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMsiPackage, id);
+                    msiRow.Attributes = msiAttributes;
+                    break;
+
+                case WixBundlePackageType.Msp:
+                    WixBundleMspPackageAttributes mspAttributes = 0;
+                    mspAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMspPackageAttributes.DisplayInternalUI : 0;
+                    mspAttributes |= (YesNoType.Yes == slipstream) ? WixBundleMspPackageAttributes.Slipstream : 0;
+
+                    var mspRow = (WixBundleMspPackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMspPackage, id);
+                    mspRow.Attributes = mspAttributes;
+                    break;
+
+                case WixBundlePackageType.Msu:
+                    var msuRow = (WixBundleMsuPackageTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMsuPackage, id);
+                    msuRow.DetectCondition = detectCondition;
+                    msuRow.MsuKB = msuKB;
+                    break;
+                }
+
+                this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, after);
+            }
+
+            return id.Id;
+        }
+
+        /// <summary>
+        /// Parse CommandLine element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseCommandLineElement(XElement node, string packageId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string installArgument = null;
+            string uninstallArgument = null;
+            string repairArgument = null;
+            string condition = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "InstallArgument":
+                        installArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "UninstallArgument":
+                        uninstallArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "RepairArgument":
+                        repairArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (String.IsNullOrEmpty(condition))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixBundlePackageCommandLineTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackageCommandLine);
+                row.WixBundlePackage_ = packageId;
+                row.InstallArgument = installArgument;
+                row.UninstallArgument = uninstallArgument;
+                row.RepairArgument = repairArgument;
+                row.Condition = condition;
+            }
+        }
+
+        /// <summary>
+        /// Parse PackageGroup element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParsePackageGroupElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                id = Identifier.Invalid;
+            }
+
+            var previousType = ComplexReferenceChildType.Unknown;
+            string previousId = null;
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                    case "MsiPackage":
+                        previousId = this.ParseMsiPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "MspPackage":
+                        previousId = this.ParseMspPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "MsuPackage":
+                        previousId = this.ParseMsuPackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "ExePackage":
+                        previousId = this.ParseExePackageElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "RollbackBoundary":
+                        previousId = this.ParseRollbackBoundaryElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.Package;
+                        break;
+                    case "PackageGroupRef":
+                        previousId = this.ParsePackageGroupRefElement(child, ComplexReferenceParentType.PackageGroup, id.Id, previousType, previousId);
+                        previousType = ComplexReferenceChildType.PackageGroup;
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundlePackageGroup, id);
+            }
+        }
+
+        /// <summary>
+        /// Parses a package group reference element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element (Unknown or PackageGroup).</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        /// <returns>Identifier for package group element.</rereturns>
+        private string ParsePackageGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId)
+        {
+            return this.ParsePackageGroupRefElement(node, parentType, parentId, ComplexReferenceChildType.Unknown, null);
+        }
+
+        /// <summary>
+        /// Parses a package group reference element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element (Unknown or PackageGroup).</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        /// <param name="parentType">ComplexReferenceParentType of previous element (Unknown, Package, or PackageGroup).</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        /// <returns>Identifier for package group element.</rereturns>
+        private string ParsePackageGroupRefElement(XElement node, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            Debug.Assert(ComplexReferenceParentType.Unknown == parentType || ComplexReferenceParentType.PackageGroup == parentType || ComplexReferenceParentType.Container == parentType);
+            Debug.Assert(ComplexReferenceChildType.Unknown == previousType || ComplexReferenceChildType.PackageGroup == previousType || ComplexReferenceChildType.Package == previousType);
+
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+            string after = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePackageGroup", id);
+                        break;
+                    case "After":
+                        after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            if (null != after && ComplexReferenceParentType.Container == parentType)
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, "After", parentId));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (ComplexReferenceParentType.Container == parentType)
+            {
+                this.Core.CreateWixGroupRow(sourceLineNumbers, ComplexReferenceParentType.Container, parentId, ComplexReferenceChildType.PackageGroup, id);
+            }
+            else
+            {
+                this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.PackageGroup, id, previousType, previousId, after);
+            }
+
+            return id;
+        }
+
+        /// <summary>
+        /// Creates rollback boundary.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers.</param>
+        /// <param name="id">Identifier for the rollback boundary.</param>
+        /// <param name="vital">Indicates whether the rollback boundary is vital or not.</param>
+        /// <param name="parentType">Type of parent group.</param>
+        /// <param name="parentId">Identifier of parent group.</param>
+        /// <param name="previousType">Type of previous item, if any.</param>
+        /// <param name="previousId">Identifier of previous item, if any.</param>
+        private void CreateRollbackBoundary(SourceLineNumber sourceLineNumbers, Identifier id, YesNoType vital, YesNoType transaction, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType previousType, string previousId)
+        {
+            var row = (WixChainItemTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixChainItem, id);
+
+            var rollbackBoundary = (WixBundleRollbackBoundaryTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleRollbackBoundary, id);
+
+            if (YesNoType.NotSet != vital)
+            {
+                rollbackBoundary.Vital = (vital == YesNoType.Yes);
+            }
+            if (YesNoType.NotSet != transaction)
+            {
+                rollbackBoundary.Transaction = (transaction == YesNoType.Yes);
+            }
+
+            this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, null);
+        }
+
+        /// <summary>
+        /// Creates group and ordering information for packages
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers.</param>
+        /// <param name="parentType">Type of parent group, if known.</param>
+        /// <param name="parentId">Identifier of parent group, if known.</param>
+        /// <param name="type">Type of this item.</param>
+        /// <param name="id">Identifier for this item.</param>
+        /// <param name="previousType">Type of previous item, if known.</param>
+        /// <param name="previousId">Identifier of previous item, if known</param>
+        /// <param name="afterId">Identifier of explicit 'After' attribute, if given.</param>
+        private void CreateChainPackageMetaRows(SourceLineNumber sourceLineNumbers,
+            ComplexReferenceParentType parentType, string parentId,
+            ComplexReferenceChildType type, string id,
+            ComplexReferenceChildType previousType, string previousId, string afterId)
+        {
+            // If there's an explicit 'After' attribute, it overrides the inferred previous item.
+            if (null != afterId)
+            {
+                previousType = ComplexReferenceChildType.Package;
+                previousId = afterId;
+            }
+
+            this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId, type, id, previousType, previousId);
+        }
+
+        // TODO: Should we define our own enum for this, just to ensure there's no "cross-contamination"?
+        // TODO: Also, we could potentially include an 'Attributes' field to track things like
+        // 'before' vs. 'after', and explicit vs. inferred dependencies.
+        private void CreateWixOrderingRow(SourceLineNumber sourceLineNumbers,
+            ComplexReferenceChildType itemType, string itemId,
+            ComplexReferenceChildType dependsOnType, string dependsOnId)
+        {
+            if (!this.Core.EncounteredError)
+            {
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixOrdering);
+                row.Set(0, itemType.ToString());
+                row.Set(1, itemId);
+                row.Set(2, dependsOnType.ToString());
+                row.Set(3, dependsOnId);
+            }
+        }
+
+        /// <summary>
+        /// Parse MsiProperty element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="packageId">Id of parent element</param>
+        private void ParseMsiPropertyElement(XElement node, string packageId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string name = null;
+            string value = null;
+            string condition = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Name":
+                        name = this.Core.GetAttributeMsiPropertyNameValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Value":
+                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == name)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+            }
+
+            if (null == value)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixBundleMsiPropertyTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleMsiProperty);
+                row.WixBundlePackage_ = packageId;
+                row.Name = name;
+                row.Value = value;
+
+                if (!String.IsNullOrEmpty(condition))
+                {
+                    row.Condition = condition;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parse SlipstreamMsp element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        /// <param name="packageId">Id of parent element</param>
+        private void ParseSlipstreamMspElement(XElement node, string packageId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePackage", id);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixBundleSlipstreamMspTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleSlipstreamMsp);
+                row.WixBundlePackage_ = packageId;
+                row.WixBundlePackage_Msp = id;
+            }
+        }
+
+        /// <summary>
+        /// Parse RelatedBundle element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseRelatedBundleElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+            var actionType = RelatedBundleActionType.Detect;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                        break;
+                    case "Action":
+                        var action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        switch (action)
+                        {
+                        case "Detect":
+                        case "detect":
+                            actionType = RelatedBundleActionType.Detect;
+                            break;
+                        case "Upgrade":
+                        case "upgrade":
+                            actionType = RelatedBundleActionType.Upgrade;
+                            break;
+                        case "Addon":
+                        case "addon":
+                            actionType = RelatedBundleActionType.Addon;
+                            break;
+                        case "Patch":
+                        case "patch":
+                            actionType = RelatedBundleActionType.Patch;
+                            break;
+                        case "":
+                            break;
+                        default:
+                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", action, "Detect", "Upgrade", "Addon", "Patch"));
+                            break;
+                        }
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var tuple = new WixRelatedBundleTuple(sourceLineNumbers)
+                {
+                    BundleId = id,
+                    Action = actionType,
+                };
+
+                this.Core.AddTuple(tuple);
+                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixRelatedBundle);
+                //row.Set(0, id);
+                //row.Set(1, (int)actionType);
+            }
+        }
+
+        /// <summary>
+        /// Parse Update element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseUpdateElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string location = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Location":
+                        location = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == location)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Location"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleUpdate);
+                row.Set(0, location);
+            }
+        }
+
+        /// <summary>
+        /// Parse Variable element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseVariableElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var hidden = false;
+            string name = null;
+            var persisted = false;
+            string value = null;
+            string type = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Hidden":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            hidden = true;
+                        }
+                        break;
+                    case "Name":
+                        name = this.Core.GetAttributeBundleVariableValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Persisted":
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            persisted = true;
+                        }
+                        break;
+                    case "Value":
+                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                        break;
+                    case "Type":
+                        type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == name)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+            }
+            else if (name.StartsWith("Wix", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
+            }
+
+            if (null == type && null != value)
+            {
+                // Infer the type from the current value... 
+                if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Version constructor does not support simple "v#" syntax so check to see if the value is
+                    // non-negative real quick.
+                    if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var number))
+                    {
+                        type = "version";
+                    }
+                    else
+                    {
+                        // Sadly, Version doesn't have a TryParse() method until .NET 4, so we have to try/catch to see if it parses.
+                        try
+                        {
+                            var version = new Version(value.Substring(1));
+                            type = "version";
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                }
+
+                // Not a version, check for numeric.
+                if (null == type)
+                {
+                    if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var number))
+                    {
+                        type = "numeric";
+                    }
+                    else
+                    {
+                        type = "string";
+                    }
+                }
+            }
+
+            if (null == value && null != type)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                var row = (WixBundleVariableTuple)this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixBundleVariable);
+                row.WixBundleVariable = name;
+                row.Value = value;
+                row.Type = type;
+                row.Hidden = hidden;
+                row.Persisted = persisted;
+            }
+        }
+
+        private class RemotePayload
+        {
+            public string CertificatePublicKey { get; set; }
+
+            public string CertificateThumbprint { get; set; }
+
+            public string Description { get; set; }
+
+            public string Hash { get; set; }
+
+            public string ProductName { get; set; }
+
+            public int Size { get; set; }
+
+            public string Version { get; set; }
+        }
+    }
+}

@@ -9,13 +9,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Runtime.InteropServices;
     using System.Text;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.Native;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
-    using WixToolset.MergeMod;
-    using WixToolset.Msi;
 
     /// <summary>
     /// Update file information.
@@ -315,18 +313,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             if (!file.File.Compressed.HasValue)
                             {
                                 // Clear all compression bits.
-                                attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
-                                attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
+                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                             }
                             else if (file.File.Compressed.Value)
                             {
-                                attributes |= MsiInterop.MsidbFileAttributesCompressed;
-                                attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                                attributes |= WindowsInstallerConstants.MsidbFileAttributesCompressed;
+                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                             }
                             else if (!file.File.Compressed.Value)
                             {
-                                attributes |= MsiInterop.MsidbFileAttributesNoncompressed;
-                                attributes &= ~MsiInterop.MsidbFileAttributesCompressed;
+                                attributes |= WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
+                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
                             }
 
                             recordUpdate.SetInteger(2, attributes);

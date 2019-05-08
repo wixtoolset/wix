@@ -12,13 +12,12 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-    using WixToolset.Core.Native;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     /// <summary>
     /// Runs internal consistency evaluators (ICEs) from cub files against a database.

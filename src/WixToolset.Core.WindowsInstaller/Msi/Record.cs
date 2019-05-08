@@ -1,11 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Msi
+namespace WixToolset.Core.WindowsInstaller.Msi
 {
     using System;
     using System.ComponentModel;
     using System.Text;
-    using WixToolset.Core.Native;
 
     /// <summary>
     /// Wrapper class around msi.dll interop for a record.

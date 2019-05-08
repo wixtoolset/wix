@@ -1,13 +1,12 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Unbind
 {
     using System;
     using System.ComponentModel;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Msi;
+    using WixToolset.Core.WindowsInstaller.Msi;
 
     internal class UnbindMsiOrMsmCommand
     {

@@ -6,12 +6,12 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     /// <summary>
     /// Creates a transform by diffing two outputs.
@@ -82,7 +82,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// <returns>The transform.</returns>
         public Output Diff(Output targetOutput, Output updatedOutput)
         {
-            return Diff(targetOutput, updatedOutput, 0);
+            return this.Diff(targetOutput, updatedOutput, 0);
         }
 
         /// <summary>

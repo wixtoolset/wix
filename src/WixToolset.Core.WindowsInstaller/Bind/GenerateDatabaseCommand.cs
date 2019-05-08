@@ -10,11 +10,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Text;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Msi;
-    using WixToolset.Core.Native;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Core.WindowsInstaller.Msi;
 
     internal class GenerateDatabaseCommand 
     {

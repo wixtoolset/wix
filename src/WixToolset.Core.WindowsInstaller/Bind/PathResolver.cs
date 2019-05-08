@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
@@ -6,6 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
 
     internal static class PathResolver
     {
@@ -28,7 +29,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (null != componentIdGenSeeds && componentIdGenSeeds.ContainsKey(directory))
                 {
-                    resolvedDirectory.Path = (string)componentIdGenSeeds[directory];
+                    resolvedDirectory.Path = componentIdGenSeeds[directory];
                 }
                 else if (canonicalize && WindowsInstallerStandard.IsStandardDirectory(directory))
                 {

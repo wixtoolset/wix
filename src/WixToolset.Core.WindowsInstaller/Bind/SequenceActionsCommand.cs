@@ -9,6 +9,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
     internal class SequenceActionsCommand
@@ -184,7 +185,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                scheduledActionRows = ScheduleActions(requiredActionRows);
+                scheduledActionRows = this.ScheduleActions(requiredActionRows);
             }
 
             // Remove all existing WixActionTuples from the section then add the
@@ -537,7 +538,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         // Only add the MigrateFeatureStates action if MigrateFeature attribute is set on
                         // at least one UpgradeVersion element.
-                        if (this.Section.Tuples.OfType<UpgradeTuple>().Any(t => (t.Attributes & MsiInterop.MsidbUpgradeAttributesMigrateFeatures) == MsiInterop.MsidbUpgradeAttributesMigrateFeatures))
+                        if (this.Section.Tuples.OfType<UpgradeTuple>().Any(t => t.MigrateFeatures))
                         {
                             set.Add("InstallExecuteSequence/MigrateFeatureStates");
                             set.Add("InstallUISequence/MigrateFeatureStates");

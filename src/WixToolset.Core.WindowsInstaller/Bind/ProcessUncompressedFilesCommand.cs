@@ -7,12 +7,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using System.Linq;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.Native;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Msi;
 
     /// <summary>
     /// Defines the file transfers necessary to layout the uncompressed files.

@@ -11,6 +11,7 @@ namespace WixToolset.Core
     using WixToolset.Core.Link;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -225,7 +226,7 @@ namespace WixToolset.Core
                     sectionCount++;
 
                     var sectionId = section.Id;
-                    if (null == sectionId && sectionIdOnRows)
+                    if (null == sectionId && this.sectionIdOnRows)
                     {
                         sectionId = "wix.section." + sectionCount.ToString(CultureInfo.InvariantCulture);
                     }
@@ -611,7 +612,7 @@ namespace WixToolset.Core
 #endif
 
                 //correct the section Id in FeatureComponents table
-                if (sectionIdOnRows)
+                if (this.sectionIdOnRows)
                 {
                     //var componentSectionIds = new Dictionary<string, string>();
 

@@ -11,7 +11,6 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data.Bind;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Msi;
     using WixToolset.Ole32;
 
     internal class MspBackend : IBackend

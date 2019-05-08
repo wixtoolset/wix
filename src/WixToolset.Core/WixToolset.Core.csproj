@@ -13,7 +13,6 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" Version="4.0.*" />
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
   </ItemGroup>
 
   <!--
@@ -26,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
   </ItemGroup>
 </Project>

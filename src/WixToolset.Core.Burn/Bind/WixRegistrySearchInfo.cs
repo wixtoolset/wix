@@ -4,7 +4,7 @@ namespace WixToolset.Core.Burn
 {
     using System;
     using System.Xml;
-    using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
     /// Utility class for all WixRegistrySearches.
@@ -43,16 +43,16 @@ namespace WixToolset.Core.Burn
 
             switch (this.Root)
             {
-                case Core.Native.MsiInterop.MsidbRegistryRootClassesRoot:
+                case WindowsInstallerConstants.MsidbRegistryRootClassesRoot:
                     writer.WriteAttributeString("Root", "HKCR");
                     break;
-                case Core.Native.MsiInterop.MsidbRegistryRootCurrentUser:
+                case WindowsInstallerConstants.MsidbRegistryRootCurrentUser:
                     writer.WriteAttributeString("Root", "HKCU");
                     break;
-                case Core.Native.MsiInterop.MsidbRegistryRootLocalMachine:
+                case WindowsInstallerConstants.MsidbRegistryRootLocalMachine:
                     writer.WriteAttributeString("Root", "HKLM");
                     break;
-                case Core.Native.MsiInterop.MsidbRegistryRootUsers:
+                case WindowsInstallerConstants.MsidbRegistryRootUsers:
                     writer.WriteAttributeString("Root", "HKU");
                     break;
             }

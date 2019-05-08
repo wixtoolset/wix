@@ -5,7 +5,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.Collections;
     using System.Globalization;
-    using WixToolset.MergeMod;
+    using WixToolset.Core.WindowsInstaller.Msi;
 
     /// <summary>
     /// Callback object for configurable merge modules.
