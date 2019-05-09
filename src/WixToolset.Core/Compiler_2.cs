@@ -4126,18 +4126,7 @@ namespace WixToolset.Core
 
                 foreach (var sequence in sequences)
                 {
-                    var sequenceId = new Identifier(AccessModifier.Public, sequence.ToString(), actionName);
-
-                    var sequenceTuple = new WixActionTuple(sourceLineNumbers, sequenceId)
-                    {
-                        SequenceTable = sequence,
-                        Action = actionName,
-                        Condition = condition,
-                        After = "CostInialize",
-                        Overridable = false
-                    };
-
-                    this.Core.AddTuple(tuple);
+                    this.Core.ScheduleActionTuple(sourceLineNumbers, AccessModifier.Public, sequence, actionName, condition, afterAction: "CostInitialize");
                 }
             }
         }
@@ -4287,43 +4276,7 @@ namespace WixToolset.Core
 
                 foreach (var sequence in sequences)
                 {
-                    var sequenceId = new Identifier(AccessModifier.Public, sequence.ToString(), actionName);
-
-                    var sequenceTuple = new WixActionTuple(sourceLineNumbers, sequenceId)
-                    {
-                        SequenceTable = sequence,
-                        Action = actionName,
-                        Condition = condition,
-                        Before = beforeAction,
-                        After = afterAction,
-                        Overridable = false
-                    };
-
-                    this.Core.AddTuple(tuple);
-
-                    if (null != beforeAction)
-                    {
-                        if (WindowsInstallerStandard.IsStandardAction(beforeAction))
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", sequence.ToString(), beforeAction);
-                        }
-                        else
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", beforeAction);
-                        }
-                    }
-
-                    if (null != afterAction)
-                    {
-                        if (WindowsInstallerStandard.IsStandardAction(afterAction))
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", sequence.ToString(), afterAction);
-                        }
-                        else
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "CustomAction", afterAction);
-                        }
-                    }
+                    this.Core.ScheduleActionTuple(sourceLineNumbers, AccessModifier.Public, sequence, actionName, condition, beforeAction, afterAction);
                 }
             }
         }

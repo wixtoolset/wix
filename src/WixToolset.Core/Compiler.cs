@@ -7284,34 +7284,28 @@ namespace WixToolset.Core
                 }
 
                 // finally, schedule RemoveExistingProducts
-                var actionTuple = new WixActionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "InstallExecuteSequence", "RemoveExistingProducts"))
-                {
-                    SequenceTable = SequenceTable.InstallExecuteSequence,
-                    Action = "RemoveExistingProducts",
-                    Overridable = false,
-                };
-
+                string after = null;
                 switch (schedule)
                 {
                     case null:
                     case "afterInstallValidate":
-                        actionTuple.After = "InstallValidate";
+                        after = "InstallValidate";
                         break;
                     case "afterInstallInitialize":
-                        actionTuple.After = "InstallInitialize";
+                        after = "InstallInitialize";
                         break;
                     case "afterInstallExecute":
-                        actionTuple.After = "InstallExecute";
+                        after = "InstallExecute";
                         break;
                     case "afterInstallExecuteAgain":
-                        actionTuple.After = "InstallExecuteAgain";
+                        after = "InstallExecuteAgain";
                         break;
                     case "afterInstallFinalize":
-                        actionTuple.After = "InstallFinalize";
+                        after = "InstallFinalize";
                         break;
                 }
 
-                this.Core.AddTuple(actionTuple);
+                this.Core.ScheduleActionTuple(sourceLineNumbers, AccessModifier.Public, SequenceTable.InstallExecuteSequence, "RemoveExistingProducts", afterAction: after);
             }
         }
 

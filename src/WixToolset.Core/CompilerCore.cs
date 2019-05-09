@@ -402,7 +402,7 @@ namespace WixToolset.Core
         /// <returns>Identifier of the leaf directory created.</returns>
         public string CreateDirectoryReferenceFromInlineSyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId)
         {
-            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, attribute, parentId);
+            return this.parseHelper.CreateDirectoryReferenceFromInlineSyntax(this.ActiveSection, sourceLineNumbers, parentId, attribute, this.activeSectionInlinedDirectoryIds);
         }
 
         /// <summary>
@@ -1147,57 +1147,7 @@ namespace WixToolset.Core
         /// <returns>Identifier for the newly created row.</returns>
         internal Identifier CreateDirectoryRow(SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            //string defaultDir = null;
-
-            //if (name.Equals("SourceDir") || this.IsValidShortFilename(name, false))
-            //{
-            //    defaultDir = name;
-            //}
-            //else
-            //{
-            //    if (String.IsNullOrEmpty(shortName))
-            //    {
-            //        shortName = this.CreateShortName(name, false, false, "Directory", parentId);
-            //    }
-
-            //    defaultDir = String.Concat(shortName, "|", name);
-            //}
-
-            //if (!String.IsNullOrEmpty(sourceName))
-            //{
-            //    if (this.IsValidShortFilename(sourceName, false))
-            //    {
-            //        defaultDir = String.Concat(defaultDir, ":", sourceName);
-            //    }
-            //    else
-            //    {
-            //        if (String.IsNullOrEmpty(shortSourceName))
-            //        {
-            //            shortSourceName = this.CreateShortName(sourceName, false, false, "Directory", parentId);
-            //        }
-
-            //        defaultDir = String.Concat(defaultDir, ":", shortSourceName, "|", sourceName);
-            //    }
-            //}
-
-            //// For anonymous directories, create the identifier. If this identifier already exists in the
-            //// active section, bail so we don't add duplicate anonymous directory rows (which are legal
-            //// but bloat the intermediate and ultimately make the linker do "busy work").
-            //if (null == id)
-            //{
-            //    id = this.CreateIdentifier("dir", parentId, name, shortName, sourceName, shortSourceName);
-
-            //    if (!this.activeSectionInlinedDirectoryIds.Add(id.Id))
-            //    {
-            //        return id;
-            //    }
-            //}
-
-            //var row = this.CreateRow(sourceLineNumbers, TupleDefinitionType.Directory, id);
-            //row.Set(1, parentId);
-            //row.Set(2, defaultDir);
-            //return id;
-            return this.parseHelper.CreateDirectoryRow(this.ActiveSection, sourceLineNumbers, id, parentId, name, shortName, sourceName, shortSourceName, this.activeSectionInlinedDirectoryIds);
+            return this.parseHelper.CreateDirectoryRow(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
         }
 
         /// <summary>
@@ -1210,6 +1160,11 @@ namespace WixToolset.Core
         internal string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference = false)
         {
             return this.parseHelper.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, resultUsedToCreateReference);
+        }
+
+        internal WixActionTuple ScheduleActionTuple(SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition = null, string beforeAction = null, string afterAction = null, bool overridable = false)
+        {
+            return this.parseHelper.ScheduleActionTuple(this.ActiveSection, sourceLineNumbers, access, sequence, actionName, condition, beforeAction, afterAction, overridable);
         }
 
         /// <summary>

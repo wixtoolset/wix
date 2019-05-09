@@ -13,6 +13,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -63,9 +64,9 @@ namespace WixToolset.Core.ExtensibilityServices
             this.CreateWixGroupRow(section, sourceLineNumbers, parentType, parentId, childType, childId);
         }
 
-        public Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null, ISet<string> sectionInlinedDirectoryIds = null)
+        public Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            string defaultDir = null;
+            string defaultDir;
 
             if (name.Equals("SourceDir") || this.IsValidShortFilename(name, false))
             {
@@ -111,13 +112,18 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
             }
 
-            var row = this.CreateRow(section, sourceLineNumbers, TupleDefinitionType.Directory, id);
-            row.Set(1, parentId);
-            row.Set(2, defaultDir);
+            var tuple = new DirectoryTuple(sourceLineNumbers, id)
+            {
+                Directory_Parent = parentId,
+                DefaultDir = defaultDir,
+            };
+
+            section.Tuples.Add(tuple);
+
             return id;
         }
 
-        public string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute attribute, string parentId)
+        public string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds)
         {
             string id = null;
             string[] inlineSyntax = this.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, true);
@@ -152,7 +158,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
                     for (int i = pathStartsAt; i < inlineSyntax.Length; ++i)
                     {
-                        Identifier inlineId = this.CreateDirectoryRow(section, sourceLineNumbers, null, id, inlineSyntax[i]);
+                        Identifier inlineId = this.CreateDirectoryRow(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
                         id = inlineId.Id;
                     }
                 }
@@ -824,6 +830,49 @@ namespace WixToolset.Core.ExtensibilityServices
                     this.ParseExtensionElement(extensions, intermediate, section, element, child);
                 }
             }
+        }
+
+        public WixActionTuple ScheduleActionTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string actionName, string condition, string beforeAction, string afterAction, bool overridable = false)
+        {
+            var actionId = new Identifier(access, sequence, actionName);
+
+            var actionTuple = new WixActionTuple(sourceLineNumbers, actionId)
+            {
+                SequenceTable = sequence,
+                Action = actionName,
+                Condition = condition,
+                Before = beforeAction,
+                After = afterAction,
+                Overridable = overridable,
+            };
+
+            section.Tuples.Add(actionTuple);
+
+            if (null != beforeAction)
+            {
+                if (WindowsInstallerStandard.IsStandardAction(beforeAction))
+                {
+                    this.CreateSimpleReference(section, sourceLineNumbers, "WixAction", sequence.ToString(), beforeAction);
+                }
+                else
+                {
+                    this.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", beforeAction);
+                }
+            }
+
+            if (null != afterAction)
+            {
+                if (WindowsInstallerStandard.IsStandardAction(afterAction))
+                {
+                    this.CreateSimpleReference(section, sourceLineNumbers, "WixAction", sequence.ToString(), afterAction);
+                }
+                else
+                {
+                    this.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", afterAction);
+                }
+            }
+
+            return actionTuple;
         }
 
         public void UnexpectedAttribute(XElement element, XAttribute attribute)
