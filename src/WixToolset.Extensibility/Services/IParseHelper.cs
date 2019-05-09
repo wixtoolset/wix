@@ -339,6 +339,20 @@ namespace WixToolset.Extensibility.Services
         void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element);
 
         /// <summary>
+        /// Schedules an action tuple.
+        /// </summary>
+        /// <param name="section">Section to add the tuple to.</param>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="access">Access modifier for the scheduled action.</param>
+        /// <param name="sequence">Sequence to add the action to.</param>
+        /// <param name="name">Name of action.</param>
+        /// <param name="condition">Optional condition of action.</param>
+        /// <param name="beforeAction">Optional action to schedule before.</param>
+        /// <param name="afterAction">Option action to schedule after.</param>
+        /// <param name="overridable">Optional overridable flag.</param>
+        WixActionTuple ScheduleActionTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, AccessModifier access, SequenceTable sequence, string name, string condition, string beforeAction, string afterAction, bool overridable = false);
+
+        /// <summary>
         /// Called when the compiler encounters an unexpected attribute.
         /// </summary>
         /// <param name="parentElement">Parent element that found unexpected attribute.</param>
