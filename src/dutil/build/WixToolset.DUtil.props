@@ -20,4 +20,9 @@
       <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v141\$(PlatformTarget)\dutil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v142')) ">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v142\$(PlatformTarget)\dutil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
 </Project>
