@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Data
 {
@@ -25,6 +25,10 @@ namespace WixToolset.Data
             else if (value.Data is int n)
             {
                 return n != 0;
+            }
+            else if (value.Data is long l)
+            {
+                return l != 0;
             }
             else if (value.Data is string s)
             {
@@ -57,6 +61,10 @@ namespace WixToolset.Data
             {
                 return n;
             }
+            else if (value.Data is long l)
+            {
+                return (int)l;
+            }
             else if (value.Data is bool b)
             {
                 return b ? 1 : 0;
@@ -87,6 +95,10 @@ namespace WixToolset.Data
             else if (value.Data is int n)
             {
                 return n.ToString();
+            }
+            else if (value.Data is long l)
+            {
+                return l.ToString();
             }
             else if (value.Data is bool b)
             {
