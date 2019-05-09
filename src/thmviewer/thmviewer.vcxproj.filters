@@ -24,9 +24,11 @@
     <ClCompile Include="load.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="precomp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="thmviewer.build" />
     <None Include="Resources\thm.xml">
       <Filter>Resource Files</Filter>
     </None>

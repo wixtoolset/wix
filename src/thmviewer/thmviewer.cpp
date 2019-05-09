@@ -98,7 +98,7 @@ int WINAPI wWinMain(
         ofn.hwndOwner = hWnd;
         ofn.lpstrFile = wzFile;
         ofn.nMaxFile = countof(wzFile);
-        ofn.lpstrFilter = L"Theme Files\0*.thm\0XML Files\0*.xml\0All Files\0*.*\0";
+        ofn.lpstrFilter = L"Theme Files (*.thm)\0*.thm\0XML Files (*.xml)\0*.xml\0All Files (*.*)\0*.*\0";
         ofn.nFilterIndex = 1;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
         ofn.lpstrTitle = vpTheme->sczCaption;

@@ -13,13 +13,6 @@ namespace WixToolsetTest.BuildTasks
     {
         private static readonly string WixTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(DoIt).Assembly.CodeBase).AbsolutePath), "wix.targets");
 
-        public MsbuildFixture()
-        {
-            this.MsbuildRunner = new MsbuildRunner();
-        }
-
-        private MsbuildRunner MsbuildRunner { get; }
-
         [Fact]
         public void CanBuildSimpleMsiPackage()
         {
@@ -31,7 +24,7 @@ namespace WixToolsetTest.BuildTasks
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
@@ -69,7 +62,7 @@ namespace WixToolsetTest.BuildTasks
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
@@ -94,7 +87,7 @@ namespace WixToolsetTest.BuildTasks
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
@@ -116,7 +109,7 @@ namespace WixToolsetTest.BuildTasks
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
@@ -141,7 +134,7 @@ namespace WixToolsetTest.BuildTasks
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
-                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
@@ -169,7 +162,7 @@ namespace WixToolsetTest.BuildTasks
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
 
                 // Build
-                var result = this.MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
@@ -187,7 +180,7 @@ namespace WixToolsetTest.BuildTasks
                 Assert.NotEmpty(createdPaths);
 
                 // Clean
-                result = this.MsbuildRunner.Execute(projectPath, new[]
+                result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
