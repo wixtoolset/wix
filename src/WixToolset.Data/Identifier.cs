@@ -40,6 +40,12 @@ namespace WixToolset.Data
             this.Id = String.Join("/", ids);
         }
 
+        public Identifier(AccessModifier access, params object[] ids)
+        {
+            this.Access = access;
+            this.Id = String.Join("/", ids);
+        }
+
         public Identifier(AccessModifier access, int id)
         {
             this.Access = access;
