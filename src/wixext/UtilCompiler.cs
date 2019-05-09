@@ -11,6 +11,7 @@ namespace WixToolset.Util
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
@@ -146,9 +147,9 @@ namespace WixToolset.Util
         /// <param name="parentElement">Parent element of element to process.</param>
         /// <param name="element">Element to process.</param>
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
-        public override ComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            ComponentKeyPath possibleKeyPath = null;
+            IComponentKeyPath possibleKeyPath = null;
 
             switch (parentElement.Name.LocalName)
             {
@@ -549,7 +550,7 @@ namespace WixToolset.Util
         /// </summary>
         /// <param name="element">Element to parse.</param>
         /// <param name="componentId">Identifier of parent component.</param>
-        private ComponentKeyPath ParseEventSourceElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
+        private IComponentKeyPath ParseEventSourceElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string sourceName = null;
@@ -568,7 +569,7 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "CategoryCount":
-                            categoryCount = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            categoryCount = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         case "CategoryMessageFile":
                             categoryMessageFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -660,31 +661,34 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            int registryRoot = 2; // MsiInterop.MsidbRegistryRootLocalMachine 
-            string eventSourceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\EventLog\{0}\{1}", logName, sourceName);
-            Identifier id = this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
+            string eventSourceKey = $@"SYSTEM\CurrentControlSet\Services\EventLog\{logName}\{sourceName}";
+            Identifier id = this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
 
             if (null != categoryMessageFile)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
             }
 
             if (CompilerConstants.IntegerNotSet != categoryCount)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
             }
 
             if (null != parameterMessageFile)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
             }
 
             if (0 != typesSupported)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
             }
 
-            return new ComponentKeyPath() { Id = id.Id, Explicit = isKeyPath, Type = ComponentKeyPathType.Registry };
+            var componentKeyPath = this.CreateComponentKeyPath();
+            componentKeyPath.Id = id.Id;
+            componentKeyPath.Explicit = isKeyPath;
+            componentKeyPath.Type = PossibleKeyPathType.Registry;
+            return componentKeyPath;
         }
 
         /// <summary>
@@ -720,10 +724,10 @@ namespace WixToolset.Util
                             property = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Sequence":
-                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         case "Timeout":
-                            timeout = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            timeout = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         case "Target":
                             target = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -789,7 +793,7 @@ namespace WixToolset.Util
                             }
                             break;
                         case "TerminateProcess":
-                            terminateExitCode = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            terminateExitCode = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             attributes |= 0x20; // CLOSEAPP_ATTRIBUTE_TERMINATEPROCESS
                             break;
                         default:
@@ -1273,7 +1277,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "User"));
             }
 
-            if (int.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
+            if (Int32.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
             {
                 this.Messaging.Write(ErrorMessages.GenericReadNotAllowed(sourceLineNumbers));
             }
@@ -1427,7 +1431,7 @@ namespace WixToolset.Util
                             iconFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "IconIndex":
-                            iconIndex = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            iconIndex = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1481,7 +1485,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                CreateWixInternetShortcut(intermediate, section, sourceLineNumbers, componentId, directoryId, id, name, target, shortcutType, iconFile, iconIndex);
+                this.CreateWixInternetShortcut(section, sourceLineNumbers, componentId, directoryId, id, name, target, shortcutType, iconFile, iconIndex);
             }
         }
 
@@ -1495,7 +1499,7 @@ namespace WixToolset.Util
         /// <param name="id">Identifier of shortcut.</param>
         /// <param name="name">Name of shortcut without extension.</param>
         /// <param name="target">Target URL of shortcut.</param>
-        public void CreateWixInternetShortcut(Intermediate intermediate, IntermediateSection section, SourceLineNumber sourceLineNumbers, string componentId, string directoryId, string shortcutId, string name, string target, InternetShortcutType type, string iconFile, int iconIndex)
+        private void CreateWixInternetShortcut(IntermediateSection section, SourceLineNumber sourceLineNumbers, string componentId, string directoryId, string shortcutId, string name, string target, InternetShortcutType type, string iconFile, int iconIndex)
         {
             // add the appropriate extension based on type of shortcut
             name = String.Concat(name, InternetShortcutType.Url == type ? ".url" : ".lnk");
@@ -1687,20 +1691,19 @@ namespace WixToolset.Util
                 row.Set(4, sbSymbolicConstants.ToString());
 
                 // Set up the application's performance key.
-                int registryRoot = 2; // HKLM
                 string escapedName = UtilCompiler.FindPropertyBrackets.Replace(name, this.EscapeProperties);
                 string linkageKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Linkage", escapedName);
                 string performanceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Performance", escapedName);
 
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, linkageKey, "Export", escapedName, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "-", null, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "Library", library, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "Open", openEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "Collect", collectEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "Close", closeEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
             }
 
             // Reference InstallPerfCounterData and UninstallPerfCounterData since nothing will happen without them
@@ -2523,7 +2526,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "User"));
             }
 
-            if (int.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
+            if (Int32.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
             {
                 this.Messaging.Write(ErrorMessages.GenericReadNotAllowed(sourceLineNumbers));
             }
@@ -2694,7 +2697,7 @@ namespace WixToolset.Util
             string variable = null;
             string condition = null;
             string after = null;
-            int root = CompilerConstants.IntegerNotSet;
+            RegistryRootType? root = null;
             string key = null;
             string value = null;
             YesNoType expand = YesNoType.NotSet;
@@ -2715,7 +2718,7 @@ namespace WixToolset.Util
                             this.ParseCommonSearchAttributes(sourceLineNumbers, attrib, ref id, ref variable, ref condition, ref after);
                             break;
                         case "Root":
-                            root = this.ParseHelper.GetAttributeMsidbRegistryRootValue(sourceLineNumbers, attrib, false);
+                            root = this.ParseHelper.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, false);
                             break;
                         case "Key":
                             key = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2764,7 +2767,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Variable"));
             }
 
-            if (CompilerConstants.IntegerNotSet == root)
+            if (!root.HasValue)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Root"));
             }
@@ -2834,7 +2837,7 @@ namespace WixToolset.Util
                 }
 
                 var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixRegistrySearch", id);
-                row.Set(1, root);
+                row.Set(1, (int)root);
                 row.Set(2, key);
                 row.Set(3, value);
                 row.Set(4, (int)attributes);
@@ -3044,10 +3047,10 @@ namespace WixToolset.Util
                             rebootMessage = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ResetPeriodInDays":
-                            resetPeriod = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            resetPeriod = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         case "RestartServiceDelayInSeconds":
-                            restartServiceDelay = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, int.MaxValue);
+                            restartServiceDelay = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         case "SecondFailureActionType":
                             secondFailureActionType = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3511,7 +3514,7 @@ namespace WixToolset.Util
                             }
                             break;
                         case "Sequence":
-                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
+                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
                             break;
                         case "Value":
                             value = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3700,7 +3703,7 @@ namespace WixToolset.Util
                             }
                             break;
                         case "Sequence":
-                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
+                            sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
                             break;
                         case "Value":
                             value = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3874,38 +3877,21 @@ namespace WixToolset.Util
         /// </summary>
         private class ParsedPerformanceCounter
         {
-            string name;
-            string help;
-            int type;
-            string language;
-
             internal ParsedPerformanceCounter(string name, string help, System.Diagnostics.PerformanceCounterType type, int language)
             {
-                this.name = name;
-                this.help = help;
-                this.type = (int)type;
-                this.language = language.ToString("D3", CultureInfo.InvariantCulture);
+                this.Name = name;
+                this.Help = help;
+                this.Type = (int)type;
+                this.Language = language.ToString("D3", CultureInfo.InvariantCulture);
             }
 
-            internal string Name
-            {
-                get { return this.name; }
-            }
+            internal string Name { get; }
 
-            internal string Help
-            {
-                get { return this.help; }
-            }
+            internal string Help { get; }
 
-            internal int Type
-            {
-                get { return this.type; }
-            }
+            internal int Type { get; }
 
-            internal string Language
-            {
-                get { return this.language; }
-            }
+            internal string Language { get; }
         }
     }
 }
