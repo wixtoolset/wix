@@ -1247,7 +1247,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var codepage = 65001;
-            string productCode = null;
+            string productCode = "*";
             string upgradeCode = null;
             string manufacturer = null;
             string version = null;
