@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Data
 {
@@ -67,14 +67,9 @@ namespace WixToolset.Data
             var id = jsonObject.GetValueOrDefault<string>("id");
             var type = jsonObject.GetEnumOrDefault("type", SectionType.Unknown);
 
-            if (null == id && (SectionType.Unknown != type && SectionType.Fragment != type))
-            {
-                throw new ArgumentException("JSON object is not a valid section");
-            }
-
             if (SectionType.Unknown == type)
             {
-                throw new ArgumentException("JSON object is not a valid section", nameof(type));
+                throw new ArgumentException("JSON object is not a valid section, unknown section type", nameof(type));
             }
 
             var section = new IntermediateSection(id, type, codepage);
