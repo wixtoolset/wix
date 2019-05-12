@@ -539,6 +539,38 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CanBuildSetProperty()
+        {
+            var folder = TestData.Get(@"TestData\SetProperty");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var pdb = Pdb.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"), false);
+                var caRows = pdb.Output.Tables["CustomAction"].Rows.Single();
+                Assert.Equal("SetINSTALLLOCATION", caRows.FieldAsString(0));
+                Assert.Equal("51", caRows.FieldAsString(1));
+                Assert.Equal("INSTALLLOCATION", caRows.FieldAsString(2));
+                Assert.Equal("[INSTALLFOLDER]", caRows.FieldAsString(3));
+            }
+        }
+
         [Fact(Skip = "Test demonstrates failure")]
         public void CanBuildVersionIndependentProgId()
         {

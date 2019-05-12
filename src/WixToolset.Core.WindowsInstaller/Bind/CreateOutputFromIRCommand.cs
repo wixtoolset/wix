@@ -250,10 +250,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private void AddCustomActionTuple(CustomActionTuple tuple, Output output)
         {
             var type = tuple.Win64 ? WindowsInstallerConstants.MsidbCustomActionType64BitScript : 0;
-            type |= tuple.TSAware ? WindowsInstallerConstants.MsidbCustomActionTypeTSAware : 0;
-            type |= tuple.Impersonate ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate;
             type |= tuple.IgnoreResult ? WindowsInstallerConstants.MsidbCustomActionTypeContinue : 0;
-            type |= tuple.Hidden ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeHideTarget;
+            type |= tuple.Hidden ? WindowsInstallerConstants.MsidbCustomActionTypeHideTarget : 0;
             type |= tuple.Async ? WindowsInstallerConstants.MsidbCustomActionTypeAsync : 0;
             type |= CustomActionExecutionType.FirstSequence == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeFirstSequence : 0;
             type |= CustomActionExecutionType.OncePerProcess == tuple.ExecutionType ? WindowsInstallerConstants.MsidbCustomActionTypeOncePerProcess : 0;
@@ -269,6 +267,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             type |= CustomActionTargetType.TextData == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeTextData : 0;
             type |= CustomActionTargetType.JScript == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeJScript : 0;
             type |= CustomActionTargetType.VBScript == tuple.TargetType ? WindowsInstallerConstants.MsidbCustomActionTypeVBScript : 0;
+
+            if (WindowsInstallerConstants.MsidbCustomActionTypeInScript == (type & WindowsInstallerConstants.MsidbCustomActionTypeInScript))
+            {
+                type |= tuple.Impersonate ? 0 : WindowsInstallerConstants.MsidbCustomActionTypeNoImpersonate;
+                type |= tuple.TSAware ? WindowsInstallerConstants.MsidbCustomActionTypeTSAware : 0;
+            }
 
             var table = output.EnsureTable(this.TableDefinitions["CustomAction"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);

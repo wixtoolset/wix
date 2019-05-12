@@ -48,6 +48,10 @@
     <Content Include="TestData\ComplexExampleExtension\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ComplexExampleExtension\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ComplexExampleExtension\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SetProperty\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SetProperty\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SetProperty\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SetProperty\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
