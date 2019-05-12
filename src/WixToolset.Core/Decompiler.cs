@@ -49,7 +49,7 @@ namespace WixToolset.Core
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            var backendFactories = extensionManager.Create<IBackendFactory>();
+            var backendFactories = extensionManager.GetServices<IBackendFactory>();
 
             foreach (var factory in backendFactories)
             {

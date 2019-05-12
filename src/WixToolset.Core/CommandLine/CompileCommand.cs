@@ -57,7 +57,7 @@ namespace WixToolset.Core.CommandLine
             foreach (var sourceFile in this.SourceFiles)
             {
                 var context = this.ServiceProvider.GetService<IPreprocessContext>();
-                context.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
+                context.Extensions = this.ExtensionManager.GetServices<IPreprocessorExtension>();
                 context.Platform = this.Platform;
                 context.IncludeSearchPaths = this.IncludeSearchPaths;
                 context.SourcePath = sourceFile.SourcePath;
@@ -80,7 +80,7 @@ namespace WixToolset.Core.CommandLine
                 }
 
                 var compileContext = this.ServiceProvider.GetService<ICompileContext>();
-                compileContext.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
+                compileContext.Extensions = this.ExtensionManager.GetServices<ICompilerExtension>();
                 compileContext.OutputPath = sourceFile.OutputPath;
                 compileContext.Platform = this.Platform;
                 compileContext.Source = result?.Document;

@@ -64,7 +64,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             var extensionManager = (IExtensionManager)this.ServiceProvider.GetService(typeof(IExtensionManager));
 
-            this.ExtensionData = extensionManager.Create<IExtensionData>();
+            this.ExtensionData = extensionManager.GetServices<IExtensionData>();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            var backendExtensions = extensionManager.Create<IWindowsInstallerBackendBinderExtension>();
+            var backendExtensions = extensionManager.GetServices<IWindowsInstallerBackendBinderExtension>();
 
             foreach (var extension in backendExtensions)
             {
@@ -49,7 +49,7 @@ namespace WixToolset.Core.WindowsInstaller
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            var backendExtensions = extensionManager.Create<IWindowsInstallerBackendDecompilerExtension>();
+            var backendExtensions = extensionManager.GetServices<IWindowsInstallerBackendDecompilerExtension>();
 
             foreach (var extension in backendExtensions)
             {

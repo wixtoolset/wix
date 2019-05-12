@@ -38,7 +38,7 @@ namespace WixToolset.Core.CommandLine
             }
 
             var context = this.ServiceProvider.GetService<IDecompileContext>();
-            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().Create<IDecompilerExtension>();
+            context.Extensions = this.ServiceProvider.GetService<IExtensionManager>().GetServices<IDecompilerExtension>();
             context.DecompilePath = this.commandLine.DecompileFilePath;
             context.DecompileType = this.commandLine.CalculateDecompileType();
             context.IntermediateFolder = this.commandLine.CalculateIntermedateFolder();

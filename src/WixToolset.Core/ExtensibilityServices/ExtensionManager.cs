@@ -84,7 +84,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
         }
 
-        public IEnumerable<T> Create<T>() where T : class
+        public IEnumerable<T> GetServices<T>() where T : class
         {
             if (!this.loadedExtensionsByType.TryGetValue(typeof(T), out var extensions))
             {

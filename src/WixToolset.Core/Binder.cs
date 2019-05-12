@@ -56,7 +56,7 @@ namespace WixToolset.Core
         {
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            var backendFactories = extensionManager.Create<IBackendFactory>();
+            var backendFactories = extensionManager.GetServices<IBackendFactory>();
 
             var entrySection = context.IntermediateRepresentation.Sections[0];
 

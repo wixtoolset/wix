@@ -465,7 +465,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
-                var extensions = extensionManager.Create<IPreprocessorExtension>();
+                var extensions = extensionManager.GetServices<IPreprocessorExtension>();
 
                 foreach (var extension in extensions)
                 {

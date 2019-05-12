@@ -89,7 +89,7 @@ namespace WixToolset.Core.CommandLine
 
         private ICommandLineCommand Parse(ICommandLineContext context)
         {
-            var extensions = this.ExtensionManager.Create<IExtensionCommandLine>();
+            var extensions = this.ExtensionManager.GetServices<IExtensionCommandLine>();
 
             foreach (var extension in extensions)
             {

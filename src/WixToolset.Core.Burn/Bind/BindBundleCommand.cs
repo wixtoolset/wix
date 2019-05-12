@@ -76,7 +76,7 @@ namespace WixToolset.Core.Burn
 
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
-            this.BackendExtensions = extensionManager.Create<IBurnBackendExtension>();
+            this.BackendExtensions = extensionManager.GetServices<IBurnBackendExtension>();
         }
 
         public CompressionLevel DefaultCompressionLevel { private get; set; }

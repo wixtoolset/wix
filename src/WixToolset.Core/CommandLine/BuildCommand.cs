@@ -187,7 +187,7 @@ namespace WixToolset.Core.CommandLine
                 }
 
                 var context = this.ServiceProvider.GetService<ICompileContext>();
-                context.Extensions = this.ExtensionManager.Create<ICompilerExtension>();
+                context.Extensions = this.ExtensionManager.GetServices<ICompilerExtension>();
                 context.OutputPath = sourceFile.OutputPath;
                 context.Platform = this.Platform;
                 context.Source = document;
@@ -219,7 +219,7 @@ namespace WixToolset.Core.CommandLine
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
             context.BindPaths = bindPaths;
-            context.Extensions = this.ExtensionManager.Create<ILibrarianExtension>();
+            context.Extensions = this.ExtensionManager.GetServices<ILibrarianExtension>();
             context.Localizations = localizations;
             context.Intermediates = intermediates;
 
@@ -247,8 +247,8 @@ namespace WixToolset.Core.CommandLine
             }
 
             var context = this.ServiceProvider.GetService<ILinkContext>();
-            context.Extensions = this.ExtensionManager.Create<ILinkerExtension>();
-            context.ExtensionData = this.ExtensionManager.Create<IExtensionData>();
+            context.Extensions = this.ExtensionManager.GetServices<ILinkerExtension>();
+            context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
             context.ExpectedOutputType = this.OutputType;
             context.Intermediates = intermediates.Concat(libraries).ToList();
             context.TupleDefinitionCreator = creator;
@@ -269,8 +269,8 @@ namespace WixToolset.Core.CommandLine
             {
                 var context = this.ServiceProvider.GetService<IResolveContext>();
                 context.BindPaths = bindPaths;
-                context.Extensions = this.ExtensionManager.Create<IResolverExtension>();
-                context.ExtensionData = this.ExtensionManager.Create<IExtensionData>();
+                context.Extensions = this.ExtensionManager.GetServices<IResolverExtension>();
+                context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
                 context.FilterCultures = filterCultures;
                 context.IntermediateFolder = intermediateFolder;
                 context.IntermediateRepresentation = output;
@@ -295,7 +295,7 @@ namespace WixToolset.Core.CommandLine
                 //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
                 context.DelayedFields = resolveResult.DelayedFields;
                 context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
-                context.Extensions = this.ExtensionManager.Create<IBinderExtension>();
+                context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
                 context.Ices = Array.Empty<string>(); // TODO: set this correctly
                 context.IntermediateFolder = intermediateFolder;
                 context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
@@ -315,7 +315,7 @@ namespace WixToolset.Core.CommandLine
 
             {
                 var context = this.ServiceProvider.GetService<ILayoutContext>();
-                context.Extensions = this.ExtensionManager.Create<ILayoutExtension>();
+                context.Extensions = this.ExtensionManager.GetServices<ILayoutExtension>();
                 context.TrackedFiles = bindResult.TrackedFiles;
                 context.FileTransfers = bindResult.FileTransfers;
                 context.IntermediateFolder = intermediateFolder;
@@ -371,7 +371,7 @@ namespace WixToolset.Core.CommandLine
         private XDocument Preprocess(IDictionary<string, string> preprocessorVariables, string sourcePath)
         {
             var context = this.ServiceProvider.GetService<IPreprocessContext>();
-            context.Extensions = this.ExtensionManager.Create<IPreprocessorExtension>();
+            context.Extensions = this.ExtensionManager.GetServices<IPreprocessorExtension>();
             context.Platform = this.Platform;
             context.IncludeSearchPaths = this.IncludeSearchPaths;
             context.SourcePath = sourcePath;
