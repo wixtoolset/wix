@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Extensibility.Services
 {
@@ -29,12 +29,11 @@ namespace WixToolset.Extensibility.Services
         /// </remarks>
         void Load(string extensionPath);
 
-
         /// <summary>
-        /// Creates extension of specified type from factories loaded into the extension manager.
+        /// Gets extensions of specified type from factories loaded into the extension manager.
         /// </summary>
-        /// <typeparam name="T">Type of extension to create.</typeparam>
-        /// <returns>Extensions created of the specified type.</returns>
-        IEnumerable<T> Create<T>() where T : class;
+        /// <typeparam name="T">Type of extension to get.</typeparam>
+        /// <returns>Extensions of the specified type.</returns>
+        IEnumerable<T> GetServices<T>() where T : class;
     }
 }
