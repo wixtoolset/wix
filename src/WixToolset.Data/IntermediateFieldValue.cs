@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Data
 {
@@ -55,18 +55,45 @@ namespace WixToolset.Data
 
             var value = data;
 
-            if (data is string)
+            switch (value)
             {
-            }
-            else if (data is long)
-            {
-                if (type == IntermediateFieldType.Number)
+            case int intData:
+                switch (type)
                 {
-                    value = Convert.ToInt32(data);
+                case IntermediateFieldType.Bool:
+                    value = intData != 0;
+                    break;
+
+                case IntermediateFieldType.LargeNumber:
+                    value = Convert.ToInt64(data);
+                    break;
+
+                case IntermediateFieldType.Path:
+                case IntermediateFieldType.String:
+                    value = intData.ToString();
+                    break;
                 }
-            }
-            else if (data is JsonObject jsonData)
-            {
+                break;
+
+            case long longData:
+                switch (type)
+                {
+                case IntermediateFieldType.Bool:
+                    value = longData != 0;
+                    break;
+
+                case IntermediateFieldType.Number:
+                    value = Convert.ToInt32(longData);
+                    break;
+
+                case IntermediateFieldType.Path:
+                case IntermediateFieldType.String:
+                    value = longData.ToString();
+                    break;
+                }
+                break;
+
+            case JsonObject jsonData:
                 jsonData.TryGetValue("embeddedIndex", out var embeddedIndex);
 
                 value = new IntermediateFieldPathValue
@@ -75,6 +102,11 @@ namespace WixToolset.Data
                     EmbeddedFileIndex = (embeddedIndex == null) ? null : (int?)Convert.ToInt32(embeddedIndex),
                     Path = jsonData.GetValueOrDefault<string>("path"),
                 };
+                break;
+
+                // Nothing to do for this case, so leave it out.
+                // case string stringData:
+                //     break;
             }
 
             var previousValueJson = jsonObject.GetValueOrDefault<JsonObject>("prev");
