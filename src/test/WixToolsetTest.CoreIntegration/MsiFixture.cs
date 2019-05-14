@@ -43,7 +43,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
                 var section = intermediate.Sections.Single();
 
-                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
+                var wixFile = section.Tuples.OfType<WixFileTuple>().First();
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
             }
@@ -536,6 +536,43 @@ namespace WixToolsetTest.CoreIntegration
 
                 var platformSummary = section.Tuples.OfType<_SummaryInformationTuple>().Single(s => s.PropertyId == 7);
                 Assert.Equal("x64;1033", platformSummary.Value);
+            }
+        }
+
+        [Fact]
+        public void CanBuildSharedComponent()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-arch", "x64",
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var section = intermediate.Sections.Single();
+
+                // Only one component is shared.
+                var sharedComponentTuples = section.Tuples.OfType<ComponentTuple>();
+                Assert.Equal(1, sharedComponentTuples.Sum(t => t.Shared ? 1 : 0));
+
+                // And it is this one.
+                var sharedComponentTuple = sharedComponentTuples.Single(t => t.Id.Id == "Shared.dll");
+                Assert.True(sharedComponentTuple.Shared);
             }
         }
 

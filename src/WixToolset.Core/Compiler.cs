@@ -2469,6 +2469,7 @@ namespace WixToolset.Core
                     NeverOverwrite = neverOverwrite,
                     Permanent = permanent,
                     SharedDllRefCount = sharedDllRefCount,
+                    Shared = shared,
                     Transitive = transitive,
                     UninstallWhenSuperseded = uninstallWhenSuperseded,
                     Win64 = win64,
