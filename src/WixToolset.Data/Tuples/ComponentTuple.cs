@@ -18,6 +18,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.NeverOverwrite), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Permanent), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.SharedDllRefCount), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Shared), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Transitive), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.UninstallWhenSuperseded), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Win64), IntermediateFieldType.Bool),
@@ -41,6 +42,7 @@ namespace WixToolset.Data.Tuples
         NeverOverwrite,
         Permanent,
         SharedDllRefCount,
+        Shared,
         Transitive,
         UninstallWhenSuperseded,
         Win64,
@@ -114,6 +116,12 @@ namespace WixToolset.Data.Tuples
         {
             get => this.Fields[(int)ComponentTupleFields.SharedDllRefCount].AsBool();
             set => this.Set((int)ComponentTupleFields.SharedDllRefCount, value);
+        }
+
+        public bool Shared
+        {
+            get => this.Fields[(int)ComponentTupleFields.Shared].AsBool();
+            set => this.Set((int)ComponentTupleFields.Shared, value);
         }
 
         public bool Transitive
