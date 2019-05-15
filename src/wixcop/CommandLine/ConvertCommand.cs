@@ -6,6 +6,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
+    using WixToolset.Converters;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -75,7 +76,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
             }
 
             var messaging = this.ServiceProvider.GetService<IMessaging>();
-            var converter = new Converter(messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
+            var converter = new Wix3Converter(messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
 
             var errors = this.InspectSubDirectories(converter, Path.GetFullPath("."));
 
@@ -131,7 +132,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
         /// </summary>
         /// <param name="directory">The directory whose sub-directories will be inspected.</param>
         /// <returns>The number of errors that were found.</returns>
-        private int InspectSubDirectories(Converter converter, string directory)
+        private int InspectSubDirectories(Wix3Converter converter, string directory)
         {
             var errors = 0;
 

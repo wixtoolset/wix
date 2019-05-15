@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Core" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Converters" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>
