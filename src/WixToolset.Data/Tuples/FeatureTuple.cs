@@ -68,37 +68,37 @@ namespace WixToolset.Data.Tuples
 
         public string Feature_Parent
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Feature_Parent]?.Value;
+            get => (string)this.Fields[(int)FeatureTupleFields.Feature_Parent];
             set => this.Set((int)FeatureTupleFields.Feature_Parent, value);
         }
 
         public string Title
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Title]?.Value;
+            get => (string)this.Fields[(int)FeatureTupleFields.Title];
             set => this.Set((int)FeatureTupleFields.Title, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)FeatureTupleFields.Description];
             set => this.Set((int)FeatureTupleFields.Description, value);
         }
 
         public int Display
         {
-            get => (int)this.Fields[(int)FeatureTupleFields.Display]?.Value;
+            get => (int)this.Fields[(int)FeatureTupleFields.Display];
             set => this.Set((int)FeatureTupleFields.Display, value);
         }
 
         public int Level
         {
-            get => (int)this.Fields[(int)FeatureTupleFields.Level]?.Value;
+            get => (int)this.Fields[(int)FeatureTupleFields.Level];
             set => this.Set((int)FeatureTupleFields.Level, value);
         }
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)FeatureTupleFields.Directory_];
             set => this.Set((int)FeatureTupleFields.Directory_, value);
         }
 

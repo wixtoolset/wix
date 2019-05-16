@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public int Error
         {
-            get => (int)this.Fields[(int)ErrorTupleFields.Error]?.Value;
+            get => (int)this.Fields[(int)ErrorTupleFields.Error];
             set => this.Set((int)ErrorTupleFields.Error, value);
         }
 
         public string Message
         {
-            get => (string)this.Fields[(int)ErrorTupleFields.Message]?.Value;
+            get => (string)this.Fields[(int)ErrorTupleFields.Message];
             set => this.Set((int)ErrorTupleFields.Message, value);
         }
     }

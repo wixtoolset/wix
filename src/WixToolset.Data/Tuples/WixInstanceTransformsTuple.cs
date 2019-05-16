@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.Id];
             set => this.Set((int)WixInstanceTransformsTupleFields.Id, value);
         }
 
         public string PropertyId
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.PropertyId]?.Value;
+            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.PropertyId];
             set => this.Set((int)WixInstanceTransformsTupleFields.PropertyId, value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.ProductCode]?.Value;
+            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.ProductCode];
             set => this.Set((int)WixInstanceTransformsTupleFields.ProductCode, value);
         }
 
         public string ProductName
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.ProductName]?.Value;
+            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.ProductName];
             set => this.Set((int)WixInstanceTransformsTupleFields.ProductName, value);
         }
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.UpgradeCode]?.Value;
+            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.UpgradeCode];
             set => this.Set((int)WixInstanceTransformsTupleFields.UpgradeCode, value);
         }
     }

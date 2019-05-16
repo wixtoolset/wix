@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundlePackageCommandLineTupleFields.WixBundlePackage_, value);
         }
 
         public string InstallArgument
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.InstallArgument]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.InstallArgument];
             set => this.Set((int)WixBundlePackageCommandLineTupleFields.InstallArgument, value);
         }
 
         public string UninstallArgument
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.UninstallArgument]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.UninstallArgument];
             set => this.Set((int)WixBundlePackageCommandLineTupleFields.UninstallArgument, value);
         }
 
         public string RepairArgument
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.RepairArgument]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.RepairArgument];
             set => this.Set((int)WixBundlePackageCommandLineTupleFields.RepairArgument, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.Condition];
             set => this.Set((int)WixBundlePackageCommandLineTupleFields.Condition, value);
         }
     }

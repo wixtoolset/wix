@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string WixSearch_
         {
-            get => (string)this.Fields[(int)WixComponentSearchTupleFields.WixSearch_]?.Value;
+            get => (string)this.Fields[(int)WixComponentSearchTupleFields.WixSearch_];
             set => this.Set((int)WixComponentSearchTupleFields.WixSearch_, value);
         }
 
         public string Guid
         {
-            get => (string)this.Fields[(int)WixComponentSearchTupleFields.Guid]?.Value;
+            get => (string)this.Fields[(int)WixComponentSearchTupleFields.Guid];
             set => this.Set((int)WixComponentSearchTupleFields.Guid, value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixComponentSearchTupleFields.ProductCode]?.Value;
+            get => (string)this.Fields[(int)WixComponentSearchTupleFields.ProductCode];
             set => this.Set((int)WixComponentSearchTupleFields.ProductCode, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixComponentSearchTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixComponentSearchTupleFields.Attributes];
             set => this.Set((int)WixComponentSearchTupleFields.Attributes, value);
         }
     }

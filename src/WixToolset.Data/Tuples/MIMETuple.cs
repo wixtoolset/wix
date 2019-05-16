@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string ContentType
         {
-            get => (string)this.Fields[(int)MIMETupleFields.ContentType]?.Value;
+            get => (string)this.Fields[(int)MIMETupleFields.ContentType];
             set => this.Set((int)MIMETupleFields.ContentType, value);
         }
 
         public string Extension_
         {
-            get => (string)this.Fields[(int)MIMETupleFields.Extension_]?.Value;
+            get => (string)this.Fields[(int)MIMETupleFields.Extension_];
             set => this.Set((int)MIMETupleFields.Extension_, value);
         }
 
         public string CLSID
         {
-            get => (string)this.Fields[(int)MIMETupleFields.CLSID]?.Value;
+            get => (string)this.Fields[(int)MIMETupleFields.CLSID];
             set => this.Set((int)MIMETupleFields.CLSID, value);
         }
     }

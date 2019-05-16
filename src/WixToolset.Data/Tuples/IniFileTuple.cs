@@ -49,31 +49,31 @@ namespace WixToolset.Data.Tuples
 
         public string FileName
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.FileName]?.Value;
+            get => (string)this.Fields[(int)IniFileTupleFields.FileName];
             set => this.Set((int)IniFileTupleFields.FileName, value);
         }
 
         public string DirProperty
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.DirProperty]?.Value;
+            get => (string)this.Fields[(int)IniFileTupleFields.DirProperty];
             set => this.Set((int)IniFileTupleFields.DirProperty, value);
         }
 
         public string Section
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.Section]?.Value;
+            get => (string)this.Fields[(int)IniFileTupleFields.Section];
             set => this.Set((int)IniFileTupleFields.Section, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)IniFileTupleFields.Key];
             set => this.Set((int)IniFileTupleFields.Key, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)IniFileTupleFields.Value];
             set => this.Set((int)IniFileTupleFields.Value, value);
         }
 
@@ -85,7 +85,7 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)IniFileTupleFields.Component_];
             set => this.Set((int)IniFileTupleFields.Component_, value);
         }
     }

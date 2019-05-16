@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)ConditionTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)ConditionTupleFields.Feature_];
             set => this.Set((int)ConditionTupleFields.Feature_, value);
         }
 
         public int Level
         {
-            get => (int)this.Fields[(int)ConditionTupleFields.Level]?.Value;
+            get => (int)this.Fields[(int)ConditionTupleFields.Level];
             set => this.Set((int)ConditionTupleFields.Level, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ConditionTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)ConditionTupleFields.Condition];
             set => this.Set((int)ConditionTupleFields.Condition, value);
         }
     }

@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Key
         {
-            get => (string)this.Fields[(int)UITextTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)UITextTupleFields.Key];
             set => this.Set((int)UITextTupleFields.Key, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)UITextTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)UITextTupleFields.Text];
             set => this.Set((int)UITextTupleFields.Text, value);
         }
     }

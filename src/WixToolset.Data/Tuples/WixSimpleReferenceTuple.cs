@@ -41,13 +41,13 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixSimpleReferenceTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)WixSimpleReferenceTupleFields.Table];
             set => this.Set((int)WixSimpleReferenceTupleFields.Table, value);
         }
 
         public string PrimaryKeys
         {
-            get => (string)this.Fields[(int)WixSimpleReferenceTupleFields.PrimaryKeys]?.Value;
+            get => (string)this.Fields[(int)WixSimpleReferenceTupleFields.PrimaryKeys];
             set => this.Set((int)WixSimpleReferenceTupleFields.PrimaryKeys, value);
         }
 

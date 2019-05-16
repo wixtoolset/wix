@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string Family
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.Family]?.Value;
+            get => (string)this.Fields[(int)ImageFamiliesTupleFields.Family];
             set => this.Set((int)ImageFamiliesTupleFields.Family, value);
         }
 
         public string MediaSrcPropName
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.MediaSrcPropName]?.Value;
+            get => (string)this.Fields[(int)ImageFamiliesTupleFields.MediaSrcPropName];
             set => this.Set((int)ImageFamiliesTupleFields.MediaSrcPropName, value);
         }
 
         public int MediaDiskId
         {
-            get => (int)this.Fields[(int)ImageFamiliesTupleFields.MediaDiskId]?.Value;
+            get => (int)this.Fields[(int)ImageFamiliesTupleFields.MediaDiskId];
             set => this.Set((int)ImageFamiliesTupleFields.MediaDiskId, value);
         }
 
         public int FileSequenceStart
         {
-            get => (int)this.Fields[(int)ImageFamiliesTupleFields.FileSequenceStart]?.Value;
+            get => (int)this.Fields[(int)ImageFamiliesTupleFields.FileSequenceStart];
             set => this.Set((int)ImageFamiliesTupleFields.FileSequenceStart, value);
         }
 
         public string DiskPrompt
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.DiskPrompt]?.Value;
+            get => (string)this.Fields[(int)ImageFamiliesTupleFields.DiskPrompt];
             set => this.Set((int)ImageFamiliesTupleFields.DiskPrompt, value);
         }
 
         public string VolumeLabel
         {
-            get => (string)this.Fields[(int)ImageFamiliesTupleFields.VolumeLabel]?.Value;
+            get => (string)this.Fields[(int)ImageFamiliesTupleFields.VolumeLabel];
             set => this.Set((int)ImageFamiliesTupleFields.VolumeLabel, value);
         }
     }

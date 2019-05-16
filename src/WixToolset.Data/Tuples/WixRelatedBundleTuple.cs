@@ -47,7 +47,7 @@ namespace WixToolset.Data.Tuples
 
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixRelatedBundleTupleFields.BundleId]?.Value;
+            get => (string)this.Fields[(int)WixRelatedBundleTupleFields.BundleId];
             set => this.Set((int)WixRelatedBundleTupleFields.BundleId, value);
         }
 

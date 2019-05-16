@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string PatchFamily
         {
-            get => (string)this.Fields[(int)PatchSequenceTupleFields.PatchFamily]?.Value;
+            get => (string)this.Fields[(int)PatchSequenceTupleFields.PatchFamily];
             set => this.Set((int)PatchSequenceTupleFields.PatchFamily, value);
         }
 
         public string Target
         {
-            get => (string)this.Fields[(int)PatchSequenceTupleFields.Target]?.Value;
+            get => (string)this.Fields[(int)PatchSequenceTupleFields.Target];
             set => this.Set((int)PatchSequenceTupleFields.Target, value);
         }
 
         public string Sequence
         {
-            get => (string)this.Fields[(int)PatchSequenceTupleFields.Sequence]?.Value;
+            get => (string)this.Fields[(int)PatchSequenceTupleFields.Sequence];
             set => this.Set((int)PatchSequenceTupleFields.Sequence, value);
         }
 
         public int Supersede
         {
-            get => (int)this.Fields[(int)PatchSequenceTupleFields.Supersede]?.Value;
+            get => (int)this.Fields[(int)PatchSequenceTupleFields.Supersede];
             set => this.Set((int)PatchSequenceTupleFields.Supersede, value);
         }
     }

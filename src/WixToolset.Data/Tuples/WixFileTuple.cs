@@ -97,37 +97,37 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)WixFileTupleFields.File_];
             set => this.Set((int)WixFileTupleFields.File_, value);
         }
 
         public FileAssemblyType AssemblyType
         {
-            get => (FileAssemblyType)(int)this.Fields[(int)WixFileTupleFields.AssemblyType]?.Value;
+            get => (FileAssemblyType)(int)this.Fields[(int)WixFileTupleFields.AssemblyType];
             set => this.Set((int)WixFileTupleFields.AssemblyType, (int)value);
         }
 
         public string File_AssemblyManifest
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.File_AssemblyManifest]?.Value;
+            get => (string)this.Fields[(int)WixFileTupleFields.File_AssemblyManifest];
             set => this.Set((int)WixFileTupleFields.File_AssemblyManifest, value);
         }
 
         public string File_AssemblyApplication
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.File_AssemblyApplication]?.Value;
+            get => (string)this.Fields[(int)WixFileTupleFields.File_AssemblyApplication];
             set => this.Set((int)WixFileTupleFields.File_AssemblyApplication, value);
         }
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)WixFileTupleFields.Directory_];
             set => this.Set((int)WixFileTupleFields.Directory_, value);
         }
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)WixFileTupleFields.DiskId]?.Value;
+            get => (int)this.Fields[(int)WixFileTupleFields.DiskId];
             set => this.Set((int)WixFileTupleFields.DiskId, value);
         }
 
@@ -139,31 +139,31 @@ namespace WixToolset.Data.Tuples
 
         public string ProcessorArchitecture
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.ProcessorArchitecture]?.Value;
+            get => (string)this.Fields[(int)WixFileTupleFields.ProcessorArchitecture];
             set => this.Set((int)WixFileTupleFields.ProcessorArchitecture, value);
         }
 
         public int PatchGroup
         {
-            get => (int)this.Fields[(int)WixFileTupleFields.PatchGroup]?.Value;
+            get => (int)this.Fields[(int)WixFileTupleFields.PatchGroup];
             set => this.Set((int)WixFileTupleFields.PatchGroup, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixFileTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixFileTupleFields.Attributes];
             set => this.Set((int)WixFileTupleFields.Attributes, value);
         }
 
         public PatchAttributeType PatchAttributes
         {
-            get => (PatchAttributeType)(int)this.Fields[(int)WixFileTupleFields.PatchAttributes]?.Value;
+            get => (PatchAttributeType)(int)this.Fields[(int)WixFileTupleFields.PatchAttributes];
             set => this.Set((int)WixFileTupleFields.PatchAttributes, (int)value);
         }
 
         public string DeltaPatchHeaderSource
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.DeltaPatchHeaderSource]?.Value;
+            get => (string)this.Fields[(int)WixFileTupleFields.DeltaPatchHeaderSource];
             set => this.Set((int)WixFileTupleFields.DeltaPatchHeaderSource, value);
         }
     }

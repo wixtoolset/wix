@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)CreateFolderTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)CreateFolderTupleFields.Directory_];
             set => this.Set((int)CreateFolderTupleFields.Directory_, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)CreateFolderTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)CreateFolderTupleFields.Component_];
             set => this.Set((int)CreateFolderTupleFields.Component_, value);
         }
     }

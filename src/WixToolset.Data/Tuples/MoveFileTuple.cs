@@ -49,43 +49,43 @@ namespace WixToolset.Data.Tuples
 
         public string FileKey
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.FileKey]?.Value;
+            get => (string)this.Fields[(int)MoveFileTupleFields.FileKey];
             set => this.Set((int)MoveFileTupleFields.FileKey, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)MoveFileTupleFields.Component_];
             set => this.Set((int)MoveFileTupleFields.Component_, value);
         }
 
         public string SourceName
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.SourceName]?.Value;
+            get => (string)this.Fields[(int)MoveFileTupleFields.SourceName];
             set => this.Set((int)MoveFileTupleFields.SourceName, value);
         }
 
         public string DestName
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.DestName]?.Value;
+            get => (string)this.Fields[(int)MoveFileTupleFields.DestName];
             set => this.Set((int)MoveFileTupleFields.DestName, value);
         }
 
         public string SourceFolder
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.SourceFolder]?.Value;
+            get => (string)this.Fields[(int)MoveFileTupleFields.SourceFolder];
             set => this.Set((int)MoveFileTupleFields.SourceFolder, value);
         }
 
         public string DestFolder
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.DestFolder]?.Value;
+            get => (string)this.Fields[(int)MoveFileTupleFields.DestFolder];
             set => this.Set((int)MoveFileTupleFields.DestFolder, value);
         }
 
         public int Options
         {
-            get => (int)this.Fields[(int)MoveFileTupleFields.Options]?.Value;
+            get => (int)this.Fields[(int)MoveFileTupleFields.Options];
             set => this.Set((int)MoveFileTupleFields.Options, value);
         }
     }

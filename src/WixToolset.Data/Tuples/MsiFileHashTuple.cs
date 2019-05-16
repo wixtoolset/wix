@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)MsiFileHashTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)MsiFileHashTupleFields.File_];
             set => this.Set((int)MsiFileHashTupleFields.File_, value);
         }
 
         public int Options
         {
-            get => (int)this.Fields[(int)MsiFileHashTupleFields.Options]?.Value;
+            get => (int)this.Fields[(int)MsiFileHashTupleFields.Options];
             set => this.Set((int)MsiFileHashTupleFields.Options, value);
         }
 
         public int HashPart1
         {
-            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart1]?.Value;
+            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart1];
             set => this.Set((int)MsiFileHashTupleFields.HashPart1, value);
         }
 
         public int HashPart2
         {
-            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart2]?.Value;
+            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart2];
             set => this.Set((int)MsiFileHashTupleFields.HashPart2, value);
         }
 
         public int HashPart3
         {
-            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart3]?.Value;
+            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart3];
             set => this.Set((int)MsiFileHashTupleFields.HashPart3, value);
         }
 
         public int HashPart4
         {
-            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart4]?.Value;
+            get => (int)this.Fields[(int)MsiFileHashTupleFields.HashPart4];
             set => this.Set((int)MsiFileHashTupleFields.HashPart4, value);
         }
     }

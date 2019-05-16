@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Dialog_
         {
-            get => (string)this.Fields[(int)EventMappingTupleFields.Dialog_]?.Value;
+            get => (string)this.Fields[(int)EventMappingTupleFields.Dialog_];
             set => this.Set((int)EventMappingTupleFields.Dialog_, value);
         }
 
         public string Control_
         {
-            get => (string)this.Fields[(int)EventMappingTupleFields.Control_]?.Value;
+            get => (string)this.Fields[(int)EventMappingTupleFields.Control_];
             set => this.Set((int)EventMappingTupleFields.Control_, value);
         }
 
         public string Event
         {
-            get => (string)this.Fields[(int)EventMappingTupleFields.Event]?.Value;
+            get => (string)this.Fields[(int)EventMappingTupleFields.Event];
             set => this.Set((int)EventMappingTupleFields.Event, value);
         }
 
         public string Attribute
         {
-            get => (string)this.Fields[(int)EventMappingTupleFields.Attribute]?.Value;
+            get => (string)this.Fields[(int)EventMappingTupleFields.Attribute];
             set => this.Set((int)EventMappingTupleFields.Attribute, value);
         }
     }

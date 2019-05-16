@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)WixBindUpdatedFilesTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)WixBindUpdatedFilesTupleFields.File_];
             set => this.Set((int)WixBindUpdatedFilesTupleFields.File_, value);
         }
     }

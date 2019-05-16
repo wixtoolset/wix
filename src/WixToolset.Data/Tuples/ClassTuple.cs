@@ -61,73 +61,73 @@ namespace WixToolset.Data.Tuples
 
         public string CLSID
         {
-            get => (string)this.Fields[(int)ClassTupleFields.CLSID]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.CLSID];
             set => this.Set((int)ClassTupleFields.CLSID, value);
         }
 
         public string Context
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Context]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.Context];
             set => this.Set((int)ClassTupleFields.Context, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.Component_];
             set => this.Set((int)ClassTupleFields.Component_, value);
         }
 
         public string ProgId_Default
         {
-            get => (string)this.Fields[(int)ClassTupleFields.ProgId_Default]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.ProgId_Default];
             set => this.Set((int)ClassTupleFields.ProgId_Default, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.Description];
             set => this.Set((int)ClassTupleFields.Description, value);
         }
 
         public string AppId_
         {
-            get => (string)this.Fields[(int)ClassTupleFields.AppId_]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.AppId_];
             set => this.Set((int)ClassTupleFields.AppId_, value);
         }
 
         public string FileTypeMask
         {
-            get => (string)this.Fields[(int)ClassTupleFields.FileTypeMask]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.FileTypeMask];
             set => this.Set((int)ClassTupleFields.FileTypeMask, value);
         }
 
         public string Icon_
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Icon_]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.Icon_];
             set => this.Set((int)ClassTupleFields.Icon_, value);
         }
 
         public int IconIndex
         {
-            get => (int)this.Fields[(int)ClassTupleFields.IconIndex]?.Value;
+            get => (int)this.Fields[(int)ClassTupleFields.IconIndex];
             set => this.Set((int)ClassTupleFields.IconIndex, value);
         }
 
         public string DefInprocHandler
         {
-            get => (string)this.Fields[(int)ClassTupleFields.DefInprocHandler]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.DefInprocHandler];
             set => this.Set((int)ClassTupleFields.DefInprocHandler, value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Argument]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.Argument];
             set => this.Set((int)ClassTupleFields.Argument, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)ClassTupleFields.Feature_];
             set => this.Set((int)ClassTupleFields.Feature_, value);
         }
 

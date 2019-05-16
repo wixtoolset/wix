@@ -60,37 +60,37 @@ namespace WixToolset.Data.Tuples
 
         public SequenceTable SequenceTable
         {
-            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixActionTupleFields.SequenceTable]?.Value);
+            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixActionTupleFields.SequenceTable]);
             set => this.Set((int)WixActionTupleFields.SequenceTable, value.ToString());
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.Action]?.Value;
+            get => (string)this.Fields[(int)WixActionTupleFields.Action];
             set => this.Set((int)WixActionTupleFields.Action, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)WixActionTupleFields.Condition];
             set => this.Set((int)WixActionTupleFields.Condition, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)WixActionTupleFields.Sequence]?.Value;
+            get => (int)this.Fields[(int)WixActionTupleFields.Sequence];
             set => this.Set((int)WixActionTupleFields.Sequence, value);
         }
 
         public string Before
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.Before]?.Value;
+            get => (string)this.Fields[(int)WixActionTupleFields.Before];
             set => this.Set((int)WixActionTupleFields.Before, value);
         }
 
         public string After
         {
-            get => (string)this.Fields[(int)WixActionTupleFields.After]?.Value;
+            get => (string)this.Fields[(int)WixActionTupleFields.After];
             set => this.Set((int)WixActionTupleFields.After, value);
         }
 

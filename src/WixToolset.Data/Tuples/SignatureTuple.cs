@@ -53,55 +53,55 @@ namespace WixToolset.Data.Tuples
 
         public string Signature
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.Signature]?.Value;
+            get => (string)this.Fields[(int)SignatureTupleFields.Signature];
             set => this.Set((int)SignatureTupleFields.Signature, value);
         }
 
         public string FileName
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.FileName]?.Value;
+            get => (string)this.Fields[(int)SignatureTupleFields.FileName];
             set => this.Set((int)SignatureTupleFields.FileName, value);
         }
 
         public string MinVersion
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.MinVersion]?.Value;
+            get => (string)this.Fields[(int)SignatureTupleFields.MinVersion];
             set => this.Set((int)SignatureTupleFields.MinVersion, value);
         }
 
         public string MaxVersion
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.MaxVersion]?.Value;
+            get => (string)this.Fields[(int)SignatureTupleFields.MaxVersion];
             set => this.Set((int)SignatureTupleFields.MaxVersion, value);
         }
 
         public int MinSize
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MinSize]?.Value;
+            get => (int)this.Fields[(int)SignatureTupleFields.MinSize];
             set => this.Set((int)SignatureTupleFields.MinSize, value);
         }
 
         public int MaxSize
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MaxSize]?.Value;
+            get => (int)this.Fields[(int)SignatureTupleFields.MaxSize];
             set => this.Set((int)SignatureTupleFields.MaxSize, value);
         }
 
         public int MinDate
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MinDate]?.Value;
+            get => (int)this.Fields[(int)SignatureTupleFields.MinDate];
             set => this.Set((int)SignatureTupleFields.MinDate, value);
         }
 
         public int MaxDate
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MaxDate]?.Value;
+            get => (int)this.Fields[(int)SignatureTupleFields.MaxDate];
             set => this.Set((int)SignatureTupleFields.MaxDate, value);
         }
 
         public string Languages
         {
-            get => (string)this.Fields[(int)SignatureTupleFields.Languages]?.Value;
+            get => (string)this.Fields[(int)SignatureTupleFields.Languages];
             set => this.Set((int)SignatureTupleFields.Languages, value);
         }
     }

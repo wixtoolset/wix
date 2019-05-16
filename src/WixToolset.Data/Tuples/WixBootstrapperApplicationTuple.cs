@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixBootstrapperApplicationTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixBootstrapperApplicationTupleFields.Id];
             set => this.Set((int)WixBootstrapperApplicationTupleFields.Id, value);
         }
     }

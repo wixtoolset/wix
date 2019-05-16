@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Table];
             set => this.Set((int)ModuleSubstitutionTupleFields.Table, value);
         }
 
         public string Row
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Row]?.Value;
+            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Row];
             set => this.Set((int)ModuleSubstitutionTupleFields.Row, value);
         }
 
         public string Column
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Column]?.Value;
+            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Column];
             set => this.Set((int)ModuleSubstitutionTupleFields.Column, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)ModuleSubstitutionTupleFields.Value];
             set => this.Set((int)ModuleSubstitutionTupleFields.Value, value);
         }
     }

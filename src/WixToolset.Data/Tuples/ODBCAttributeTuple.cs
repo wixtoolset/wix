@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string Driver_
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Driver_]?.Value;
+            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Driver_];
             set => this.Set((int)ODBCAttributeTupleFields.Driver_, value);
         }
 
         public string Attribute
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Attribute]?.Value;
+            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Attribute];
             set => this.Set((int)ODBCAttributeTupleFields.Attribute, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Value];
             set => this.Set((int)ODBCAttributeTupleFields.Value, value);
         }
     }

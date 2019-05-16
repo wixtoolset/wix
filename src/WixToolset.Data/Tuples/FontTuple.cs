@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)FontTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)FontTupleFields.File_];
             set => this.Set((int)FontTupleFields.File_, value);
         }
 
         public string FontTitle
         {
-            get => (string)this.Fields[(int)FontTupleFields.FontTitle]?.Value;
+            get => (string)this.Fields[(int)FontTupleFields.FontTitle];
             set => this.Set((int)FontTupleFields.FontTitle, value);
         }
     }

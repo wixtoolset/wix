@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string WixPatchFamilyGroup
         {
-            get => (string)this.Fields[(int)WixPatchFamilyGroupTupleFields.WixPatchFamilyGroup]?.Value;
+            get => (string)this.Fields[(int)WixPatchFamilyGroupTupleFields.WixPatchFamilyGroup];
             set => this.Set((int)WixPatchFamilyGroupTupleFields.WixPatchFamilyGroup, value);
         }
     }

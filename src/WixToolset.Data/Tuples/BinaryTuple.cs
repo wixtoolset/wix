@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Name
         {
-            get => (string)this.Fields[(int)BinaryTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)BinaryTupleFields.Name];
             set => this.Set((int)BinaryTupleFields.Name, value);
         }
 
         public string Data
         {
-            get => (string)this.Fields[(int)BinaryTupleFields.Data]?.Value;
+            get => (string)this.Fields[(int)BinaryTupleFields.Data];
             set => this.Set((int)BinaryTupleFields.Data, value);
         }
     }

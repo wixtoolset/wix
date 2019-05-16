@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Signature_
         {
-            get => (string)this.Fields[(int)RegLocatorTupleFields.Signature_]?.Value;
+            get => (string)this.Fields[(int)RegLocatorTupleFields.Signature_];
             set => this.Set((int)RegLocatorTupleFields.Signature_, value);
         }
 
         public int Root
         {
-            get => (int)this.Fields[(int)RegLocatorTupleFields.Root]?.Value;
+            get => (int)this.Fields[(int)RegLocatorTupleFields.Root];
             set => this.Set((int)RegLocatorTupleFields.Root, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)RegLocatorTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)RegLocatorTupleFields.Key];
             set => this.Set((int)RegLocatorTupleFields.Key, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)RegLocatorTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)RegLocatorTupleFields.Name];
             set => this.Set((int)RegLocatorTupleFields.Name, value);
         }
 
         public int Type
         {
-            get => (int)this.Fields[(int)RegLocatorTupleFields.Type]?.Value;
+            get => (int)this.Fields[(int)RegLocatorTupleFields.Type];
             set => this.Set((int)RegLocatorTupleFields.Type, value);
         }
     }

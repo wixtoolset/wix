@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)ComboBoxTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)ComboBoxTupleFields.Property];
             set => this.Set((int)ComboBoxTupleFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ComboBoxTupleFields.Order]?.Value;
+            get => (int)this.Fields[(int)ComboBoxTupleFields.Order];
             set => this.Set((int)ComboBoxTupleFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ComboBoxTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)ComboBoxTupleFields.Value];
             set => this.Set((int)ComboBoxTupleFields.Value, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ComboBoxTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)ComboBoxTupleFields.Text];
             set => this.Set((int)ComboBoxTupleFields.Text, value);
         }
     }

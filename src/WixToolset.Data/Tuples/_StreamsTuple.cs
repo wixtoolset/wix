@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Name
         {
-            get => (string)this.Fields[(int)_StreamsTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)_StreamsTupleFields.Name];
             set => this.Set((int)_StreamsTupleFields.Name, value);
         }
 
         public string Data
         {
-            get => (string)this.Fields[(int)_StreamsTupleFields.Data]?.Value;
+            get => (string)this.Fields[(int)_StreamsTupleFields.Data];
             set => this.Set((int)_StreamsTupleFields.Data, value);
         }
     }

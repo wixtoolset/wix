@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string ModuleID
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ModuleID]?.Value;
+            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ModuleID];
             set => this.Set((int)ModuleExclusionTupleFields.ModuleID, value);
         }
 
         public int ModuleLanguage
         {
-            get => (int)this.Fields[(int)ModuleExclusionTupleFields.ModuleLanguage]?.Value;
+            get => (int)this.Fields[(int)ModuleExclusionTupleFields.ModuleLanguage];
             set => this.Set((int)ModuleExclusionTupleFields.ModuleLanguage, value);
         }
 
         public string ExcludedID
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedID]?.Value;
+            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedID];
             set => this.Set((int)ModuleExclusionTupleFields.ExcludedID, value);
         }
 
         public int ExcludedLanguage
         {
-            get => (int)this.Fields[(int)ModuleExclusionTupleFields.ExcludedLanguage]?.Value;
+            get => (int)this.Fields[(int)ModuleExclusionTupleFields.ExcludedLanguage];
             set => this.Set((int)ModuleExclusionTupleFields.ExcludedLanguage, value);
         }
 
         public string ExcludedMinVersion
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedMinVersion]?.Value;
+            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedMinVersion];
             set => this.Set((int)ModuleExclusionTupleFields.ExcludedMinVersion, value);
         }
 
         public string ExcludedMaxVersion
         {
-            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedMaxVersion]?.Value;
+            get => (string)this.Fields[(int)ModuleExclusionTupleFields.ExcludedMaxVersion];
             set => this.Set((int)ModuleExclusionTupleFields.ExcludedMaxVersion, value);
         }
     }

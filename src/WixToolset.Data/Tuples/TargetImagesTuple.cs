@@ -49,43 +49,43 @@ namespace WixToolset.Data.Tuples
 
         public string Target
         {
-            get => (string)this.Fields[(int)TargetImagesTupleFields.Target]?.Value;
+            get => (string)this.Fields[(int)TargetImagesTupleFields.Target];
             set => this.Set((int)TargetImagesTupleFields.Target, value);
         }
 
         public string MsiPath
         {
-            get => (string)this.Fields[(int)TargetImagesTupleFields.MsiPath]?.Value;
+            get => (string)this.Fields[(int)TargetImagesTupleFields.MsiPath];
             set => this.Set((int)TargetImagesTupleFields.MsiPath, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)TargetImagesTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)TargetImagesTupleFields.SymbolPaths];
             set => this.Set((int)TargetImagesTupleFields.SymbolPaths, value);
         }
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)TargetImagesTupleFields.Upgraded]?.Value;
+            get => (string)this.Fields[(int)TargetImagesTupleFields.Upgraded];
             set => this.Set((int)TargetImagesTupleFields.Upgraded, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)TargetImagesTupleFields.Order]?.Value;
+            get => (int)this.Fields[(int)TargetImagesTupleFields.Order];
             set => this.Set((int)TargetImagesTupleFields.Order, value);
         }
 
         public string ProductValidateFlags
         {
-            get => (string)this.Fields[(int)TargetImagesTupleFields.ProductValidateFlags]?.Value;
+            get => (string)this.Fields[(int)TargetImagesTupleFields.ProductValidateFlags];
             set => this.Set((int)TargetImagesTupleFields.ProductValidateFlags, value);
         }
 
         public int IgnoreMissingSrcFiles
         {
-            get => (int)this.Fields[(int)TargetImagesTupleFields.IgnoreMissingSrcFiles]?.Value;
+            get => (int)this.Fields[(int)TargetImagesTupleFields.IgnoreMissingSrcFiles];
             set => this.Set((int)TargetImagesTupleFields.IgnoreMissingSrcFiles, value);
         }
     }

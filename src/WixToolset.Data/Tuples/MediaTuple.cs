@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)MediaTupleFields.DiskId]?.Value;
+            get => (int)this.Fields[(int)MediaTupleFields.DiskId];
             set => this.Set((int)MediaTupleFields.DiskId, value);
         }
 
         public int LastSequence
         {
-            get => (int)this.Fields[(int)MediaTupleFields.LastSequence]?.Value;
+            get => (int)this.Fields[(int)MediaTupleFields.LastSequence];
             set => this.Set((int)MediaTupleFields.LastSequence, value);
         }
 
         public string DiskPrompt
         {
-            get => (string)this.Fields[(int)MediaTupleFields.DiskPrompt]?.Value;
+            get => (string)this.Fields[(int)MediaTupleFields.DiskPrompt];
             set => this.Set((int)MediaTupleFields.DiskPrompt, value);
         }
 
         public string Cabinet
         {
-            get => (string)this.Fields[(int)MediaTupleFields.Cabinet]?.Value;
+            get => (string)this.Fields[(int)MediaTupleFields.Cabinet];
             set => this.Set((int)MediaTupleFields.Cabinet, value);
         }
 
         public string VolumeLabel
         {
-            get => (string)this.Fields[(int)MediaTupleFields.VolumeLabel]?.Value;
+            get => (string)this.Fields[(int)MediaTupleFields.VolumeLabel];
             set => this.Set((int)MediaTupleFields.VolumeLabel, value);
         }
 
         public string Source
         {
-            get => (string)this.Fields[(int)MediaTupleFields.Source]?.Value;
+            get => (string)this.Fields[(int)MediaTupleFields.Source];
             set => this.Set((int)MediaTupleFields.Source, value);
         }
     }

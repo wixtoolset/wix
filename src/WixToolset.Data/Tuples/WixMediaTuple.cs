@@ -43,19 +43,19 @@ namespace WixToolset.Data.Tuples
 
         public int DiskId_
         {
-            get => (int)this.Fields[(int)WixMediaTupleFields.DiskId_]?.Value;
+            get => (int)this.Fields[(int)WixMediaTupleFields.DiskId_];
             set => this.Set((int)WixMediaTupleFields.DiskId_, value);
         }
 
         public CompressionLevel? CompressionLevel
         {
-            get => Enum.TryParse((string)this.Fields[(int)WixMediaTupleFields.CompressionLevel]?.Value, true, out CompressionLevel value) ? value : (CompressionLevel?)null;
+            get => Enum.TryParse((string)this.Fields[(int)WixMediaTupleFields.CompressionLevel], true, out CompressionLevel value) ? value : (CompressionLevel?)null;
             set => this.Set((int)WixMediaTupleFields.CompressionLevel, value?.ToString());
         }
 
         public string Layout
         {
-            get => (string)this.Fields[(int)WixMediaTupleFields.Layout]?.Value;
+            get => (string)this.Fields[(int)WixMediaTupleFields.Layout];
             set => this.Set((int)WixMediaTupleFields.Layout, value);
         }
     }

@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)AppSearchTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)AppSearchTupleFields.Property];
             set => this.Set((int)AppSearchTupleFields.Property, value);
         }
 
         public string Signature_
         {
-            get => (string)this.Fields[(int)AppSearchTupleFields.Signature_]?.Value;
+            get => (string)this.Fields[(int)AppSearchTupleFields.Signature_];
             set => this.Set((int)AppSearchTupleFields.Signature_, value);
         }
     }

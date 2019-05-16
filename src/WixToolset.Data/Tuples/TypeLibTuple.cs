@@ -51,49 +51,49 @@ namespace WixToolset.Data.Tuples
 
         public string LibID
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.LibID]?.Value;
+            get => (string)this.Fields[(int)TypeLibTupleFields.LibID];
             set => this.Set((int)TypeLibTupleFields.LibID, value);
         }
 
         public int Language
         {
-            get => (int)this.Fields[(int)TypeLibTupleFields.Language]?.Value;
+            get => (int)this.Fields[(int)TypeLibTupleFields.Language];
             set => this.Set((int)TypeLibTupleFields.Language, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)TypeLibTupleFields.Component_];
             set => this.Set((int)TypeLibTupleFields.Component_, value);
         }
 
         public int Version
         {
-            get => (int)this.Fields[(int)TypeLibTupleFields.Version]?.Value;
+            get => (int)this.Fields[(int)TypeLibTupleFields.Version];
             set => this.Set((int)TypeLibTupleFields.Version, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)TypeLibTupleFields.Description];
             set => this.Set((int)TypeLibTupleFields.Description, value);
         }
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)TypeLibTupleFields.Directory_];
             set => this.Set((int)TypeLibTupleFields.Directory_, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)TypeLibTupleFields.Feature_];
             set => this.Set((int)TypeLibTupleFields.Feature_, value);
         }
 
         public int Cost
         {
-            get => (int)this.Fields[(int)TypeLibTupleFields.Cost]?.Value;
+            get => (int)this.Fields[(int)TypeLibTupleFields.Cost];
             set => this.Set((int)TypeLibTupleFields.Cost, value);
         }
     }

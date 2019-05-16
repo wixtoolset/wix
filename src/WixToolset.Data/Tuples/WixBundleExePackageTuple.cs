@@ -57,43 +57,43 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundleExePackageTupleFields.WixBundlePackage_, value);
         }
 
         public WixBundleExePackageAttributes Attributes
         {
-            get => (WixBundleExePackageAttributes)(int)this.Fields[(int)WixBundleExePackageTupleFields.Attributes]?.Value;
+            get => (WixBundleExePackageAttributes)(int)this.Fields[(int)WixBundleExePackageTupleFields.Attributes];
             set => this.Set((int)WixBundleExePackageTupleFields.Attributes, (int)value);
         }
 
         public string DetectCondition
         {
-            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.DetectCondition]?.Value;
+            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.DetectCondition];
             set => this.Set((int)WixBundleExePackageTupleFields.DetectCondition, value);
         }
 
         public string InstallCommand
         {
-            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.InstallCommand]?.Value;
+            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.InstallCommand];
             set => this.Set((int)WixBundleExePackageTupleFields.InstallCommand, value);
         }
 
         public string RepairCommand
         {
-            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.RepairCommand]?.Value;
+            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.RepairCommand];
             set => this.Set((int)WixBundleExePackageTupleFields.RepairCommand, value);
         }
 
         public string UninstallCommand
         {
-            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.UninstallCommand]?.Value;
+            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.UninstallCommand];
             set => this.Set((int)WixBundleExePackageTupleFields.UninstallCommand, value);
         }
 
         public string ExeProtocol
         {
-            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.ExeProtocol]?.Value;
+            get => (string)this.Fields[(int)WixBundleExePackageTupleFields.ExeProtocol];
             set => this.Set((int)WixBundleExePackageTupleFields.ExeProtocol, value);
         }
     }

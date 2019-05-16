@@ -72,37 +72,37 @@ namespace WixToolset.Data.Tuples
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Directory_];
             set => this.Set((int)ShortcutTupleFields.Directory_, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Name];
             set => this.Set((int)ShortcutTupleFields.Name, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Component_];
             set => this.Set((int)ShortcutTupleFields.Component_, value);
         }
 
         public string Target
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Target]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Target];
             set => this.Set((int)ShortcutTupleFields.Target, value);
         }
 
         public string Arguments
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Arguments]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Arguments];
             set => this.Set((int)ShortcutTupleFields.Arguments, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Description];
             set => this.Set((int)ShortcutTupleFields.Description, value);
         }
 
@@ -114,7 +114,7 @@ namespace WixToolset.Data.Tuples
 
         public string Icon_
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Icon_]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.Icon_];
             set => this.Set((int)ShortcutTupleFields.Icon_, value);
         }
 
@@ -132,13 +132,13 @@ namespace WixToolset.Data.Tuples
 
         public string WorkingDirectory
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.WkDir]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.WkDir];
             set => this.Set((int)ShortcutTupleFields.WkDir, value);
         }
 
         public string DisplayResourceDll
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.DisplayResourceDLL]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.DisplayResourceDLL];
             set => this.Set((int)ShortcutTupleFields.DisplayResourceDLL, value);
         }
 
@@ -150,7 +150,7 @@ namespace WixToolset.Data.Tuples
 
         public string DescriptionResourceDll
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.DescriptionResourceDLL]?.Value;
+            get => (string)this.Fields[(int)ShortcutTupleFields.DescriptionResourceDLL];
             set => this.Set((int)ShortcutTupleFields.DescriptionResourceDLL, value);
         }
 

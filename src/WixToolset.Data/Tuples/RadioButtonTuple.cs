@@ -53,55 +53,55 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)RadioButtonTupleFields.Property];
             set => this.Set((int)RadioButtonTupleFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Order]?.Value;
+            get => (int)this.Fields[(int)RadioButtonTupleFields.Order];
             set => this.Set((int)RadioButtonTupleFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)RadioButtonTupleFields.Value];
             set => this.Set((int)RadioButtonTupleFields.Value, value);
         }
 
         public int X
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.X]?.Value;
+            get => (int)this.Fields[(int)RadioButtonTupleFields.X];
             set => this.Set((int)RadioButtonTupleFields.X, value);
         }
 
         public int Y
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Y]?.Value;
+            get => (int)this.Fields[(int)RadioButtonTupleFields.Y];
             set => this.Set((int)RadioButtonTupleFields.Y, value);
         }
 
         public int Width
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Width]?.Value;
+            get => (int)this.Fields[(int)RadioButtonTupleFields.Width];
             set => this.Set((int)RadioButtonTupleFields.Width, value);
         }
 
         public int Height
         {
-            get => (int)this.Fields[(int)RadioButtonTupleFields.Height]?.Value;
+            get => (int)this.Fields[(int)RadioButtonTupleFields.Height];
             set => this.Set((int)RadioButtonTupleFields.Height, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)RadioButtonTupleFields.Text];
             set => this.Set((int)RadioButtonTupleFields.Text, value);
         }
 
         public string Help
         {
-            get => (string)this.Fields[(int)RadioButtonTupleFields.Help]?.Value;
+            get => (string)this.Fields[(int)RadioButtonTupleFields.Help];
             set => this.Set((int)RadioButtonTupleFields.Help, value);
         }
     }

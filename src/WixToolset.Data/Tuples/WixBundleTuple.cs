@@ -81,139 +81,139 @@ namespace WixToolset.Data.Tuples
 
         public string Version
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Version]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Version];
             set => this.Set((int)WixBundleTupleFields.Version, value);
         }
 
         public string Copyright
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Copyright]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Copyright];
             set => this.Set((int)WixBundleTupleFields.Copyright, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Name];
             set => this.Set((int)WixBundleTupleFields.Name, value);
         }
 
         public string AboutUrl
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.AboutUrl]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.AboutUrl];
             set => this.Set((int)WixBundleTupleFields.AboutUrl, value);
         }
 
         public int DisableModify
         {
-            get => (int)this.Fields[(int)WixBundleTupleFields.DisableModify]?.Value;
+            get => (int)this.Fields[(int)WixBundleTupleFields.DisableModify];
             set => this.Set((int)WixBundleTupleFields.DisableModify, value);
         }
 
         public int DisableRemove
         {
-            get => (int)this.Fields[(int)WixBundleTupleFields.DisableRemove]?.Value;
+            get => (int)this.Fields[(int)WixBundleTupleFields.DisableRemove];
             set => this.Set((int)WixBundleTupleFields.DisableRemove, value);
         }
 
         public int DisableRepair
         {
-            get => (int)this.Fields[(int)WixBundleTupleFields.DisableRepair]?.Value;
+            get => (int)this.Fields[(int)WixBundleTupleFields.DisableRepair];
             set => this.Set((int)WixBundleTupleFields.DisableRepair, value);
         }
 
         public string HelpTelephone
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.HelpTelephone]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.HelpTelephone];
             set => this.Set((int)WixBundleTupleFields.HelpTelephone, value);
         }
 
         public string HelpUrl
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.HelpUrl]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.HelpUrl];
             set => this.Set((int)WixBundleTupleFields.HelpUrl, value);
         }
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Manufacturer]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Manufacturer];
             set => this.Set((int)WixBundleTupleFields.Manufacturer, value);
         }
 
         public string UpdateUrl
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.UpdateUrl]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.UpdateUrl];
             set => this.Set((int)WixBundleTupleFields.UpdateUrl, value);
         }
 
         public int Compressed
         {
-            get => (int)this.Fields[(int)WixBundleTupleFields.Compressed]?.Value;
+            get => (int)this.Fields[(int)WixBundleTupleFields.Compressed];
             set => this.Set((int)WixBundleTupleFields.Compressed, value);
         }
 
         public string LogPrefixAndExtension
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.LogPrefixAndExtension]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.LogPrefixAndExtension];
             set => this.Set((int)WixBundleTupleFields.LogPrefixAndExtension, value);
         }
 
         public string IconSourceFile
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.IconSourceFile]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.IconSourceFile];
             set => this.Set((int)WixBundleTupleFields.IconSourceFile, value);
         }
 
         public string SplashScreenSourceFile
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.SplashScreenSourceFile]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.SplashScreenSourceFile];
             set => this.Set((int)WixBundleTupleFields.SplashScreenSourceFile, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Condition];
             set => this.Set((int)WixBundleTupleFields.Condition, value);
         }
 
         public string Tag
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Tag]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Tag];
             set => this.Set((int)WixBundleTupleFields.Tag, value);
         }
 
         public string Platform
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.Platform]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.Platform];
             set => this.Set((int)WixBundleTupleFields.Platform, value);
         }
 
         public string ParentName
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.ParentName]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.ParentName];
             set => this.Set((int)WixBundleTupleFields.ParentName, value);
         }
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.UpgradeCode]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.UpgradeCode];
             set => this.Set((int)WixBundleTupleFields.UpgradeCode, value);
         }
 
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.BundleId]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.BundleId];
             set => this.Set((int)WixBundleTupleFields.BundleId, value);
         }
 
         public string ProviderKey
         {
-            get => (string)this.Fields[(int)WixBundleTupleFields.ProviderKey]?.Value;
+            get => (string)this.Fields[(int)WixBundleTupleFields.ProviderKey];
             set => this.Set((int)WixBundleTupleFields.ProviderKey, value);
         }
 
         public int PerMachine
         {
-            get => (int)this.Fields[(int)WixBundleTupleFields.PerMachine]?.Value;
+            get => (int)this.Fields[(int)WixBundleTupleFields.PerMachine];
             set => this.Set((int)WixBundleTupleFields.PerMachine, value);
         }
     }

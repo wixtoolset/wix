@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string Action
         {
-            get => (string)this.Fields[(int)InstallExecuteSequenceTupleFields.Action]?.Value;
+            get => (string)this.Fields[(int)InstallExecuteSequenceTupleFields.Action];
             set => this.Set((int)InstallExecuteSequenceTupleFields.Action, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)InstallExecuteSequenceTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)InstallExecuteSequenceTupleFields.Condition];
             set => this.Set((int)InstallExecuteSequenceTupleFields.Condition, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)InstallExecuteSequenceTupleFields.Sequence]?.Value;
+            get => (int)this.Fields[(int)InstallExecuteSequenceTupleFields.Sequence];
             set => this.Set((int)InstallExecuteSequenceTupleFields.Sequence, value);
         }
     }

@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string Company
         {
-            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Company]?.Value;
+            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Company];
             set => this.Set((int)MsiPatchMetadataTupleFields.Company, value);
         }
 
         public string Property
         {
-            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Property];
             set => this.Set((int)MsiPatchMetadataTupleFields.Property, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)MsiPatchMetadataTupleFields.Value];
             set => this.Set((int)MsiPatchMetadataTupleFields.Value, value);
         }
     }

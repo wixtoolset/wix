@@ -59,25 +59,25 @@ namespace WixToolset.Data.Tuples
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.UpgradeCode]?.Value;
+            get => (string)this.Fields[(int)UpgradeTupleFields.UpgradeCode];
             set => this.Set((int)UpgradeTupleFields.UpgradeCode, value);
         }
 
         public string VersionMin
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.VersionMin]?.Value;
+            get => (string)this.Fields[(int)UpgradeTupleFields.VersionMin];
             set => this.Set((int)UpgradeTupleFields.VersionMin, value);
         }
 
         public string VersionMax
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.VersionMax]?.Value;
+            get => (string)this.Fields[(int)UpgradeTupleFields.VersionMax];
             set => this.Set((int)UpgradeTupleFields.VersionMax, value);
         }
 
         public string Language
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.Language]?.Value;
+            get => (string)this.Fields[(int)UpgradeTupleFields.Language];
             set => this.Set((int)UpgradeTupleFields.Language, value);
         }
 
@@ -119,13 +119,13 @@ namespace WixToolset.Data.Tuples
 
         public string Remove
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.Remove]?.Value;
+            get => (string)this.Fields[(int)UpgradeTupleFields.Remove];
             set => this.Set((int)UpgradeTupleFields.Remove, value);
         }
 
         public string ActionProperty
         {
-            get => (string)this.Fields[(int)UpgradeTupleFields.ActionProperty]?.Value;
+            get => (string)this.Fields[(int)UpgradeTupleFields.ActionProperty];
             set => this.Set((int)UpgradeTupleFields.ActionProperty, value);
         }
     }

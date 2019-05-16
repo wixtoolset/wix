@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string WixSearch_
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.WixSearch_]?.Value;
+            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.WixSearch_];
             set => this.Set((int)WixRegistrySearchTupleFields.WixSearch_, value);
         }
 
         public int Root
         {
-            get => (int)this.Fields[(int)WixRegistrySearchTupleFields.Root]?.Value;
+            get => (int)this.Fields[(int)WixRegistrySearchTupleFields.Root];
             set => this.Set((int)WixRegistrySearchTupleFields.Root, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.Key];
             set => this.Set((int)WixRegistrySearchTupleFields.Key, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.Value];
             set => this.Set((int)WixRegistrySearchTupleFields.Value, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixRegistrySearchTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixRegistrySearchTupleFields.Attributes];
             set => this.Set((int)WixRegistrySearchTupleFields.Attributes, value);
         }
     }

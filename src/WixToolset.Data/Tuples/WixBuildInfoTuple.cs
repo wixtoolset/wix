@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string WixVersion
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixVersion]?.Value;
+            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixVersion];
             set => this.Set((int)WixBuildInfoTupleFields.WixVersion, value);
         }
 
         public string WixOutputFile
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixOutputFile]?.Value;
+            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixOutputFile];
             set => this.Set((int)WixBuildInfoTupleFields.WixOutputFile, value);
         }
 
         public string WixProjectFile
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixProjectFile]?.Value;
+            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixProjectFile];
             set => this.Set((int)WixBuildInfoTupleFields.WixProjectFile, value);
         }
 
         public string WixPdbFile
         {
-            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixPdbFile]?.Value;
+            get => (string)this.Fields[(int)WixBuildInfoTupleFields.WixPdbFile];
             set => this.Set((int)WixBuildInfoTupleFields.WixPdbFile, value);
         }
     }

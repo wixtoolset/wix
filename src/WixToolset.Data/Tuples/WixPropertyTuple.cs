@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Property_
         {
-            get => (string)this.Fields[(int)WixPropertyTupleFields.Property_]?.Value;
+            get => (string)this.Fields[(int)WixPropertyTupleFields.Property_];
             set => this.Set((int)WixPropertyTupleFields.Property_, value);
         }
 
         public bool Admin
         {
-            get => (bool)this.Fields[(int)WixPropertyTupleFields.Admin]?.Value;
+            get => (bool)this.Fields[(int)WixPropertyTupleFields.Admin];
             set => this.Set((int)WixPropertyTupleFields.Admin, value);
         }
 
         public bool Hidden
         {
-            get => (bool)this.Fields[(int)WixPropertyTupleFields.Hidden]?.Value;
+            get => (bool)this.Fields[(int)WixPropertyTupleFields.Hidden];
             set => this.Set((int)WixPropertyTupleFields.Hidden, value);
         }
 
         public bool Secure
         {
-            get => (bool)this.Fields[(int)WixPropertyTupleFields.Secure]?.Value;
+            get => (bool)this.Fields[(int)WixPropertyTupleFields.Secure];
             set => this.Set((int)WixPropertyTupleFields.Secure, value);
         }
     }

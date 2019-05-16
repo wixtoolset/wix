@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string FileKey
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.FileKey]?.Value;
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.FileKey];
             set => this.Set((int)DuplicateFileTupleFields.FileKey, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.Component_];
             set => this.Set((int)DuplicateFileTupleFields.Component_, value);
         }
 
         public string File_
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.File_];
             set => this.Set((int)DuplicateFileTupleFields.File_, value);
         }
 
         public string DestName
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestName]?.Value;
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestName];
             set => this.Set((int)DuplicateFileTupleFields.DestName, value);
         }
 
         public string DestFolder
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestFolder]?.Value;
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestFolder];
             set => this.Set((int)DuplicateFileTupleFields.DestFolder, value);
         }
     }

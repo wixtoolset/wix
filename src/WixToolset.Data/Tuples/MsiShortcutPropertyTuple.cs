@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string MsiShortcutProperty
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.MsiShortcutProperty]?.Value;
+            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.MsiShortcutProperty];
             set => this.Set((int)MsiShortcutPropertyTupleFields.MsiShortcutProperty, value);
         }
 
         public string Shortcut_
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.Shortcut_]?.Value;
+            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.Shortcut_];
             set => this.Set((int)MsiShortcutPropertyTupleFields.Shortcut_, value);
         }
 
         public string PropertyKey
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.PropertyKey]?.Value;
+            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.PropertyKey];
             set => this.Set((int)MsiShortcutPropertyTupleFields.PropertyKey, value);
         }
 
         public string PropVariantValue
         {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.PropVariantValue]?.Value;
+            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.PropVariantValue];
             set => this.Set((int)MsiShortcutPropertyTupleFields.PropVariantValue, value);
         }
     }

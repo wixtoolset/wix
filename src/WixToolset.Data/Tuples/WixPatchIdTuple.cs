@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixPatchIdTupleFields.ProductCode]?.Value;
+            get => (string)this.Fields[(int)WixPatchIdTupleFields.ProductCode];
             set => this.Set((int)WixPatchIdTupleFields.ProductCode, value);
         }
 
         public string ClientPatchId
         {
-            get => (string)this.Fields[(int)WixPatchIdTupleFields.ClientPatchId]?.Value;
+            get => (string)this.Fields[(int)WixPatchIdTupleFields.ClientPatchId];
             set => this.Set((int)WixPatchIdTupleFields.ClientPatchId, value);
         }
 
         public bool OptimizePatchSizeForLargeFiles
         {
-            get => (bool)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles]?.Value;
+            get => (bool)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles];
             set => this.Set((int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles, value);
         }
 
         public int ApiPatchingSymbolFlags
         {
-            get => (int)this.Fields[(int)WixPatchIdTupleFields.ApiPatchingSymbolFlags]?.Value;
+            get => (int)this.Fields[(int)WixPatchIdTupleFields.ApiPatchingSymbolFlags];
             set => this.Set((int)WixPatchIdTupleFields.ApiPatchingSymbolFlags, value);
         }
     }

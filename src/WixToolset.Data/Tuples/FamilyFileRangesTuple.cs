@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Family
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.Family]?.Value;
+            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.Family];
             set => this.Set((int)FamilyFileRangesTupleFields.Family, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.FTK]?.Value;
+            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.FTK];
             set => this.Set((int)FamilyFileRangesTupleFields.FTK, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.RetainOffsets]?.Value;
+            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.RetainOffsets];
             set => this.Set((int)FamilyFileRangesTupleFields.RetainOffsets, value);
         }
 
         public string RetainLengths
         {
-            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.RetainLengths]?.Value;
+            get => (string)this.Fields[(int)FamilyFileRangesTupleFields.RetainLengths];
             set => this.Set((int)FamilyFileRangesTupleFields.RetainLengths, value);
         }
     }

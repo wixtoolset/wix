@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string PackageId
         {
-            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.PackageId]?.Value;
+            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.PackageId];
             set => this.Set((int)WixBundlePatchTargetCodeTupleFields.PackageId, value);
         }
 
         public string TargetCode
         {
-            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.TargetCode]?.Value;
+            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.TargetCode];
             set => this.Set((int)WixBundlePatchTargetCodeTupleFields.TargetCode, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.Attributes];
             set => this.Set((int)WixBundlePatchTargetCodeTupleFields.Attributes, value);
         }
     }

@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Component_Shared
         {
-            get => (string)this.Fields[(int)IsolatedComponentTupleFields.Component_Shared]?.Value;
+            get => (string)this.Fields[(int)IsolatedComponentTupleFields.Component_Shared];
             set => this.Set((int)IsolatedComponentTupleFields.Component_Shared, value);
         }
 
         public string Component_Application
         {
-            get => (string)this.Fields[(int)IsolatedComponentTupleFields.Component_Application]?.Value;
+            get => (string)this.Fields[(int)IsolatedComponentTupleFields.Component_Application];
             set => this.Set((int)IsolatedComponentTupleFields.Component_Application, value);
         }
     }

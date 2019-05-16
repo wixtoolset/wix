@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string MsiLockPermissionsEx
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.MsiLockPermissionsEx]?.Value;
+            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.MsiLockPermissionsEx];
             set => this.Set((int)MsiLockPermissionsExTupleFields.MsiLockPermissionsEx, value);
         }
 
         public string LockObject
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.LockObject]?.Value;
+            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.LockObject];
             set => this.Set((int)MsiLockPermissionsExTupleFields.LockObject, value);
         }
 
         public string Table
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.Table];
             set => this.Set((int)MsiLockPermissionsExTupleFields.Table, value);
         }
 
         public string SDDLText
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.SDDLText]?.Value;
+            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.SDDLText];
             set => this.Set((int)MsiLockPermissionsExTupleFields.SDDLText, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.Condition];
             set => this.Set((int)MsiLockPermissionsExTupleFields.Condition, value);
         }
     }

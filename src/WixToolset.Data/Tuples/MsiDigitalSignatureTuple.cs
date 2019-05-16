@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.Table];
             set => this.Set((int)MsiDigitalSignatureTupleFields.Table, value);
         }
 
         public string SignObject
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.SignObject]?.Value;
+            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.SignObject];
             set => this.Set((int)MsiDigitalSignatureTupleFields.SignObject, value);
         }
 
         public string DigitalCertificate_
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.DigitalCertificate_]?.Value;
+            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.DigitalCertificate_];
             set => this.Set((int)MsiDigitalSignatureTupleFields.DigitalCertificate_, value);
         }
 
         public string Hash
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.Hash]?.Value;
+            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.Hash];
             set => this.Set((int)MsiDigitalSignatureTupleFields.Hash, value);
         }
     }

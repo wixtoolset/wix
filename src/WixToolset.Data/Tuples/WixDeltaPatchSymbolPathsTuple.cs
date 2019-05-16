@@ -56,19 +56,19 @@ namespace WixToolset.Data.Tuples
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.Id];
             set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.Id, value);
         }
 
         public SymbolPathType Type
         {
-            get => (SymbolPathType)Enum.Parse(typeof(SymbolPathType), (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.Type]?.Value, true);
+            get => (SymbolPathType)Enum.Parse(typeof(SymbolPathType), (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.Type], true);
             set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.Type, value.ToString());
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolPaths];
             set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.SymbolPaths, value);
         }
     }

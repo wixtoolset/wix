@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Driver
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.Driver]?.Value;
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.Driver];
             set => this.Set((int)ODBCDriverTupleFields.Driver, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.Component_];
             set => this.Set((int)ODBCDriverTupleFields.Component_, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.Description];
             set => this.Set((int)ODBCDriverTupleFields.Description, value);
         }
 
         public string File_
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.File_];
             set => this.Set((int)ODBCDriverTupleFields.File_, value);
         }
 
         public string File_Setup
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.File_Setup]?.Value;
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.File_Setup];
             set => this.Set((int)ODBCDriverTupleFields.File_Setup, value);
         }
     }

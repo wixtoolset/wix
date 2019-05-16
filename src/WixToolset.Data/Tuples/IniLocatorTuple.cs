@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string Signature_
         {
-            get => (string)this.Fields[(int)IniLocatorTupleFields.Signature_]?.Value;
+            get => (string)this.Fields[(int)IniLocatorTupleFields.Signature_];
             set => this.Set((int)IniLocatorTupleFields.Signature_, value);
         }
 
         public string FileName
         {
-            get => (string)this.Fields[(int)IniLocatorTupleFields.FileName]?.Value;
+            get => (string)this.Fields[(int)IniLocatorTupleFields.FileName];
             set => this.Set((int)IniLocatorTupleFields.FileName, value);
         }
 
         public string Section
         {
-            get => (string)this.Fields[(int)IniLocatorTupleFields.Section]?.Value;
+            get => (string)this.Fields[(int)IniLocatorTupleFields.Section];
             set => this.Set((int)IniLocatorTupleFields.Section, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)IniLocatorTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)IniLocatorTupleFields.Key];
             set => this.Set((int)IniLocatorTupleFields.Key, value);
         }
 
         public int Field
         {
-            get => (int)this.Fields[(int)IniLocatorTupleFields.Field]?.Value;
+            get => (int)this.Fields[(int)IniLocatorTupleFields.Field];
             set => this.Set((int)IniLocatorTupleFields.Field, value);
         }
 
         public int Type
         {
-            get => (int)this.Fields[(int)IniLocatorTupleFields.Type]?.Value;
+            get => (int)this.Fields[(int)IniLocatorTupleFields.Type];
             set => this.Set((int)IniLocatorTupleFields.Type, value);
         }
     }

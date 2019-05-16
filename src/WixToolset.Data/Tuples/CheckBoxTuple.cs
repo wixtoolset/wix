@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)CheckBoxTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)CheckBoxTupleFields.Property];
             set => this.Set((int)CheckBoxTupleFields.Property, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)CheckBoxTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)CheckBoxTupleFields.Value];
             set => this.Set((int)CheckBoxTupleFields.Value, value);
         }
     }

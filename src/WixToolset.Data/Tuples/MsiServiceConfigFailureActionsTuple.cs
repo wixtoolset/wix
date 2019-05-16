@@ -55,7 +55,7 @@ namespace WixToolset.Data.Tuples
 
         public string Name
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Name];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Name, value);
         }
 
@@ -85,31 +85,31 @@ namespace WixToolset.Data.Tuples
 
         public string RebootMessage
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.RebootMessage]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.RebootMessage];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.RebootMessage, value);
         }
 
         public string Command
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Command]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Command];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Command, value);
         }
 
         public string Actions
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Actions]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Actions];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Actions, value);
         }
 
         public string DelayActions
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.DelayActions]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.DelayActions];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.DelayActions, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Component_];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Component_, value);
         }
     }

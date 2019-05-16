@@ -41,13 +41,13 @@ namespace WixToolset.Data.Tuples
 
         public SequenceTable SequenceTable
         {
-            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixSuppressActionTupleFields.SequenceTable]?.Value);
+            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixSuppressActionTupleFields.SequenceTable]);
             set => this.Set((int)WixSuppressActionTupleFields.SequenceTable, value.ToString());
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)WixSuppressActionTupleFields.Action]?.Value;
+            get => (string)this.Fields[(int)WixSuppressActionTupleFields.Action];
             set => this.Set((int)WixSuppressActionTupleFields.Action, value);
         }
     }

@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixPatchTargetTupleFields.ProductCode]?.Value;
+            get => (string)this.Fields[(int)WixPatchTargetTupleFields.ProductCode];
             set => this.Set((int)WixPatchTargetTupleFields.ProductCode, value);
         }
     }

@@ -55,61 +55,61 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.WixBundlePackage_, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Name];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Name, value);
         }
 
         public int Size
         {
-            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Size]?.Value;
+            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Size];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Size, value);
         }
 
         public string Parent
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Parent]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Parent];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Parent, value);
         }
 
         public string Title
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Title]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Title];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Title, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Description];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Description, value);
         }
 
         public int Display
         {
-            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Display]?.Value;
+            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Display];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Display, value);
         }
 
         public int Level
         {
-            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Level]?.Value;
+            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Level];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Level, value);
         }
 
         public string Directory
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Directory]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.Directory];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Directory, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Attributes];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Attributes, value);
         }
     }

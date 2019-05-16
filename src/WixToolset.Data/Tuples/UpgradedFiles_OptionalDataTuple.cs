@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.Upgraded]?.Value;
+            get => (string)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.Upgraded];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.Upgraded, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.FTK]?.Value;
+            get => (string)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.FTK];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.FTK, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.SymbolPaths];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.SymbolPaths, value);
         }
 
         public int AllowIgnoreOnPatchError
         {
-            get => (int)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError]?.Value;
+            get => (int)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError, value);
         }
 
         public int IncludeWholeFile
         {
-            get => (int)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile]?.Value;
+            get => (int)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile, value);
         }
     }

@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string PatchCertificate
         {
-            get => (string)this.Fields[(int)MsiPatchCertificateTupleFields.PatchCertificate]?.Value;
+            get => (string)this.Fields[(int)MsiPatchCertificateTupleFields.PatchCertificate];
             set => this.Set((int)MsiPatchCertificateTupleFields.PatchCertificate, value);
         }
 
         public string DigitalCertificate_
         {
-            get => (string)this.Fields[(int)MsiPatchCertificateTupleFields.DigitalCertificate_]?.Value;
+            get => (string)this.Fields[(int)MsiPatchCertificateTupleFields.DigitalCertificate_];
             set => this.Set((int)MsiPatchCertificateTupleFields.DigitalCertificate_, value);
         }
     }

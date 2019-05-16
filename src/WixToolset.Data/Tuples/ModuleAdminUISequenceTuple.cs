@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Action
         {
-            get => (string)this.Fields[(int)ModuleAdminUISequenceTupleFields.Action]?.Value;
+            get => (string)this.Fields[(int)ModuleAdminUISequenceTupleFields.Action];
             set => this.Set((int)ModuleAdminUISequenceTupleFields.Action, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)ModuleAdminUISequenceTupleFields.Sequence]?.Value;
+            get => (int)this.Fields[(int)ModuleAdminUISequenceTupleFields.Sequence];
             set => this.Set((int)ModuleAdminUISequenceTupleFields.Sequence, value);
         }
 
         public string BaseAction
         {
-            get => (string)this.Fields[(int)ModuleAdminUISequenceTupleFields.BaseAction]?.Value;
+            get => (string)this.Fields[(int)ModuleAdminUISequenceTupleFields.BaseAction];
             set => this.Set((int)ModuleAdminUISequenceTupleFields.BaseAction, value);
         }
 
         public int After
         {
-            get => (int)this.Fields[(int)ModuleAdminUISequenceTupleFields.After]?.Value;
+            get => (int)this.Fields[(int)ModuleAdminUISequenceTupleFields.After];
             set => this.Set((int)ModuleAdminUISequenceTupleFields.After, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ModuleAdminUISequenceTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)ModuleAdminUISequenceTupleFields.Condition];
             set => this.Set((int)ModuleAdminUISequenceTupleFields.Condition, value);
         }
     }

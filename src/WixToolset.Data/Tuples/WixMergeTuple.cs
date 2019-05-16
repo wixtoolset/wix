@@ -51,49 +51,49 @@ namespace WixToolset.Data.Tuples
 
         public string WixMerge
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.WixMerge]?.Value;
+            get => (string)this.Fields[(int)WixMergeTupleFields.WixMerge];
             set => this.Set((int)WixMergeTupleFields.WixMerge, value);
         }
 
         public int Language
         {
-            get => (int)this.Fields[(int)WixMergeTupleFields.Language]?.Value;
+            get => (int)this.Fields[(int)WixMergeTupleFields.Language];
             set => this.Set((int)WixMergeTupleFields.Language, value);
         }
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)WixMergeTupleFields.Directory_];
             set => this.Set((int)WixMergeTupleFields.Directory_, value);
         }
 
         public string SourceFile
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.SourceFile]?.Value;
+            get => (string)this.Fields[(int)WixMergeTupleFields.SourceFile];
             set => this.Set((int)WixMergeTupleFields.SourceFile, value);
         }
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)WixMergeTupleFields.DiskId]?.Value;
+            get => (int)this.Fields[(int)WixMergeTupleFields.DiskId];
             set => this.Set((int)WixMergeTupleFields.DiskId, value);
         }
 
         public bool? FileCompression
         {
-            get => (bool?)this.Fields[(int)WixMergeTupleFields.FileCompression]?.Value;
+            get => (bool?)this.Fields[(int)WixMergeTupleFields.FileCompression];
             set => this.Set((int)WixMergeTupleFields.FileCompression, value);
         }
 
         public string ConfigurationData
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.ConfigurationData]?.Value;
+            get => (string)this.Fields[(int)WixMergeTupleFields.ConfigurationData];
             set => this.Set((int)WixMergeTupleFields.ConfigurationData, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)WixMergeTupleFields.Feature_];
             set => this.Set((int)WixMergeTupleFields.Feature_, value);
         }
     }

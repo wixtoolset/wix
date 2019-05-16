@@ -57,13 +57,13 @@ namespace WixToolset.Data.Tuples
 
         public string ServiceControl
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.ServiceControl]?.Value;
+            get => (string)this.Fields[(int)ServiceControlTupleFields.ServiceControl];
             set => this.Set((int)ServiceControlTupleFields.ServiceControl, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)ServiceControlTupleFields.Name];
             set => this.Set((int)ServiceControlTupleFields.Name, value);
         }
 
@@ -105,7 +105,7 @@ namespace WixToolset.Data.Tuples
 
         public string Arguments
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.Arguments]?.Value;
+            get => (string)this.Fields[(int)ServiceControlTupleFields.Arguments];
             set => this.Set((int)ServiceControlTupleFields.Arguments, value);
         }
 
@@ -117,7 +117,7 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ServiceControlTupleFields.Component_];
             set => this.Set((int)ServiceControlTupleFields.Component_, value);
         }
     }

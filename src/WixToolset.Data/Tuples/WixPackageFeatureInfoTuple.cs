@@ -55,61 +55,61 @@ namespace WixToolset.Data.Tuples
 
         public string Package
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Package]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Package];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Package, value);
         }
 
         public string Feature
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Feature]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Feature];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Feature, value);
         }
 
         public string Size
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Size]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Size];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Size, value);
         }
 
         public string Parent
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Parent]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Parent];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Parent, value);
         }
 
         public string Title
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Title]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Title];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Title, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Description];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Description, value);
         }
 
         public string Display
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Display]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Display];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Display, value);
         }
 
         public string Level
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Level]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Level];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Level, value);
         }
 
         public string Directory
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Directory]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Directory];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Directory, value);
         }
 
         public string Attributes
         {
-            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Attributes]?.Value;
+            get => (string)this.Fields[(int)WixPackageFeatureInfoTupleFields.Attributes];
             set => this.Set((int)WixPackageFeatureInfoTupleFields.Attributes, value);
         }
     }

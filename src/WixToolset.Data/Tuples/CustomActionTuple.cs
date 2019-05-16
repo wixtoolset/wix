@@ -93,7 +93,7 @@ namespace WixToolset.Data.Tuples
 
         public string Source
         {
-            get => (string)this.Fields[(int)CustomActionTupleFields.Source]?.Value;
+            get => (string)this.Fields[(int)CustomActionTupleFields.Source];
             set => this.Set((int)CustomActionTupleFields.Source, value);
         }
 
@@ -105,7 +105,7 @@ namespace WixToolset.Data.Tuples
 
         public string Target
         {
-            get => (string)this.Fields[(int)CustomActionTupleFields.Target]?.Value;
+            get => (string)this.Fields[(int)CustomActionTupleFields.Target];
             set => this.Set((int)CustomActionTupleFields.Target, value);
         }
 

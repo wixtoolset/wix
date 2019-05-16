@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Signature_
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.Signature_]?.Value;
+            get => (string)this.Fields[(int)DrLocatorTupleFields.Signature_];
             set => this.Set((int)DrLocatorTupleFields.Signature_, value);
         }
 
         public string Parent
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.Parent]?.Value;
+            get => (string)this.Fields[(int)DrLocatorTupleFields.Parent];
             set => this.Set((int)DrLocatorTupleFields.Parent, value);
         }
 
         public string Path
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.Path]?.Value;
+            get => (string)this.Fields[(int)DrLocatorTupleFields.Path];
             set => this.Set((int)DrLocatorTupleFields.Path, value);
         }
 
         public int Depth
         {
-            get => (int)this.Fields[(int)DrLocatorTupleFields.Depth]?.Value;
+            get => (int)this.Fields[(int)DrLocatorTupleFields.Depth];
             set => this.Set((int)DrLocatorTupleFields.Depth, value);
         }
     }

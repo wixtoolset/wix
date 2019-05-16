@@ -51,13 +51,13 @@ namespace WixToolset.Data.Tuples
 
         public string TextStyle
         {
-            get => (string)this.Fields[(int)TextStyleTupleFields.TextStyle]?.Value;
+            get => (string)this.Fields[(int)TextStyleTupleFields.TextStyle];
             set => this.Set((int)TextStyleTupleFields.TextStyle, value);
         }
 
         public string FaceName
         {
-            get => (string)this.Fields[(int)TextStyleTupleFields.FaceName]?.Value;
+            get => (string)this.Fields[(int)TextStyleTupleFields.FaceName];
             set => this.Set((int)TextStyleTupleFields.FaceName, value);
         }
 

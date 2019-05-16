@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string SFPCatalog
         {
-            get => (string)this.Fields[(int)SFPCatalogTupleFields.SFPCatalog]?.Value;
+            get => (string)this.Fields[(int)SFPCatalogTupleFields.SFPCatalog];
             set => this.Set((int)SFPCatalogTupleFields.SFPCatalog, value);
         }
 
         public string Catalog
         {
-            get => (string)this.Fields[(int)SFPCatalogTupleFields.Catalog]?.Value;
+            get => (string)this.Fields[(int)SFPCatalogTupleFields.Catalog];
             set => this.Set((int)SFPCatalogTupleFields.Catalog, value);
         }
 
         public string Dependency
         {
-            get => (string)this.Fields[(int)SFPCatalogTupleFields.Dependency]?.Value;
+            get => (string)this.Fields[(int)SFPCatalogTupleFields.Dependency];
             set => this.Set((int)SFPCatalogTupleFields.Dependency, value);
         }
     }

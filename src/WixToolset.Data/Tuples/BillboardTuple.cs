@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Billboard
         {
-            get => (string)this.Fields[(int)BillboardTupleFields.Billboard]?.Value;
+            get => (string)this.Fields[(int)BillboardTupleFields.Billboard];
             set => this.Set((int)BillboardTupleFields.Billboard, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)BillboardTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)BillboardTupleFields.Feature_];
             set => this.Set((int)BillboardTupleFields.Feature_, value);
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)BillboardTupleFields.Action]?.Value;
+            get => (string)this.Fields[(int)BillboardTupleFields.Action];
             set => this.Set((int)BillboardTupleFields.Action, value);
         }
 
         public int Ordering
         {
-            get => (int)this.Fields[(int)BillboardTupleFields.Ordering]?.Value;
+            get => (int)this.Fields[(int)BillboardTupleFields.Ordering];
             set => this.Set((int)BillboardTupleFields.Ordering, value);
         }
     }

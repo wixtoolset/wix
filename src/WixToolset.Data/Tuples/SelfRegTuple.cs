@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)SelfRegTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)SelfRegTupleFields.File_];
             set => this.Set((int)SelfRegTupleFields.File_, value);
         }
 
         public int Cost
         {
-            get => (int)this.Fields[(int)SelfRegTupleFields.Cost]?.Value;
+            get => (int)this.Fields[(int)SelfRegTupleFields.Cost];
             set => this.Set((int)SelfRegTupleFields.Cost, value);
         }
     }

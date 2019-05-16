@@ -52,19 +52,19 @@ namespace WixToolset.Data.Tuples
 
         public string ChainPackageId
         {
-            get => (string)this.Fields[(int)WixBundlePackageExitCodeTupleFields.ChainPackageId]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageExitCodeTupleFields.ChainPackageId];
             set => this.Set((int)WixBundlePackageExitCodeTupleFields.ChainPackageId, value);
         }
 
         public int Code
         {
-            get => (int)this.Fields[(int)WixBundlePackageExitCodeTupleFields.Code]?.Value;
+            get => (int)this.Fields[(int)WixBundlePackageExitCodeTupleFields.Code];
             set => this.Set((int)WixBundlePackageExitCodeTupleFields.Code, value);
         }
 
         public ExitCodeBehaviorType Behavior
         {
-            get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageExitCodeTupleFields.Behavior]?.Value, true, out ExitCodeBehaviorType value) ? value : ExitCodeBehaviorType.NotSet;
+            get => Enum.TryParse((string)this.Fields[(int)WixBundlePackageExitCodeTupleFields.Behavior], true, out ExitCodeBehaviorType value) ? value : ExitCodeBehaviorType.NotSet;
             set => this.Set((int)WixBundlePackageExitCodeTupleFields.Behavior, value.ToString());
         }
     }

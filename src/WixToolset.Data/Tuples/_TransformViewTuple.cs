@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)_TransformViewTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)_TransformViewTupleFields.Table];
             set => this.Set((int)_TransformViewTupleFields.Table, value);
         }
 
         public string Column
         {
-            get => (string)this.Fields[(int)_TransformViewTupleFields.Column]?.Value;
+            get => (string)this.Fields[(int)_TransformViewTupleFields.Column];
             set => this.Set((int)_TransformViewTupleFields.Column, value);
         }
 
         public string Row
         {
-            get => (string)this.Fields[(int)_TransformViewTupleFields.Row]?.Value;
+            get => (string)this.Fields[(int)_TransformViewTupleFields.Row];
             set => this.Set((int)_TransformViewTupleFields.Row, value);
         }
 
         public string Data
         {
-            get => (string)this.Fields[(int)_TransformViewTupleFields.Data]?.Value;
+            get => (string)this.Fields[(int)_TransformViewTupleFields.Data];
             set => this.Set((int)_TransformViewTupleFields.Data, value);
         }
 
         public string Current
         {
-            get => (string)this.Fields[(int)_TransformViewTupleFields.Current]?.Value;
+            get => (string)this.Fields[(int)_TransformViewTupleFields.Current];
             set => this.Set((int)_TransformViewTupleFields.Current, value);
         }
     }

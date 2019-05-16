@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string Target
         {
-            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.Target]?.Value;
+            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.Target];
             set => this.Set((int)TargetFiles_OptionalDataTupleFields.Target, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.FTK]?.Value;
+            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.FTK];
             set => this.Set((int)TargetFiles_OptionalDataTupleFields.FTK, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.SymbolPaths];
             set => this.Set((int)TargetFiles_OptionalDataTupleFields.SymbolPaths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.IgnoreOffsets]?.Value;
+            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.IgnoreOffsets];
             set => this.Set((int)TargetFiles_OptionalDataTupleFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.IgnoreLengths]?.Value;
+            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.IgnoreLengths];
             set => this.Set((int)TargetFiles_OptionalDataTupleFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.RetainOffsets]?.Value;
+            get => (string)this.Fields[(int)TargetFiles_OptionalDataTupleFields.RetainOffsets];
             set => this.Set((int)TargetFiles_OptionalDataTupleFields.RetainOffsets, value);
         }
     }

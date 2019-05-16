@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.Upgraded]?.Value;
+            get => (string)this.Fields[(int)UpgradedImagesTupleFields.Upgraded];
             set => this.Set((int)UpgradedImagesTupleFields.Upgraded, value);
         }
 
         public string MsiPath
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.MsiPath]?.Value;
+            get => (string)this.Fields[(int)UpgradedImagesTupleFields.MsiPath];
             set => this.Set((int)UpgradedImagesTupleFields.MsiPath, value);
         }
 
         public string PatchMsiPath
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.PatchMsiPath]?.Value;
+            get => (string)this.Fields[(int)UpgradedImagesTupleFields.PatchMsiPath];
             set => this.Set((int)UpgradedImagesTupleFields.PatchMsiPath, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)UpgradedImagesTupleFields.SymbolPaths];
             set => this.Set((int)UpgradedImagesTupleFields.SymbolPaths, value);
         }
 
         public string Family
         {
-            get => (string)this.Fields[(int)UpgradedImagesTupleFields.Family]?.Value;
+            get => (string)this.Fields[(int)UpgradedImagesTupleFields.Family];
             set => this.Set((int)UpgradedImagesTupleFields.Family, value);
         }
     }

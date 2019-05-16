@@ -49,43 +49,43 @@ namespace WixToolset.Data.Tuples
 
         public string AppId
         {
-            get => (string)this.Fields[(int)AppIdTupleFields.AppId]?.Value;
+            get => (string)this.Fields[(int)AppIdTupleFields.AppId];
             set => this.Set((int)AppIdTupleFields.AppId, value);
         }
 
         public string RemoteServerName
         {
-            get => (string)this.Fields[(int)AppIdTupleFields.RemoteServerName]?.Value;
+            get => (string)this.Fields[(int)AppIdTupleFields.RemoteServerName];
             set => this.Set((int)AppIdTupleFields.RemoteServerName, value);
         }
 
         public string LocalService
         {
-            get => (string)this.Fields[(int)AppIdTupleFields.LocalService]?.Value;
+            get => (string)this.Fields[(int)AppIdTupleFields.LocalService];
             set => this.Set((int)AppIdTupleFields.LocalService, value);
         }
 
         public string ServiceParameters
         {
-            get => (string)this.Fields[(int)AppIdTupleFields.ServiceParameters]?.Value;
+            get => (string)this.Fields[(int)AppIdTupleFields.ServiceParameters];
             set => this.Set((int)AppIdTupleFields.ServiceParameters, value);
         }
 
         public string DllSurrogate
         {
-            get => (string)this.Fields[(int)AppIdTupleFields.DllSurrogate]?.Value;
+            get => (string)this.Fields[(int)AppIdTupleFields.DllSurrogate];
             set => this.Set((int)AppIdTupleFields.DllSurrogate, value);
         }
 
-        public int ActivateAtStorage
+        public bool? ActivateAtStorage
         {
-            get => (int)this.Fields[(int)AppIdTupleFields.ActivateAtStorage]?.Value;
+            get => (bool?)this.Fields[(int)AppIdTupleFields.ActivateAtStorage];
             set => this.Set((int)AppIdTupleFields.ActivateAtStorage, value);
         }
 
-        public int RunAsInteractiveUser
+        public bool? RunAsInteractiveUser
         {
-            get => (int)this.Fields[(int)AppIdTupleFields.RunAsInteractiveUser]?.Value;
+            get => (bool?)this.Fields[(int)AppIdTupleFields.RunAsInteractiveUser];
             set => this.Set((int)AppIdTupleFields.RunAsInteractiveUser, value);
         }
     }

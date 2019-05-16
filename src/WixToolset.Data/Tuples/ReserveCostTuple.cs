@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string ReserveKey
         {
-            get => (string)this.Fields[(int)ReserveCostTupleFields.ReserveKey]?.Value;
+            get => (string)this.Fields[(int)ReserveCostTupleFields.ReserveKey];
             set => this.Set((int)ReserveCostTupleFields.ReserveKey, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ReserveCostTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ReserveCostTupleFields.Component_];
             set => this.Set((int)ReserveCostTupleFields.Component_, value);
         }
 
         public string ReserveFolder
         {
-            get => (string)this.Fields[(int)ReserveCostTupleFields.ReserveFolder]?.Value;
+            get => (string)this.Fields[(int)ReserveCostTupleFields.ReserveFolder];
             set => this.Set((int)ReserveCostTupleFields.ReserveFolder, value);
         }
 
         public int ReserveLocal
         {
-            get => (int)this.Fields[(int)ReserveCostTupleFields.ReserveLocal]?.Value;
+            get => (int)this.Fields[(int)ReserveCostTupleFields.ReserveLocal];
             set => this.Set((int)ReserveCostTupleFields.ReserveLocal, value);
         }
 
         public int ReserveSource
         {
-            get => (int)this.Fields[(int)ReserveCostTupleFields.ReserveSource]?.Value;
+            get => (int)this.Fields[(int)ReserveCostTupleFields.ReserveSource];
             set => this.Set((int)ReserveCostTupleFields.ReserveSource, value);
         }
     }

@@ -39,7 +39,7 @@ namespace WixToolset.Data.Tuples
 
         public string ComponentId
         {
-            get => (string)this.Fields[(int)CompLocatorTupleFields.ComponentId]?.Value;
+            get => (string)this.Fields[(int)CompLocatorTupleFields.ComponentId];
             set => this.Set((int)CompLocatorTupleFields.ComponentId, value);
         }
 

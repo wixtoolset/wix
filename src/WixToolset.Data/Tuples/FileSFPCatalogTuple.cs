@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.File_];
             set => this.Set((int)FileSFPCatalogTupleFields.File_, value);
         }
 
         public string SFPCatalog_
         {
-            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.SFPCatalog_]?.Value;
+            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.SFPCatalog_];
             set => this.Set((int)FileSFPCatalogTupleFields.SFPCatalog_, value);
         }
     }

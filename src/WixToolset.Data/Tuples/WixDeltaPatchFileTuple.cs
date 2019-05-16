@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.File_];
             set => this.Set((int)WixDeltaPatchFileTupleFields.File_, value);
         }
 
         public string RetainLengths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.RetainLengths]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.RetainLengths];
             set => this.Set((int)WixDeltaPatchFileTupleFields.RetainLengths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.IgnoreOffsets]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.IgnoreOffsets];
             set => this.Set((int)WixDeltaPatchFileTupleFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.IgnoreLengths]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.IgnoreLengths];
             set => this.Set((int)WixDeltaPatchFileTupleFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.RetainOffsets]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.RetainOffsets];
             set => this.Set((int)WixDeltaPatchFileTupleFields.RetainOffsets, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.SymbolPaths];
             set => this.Set((int)WixDeltaPatchFileTupleFields.SymbolPaths, value);
         }
     }

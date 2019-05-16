@@ -53,55 +53,55 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.WixBundlePackage_, value);
         }
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.Id];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.Id, value);
         }
 
         public string MinVersion
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.MinVersion]?.Value;
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.MinVersion];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.MinVersion, value);
         }
 
         public string MaxVersion
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.MaxVersion]?.Value;
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.MaxVersion];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.MaxVersion, value);
         }
 
         public string Languages
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.Languages]?.Value;
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.Languages];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.Languages, value);
         }
 
         public int MinInclusive
         {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.MinInclusive]?.Value;
+            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.MinInclusive];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.MinInclusive, value);
         }
 
         public int MaxInclusive
         {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.MaxInclusive]?.Value;
+            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.MaxInclusive];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.MaxInclusive, value);
         }
 
         public int LangInclusive
         {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.LangInclusive]?.Value;
+            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.LangInclusive];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.LangInclusive, value);
         }
 
         public int OnlyDetect
         {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.OnlyDetect]?.Value;
+            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.OnlyDetect];
             set => this.Set((int)WixBundleRelatedPackageTupleFields.OnlyDetect, value);
         }
     }

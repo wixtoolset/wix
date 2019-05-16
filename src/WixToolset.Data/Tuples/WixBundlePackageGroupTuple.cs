@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackageGroup
         {
-            get => (string)this.Fields[(int)WixBundlePackageGroupTupleFields.WixBundlePackageGroup]?.Value;
+            get => (string)this.Fields[(int)WixBundlePackageGroupTupleFields.WixBundlePackageGroup];
             set => this.Set((int)WixBundlePackageGroupTupleFields.WixBundlePackageGroup, value);
         }
     }

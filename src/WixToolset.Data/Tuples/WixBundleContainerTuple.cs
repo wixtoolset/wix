@@ -62,49 +62,49 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundleContainer
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.WixBundleContainer]?.Value;
+            get => (string)this.Fields[(int)WixBundleContainerTupleFields.WixBundleContainer];
             set => this.Set((int)WixBundleContainerTupleFields.WixBundleContainer, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)WixBundleContainerTupleFields.Name];
             set => this.Set((int)WixBundleContainerTupleFields.Name, value);
         }
 
         public ContainerType Type
         {
-            get => (ContainerType)Enum.Parse(typeof(ContainerType), (string)this.Fields[(int)WixBundleContainerTupleFields.Type]?.Value, true);
+            get => (ContainerType)Enum.Parse(typeof(ContainerType), (string)this.Fields[(int)WixBundleContainerTupleFields.Type], true);
             set => this.Set((int)WixBundleContainerTupleFields.Type, value.ToString());
         }
 
         public string DownloadUrl
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.DownloadUrl]?.Value;
+            get => (string)this.Fields[(int)WixBundleContainerTupleFields.DownloadUrl];
             set => this.Set((int)WixBundleContainerTupleFields.DownloadUrl, value);
         }
 
         public int Size
         {
-            get => (int)this.Fields[(int)WixBundleContainerTupleFields.Size]?.Value;
+            get => (int)this.Fields[(int)WixBundleContainerTupleFields.Size];
             set => this.Set((int)WixBundleContainerTupleFields.Size, value);
         }
 
         public string Hash
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.Hash]?.Value;
+            get => (string)this.Fields[(int)WixBundleContainerTupleFields.Hash];
             set => this.Set((int)WixBundleContainerTupleFields.Hash, value);
         }
 
         public int AttachedContainerIndex
         {
-            get => (int)this.Fields[(int)WixBundleContainerTupleFields.AttachedContainerIndex]?.Value;
+            get => (int)this.Fields[(int)WixBundleContainerTupleFields.AttachedContainerIndex];
             set => this.Set((int)WixBundleContainerTupleFields.AttachedContainerIndex, value);
         }
 
         public string WorkingPath
         {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.WorkingPath]?.Value;
+            get => (string)this.Fields[(int)WixBundleContainerTupleFields.WorkingPath];
             set => this.Set((int)WixBundleContainerTupleFields.WorkingPath, value);
         }
     }

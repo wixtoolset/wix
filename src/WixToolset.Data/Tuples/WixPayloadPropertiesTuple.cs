@@ -49,43 +49,43 @@ namespace WixToolset.Data.Tuples
 
         public string Payload
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Payload]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Payload];
             set => this.Set((int)WixPayloadPropertiesTupleFields.Payload, value);
         }
 
         public string Package
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Package]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Package];
             set => this.Set((int)WixPayloadPropertiesTupleFields.Package, value);
         }
 
         public string Container
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Container]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Container];
             set => this.Set((int)WixPayloadPropertiesTupleFields.Container, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Name];
             set => this.Set((int)WixPayloadPropertiesTupleFields.Name, value);
         }
 
         public string Size
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Size]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.Size];
             set => this.Set((int)WixPayloadPropertiesTupleFields.Size, value);
         }
 
         public string DownloadUrl
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.DownloadUrl]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.DownloadUrl];
             set => this.Set((int)WixPayloadPropertiesTupleFields.DownloadUrl, value);
         }
 
         public string LayoutOnly
         {
-            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.LayoutOnly]?.Value;
+            get => (string)this.Fields[(int)WixPayloadPropertiesTupleFields.LayoutOnly];
             set => this.Set((int)WixPayloadPropertiesTupleFields.LayoutOnly, value);
         }
     }

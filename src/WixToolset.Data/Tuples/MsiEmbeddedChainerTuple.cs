@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string MsiEmbeddedChainer
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.MsiEmbeddedChainer]?.Value;
+            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.MsiEmbeddedChainer];
             set => this.Set((int)MsiEmbeddedChainerTupleFields.MsiEmbeddedChainer, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.Condition];
             set => this.Set((int)MsiEmbeddedChainerTupleFields.Condition, value);
         }
 
         public string CommandLine
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.CommandLine]?.Value;
+            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.CommandLine];
             set => this.Set((int)MsiEmbeddedChainerTupleFields.CommandLine, value);
         }
 
         public string Source
         {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.Source]?.Value;
+            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.Source];
             set => this.Set((int)MsiEmbeddedChainerTupleFields.Source, value);
         }
 
         public int Type
         {
-            get => (int)this.Fields[(int)MsiEmbeddedChainerTupleFields.Type]?.Value;
+            get => (int)this.Fields[(int)MsiEmbeddedChainerTupleFields.Type];
             set => this.Set((int)MsiEmbeddedChainerTupleFields.Type, value);
         }
     }

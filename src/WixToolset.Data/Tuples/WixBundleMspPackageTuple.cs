@@ -55,31 +55,31 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundleMspPackageTupleFields.WixBundlePackage_, value);
         }
 
         public WixBundleMspPackageAttributes Attributes
         {
-            get => (WixBundleMspPackageAttributes)(int)this.Fields[(int)WixBundleMspPackageTupleFields.Attributes]?.Value;
+            get => (WixBundleMspPackageAttributes)(int)this.Fields[(int)WixBundleMspPackageTupleFields.Attributes];
             set => this.Set((int)WixBundleMspPackageTupleFields.Attributes, (int)value);
         }
 
         public string PatchCode
         {
-            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.PatchCode]?.Value;
+            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.PatchCode];
             set => this.Set((int)WixBundleMspPackageTupleFields.PatchCode, value);
         }
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.Manufacturer]?.Value;
+            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.Manufacturer];
             set => this.Set((int)WixBundleMspPackageTupleFields.Manufacturer, value);
         }
 
         public string PatchXml
         {
-            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.PatchXml]?.Value;
+            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.PatchXml];
             set => this.Set((int)WixBundleMspPackageTupleFields.PatchXml, value);
         }
     }

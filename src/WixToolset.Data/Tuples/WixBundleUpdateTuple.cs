@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Location
         {
-            get => (string)this.Fields[(int)WixBundleUpdateTupleFields.Location]?.Value;
+            get => (string)this.Fields[(int)WixBundleUpdateTupleFields.Location];
             set => this.Set((int)WixBundleUpdateTupleFields.Location, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixBundleUpdateTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixBundleUpdateTupleFields.Attributes];
             set => this.Set((int)WixBundleUpdateTupleFields.Attributes, value);
         }
     }

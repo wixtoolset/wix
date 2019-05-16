@@ -55,61 +55,61 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.Table];
             set => this.Set((int)_ValidationTupleFields.Table, value);
         }
 
         public string Column
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.Column]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.Column];
             set => this.Set((int)_ValidationTupleFields.Column, value);
         }
 
         public string Nullable
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.Nullable]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.Nullable];
             set => this.Set((int)_ValidationTupleFields.Nullable, value);
         }
 
         public int MinValue
         {
-            get => (int)this.Fields[(int)_ValidationTupleFields.MinValue]?.Value;
+            get => (int)this.Fields[(int)_ValidationTupleFields.MinValue];
             set => this.Set((int)_ValidationTupleFields.MinValue, value);
         }
 
         public int MaxValue
         {
-            get => (int)this.Fields[(int)_ValidationTupleFields.MaxValue]?.Value;
+            get => (int)this.Fields[(int)_ValidationTupleFields.MaxValue];
             set => this.Set((int)_ValidationTupleFields.MaxValue, value);
         }
 
         public string KeyTable
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.KeyTable]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.KeyTable];
             set => this.Set((int)_ValidationTupleFields.KeyTable, value);
         }
 
         public int KeyColumn
         {
-            get => (int)this.Fields[(int)_ValidationTupleFields.KeyColumn]?.Value;
+            get => (int)this.Fields[(int)_ValidationTupleFields.KeyColumn];
             set => this.Set((int)_ValidationTupleFields.KeyColumn, value);
         }
 
         public string Category
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.Category]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.Category];
             set => this.Set((int)_ValidationTupleFields.Category, value);
         }
 
         public string Set
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.Set]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.Set];
             set => this.Set((int)_ValidationTupleFields.Set, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)_ValidationTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)_ValidationTupleFields.Description];
             set => this.Set((int)_ValidationTupleFields.Description, value);
         }
     }

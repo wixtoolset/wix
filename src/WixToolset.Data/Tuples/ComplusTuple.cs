@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ComplusTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ComplusTupleFields.Component_];
             set => this.Set((int)ComplusTupleFields.Component_, value);
         }
 
         public int ExpType
         {
-            get => (int)this.Fields[(int)ComplusTupleFields.ExpType]?.Value;
+            get => (int)this.Fields[(int)ComplusTupleFields.ExpType];
             set => this.Set((int)ComplusTupleFields.ExpType, value);
         }
     }

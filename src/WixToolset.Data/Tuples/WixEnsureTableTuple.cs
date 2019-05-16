@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixEnsureTableTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)WixEnsureTableTupleFields.Table];
             set => this.Set((int)WixEnsureTableTupleFields.Table, value);
         }
     }

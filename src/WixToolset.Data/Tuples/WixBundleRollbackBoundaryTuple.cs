@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string WixChainItem_
         {
-            get => (string)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.WixChainItem_]?.Value;
+            get => (string)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.WixChainItem_];
             set => this.Set((int)WixBundleRollbackBoundaryTupleFields.WixChainItem_, value);
         }
 
         public bool? Vital
         {
-            get => (bool?)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.Vital]?.Value;
+            get => (bool?)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.Vital];
             set => this.Set((int)WixBundleRollbackBoundaryTupleFields.Vital, value);
         }
 
         public bool? Transaction
         {
-            get => (bool?)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.Transaction]?.Value;
+            get => (bool?)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.Transaction];
             set => this.Set((int)WixBundleRollbackBoundaryTupleFields.Transaction, value);
         }
     }

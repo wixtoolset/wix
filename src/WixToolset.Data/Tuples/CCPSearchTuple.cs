@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string Signature_
         {
-            get => (string)this.Fields[(int)CCPSearchTupleFields.Signature_]?.Value;
+            get => (string)this.Fields[(int)CCPSearchTupleFields.Signature_];
             set => this.Set((int)CCPSearchTupleFields.Signature_, value);
         }
     }

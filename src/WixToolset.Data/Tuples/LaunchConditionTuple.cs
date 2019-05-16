@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Condition
         {
-            get => (string)this.Fields[(int)LaunchConditionTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)LaunchConditionTupleFields.Condition];
             set => this.Set((int)LaunchConditionTupleFields.Condition, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)LaunchConditionTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)LaunchConditionTupleFields.Description];
             set => this.Set((int)LaunchConditionTupleFields.Description, value);
         }
     }

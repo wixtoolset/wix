@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)ListViewTupleFields.Property];
             set => this.Set((int)ListViewTupleFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ListViewTupleFields.Order]?.Value;
+            get => (int)this.Fields[(int)ListViewTupleFields.Order];
             set => this.Set((int)ListViewTupleFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)ListViewTupleFields.Value];
             set => this.Set((int)ListViewTupleFields.Value, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)ListViewTupleFields.Text];
             set => this.Set((int)ListViewTupleFields.Text, value);
         }
 
         public string Binary_
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Binary_]?.Value;
+            get => (string)this.Fields[(int)ListViewTupleFields.Binary_];
             set => this.Set((int)ListViewTupleFields.Binary_, value);
         }
     }

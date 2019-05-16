@@ -73,25 +73,25 @@ namespace WixToolset.Data.Tuples
 
         public int HCentering
         {
-            get => (int)this.Fields[(int)DialogTupleFields.HCentering]?.Value;
+            get => (int)this.Fields[(int)DialogTupleFields.HCentering];
             set => this.Set((int)DialogTupleFields.HCentering, value);
         }
 
         public int VCentering
         {
-            get => (int)this.Fields[(int)DialogTupleFields.VCentering]?.Value;
+            get => (int)this.Fields[(int)DialogTupleFields.VCentering];
             set => this.Set((int)DialogTupleFields.VCentering, value);
         }
 
         public int Width
         {
-            get => (int)this.Fields[(int)DialogTupleFields.Width]?.Value;
+            get => (int)this.Fields[(int)DialogTupleFields.Width];
             set => this.Set((int)DialogTupleFields.Width, value);
         }
 
         public int Height
         {
-            get => (int)this.Fields[(int)DialogTupleFields.Height]?.Value;
+            get => (int)this.Fields[(int)DialogTupleFields.Height];
             set => this.Set((int)DialogTupleFields.Height, value);
         }
 
@@ -163,25 +163,25 @@ namespace WixToolset.Data.Tuples
 
         public string Title
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Title]?.Value;
+            get => (string)this.Fields[(int)DialogTupleFields.Title];
             set => this.Set((int)DialogTupleFields.Title, value);
         }
 
         public string Control_First
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Control_First]?.Value;
+            get => (string)this.Fields[(int)DialogTupleFields.Control_First];
             set => this.Set((int)DialogTupleFields.Control_First, value);
         }
 
         public string Control_Default
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Control_Default]?.Value;
+            get => (string)this.Fields[(int)DialogTupleFields.Control_Default];
             set => this.Set((int)DialogTupleFields.Control_Default, value);
         }
 
         public string Control_Cancel
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Control_Cancel]?.Value;
+            get => (string)this.Fields[(int)DialogTupleFields.Control_Cancel];
             set => this.Set((int)DialogTupleFields.Control_Cancel, value);
         }
     }

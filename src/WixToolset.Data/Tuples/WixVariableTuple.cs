@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string WixVariable
         {
-            get => (string)this.Fields[(int)WixVariableTupleFields.WixVariable]?.Value;
+            get => (string)this.Fields[(int)WixVariableTupleFields.WixVariable];
             set => this.Set((int)WixVariableTupleFields.WixVariable, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixVariableTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)WixVariableTupleFields.Value];
             set => this.Set((int)WixVariableTupleFields.Value, value);
         }
 
         public bool Overridable
         {
-            get => (bool)this.Fields[(int)WixVariableTupleFields.Overridable]?.Value;
+            get => (bool)this.Fields[(int)WixVariableTupleFields.Overridable];
             set => this.Set((int)WixVariableTupleFields.Overridable, value);
         }
     }

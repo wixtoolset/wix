@@ -45,25 +45,25 @@ namespace WixToolset.Data.Tuples
 
         public string ParentId
         {
-            get => (string)this.Fields[(int)WixGroupTupleFields.ParentId]?.Value;
+            get => (string)this.Fields[(int)WixGroupTupleFields.ParentId];
             set => this.Set((int)WixGroupTupleFields.ParentId, value);
         }
 
         public ComplexReferenceParentType ParentType
         {
-            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixGroupTupleFields.ParentType]?.Value, true);
+            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixGroupTupleFields.ParentType], true);
             set => this.Set((int)WixGroupTupleFields.ParentType, value.ToString());
         }
 
         public string ChildId
         {
-            get => (string)this.Fields[(int)WixGroupTupleFields.ChildId]?.Value;
+            get => (string)this.Fields[(int)WixGroupTupleFields.ChildId];
             set => this.Set((int)WixGroupTupleFields.ChildId, value);
         }
 
         public ComplexReferenceChildType ChildType
         {
-            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixGroupTupleFields.ChildType]?.Value, true);
+            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixGroupTupleFields.ChildType], true);
             set => this.Set((int)WixGroupTupleFields.ChildType, value.ToString());
         }
     }

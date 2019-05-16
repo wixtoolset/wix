@@ -88,13 +88,13 @@ namespace WixToolset.Data.Tuples
 
         public string Name
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.Name];
             set => this.Set((int)ServiceInstallTupleFields.Name, value);
         }
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.DisplayName]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.DisplayName];
             set => this.Set((int)ServiceInstallTupleFields.DisplayName, value);
         }
 
@@ -118,43 +118,43 @@ namespace WixToolset.Data.Tuples
 
         public string LoadOrderGroup
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.LoadOrderGroup]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.LoadOrderGroup];
             set => this.Set((int)ServiceInstallTupleFields.LoadOrderGroup, value);
         }
 
         public string Dependencies
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Dependencies]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.Dependencies];
             set => this.Set((int)ServiceInstallTupleFields.Dependencies, value);
         }
 
         public string StartName
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.StartName]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.StartName];
             set => this.Set((int)ServiceInstallTupleFields.StartName, value);
         }
 
         public string Password
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Password]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.Password];
             set => this.Set((int)ServiceInstallTupleFields.Password, value);
         }
 
         public string Arguments
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Arguments]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.Arguments];
             set => this.Set((int)ServiceInstallTupleFields.Arguments, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.Component_];
             set => this.Set((int)ServiceInstallTupleFields.Component_, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.Description];
             set => this.Set((int)ServiceInstallTupleFields.Description, value);
         }
 

@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.DisplayName]?.Value;
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.DisplayName];
             set => this.Set((int)WixBundlePropertiesTupleFields.DisplayName, value);
         }
 
         public string LogPathVariable
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.LogPathVariable]?.Value;
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.LogPathVariable];
             set => this.Set((int)WixBundlePropertiesTupleFields.LogPathVariable, value);
         }
 
         public string Compressed
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.Compressed]?.Value;
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.Compressed];
             set => this.Set((int)WixBundlePropertiesTupleFields.Compressed, value);
         }
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.Id];
             set => this.Set((int)WixBundlePropertiesTupleFields.Id, value);
         }
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.UpgradeCode]?.Value;
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.UpgradeCode];
             set => this.Set((int)WixBundlePropertiesTupleFields.UpgradeCode, value);
         }
 
         public string PerMachine
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.PerMachine]?.Value;
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.PerMachine];
             set => this.Set((int)WixBundlePropertiesTupleFields.PerMachine, value);
         }
     }

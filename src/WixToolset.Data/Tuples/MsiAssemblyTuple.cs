@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.Component_];
             set => this.Set((int)MsiAssemblyTupleFields.Component_, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.Feature_];
             set => this.Set((int)MsiAssemblyTupleFields.Feature_, value);
         }
 
         public string File_Manifest
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.File_Manifest]?.Value;
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.File_Manifest];
             set => this.Set((int)MsiAssemblyTupleFields.File_Manifest, value);
         }
 
         public string File_Application
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.File_Application]?.Value;
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.File_Application];
             set => this.Set((int)MsiAssemblyTupleFields.File_Application, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)MsiAssemblyTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)MsiAssemblyTupleFields.Attributes];
             set => this.Set((int)MsiAssemblyTupleFields.Attributes, value);
         }
     }

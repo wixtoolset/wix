@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)BindImageTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)BindImageTupleFields.File_];
             set => this.Set((int)BindImageTupleFields.File_, value);
         }
 
         public string Path
         {
-            get => (string)this.Fields[(int)BindImageTupleFields.Path]?.Value;
+            get => (string)this.Fields[(int)BindImageTupleFields.Path];
             set => this.Set((int)BindImageTupleFields.Path, value);
         }
     }

@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string ProgId
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.ProgId]?.Value;
+            get => (string)this.Fields[(int)ProgIdTupleFields.ProgId];
             set => this.Set((int)ProgIdTupleFields.ProgId, value);
         }
 
         public string ProgId_Parent
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.ProgId_Parent]?.Value;
+            get => (string)this.Fields[(int)ProgIdTupleFields.ProgId_Parent];
             set => this.Set((int)ProgIdTupleFields.ProgId_Parent, value);
         }
 
         public string Class_
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.Class_]?.Value;
+            get => (string)this.Fields[(int)ProgIdTupleFields.Class_];
             set => this.Set((int)ProgIdTupleFields.Class_, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ProgIdTupleFields.Description];
             set => this.Set((int)ProgIdTupleFields.Description, value);
         }
 
         public string Icon_
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.Icon_]?.Value;
+            get => (string)this.Fields[(int)ProgIdTupleFields.Icon_];
             set => this.Set((int)ProgIdTupleFields.Icon_, value);
         }
 
         public int IconIndex
         {
-            get => (int)this.Fields[(int)ProgIdTupleFields.IconIndex]?.Value;
+            get => (int)this.Fields[(int)ProgIdTupleFields.IconIndex];
             set => this.Set((int)ProgIdTupleFields.IconIndex, value);
         }
     }

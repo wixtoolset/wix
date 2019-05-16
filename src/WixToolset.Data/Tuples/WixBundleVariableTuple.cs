@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundleVariable
         {
-            get => (string)this.Fields[(int)WixBundleVariableTupleFields.WixBundleVariable]?.Value;
+            get => (string)this.Fields[(int)WixBundleVariableTupleFields.WixBundleVariable];
             set => this.Set((int)WixBundleVariableTupleFields.WixBundleVariable, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixBundleVariableTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)WixBundleVariableTupleFields.Value];
             set => this.Set((int)WixBundleVariableTupleFields.Value, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)WixBundleVariableTupleFields.Type]?.Value;
+            get => (string)this.Fields[(int)WixBundleVariableTupleFields.Type];
             set => this.Set((int)WixBundleVariableTupleFields.Type, value);
         }
 
         public bool Hidden
         {
-            get => (bool)this.Fields[(int)WixBundleVariableTupleFields.Hidden]?.Value;
+            get => (bool)this.Fields[(int)WixBundleVariableTupleFields.Hidden];
             set => this.Set((int)WixBundleVariableTupleFields.Hidden, value);
         }
 
         public bool Persisted
         {
-            get => (bool)this.Fields[(int)WixBundleVariableTupleFields.Persisted]?.Value;
+            get => (bool)this.Fields[(int)WixBundleVariableTupleFields.Persisted];
             set => this.Set((int)WixBundleVariableTupleFields.Persisted, value);
         }
     }

@@ -71,31 +71,31 @@ namespace WixToolset.Data.Tuples
 
         public string Billboard_
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.Billboard_]?.Value;
+            get => (string)this.Fields[(int)BBControlTupleFields.Billboard_];
             set => this.Set((int)BBControlTupleFields.Billboard_, value);
         }
 
         public string BBControl
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.BBControl]?.Value;
+            get => (string)this.Fields[(int)BBControlTupleFields.BBControl];
             set => this.Set((int)BBControlTupleFields.BBControl, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.Type]?.Value;
+            get => (string)this.Fields[(int)BBControlTupleFields.Type];
             set => this.Set((int)BBControlTupleFields.Type, value);
         }
 
         public int X
         {
-            get => (int)this.Fields[(int)BBControlTupleFields.X]?.Value;
+            get => (int)this.Fields[(int)BBControlTupleFields.X];
             set => this.Set((int)BBControlTupleFields.X, value);
         }
 
         public int Y
         {
-            get => (int)this.Fields[(int)BBControlTupleFields.Y]?.Value;
+            get => (int)this.Fields[(int)BBControlTupleFields.Y];
             set => this.Set((int)BBControlTupleFields.Y, value);
         }
 
@@ -107,7 +107,7 @@ namespace WixToolset.Data.Tuples
 
         public int Height
         {
-            get => (int)this.Fields[(int)BBControlTupleFields.Height]?.Value;
+            get => (int)this.Fields[(int)BBControlTupleFields.Height];
             set => this.Set((int)BBControlTupleFields.Height, value);
         }
 
@@ -167,13 +167,13 @@ namespace WixToolset.Data.Tuples
 
         public string Text
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)BBControlTupleFields.Text];
             set => this.Set((int)BBControlTupleFields.Text, value);
         }
 
         public string SourceFile
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.SourceFile]?.Value;
+            get => (string)this.Fields[(int)BBControlTupleFields.SourceFile];
             set => this.Set((int)BBControlTupleFields.SourceFile, value);
         }
     }

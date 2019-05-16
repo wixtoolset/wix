@@ -51,49 +51,49 @@ namespace WixToolset.Data.Tuples
 
         public string RemoveIniFile
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.RemoveIniFile]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.RemoveIniFile];
             set => this.Set((int)RemoveIniFileTupleFields.RemoveIniFile, value);
         }
 
         public string FileName
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.FileName]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.FileName];
             set => this.Set((int)RemoveIniFileTupleFields.FileName, value);
         }
 
         public string DirProperty
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.DirProperty]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.DirProperty];
             set => this.Set((int)RemoveIniFileTupleFields.DirProperty, value);
         }
 
         public string Section
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Section]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Section];
             set => this.Set((int)RemoveIniFileTupleFields.Section, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Key];
             set => this.Set((int)RemoveIniFileTupleFields.Key, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Value];
             set => this.Set((int)RemoveIniFileTupleFields.Value, value);
         }
 
         public int Action
         {
-            get => (int)this.Fields[(int)RemoveIniFileTupleFields.Action]?.Value;
+            get => (int)this.Fields[(int)RemoveIniFileTupleFields.Action];
             set => this.Set((int)RemoveIniFileTupleFields.Action, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Component_];
             set => this.Set((int)RemoveIniFileTupleFields.Component_, value);
         }
     }

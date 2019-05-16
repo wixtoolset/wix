@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string WixPatchBaseline
         {
-            get => (string)this.Fields[(int)WixPatchBaselineTupleFields.WixPatchBaseline]?.Value;
+            get => (string)this.Fields[(int)WixPatchBaselineTupleFields.WixPatchBaseline];
             set => this.Set((int)WixPatchBaselineTupleFields.WixPatchBaseline, value);
         }
 
         public int DiskId
         {
-            get => (int)this.Fields[(int)WixPatchBaselineTupleFields.DiskId]?.Value;
+            get => (int)this.Fields[(int)WixPatchBaselineTupleFields.DiskId];
             set => this.Set((int)WixPatchBaselineTupleFields.DiskId, value);
         }
 
         public int ValidationFlags
         {
-            get => (int)this.Fields[(int)WixPatchBaselineTupleFields.ValidationFlags]?.Value;
+            get => (int)this.Fields[(int)WixPatchBaselineTupleFields.ValidationFlags];
             set => this.Set((int)WixPatchBaselineTupleFields.ValidationFlags, value);
         }
     }

@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)ListBoxTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)ListBoxTupleFields.Property];
             set => this.Set((int)ListBoxTupleFields.Property, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ListBoxTupleFields.Order]?.Value;
+            get => (int)this.Fields[(int)ListBoxTupleFields.Order];
             set => this.Set((int)ListBoxTupleFields.Order, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)ListBoxTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)ListBoxTupleFields.Value];
             set => this.Set((int)ListBoxTupleFields.Value, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ListBoxTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)ListBoxTupleFields.Text];
             set => this.Set((int)ListBoxTupleFields.Text, value);
         }
     }

@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Extension
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.Extension]?.Value;
+            get => (string)this.Fields[(int)ExtensionTupleFields.Extension];
             set => this.Set((int)ExtensionTupleFields.Extension, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ExtensionTupleFields.Component_];
             set => this.Set((int)ExtensionTupleFields.Component_, value);
         }
 
         public string ProgId_
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.ProgId_]?.Value;
+            get => (string)this.Fields[(int)ExtensionTupleFields.ProgId_];
             set => this.Set((int)ExtensionTupleFields.ProgId_, value);
         }
 
         public string MIME_
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.MIME_]?.Value;
+            get => (string)this.Fields[(int)ExtensionTupleFields.MIME_];
             set => this.Set((int)ExtensionTupleFields.MIME_, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)ExtensionTupleFields.Feature_];
             set => this.Set((int)ExtensionTupleFields.Feature_, value);
         }
     }

@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Upgraded
         {
-            get => (string)this.Fields[(int)UpgradedFilesToIgnoreTupleFields.Upgraded]?.Value;
+            get => (string)this.Fields[(int)UpgradedFilesToIgnoreTupleFields.Upgraded];
             set => this.Set((int)UpgradedFilesToIgnoreTupleFields.Upgraded, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)UpgradedFilesToIgnoreTupleFields.FTK]?.Value;
+            get => (string)this.Fields[(int)UpgradedFilesToIgnoreTupleFields.FTK];
             set => this.Set((int)UpgradedFilesToIgnoreTupleFields.FTK, value);
         }
     }

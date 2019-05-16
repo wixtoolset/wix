@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)WixInstanceComponentTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)WixInstanceComponentTupleFields.Component_];
             set => this.Set((int)WixInstanceComponentTupleFields.Component_, value);
         }
     }

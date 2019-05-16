@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Id];
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Id, value);
         }
 
         public string Key
         {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Key];
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Key, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Value];
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Value, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes];
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Attributes, value);
         }
     }

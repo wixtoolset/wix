@@ -72,19 +72,19 @@ namespace WixToolset.Data.Tuples
 
         public string Component
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.Component]?.Value;
+            get => (string)this.Fields[(int)ComponentTupleFields.Component];
             set => this.Set((int)ComponentTupleFields.Component, value);
         }
 
         public string ComponentId
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.ComponentId]?.Value;
+            get => (string)this.Fields[(int)ComponentTupleFields.ComponentId];
             set => this.Set((int)ComponentTupleFields.ComponentId, value);
         }
 
         public string Directory_
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.Directory_]?.Value;
+            get => (string)this.Fields[(int)ComponentTupleFields.Directory_];
             set => this.Set((int)ComponentTupleFields.Directory_, value);
         }
 
@@ -144,13 +144,13 @@ namespace WixToolset.Data.Tuples
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)ComponentTupleFields.Condition];
             set => this.Set((int)ComponentTupleFields.Condition, value);
         }
 
         public string KeyPath
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.KeyPath]?.Value;
+            get => (string)this.Fields[(int)ComponentTupleFields.KeyPath];
             set => this.Set((int)ComponentTupleFields.KeyPath, value);
         }
 

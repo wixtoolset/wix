@@ -51,49 +51,49 @@ namespace WixToolset.Data.Tuples
 
         public string Family
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.Family]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.Family];
             set => this.Set((int)ExternalFilesTupleFields.Family, value);
         }
 
         public string FTK
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.FTK]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.FTK];
             set => this.Set((int)ExternalFilesTupleFields.FTK, value);
         }
 
         public string FilePath
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.FilePath]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.FilePath];
             set => this.Set((int)ExternalFilesTupleFields.FilePath, value);
         }
 
         public string SymbolPaths
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.SymbolPaths]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.SymbolPaths];
             set => this.Set((int)ExternalFilesTupleFields.SymbolPaths, value);
         }
 
         public string IgnoreOffsets
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.IgnoreOffsets]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.IgnoreOffsets];
             set => this.Set((int)ExternalFilesTupleFields.IgnoreOffsets, value);
         }
 
         public string IgnoreLengths
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.IgnoreLengths]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.IgnoreLengths];
             set => this.Set((int)ExternalFilesTupleFields.IgnoreLengths, value);
         }
 
         public string RetainOffsets
         {
-            get => (string)this.Fields[(int)ExternalFilesTupleFields.RetainOffsets]?.Value;
+            get => (string)this.Fields[(int)ExternalFilesTupleFields.RetainOffsets];
             set => this.Set((int)ExternalFilesTupleFields.RetainOffsets, value);
         }
 
         public int Order
         {
-            get => (int)this.Fields[(int)ExternalFilesTupleFields.Order]?.Value;
+            get => (int)this.Fields[(int)ExternalFilesTupleFields.Order];
             set => this.Set((int)ExternalFilesTupleFields.Order, value);
         }
     }

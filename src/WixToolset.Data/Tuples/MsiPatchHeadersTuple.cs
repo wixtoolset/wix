@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string StreamRef
         {
-            get => (string)this.Fields[(int)MsiPatchHeadersTupleFields.StreamRef]?.Value;
+            get => (string)this.Fields[(int)MsiPatchHeadersTupleFields.StreamRef];
             set => this.Set((int)MsiPatchHeadersTupleFields.StreamRef, value);
         }
 
         public string Header
         {
-            get => (string)this.Fields[(int)MsiPatchHeadersTupleFields.Header]?.Value;
+            get => (string)this.Fields[(int)MsiPatchHeadersTupleFields.Header];
             set => this.Set((int)MsiPatchHeadersTupleFields.Header, value);
         }
     }

@@ -71,13 +71,13 @@ namespace WixToolset.Data.Tuples
 
         public string Key
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Key]?.Value;
+            get => (string)this.Fields[(int)RegistryTupleFields.Key];
             set => this.Set((int)RegistryTupleFields.Key, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)RegistryTupleFields.Name];
             set => this.Set((int)RegistryTupleFields.Name, value);
         }
 
@@ -101,7 +101,7 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)RegistryTupleFields.Component_];
             set => this.Set((int)RegistryTupleFields.Component_, value);
         }
     }

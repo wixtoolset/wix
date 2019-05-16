@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Manufacturer]?.Value;
+            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Manufacturer];
             set => this.Set((int)WixUpdateRegistrationTupleFields.Manufacturer, value);
         }
 
         public string Department
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Department]?.Value;
+            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Department];
             set => this.Set((int)WixUpdateRegistrationTupleFields.Department, value);
         }
 
         public string ProductFamily
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.ProductFamily]?.Value;
+            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.ProductFamily];
             set => this.Set((int)WixUpdateRegistrationTupleFields.ProductFamily, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Name];
             set => this.Set((int)WixUpdateRegistrationTupleFields.Name, value);
         }
 
         public string Classification
         {
-            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Classification]?.Value;
+            get => (string)this.Fields[(int)WixUpdateRegistrationTupleFields.Classification];
             set => this.Set((int)WixUpdateRegistrationTupleFields.Classification, value);
         }
     }

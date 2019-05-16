@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string ComponentId
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.ComponentId]?.Value;
+            get => (string)this.Fields[(int)PublishComponentTupleFields.ComponentId];
             set => this.Set((int)PublishComponentTupleFields.ComponentId, value);
         }
 
         public string Qualifier
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.Qualifier]?.Value;
+            get => (string)this.Fields[(int)PublishComponentTupleFields.Qualifier];
             set => this.Set((int)PublishComponentTupleFields.Qualifier, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)PublishComponentTupleFields.Component_];
             set => this.Set((int)PublishComponentTupleFields.Component_, value);
         }
 
         public string AppData
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.AppData]?.Value;
+            get => (string)this.Fields[(int)PublishComponentTupleFields.AppData];
             set => this.Set((int)PublishComponentTupleFields.AppData, value);
         }
 
         public string Feature_
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.Feature_]?.Value;
+            get => (string)this.Fields[(int)PublishComponentTupleFields.Feature_];
             set => this.Set((int)PublishComponentTupleFields.Feature_, value);
         }
     }

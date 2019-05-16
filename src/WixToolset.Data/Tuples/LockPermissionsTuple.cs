@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string LockObject
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.LockObject]?.Value;
+            get => (string)this.Fields[(int)LockPermissionsTupleFields.LockObject];
             set => this.Set((int)LockPermissionsTupleFields.LockObject, value);
         }
 
         public string Table
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)LockPermissionsTupleFields.Table];
             set => this.Set((int)LockPermissionsTupleFields.Table, value);
         }
 
         public string Domain
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.Domain]?.Value;
+            get => (string)this.Fields[(int)LockPermissionsTupleFields.Domain];
             set => this.Set((int)LockPermissionsTupleFields.Domain, value);
         }
 
         public string User
         {
-            get => (string)this.Fields[(int)LockPermissionsTupleFields.User]?.Value;
+            get => (string)this.Fields[(int)LockPermissionsTupleFields.User];
             set => this.Set((int)LockPermissionsTupleFields.User, value);
         }
 
         public int Permission
         {
-            get => (int)this.Fields[(int)LockPermissionsTupleFields.Permission]?.Value;
+            get => (int)this.Fields[(int)LockPermissionsTupleFields.Permission];
             set => this.Set((int)LockPermissionsTupleFields.Permission, value);
         }
     }

@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string WixFragment
         {
-            get => (string)this.Fields[(int)WixFragmentTupleFields.WixFragment]?.Value;
+            get => (string)this.Fields[(int)WixFragmentTupleFields.WixFragment];
             set => this.Set((int)WixFragmentTupleFields.WixFragment, value);
         }
     }

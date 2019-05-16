@@ -59,7 +59,7 @@ namespace WixToolset.Data.Tuples
 
         public string Name
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Name];
             set => this.Set((int)MsiServiceConfigTupleFields.Name, value);
         }
 
@@ -89,13 +89,13 @@ namespace WixToolset.Data.Tuples
 
         public string Argument
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Argument]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Argument];
             set => this.Set((int)MsiServiceConfigTupleFields.Argument, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Component_];
             set => this.Set((int)MsiServiceConfigTupleFields.Component_, value);
         }
     }

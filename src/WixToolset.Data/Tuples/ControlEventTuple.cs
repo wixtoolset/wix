@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string Dialog_
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Dialog_]?.Value;
+            get => (string)this.Fields[(int)ControlEventTupleFields.Dialog_];
             set => this.Set((int)ControlEventTupleFields.Dialog_, value);
         }
 
         public string Control_
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Control_]?.Value;
+            get => (string)this.Fields[(int)ControlEventTupleFields.Control_];
             set => this.Set((int)ControlEventTupleFields.Control_, value);
         }
 
         public string Event
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Event]?.Value;
+            get => (string)this.Fields[(int)ControlEventTupleFields.Event];
             set => this.Set((int)ControlEventTupleFields.Event, value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Argument]?.Value;
+            get => (string)this.Fields[(int)ControlEventTupleFields.Argument];
             set => this.Set((int)ControlEventTupleFields.Argument, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)ControlEventTupleFields.Condition];
             set => this.Set((int)ControlEventTupleFields.Condition, value);
         }
 
         public int Ordering
         {
-            get => (int)this.Fields[(int)ControlEventTupleFields.Ordering]?.Value;
+            get => (int)this.Fields[(int)ControlEventTupleFields.Ordering];
             set => this.Set((int)ControlEventTupleFields.Ordering, value);
         }
     }

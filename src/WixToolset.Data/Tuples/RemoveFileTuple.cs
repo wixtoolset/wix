@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string FileKey
         {
-            get => (string)this.Fields[(int)RemoveFileTupleFields.FileKey]?.Value;
+            get => (string)this.Fields[(int)RemoveFileTupleFields.FileKey];
             set => this.Set((int)RemoveFileTupleFields.FileKey, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)RemoveFileTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)RemoveFileTupleFields.Component_];
             set => this.Set((int)RemoveFileTupleFields.Component_, value);
         }
 
         public string FileName
         {
-            get => (string)this.Fields[(int)RemoveFileTupleFields.FileName]?.Value;
+            get => (string)this.Fields[(int)RemoveFileTupleFields.FileName];
             set => this.Set((int)RemoveFileTupleFields.FileName, value);
         }
 
         public string DirProperty
         {
-            get => (string)this.Fields[(int)RemoveFileTupleFields.DirProperty]?.Value;
+            get => (string)this.Fields[(int)RemoveFileTupleFields.DirProperty];
             set => this.Set((int)RemoveFileTupleFields.DirProperty, value);
         }
 
         public int InstallMode
         {
-            get => (int)this.Fields[(int)RemoveFileTupleFields.InstallMode]?.Value;
+            get => (int)this.Fields[(int)RemoveFileTupleFields.InstallMode];
             set => this.Set((int)RemoveFileTupleFields.InstallMode, value);
         }
     }

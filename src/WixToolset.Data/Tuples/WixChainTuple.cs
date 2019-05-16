@@ -48,7 +48,7 @@ namespace WixToolset.Data.Tuples
 
         public WixChainAttributes Attributes
         {
-            get => (WixChainAttributes)(int)this.Fields[(int)WixChainTupleFields.Attributes]?.Value;
+            get => (WixChainAttributes)(int)this.Fields[(int)WixChainTupleFields.Attributes];
             set => this.Set((int)WixChainTupleFields.Attributes, (int)value);
         }
     }

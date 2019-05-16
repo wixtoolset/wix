@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixCustomRowTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)WixCustomRowTupleFields.Table];
             set => this.Set((int)WixCustomRowTupleFields.Table, value);
         }
 
         public string FieldData
         {
-            get => (string)this.Fields[(int)WixCustomRowTupleFields.FieldData]?.Value;
+            get => (string)this.Fields[(int)WixCustomRowTupleFields.FieldData];
             set => this.Set((int)WixCustomRowTupleFields.FieldData, value);
         }
     }

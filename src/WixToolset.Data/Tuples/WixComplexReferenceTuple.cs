@@ -49,37 +49,37 @@ namespace WixToolset.Data.Tuples
 
         public string Parent
         {
-            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.Parent]?.Value;
+            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.Parent];
             set => this.Set((int)WixComplexReferenceTupleFields.Parent, value);
         }
 
         public ComplexReferenceParentType ParentType
         {
-            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixComplexReferenceTupleFields.ParentAttributes]?.Value, true);
+            get => (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), (string)this.Fields[(int)WixComplexReferenceTupleFields.ParentAttributes], true);
             set => this.Set((int)WixComplexReferenceTupleFields.ParentAttributes, value.ToString());
         }
 
         public string ParentLanguage
         {
-            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.ParentLanguage]?.Value;
+            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.ParentLanguage];
             set => this.Set((int)WixComplexReferenceTupleFields.ParentLanguage, value);
         }
 
         public string Child
         {
-            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.Child]?.Value;
+            get => (string)this.Fields[(int)WixComplexReferenceTupleFields.Child];
             set => this.Set((int)WixComplexReferenceTupleFields.Child, value);
         }
 
         public ComplexReferenceChildType ChildType
         {
-            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixComplexReferenceTupleFields.ChildAttributes]?.Value, true);
+            get => (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), (string)this.Fields[(int)WixComplexReferenceTupleFields.ChildAttributes], true);
             set => this.Set((int)WixComplexReferenceTupleFields.ChildAttributes, value.ToString());
         }
 
         public bool IsPrimary
         {
-            get => (bool)this.Fields[(int)WixComplexReferenceTupleFields.Attributes]?.Value;
+            get => (bool)this.Fields[(int)WixComplexReferenceTupleFields.Attributes];
             set => this.Set((int)WixComplexReferenceTupleFields.Attributes, value);
         }
     }

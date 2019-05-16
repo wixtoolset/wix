@@ -63,85 +63,85 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.Table];
             set => this.Set((int)WixCustomTableTupleFields.Table, value);
         }
 
         public int ColumnCount
         {
-            get => (int)this.Fields[(int)WixCustomTableTupleFields.ColumnCount]?.Value;
+            get => (int)this.Fields[(int)WixCustomTableTupleFields.ColumnCount];
             set => this.Set((int)WixCustomTableTupleFields.ColumnCount, value);
         }
 
         public string ColumnNames
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.ColumnNames]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.ColumnNames];
             set => this.Set((int)WixCustomTableTupleFields.ColumnNames, value);
         }
 
         public string ColumnTypes
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.ColumnTypes]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.ColumnTypes];
             set => this.Set((int)WixCustomTableTupleFields.ColumnTypes, value);
         }
 
         public string PrimaryKeys
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.PrimaryKeys]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.PrimaryKeys];
             set => this.Set((int)WixCustomTableTupleFields.PrimaryKeys, value);
         }
 
         public string MinValues
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.MinValues]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.MinValues];
             set => this.Set((int)WixCustomTableTupleFields.MinValues, value);
         }
 
         public string MaxValues
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.MaxValues]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.MaxValues];
             set => this.Set((int)WixCustomTableTupleFields.MaxValues, value);
         }
 
         public string KeyTables
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.KeyTables]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.KeyTables];
             set => this.Set((int)WixCustomTableTupleFields.KeyTables, value);
         }
 
         public string KeyColumns
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.KeyColumns]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.KeyColumns];
             set => this.Set((int)WixCustomTableTupleFields.KeyColumns, value);
         }
 
         public string Categories
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.Categories]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.Categories];
             set => this.Set((int)WixCustomTableTupleFields.Categories, value);
         }
 
         public string Sets
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.Sets]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.Sets];
             set => this.Set((int)WixCustomTableTupleFields.Sets, value);
         }
 
         public string Descriptions
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.Descriptions]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.Descriptions];
             set => this.Set((int)WixCustomTableTupleFields.Descriptions, value);
         }
 
         public string Modularizations
         {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.Modularizations]?.Value;
+            get => (string)this.Fields[(int)WixCustomTableTupleFields.Modularizations];
             set => this.Set((int)WixCustomTableTupleFields.Modularizations, value);
         }
 
         public int BootstrapperApplicationData
         {
-            get => (int)this.Fields[(int)WixCustomTableTupleFields.BootstrapperApplicationData]?.Value;
+            get => (int)this.Fields[(int)WixCustomTableTupleFields.BootstrapperApplicationData];
             set => this.Set((int)WixCustomTableTupleFields.BootstrapperApplicationData, value);
         }
     }

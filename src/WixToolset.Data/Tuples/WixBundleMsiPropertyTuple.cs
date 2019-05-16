@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundleMsiPropertyTupleFields.WixBundlePackage_, value);
         }
 
         public string Name
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Name];
             set => this.Set((int)WixBundleMsiPropertyTupleFields.Name, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Value];
             set => this.Set((int)WixBundleMsiPropertyTupleFields.Value, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPropertyTupleFields.Condition];
             set => this.Set((int)WixBundleMsiPropertyTupleFields.Condition, value);
         }
     }

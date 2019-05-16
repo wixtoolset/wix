@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Translator
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Translator]?.Value;
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Translator];
             set => this.Set((int)ODBCTranslatorTupleFields.Translator, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Component_];
             set => this.Set((int)ODBCTranslatorTupleFields.Component_, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Description];
             set => this.Set((int)ODBCTranslatorTupleFields.Description, value);
         }
 
         public string File_
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.File_];
             set => this.Set((int)ODBCTranslatorTupleFields.File_, value);
         }
 
         public string File_Setup
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.File_Setup]?.Value;
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.File_Setup];
             set => this.Set((int)ODBCTranslatorTupleFields.File_Setup, value);
         }
     }

@@ -62,49 +62,49 @@ namespace WixToolset.Data.Tuples
 
         public string WixBundlePackage_
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.WixBundlePackage_]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.WixBundlePackage_];
             set => this.Set((int)WixBundleMsiPackageTupleFields.WixBundlePackage_, value);
         }
 
         public WixBundleMsiPackageAttributes Attributes
         {
-            get => (WixBundleMsiPackageAttributes)(int)this.Fields[(int)WixBundleMsiPackageTupleFields.Attributes]?.Value;
+            get => (WixBundleMsiPackageAttributes)(int)this.Fields[(int)WixBundleMsiPackageTupleFields.Attributes];
             set => this.Set((int)WixBundleMsiPackageTupleFields.Attributes, (int)value);
         }
 
         public string ProductCode
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductCode]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductCode];
             set => this.Set((int)WixBundleMsiPackageTupleFields.ProductCode, value);
         }
 
         public string UpgradeCode
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.UpgradeCode]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.UpgradeCode];
             set => this.Set((int)WixBundleMsiPackageTupleFields.UpgradeCode, value);
         }
 
         public string ProductVersion
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductVersion]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductVersion];
             set => this.Set((int)WixBundleMsiPackageTupleFields.ProductVersion, value);
         }
 
         public int ProductLanguage
         {
-            get => (int)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductLanguage]?.Value;
+            get => (int)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductLanguage];
             set => this.Set((int)WixBundleMsiPackageTupleFields.ProductLanguage, value);
         }
 
         public string ProductName
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductName]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.ProductName];
             set => this.Set((int)WixBundleMsiPackageTupleFields.ProductName, value);
         }
 
         public string Manufacturer
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.Manufacturer]?.Value;
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.Manufacturer];
             set => this.Set((int)WixBundleMsiPackageTupleFields.Manufacturer, value);
         }
     }

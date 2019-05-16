@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string WixSuppressModularization
         {
-            get => (string)this.Fields[(int)WixSuppressModularizationTupleFields.WixSuppressModularization]?.Value;
+            get => (string)this.Fields[(int)WixSuppressModularizationTupleFields.WixSuppressModularization];
             set => this.Set((int)WixSuppressModularizationTupleFields.WixSuppressModularization, value);
         }
     }

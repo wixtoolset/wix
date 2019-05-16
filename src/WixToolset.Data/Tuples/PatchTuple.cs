@@ -47,37 +47,37 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)PatchTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)PatchTupleFields.File_];
             set => this.Set((int)PatchTupleFields.File_, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)PatchTupleFields.Sequence]?.Value;
+            get => (int)this.Fields[(int)PatchTupleFields.Sequence];
             set => this.Set((int)PatchTupleFields.Sequence, value);
         }
 
         public int PatchSize
         {
-            get => (int)this.Fields[(int)PatchTupleFields.PatchSize]?.Value;
+            get => (int)this.Fields[(int)PatchTupleFields.PatchSize];
             set => this.Set((int)PatchTupleFields.PatchSize, value);
         }
 
         public int Attributes
         {
-            get => (int)this.Fields[(int)PatchTupleFields.Attributes]?.Value;
+            get => (int)this.Fields[(int)PatchTupleFields.Attributes];
             set => this.Set((int)PatchTupleFields.Attributes, value);
         }
 
         public string Header
         {
-            get => (string)this.Fields[(int)PatchTupleFields.Header]?.Value;
+            get => (string)this.Fields[(int)PatchTupleFields.Header];
             set => this.Set((int)PatchTupleFields.Header, value);
         }
 
         public string StreamRef_
         {
-            get => (string)this.Fields[(int)PatchTupleFields.StreamRef_]?.Value;
+            get => (string)this.Fields[(int)PatchTupleFields.StreamRef_];
             set => this.Set((int)PatchTupleFields.StreamRef_, value);
         }
     }

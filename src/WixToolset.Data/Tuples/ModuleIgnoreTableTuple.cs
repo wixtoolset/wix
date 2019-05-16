@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string Table
         {
-            get => (string)this.Fields[(int)ModuleIgnoreTableTupleFields.Table]?.Value;
+            get => (string)this.Fields[(int)ModuleIgnoreTableTupleFields.Table];
             set => this.Set((int)ModuleIgnoreTableTupleFields.Table, value);
         }
     }

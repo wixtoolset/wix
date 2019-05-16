@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string ModuleID
         {
-            get => (string)this.Fields[(int)ModuleDependencyTupleFields.ModuleID]?.Value;
+            get => (string)this.Fields[(int)ModuleDependencyTupleFields.ModuleID];
             set => this.Set((int)ModuleDependencyTupleFields.ModuleID, value);
         }
 
         public int ModuleLanguage
         {
-            get => (int)this.Fields[(int)ModuleDependencyTupleFields.ModuleLanguage]?.Value;
+            get => (int)this.Fields[(int)ModuleDependencyTupleFields.ModuleLanguage];
             set => this.Set((int)ModuleDependencyTupleFields.ModuleLanguage, value);
         }
 
         public string RequiredID
         {
-            get => (string)this.Fields[(int)ModuleDependencyTupleFields.RequiredID]?.Value;
+            get => (string)this.Fields[(int)ModuleDependencyTupleFields.RequiredID];
             set => this.Set((int)ModuleDependencyTupleFields.RequiredID, value);
         }
 
         public int RequiredLanguage
         {
-            get => (int)this.Fields[(int)ModuleDependencyTupleFields.RequiredLanguage]?.Value;
+            get => (int)this.Fields[(int)ModuleDependencyTupleFields.RequiredLanguage];
             set => this.Set((int)ModuleDependencyTupleFields.RequiredLanguage, value);
         }
 
         public string RequiredVersion
         {
-            get => (string)this.Fields[(int)ModuleDependencyTupleFields.RequiredVersion]?.Value;
+            get => (string)this.Fields[(int)ModuleDependencyTupleFields.RequiredVersion];
             set => this.Set((int)ModuleDependencyTupleFields.RequiredVersion, value);
         }
     }

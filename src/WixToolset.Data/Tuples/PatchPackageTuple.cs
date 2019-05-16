@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string PatchId
         {
-            get => (string)this.Fields[(int)PatchPackageTupleFields.PatchId]?.Value;
+            get => (string)this.Fields[(int)PatchPackageTupleFields.PatchId];
             set => this.Set((int)PatchPackageTupleFields.PatchId, value);
         }
 
         public int Media_
         {
-            get => (int)this.Fields[(int)PatchPackageTupleFields.Media_]?.Value;
+            get => (int)this.Fields[(int)PatchPackageTupleFields.Media_];
             set => this.Set((int)PatchPackageTupleFields.Media_, value);
         }
     }

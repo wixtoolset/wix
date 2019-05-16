@@ -61,79 +61,79 @@ namespace WixToolset.Data.Tuples
 
         public string File
         {
-            get => (string)this.Fields[(int)FileTupleFields.File]?.Value;
+            get => (string)this.Fields[(int)FileTupleFields.File];
             set => this.Set((int)FileTupleFields.File, value);
         }
 
         public string Component_
         {
-            get => (string)this.Fields[(int)FileTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)FileTupleFields.Component_];
             set => this.Set((int)FileTupleFields.Component_, value);
         }
 
         public string ShortFileName
         {
-            get => (string)this.Fields[(int)FileTupleFields.ShortFileName]?.Value;
+            get => (string)this.Fields[(int)FileTupleFields.ShortFileName];
             set => this.Set((int)FileTupleFields.ShortFileName, value);
         }
 
         public string LongFileName
         {
-            get => (string)this.Fields[(int)FileTupleFields.LongFileName]?.Value;
+            get => (string)this.Fields[(int)FileTupleFields.LongFileName];
             set => this.Set((int)FileTupleFields.LongFileName, value);
         }
 
         public int FileSize
         {
-            get => (int)this.Fields[(int)FileTupleFields.FileSize]?.Value;
+            get => (int)this.Fields[(int)FileTupleFields.FileSize];
             set => this.Set((int)FileTupleFields.FileSize, value);
         }
 
         public string Version
         {
-            get => (string)this.Fields[(int)FileTupleFields.Version]?.Value;
+            get => (string)this.Fields[(int)FileTupleFields.Version];
             set => this.Set((int)FileTupleFields.Version, value);
         }
 
         public string Language
         {
-            get => (string)this.Fields[(int)FileTupleFields.Language]?.Value;
+            get => (string)this.Fields[(int)FileTupleFields.Language];
             set => this.Set((int)FileTupleFields.Language, value);
         }
 
         public bool ReadOnly
         {
-            get => (bool)this.Fields[(int)FileTupleFields.ReadOnly]?.Value;
+            get => (bool)this.Fields[(int)FileTupleFields.ReadOnly];
             set => this.Set((int)FileTupleFields.ReadOnly, value);
         }
 
         public bool Hidden
         {
-            get => (bool)this.Fields[(int)FileTupleFields.Hidden]?.Value;
+            get => (bool)this.Fields[(int)FileTupleFields.Hidden];
             set => this.Set((int)FileTupleFields.Hidden, value);
         }
 
         public bool System
         {
-            get => (bool)this.Fields[(int)FileTupleFields.System]?.Value;
+            get => (bool)this.Fields[(int)FileTupleFields.System];
             set => this.Set((int)FileTupleFields.System, value);
         }
 
         public bool Vital
         {
-            get => (bool)this.Fields[(int)FileTupleFields.Vital]?.Value;
+            get => (bool)this.Fields[(int)FileTupleFields.Vital];
             set => this.Set((int)FileTupleFields.Vital, value);
         }
 
         public bool Checksum
         {
-            get => (bool)this.Fields[(int)FileTupleFields.Checksum]?.Value;
+            get => (bool)this.Fields[(int)FileTupleFields.Checksum];
             set => this.Set((int)FileTupleFields.Checksum, value);
         }
 
         public bool? Compressed
         {
-            get => (bool?)this.Fields[(int)FileTupleFields.Compressed]?.Value;
+            get => (bool?)this.Fields[(int)FileTupleFields.Compressed];
             set => this.Set((int)FileTupleFields.Compressed, value);
         }
     }

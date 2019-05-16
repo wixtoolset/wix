@@ -41,19 +41,19 @@ namespace WixToolset.Data.Tuples
 
         public string ModuleID
         {
-            get => (string)this.Fields[(int)ModuleSignatureTupleFields.ModuleID]?.Value;
+            get => (string)this.Fields[(int)ModuleSignatureTupleFields.ModuleID];
             set => this.Set((int)ModuleSignatureTupleFields.ModuleID, value);
         }
 
         public int Language
         {
-            get => (int)this.Fields[(int)ModuleSignatureTupleFields.Language]?.Value;
+            get => (int)this.Fields[(int)ModuleSignatureTupleFields.Language];
             set => this.Set((int)ModuleSignatureTupleFields.Language, value);
         }
 
         public string Version
         {
-            get => (string)this.Fields[(int)ModuleSignatureTupleFields.Version]?.Value;
+            get => (string)this.Fields[(int)ModuleSignatureTupleFields.Version];
             set => this.Set((int)ModuleSignatureTupleFields.Version, value);
         }
     }

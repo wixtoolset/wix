@@ -39,13 +39,13 @@ namespace WixToolset.Data.Tuples
 
         public string File_
         {
-            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.File_]?.Value;
+            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.File_];
             set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.File_, value);
         }
 
         public string Assembly_
         {
-            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.Assembly_]?.Value;
+            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.Assembly_];
             set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.Assembly_, value);
         }
     }

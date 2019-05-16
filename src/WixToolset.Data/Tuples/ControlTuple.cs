@@ -79,43 +79,43 @@ namespace WixToolset.Data.Tuples
 
         public string Dialog_
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Dialog_]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Dialog_];
             set => this.Set((int)ControlTupleFields.Dialog_, value);
         }
 
         public string Control
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Control]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Control];
             set => this.Set((int)ControlTupleFields.Control, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Type]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Type];
             set => this.Set((int)ControlTupleFields.Type, value);
         }
 
         public int X
         {
-            get => (int)this.Fields[(int)ControlTupleFields.X]?.Value;
+            get => (int)this.Fields[(int)ControlTupleFields.X];
             set => this.Set((int)ControlTupleFields.X, value);
         }
 
         public int Y
         {
-            get => (int)this.Fields[(int)ControlTupleFields.Y]?.Value;
+            get => (int)this.Fields[(int)ControlTupleFields.Y];
             set => this.Set((int)ControlTupleFields.Y, value);
         }
 
         public int Width
         {
-            get => (int)this.Fields[(int)ControlTupleFields.Width]?.Value;
+            get => (int)this.Fields[(int)ControlTupleFields.Width];
             set => this.Set((int)ControlTupleFields.Width, value);
         }
 
         public int Height
         {
-            get => (int)this.Fields[(int)ControlTupleFields.Height]?.Value;
+            get => (int)this.Fields[(int)ControlTupleFields.Height];
             set => this.Set((int)ControlTupleFields.Height, value);
         }
 
@@ -266,25 +266,25 @@ namespace WixToolset.Data.Tuples
 
         public string Property
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Property]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Property];
             set => this.Set((int)ControlTupleFields.Property, value);
         }
 
         public string Text
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Text]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Text];
             set => this.Set((int)ControlTupleFields.Text, value);
         }
 
         public string Control_Next
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Control_Next]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Control_Next];
             set => this.Set((int)ControlTupleFields.Control_Next, value);
         }
 
         public string Help
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Help]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.Help];
             set => this.Set((int)ControlTupleFields.Help, value);
         }
 
@@ -296,7 +296,7 @@ namespace WixToolset.Data.Tuples
 
         public string SourceFile
         {
-            get => (string)this.Fields[(int)ControlTupleFields.SourceFile]?.Value;
+            get => (string)this.Fields[(int)ControlTupleFields.SourceFile];
             set => this.Set((int)ControlTupleFields.SourceFile, value);
         }
     }

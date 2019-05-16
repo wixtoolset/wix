@@ -43,25 +43,25 @@ namespace WixToolset.Data.Tuples
 
         public string Dialog_
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Dialog_]?.Value;
+            get => (string)this.Fields[(int)ControlConditionTupleFields.Dialog_];
             set => this.Set((int)ControlConditionTupleFields.Dialog_, value);
         }
 
         public string Control_
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Control_]?.Value;
+            get => (string)this.Fields[(int)ControlConditionTupleFields.Control_];
             set => this.Set((int)ControlConditionTupleFields.Control_, value);
         }
 
         public string Action
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Action]?.Value;
+            get => (string)this.Fields[(int)ControlConditionTupleFields.Action];
             set => this.Set((int)ControlConditionTupleFields.Action, value);
         }
 
         public string Condition
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Condition]?.Value;
+            get => (string)this.Fields[(int)ControlConditionTupleFields.Condition];
             set => this.Set((int)ControlConditionTupleFields.Condition, value);
         }
     }

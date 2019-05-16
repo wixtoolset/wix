@@ -45,31 +45,31 @@ namespace WixToolset.Data.Tuples
 
         public string Extension_
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Extension_]?.Value;
+            get => (string)this.Fields[(int)VerbTupleFields.Extension_];
             set => this.Set((int)VerbTupleFields.Extension_, value);
         }
 
         public string Verb
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Verb]?.Value;
+            get => (string)this.Fields[(int)VerbTupleFields.Verb];
             set => this.Set((int)VerbTupleFields.Verb, value);
         }
 
         public int Sequence
         {
-            get => (int)this.Fields[(int)VerbTupleFields.Sequence]?.Value;
+            get => (int)this.Fields[(int)VerbTupleFields.Sequence];
             set => this.Set((int)VerbTupleFields.Sequence, value);
         }
 
         public string Command
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Command]?.Value;
+            get => (string)this.Fields[(int)VerbTupleFields.Command];
             set => this.Set((int)VerbTupleFields.Command, value);
         }
 
         public string Argument
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Argument]?.Value;
+            get => (string)this.Fields[(int)VerbTupleFields.Argument];
             set => this.Set((int)VerbTupleFields.Argument, value);
         }
     }

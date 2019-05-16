@@ -45,7 +45,7 @@ namespace WixToolset.Data.Tuples
 
         public string FileName
         {
-            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.FileName]?.Value;
+            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.FileName];
             set => this.Set((int)MsiEmbeddedUITupleFields.FileName, value);
         }
 
@@ -63,13 +63,13 @@ namespace WixToolset.Data.Tuples
 
         public int MessageFilter
         {
-            get => (int)this.Fields[(int)MsiEmbeddedUITupleFields.MessageFilter]?.Value;
+            get => (int)this.Fields[(int)MsiEmbeddedUITupleFields.MessageFilter];
             set => this.Set((int)MsiEmbeddedUITupleFields.MessageFilter, value);
         }
 
         public string Source
         {
-            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.Source]?.Value;
+            get => (string)this.Fields[(int)MsiEmbeddedUITupleFields.Source];
             set => this.Set((int)MsiEmbeddedUITupleFields.Source, value);
         }
     }

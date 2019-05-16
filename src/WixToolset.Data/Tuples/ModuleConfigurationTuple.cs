@@ -55,25 +55,25 @@ namespace WixToolset.Data.Tuples
 
         public int Format
         {
-            get => (int)this.Fields[(int)ModuleConfigurationTupleFields.Format]?.Value;
+            get => (int)this.Fields[(int)ModuleConfigurationTupleFields.Format];
             set => this.Set((int)ModuleConfigurationTupleFields.Format, value);
         }
 
         public string Type
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Type]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Type];
             set => this.Set((int)ModuleConfigurationTupleFields.Type, value);
         }
 
         public string ContextData
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.ContextData]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.ContextData];
             set => this.Set((int)ModuleConfigurationTupleFields.ContextData, value);
         }
 
         public string DefaultValue
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.DefaultValue]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.DefaultValue];
             set => this.Set((int)ModuleConfigurationTupleFields.DefaultValue, value);
         }
 
@@ -91,25 +91,25 @@ namespace WixToolset.Data.Tuples
 
         public string DisplayName
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.DisplayName]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.DisplayName];
             set => this.Set((int)ModuleConfigurationTupleFields.DisplayName, value);
         }
 
         public string Description
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Description]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.Description];
             set => this.Set((int)ModuleConfigurationTupleFields.Description, value);
         }
 
         public string HelpLocation
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.HelpLocation]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.HelpLocation];
             set => this.Set((int)ModuleConfigurationTupleFields.HelpLocation, value);
         }
 
         public string HelpKeyword
         {
-            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.HelpKeyword]?.Value;
+            get => (string)this.Fields[(int)ModuleConfigurationTupleFields.HelpKeyword];
             set => this.Set((int)ModuleConfigurationTupleFields.HelpKeyword, value);
         }
     }

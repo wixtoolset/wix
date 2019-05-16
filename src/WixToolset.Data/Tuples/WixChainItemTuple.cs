@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 
         public string Id
         {
-            get => (string)this.Fields[(int)WixChainItemTupleFields.Id]?.Value;
+            get => (string)this.Fields[(int)WixChainItemTupleFields.Id];
             set => this.Set((int)WixChainItemTupleFields.Id, value);
         }
     }

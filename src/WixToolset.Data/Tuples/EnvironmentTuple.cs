@@ -65,19 +65,19 @@ namespace WixToolset.Data.Tuples
 
         public string Name
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Name]?.Value;
+            get => (string)this.Fields[(int)EnvironmentTupleFields.Name];
             set => this.Set((int)EnvironmentTupleFields.Name, value);
         }
 
         public string Value
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)EnvironmentTupleFields.Value];
             set => this.Set((int)EnvironmentTupleFields.Value, value);
         }
 
         public string Separator
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Separator]?.Value;
+            get => (string)this.Fields[(int)EnvironmentTupleFields.Separator];
             set => this.Set((int)EnvironmentTupleFields.Separator, value);
         }
 
@@ -107,7 +107,7 @@ namespace WixToolset.Data.Tuples
 
         public string Component_
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Component_]?.Value;
+            get => (string)this.Fields[(int)EnvironmentTupleFields.Component_];
             set => this.Set((int)EnvironmentTupleFields.Component_, value);
         }
     }
