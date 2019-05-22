@@ -45,6 +45,9 @@ namespace WixToolset.Extensibility.Services
         /// <param name="tableName">Name of table to create row in.</param>
         /// <param name="identifier">Optional identifier for the row.</param>
         /// <returns>New row.</returns>
+        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
+
+        [Obsolete]
         IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
 
         /// <summary>
@@ -55,6 +58,9 @@ namespace WixToolset.Extensibility.Services
         /// <param name="tupleType">Type of tuple to create.</param>
         /// <param name="identifier">Optional identifier for the row.</param>
         /// <returns>New row.</returns>
+        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null);
+
+        [Obsolete]
         IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null);
 
         /// <summary>
@@ -70,6 +76,9 @@ namespace WixToolset.Extensibility.Services
         /// <param name="sourceName">Optional source name for the directory.</param>
         /// <param name="shortSourceName">Optional short source name for the directory.</param>
         /// <returns>Identifier for the newly created row.</returns>
+        Identifier CreateDirectoryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
+
+        [Obsolete]
         Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null);
 
         /// <summary>
@@ -93,6 +102,9 @@ namespace WixToolset.Extensibility.Services
         /// <param name="value">The registry entry value.</param>
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         /// <param name="escapeLeadingHash">If true, "escape" leading '#' characters so the value is written as a REG_SZ.</param>
+        Identifier CreateRegistryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
+
+        [Obsolete]
         Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash);
 
         /// <summary>
@@ -133,6 +145,9 @@ namespace WixToolset.Extensibility.Services
         /// <param name="parentId">Id of the parenet node.</param>
         /// <param name="childType">Complex reference type of child</param>
         /// <param name="childId">Id of the Child Node.</param>
+        void CreateWixGroupTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
+
+        [Obsolete]
         void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
 
         /// <summary>
