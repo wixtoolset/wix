@@ -375,7 +375,7 @@ namespace WixToolset.Core.WindowsInstaller
                     case SequenceTable.AdminUISequence:
                         sequenceElement = new Wix.AdminUISequence();
                         break;
-                    case SequenceTable.AdvtExecuteSequence:
+                    case SequenceTable.AdvertiseExecuteSequence:
                         sequenceElement = new Wix.AdvertiseExecuteSequence();
                         break;
                     case SequenceTable.InstallExecuteSequence:

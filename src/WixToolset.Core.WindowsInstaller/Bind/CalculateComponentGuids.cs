@@ -81,25 +81,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             // If the directory Id already exists, we will skip it here since
                             // checking for duplicate primary keys is done later when importing tables
                             // into database
-                            if (targetPathsByDirectoryId.ContainsKey(row.Directory))
+                            if (targetPathsByDirectoryId.ContainsKey(row.Id.Id))
                             {
                                 continue;
                             }
 
                             var targetName = Common.GetName(row.DefaultDir, false, true);
-                            targetPathsByDirectoryId.Add(row.Directory, new ResolvedDirectory(row.Directory_Parent, targetName));
+                            targetPathsByDirectoryId.Add(row.Id.Id, new ResolvedDirectory(row.Directory_Parent, targetName));
                         }
                     }
 
                     // If the component id generation seeds have not been indexed
-                    // from the WixDirectory table do that now.
+                    // from the Directory tuples do that now.
                     if (componentIdGenSeeds is null)
                     {
-                        // If there are any WixDirectory rows, build up the Component Guid
+                        // If there are any Directory tuples, build up the Component Guid
                         // generation seeds indexed by Directory/@Id.
-                        componentIdGenSeeds = this.Section.Tuples.OfType<WixDirectoryTuple>()
+                        componentIdGenSeeds = this.Section.Tuples.OfType<DirectoryTuple>()
                             .Where(t => !String.IsNullOrEmpty(t.ComponentGuidGenerationSeed))
-                            .ToDictionary(t => t.Directory_, t => t.ComponentGuidGenerationSeed);
+                            .ToDictionary(t => t.Id.Id, t => t.ComponentGuidGenerationSeed);
                     }
 
                     // if the file rows have not been indexed by File.Component yet
@@ -123,13 +123,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
 
                     // validate component meets all the conditions to have a generated guid
-                    var currentComponentFiles = filesByComponentId[componentTuple.Component];
+                    var currentComponentFiles = filesByComponentId[componentTuple.Id.Id];
                     var numFilesInComponent = currentComponentFiles.Count;
                     string path = null;
 
                     foreach (var fileRow in currentComponentFiles)
                     {
-                        if (fileRow.File == componentTuple.KeyPath)
+                        if (fileRow.Id.Id == componentTuple.KeyPath)
                         {
                             // calculate the key file's canonical target path
                             string directoryPath = PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentTuple.Directory_, true);

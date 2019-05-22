@@ -120,8 +120,10 @@ namespace WixToolset.Core
 
                     // the following are available indentically under the UI and Product elements for document organization use only
                     case "AdminUISequence":
+                        this.ParseSequenceElement(child, SequenceTable.AdminUISequence);
+                        break;
                     case "InstallUISequence":
-                        this.ParseSequenceElement(child, child.Name.LocalName);
+                        this.ParseSequenceElement(child, SequenceTable.InstallUISequence);
                         break;
                     case "Binary":
                         this.ParseBinaryElement(child);
@@ -149,7 +151,8 @@ namespace WixToolset.Core
 
             if (null != id && !this.Core.EncounteredError)
             {
-                this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixUI, id);
+                var tuple = new WixUITuple(sourceLineNumbers, id);
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -160,7 +163,7 @@ namespace WixToolset.Core
         /// <param name="table">Table to add row to.</param>
         /// <param name="property">Identifier of property referred to by list item.</param>
         /// <param name="order">Relative order of list items.</param>
-        private void ParseListItemElement(XElement node, TupleDefinitionType tableName, string property, ref int order)
+        private void ParseListItemElement(XElement node, TupleDefinitionType tupleType, string property, ref int order)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string icon = null;
@@ -174,7 +177,7 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                     case "Icon":
-                        if (TupleDefinitionType.ListView == tableName)
+                        if (TupleDefinitionType.ListView == tupleType)
                         {
                             icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", icon);
@@ -210,14 +213,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, tableName);
-                row.Set(0, property);
-                row.Set(1, ++order);
-                row.Set(2, value);
-                row.Set(3, text);
+                var tuple = this.Core.CreateTuple(sourceLineNumbers, tupleType);
+                tuple.Set(0, property);
+                tuple.Set(1, ++order);
+                tuple.Set(2, value);
+                tuple.Set(3, text);
                 if (null != icon)
                 {
-                    row.Set(4, icon);
+                    tuple.Set(4, icon);
                 }
             }
         }
@@ -335,19 +338,21 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.RadioButton);
-                row.Set(0, property);
-                row.Set(1, ++order);
-                row.Set(2, value);
-                row.Set(3, x);
-                row.Set(4, y);
-                row.Set(5, width);
-                row.Set(6, height);
-                row.Set(7, text);
-                if (null != tooltip || null != help)
+                var tuple = new RadioButtonTuple(sourceLineNumbers)
                 {
-                    row.Set(8, String.Concat(tooltip, "|", help));
-                }
+                    Property = property,
+                    Order = ++order,
+                    Value = value,
+                    Text = text,
+                    Help = (null != tooltip || null != help) ? String.Concat(tooltip, "|", help) : null
+                };
+
+                tuple.Set((int)RadioButtonTupleFields.X, x);
+                tuple.Set((int)RadioButtonTupleFields.Y, y);
+                tuple.Set((int)RadioButtonTupleFields.Width, width);
+                tuple.Set((int)RadioButtonTupleFields.Height, height);
+
+                this.Core.AddTuple(tuple);
             }
 
             return type;
@@ -481,10 +486,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Billboard, id);
-                row.Set(1, feature);
-                row.Set(2, action);
-                row.Set(3, order);
+                var tuple = new BillboardTuple(sourceLineNumbers, id)
+                {
+                    Feature_ = feature,
+                    Action = action,
+                    Ordering = order
+                };
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -494,7 +503,7 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="table">Table referred to by control group.</param>
         /// <param name="childTag">Expected child elements.</param>
-        private void ParseControlGroupElement(XElement node, TupleDefinitionType tableName, string childTag)
+        private void ParseControlGroupElement(XElement node, TupleDefinitionType tupleType, string childTag)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var order = 0;
@@ -537,7 +546,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "ListItem":
-                        this.ParseListItemElement(child, tableName, property, ref order);
+                        this.ParseListItemElement(child, tupleType, property, ref order);
                         break;
                     case "Property":
                         this.ParsePropertyElement(child);
@@ -668,10 +677,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ActionText);
-                row.Set(0, action);
-                row.Set(1, Common.GetInnerText(node));
-                row.Set(2, template);
+                var tuple = new ActionTextTuple(sourceLineNumbers)
+                {
+                    Action = action,
+                    Description = Common.GetInnerText(node),
+                    Template = template
+                };
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -716,8 +729,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.UIText, id);
-                row.Set(1, text);
+                var tuple = new UITextTuple(sourceLineNumbers, id)
+                {
+                    Text = text,
+                };
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -1654,13 +1671,17 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ControlEvent);
-                row.Set(0, dialog);
-                row.Set(1, control);
-                row.Set(2, (null != controlEvent ? controlEvent : property));
-                row.Set(3, argument);
-                row.Set(4, condition);
-                row.Set(5, order);
+                var tuple = new ControlEventTuple(sourceLineNumbers)
+                {
+                    Dialog_ = dialog,
+                    Control_ = control,
+                    Event = controlEvent ?? property,
+                    Argument = argument,
+                    Condition = condition,
+                    Ordering = order
+                };
+
+                this.Core.AddTuple(tuple);
             }
 
             if ("DoAction" == controlEvent && null != argument)
@@ -1719,11 +1740,15 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.EventMapping);
-                row.Set(0, dialog);
-                row.Set(1, control);
-                row.Set(2, eventMapping);
-                row.Set(3, controlAttribute);
+                var tuple = new EventMappingTuple(sourceLineNumbers)
+                {
+                    Dialog_ = dialog,
+                    Control_ = control,
+                    Event = eventMapping,
+                    Attribute = controlAttribute
+                }; ;
+
+                this.Core.AddTuple(tuple);
             }
         }
     }

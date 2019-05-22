@@ -26,11 +26,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
         public const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
 
-        private List<IFileTransfer> fileTransfers;
+        private readonly List<IFileTransfer> fileTransfers;
 
-        private List<ITrackedFile> trackedFiles;
+        private readonly List<ITrackedFile> trackedFiles;
 
-        private FileSplitCabNamesCallback newCabNamesCallBack;
+        private readonly FileSplitCabNamesCallback newCabNamesCallBack;
 
         private Dictionary<string, string> lastCabinetAddedToMediaTable; // Key is First Cabinet Name, Value is Last Cabinet Added in the Split Sequence
 
@@ -82,8 +82,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
-        public IEnumerable<WixMediaTuple> WixMediaTuples { private get; set; }
-
         public IEnumerable<IFileTransfer> FileTransfers => this.fileTransfers;
 
         public IEnumerable<ITrackedFile> TrackedFiles => this.trackedFiles;
@@ -94,14 +92,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <returns>The uncompressed file rows.</returns>
         public void Execute()
         {
-            var wixMediaTuples = this.WixMediaTuples.ToDictionary(t => t.DiskId_);
-
             this.lastCabinetAddedToMediaTable = new Dictionary<string, string>();
 
             this.SetCabbingThreadCount();
 
             // Send Binder object to Facilitate NewCabNamesCallBack Callback
-            CabinetBuilder cabinetBuilder = new CabinetBuilder(this.Messaging, this.CabbingThreadCount, Marshal.GetFunctionPointerForDelegate(this.newCabNamesCallBack));
+            var cabinetBuilder = new CabinetBuilder(this.Messaging, this.CabbingThreadCount, Marshal.GetFunctionPointerForDelegate(this.newCabNamesCallBack));
 
             // Supply Compile MediaTemplate Attributes to Cabinet Builder
             this.GetMediaTemplateAttributes(out var MaximumCabinetSizeForLargeFileSplitting, out var MaximumUncompressedMediaSize);
@@ -111,22 +107,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             foreach (var entry in this.FileRowsByCabinet)
             {
                 var mediaTuple = entry.Key;
-                IEnumerable<FileFacade> files = entry.Value;
-                CompressionLevel compressionLevel = this.DefaultCompressionLevel ?? CompressionLevel.Medium;
-
-                string mediaLayoutFolder = null;
-
-                if (wixMediaTuples.TryGetValue(mediaTuple.DiskId, out var wixMediaRow))
-                {
-                    mediaLayoutFolder = wixMediaRow.Layout;
-
-                    if (wixMediaRow.CompressionLevel.HasValue)
-                    {
-                        compressionLevel = wixMediaRow.CompressionLevel.Value;
-                    }
-                }
-
-                string cabinetDir = this.ResolveMedia(mediaTuple, mediaLayoutFolder, this.LayoutDirectory);
+                var files = entry.Value;
+                var compressionLevel = mediaTuple.CompressionLevel ?? this.DefaultCompressionLevel ?? CompressionLevel.Medium;
+                var cabinetDir = this.ResolveMedia(mediaTuple, mediaTuple.Layout, this.LayoutDirectory);
 
                 var cabinetWorkItem = this.CreateCabinetWorkItem(this.Output, cabinetDir, mediaTuple, compressionLevel, files);
                 if (null != cabinetWorkItem)

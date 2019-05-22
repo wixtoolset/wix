@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
@@ -6,13 +6,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Linq;
     using WixToolset.Core.Bind;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
 
     internal class UpdateMediaSequencesCommand
     {
-        public UpdateMediaSequencesCommand(Output output, List<FileFacade> fileFacades, Dictionary<int, MediaTuple> assignedMediaRows)
+        public UpdateMediaSequencesCommand(Output output, List<FileFacade> fileFacades)
         {
             this.Output = output;
             this.FileFacades = fileFacades;
@@ -34,7 +33,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 // Order by Component to group the files by directory.
                 var optimized = this.OptimizedFileFacades();
-                foreach (var fileId in optimized.Select(f => f.File.File))
+                foreach (var fileId in optimized.Select(f => f.File.Id.Id))
                 {
                     var fileRow = fileRows.Get(fileId);
                     fileRow.Sequence = ++lastSequence;
@@ -77,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        var fileRow = fileRows.Get(facade.File.File);
+                        var fileRow = fileRows.Get(facade.File.Id.Id);
                         fileRow.Sequence = ++lastSequence;
                     }
                 }
@@ -103,7 +102,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             mediaRow = mediaRows.Get(facade.WixFile.DiskId);
                         }
 
-                        var fileRow = fileRows.Get(facade.File.File);
+                        var fileRow = fileRows.Get(facade.File.Id.Id);
                         fileRow.Sequence = ++lastSequence;
                     }
                 }

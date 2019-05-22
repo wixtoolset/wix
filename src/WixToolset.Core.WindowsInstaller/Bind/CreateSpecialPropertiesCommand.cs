@@ -44,8 +44,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < adminProperties.Count)
             {
-                var tuple = new PropertyTuple(null, new Identifier("AdminProperties", AccessModifier.Private));
-                tuple.Property = "AdminProperties";
+                var tuple = new PropertyTuple(null, new Identifier(AccessModifier.Private, "AdminProperties"));
                 tuple.Value = String.Join(";", adminProperties);
 
                 this.Section.Tuples.Add(tuple);
@@ -53,8 +52,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < secureProperties.Count)
             {
-                var tuple = new PropertyTuple(null, new Identifier("SecureCustomProperties", AccessModifier.Private));
-                tuple.Property = "SecureCustomProperties";
+                var tuple = new PropertyTuple(null, new Identifier(AccessModifier.Private, "SecureCustomProperties"));
                 tuple.Value = String.Join(";", secureProperties);
 
                 this.Section.Tuples.Add(tuple);
@@ -62,8 +60,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (0 < hiddenProperties.Count)
             {
-                var tuple = new PropertyTuple(null, new Identifier("MsiHiddenProperties", AccessModifier.Private));
-                tuple.Property = "MsiHiddenProperties";
+                var tuple = new PropertyTuple(null, new Identifier(AccessModifier.Private, "MsiHiddenProperties"));
                 tuple.Value = String.Join(";", hiddenProperties);
 
                 this.Section.Tuples.Add(tuple);

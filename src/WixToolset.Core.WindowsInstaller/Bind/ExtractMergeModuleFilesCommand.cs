@@ -57,7 +57,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Now since Merge Modules are already slow and generally less desirable than .wixlibs we'll let
             // this case be slightly more expensive because the cost of maintaining an indexed file row collection
             // is a lot more costly for the common cases.
-            var indexedFileFacades = this.FileFacades.ToDictionary(f => f.File.File, StringComparer.Ordinal);
+            var indexedFileFacades = this.FileFacades.ToDictionary(f => f.File.Id.Id, StringComparer.Ordinal);
 
             foreach (var wixMergeRow in this.WixMergeTuples)
             {
@@ -101,42 +101,33 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     // NOTE: this is very tricky - the merge module file rows are not added to the
                                     // file table because they should not be created via idt import.  Instead, these
                                     // rows are created by merging in the actual modules.
-                                    var fileRow = new FileTuple(wixMergeRow.SourceLineNumbers, new Identifier(record[1], AccessModifier.Private));
-                                    fileRow.File = record[1];
+                                    var fileRow = new FileTuple(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Private, record[1]));
                                     fileRow.Compressed = wixMergeRow.FileCompression;
-                                    //FileRow fileRow = (FileRow)this.FileTable.CreateRow(wixMergeRow.SourceLineNumbers, false);
-                                    //fileRow.File = record[1];
-                                    //fileRow.Compressed = wixMergeRow.FileCompression;
 
                                     var wixFileRow = new WixFileTuple(wixMergeRow.SourceLineNumbers);
                                     wixFileRow.Directory_ = record[2];
                                     wixFileRow.DiskId = wixMergeRow.DiskId;
                                     wixFileRow.PatchGroup = -1;
                                     wixFileRow.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
-                                    //WixFileRow wixFileRow = (WixFileRow)this.WixFileTable.CreateRow(wixMergeRow.SourceLineNumbers, false);
-                                    //wixFileRow.Directory = record[2];
-                                    //wixFileRow.DiskId = wixMergeRow.DiskId;
-                                    //wixFileRow.PatchGroup = -1;
-                                    //wixFileRow.Source = Path.Combine(this.IntermediateFolder, "MergeId.", wixMergeRow.Number.ToString(CultureInfo.InvariantCulture), record[1]);
 
                                     var mergeModuleFileFacade = new FileFacade(true, fileRow, wixFileRow);
 
                                     // If case-sensitive collision with another merge module or a user-authored file identifier.
-                                    if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.File.File, out var collidingFacade))
+                                    if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.File.Id.Id, out var collidingFacade))
                                     {
-                                        this.Messaging.Write(ErrorMessages.DuplicateModuleFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, collidingFacade.File.File));
+                                        this.Messaging.Write(ErrorMessages.DuplicateModuleFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, collidingFacade.File.Id.Id));
                                     }
-                                    else if (uniqueModuleFileIdentifiers.TryGetValue(mergeModuleFileFacade.File.File, out collidingFacade)) // case-insensitive collision with another file identifier in the same merge module
+                                    else if (uniqueModuleFileIdentifiers.TryGetValue(mergeModuleFileFacade.File.Id.Id, out collidingFacade)) // case-insensitive collision with another file identifier in the same merge module
                                     {
-                                        this.Messaging.Write(ErrorMessages.DuplicateModuleCaseInsensitiveFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, mergeModuleFileFacade.File.File, collidingFacade.File.File));
+                                        this.Messaging.Write(ErrorMessages.DuplicateModuleCaseInsensitiveFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, mergeModuleFileFacade.File.Id.Id, collidingFacade.File.Id.Id));
                                     }
                                     else // no collision
                                     {
                                         mergeModulesFileFacades.Add(mergeModuleFileFacade);
 
                                         // Keep updating the indexes as new rows are added.
-                                        indexedFileFacades.Add(mergeModuleFileFacade.File.File, mergeModuleFileFacade);
-                                        uniqueModuleFileIdentifiers.Add(mergeModuleFileFacade.File.File, mergeModuleFileFacade);
+                                        indexedFileFacades.Add(mergeModuleFileFacade.File.Id.Id, mergeModuleFileFacade);
+                                        uniqueModuleFileIdentifiers.Add(mergeModuleFileFacade.File.Id.Id, mergeModuleFileFacade);
                                     }
 
                                     containsFiles = true;

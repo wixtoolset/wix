@@ -213,7 +213,7 @@ namespace WixToolset.Core
             var wixVariableTuples = context.IntermediateRepresentation.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
             foreach (var tuple in wixVariableTuples)
             {
-                context.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.WixVariable, tuple.Value, tuple.Overridable);
+                context.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.Id.Id, tuple.Value, tuple.Overridable);
             }
         }
 

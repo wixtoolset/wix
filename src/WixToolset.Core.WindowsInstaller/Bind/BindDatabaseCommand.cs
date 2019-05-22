@@ -128,7 +128,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 foreach (var propertyRow in section.Tuples.OfType<PropertyTuple>())
                 {
                     // Set the ProductCode if it is to be generated.
-                    if ("ProductCode".Equals(propertyRow.Property, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
+                    if ("ProductCode".Equals(propertyRow.Id.Id, StringComparison.Ordinal) && "*".Equals(propertyRow.Value, StringComparison.Ordinal))
                     {
                         propertyRow.Value = Common.GenerateGuid();
 
@@ -159,7 +159,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // Add the property name and value to the variableCache.
                     if (variableCache != null)
                     {
-                        var key = String.Concat("property.", propertyRow.Property);
+                        var key = String.Concat("property.", propertyRow.Id.Id);
                         variableCache[key] = propertyRow.Value;
                     }
                 }
@@ -312,7 +312,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Update file sequence.
             {
-                var command = new UpdateMediaSequencesCommand(output, fileFacades, assignedMediaRows);
+                var command = new UpdateMediaSequencesCommand(output, fileFacades);
                 command.Execute();
             }
 
@@ -400,7 +400,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.ResolveMedia = this.ResolveMedia;
                 command.TableDefinitions = this.TableDefinitions;
                 command.TempFilesLocation = this.IntermediateFolder;
-                command.WixMediaTuples = section.Tuples.OfType<WixMediaTuple>();
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);

@@ -53,18 +53,29 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary)
         {
-            var wixComplexReferenceRow = (WixComplexReferenceTuple)this.CreateRow(section, sourceLineNumbers, TupleDefinitionType.WixComplexReference);
-            wixComplexReferenceRow.Parent = parentId;
-            wixComplexReferenceRow.ParentType = parentType;
-            wixComplexReferenceRow.ParentLanguage = parentLanguage;
-            wixComplexReferenceRow.Child = childId;
-            wixComplexReferenceRow.ChildType = childType;
-            wixComplexReferenceRow.IsPrimary = isPrimary;
 
-            this.CreateWixGroupRow(section, sourceLineNumbers, parentType, parentId, childType, childId);
+            var tuple = new WixComplexReferenceTuple(sourceLineNumbers)
+            {
+                Parent = parentId,
+                ParentType = parentType,
+                ParentLanguage = parentLanguage,
+                Child = childId,
+                ChildType = childType,
+                IsPrimary = isPrimary
+            };
+
+            section.Tuples.Add(tuple);
+
+            this.CreateWixGroupTuple(section, sourceLineNumbers, parentType, parentId, childType, childId);
         }
 
+        [Obsolete]
         public Identifier CreateDirectoryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
+        {
+            return this.CreateDirectoryTuple(section, sourceLineNumbers, id, parentId, name, sectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
+        }
+
+        public Identifier CreateDirectoryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
             string defaultDir;
 
@@ -158,7 +169,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
                     for (int i = pathStartsAt; i < inlineSyntax.Length; ++i)
                     {
-                        Identifier inlineId = this.CreateDirectoryRow(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
+                        Identifier inlineId = this.CreateDirectoryTuple(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
                         id = inlineId.Id;
                     }
                 }
@@ -175,16 +186,22 @@ namespace WixToolset.Core.ExtensibilityServices
         public Identifier CreateIdentifier(string prefix, params string[] args)
         {
             var id = Common.GenerateIdentifier(prefix, args);
-            return new Identifier(id, AccessModifier.Private);
+            return new Identifier(AccessModifier.Private, id);
         }
 
         public Identifier CreateIdentifierFromFilename(string filename)
         {
             var id = Common.GetIdentifierFromName(filename);
-            return new Identifier(id, AccessModifier.Private);
+            return new Identifier(AccessModifier.Private, id);
         }
 
+        [Obsolete]
         public Identifier CreateRegistryRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
+        {
+            return this.CreateRegistryTuple(section, sourceLineNumbers, root, key, name, value, componentId, escapeLeadingHash);
+        }
+
+        public Identifier CreateRegistryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId, bool escapeLeadingHash)
         {
             if (RegistryRootType.Unknown == root)
             {
@@ -234,7 +251,13 @@ namespace WixToolset.Core.ExtensibilityServices
             section.Tuples.Add(tuple);
         }
 
+        [Obsolete]
         public void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
+        {
+            this.CreateWixGroupTuple(section, sourceLineNumbers, parentType, parentId, childType, childId);
+        }
+
+        public void CreateWixGroupTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId)
         {
             if (null == parentId || ComplexReferenceParentType.Unknown == parentType)
             {
@@ -257,7 +280,19 @@ namespace WixToolset.Core.ExtensibilityServices
             section.Tuples.Add(tuple);
         }
 
+        [Obsolete]
         public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
+        {
+            return this.CreateTuple(section, sourceLineNumbers, tableName, identifier);
+        }
+
+        [Obsolete]
+        public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
+        {
+            return this.CreateTuple(section, sourceLineNumbers, tupleType, identifier);
+        }
+
+        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
         {
             if (this.Creator == null)
             {
@@ -272,7 +307,7 @@ namespace WixToolset.Core.ExtensibilityServices
             return CreateRow(section, sourceLineNumbers, tupleDefinition, identifier);
         }
 
-        public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
+        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
         {
             var tupleDefinition = TupleDefinitions.ByType(tupleType);
 
@@ -331,7 +366,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName)
         {
-            var row = this.CreateRow(section, sourceLineNumbers, TupleDefinitionType.WixEnsureTable);
+            var row = this.CreateTuple(section, sourceLineNumbers, TupleDefinitionType.WixEnsureTable);
             row.Set(0, tableName);
 
             if (this.Creator == null)
@@ -428,7 +463,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 this.Messaging.Write(WarningMessages.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
             }
 
-            return new Identifier(value, access);
+            return new Identifier(access, value);
         }
 
         public string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)

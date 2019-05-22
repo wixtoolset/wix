@@ -6,7 +6,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
@@ -31,20 +30,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IMessaging Messaging { private get; set; }
 
-        public void Execute()
-        {
-            var actions = this.Section.Tuples.OfType<WixActionTuple>().ToList();
-            var suppressActions = this.Section.Tuples.OfType<WixSuppressActionTuple>().ToList();
-
-            this.SequenceActions(actions, suppressActions);
-        }
-
         /// <summary>
         /// Set sequence numbers for all the actions and create rows in the output object.
         /// </summary>
-        /// <param name="actionRows">Collection of actions to schedule.</param>
-        /// <param name="suppressActionRows">Collection of actions to suppress.</param>
-        private void SequenceActions(List<WixActionTuple> actionRows, List<WixSuppressActionTuple> suppressActionRows)
+        public void Execute()
         {
             var overridableActionRows = new Dictionary<string, WixActionTuple>();
             var requiredActionRows = new Dictionary<string, WixActionTuple>();
@@ -118,7 +107,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Suppress the required actions that are overridable.
-            foreach (var suppressActionRow in suppressActionRows)
+            foreach (var suppressActionRow in this.Section.Tuples.OfType<WixSuppressActionTuple>())
             {
                 var key = suppressActionRow.Id.Id;
 
@@ -233,7 +222,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             if (sequenceScheduledActionRow.Sequence == actionRow.Sequence)
                             {
-                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, sequenceScheduledActionRow.Action, actionRow.Sequence));
+                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, sequenceScheduledActionRow.Action, actionRow.Sequence ?? 0));
                                 if (null != sequenceScheduledActionRow.SourceLineNumbers)
                                 {
                                     this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionRow.SourceLineNumbers));
@@ -245,7 +234,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
 
-                absoluteActionRows.Sort((x, y) => x.Sequence.CompareTo(y.Sequence));
+                absoluteActionRows.Sort((x, y) => (x.Sequence ?? 0).CompareTo(y.Sequence ?? 0));
 
                 // Schedule the relatively scheduled actions (by resolving the dependency trees).
                 var previousUsedSequence = 0;
@@ -310,7 +299,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var nextUsedSequence = Int16.MaxValue + 1;
                     if (absoluteActionRows.Count > j + 1)
                     {
-                        nextUsedSequence = absoluteActionRows[j + 1].Sequence;
+                        nextUsedSequence = absoluteActionRows[j + 1].Sequence ?? 0;
                     }
 
                     // Schedule the action rows after this one.
@@ -337,7 +326,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
 
                     // keep track of this sequence number as the previous used sequence number for the next iteration
-                    previousUsedSequence = absoluteActionRow.Sequence;
+                    previousUsedSequence = absoluteActionRow.Sequence ?? 0;
                 }
 
                 // add the absolutely and relatively scheduled actions to the list of scheduled actions
@@ -412,9 +401,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallExecuteSequence/AppSearch");
                         set.Add("InstallUISequence/AppSearch");
                         break;
-                    case TupleDefinitionType.BindImage:
-                        set.Add("InstallExecuteSequence/BindImage");
-                        break;
                     case TupleDefinitionType.CCPSearch:
                         set.Add("InstallExecuteSequence/AppSearch");
                         set.Add("InstallExecuteSequence/CCPSearch");
@@ -452,10 +438,32 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case TupleDefinitionType.File:
                         set.Add("InstallExecuteSequence/InstallFiles");
                         set.Add("InstallExecuteSequence/RemoveFiles");
-                        break;
-                    case TupleDefinitionType.Font:
-                        set.Add("InstallExecuteSequence/RegisterFonts");
-                        set.Add("InstallExecuteSequence/UnregisterFonts");
+
+                        var foundFont = false;
+                        var foundSelfReg = false;
+                        var foundBindPath = false;
+                        foreach (var file in this.Section.Tuples.OfType<FileTuple>())
+                        {
+                            if (!foundFont && !String.IsNullOrEmpty(file.FontTitle))
+                            {
+                                set.Add("InstallExecuteSequence/RegisterFonts");
+                                set.Add("InstallExecuteSequence/UnregisterFonts");
+                                foundFont = true;
+                            }
+
+                            if (!foundSelfReg && file.SelfRegCost.HasValue)
+                            {
+                                set.Add("InstallExecuteSequence/SelfRegModules");
+                                set.Add("InstallExecuteSequence/SelfUnregModules");
+                                foundSelfReg = true;
+                            }
+
+                            if (!foundBindPath && !String.IsNullOrEmpty(file.BindPath))
+                            {
+                                set.Add("InstallExecuteSequence/BindImage");
+                                foundBindPath = true;
+                            }
+                        }
                         break;
                     case TupleDefinitionType.IniFile:
                     case TupleDefinitionType.RemoveIniFile:
@@ -510,10 +518,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
                     case TupleDefinitionType.RemoveFile:
                         set.Add("InstallExecuteSequence/RemoveFiles");
-                        break;
-                    case TupleDefinitionType.SelfReg:
-                        set.Add("InstallExecuteSequence/SelfRegModules");
-                        set.Add("InstallExecuteSequence/SelfUnregModules");
                         break;
                     case TupleDefinitionType.ServiceControl:
                         set.Add("InstallExecuteSequence/StartServices");

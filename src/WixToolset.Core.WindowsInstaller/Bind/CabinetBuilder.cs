@@ -148,7 +148,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     // Cabinet has Single File, Check if this is Large File than needs Splitting into Multiple cabs
                     // Get the Value for Max Uncompressed Media Size
-                    maxPreCompressedSizeInBytes = (ulong)MaximumUncompressedMediaSize * 1024 * 1024;
+                    maxPreCompressedSizeInBytes = (ulong)this.MaximumUncompressedMediaSize * 1024 * 1024;
 
                     foreach (FileFacade facade in cabinetWorkItem.FileFacades) // No other easy way than looping to get the only row
                     {
@@ -168,8 +168,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var files = cabinetWorkItem.FileFacades
                 .Select(facade => facade.Hash == null ?
-                    new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.File) :
-                    new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.File, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
+                    new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.Id.Id) :
+                    new CabinetCompressFile(facade.WixFile.Source.Path, facade.File.Id.Id, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
                 .ToList();
 
             var cabinetCompressionLevel = (CabinetCompressionLevel)cabinetWorkItem.CompressionLevel;

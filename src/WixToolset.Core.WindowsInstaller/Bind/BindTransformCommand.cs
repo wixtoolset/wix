@@ -8,6 +8,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;

@@ -98,7 +98,7 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var property = section.Tuples.OfType<PropertyTuple>().Where(p => p.Id.Id == "ExampleProperty").Single();
-                Assert.Equal("ExampleProperty", property.Property);
+                Assert.Equal("ExampleProperty", property.Id.Id);
                 Assert.Equal("test", property.Value);
             }
         }

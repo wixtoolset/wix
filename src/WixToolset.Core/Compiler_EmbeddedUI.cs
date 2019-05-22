@@ -91,11 +91,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiEmbeddedChainer, id);
-                row.Set(1, condition);
-                row.Set(2, commandLine);
-                row.Set(3, source);
-                row.Set(4, type);
+                this.Core.AddTuple(new MsiEmbeddedChainerTuple(sourceLineNumbers, id)
+                {
+                    Condition = condition,
+                    CommandLine = commandLine,
+                    Source = source,
+                    Type = type
+                });
             }
         }
 

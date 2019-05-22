@@ -286,7 +286,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         using (Record record = new Record(1))
                         {
-                            record.SetString(1, file.File.File);
+                            record.SetString(1, file.File.Id.Id);
                             view.Execute(record);
                         }
 

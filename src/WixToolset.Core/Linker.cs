@@ -20,8 +20,8 @@ namespace WixToolset.Core
     /// </summary>
     internal class Linker : ILinker
     {
-        private static readonly char[] colonCharacter = ":".ToCharArray();
-        private static readonly string emptyGuid = Guid.Empty.ToString("B");
+        private static readonly char[] ColonCharacter = new[] { ':' };
+        private static readonly string EmptyGuid = Guid.Empty.ToString("B");
 
         private readonly bool sectionIdOnRows;
 
@@ -428,21 +428,22 @@ namespace WixToolset.Core
                         // check for colliding values and collect the wix variable rows
                         {
                             var row = (WixVariableTuple)tuple;
+                            var id = row.Id.Id;
 
-                            if (wixVariables.TryGetValue(row.WixVariable, out var collidingRow))
+                            if (wixVariables.TryGetValue(id, out var collidingRow))
                             {
                                 if (collidingRow.Overridable && !row.Overridable)
                                 {
-                                    wixVariables[row.WixVariable] = row;
+                                    wixVariables[id] = row;
                                 }
                                 else if (!row.Overridable || (collidingRow.Overridable && row.Overridable))
                                 {
-                                    this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, row.WixVariable));
+                                    this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, id));
                                 }
                             }
                             else
                             {
-                                wixVariables.Add(row.WixVariable, row);
+                                wixVariables.Add(id, row);
                             }
                         }
 
@@ -1609,14 +1610,14 @@ namespace WixToolset.Core
             var groups = new WixGroupingOrdering(entrySection, this.Messaging);
 
             // Create UX payloads and Package payloads
-            groups.UseTypes(new string[] { "Container", "Layout", "PackageGroup", "PayloadGroup", "Package" }, new string[] { "PackageGroup", "Package", "PayloadGroup", "Payload" });
-            groups.FlattenAndRewriteGroups("Package", false);
-            groups.FlattenAndRewriteGroups("Container", false);
-            groups.FlattenAndRewriteGroups("Layout", false);
-
+            groups.UseTypes(new[] { ComplexReferenceParentType.Container, ComplexReferenceParentType.Layout, ComplexReferenceParentType.PackageGroup, ComplexReferenceParentType.PayloadGroup, ComplexReferenceParentType.Package }, new[] { ComplexReferenceChildType.PackageGroup, ComplexReferenceChildType.Package, ComplexReferenceChildType.PayloadGroup, ComplexReferenceChildType.Payload });
+            groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Package, false);
+            groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Container, false);
+            groups.FlattenAndRewriteGroups(ComplexReferenceParentType.Layout, false);
+            
             // Create Chain packages...
-            groups.UseTypes(new string[] { "PackageGroup" }, new string[] { "Package", "PackageGroup" });
-            groups.FlattenAndRewriteRows("PackageGroup", "WixChain", false);
+            groups.UseTypes(new[] { ComplexReferenceParentType.PackageGroup }, new[] { ComplexReferenceChildType.Package, ComplexReferenceChildType.PackageGroup });
+            groups.FlattenAndRewriteRows(ComplexReferenceChildType.PackageGroup, "WixChain", false);
 
             groups.RemoveUsedGroupRows();
         }
@@ -1702,7 +1703,7 @@ namespace WixToolset.Core
             var connectionId = row.AsString(connectionColumn);
             var featureId = row.AsString(featureColumn);
 
-            if (emptyGuid == featureId)
+            if (EmptyGuid == featureId)
             {
                 var connection = connectToFeatures[connectionId];
 

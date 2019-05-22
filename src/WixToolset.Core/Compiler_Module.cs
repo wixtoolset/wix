@@ -100,11 +100,19 @@ namespace WixToolset.Core
                         switch (child.Name.LocalName)
                         {
                         case "AdminExecuteSequence":
+                            this.ParseSequenceElement(child, SequenceTable.AdminExecuteSequence);
+                            break;
                         case "AdminUISequence":
+                            this.ParseSequenceElement(child, SequenceTable.AdminUISequence);
+                            break;
                         case "AdvertiseExecuteSequence":
+                            this.ParseSequenceElement(child, SequenceTable.AdvertiseExecuteSequence);
+                            break;
                         case "InstallExecuteSequence":
+                            this.ParseSequenceElement(child, SequenceTable.InstallExecuteSequence);
+                            break;
                         case "InstallUISequence":
-                            this.ParseSequenceElement(child, child.Name.LocalName);
+                            this.ParseSequenceElement(child, SequenceTable.InstallUISequence);
                             break;
                         case "AppId":
                             this.ParseAppIdElement(child, null, YesNoType.Yes, null, null, null);
@@ -208,10 +216,15 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleSignature);
-                    row.Set(0, this.activeName);
-                    row.Set(1, this.activeLanguage);
-                    row.Set(2, version);
+                    var tuple = new ModuleSignatureTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
+                    {
+                        ModuleID = this.activeName,
+                        Version = version
+                    };
+
+                    tuple.Set((int)ModuleSignatureTupleFields.Language, this.activeLanguage);
+
+                    this.Core.AddTuple(tuple);
                 }
             }
             finally
@@ -273,12 +286,17 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleDependency);
-                row.Set(0, this.activeName);
-                row.Set(1, this.activeLanguage);
-                row.Set(2, requiredId);
-                row.Set(3, requiredLanguage.ToString(CultureInfo.InvariantCulture));
-                row.Set(4, requiredVersion);
+                var tuple = new ModuleDependencyTuple(sourceLineNumbers)
+                {
+                    ModuleID = this.activeName,
+                    RequiredID = requiredId,
+                    RequiredLanguage  = requiredLanguage,
+                    RequiredVersion = requiredVersion
+                };
+
+                tuple.Set((int)ModuleDependencyTupleFields.ModuleLanguage, this.activeLanguage);
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -351,13 +369,18 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleExclusion);
-                row.Set(0, this.activeName);
-                row.Set(1, this.activeLanguage);
-                row.Set(2, excludedId);
-                row.Set(3, excludedLanguageField);
-                row.Set(4, excludedMinVersion);
-                row.Set(5, excludedMaxVersion);
+                var tuple = new ModuleExclusionTuple(sourceLineNumbers)
+                {
+                    ModuleID = this.activeName,
+                    ExcludedID = excludedId,
+                    ExcludedMinVersion = excludedMinVersion,
+                    ExcludedMaxVersion = excludedMaxVersion
+                };
+
+                tuple.Set((int)ModuleExclusionTupleFields.ModuleLanguage, this.activeLanguage);
+                tuple.Set((int)ModuleExclusionTupleFields.ExcludedLanguage, excludedLanguageField);
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -548,11 +571,15 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleSubstitution);
-                row.Set(0, table);
-                row.Set(1, rowKeys);
-                row.Set(2, column);
-                row.Set(3, value);
+                var tuple = new ModuleSubstitutionTuple(sourceLineNumbers)
+                {
+                    Table = table,
+                    Row = rowKeys,
+                    Column = column,
+                    Value = value
+                };
+
+                this.Core.AddTuple(tuple);
             }
         }
 
@@ -599,8 +626,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixSuppressModularization);
-                row.Set(0, name);
+                this.Core.AddTuple(new WixSuppressModularizationTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name)));
             }
         }
 
@@ -642,8 +668,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ModuleIgnoreTable);
-                row.Set(0, id);
+                this.Core.AddTuple(new ModuleIgnoreTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, id)));
             }
         }
     }

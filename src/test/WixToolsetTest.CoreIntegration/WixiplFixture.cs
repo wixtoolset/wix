@@ -130,7 +130,7 @@ namespace WixToolsetTest.CoreIntegration
                     var path = binary[BinaryTupleFields.Data].AsPath().Path;
                     Assert.Contains("Example.Extension", path);
                     Assert.EndsWith(@"\0", path);
-                    Assert.Equal(@"BinFromWir", binary[BinaryTupleFields.Name].AsString());
+                    Assert.Equal(@"BinFromWir", binary.Id.Id);
                 }
             }
         }
@@ -185,7 +185,7 @@ namespace WixToolsetTest.CoreIntegration
                     var path = binary[BinaryTupleFields.Data].AsPath().Path;
                     Assert.Contains("Example.Extension", path);
                     Assert.EndsWith(@"\0", path);
-                    Assert.Equal(@"BinFromWir", binary[BinaryTupleFields.Name].AsString());
+                    Assert.Equal(@"BinFromWir", binary.Id.Id);
                 }
             }
         }

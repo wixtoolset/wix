@@ -17,7 +17,6 @@ namespace WixToolset.Core
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using Wix = WixToolset.Data.Serialize;
 
     internal enum ValueListKind
     {
@@ -50,9 +49,7 @@ namespace WixToolset.Core
         private const string IllegalLongFilenameCharacters = @"[\\\?|><:/\*""]"; // illegal: \ ? | > < : / * "
         private static readonly Regex IllegalLongFilename = new Regex(IllegalLongFilenameCharacters, RegexOptions.Compiled);
 
-        public const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
-        public const int MinValueOfMaxCabSizeForLargeFileSplitting = 20; // 20 MB
-        public const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
+        //public const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
 
 
         // Built-in variables (from burn\engine\variable.cpp, "vrgBuiltInVariables", around line 113)
@@ -354,43 +351,20 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Creates a row in the active section.
+        /// Creates a tuple in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tupleType">Name of table to create row in.</param>
-        /// <returns>New row.</returns>
-        public IntermediateTuple CreateRow(SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
-        {
-            return this.CreateRow(sourceLineNumbers, tupleType, this.ActiveSection, identifier);
-        }
-
-        /// <summary>
-        /// Creates a row in the active given <paramref name="section"/>.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tupleType">Name of table to create row in.</param>
-        /// <param name="section">The section to which the row is added. If null, the row is added to the active section.</param>
-        /// <returns>New row.</returns>
-        internal IntermediateTuple CreateRow(SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, IntermediateSection section, Identifier identifier = null)
+        /// <param name="tupleType">Type of tuple to create.</param>
+        /// <param name="identifier">Optional identifier.</param>
+        /// <returns>New tuple.</returns>
+        public IntermediateTuple CreateTuple(SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
         {
             var tupleDefinition = TupleDefinitions.ByType(tupleType);
-            var row = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
+            var tuple = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
 
-            if (null != identifier)
-            {
-                if (row.Definition.FieldDefinitions[0].Type == IntermediateFieldType.Number)
-                {
-                    row.Set(0, Convert.ToInt32(identifier.Id));
-                }
-                else
-                {
-                    row.Set(0, identifier.Id);
-                }
-            }
+            this.ActiveSection.Tuples.Add(tuple);
 
-            section.Tuples.Add(row);
-
-            return row;
+            return tuple;
         }
 
         /// <summary>
@@ -406,20 +380,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Creates a patch resource reference to the list of resoures to be filtered when producing a patch. This method should only be used when processing children of a patch family.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tableName">Name of table to create row in.</param>
-        /// <param name="primaryKeys">Array of keys that make up the primary key of the table.</param>
-        /// <returns>New row.</returns>
-        public void CreatePatchFamilyChildReference(SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys)
-        {
-            var patchReferenceRow = this.CreateRow(sourceLineNumbers, TupleDefinitionType.WixPatchRef);
-            patchReferenceRow.Set(0, tableName);
-            patchReferenceRow.Set(1, String.Join("/", primaryKeys));
-        }
-
-        /// <summary>
         /// Creates a Registry row in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source and line number of the current row.</param>
@@ -430,7 +390,7 @@ namespace WixToolset.Core
         /// <param name="componentId">The component which will control installation/uninstallation of the registry entry.</param>
         public Identifier CreateRegistryRow(SourceLineNumber sourceLineNumbers, RegistryRootType root, string key, string name, string value, string componentId)
         {
-            return this.parseHelper.CreateRegistryRow(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
+            return this.parseHelper.CreateRegistryTuple(this.ActiveSection, sourceLineNumbers, root, key, name, value, componentId, true);
         }
 
         /// <summary>
@@ -466,7 +426,7 @@ namespace WixToolset.Core
         {
             if (!this.EncounteredError)
             {
-                this.parseHelper.CreateWixGroupRow(this.ActiveSection, sourceLineNumbers, parentType, parentId, childType, childId);
+                this.parseHelper.CreateWixGroupTuple(this.ActiveSection, sourceLineNumbers, parentType, parentId, childType, childId);
             }
         }
 
@@ -753,39 +713,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Gets a yes/no/always value and displays an error for an illegal value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <returns>The attribute's YesNoAlwaysType value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        public YesNoAlwaysType GetAttributeYesNoAlwaysValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
-        {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                switch (Wix.Enums.ParseYesNoAlwaysType(value))
-                {
-                    case Wix.YesNoAlwaysType.@always:
-                        return YesNoAlwaysType.Always;
-                    case Wix.YesNoAlwaysType.no:
-                        return YesNoAlwaysType.No;
-                    case Wix.YesNoAlwaysType.yes:
-                        return YesNoAlwaysType.Yes;
-                    case Wix.YesNoAlwaysType.NotSet:
-                        // Previous code never returned 'NotSet'!
-                        break;
-                    default:
-                        this.Write(ErrorMessages.IllegalYesNoAlwaysValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
-                        break;
-                }
-            }
-
-            return YesNoAlwaysType.IllegalValue;
-        }
-
-        /// <summary>
         /// Gets a short filename value and displays an error for an illegal short filename value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
@@ -852,57 +779,6 @@ namespace WixToolset.Core
         public RegistryRootType? GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
         {
             return this.parseHelper.GetAttributeRegistryRootValue(sourceLineNumbers, attribute, allowHkmu);
-        }
-
-        /// <summary>
-        /// Gets an InstallUninstallType value and displays an error for an illegal value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <returns>The attribute's InstallUninstallType value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        public Wix.InstallUninstallType GetAttributeInstallUninstallValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
-        {
-            Wix.InstallUninstallType installUninstall = Wix.InstallUninstallType.NotSet;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            if (0 < value.Length)
-            {
-                installUninstall = Wix.Enums.ParseInstallUninstallType(value);
-
-                if (Wix.InstallUninstallType.IllegalValue == installUninstall)
-                {
-                    // TODO: Find a way to expose the valid values programatically!
-                    this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
-                         "install", "uninstall", "both"));
-                }
-            }
-
-            return installUninstall;
-        }
-
-        /// <summary>
-        /// Gets an ExitType value and displays an error for an illegal value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <returns>The attribute's ExitType value.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        public Wix.ExitType GetAttributeExitValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
-        {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
-
-            Wix.ExitType result = Wix.ExitType.NotSet;
-            if (!Enum.TryParse<Wix.ExitType>(value, out result))
-            {
-                result = Wix.ExitType.IllegalValue;
-
-                // TODO: Find a way to expose the valid values programatically!
-                this.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value,
-                     "success", "cancel", "error", "suspend"));
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -1062,7 +938,7 @@ namespace WixToolset.Core
         internal void VerifyRequiredVersion(SourceLineNumber sourceLineNumbers, string requiredVersion)
         {
             // an null or empty string means any version will work
-            if (!string.IsNullOrEmpty(requiredVersion))
+            if (!String.IsNullOrEmpty(requiredVersion))
             {
                 Assembly caller = Assembly.GetCallingAssembly();
                 AssemblyName name = caller.GetName();
@@ -1147,7 +1023,7 @@ namespace WixToolset.Core
         /// <returns>Identifier for the newly created row.</returns>
         internal Identifier CreateDirectoryRow(SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            return this.parseHelper.CreateDirectoryRow(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
+            return this.parseHelper.CreateDirectoryTuple(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
         }
 
         /// <summary>

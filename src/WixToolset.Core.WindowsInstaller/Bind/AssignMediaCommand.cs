@@ -16,6 +16,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class AssignMediaCommand
     {
+        private const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
+
         public AssignMediaCommand(IntermediateSection section, IMessaging messaging)
         {
             this.CabinetNameTemplate = "Cab{0}.cab";
@@ -82,7 +84,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                this.AutoAssignFiles(mediaTable, this.FileFacades, filesByCabinetMedia, mediaRows, uncompressedFiles);
+                this.AutoAssignFiles(mediaTable, filesByCabinetMedia, mediaRows, uncompressedFiles);
             }
 
             this.FileFacadesByCabinetMedia = new Dictionary<MediaTuple, IEnumerable<FileFacade>>();
@@ -101,7 +103,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Assign files to cabinets based on MediaTemplate authoring.
         /// </summary>
         /// <param name="fileFacades">FileRowCollection</param>
-        private void AutoAssignFiles(List<MediaTuple> mediaTable, IEnumerable<FileFacade> fileFacades, Dictionary<MediaTuple, List<FileFacade>> filesByCabinetMedia, Dictionary<int, MediaTuple> mediaRows, List<FileFacade> uncompressedFiles)
+        private void AutoAssignFiles(List<MediaTuple> mediaTable, Dictionary<MediaTuple, List<FileFacade>> filesByCabinetMedia, Dictionary<int, MediaTuple> mediaRows, List<FileFacade> uncompressedFiles)
         {
             const int MaxCabIndex = 999;
 
@@ -140,7 +142,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    maxPreCabSizeInMB = mediaTemplateRow.MaximumUncompressedMediaSize;
+                    maxPreCabSizeInMB = mediaTemplateRow.MaximumUncompressedMediaSize ?? DefaultMaximumUncompressedMediaSize;
                 }
 
                 maxPreCabSizeInBytes = (ulong)maxPreCabSizeInMB * 1024 * 1024;
@@ -212,8 +214,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // If there are uncompressed files and no MediaRow, create a default one.
             if (uncompressedFiles.Count > 0 && !this.Section.Tuples.OfType<MediaTuple>().Any())
             {
-                var defaultMediaRow = new MediaTuple(null, new Identifier(1, AccessModifier.Private));
-                defaultMediaRow.DiskId = 1;
+                var defaultMediaRow = new MediaTuple(null, new Identifier(AccessModifier.Private, 1))
+                {
+                    DiskId = 1
+                };
 
                 mediaRows.Add(1, defaultMediaRow);
                 this.Section.Tuples.Add(defaultMediaRow);
@@ -282,7 +286,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.ExpectedMediaCabinet(facade.File.SourceLineNumbers, facade.File.File, facade.WixFile.DiskId));
+                        this.Messaging.Write(ErrorMessages.ExpectedMediaCabinet(facade.File.SourceLineNumbers, facade.File.Id.Id, facade.WixFile.DiskId));
                     }
                 }
             }
@@ -294,21 +298,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="mediaTable"></param>
         /// <param name="cabIndex"></param>
         /// <returns></returns>
-        private MediaTuple AddMediaRow(WixMediaTemplateTuple mediaTemplateRow, int cabIndex)
+        private MediaTuple AddMediaRow(WixMediaTemplateTuple mediaTemplateTuple, int cabIndex)
         {
-            var currentMediaRow = new MediaTuple(mediaTemplateRow.SourceLineNumbers, new Identifier(cabIndex, AccessModifier.Private));
-            currentMediaRow.DiskId = cabIndex;
-            currentMediaRow.Cabinet = String.Format(CultureInfo.InvariantCulture, this.CabinetNameTemplate, cabIndex);
+            var currentMediaTuple = new MediaTuple(mediaTemplateTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, cabIndex));
+            currentMediaTuple.DiskId = cabIndex;
+            currentMediaTuple.Cabinet = String.Format(CultureInfo.InvariantCulture, this.CabinetNameTemplate, cabIndex);
+            currentMediaTuple.CompressionLevel = mediaTemplateTuple.CompressionLevel;
 
-            this.Section.Tuples.Add(currentMediaRow);
+            this.Section.Tuples.Add(currentMediaTuple);
 
-            var row = new WixMediaTuple(mediaTemplateRow.SourceLineNumbers, new Identifier(cabIndex, AccessModifier.Private));
-            row.DiskId_ = cabIndex;
-            row.CompressionLevel = mediaTemplateRow.CompressionLevel;
-
-            this.Section.Tuples.Add(row);
-
-            return currentMediaRow;
+            return currentMediaTuple;
         }
     }
 }

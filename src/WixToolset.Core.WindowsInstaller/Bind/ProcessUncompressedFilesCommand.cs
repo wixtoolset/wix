@@ -54,8 +54,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var mediaRows = this.Section.Tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
 
-            var wixMediaRows = this.Section.Tuples.OfType<WixMediaTuple>().ToDictionary(t => t.DiskId_);
-
             using (Database db = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
             {
                 using (View directoryView = db.OpenExecuteView("SELECT `Directory`, `Directory_Parent`, `DefaultDir` FROM `Directory`"))
@@ -85,25 +83,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             var mediaTuple = mediaRows[facade.WixFile.DiskId];
                             string relativeFileLayoutPath = null;
-                            string mediaLayoutFolder = null;
-
-                            if (wixMediaRows.TryGetValue(facade.WixFile.DiskId, out var wixMediaRow))
-                            {
-                                mediaLayoutFolder = wixMediaRow.Layout;
-                            }
+                            string mediaLayoutFolder = mediaTuple.Layout;
 
                             var mediaLayoutDirectory = this.ResolveMedia(mediaTuple, mediaLayoutFolder, this.LayoutDirectory);
 
                             // setup up the query record and find the appropriate file in the
                             // previously executed file view
-                            fileQueryRecord[1] = facade.File.File;
+                            fileQueryRecord[1] = facade.File.Id.Id;
                             fileView.Execute(fileQueryRecord);
 
                             using (Record fileRecord = fileView.Fetch())
                             {
                                 if (null == fileRecord)
                                 {
-                                    throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.File));
+                                    throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.Id.Id));
                                 }
 
                                 relativeFileLayoutPath = PathResolver.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);

@@ -25,14 +25,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var facades = new List<FileFacade>();
 
-            var wixFiles = this.Section.Tuples.OfType<WixFileTuple>().ToDictionary(t => t.File_);
-            var deltaPatchFiles = this.Section.Tuples.OfType<WixDeltaPatchFileTuple>().ToDictionary(t => t.File_);
+            var wixFiles = this.Section.Tuples.OfType<WixFileTuple>().ToDictionary(t => t.Id.Id);
+            var deltaPatchFiles = this.Section.Tuples.OfType<WixDeltaPatchFileTuple>().ToDictionary(t => t.Id.Id);
 
             foreach (var file in this.Section.Tuples.OfType<FileTuple>())
             {
-                var wixFile = wixFiles[file.File];
+                var wixFile = wixFiles[file.Id.Id];
 
-                deltaPatchFiles.TryGetValue(file.File, out var deltaPatchFile);
+                deltaPatchFiles.TryGetValue(file.Id.Id, out var deltaPatchFile);
 
                 facades.Add(new FileFacade(file, wixFile, deltaPatchFile));
             }
@@ -51,12 +51,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             ILookup<string, FileFacade> filesByDirectory = null;
             ILookup<string, FileFacade> filesByDiskId = null;
 
-            foreach (var row in this.Section.Tuples.OfType<WixDeltaPatchSymbolPathsTuple>().OrderBy(r => r.Type))
+            foreach (var row in this.Section.Tuples.OfType<WixDeltaPatchSymbolPathsTuple>().OrderBy(r => r.SymbolType))
             {
-                switch (row.Type)
+                switch (row.SymbolType)
                 {
                     case SymbolPathType.File:
-                        this.MergeSymbolPaths(row, deltaPatchFiles[row.Id]);
+                        this.MergeSymbolPaths(row, deltaPatchFiles[row.SymbolId]);
                         break;
 
                     case SymbolPathType.Component:
@@ -65,9 +65,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             filesByComponent = facades.ToLookup(f => f.File.Component_);
                         }
 
-                        foreach (var facade in filesByComponent[row.Id])
+                        foreach (var facade in filesByComponent[row.SymbolId])
                         {
-                            this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.File]);
+                            this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.Id.Id]);
                         }
                         break;
 
@@ -77,9 +77,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             filesByDirectory = facades.ToLookup(f => f.WixFile.Directory_);
                         }
 
-                        foreach (var facade in filesByDirectory[row.Id])
+                        foreach (var facade in filesByDirectory[row.SymbolId])
                         {
-                            this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.File]);
+                            this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.Id.Id]);
                         }
                         break;
 
@@ -89,9 +89,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             filesByDiskId = facades.ToLookup(f => f.WixFile.DiskId.ToString(CultureInfo.InvariantCulture));
                         }
 
-                        foreach (var facade in filesByDiskId[row.Id])
+                        foreach (var facade in filesByDiskId[row.SymbolId])
                         {
-                            this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.File]);
+                            this.MergeSymbolPaths(row, deltaPatchFiles[facade.File.Id.Id]);
                         }
                         break;
 

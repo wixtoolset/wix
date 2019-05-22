@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
@@ -21,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ModularizationGuid = modularizationGuid;
 
             // Gather all the unique suppress modularization identifiers.
-            this.SuppressModularizationIdentifiers = new HashSet<string>(suppressTuples.Select(s => s.WixSuppressModularization));
+            this.SuppressModularizationIdentifiers = new HashSet<string>(suppressTuples.Select(s => s.Id.Id));
         }
 
         private Output Output { get; }

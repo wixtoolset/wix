@@ -14,6 +14,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreateOutputFromIRCommand
     {
+        private const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
+        private const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
+
         public CreateOutputFromIRCommand(IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
             this.Section = section;
@@ -46,6 +49,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 switch (tuple.Definition.Type)
                 {
+                case TupleDefinitionType.Binary:
+                    this.AddTupleDefaultly(tuple, output, true);
+                    break;
+
                 case TupleDefinitionType.BBControl:
                     this.AddBBControlTuple((BBControlTuple)tuple, output);
                     break;
@@ -64,6 +71,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 case TupleDefinitionType.Dialog:
                     this.AddDialogTuple((DialogTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Directory:
+                    this.AddDirectoryTuple((DirectoryTuple)tuple, output);
                     break;
 
                 case TupleDefinitionType.Environment:
@@ -102,12 +113,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.MoveFile:
+                    this.AddMoveFileTuple((MoveFileTuple)tuple, output);
+                    break;
+
                 case TupleDefinitionType.Property:
                     this.AddPropertyTuple((PropertyTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.RemoveFile:
+                    this.AddRemoveFileTuple((RemoveFileTuple)tuple, output);
+                    break;
+
                 case TupleDefinitionType.Registry:
                     this.AddRegistryTuple((RegistryTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.RegLocator:
+                    this.AddRegLocatorTuple((RegLocatorTuple)tuple, output);
                     break;
 
                 case TupleDefinitionType.RemoveRegistry:
@@ -138,16 +161,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddWixActionTuple((WixActionTuple)tuple, output);
                     break;
 
-                case TupleDefinitionType.WixMedia:
-                    // Ignored.
-                    break;
-
                 case TupleDefinitionType.WixMediaTemplate:
                     this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple, output);
                     break;
 
                 case TupleDefinitionType.MustBeFromAnExtension:
                     this.AddTupleFromExtension(tuple, output);
+                    break;
+
+                // ignored.
+                case TupleDefinitionType.WixFile:
+                case TupleDefinitionType.WixComponentGroup:
+                case TupleDefinitionType.WixDeltaPatchFile:
                     break;
 
                 default:
@@ -311,6 +336,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[9] = tuple.Control_Cancel;
         }
 
+        private void AddDirectoryTuple(DirectoryTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["Directory"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Directory_Parent;
+            row[2] = tuple.DefaultDir;
+        }
+
         private void AddEnvironmentTuple(EnvironmentTuple tuple, Output output)
         {
             var action = String.Empty;
@@ -373,7 +407,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var table = output.EnsureTable(this.TableDefinitions["File"]);
             var row = (FileRow)table.CreateRow(tuple.SourceLineNumbers);
-            row.File = tuple.File;
+            row.File = tuple.Id.Id;
             row.Component = tuple.Component_;
             row.FileName = GetMsiFilenameValue(tuple.ShortFileName, tuple.LongFileName);
             row.FileSize = tuple.FileSize;
@@ -392,7 +426,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddIniFileTuple(IniFileTuple tuple, Output output)
         {
-            string tableName = (InifFileActionType.AddLine == tuple.Action || InifFileActionType.AddTag == tuple.Action || InifFileActionType.CreateLine == tuple.Action) ? "IniFile" : "RemoveIniFile";
+            var tableName = (InifFileActionType.AddLine == tuple.Action || InifFileActionType.AddTag == tuple.Action || InifFileActionType.CreateLine == tuple.Action) ? "IniFile" : "RemoveIniFile";
 
             var table = output.EnsureTable(this.TableDefinitions[tableName]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
@@ -487,6 +521,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[8] = tuple.Component_;
         }
 
+        private void AddMoveFileTuple(MoveFileTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["MoveFile"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Component_;
+            row[2] = tuple.SourceName;
+            row[3] = tuple.DestName;
+            row[4] = tuple.SourceFolder;
+            row[5] = tuple.DestFolder;
+            row[6] = tuple.Delete ? WindowsInstallerConstants.MsidbMoveFileOptionsMove : 0;
+        }
+
         private void AddPropertyTuple(PropertyTuple tuple, Output output)
         {
             if (String.IsNullOrEmpty(tuple.Value))
@@ -496,8 +543,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var table = output.EnsureTable(this.TableDefinitions["Property"]);
             var row = (PropertyRow)table.CreateRow(tuple.SourceLineNumbers);
-            row.Property = tuple.Property;
+            row.Property = tuple.Id.Id;
             row.Value = tuple.Value;
+        }
+
+        private void AddRemoveFileTuple(RemoveFileTuple tuple, Output output)
+        {
+            var installMode = tuple.OnInstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall : 0;
+            installMode |= tuple.OnUninstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["RemoveFile"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Component_;
+            row[2] = tuple.FileName;
+            row[3] = tuple.DirProperty;
+            row[4] = installMode;
         }
 
         private void AddRegistryTuple(RegistryTuple tuple, Output output)
@@ -550,6 +611,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[3] = tuple.Name;
             row[4] = value;
             row[5] = tuple.Component_;
+        }
+
+        private void AddRegLocatorTuple(RegLocatorTuple tuple, Output output)
+        {
+            var type = (int)tuple.Type;
+            type |= tuple.Win64 ? WindowsInstallerConstants.MsidbLocatorType64bit : 0;
+
+            var table = output.EnsureTable(this.TableDefinitions["RegLocator"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Root;
+            row[2] = tuple.Key;
+            row[3] = tuple.Name;
+            row[4] = type;
         }
 
         private void AddRemoveRegistryTuple(RemoveRegistryTuple tuple, Output output)
@@ -684,7 +759,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         sequenceTableDefinition = this.TableDefinitions["AdminUISequence"];
                     }
                     break;
-                case SequenceTable.AdvtExecuteSequence:
+                case SequenceTable.AdvertiseExecuteSequence:
                     if (OutputType.Module == output.Type)
                     {
                         output.EnsureTable(this.TableDefinitions["AdvtExecuteSequence"]);
@@ -754,8 +829,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.CompressionLevel = tuple.CompressionLevel;
             row.DiskPrompt = tuple.DiskPrompt;
             row.VolumeLabel = tuple.VolumeLabel;
-            row.MaximumUncompressedMediaSize = tuple.MaximumUncompressedMediaSize;
-            row.MaximumCabinetSizeForLargeFileSplitting = tuple.MaximumCabinetSizeForLargeFileSplitting;
+            row.MaximumUncompressedMediaSize = tuple.MaximumUncompressedMediaSize ?? DefaultMaximumUncompressedMediaSize;
+            row.MaximumCabinetSizeForLargeFileSplitting = tuple.MaximumCabinetSizeForLargeFileSplitting ?? MaxValueOfMaxCabSizeForLargeFileSplitting;
         }
 
         private void AddTupleFromExtension(IntermediateTuple tuple, Output output)

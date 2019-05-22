@@ -18,11 +18,11 @@ namespace WixToolset.Core.Link
     /// </summary>
     internal class WixGroupingOrdering
     {
-        private IMessaging messageHandler;
+        private readonly IMessaging messageHandler;
         private List<string> groupTypes;
         private List<string> itemTypes;
         private ItemCollection items;
-        private List<int> rowsUsed;
+        private readonly List<int> rowsUsed;
         private bool loaded;
         private bool encounteredError;
 
@@ -50,10 +50,10 @@ namespace WixToolset.Core.Link
         /// </summary>
         /// <param name="groupTypes">Group types to include.</param>
         /// <param name="itemTypes">Item types to include.</param>
-        public void UseTypes(IEnumerable<string> groupTypes, IEnumerable<string> itemTypes)
+        public void UseTypes(IEnumerable<ComplexReferenceParentType> groupTypes, IEnumerable<ComplexReferenceChildType> itemTypes)
         {
-            this.groupTypes = new List<string>(groupTypes);
-            this.itemTypes = new List<string>(itemTypes);
+            this.groupTypes = new List<string>(groupTypes.Select(g => g.ToString()));
+            this.itemTypes = new List<string>(itemTypes.Select(i => i.ToString()));
 
             this.items = new ItemCollection();
             this.loaded = false;
@@ -65,17 +65,18 @@ namespace WixToolset.Core.Link
         /// <param name="parentType">The group type for the parent group to flatten.</param>
         /// <param name="parentId">The identifier of the parent group to flatten.</param>
         /// <param name="removeUsedRows">Whether to remove used group rows before returning.</param>
-        public void FlattenAndRewriteRows(string parentType, string parentId, bool removeUsedRows)
+        public void FlattenAndRewriteRows(ComplexReferenceChildType parentType, string parentId, bool removeUsedRows)
         {
-            Debug.Assert(this.groupTypes.Contains(parentType));
+            var parentTypeString = parentType.ToString();
+            Debug.Assert(this.groupTypes.Contains(parentTypeString));
 
-            this.CreateOrderedList(parentType, parentId, out var orderedItems);
+            this.CreateOrderedList(parentTypeString, parentId, out var orderedItems);
             if (this.encounteredError)
             {
                 return;
             }
 
-            this.CreateNewGroupRows(parentType, parentId, orderedItems);
+            this.CreateNewGroupRows(parentTypeString, parentId, orderedItems);
 
             if (removeUsedRows)
             {
@@ -88,9 +89,10 @@ namespace WixToolset.Core.Link
         /// </summary>
         /// <param name="parentType">The type of the parent group to flatten.</param>
         /// <param name="removeUsedRows">Whether to remove used group rows before returning.</param>
-        public void FlattenAndRewriteGroups(string parentType, bool removeUsedRows)
+        public void FlattenAndRewriteGroups(ComplexReferenceParentType parentType, bool removeUsedRows)
         {
-            Debug.Assert(this.groupTypes.Contains(parentType));
+            var parentTypeString = parentType.ToString();
+            Debug.Assert(this.groupTypes.Contains(parentTypeString));
 
             this.LoadFlattenOrderGroups();
             if (this.encounteredError)
@@ -100,10 +102,9 @@ namespace WixToolset.Core.Link
 
             foreach (Item item in this.items)
             {
-                if (parentType == item.Type)
+                if (parentTypeString == item.Type)
                 {
-                    List<Item> orderedItems;
-                    this.CreateOrderedList(item.Type, item.Id, out orderedItems);
+                    this.CreateOrderedList(item.Type, item.Id, out var orderedItems);
                     this.CreateNewGroupRows(item.Type, item.Id, orderedItems);
                 }
             }
@@ -131,8 +132,7 @@ namespace WixToolset.Core.Link
                 return;
             }
 
-            Item parentItem;
-            if (!this.items.TryGetValue(parentType, parentId, out parentItem))
+            if (!this.items.TryGetValue(parentType, parentId, out var parentItem))
             {
                 this.messageHandler.Write(ErrorMessages.IdentifierNotFound(parentType, parentId));
                 return;
@@ -360,9 +360,9 @@ namespace WixToolset.Core.Link
 
             foreach (var row in this.EntrySection.Tuples.OfType<WixOrderingTuple>())
             {
-                var rowItemType = row.ItemType;
+                var rowItemType = row.ItemType.ToString();
                 var rowItemName = row.ItemId_;
-                var rowDependsOnType = row.DependsOnType;
+                var rowDependsOnType = row.DependsOnType.ToString();
                 var rowDependsOnName = row.DependsOnId_;
 
                 // If this row specifies some other (unknown) type in either
@@ -510,8 +510,8 @@ namespace WixToolset.Core.Link
         /// ordering dependencies.</remarks>
         internal class Item
         {
-            private ItemCollection afterItems;
-            private ItemCollection beforeItems; // for checking for circular references
+            private readonly ItemCollection afterItems;
+            private readonly ItemCollection beforeItems; // for checking for circular references
             private bool flattenedAfterItems;
 
             public Item(IntermediateTuple row, string type, string id)
@@ -522,9 +522,9 @@ namespace WixToolset.Core.Link
 
                 this.Key = ItemCollection.CreateKeyFromTypeId(type, id);
 
-                afterItems = new ItemCollection();
-                beforeItems = new ItemCollection();
-                flattenedAfterItems = false;
+                this.afterItems = new ItemCollection();
+                this.beforeItems = new ItemCollection();
+                this.flattenedAfterItems = false;
             }
 
             public IntermediateTuple Row { get; private set; }
@@ -540,8 +540,7 @@ namespace WixToolset.Core.Link
             }
 #endif // DEBUG
 
-            private ItemCollection childItems = new ItemCollection();
-            public ItemCollection ChildItems { get { return childItems; } }
+            public ItemCollection ChildItems { get; } = new ItemCollection();
 
             /// <summary>
             /// Removes any nested groups under this item and replaces
@@ -614,7 +613,7 @@ namespace WixToolset.Core.Link
             {
                 if (this.ShouldItemPropagateChildOrdering())
                 {
-                    foreach (Item childItem in this.childItems)
+                    foreach (Item childItem in this.ChildItems)
                     {
                         childItem.AddAfter(this.afterItems, messageHandler);
                     }
@@ -667,9 +666,9 @@ namespace WixToolset.Core.Link
             // first payload to be the entrypoint.
             private bool ShouldItemPropagateChildOrdering()
             {
-                if (String.Equals("Package", this.Type, StringComparison.Ordinal) ||
-                    (String.Equals("Container", this.Type, StringComparison.Ordinal) &&
-                    !String.Equals(Compiler.BurnUXContainerId, this.Id, StringComparison.Ordinal)))
+                if (String.Equals(nameof(ComplexReferenceChildType.Package), this.Type, StringComparison.Ordinal) ||
+                    (String.Equals(nameof(ComplexReferenceParentType.Container), this.Type, StringComparison.Ordinal) &&
+                    !String.Equals(Compiler.BurnUXContainerId.Id, this.Id, StringComparison.Ordinal)))
                 {
                     return false;
                 }

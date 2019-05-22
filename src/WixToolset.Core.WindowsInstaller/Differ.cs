@@ -8,6 +8,7 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Globalization;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
@@ -18,7 +19,7 @@ namespace WixToolset.Core.WindowsInstaller
     /// </summary>
     public sealed class Differ
     {
-        private List<IInspectorExtension> inspectorExtensions;
+        private readonly List<IInspectorExtension> inspectorExtensions;
         private bool showPedanticMessages;
         private bool suppressKeepingSpecialRows;
         private bool preserveUnchangedRows;

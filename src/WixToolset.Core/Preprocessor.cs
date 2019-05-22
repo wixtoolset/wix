@@ -66,7 +66,8 @@ namespace WixToolset.Core
         /// <summary>
         /// Event for resolved variables.
         /// </summary>
-        public event ResolvedVariableEventHandler ResolvedVariable;
+        /// TOOD: Remove?
+        //public event ResolvedVariableEventHandler ResolvedVariable;
 
         /// <summary>
         /// Get the source line information for the current element.  The precompiler will insert

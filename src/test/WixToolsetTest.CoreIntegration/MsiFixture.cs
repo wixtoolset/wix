@@ -534,7 +534,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
                 var section = intermediate.Sections.Single();
 
-                var platformSummary = section.Tuples.OfType<_SummaryInformationTuple>().Single(s => s.PropertyId == 7);
+                var platformSummary = section.Tuples.OfType<SummaryInformationTuple>().Single(s => s.PropertyId == SumaryInformationType.PlatformAndLanguage);
                 Assert.Equal("x64;1033", platformSummary.Value);
             }
         }

@@ -79,7 +79,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (!fileInfo.Exists)
             {
-                this.Messaging.Write(ErrorMessages.CannotFindFile(file.File.SourceLineNumbers, file.File.File, file.File.LongFileName, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.CannotFindFile(file.File.SourceLineNumbers, file.File.Id.Id, file.File.LongFileName, file.WixFile.Source.Path));
                 return;
             }
 
@@ -127,16 +127,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     //
                     // Also, if we do not find a matching file identifier then the user provided a default version and is providing a version
                     // for unversioned file. That's allowed but generally a dangerous thing to do so let's point that out to the user.
-                    if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.File, StringComparison.Ordinal)))
+                    if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.Id.Id, StringComparison.Ordinal)))
                     {
-                        this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Version, file.File.File));
+                        this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Version, file.File.Id.Id));
                     }
                 }
                 else
                 {
                     if (null != file.File.Language)
                     {
-                        this.Messaging.Write(WarningMessages.DefaultLanguageUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.File));
+                        this.Messaging.Write(WarningMessages.DefaultLanguageUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.Id.Id));
                     }
 
                     int[] hash;
@@ -162,7 +162,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.Section.Tuples.Add(file.Hash);
                     }
 
-                    file.Hash.File_ = file.File.File;
+                    file.Hash.File_ = file.File.Id.Id;
                     file.Hash.Options = 0;
                     file.Hash.HashPart1 = hash[0];
                     file.Hash.HashPart2 = hash[1];
@@ -178,7 +178,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     file.File.Version = version;
                 }
-                else if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.File, StringComparison.Ordinal))) // this looks expensive, but see explanation below.
+                else if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.Id.Id, StringComparison.Ordinal))) // this looks expensive, but see explanation below.
                 {
                     // The user provided a default version for the file row so we looked for a companion file (a file row with Id matching
                     // the version value). We didn't find it so, we will override the default version they provided with the actual
@@ -194,7 +194,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (!String.IsNullOrEmpty(file.File.Language) && String.IsNullOrEmpty(language))
                 {
-                    this.Messaging.Write(WarningMessages.DefaultLanguageUsedForVersionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.File));
+                    this.Messaging.Write(WarningMessages.DefaultLanguageUsedForVersionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.Id.Id));
                 }
                 else // override the default provided by the user (usually nothing) with the actual language from the file itself.
                 {
@@ -206,13 +206,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (!String.IsNullOrEmpty(file.File.Version))
                     {
-                        var key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", file.File.File);
+                        var key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", file.File.Id.Id);
                         this.VariableCache[key] = file.File.Version;
                     }
 
                     if (!String.IsNullOrEmpty(file.File.Language))
                     {
-                        var key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", file.File.File);
+                        var key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", file.File.Id.Id);
                         this.VariableCache[key] = file.File.Language;
                     }
                 }
@@ -256,7 +256,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // add the assembly name to the information cache
                     if (null != this.VariableCache)
                     {
-                        this.VariableCache[$"assemblyfullname.{file.File.File}"] = assemblyName.GetFullName();
+                        this.VariableCache[$"assemblyfullname.{file.File.Id.Id}"] = assemblyName.GetFullName();
                     }
                 }
                 catch (WixException e)
@@ -269,10 +269,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // TODO: Consider passing in the this.FileFacades as an indexed collection instead of searching through
                 // all files like this. Even though this is a rare case it looks like we might be able to index the
                 // file earlier.
-                var fileManifest = this.FileFacades.SingleOrDefault(r => r.File.File.Equals(file.WixFile.File_AssemblyManifest, StringComparison.Ordinal));
+                var fileManifest = this.FileFacades.FirstOrDefault(r => r.File.Id.Id.Equals(file.WixFile.File_AssemblyManifest, StringComparison.Ordinal));
                 if (null == fileManifest)
                 {
-                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.File, file.WixFile.File_AssemblyManifest));
+                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.Id.Id, file.WixFile.File_AssemblyManifest));
                 }
 
                 try
@@ -358,7 +358,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (this.VariableCache != null)
                 {
-                    var key = String.Format(CultureInfo.InvariantCulture, "assembly{0}.{1}", name, file.File.File).ToLowerInvariant();
+                    var key = String.Format(CultureInfo.InvariantCulture, "assembly{0}.{1}", name, file.File.Id.Id).ToLowerInvariant();
                     this.VariableCache[key] = value;
                 }
             }

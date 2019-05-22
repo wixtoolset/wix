@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller.Rows
     // TODO: Remove this
     internal sealed class WixActionRowCollection : ICollection
     {
-        private SortedList collection;
+        private readonly SortedList collection;
 
         /// <summary>
         /// Creates a new action table object.
@@ -235,7 +235,7 @@ namespace WixToolset.Core.WindowsInstaller.Rows
             string id = null;
             string condition = null;
             bool empty = reader.IsEmptyElement;
-            int sequence = int.MinValue;
+            int sequence = Int32.MinValue;
             int sequenceCount = 0;
             SequenceTable[] sequenceTables = new SequenceTable[Enum.GetValues(typeof(SequenceTable)).Length];
 
@@ -263,7 +263,7 @@ namespace WixToolset.Core.WindowsInstaller.Rows
                     case "AdvtExecuteSequence":
                         if (reader.Value.Equals("yes"))
                         {
-                            sequenceTables[sequenceCount] = SequenceTable.AdvtExecuteSequence;
+                            sequenceTables[sequenceCount] = SequenceTable.AdvertiseExecuteSequence;
                             ++sequenceCount;
                         }
                         break;
@@ -295,7 +295,7 @@ namespace WixToolset.Core.WindowsInstaller.Rows
                 throw new XmlException();
             }
 
-            if (int.MinValue == sequence)
+            if (Int32.MinValue == sequence)
             {
                 throw new XmlException();
             }
@@ -316,7 +316,7 @@ namespace WixToolset.Core.WindowsInstaller.Rows
 
             // create the actions
             WixActionRow[] actionRows = new WixActionRow[sequenceCount];
-            for (int i = 0; i < sequenceCount; i++)
+            for (var i = 0; i < sequenceCount; i++)
             {
                 //WixActionRow actionRow = new WixActionRow(sequenceTables[i], id, condition, sequence);
                 //actionRows[i] = actionRow;

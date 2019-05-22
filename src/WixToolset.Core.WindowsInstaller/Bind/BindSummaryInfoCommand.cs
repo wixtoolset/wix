@@ -49,13 +49,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             bool foundCreatingApplication = false;
             string now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-            foreach (var summaryInformationRow in this.Section.Tuples.OfType<_SummaryInformationTuple>())
+            foreach (var summaryInformationTuple in this.Section.Tuples.OfType<SummaryInformationTuple>())
             {
-                switch (summaryInformationRow.PropertyId)
+                switch (summaryInformationTuple.PropertyId)
                 {
-                    case 1: // PID_CODEPAGE
-                            // make sure the code page is an int and not a web name or null
-                        var codepage = summaryInformationRow.Value;
+                    case SumaryInformationType.Codepage: // PID_CODEPAGE
+                        // make sure the code page is an int and not a web name or null
+                        var codepage = summaryInformationTuple.Value;
 
                         if (String.IsNullOrEmpty(codepage))
                         {
@@ -63,11 +63,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            summaryInformationRow.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationRow.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
+                            summaryInformationTuple.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationTuple.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
                         }
                         break;
-                    case 9: // PID_REVNUMBER
-                        var packageCode = summaryInformationRow.Value;
+                    case SumaryInformationType.PackageCode: // PID_REVNUMBER
+                        var packageCode = summaryInformationTuple.Value;
 
                         if (SectionType.Module == this.Section.Type)
                         {
@@ -76,19 +76,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         else if ("*" == packageCode)
                         {
                             // set the revision number (package/patch code) if it should be automatically generated
-                            summaryInformationRow.Value = Common.GenerateGuid();
+                            summaryInformationTuple.Value = Common.GenerateGuid();
                         }
                         break;
-                    case 12: // PID_CREATE_DTM
+                    case SumaryInformationType.Created:
                         foundCreateDataTime = true;
                         break;
-                    case 13: // PID_LASTSAVE_DTM
+                    case SumaryInformationType.LastSaved:
                         foundLastSaveDataTime = true;
                         break;
-                    case 14:
-                        this.InstallerVersion = summaryInformationRow[_SummaryInformationTupleFields.Value].AsNumber();
+                    case SumaryInformationType.WindowsInstallerVersion:
+                        this.InstallerVersion = summaryInformationTuple[SummaryInformationTupleFields.Value].AsNumber();
                         break;
-                    case 15: // PID_WORDCOUNT
+                    case SumaryInformationType.WordCount:
                         if (SectionType.Patch == this.Section.Type)
                         {
                             this.LongNames = true;
@@ -96,12 +96,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         else
                         {
-                            var attributes = summaryInformationRow[_SummaryInformationTupleFields.Value].AsNumber();
+                            var attributes = summaryInformationTuple[SummaryInformationTupleFields.Value].AsNumber();
                             this.LongNames = (0 == (attributes & 1));
                             this.Compressed = (2 == (attributes & 2));
                         }
                         break;
-                    case 18: // PID_APPNAME
+                    case SumaryInformationType.CreatingApplication: // PID_APPNAME
                         foundCreatingApplication = true;
                         break;
                 }
@@ -110,8 +110,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the create time/date property if its not already set
             if (!foundCreateDataTime)
             {
-                var createTimeDateRow = new _SummaryInformationTuple(null, new Identifier(12, AccessModifier.Private));
-                createTimeDateRow.PropertyId = 12;
+                var createTimeDateRow = new SummaryInformationTuple(null);
+                createTimeDateRow.PropertyId = SumaryInformationType.Created;
                 createTimeDateRow.Value = now;
 
                 this.Section.Tuples.Add(createTimeDateRow);
@@ -120,8 +120,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the last save time/date property if its not already set
             if (!foundLastSaveDataTime)
             {
-                var lastSaveTimeDateRow = new _SummaryInformationTuple(null, new Identifier(13, AccessModifier.Private));
-                lastSaveTimeDateRow.PropertyId = 13;
+                var lastSaveTimeDateRow = new SummaryInformationTuple(null);
+                lastSaveTimeDateRow.PropertyId = SumaryInformationType.LastSaved;
                 lastSaveTimeDateRow.Value = now;
 
                 this.Section.Tuples.Add(lastSaveTimeDateRow);
@@ -130,8 +130,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the creating application property if its not already set
             if (!foundCreatingApplication)
             {
-                var creatingApplicationRow = new _SummaryInformationTuple(null, new Identifier(18, AccessModifier.Private));
-                creatingApplicationRow.PropertyId = 18;
+                var creatingApplicationRow = new SummaryInformationTuple(null);
+                creatingApplicationRow.PropertyId = SumaryInformationType.CreatingApplication;
                 creatingApplicationRow.Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString());
 
                 this.Section.Tuples.Add(creatingApplicationRow);
