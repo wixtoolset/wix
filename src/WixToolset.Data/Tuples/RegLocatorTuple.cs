@@ -10,11 +10,11 @@ namespace WixToolset.Data
             TupleDefinitionType.RegLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RegLocatorTupleFields.Signature_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegLocatorTupleFields.Root), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(RegLocatorTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegLocatorTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegLocatorTupleFields.Type), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RegLocatorTupleFields.Win64), IntermediateFieldType.Bool),
             },
             typeof(RegLocatorTuple));
     }
@@ -24,12 +24,19 @@ namespace WixToolset.Data.Tuples
 {
     public enum RegLocatorTupleFields
     {
-        Signature_,
         Root,
         Key,
         Name,
         Type,
+        Win64,
     }
+
+    public enum RegLocatorType
+    {
+        Directory,
+        FileName,
+        Raw
+    };
 
     public class RegLocatorTuple : IntermediateTuple
     {
@@ -43,16 +50,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[RegLocatorTupleFields index] => this.Fields[(int)index];
 
-        public string Signature_
+        public RegistryRootType Root
         {
-            get => (string)this.Fields[(int)RegLocatorTupleFields.Signature_];
-            set => this.Set((int)RegLocatorTupleFields.Signature_, value);
-        }
-
-        public int Root
-        {
-            get => (int)this.Fields[(int)RegLocatorTupleFields.Root];
-            set => this.Set((int)RegLocatorTupleFields.Root, value);
+            get => (RegistryRootType)this.Fields[(int)RegLocatorTupleFields.Root].AsNumber();
+            set => this.Set((int)RegLocatorTupleFields.Root, (int)value);
         }
 
         public string Key
@@ -67,10 +68,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)RegLocatorTupleFields.Name, value);
         }
 
-        public int Type
+        public RegLocatorType Type
         {
-            get => (int)this.Fields[(int)RegLocatorTupleFields.Type];
-            set => this.Set((int)RegLocatorTupleFields.Type, value);
+            get => (RegLocatorType)this.Fields[(int)RegLocatorTupleFields.Type].AsNumber();
+            set => this.Set((int)RegLocatorTupleFields.Type, (int)value);
+        }
+
+        public bool Win64
+        {
+            get => this.Fields[(int)RegLocatorTupleFields.Win64].AsBool();
+            set => this.Set((int)RegLocatorTupleFields.Win64, value);
         }
     }
 }

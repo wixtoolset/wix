@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.File,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileTupleFields.File), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.ShortFileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.LongFileName), IntermediateFieldType.String),
@@ -23,6 +22,9 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Vital), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Checksum), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Compressed), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.FontTitle), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.SelfRegCost), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.BindPath), IntermediateFieldType.String),
             },
             typeof(FileTuple));
     }
@@ -32,7 +34,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum FileTupleFields
     {
-        File,
         Component_,
         ShortFileName,
         LongFileName,
@@ -45,6 +46,9 @@ namespace WixToolset.Data.Tuples
         Vital,
         Checksum,
         Compressed,
+        FontTitle,
+        SelfRegCost,
+        BindPath,
     }
 
     public class FileTuple : IntermediateTuple
@@ -58,12 +62,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[FileTupleFields index] => this.Fields[(int)index];
-
-        public string File
-        {
-            get => (string)this.Fields[(int)FileTupleFields.File];
-            set => this.Set((int)FileTupleFields.File, value);
-        }
 
         public string Component_
         {
@@ -135,6 +133,24 @@ namespace WixToolset.Data.Tuples
         {
             get => (bool?)this.Fields[(int)FileTupleFields.Compressed];
             set => this.Set((int)FileTupleFields.Compressed, value);
+        }
+
+        public string FontTitle
+        {
+            get => (string)this.Fields[(int)FileTupleFields.FontTitle];
+            set => this.Set((int)FileTupleFields.FontTitle, value);
+        }
+
+        public int? SelfRegCost
+        {
+            get => (int?)this.Fields[(int)FileTupleFields.SelfRegCost];
+            set => this.Set((int)FileTupleFields.SelfRegCost, value);
+        }
+
+        public string BindPath
+        {
+            get => (string)this.Fields[(int)FileTupleFields.BindPath];
+            set => this.Set((int)FileTupleFields.BindPath, value);
         }
     }
 }

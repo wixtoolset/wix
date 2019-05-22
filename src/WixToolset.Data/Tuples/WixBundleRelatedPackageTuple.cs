@@ -10,8 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleRelatedPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.WixBundlePackage_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.Id), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.RelatedId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MaxVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.Languages), IntermediateFieldType.String),
@@ -28,8 +27,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleRelatedPackageTupleFields
     {
-        WixBundlePackage_,
-        Id,
+        RelatedId,
         MinVersion,
         MaxVersion,
         Languages,
@@ -51,16 +49,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleRelatedPackageTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackage_
+        public string RelatedId
         {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.WixBundlePackage_];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.WixBundlePackage_, value);
-        }
-
-        public string Id
-        {
-            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.Id];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.Id, value);
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.RelatedId];
+            set => this.Set((int)WixBundleRelatedPackageTupleFields.RelatedId, value);
         }
 
         public string MinVersion

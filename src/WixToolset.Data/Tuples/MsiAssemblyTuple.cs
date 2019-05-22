@@ -67,10 +67,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiAssemblyTupleFields.File_Application, value);
         }
 
-        public int Attributes
+        public FileAssemblyType Type
         {
-            get => (int)this.Fields[(int)MsiAssemblyTupleFields.Attributes];
-            set => this.Set((int)MsiAssemblyTupleFields.Attributes, value);
+            get => (FileAssemblyType)this.Fields[(int)MsiAssemblyTupleFields.Attributes].AsNumber();
+            set => this.Set((int)MsiAssemblyTupleFields.Attributes, (int)value);
         }
     }
 }

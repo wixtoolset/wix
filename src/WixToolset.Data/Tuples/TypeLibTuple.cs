@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.TypeLib,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.LibID), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.LibId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Language), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Version), IntermediateFieldType.Number),
@@ -27,7 +27,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum TypeLibTupleFields
     {
-        LibID,
+        LibId,
         Language,
         Component_,
         Version,
@@ -49,10 +49,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[TypeLibTupleFields index] => this.Fields[(int)index];
 
-        public string LibID
+        public string LibId
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.LibID];
-            set => this.Set((int)TypeLibTupleFields.LibID, value);
+            get => (string)this.Fields[(int)TypeLibTupleFields.LibId];
+            set => this.Set((int)TypeLibTupleFields.LibId, value);
         }
 
         public int Language

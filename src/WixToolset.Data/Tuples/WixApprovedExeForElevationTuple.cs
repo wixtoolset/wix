@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixApprovedExeForElevation,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Id), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Attributes), IntermediateFieldType.Number),
@@ -23,7 +22,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixApprovedExeForElevationTupleFields
     {
-        Id,
         Key,
         Value,
         Attributes,
@@ -41,12 +39,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixApprovedExeForElevationTupleFields index] => this.Fields[(int)index];
 
-        public string Id
-        {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Id];
-            set => this.Set((int)WixApprovedExeForElevationTupleFields.Id, value);
-        }
-
         public string Key
         {
             get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Key];
@@ -59,10 +51,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Value, value);
         }
 
-        public int Attributes
+        public BundleApprovedExeForElevationAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes];
-            set => this.Set((int)WixApprovedExeForElevationTupleFields.Attributes, value);
+            get => (BundleApprovedExeForElevationAttributes)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixApprovedExeForElevationTupleFields.Attributes, (int)value);
         }
     }
 }

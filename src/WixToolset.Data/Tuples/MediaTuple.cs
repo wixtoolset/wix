@@ -16,6 +16,8 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(MediaTupleFields.Cabinet), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MediaTupleFields.VolumeLabel), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MediaTupleFields.Source), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MediaTupleFields.CompressionLevel), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MediaTupleFields.Layout), IntermediateFieldType.String),
             },
             typeof(MediaTuple));
     }
@@ -31,6 +33,8 @@ namespace WixToolset.Data.Tuples
         Cabinet,
         VolumeLabel,
         Source,
+        CompressionLevel,
+        Layout,
     }
 
     public class MediaTuple : IntermediateTuple
@@ -79,6 +83,18 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)MediaTupleFields.Source];
             set => this.Set((int)MediaTupleFields.Source, value);
+        }
+
+        public CompressionLevel? CompressionLevel
+        {
+            get => (CompressionLevel?)this.Fields[(int)MediaTupleFields.CompressionLevel].AsNullableNumber();
+            set => this.Set((int)MediaTupleFields.CompressionLevel, (int?)value);
+        }
+
+        public string Layout
+        {
+            get => (string)this.Fields[(int)MediaTupleFields.Layout];
+            set => this.Set((int)MediaTupleFields.Layout, value);
         }
     }
 }

@@ -63,9 +63,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ImageFamiliesTupleFields.MediaDiskId, value);
         }
 
-        public int FileSequenceStart
+        public int? FileSequenceStart
         {
-            get => (int)this.Fields[(int)ImageFamiliesTupleFields.FileSequenceStart];
+            get => (int?)this.Fields[(int)ImageFamiliesTupleFields.FileSequenceStart];
             set => this.Set((int)ImageFamiliesTupleFields.FileSequenceStart, value);
         }
 

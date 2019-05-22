@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Binary,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(BinaryTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(BinaryTupleFields.Data), IntermediateFieldType.Path),
             },
             typeof(BinaryTuple));
@@ -21,7 +20,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum BinaryTupleFields
     {
-        Name,
         Data,
     }
 
@@ -36,12 +34,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[BinaryTupleFields index] => this.Fields[(int)index];
-
-        public string Name
-        {
-            get => (string)this.Fields[(int)BinaryTupleFields.Name];
-            set => this.Set((int)BinaryTupleFields.Name, value);
-        }
 
         public string Data
         {

@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiShortcutProperty,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.MsiShortcutProperty), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.Shortcut_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.PropertyKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiShortcutPropertyTupleFields.PropVariantValue), IntermediateFieldType.String),
@@ -23,7 +22,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiShortcutPropertyTupleFields
     {
-        MsiShortcutProperty,
         Shortcut_,
         PropertyKey,
         PropVariantValue,
@@ -40,12 +38,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[MsiShortcutPropertyTupleFields index] => this.Fields[(int)index];
-
-        public string MsiShortcutProperty
-        {
-            get => (string)this.Fields[(int)MsiShortcutPropertyTupleFields.MsiShortcutProperty];
-            set => this.Set((int)MsiShortcutPropertyTupleFields.MsiShortcutProperty, value);
-        }
 
         public string Shortcut_
         {

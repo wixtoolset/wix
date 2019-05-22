@@ -10,11 +10,11 @@ namespace WixToolset.Data
             TupleDefinitionType.RemoveFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.FileKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.FileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.DirProperty), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.InstallMode), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.OnInstall), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.OnUninstall), IntermediateFieldType.Bool),
             },
             typeof(RemoveFileTuple));
     }
@@ -24,11 +24,11 @@ namespace WixToolset.Data.Tuples
 {
     public enum RemoveFileTupleFields
     {
-        FileKey,
         Component_,
         FileName,
         DirProperty,
-        InstallMode,
+        OnInstall,
+        OnUninstall,
     }
 
     public class RemoveFileTuple : IntermediateTuple
@@ -42,12 +42,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[RemoveFileTupleFields index] => this.Fields[(int)index];
-
-        public string FileKey
-        {
-            get => (string)this.Fields[(int)RemoveFileTupleFields.FileKey];
-            set => this.Set((int)RemoveFileTupleFields.FileKey, value);
-        }
 
         public string Component_
         {
@@ -67,10 +61,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)RemoveFileTupleFields.DirProperty, value);
         }
 
-        public int InstallMode
+        public bool? OnInstall
         {
-            get => (int)this.Fields[(int)RemoveFileTupleFields.InstallMode];
-            set => this.Set((int)RemoveFileTupleFields.InstallMode, value);
+            get => (bool?)this.Fields[(int)RemoveFileTupleFields.OnInstall];
+            set => this.Set((int)RemoveFileTupleFields.OnInstall, value);
+        }
+
+        public bool? OnUninstall
+        {
+            get => (bool?)this.Fields[(int)RemoveFileTupleFields.OnUninstall];
+            set => this.Set((int)RemoveFileTupleFields.OnUninstall, value);
         }
     }
 }

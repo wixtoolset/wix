@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixAction,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixActionTupleFields.SequenceTable), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixActionTupleFields.SequenceTable), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixActionTupleFields.Action), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixActionTupleFields.Condition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixActionTupleFields.Sequence), IntermediateFieldType.Number),
@@ -41,7 +41,7 @@ namespace WixToolset.Data.Tuples
     {
         AdminUISequence,
         AdminExecuteSequence,
-        AdvtExecuteSequence,
+        AdvertiseExecuteSequence,
         InstallUISequence,
         InstallExecuteSequence
     }
@@ -60,8 +60,8 @@ namespace WixToolset.Data.Tuples
 
         public SequenceTable SequenceTable
         {
-            get => (SequenceTable)Enum.Parse(typeof(SequenceTable), (string)this.Fields[(int)WixActionTupleFields.SequenceTable]);
-            set => this.Set((int)WixActionTupleFields.SequenceTable, value.ToString());
+            get => (SequenceTable)this.Fields[(int)WixActionTupleFields.SequenceTable].AsNumber();
+            set => this.Set((int)WixActionTupleFields.SequenceTable, (int)value);
         }
 
         public string Action
@@ -76,9 +76,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixActionTupleFields.Condition, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => (int)this.Fields[(int)WixActionTupleFields.Sequence];
+            get => (int?)this.Fields[(int)WixActionTupleFields.Sequence];
             set => this.Set((int)WixActionTupleFields.Sequence, value);
         }
 

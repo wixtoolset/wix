@@ -10,9 +10,9 @@ namespace WixToolset.Data
             TupleDefinitionType.Directory,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.Directory), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DirectoryTupleFields.Directory_Parent), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DirectoryTupleFields.DefaultDir), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ComponentGuidGenerationSeed), IntermediateFieldType.String),
             },
             typeof(DirectoryTuple));
     }
@@ -22,9 +22,9 @@ namespace WixToolset.Data.Tuples
 {
     public enum DirectoryTupleFields
     {
-        Directory,
         Directory_Parent,
         DefaultDir,
+        ComponentGuidGenerationSeed,
     }
 
     public class DirectoryTuple : IntermediateTuple
@@ -39,22 +39,22 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[DirectoryTupleFields index] => this.Fields[(int)index];
 
-        public string Directory
-        {
-            get => (string)this.Fields[(int)DirectoryTupleFields.Directory]?.Value;
-            set => this.Set((int)DirectoryTupleFields.Directory, value);
-        }
-
         public string Directory_Parent
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.Directory_Parent]?.Value;
+            get => (string)this.Fields[(int)DirectoryTupleFields.Directory_Parent];
             set => this.Set((int)DirectoryTupleFields.Directory_Parent, value);
         }
 
         public string DefaultDir
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.DefaultDir]?.Value;
+            get => (string)this.Fields[(int)DirectoryTupleFields.DefaultDir];
             set => this.Set((int)DirectoryTupleFields.DefaultDir, value);
+        }
+
+        public string ComponentGuidGenerationSeed
+        {
+            get => (string)this.Fields[(int)DirectoryTupleFields.ComponentGuidGenerationSeed];
+            set => this.Set((int)DirectoryTupleFields.ComponentGuidGenerationSeed, value);
         }
     }
 }

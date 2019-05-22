@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.UIText,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UITextTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UITextTupleFields.Text), IntermediateFieldType.String),
             },
             typeof(UITextTuple));
@@ -21,7 +20,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum UITextTupleFields
     {
-        Key,
         Text,
     }
 
@@ -36,12 +34,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[UITextTupleFields index] => this.Fields[(int)index];
-
-        public string Key
-        {
-            get => (string)this.Fields[(int)UITextTupleFields.Key];
-            set => this.Set((int)UITextTupleFields.Key, value);
-        }
 
         public string Text
         {

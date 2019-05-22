@@ -8,10 +8,7 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixUI = new IntermediateTupleDefinition(
             TupleDefinitionType.WixUI,
-            new[]
-            {
-                new IntermediateFieldDefinition(nameof(WixUITupleFields.WixUI), IntermediateFieldType.String),
-            },
+            new IntermediateFieldDefinition[0],
             typeof(WixUITuple));
     }
 }
@@ -20,7 +17,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixUITupleFields
     {
-        WixUI,
     }
 
     public class WixUITuple : IntermediateTuple
@@ -34,11 +30,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixUITupleFields index] => this.Fields[(int)index];
-
-        public string WixUI
-        {
-            get => (string)this.Fields[(int)WixUITupleFields.WixUI]?.Value;
-            set => this.Set((int)WixUITupleFields.WixUI, value);
-        }
-    }
+   }
 }

@@ -3,14 +3,11 @@
 namespace WixToolset.Data
 {
     using System;
-    using WixToolset.Data.Tuples;
 
     public enum TupleDefinitionType
     {
-        _Streams,
-        _SummaryInformation,
-        _TransformView,
-        _Validation,
+        SummaryInformation,
+        Validation,
         ActionText,
         AdminExecuteSequence,
         AdminUISequence,
@@ -20,7 +17,6 @@ namespace WixToolset.Data
         BBControl,
         Billboard,
         Binary,
-        BindImage,
         CCPSearch,
         CheckBox,
         Class,
@@ -48,7 +44,6 @@ namespace WixToolset.Data
         FeatureComponents,
         File,
         FileSFPCatalog,
-        Font,
         Icon,
         ImageFamilies,
         IniFile,
@@ -113,7 +108,6 @@ namespace WixToolset.Data
         RemoveIniFile,
         RemoveRegistry,
         ReserveCost,
-        SelfReg,
         ServiceControl,
         ServiceInstall,
         SFPCatalog,
@@ -165,7 +159,6 @@ namespace WixToolset.Data
         WixCustomTable,
         WixDeltaPatchFile,
         WixDeltaPatchSymbolPaths,
-        WixDirectory,
         WixEnsureTable,
         WixFeatureGroup,
         WixFeatureModules,
@@ -175,7 +168,6 @@ namespace WixToolset.Data
         WixGroup,
         WixInstanceComponent,
         WixInstanceTransforms,
-        WixMedia,
         WixMediaTemplate,
         WixMerge,
         WixOrdering,
@@ -221,17 +213,8 @@ namespace WixToolset.Data
         {
             switch (type)
             {
-                case TupleDefinitionType._Streams:
-                    return TupleDefinitions._Streams;
-
-                case TupleDefinitionType._SummaryInformation:
-                    return TupleDefinitions._SummaryInformation;
-
-                case TupleDefinitionType._TransformView:
-                    return TupleDefinitions._TransformView;
-
-                case TupleDefinitionType._Validation:
-                    return TupleDefinitions._Validation;
+                case TupleDefinitionType.SummaryInformation:
+                    return TupleDefinitions.SummaryInformation;
 
                 case TupleDefinitionType.ActionText:
                     return TupleDefinitions.ActionText;
@@ -259,9 +242,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.Binary:
                     return TupleDefinitions.Binary;
-
-                case TupleDefinitionType.BindImage:
-                    return TupleDefinitions.BindImage;
 
                 case TupleDefinitionType.CCPSearch:
                     return TupleDefinitions.CCPSearch;
@@ -343,9 +323,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.FileSFPCatalog:
                     return TupleDefinitions.FileSFPCatalog;
-
-                case TupleDefinitionType.Font:
-                    return TupleDefinitions.Font;
 
                 case TupleDefinitionType.Icon:
                     return TupleDefinitions.Icon;
@@ -539,9 +516,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.ReserveCost:
                     return TupleDefinitions.ReserveCost;
 
-                case TupleDefinitionType.SelfReg:
-                    return TupleDefinitions.SelfReg;
-
                 case TupleDefinitionType.ServiceControl:
                     return TupleDefinitions.ServiceControl;
 
@@ -695,9 +669,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixDeltaPatchSymbolPaths:
                     return TupleDefinitions.WixDeltaPatchSymbolPaths;
 
-                case TupleDefinitionType.WixDirectory:
-                    return TupleDefinitions.WixDirectory;
-
                 case TupleDefinitionType.WixEnsureTable:
                     return TupleDefinitions.WixEnsureTable;
 
@@ -724,9 +695,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixInstanceTransforms:
                     return TupleDefinitions.WixInstanceTransforms;
-
-                case TupleDefinitionType.WixMedia:
-                    return TupleDefinitions.WixMedia;
 
                 case TupleDefinitionType.WixMediaTemplate:
                     return TupleDefinitions.WixMediaTemplate;

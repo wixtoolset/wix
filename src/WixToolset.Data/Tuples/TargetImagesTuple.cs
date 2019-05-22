@@ -16,7 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(TargetImagesTupleFields.Upgraded), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TargetImagesTupleFields.Order), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(TargetImagesTupleFields.ProductValidateFlags), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TargetImagesTupleFields.IgnoreMissingSrcFiles), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TargetImagesTupleFields.IgnoreMissingSrcFiles), IntermediateFieldType.Bool),
             },
             typeof(TargetImagesTuple));
     }
@@ -83,9 +83,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)TargetImagesTupleFields.ProductValidateFlags, value);
         }
 
-        public int IgnoreMissingSrcFiles
+        public bool IgnoreMissingSrcFiles
         {
-            get => (int)this.Fields[(int)TargetImagesTupleFields.IgnoreMissingSrcFiles];
+            get => (bool)this.Fields[(int)TargetImagesTupleFields.IgnoreMissingSrcFiles];
             set => this.Set((int)TargetImagesTupleFields.IgnoreMissingSrcFiles, value);
         }
     }

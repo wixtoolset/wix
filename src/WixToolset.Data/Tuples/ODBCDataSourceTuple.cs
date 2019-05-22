@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.ODBCDataSource,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.DataSource), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCDataSourceTupleFields.DriverDescription), IntermediateFieldType.String),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ODBCDataSourceTupleFields
     {
-        DataSource,
         Component_,
         Description,
         DriverDescription,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ODBCDataSourceTupleFields index] => this.Fields[(int)index];
-
-        public string DataSource
-        {
-            get => (string)this.Fields[(int)ODBCDataSourceTupleFields.DataSource];
-            set => this.Set((int)ODBCDataSourceTupleFields.DataSource, value);
-        }
 
         public string Component_
         {

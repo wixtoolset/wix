@@ -1954,6 +1954,11 @@ namespace WixToolset.Data
             return Message(null, Ids.UnableToGetAuthenticodeCertOfFileDownlevelOS, "Unable to get the authenticode certificate of '{0}'. The cryptography API has limitations on Windows XP and Windows Server 2003.  More information: {1}", filePath, moreInformation);
         }
 
+        public static Message UnableToConvertFieldToNumber(string value)
+        {
+            return Message(null, Ids.UnableToConvertFieldToNumber, "Unable to convert intermediate tuple field value '{0}' to a number. This means the intermediate is corrupt or of an unsupported version.", value);
+        }
+
         public static Message UnableToOpenModule(SourceLineNumber sourceLineNumbers, string modulePath, string message)
         {
             return Message(sourceLineNumbers, Ids.UnableToOpenModule, "Unable to open merge module '{0}'. Check to make sure the module language is correct. '{1}'", modulePath, message);
@@ -2634,6 +2639,7 @@ namespace WixToolset.Data
             MsiTransactionX86BeforeX64 = 390,
             NoSourceFiles = 391,
             WixiplSourceFileIsExclusive = 392,
+            UnableToConvertFieldToNumber = 393,
         }
     }
 }

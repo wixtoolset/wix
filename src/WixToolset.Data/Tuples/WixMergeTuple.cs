@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixMerge,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.WixMerge), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Language), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Directory_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.SourceFile), IntermediateFieldType.Path),
@@ -27,7 +26,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixMergeTupleFields
     {
-        WixMerge,
         Language,
         Directory_,
         SourceFile,
@@ -48,12 +46,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixMergeTupleFields index] => this.Fields[(int)index];
-
-        public string WixMerge
-        {
-            get => (string)this.Fields[(int)WixMergeTupleFields.WixMerge];
-            set => this.Set((int)WixMergeTupleFields.WixMerge, value);
-        }
 
         public int Language
         {

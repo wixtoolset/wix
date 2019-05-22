@@ -13,7 +13,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.LogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.Compressed), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.Id), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.BundleId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.UpgradeCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePropertiesTupleFields.PerMachine), IntermediateFieldType.String),
             },
@@ -28,7 +28,7 @@ namespace WixToolset.Data.Tuples
         DisplayName,
         LogPathVariable,
         Compressed,
-        Id,
+        BundleId,
         UpgradeCode,
         PerMachine,
     }
@@ -63,10 +63,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePropertiesTupleFields.Compressed, value);
         }
 
-        public string Id
+        public string BundleId
         {
-            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.Id];
-            set => this.Set((int)WixBundlePropertiesTupleFields.Id, value);
+            get => (string)this.Fields[(int)WixBundlePropertiesTupleFields.BundleId];
+            set => this.Set((int)WixBundlePropertiesTupleFields.BundleId, value);
         }
 
         public string UpgradeCode

@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiLockPermissionsEx,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.MsiLockPermissionsEx), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.LockObject), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.Table), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiLockPermissionsExTupleFields.SDDLText), IntermediateFieldType.String),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiLockPermissionsExTupleFields
     {
-        MsiLockPermissionsEx,
         LockObject,
         Table,
         SDDLText,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[MsiLockPermissionsExTupleFields index] => this.Fields[(int)index];
-
-        public string MsiLockPermissionsEx
-        {
-            get => (string)this.Fields[(int)MsiLockPermissionsExTupleFields.MsiLockPermissionsEx];
-            set => this.Set((int)MsiLockPermissionsExTupleFields.MsiLockPermissionsEx, value);
-        }
 
         public string LockObject
         {

@@ -8,10 +8,7 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixSuppressModularization = new IntermediateTupleDefinition(
             TupleDefinitionType.WixSuppressModularization,
-            new[]
-            {
-                new IntermediateFieldDefinition(nameof(WixSuppressModularizationTupleFields.WixSuppressModularization), IntermediateFieldType.String),
-            },
+            new IntermediateFieldDefinition[0],
             typeof(WixSuppressModularizationTuple));
     }
 }
@@ -20,7 +17,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixSuppressModularizationTupleFields
     {
-        WixSuppressModularization,
     }
 
     public class WixSuppressModularizationTuple : IntermediateTuple
@@ -34,11 +30,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixSuppressModularizationTupleFields index] => this.Fields[(int)index];
-
-        public string WixSuppressModularization
-        {
-            get => (string)this.Fields[(int)WixSuppressModularizationTupleFields.WixSuppressModularization];
-            set => this.Set((int)WixSuppressModularizationTupleFields.WixSuppressModularization, value);
-        }
     }
 }

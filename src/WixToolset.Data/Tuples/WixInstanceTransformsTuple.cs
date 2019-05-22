@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixInstanceTransforms,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.Id), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.PropertyId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixInstanceTransformsTupleFields.ProductName), IntermediateFieldType.String),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixInstanceTransformsTupleFields
     {
-        Id,
         PropertyId,
         ProductCode,
         ProductName,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixInstanceTransformsTupleFields index] => this.Fields[(int)index];
-
-        public string Id
-        {
-            get => (string)this.Fields[(int)WixInstanceTransformsTupleFields.Id];
-            set => this.Set((int)WixInstanceTransformsTupleFields.Id, value);
-        }
 
         public string PropertyId
         {

@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.ODBCTranslator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.Translator), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.File_), IntermediateFieldType.String),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ODBCTranslatorTupleFields
     {
-        Translator,
         Component_,
         Description,
         File_,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ODBCTranslatorTupleFields index] => this.Fields[(int)index];
-
-        public string Translator
-        {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Translator];
-            set => this.Set((int)ODBCTranslatorTupleFields.Translator, value);
-        }
 
         public string Component_
         {

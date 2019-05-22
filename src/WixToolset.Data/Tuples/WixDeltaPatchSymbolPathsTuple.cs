@@ -12,8 +12,8 @@ namespace WixToolset.Data
             TupleDefinitionType.WixDeltaPatchSymbolPaths,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.Id), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.Type), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.SymbolType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.SymbolId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDeltaPatchSymbolPathsTupleFields.SymbolPaths), IntermediateFieldType.String),
             },
             typeof(WixDeltaPatchSymbolPathsTuple));
@@ -24,8 +24,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixDeltaPatchSymbolPathsTupleFields
     {
-        Id,
-        Type,
+        SymbolType,
+        SymbolId,
         SymbolPaths,
     }
 
@@ -48,22 +48,22 @@ namespace WixToolset.Data.Tuples
         {
         }
 
-        public WixDeltaPatchSymbolPathsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDeltaPatchSymbolPaths, sourceLineNumber, id)
+        public WixDeltaPatchSymbolPathsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDeltaPatchSymbolPaths, sourceLineNumber, null)
         {
         }
 
         public IntermediateField this[WixDeltaPatchSymbolPathsTupleFields index] => this.Fields[(int)index];
 
-        public string Id
+        public SymbolPathType SymbolType
         {
-            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.Id];
-            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.Id, value);
+            get => (SymbolPathType)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolType].AsNumber();
+            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.SymbolType, (int)value);
         }
 
-        public SymbolPathType Type
+        public string SymbolId
         {
-            get => (SymbolPathType)Enum.Parse(typeof(SymbolPathType), (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.Type], true);
-            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.Type, value.ToString());
+            get => (string)this.Fields[(int)WixDeltaPatchSymbolPathsTupleFields.SymbolId];
+            set => this.Set((int)WixDeltaPatchSymbolPathsTupleFields.SymbolId, value);
         }
 
         public string SymbolPaths

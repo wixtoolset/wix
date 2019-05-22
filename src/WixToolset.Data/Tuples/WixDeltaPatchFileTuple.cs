@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixDeltaPatchFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.File_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.RetainLengths), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.IgnoreOffsets), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDeltaPatchFileTupleFields.IgnoreLengths), IntermediateFieldType.String),
@@ -25,7 +24,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixDeltaPatchFileTupleFields
     {
-        File_,
         RetainLengths,
         IgnoreOffsets,
         IgnoreLengths,
@@ -44,12 +42,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixDeltaPatchFileTupleFields index] => this.Fields[(int)index];
-
-        public string File_
-        {
-            get => (string)this.Fields[(int)WixDeltaPatchFileTupleFields.File_];
-            set => this.Set((int)WixDeltaPatchFileTupleFields.File_, value);
-        }
 
         public string RetainLengths
         {

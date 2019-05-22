@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFileTupleFields.File_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.AssemblyType), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.File_AssemblyManifest), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.File_AssemblyApplication), IntermediateFieldType.String),
@@ -33,7 +32,6 @@ namespace WixToolset.Data.Tuples
 
     public enum WixFileTupleFields
     {
-        File_,
         AssemblyType,
         File_AssemblyManifest,
         File_AssemblyApplication,
@@ -95,12 +93,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixFileTupleFields index] => this.Fields[(int)index];
 
-        public string File_
-        {
-            get => (string)this.Fields[(int)WixFileTupleFields.File_];
-            set => this.Set((int)WixFileTupleFields.File_, value);
-        }
-
         public FileAssemblyType AssemblyType
         {
             get => (FileAssemblyType)(int)this.Fields[(int)WixFileTupleFields.AssemblyType];
@@ -155,10 +147,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixFileTupleFields.Attributes, value);
         }
 
-        public PatchAttributeType PatchAttributes
+        public PatchAttributeType? PatchAttributes
         {
-            get => (PatchAttributeType)(int)this.Fields[(int)WixFileTupleFields.PatchAttributes];
-            set => this.Set((int)WixFileTupleFields.PatchAttributes, (int)value);
+            get => (PatchAttributeType?)this.Fields[(int)WixFileTupleFields.PatchAttributes].AsNullableNumber();
+            set => this.Set((int)WixFileTupleFields.PatchAttributes, (int?)value);
         }
 
         public string DeltaPatchHeaderSource

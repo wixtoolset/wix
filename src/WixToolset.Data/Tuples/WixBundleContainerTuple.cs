@@ -10,11 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleContainer,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.WixBundleContainer), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Type), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.DownloadUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Size), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Size), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.AttachedContainerIndex), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerTupleFields.WorkingPath), IntermediateFieldType.String),
@@ -29,7 +28,6 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundleContainerTupleFields
     {
-        WixBundleContainer,
         Name,
         Type,
         DownloadUrl,
@@ -60,12 +58,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleContainerTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundleContainer
-        {
-            get => (string)this.Fields[(int)WixBundleContainerTupleFields.WixBundleContainer];
-            set => this.Set((int)WixBundleContainerTupleFields.WixBundleContainer, value);
-        }
-
         public string Name
         {
             get => (string)this.Fields[(int)WixBundleContainerTupleFields.Name];
@@ -74,8 +66,8 @@ namespace WixToolset.Data.Tuples
 
         public ContainerType Type
         {
-            get => (ContainerType)Enum.Parse(typeof(ContainerType), (string)this.Fields[(int)WixBundleContainerTupleFields.Type], true);
-            set => this.Set((int)WixBundleContainerTupleFields.Type, value.ToString());
+            get => (ContainerType)this.Fields[(int)WixBundleContainerTupleFields.Type].AsNumber();
+            set => this.Set((int)WixBundleContainerTupleFields.Type, (int)value);
         }
 
         public string DownloadUrl
@@ -84,9 +76,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundleContainerTupleFields.DownloadUrl, value);
         }
 
-        public int Size
+        public long Size
         {
-            get => (int)this.Fields[(int)WixBundleContainerTupleFields.Size];
+            get => (long)this.Fields[(int)WixBundleContainerTupleFields.Size];
             set => this.Set((int)WixBundleContainerTupleFields.Size, value);
         }
 

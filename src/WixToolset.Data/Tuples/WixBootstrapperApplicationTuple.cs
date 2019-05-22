@@ -8,10 +8,7 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixBootstrapperApplication = new IntermediateTupleDefinition(
             TupleDefinitionType.WixBootstrapperApplication,
-            new[]
-            {
-                new IntermediateFieldDefinition(nameof(WixBootstrapperApplicationTupleFields.Id), IntermediateFieldType.String),
-            },
+            new IntermediateFieldDefinition[0],
             typeof(WixBootstrapperApplicationTuple));
     }
 }
@@ -20,7 +17,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBootstrapperApplicationTupleFields
     {
-        Id,
     }
 
     public class WixBootstrapperApplicationTuple : IntermediateTuple
@@ -34,11 +30,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixBootstrapperApplicationTupleFields index] => this.Fields[(int)index];
-
-        public string Id
-        {
-            get => (string)this.Fields[(int)WixBootstrapperApplicationTupleFields.Id];
-            set => this.Set((int)WixBootstrapperApplicationTupleFields.Id, value);
-        }
-    }
+   }
 }

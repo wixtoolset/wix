@@ -10,13 +10,12 @@ namespace WixToolset.Data
             TupleDefinitionType.MoveFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.FileKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.SourceName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.DestName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.SourceFolder), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.DestFolder), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.Options), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.Delete), IntermediateFieldType.Bool),
             },
             typeof(MoveFileTuple));
     }
@@ -26,13 +25,12 @@ namespace WixToolset.Data.Tuples
 {
     public enum MoveFileTupleFields
     {
-        FileKey,
         Component_,
         SourceName,
         DestName,
         SourceFolder,
         DestFolder,
-        Options,
+        Delete,
     }
 
     public class MoveFileTuple : IntermediateTuple
@@ -46,12 +44,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[MoveFileTupleFields index] => this.Fields[(int)index];
-
-        public string FileKey
-        {
-            get => (string)this.Fields[(int)MoveFileTupleFields.FileKey];
-            set => this.Set((int)MoveFileTupleFields.FileKey, value);
-        }
 
         public string Component_
         {
@@ -83,10 +75,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MoveFileTupleFields.DestFolder, value);
         }
 
-        public int Options
+        public bool Delete
         {
-            get => (int)this.Fields[(int)MoveFileTupleFields.Options];
-            set => this.Set((int)MoveFileTupleFields.Options, value);
+            get => (bool)this.Fields[(int)MoveFileTupleFields.Delete];
+            set => this.Set((int)MoveFileTupleFields.Delete, value);
         }
     }
 }

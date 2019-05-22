@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.DuplicateFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.FileKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.Component_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.File_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestName), IntermediateFieldType.String),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum DuplicateFileTupleFields
     {
-        FileKey,
         Component_,
         File_,
         DestName,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[DuplicateFileTupleFields index] => this.Fields[(int)index];
-
-        public string FileKey
-        {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.FileKey];
-            set => this.Set((int)DuplicateFileTupleFields.FileKey, value);
-        }
 
         public string Component_
         {

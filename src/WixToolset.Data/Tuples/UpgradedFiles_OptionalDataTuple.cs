@@ -13,8 +13,8 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.Upgraded), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.FTK), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.SymbolPaths), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile), IntermediateFieldType.Bool),
             },
             typeof(UpgradedFiles_OptionalDataTuple));
     }
@@ -61,15 +61,15 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.SymbolPaths, value);
         }
 
-        public int AllowIgnoreOnPatchError
+        public bool AllowIgnoreOnPatchError
         {
-            get => (int)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError];
+            get => (bool)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.AllowIgnoreOnPatchError, value);
         }
 
-        public int IncludeWholeFile
+        public bool IncludeWholeFile
         {
-            get => (int)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile];
+            get => (bool)this.Fields[(int)UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile];
             set => this.Set((int)UpgradedFiles_OptionalDataTupleFields.IncludeWholeFile, value);
         }
     }

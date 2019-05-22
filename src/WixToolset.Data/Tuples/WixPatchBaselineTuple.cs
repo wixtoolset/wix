@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixPatchBaseline,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.WixPatchBaseline), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.DiskId), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.ValidationFlags), IntermediateFieldType.Number),
             },
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixPatchBaselineTupleFields
     {
-        WixPatchBaseline,
         DiskId,
         ValidationFlags,
     }
@@ -39,22 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixPatchBaselineTupleFields index] => this.Fields[(int)index];
 
-        public string WixPatchBaseline
-        {
-            get => (string)this.Fields[(int)WixPatchBaselineTupleFields.WixPatchBaseline];
-            set => this.Set((int)WixPatchBaselineTupleFields.WixPatchBaseline, value);
-        }
-
         public int DiskId
         {
             get => (int)this.Fields[(int)WixPatchBaselineTupleFields.DiskId];
             set => this.Set((int)WixPatchBaselineTupleFields.DiskId, value);
         }
 
-        public int ValidationFlags
+        public TransformFlags ValidationFlags
         {
-            get => (int)this.Fields[(int)WixPatchBaselineTupleFields.ValidationFlags];
-            set => this.Set((int)WixPatchBaselineTupleFields.ValidationFlags, value);
+            get => (TransformFlags)this.Fields[(int)WixPatchBaselineTupleFields.ValidationFlags].AsNumber();
+            set => this.Set((int)WixPatchBaselineTupleFields.ValidationFlags, (int)value);
         }
     }
 }

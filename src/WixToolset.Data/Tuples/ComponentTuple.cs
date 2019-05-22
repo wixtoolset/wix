@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Component,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Component), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.ComponentId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Directory_), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Location), IntermediateFieldType.Number),
@@ -34,7 +33,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ComponentTupleFields
     {
-        Component,
         ComponentId,
         Directory_,
         Location,
@@ -69,12 +67,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ComponentTupleFields index] => this.Fields[(int)index];
-
-        public string Component
-        {
-            get => (string)this.Fields[(int)ComponentTupleFields.Component];
-            set => this.Set((int)ComponentTupleFields.Component, value);
-        }
 
         public string ComponentId
         {

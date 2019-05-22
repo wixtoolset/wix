@@ -75,9 +75,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ProgIdTupleFields.Icon_, value);
         }
 
-        public int IconIndex
+        public int? IconIndex
         {
-            get => (int)this.Fields[(int)ProgIdTupleFields.IconIndex];
+            get => (int?)this.Fields[(int)ProgIdTupleFields.IconIndex];
             set => this.Set((int)ProgIdTupleFields.IconIndex, value);
         }
     }

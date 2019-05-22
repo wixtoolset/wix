@@ -8,10 +8,7 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition CCPSearch = new IntermediateTupleDefinition(
             TupleDefinitionType.CCPSearch,
-            new[]
-            {
-                new IntermediateFieldDefinition(nameof(CCPSearchTupleFields.Signature_), IntermediateFieldType.String),
-            },
+            new IntermediateFieldDefinition[0],
             typeof(CCPSearchTuple));
     }
 }
@@ -20,7 +17,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum CCPSearchTupleFields
     {
-        Signature_,
     }
 
     public class CCPSearchTuple : IntermediateTuple
@@ -34,11 +30,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[CCPSearchTupleFields index] => this.Fields[(int)index];
-
-        public string Signature_
-        {
-            get => (string)this.Fields[(int)CCPSearchTupleFields.Signature_];
-            set => this.Set((int)CCPSearchTupleFields.Signature_, value);
-        }
     }
 }

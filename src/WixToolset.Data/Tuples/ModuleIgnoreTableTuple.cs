@@ -8,10 +8,7 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition ModuleIgnoreTable = new IntermediateTupleDefinition(
             TupleDefinitionType.ModuleIgnoreTable,
-            new[]
-            {
-                new IntermediateFieldDefinition(nameof(ModuleIgnoreTableTupleFields.Table), IntermediateFieldType.String),
-            },
+            new IntermediateFieldDefinition[0],
             typeof(ModuleIgnoreTableTuple));
     }
 }
@@ -20,7 +17,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ModuleIgnoreTableTupleFields
     {
-        Table,
     }
 
     public class ModuleIgnoreTableTuple : IntermediateTuple
@@ -34,11 +30,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ModuleIgnoreTableTupleFields index] => this.Fields[(int)index];
-
-        public string Table
-        {
-            get => (string)this.Fields[(int)ModuleIgnoreTableTupleFields.Table];
-            set => this.Set((int)ModuleIgnoreTableTupleFields.Table, value);
-        }
-    }
+   }
 }

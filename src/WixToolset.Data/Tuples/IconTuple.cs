@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Icon,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IconTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IconTupleFields.Data), IntermediateFieldType.Path),
             },
             typeof(IconTuple));
@@ -21,7 +20,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum IconTupleFields
     {
-        Name,
         Data,
     }
 
@@ -36,12 +34,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[IconTupleFields index] => this.Fields[(int)index];
-
-        public string Name
-        {
-            get => (string)this.Fields[(int)IconTupleFields.Name];
-            set => this.Set((int)IconTupleFields.Name, value);
-        }
 
         public string Data
         {

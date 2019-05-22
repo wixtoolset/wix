@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixCustomTable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Table), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.ColumnCount), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.ColumnNames), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.ColumnTypes), IntermediateFieldType.String),
@@ -33,7 +32,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixCustomTableTupleFields
     {
-        Table,
         ColumnCount,
         ColumnNames,
         ColumnTypes,
@@ -60,12 +58,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixCustomTableTupleFields index] => this.Fields[(int)index];
-
-        public string Table
-        {
-            get => (string)this.Fields[(int)WixCustomTableTupleFields.Table];
-            set => this.Set((int)WixCustomTableTupleFields.Table, value);
-        }
 
         public int ColumnCount
         {
@@ -139,9 +131,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixCustomTableTupleFields.Modularizations, value);
         }
 
-        public int BootstrapperApplicationData
+        public bool BootstrapperApplicationData
         {
-            get => (int)this.Fields[(int)WixCustomTableTupleFields.BootstrapperApplicationData];
+            get => (bool)this.Fields[(int)WixCustomTableTupleFields.BootstrapperApplicationData];
             set => this.Set((int)WixCustomTableTupleFields.BootstrapperApplicationData, value);
         }
     }

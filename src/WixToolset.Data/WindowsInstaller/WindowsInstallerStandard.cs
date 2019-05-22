@@ -90,7 +90,7 @@ namespace WixToolset.Data.WindowsInstaller
         private static readonly WixActionTuple[] standardActions = new[]
         {
             new WixActionTuple(null, new Identifier("AdminExecuteSequence/InstallInitialize", AccessModifier.Public)) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.AdminExecuteSequence },
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/InstallInitialize", AccessModifier.Public)) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/InstallInitialize", AccessModifier.Public)) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/InstallInitialize", AccessModifier.Public)) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.InstallExecuteSequence },
 
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/InstallExecute", AccessModifier.Public)) { Action="InstallExecute", Sequence=6500, SequenceTable=SequenceTable.InstallExecuteSequence, Condition="NOT Installed" },
@@ -98,7 +98,7 @@ namespace WixToolset.Data.WindowsInstaller
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/InstallExecuteAgain", AccessModifier.Public)) { Action="InstallExecuteAgain", Sequence=6550, SequenceTable=SequenceTable.InstallExecuteSequence, Condition="NOT Installed" },
 
             new WixActionTuple(null, new Identifier("AdminExecuteSequence/InstallFinalize", AccessModifier.Public)) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.AdminExecuteSequence },
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/InstallFinalize", AccessModifier.Public)) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/InstallFinalize", AccessModifier.Public)) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/InstallFinalize", AccessModifier.Public)) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.InstallExecuteSequence },
 
             new WixActionTuple(null, new Identifier("AdminExecuteSequence/InstallFiles", AccessModifier.Public)) { Action="InstallFiles", Sequence=4000, SequenceTable=SequenceTable.AdminExecuteSequence },
@@ -113,48 +113,48 @@ namespace WixToolset.Data.WindowsInstaller
 
             new WixActionTuple(null, new Identifier("AdminExecuteSequence/CostInitialize", AccessModifier.Public)) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdminExecuteSequence },
             new WixActionTuple(null, new Identifier("AdminUISequence/CostInitialize", AccessModifier.Public)) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdminUISequence },
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/CostInitialize", AccessModifier.Public)) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/CostInitialize", AccessModifier.Public)) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/CostInitialize", AccessModifier.Public)) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.InstallExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallUISequence/CostInitialize", AccessModifier.Public)) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.InstallUISequence },
 
             new WixActionTuple(null, new Identifier("AdminExecuteSequence/CostFinalize", AccessModifier.Public)) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdminExecuteSequence },
             new WixActionTuple(null, new Identifier("AdminUISequence/CostFinalize", AccessModifier.Public)) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdminUISequence },
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/CostFinalize", AccessModifier.Public)) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/CostFinalize", AccessModifier.Public)) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/CostFinalize", AccessModifier.Public)) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.InstallExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallUISequence/CostFinalize", AccessModifier.Public)) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.InstallUISequence },
 
             new WixActionTuple(null, new Identifier("AdminExecuteSequence/InstallValidate", AccessModifier.Public)) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.AdminExecuteSequence },
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/InstallValidate", AccessModifier.Public)) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/InstallValidate", AccessModifier.Public)) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/InstallValidate", AccessModifier.Public)) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.InstallExecuteSequence },
 
             new WixActionTuple(null, new Identifier("AdminUISequence/ExecuteAction", AccessModifier.Public)) { Action="ExecuteAction", Sequence=1300, SequenceTable=SequenceTable.AdminUISequence },
             new WixActionTuple(null, new Identifier("InstallUISequence/ExecuteAction", AccessModifier.Public)) { Action="ExecuteAction", Sequence=1300, SequenceTable=SequenceTable.InstallUISequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/CreateShortcuts", AccessModifier.Public)) { Action="CreateShortcuts", Sequence=4500, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/CreateShortcuts", AccessModifier.Public)) { Action="CreateShortcuts", Sequence=4500, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/CreateShortcuts", AccessModifier.Public)) { Action="CreateShortcuts", Sequence=4500, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/MsiPublishAssemblies", AccessModifier.Public)) { Action="MsiPublishAssemblies", Sequence=6250, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/MsiPublishAssemblies", AccessModifier.Public)) { Action="MsiPublishAssemblies", Sequence=6250, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/MsiPublishAssemblies", AccessModifier.Public)) { Action="MsiPublishAssemblies", Sequence=6250, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/PublishComponents", AccessModifier.Public)) { Action="PublishComponents", Sequence=6200, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/PublishComponents", AccessModifier.Public)) { Action="PublishComponents", Sequence=6200, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/PublishComponents", AccessModifier.Public)) { Action="PublishComponents", Sequence=6200, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/PublishFeatures", AccessModifier.Public)) { Action="PublishFeatures", Sequence=6300, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/PublishFeatures", AccessModifier.Public)) { Action="PublishFeatures", Sequence=6300, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/PublishFeatures", AccessModifier.Public)) { Action="PublishFeatures", Sequence=6300, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/PublishProduct", AccessModifier.Public)) { Action="PublishProduct", Sequence=6400, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/PublishProduct", AccessModifier.Public)) { Action="PublishProduct", Sequence=6400, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/PublishProduct", AccessModifier.Public)) { Action="PublishProduct", Sequence=6400, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterClassInfo", AccessModifier.Public)) { Action="RegisterClassInfo", Sequence=4600, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterClassInfo", AccessModifier.Public)) { Action="RegisterClassInfo", Sequence=4600, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/RegisterClassInfo", AccessModifier.Public)) { Action="RegisterClassInfo", Sequence=4600, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterExtensionInfo", AccessModifier.Public)) { Action="RegisterExtensionInfo", Sequence=4700, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterExtensionInfo", AccessModifier.Public)) { Action="RegisterExtensionInfo", Sequence=4700, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/RegisterExtensionInfo", AccessModifier.Public)) { Action="RegisterExtensionInfo", Sequence=4700, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterMIMEInfo", AccessModifier.Public)) { Action="RegisterMIMEInfo", Sequence=4900, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterMIMEInfo", AccessModifier.Public)) { Action="RegisterMIMEInfo", Sequence=4900, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/RegisterMIMEInfo", AccessModifier.Public)) { Action="RegisterMIMEInfo", Sequence=4900, SequenceTable=SequenceTable.InstallExecuteSequence },
 
-            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterProgIdInfo", AccessModifier.Public)) { Action="RegisterProgIdInfo", Sequence=4800, SequenceTable=SequenceTable.AdvtExecuteSequence },
+            new WixActionTuple(null, new Identifier("AdvtExecuteSequence/RegisterProgIdInfo", AccessModifier.Public)) { Action="RegisterProgIdInfo", Sequence=4800, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/RegisterProgIdInfo", AccessModifier.Public)) { Action="RegisterProgIdInfo", Sequence=4800, SequenceTable=SequenceTable.InstallExecuteSequence },
 
             new WixActionTuple(null, new Identifier("InstallExecuteSequence/AllocateRegistrySpace", AccessModifier.Public)) { Action="AllocateRegistrySpace", Sequence=1550, SequenceTable=SequenceTable.InstallExecuteSequence },

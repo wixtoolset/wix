@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixVariable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixVariableTupleFields.WixVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixVariableTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixVariableTupleFields.Overridable), IntermediateFieldType.Bool),
             },
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixVariableTupleFields
     {
-        WixVariable,
         Value,
         Overridable,
     }
@@ -38,12 +36,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixVariableTupleFields index] => this.Fields[(int)index];
-
-        public string WixVariable
-        {
-            get => (string)this.Fields[(int)WixVariableTupleFields.WixVariable];
-            set => this.Set((int)WixVariableTupleFields.WixVariable, value);
-        }
 
         public string Value
         {

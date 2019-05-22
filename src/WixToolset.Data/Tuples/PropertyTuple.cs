@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Property,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PropertyTupleFields.Property), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PropertyTupleFields.Value), IntermediateFieldType.String),
             },
             typeof(PropertyTuple));
@@ -21,7 +20,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum PropertyTupleFields
     {
-        Property,
         Value,
     }
 
@@ -37,15 +35,9 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[PropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Property
-        {
-            get => (string)this.Fields[(int)PropertyTupleFields.Property]?.Value;
-            set => this.Set((int)PropertyTupleFields.Property, value);
-        }
-
         public string Value
         {
-            get => (string)this.Fields[(int)PropertyTupleFields.Value]?.Value;
+            get => (string)this.Fields[(int)PropertyTupleFields.Value];
             set => this.Set((int)PropertyTupleFields.Value, value);
         }
     }

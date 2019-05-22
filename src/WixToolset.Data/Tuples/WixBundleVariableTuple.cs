@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleVariable,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.WixBundleVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Type), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleVariableTupleFields.Hidden), IntermediateFieldType.Bool),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleVariableTupleFields
     {
-        WixBundleVariable,
         Value,
         Type,
         Hidden,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixBundleVariableTupleFields index] => this.Fields[(int)index];
-
-        public string WixBundleVariable
-        {
-            get => (string)this.Fields[(int)WixBundleVariableTupleFields.WixBundleVariable];
-            set => this.Set((int)WixBundleVariableTupleFields.WixBundleVariable, value);
-        }
 
         public string Value
         {

@@ -71,7 +71,14 @@ namespace WixToolset.Data
             }
             else if (value.Data is string s)
             {
-                return Convert.ToInt32(s);
+                try
+                {
+                    return Convert.ToInt32(s);
+                }
+                catch (FormatException)
+                {
+                    throw new WixException(ErrorMessages.UnableToConvertFieldToNumber(s));
+                }
             }
 
             return (int)value.Data;
