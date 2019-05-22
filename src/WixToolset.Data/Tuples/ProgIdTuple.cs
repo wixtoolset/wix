@@ -11,10 +11,10 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ProgId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ProgId_Parent), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.Class_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ParentProgIdRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.ClassRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ProgIdTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.Icon_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ProgIdTupleFields.IconRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ProgIdTupleFields.IconIndex), IntermediateFieldType.Number),
             },
             typeof(ProgIdTuple));
@@ -26,10 +26,10 @@ namespace WixToolset.Data.Tuples
     public enum ProgIdTupleFields
     {
         ProgId,
-        ProgId_Parent,
-        Class_,
+        ParentProgIdRef,
+        ClassRef,
         Description,
-        Icon_,
+        IconRef,
         IconIndex,
     }
 
@@ -51,16 +51,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ProgIdTupleFields.ProgId, value);
         }
 
-        public string ProgId_Parent
+        public string ParentProgIdRef
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.ProgId_Parent];
-            set => this.Set((int)ProgIdTupleFields.ProgId_Parent, value);
+            get => (string)this.Fields[(int)ProgIdTupleFields.ParentProgIdRef];
+            set => this.Set((int)ProgIdTupleFields.ParentProgIdRef, value);
         }
 
-        public string Class_
+        public string ClassRef
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.Class_];
-            set => this.Set((int)ProgIdTupleFields.Class_, value);
+            get => (string)this.Fields[(int)ProgIdTupleFields.ClassRef];
+            set => this.Set((int)ProgIdTupleFields.ClassRef, value);
         }
 
         public string Description
@@ -69,10 +69,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ProgIdTupleFields.Description, value);
         }
 
-        public string Icon_
+        public string IconRef
         {
-            get => (string)this.Fields[(int)ProgIdTupleFields.Icon_];
-            set => this.Set((int)ProgIdTupleFields.Icon_, value);
+            get => (string)this.Fields[(int)ProgIdTupleFields.IconRef];
+            set => this.Set((int)ProgIdTupleFields.IconRef, value);
         }
 
         public int? IconIndex

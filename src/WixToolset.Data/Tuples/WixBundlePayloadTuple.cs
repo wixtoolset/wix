@@ -24,14 +24,14 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.PublicKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Thumbprint), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Catalog_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Container_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.CatalogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ContainerRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Package), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ContentFile), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.EmbeddedId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.LayoutOnly), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Packaging), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ParentPackagePayload_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ParentPackagePayloadRef), IntermediateFieldType.String),
             },
             typeof(WixBundlePayloadTuple));
     }
@@ -57,14 +57,14 @@ namespace WixToolset.Data.Tuples
         Hash,
         PublicKey,
         Thumbprint,
-        Catalog_,
-        Container_,
+        CatalogRef,
+        ContainerRef,
         Package,
         ContentFile,
         EmbeddedId,
         LayoutOnly,
         Packaging,
-        ParentPackagePayload_,
+        ParentPackagePayloadRef,
     }
 
     public class WixBundlePayloadTuple : IntermediateTuple
@@ -163,16 +163,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.Thumbprint, value);
         }
 
-        public string Catalog_
+        public string CatalogRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Catalog_];
-            set => this.Set((int)WixBundlePayloadTupleFields.Catalog_, value);
+            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.CatalogRef];
+            set => this.Set((int)WixBundlePayloadTupleFields.CatalogRef, value);
         }
 
-        public string Container_
+        public string ContainerRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Container_];
-            set => this.Set((int)WixBundlePayloadTupleFields.Container_, value);
+            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.ContainerRef];
+            set => this.Set((int)WixBundlePayloadTupleFields.ContainerRef, value);
         }
 
         public string Package
@@ -205,10 +205,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.Packaging, value);
         }
 
-        public string ParentPackagePayload_
+        public string ParentPackagePayloadRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.ParentPackagePayload_];
-            set => this.Set((int)WixBundlePayloadTupleFields.ParentPackagePayload_, value);
+            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.ParentPackagePayloadRef];
+            set => this.Set((int)WixBundlePayloadTupleFields.ParentPackagePayloadRef, value);
         }
     }
 }

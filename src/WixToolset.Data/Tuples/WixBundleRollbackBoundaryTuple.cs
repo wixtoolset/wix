@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleRollbackBoundary,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundaryTupleFields.WixChainItem_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundaryTupleFields.WixChainItemRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundaryTupleFields.Vital), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleRollbackBoundaryTupleFields.Transaction), IntermediateFieldType.Number),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleRollbackBoundaryTupleFields
     {
-        WixChainItem_,
+        WixChainItemRef,
         Vital,
         Transaction,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleRollbackBoundaryTupleFields index] => this.Fields[(int)index];
 
-        public string WixChainItem_
+        public string WixChainItemRef
         {
-            get => (string)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.WixChainItem_];
-            set => this.Set((int)WixBundleRollbackBoundaryTupleFields.WixChainItem_, value);
+            get => (string)this.Fields[(int)WixBundleRollbackBoundaryTupleFields.WixChainItemRef];
+            set => this.Set((int)WixBundleRollbackBoundaryTupleFields.WixChainItemRef, value);
         }
 
         public bool? Vital

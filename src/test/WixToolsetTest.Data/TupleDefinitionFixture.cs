@@ -35,8 +35,8 @@ namespace WixToolsetTest.Data
         public void CanSetComponentFieldInFileTupleByCasting()
         {
             var fileTuple = (FileTuple)TupleDefinitions.File.CreateTuple();
-            fileTuple.Component_ = "Foo";
-            Assert.Equal("Foo", fileTuple.Component_);
+            fileTuple.ComponentRef = "Foo";
+            Assert.Equal("Foo", fileTuple.ComponentRef);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace WixToolsetTest.Data
             var fileTuple = new FileTuple();
             Assert.Equal("Component_", fileTuple.Definition.FieldDefinitions[0].Name);
             Assert.Null(fileTuple.Fields[0]);
-            fileTuple.Component_ = "Foo";
+            fileTuple.ComponentRef = "Foo";
             Assert.Equal("Component_", fileTuple.Fields[0].Name);
             Assert.Same(fileTuple.Definition.FieldDefinitions[0].Name, fileTuple.Fields[0].Name);
         }
@@ -54,8 +54,8 @@ namespace WixToolsetTest.Data
         public void CanSetComponentFieldInFileTupleByNew()
         {
             var fileTuple = new FileTuple();
-            fileTuple.Component_ = "Foo";
-            Assert.Equal("Foo", fileTuple.Component_);
+            fileTuple.ComponentRef = "Foo";
+            Assert.Equal("Foo", fileTuple.ComponentRef);
         }
 
         [Fact]
@@ -64,9 +64,9 @@ namespace WixToolsetTest.Data
             using (new IntermediateFieldContext("bar"))
             {
                 var fileTuple = new FileTuple();
-                fileTuple.Component_ = "Foo";
+                fileTuple.ComponentRef = "Foo";
 
-                var field = fileTuple[FileTupleFields.Component_];
+                var field = fileTuple[FileTupleFields.ComponentRef];
                 Assert.Equal("Foo", field.AsString());
                 Assert.Equal("bar", field.Context);
             }
@@ -79,17 +79,17 @@ namespace WixToolsetTest.Data
 
             using (new IntermediateFieldContext("bar"))
             {
-                fileTuple.Component_ = "Foo";
+                fileTuple.ComponentRef = "Foo";
 
-                var field = fileTuple[FileTupleFields.Component_];
+                var field = fileTuple[FileTupleFields.ComponentRef];
                 Assert.Equal("Foo", field.AsString());
                 Assert.Equal("bar", field.Context);
 
                 using (new IntermediateFieldContext("baz"))
                 {
-                    fileTuple.Component_ = "Foo2";
+                    fileTuple.ComponentRef = "Foo2";
 
-                    field = fileTuple[FileTupleFields.Component_];
+                    field = fileTuple[FileTupleFields.ComponentRef];
                     Assert.Equal("Foo2", field.AsString());
                     Assert.Equal("baz", field.Context);
 
@@ -97,9 +97,9 @@ namespace WixToolsetTest.Data
                     Assert.Equal("bar", field.PreviousValue.Context);
                 }
 
-                fileTuple.Component_ = "Foo3";
+                fileTuple.ComponentRef = "Foo3";
 
-                field = fileTuple[FileTupleFields.Component_];
+                field = fileTuple[FileTupleFields.ComponentRef];
                 Assert.Equal("Foo3", field.AsString());
                 Assert.Equal("bar", field.Context);
 
@@ -110,9 +110,9 @@ namespace WixToolsetTest.Data
                 Assert.Equal("bar", field.PreviousValue.PreviousValue.Context);
             }
 
-            fileTuple.Component_ = "Foo4";
+            fileTuple.ComponentRef = "Foo4";
 
-            var fieldOutside = fileTuple[FileTupleFields.Component_];
+            var fieldOutside = fileTuple[FileTupleFields.ComponentRef];
             Assert.Equal("Foo4", fieldOutside.AsString());
             Assert.Null(fieldOutside.Context);
         }

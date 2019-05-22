@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.Billboard,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(BillboardTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(BillboardTupleFields.FeatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(BillboardTupleFields.Action), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(BillboardTupleFields.Ordering), IntermediateFieldType.Number),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum BillboardTupleFields
     {
-        Feature_,
+        FeatureRef,
         Action,
         Ordering,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[BillboardTupleFields index] => this.Fields[(int)index];
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)BillboardTupleFields.Feature_];
-            set => this.Set((int)BillboardTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)BillboardTupleFields.FeatureRef];
+            set => this.Set((int)BillboardTupleFields.FeatureRef, value);
         }
 
         public string Action

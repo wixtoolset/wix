@@ -10,9 +10,9 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundlePackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.WixChainItem_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.WixChainItemRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Type), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Payload_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.PayloadRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.InstallCondition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Cache), IntermediateFieldType.String),
@@ -27,9 +27,9 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Language), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackBoundary_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackBoundaryBackward_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.x64), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackBoundaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackBoundaryBackwardRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Win64), IntermediateFieldType.Number),
             },
             typeof(WixBundlePackageTuple));
     }
@@ -41,9 +41,9 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundlePackageTupleFields
     {
-        WixChainItem_,
+        WixChainItemRef,
         Type,
-        Payload_,
+        PayloadRef,
         Attributes,
         InstallCondition,
         Cache,
@@ -58,9 +58,9 @@ namespace WixToolset.Data.Tuples
         Language,
         DisplayName,
         Description,
-        RollbackBoundary_,
-        RollbackBoundaryBackward_,
-        x64,
+        RollbackBoundaryRef,
+        RollbackBoundaryBackwardRef,
+        Win64,
     }
 
     /// <summary>
@@ -93,10 +93,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundlePackageTupleFields index] => this.Fields[(int)index];
 
-        public string WixChainItem_
+        public string WixChainItemRef
         {
-            get => (string)this.Fields[(int)WixBundlePackageTupleFields.WixChainItem_];
-            set => this.Set((int)WixBundlePackageTupleFields.WixChainItem_, value);
+            get => (string)this.Fields[(int)WixBundlePackageTupleFields.WixChainItemRef];
+            set => this.Set((int)WixBundlePackageTupleFields.WixChainItemRef, value);
         }
 
         public WixBundlePackageType Type
@@ -105,10 +105,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePackageTupleFields.Type, value.ToString());
         }
 
-        public string Payload_
+        public string PayloadRef
         {
-            get => (string)this.Fields[(int)WixBundlePackageTupleFields.Payload_];
-            set => this.Set((int)WixBundlePackageTupleFields.Payload_, value);
+            get => (string)this.Fields[(int)WixBundlePackageTupleFields.PayloadRef];
+            set => this.Set((int)WixBundlePackageTupleFields.PayloadRef, value);
         }
 
         public WixBundlePackageAttributes Attributes
@@ -195,22 +195,22 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePackageTupleFields.Description, value);
         }
 
-        public string RollbackBoundary_
+        public string RollbackBoundaryRef
         {
-            get => (string)this.Fields[(int)WixBundlePackageTupleFields.RollbackBoundary_];
-            set => this.Set((int)WixBundlePackageTupleFields.RollbackBoundary_, value);
+            get => (string)this.Fields[(int)WixBundlePackageTupleFields.RollbackBoundaryRef];
+            set => this.Set((int)WixBundlePackageTupleFields.RollbackBoundaryRef, value);
         }
 
-        public string RollbackBoundaryBackward_
+        public string RollbackBoundaryBackwardRef
         {
-            get => (string)this.Fields[(int)WixBundlePackageTupleFields.RollbackBoundaryBackward_];
-            set => this.Set((int)WixBundlePackageTupleFields.RollbackBoundaryBackward_, value);
+            get => (string)this.Fields[(int)WixBundlePackageTupleFields.RollbackBoundaryBackwardRef];
+            set => this.Set((int)WixBundlePackageTupleFields.RollbackBoundaryBackwardRef, value);
         }
 
-        public int x64
+        public int Win64
         {
-            get => (int)this.Fields[(int)WixBundlePackageTupleFields.x64];
-            set => this.Set((int)WixBundlePackageTupleFields.x64, value);
+            get => (int)this.Fields[(int)WixBundlePackageTupleFields.Win64];
+            set => this.Set((int)WixBundlePackageTupleFields.Win64, value);
         }
     }
 }

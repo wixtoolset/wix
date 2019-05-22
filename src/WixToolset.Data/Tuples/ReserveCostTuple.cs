@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.ReserveCost,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ReserveFolder), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ReserveLocal), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ReserveCostTupleFields.ReserveSource), IntermediateFieldType.Number),
@@ -23,7 +23,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum ReserveCostTupleFields
     {
-        Component_,
+        ComponentRef,
         ReserveFolder,
         ReserveLocal,
         ReserveSource,
@@ -41,10 +41,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ReserveCostTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ReserveCostTupleFields.Component_];
-            set => this.Set((int)ReserveCostTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ReserveCostTupleFields.ComponentRef];
+            set => this.Set((int)ReserveCostTupleFields.ComponentRef, value);
         }
 
         public string ReserveFolder

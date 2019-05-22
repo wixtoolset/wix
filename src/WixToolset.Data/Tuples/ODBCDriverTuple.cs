@@ -10,10 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.ODBCDriver,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.File_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.File_Setup), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCDriverTupleFields.SetupFileRef), IntermediateFieldType.String),
             },
             typeof(ODBCDriverTuple));
     }
@@ -23,10 +23,10 @@ namespace WixToolset.Data.Tuples
 {
     public enum ODBCDriverTupleFields
     {
-        Component_,
+        ComponentRef,
         Description,
-        File_,
-        File_Setup,
+        FileRef,
+        SetupFileRef,
     }
 
     public class ODBCDriverTuple : IntermediateTuple
@@ -41,10 +41,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ODBCDriverTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.Component_];
-            set => this.Set((int)ODBCDriverTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.ComponentRef];
+            set => this.Set((int)ODBCDriverTupleFields.ComponentRef, value);
         }
 
         public string Description
@@ -53,16 +53,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ODBCDriverTupleFields.Description, value);
         }
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.File_];
-            set => this.Set((int)ODBCDriverTupleFields.File_, value);
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.FileRef];
+            set => this.Set((int)ODBCDriverTupleFields.FileRef, value);
         }
 
-        public string File_Setup
+        public string SetupFileRef
         {
-            get => (string)this.Fields[(int)ODBCDriverTupleFields.File_Setup];
-            set => this.Set((int)ODBCDriverTupleFields.File_Setup, value);
+            get => (string)this.Fields[(int)ODBCDriverTupleFields.SetupFileRef];
+            set => this.Set((int)ODBCDriverTupleFields.SetupFileRef, value);
         }
     }
 }

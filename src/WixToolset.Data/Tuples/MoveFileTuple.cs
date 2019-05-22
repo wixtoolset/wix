@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.MoveFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MoveFileTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.SourceName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.DestName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MoveFileTupleFields.SourceFolder), IntermediateFieldType.String),
@@ -25,7 +25,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum MoveFileTupleFields
     {
-        Component_,
+        ComponentRef,
         SourceName,
         DestName,
         SourceFolder,
@@ -45,10 +45,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MoveFileTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)MoveFileTupleFields.Component_];
-            set => this.Set((int)MoveFileTupleFields.Component_, value);
+            get => (string)this.Fields[(int)MoveFileTupleFields.ComponentRef];
+            set => this.Set((int)MoveFileTupleFields.ComponentRef, value);
         }
 
         public string SourceName

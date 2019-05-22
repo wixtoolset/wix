@@ -20,7 +20,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallStop), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Arguments), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Wait), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(ServiceControlTuple));
     }
@@ -40,7 +40,7 @@ namespace WixToolset.Data.Tuples
         UninstallStop,
         Arguments,
         Wait,
-        Component_,
+        ComponentRef,
     }
 
     public class ServiceControlTuple : IntermediateTuple
@@ -115,10 +115,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ServiceControlTupleFields.Wait, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.Component_];
-            set => this.Set((int)ServiceControlTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ServiceControlTupleFields.ComponentRef];
+            set => this.Set((int)ServiceControlTupleFields.ComponentRef, value);
         }
     }
 }

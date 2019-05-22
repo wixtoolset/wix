@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.ODBCSourceAttribute,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.DataSource_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.DataSourceRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.Attribute), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCSourceAttributeTupleFields.Value), IntermediateFieldType.String),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum ODBCSourceAttributeTupleFields
     {
-        DataSource_,
+        DataSourceRef,
         Attribute,
         Value,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ODBCSourceAttributeTupleFields index] => this.Fields[(int)index];
 
-        public string DataSource_
+        public string DataSourceRef
         {
-            get => (string)this.Fields[(int)ODBCSourceAttributeTupleFields.DataSource_];
-            set => this.Set((int)ODBCSourceAttributeTupleFields.DataSource_, value);
+            get => (string)this.Fields[(int)ODBCSourceAttributeTupleFields.DataSourceRef];
+            set => this.Set((int)ODBCSourceAttributeTupleFields.DataSourceRef, value);
         }
 
         public string Attribute

@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixProductSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.WixSearch_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.Guid), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.Attributes), IntermediateFieldType.Number),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixProductSearchTupleFields
     {
-        WixSearch_,
+        WixSearchRef,
         Guid,
         Attributes,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixProductSearchTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearch_
+        public string WixSearchRef
         {
-            get => (string)this.Fields[(int)WixProductSearchTupleFields.WixSearch_];
-            set => this.Set((int)WixProductSearchTupleFields.WixSearch_, value);
+            get => (string)this.Fields[(int)WixProductSearchTupleFields.WixSearchRef];
+            set => this.Set((int)WixProductSearchTupleFields.WixSearchRef, value);
         }
 
         public string Guid

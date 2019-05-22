@@ -11,10 +11,10 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ExtensionTupleFields.Extension), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.ProgId_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.MIME_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.ProgIdRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.MimeRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ExtensionTupleFields.FeatureRef), IntermediateFieldType.String),
             },
             typeof(ExtensionTuple));
     }
@@ -25,10 +25,10 @@ namespace WixToolset.Data.Tuples
     public enum ExtensionTupleFields
     {
         Extension,
-        Component_,
-        ProgId_,
-        MIME_,
-        Feature_,
+        ComponentRef,
+        ProgIdRef,
+        MimeRef,
+        FeatureRef,
     }
 
     public class ExtensionTuple : IntermediateTuple
@@ -49,28 +49,28 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ExtensionTupleFields.Extension, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.Component_];
-            set => this.Set((int)ExtensionTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ExtensionTupleFields.ComponentRef];
+            set => this.Set((int)ExtensionTupleFields.ComponentRef, value);
         }
 
-        public string ProgId_
+        public string ProgIdRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.ProgId_];
-            set => this.Set((int)ExtensionTupleFields.ProgId_, value);
+            get => (string)this.Fields[(int)ExtensionTupleFields.ProgIdRef];
+            set => this.Set((int)ExtensionTupleFields.ProgIdRef, value);
         }
 
-        public string MIME_
+        public string MimeRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.MIME_];
-            set => this.Set((int)ExtensionTupleFields.MIME_, value);
+            get => (string)this.Fields[(int)ExtensionTupleFields.MimeRef];
+            set => this.Set((int)ExtensionTupleFields.MimeRef, value);
         }
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)ExtensionTupleFields.Feature_];
-            set => this.Set((int)ExtensionTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)ExtensionTupleFields.FeatureRef];
+            set => this.Set((int)ExtensionTupleFields.FeatureRef, value);
         }
     }
 }

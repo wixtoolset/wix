@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.RemoveFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.FileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.DirProperty), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveFileTupleFields.OnInstall), IntermediateFieldType.Bool),
@@ -24,7 +24,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum RemoveFileTupleFields
     {
-        Component_,
+        ComponentRef,
         FileName,
         DirProperty,
         OnInstall,
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[RemoveFileTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)RemoveFileTupleFields.Component_];
-            set => this.Set((int)RemoveFileTupleFields.Component_, value);
+            get => (string)this.Fields[(int)RemoveFileTupleFields.ComponentRef];
+            set => this.Set((int)RemoveFileTupleFields.ComponentRef, value);
         }
 
         public string FileName

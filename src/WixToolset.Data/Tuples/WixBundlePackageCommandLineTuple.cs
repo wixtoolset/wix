@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundlePackageCommandLine,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.WixBundlePackage_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.InstallArgument), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.UninstallArgument), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageCommandLineTupleFields.RepairArgument), IntermediateFieldType.String),
@@ -24,7 +24,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundlePackageCommandLineTupleFields
     {
-        WixBundlePackage_,
+        WixBundlePackageRef,
         InstallArgument,
         UninstallArgument,
         RepairArgument,
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundlePackageCommandLineTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackage_
+        public string WixBundlePackageRef
         {
-            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.WixBundlePackage_];
-            set => this.Set((int)WixBundlePackageCommandLineTupleFields.WixBundlePackage_, value);
+            get => (string)this.Fields[(int)WixBundlePackageCommandLineTupleFields.WixBundlePackageRef];
+            set => this.Set((int)WixBundlePackageCommandLineTupleFields.WixBundlePackageRef, value);
         }
 
         public string InstallArgument

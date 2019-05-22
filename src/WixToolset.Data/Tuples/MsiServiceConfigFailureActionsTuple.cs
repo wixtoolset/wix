@@ -19,7 +19,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.Command), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.Actions), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.DelayActions), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(MsiServiceConfigFailureActionsTuple));
     }
@@ -38,7 +38,7 @@ namespace WixToolset.Data.Tuples
         Command,
         Actions,
         DelayActions,
-        Component_,
+        ComponentRef,
     }
 
     public class MsiServiceConfigFailureActionsTuple : IntermediateTuple
@@ -107,10 +107,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.DelayActions, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.Component_];
-            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.Component_, value);
+            get => (string)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.ComponentRef];
+            set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.ComponentRef, value);
         }
     }
 }

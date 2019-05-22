@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.Directory,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.Directory_Parent), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ParentDirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DirectoryTupleFields.DefaultDir), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ComponentGuidGenerationSeed), IntermediateFieldType.String),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum DirectoryTupleFields
     {
-        Directory_Parent,
+        ParentDirectoryRef,
         DefaultDir,
         ComponentGuidGenerationSeed,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[DirectoryTupleFields index] => this.Fields[(int)index];
 
-        public string Directory_Parent
+        public string ParentDirectoryRef
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.Directory_Parent];
-            set => this.Set((int)DirectoryTupleFields.Directory_Parent, value);
+            get => (string)this.Fields[(int)DirectoryTupleFields.ParentDirectoryRef];
+            set => this.Set((int)DirectoryTupleFields.ParentDirectoryRef, value);
         }
 
         public string DefaultDir

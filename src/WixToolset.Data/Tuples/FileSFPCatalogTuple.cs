@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.FileSFPCatalog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileSFPCatalogTupleFields.File_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileSFPCatalogTupleFields.SFPCatalog_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSFPCatalogTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSFPCatalogTupleFields.SFPCatalogRef), IntermediateFieldType.String),
             },
             typeof(FileSFPCatalogTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum FileSFPCatalogTupleFields
     {
-        File_,
-        SFPCatalog_,
+        FileRef,
+        SFPCatalogRef,
     }
 
     public class FileSFPCatalogTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[FileSFPCatalogTupleFields index] => this.Fields[(int)index];
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.File_];
-            set => this.Set((int)FileSFPCatalogTupleFields.File_, value);
+            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.FileRef];
+            set => this.Set((int)FileSFPCatalogTupleFields.FileRef, value);
         }
 
-        public string SFPCatalog_
+        public string SFPCatalogRef
         {
-            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.SFPCatalog_];
-            set => this.Set((int)FileSFPCatalogTupleFields.SFPCatalog_, value);
+            get => (string)this.Fields[(int)FileSFPCatalogTupleFields.SFPCatalogRef];
+            set => this.Set((int)FileSFPCatalogTupleFields.SFPCatalogRef, value);
         }
     }
 }

@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiPatchOldAssemblyFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileTupleFields.File_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileTupleFields.Assembly_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPatchOldAssemblyFileTupleFields.AssemblyRef), IntermediateFieldType.String),
             },
             typeof(MsiPatchOldAssemblyFileTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiPatchOldAssemblyFileTupleFields
     {
-        File_,
-        Assembly_,
+        FileRef,
+        AssemblyRef,
     }
 
     public class MsiPatchOldAssemblyFileTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiPatchOldAssemblyFileTupleFields index] => this.Fields[(int)index];
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.File_];
-            set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.File_, value);
+            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.FileRef];
+            set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.FileRef, value);
         }
 
-        public string Assembly_
+        public string AssemblyRef
         {
-            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.Assembly_];
-            set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.Assembly_, value);
+            get => (string)this.Fields[(int)MsiPatchOldAssemblyFileTupleFields.AssemblyRef];
+            set => this.Set((int)MsiPatchOldAssemblyFileTupleFields.AssemblyRef, value);
         }
     }
 }

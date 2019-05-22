@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleSlipstreamMsp,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspTupleFields.WixBundlePackage_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspTupleFields.WixBundlePackage_Msp), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSlipstreamMspTupleFields.MspWixBundlePackageRef), IntermediateFieldType.String),
             },
             typeof(WixBundleSlipstreamMspTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleSlipstreamMspTupleFields
     {
-        WixBundlePackage_,
-        WixBundlePackage_Msp,
+        WixBundlePackageRef,
+        MspWixBundlePackageRef,
     }
 
     public class WixBundleSlipstreamMspTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleSlipstreamMspTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackage_
+        public string WixBundlePackageRef
         {
-            get => (string)this.Fields[(int)WixBundleSlipstreamMspTupleFields.WixBundlePackage_];
-            set => this.Set((int)WixBundleSlipstreamMspTupleFields.WixBundlePackage_, value);
+            get => (string)this.Fields[(int)WixBundleSlipstreamMspTupleFields.WixBundlePackageRef];
+            set => this.Set((int)WixBundleSlipstreamMspTupleFields.WixBundlePackageRef, value);
         }
 
-        public string WixBundlePackage_Msp
+        public string MspWixBundlePackageRef
         {
-            get => (string)this.Fields[(int)WixBundleSlipstreamMspTupleFields.WixBundlePackage_Msp];
-            set => this.Set((int)WixBundleSlipstreamMspTupleFields.WixBundlePackage_Msp, value);
+            get => (string)this.Fields[(int)WixBundleSlipstreamMspTupleFields.MspWixBundlePackageRef];
+            set => this.Set((int)WixBundleSlipstreamMspTupleFields.MspWixBundlePackageRef, value);
         }
     }
 }

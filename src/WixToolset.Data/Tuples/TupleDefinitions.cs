@@ -113,13 +113,13 @@ namespace WixToolset.Data
         SFPCatalog,
         Shortcut,
         Signature,
-        TargetFiles_OptionalData,
+        TargetFilesOptionalData,
         TargetImages,
         TextStyle,
         TypeLib,
         UIText,
         Upgrade,
-        UpgradedFiles_OptionalData,
+        UpgradedFilesOptionalData,
         UpgradedFilesToIgnore,
         UpgradedImages,
         Verb,
@@ -531,8 +531,8 @@ namespace WixToolset.Data
                 case TupleDefinitionType.Signature:
                     return TupleDefinitions.Signature;
 
-                case TupleDefinitionType.TargetFiles_OptionalData:
-                    return TupleDefinitions.TargetFiles_OptionalData;
+                case TupleDefinitionType.TargetFilesOptionalData:
+                    return TupleDefinitions.TargetFilesOptionalData;
 
                 case TupleDefinitionType.TargetImages:
                     return TupleDefinitions.TargetImages;
@@ -549,8 +549,8 @@ namespace WixToolset.Data
                 case TupleDefinitionType.Upgrade:
                     return TupleDefinitions.Upgrade;
 
-                case TupleDefinitionType.UpgradedFiles_OptionalData:
-                    return TupleDefinitions.UpgradedFiles_OptionalData;
+                case TupleDefinitionType.UpgradedFilesOptionalData:
+                    return TupleDefinitions.UpgradedFilesOptionalData;
 
                 case TupleDefinitionType.UpgradedFilesToIgnore:
                     return TupleDefinitions.UpgradedFilesToIgnore;

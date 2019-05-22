@@ -10,10 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiAssembly,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.Feature_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.File_Manifest), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.File_Application), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.ManifestFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.ApplicationFileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(MsiAssemblyTuple));
@@ -24,10 +24,10 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiAssemblyTupleFields
     {
-        Component_,
-        Feature_,
-        File_Manifest,
-        File_Application,
+        ComponentRef,
+        FeatureRef,
+        ManifestFileRef,
+        ApplicationFileRef,
         Attributes,
     }
 
@@ -43,28 +43,28 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiAssemblyTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.Component_];
-            set => this.Set((int)MsiAssemblyTupleFields.Component_, value);
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.ComponentRef];
+            set => this.Set((int)MsiAssemblyTupleFields.ComponentRef, value);
         }
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.Feature_];
-            set => this.Set((int)MsiAssemblyTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.FeatureRef];
+            set => this.Set((int)MsiAssemblyTupleFields.FeatureRef, value);
         }
 
-        public string File_Manifest
+        public string ManifestFileRef
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.File_Manifest];
-            set => this.Set((int)MsiAssemblyTupleFields.File_Manifest, value);
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.ManifestFileRef];
+            set => this.Set((int)MsiAssemblyTupleFields.ManifestFileRef, value);
         }
 
-        public string File_Application
+        public string ApplicationFileRef
         {
-            get => (string)this.Fields[(int)MsiAssemblyTupleFields.File_Application];
-            set => this.Set((int)MsiAssemblyTupleFields.File_Application, value);
+            get => (string)this.Fields[(int)MsiAssemblyTupleFields.ApplicationFileRef];
+            set => this.Set((int)MsiAssemblyTupleFields.ApplicationFileRef, value);
         }
 
         public FileAssemblyType Type

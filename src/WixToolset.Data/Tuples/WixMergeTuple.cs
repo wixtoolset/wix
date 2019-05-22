@@ -11,12 +11,12 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Language), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.SourceFile), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.DiskId), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.FileCompression), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixMergeTupleFields.ConfigurationData), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixMergeTupleFields.FeatureRef), IntermediateFieldType.String),
             },
             typeof(WixMergeTuple));
     }
@@ -27,12 +27,12 @@ namespace WixToolset.Data.Tuples
     public enum WixMergeTupleFields
     {
         Language,
-        Directory_,
+        DirectoryRef,
         SourceFile,
         DiskId,
         FileCompression,
         ConfigurationData,
-        Feature_,
+        FeatureRef,
     }
 
     public class WixMergeTuple : IntermediateTuple
@@ -53,10 +53,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixMergeTupleFields.Language, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.Directory_];
-            set => this.Set((int)WixMergeTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)WixMergeTupleFields.DirectoryRef];
+            set => this.Set((int)WixMergeTupleFields.DirectoryRef, value);
         }
 
         public string SourceFile
@@ -83,10 +83,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixMergeTupleFields.ConfigurationData, value);
         }
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)WixMergeTupleFields.Feature_];
-            set => this.Set((int)WixMergeTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)WixMergeTupleFields.FeatureRef];
+            set => this.Set((int)WixMergeTupleFields.FeatureRef, value);
         }
     }
 }

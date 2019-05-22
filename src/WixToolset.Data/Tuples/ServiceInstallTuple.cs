@@ -20,7 +20,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.StartName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Password), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Arguments), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Interactive), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ServiceInstallTupleFields.Vital), IntermediateFieldType.Bool),
@@ -43,7 +43,7 @@ namespace WixToolset.Data.Tuples
         StartName,
         Password,
         Arguments,
-        Component_,
+        ComponentRef,
         Description,
         Interactive,
         Vital,
@@ -146,10 +146,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ServiceInstallTupleFields.Arguments, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ServiceInstallTupleFields.Component_];
-            set => this.Set((int)ServiceInstallTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ServiceInstallTupleFields.ComponentRef];
+            set => this.Set((int)ServiceInstallTupleFields.ComponentRef, value);
         }
 
         public string Description

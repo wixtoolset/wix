@@ -10,14 +10,14 @@ namespace WixToolset.Data
             TupleDefinitionType.Shortcut,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Target), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Arguments), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Hotkey), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Icon_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.IconRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.IconIndex), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Show), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.WkDir), IntermediateFieldType.String),
@@ -34,14 +34,14 @@ namespace WixToolset.Data.Tuples
 {
     public enum ShortcutTupleFields
     {
-        Directory_,
+        DirectoryRef,
         Name,
-        Component_,
+        ComponentRef,
         Target,
         Arguments,
         Description,
         Hotkey,
-        Icon_,
+        IconRef,
         IconIndex,
         Show,
         WkDir,
@@ -70,10 +70,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ShortcutTupleFields index] => this.Fields[(int)index];
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Directory_];
-            set => this.Set((int)ShortcutTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)ShortcutTupleFields.DirectoryRef];
+            set => this.Set((int)ShortcutTupleFields.DirectoryRef, value);
         }
 
         public string Name
@@ -82,10 +82,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ShortcutTupleFields.Name, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Component_];
-            set => this.Set((int)ShortcutTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ShortcutTupleFields.ComponentRef];
+            set => this.Set((int)ShortcutTupleFields.ComponentRef, value);
         }
 
         public string Target
@@ -112,10 +112,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ShortcutTupleFields.Hotkey, value);
         }
 
-        public string Icon_
+        public string IconRef
         {
-            get => (string)this.Fields[(int)ShortcutTupleFields.Icon_];
-            set => this.Set((int)ShortcutTupleFields.Icon_, value);
+            get => (string)this.Fields[(int)ShortcutTupleFields.IconRef];
+            set => this.Set((int)ShortcutTupleFields.IconRef, value);
         }
 
         public int? IconIndex

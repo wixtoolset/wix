@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.FeatureComponents,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FeatureComponentsTupleFields.Feature_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FeatureComponentsTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureComponentsTupleFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureComponentsTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(FeatureComponentsTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum FeatureComponentsTupleFields
     {
-        Feature_,
-        Component_,
+        FeatureRef,
+        ComponentRef,
     }
 
     public class FeatureComponentsTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[FeatureComponentsTupleFields index] => this.Fields[(int)index];
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)FeatureComponentsTupleFields.Feature_];
-            set => this.Set((int)FeatureComponentsTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)FeatureComponentsTupleFields.FeatureRef];
+            set => this.Set((int)FeatureComponentsTupleFields.FeatureRef, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)FeatureComponentsTupleFields.Component_];
-            set => this.Set((int)FeatureComponentsTupleFields.Component_, value);
+            get => (string)this.Fields[(int)FeatureComponentsTupleFields.ComponentRef];
+            set => this.Set((int)FeatureComponentsTupleFields.ComponentRef, value);
         }
     }
 }

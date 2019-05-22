@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.Complus,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComplusTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComplusTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComplusTupleFields.ExpType), IntermediateFieldType.Number),
             },
             typeof(ComplusTuple));
@@ -21,7 +21,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum ComplusTupleFields
     {
-        Component_,
+        ComponentRef,
         ExpType,
     }
 
@@ -37,10 +37,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ComplusTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ComplusTupleFields.Component_];
-            set => this.Set((int)ComplusTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ComplusTupleFields.ComponentRef];
+            set => this.Set((int)ComplusTupleFields.ComponentRef, value);
         }
 
         public int ExpType

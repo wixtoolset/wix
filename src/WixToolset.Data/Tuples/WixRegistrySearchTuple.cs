@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixRegistrySearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.WixSearch_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Root), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Value), IntermediateFieldType.String),
@@ -24,7 +24,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixRegistrySearchTupleFields
     {
-        WixSearch_,
+        WixSearchRef,
         Root,
         Key,
         Value,
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixRegistrySearchTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearch_
+        public string WixSearchRef
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.WixSearch_];
-            set => this.Set((int)WixRegistrySearchTupleFields.WixSearch_, value);
+            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.WixSearchRef];
+            set => this.Set((int)WixRegistrySearchTupleFields.WixSearchRef, value);
         }
 
         public int Root

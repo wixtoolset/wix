@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.Control,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ControlTupleFields.Dialog_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlTupleFields.DialogRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.Control), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.Type), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.X), IntermediateFieldType.Number),
@@ -28,7 +28,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.Visible), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.Property), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.Text), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlTupleFields.Control_Next), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlTupleFields.NextControlRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.Help), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.TrackDiskSpace), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ControlTupleFields.SourceFile), IntermediateFieldType.Path),
@@ -41,7 +41,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum ControlTupleFields
     {
-        Dialog_,
+        DialogRef,
         Control,
         Type,
         X,
@@ -59,7 +59,7 @@ namespace WixToolset.Data.Tuples
         Visible,
         Property,
         Text,
-        Control_Next,
+        NextControlRef,
         Help,
         TrackDiskSpace,
         SourceFile,
@@ -77,10 +77,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ControlTupleFields index] => this.Fields[(int)index];
 
-        public string Dialog_
+        public string DialogRef
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Dialog_];
-            set => this.Set((int)ControlTupleFields.Dialog_, value);
+            get => (string)this.Fields[(int)ControlTupleFields.DialogRef];
+            set => this.Set((int)ControlTupleFields.DialogRef, value);
         }
 
         public string Control
@@ -276,10 +276,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ControlTupleFields.Text, value);
         }
 
-        public string Control_Next
+        public string NextControlRef
         {
-            get => (string)this.Fields[(int)ControlTupleFields.Control_Next];
-            set => this.Set((int)ControlTupleFields.Control_Next, value);
+            get => (string)this.Fields[(int)ControlTupleFields.NextControlRef];
+            set => this.Set((int)ControlTupleFields.NextControlRef, value);
         }
 
         public string Help

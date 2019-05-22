@@ -14,7 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Action), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveRegistryTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(RemoveRegistryTuple));
     }
@@ -28,7 +28,7 @@ namespace WixToolset.Data.Tuples
         Key,
         Name,
         Action,
-        Component_,
+        ComponentRef,
     }
 
     public enum RemoveRegistryActionType
@@ -73,10 +73,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)RemoveRegistryTupleFields.Action, (int)value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)RemoveRegistryTupleFields.Component_];
-            set => this.Set((int)RemoveRegistryTupleFields.Component_, value);
+            get => (string)this.Fields[(int)RemoveRegistryTupleFields.ComponentRef];
+            set => this.Set((int)RemoveRegistryTupleFields.ComponentRef, value);
         }
     }
 }

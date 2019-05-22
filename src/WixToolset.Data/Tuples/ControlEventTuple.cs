@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.ControlEvent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Dialog_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Control_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.DialogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlEventTupleFields.ControlRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Event), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Argument), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlEventTupleFields.Condition), IntermediateFieldType.String),
@@ -25,8 +25,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum ControlEventTupleFields
     {
-        Dialog_,
-        Control_,
+        DialogRef,
+        ControlRef,
         Event,
         Argument,
         Condition,
@@ -45,16 +45,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ControlEventTupleFields index] => this.Fields[(int)index];
 
-        public string Dialog_
+        public string DialogRef
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Dialog_];
-            set => this.Set((int)ControlEventTupleFields.Dialog_, value);
+            get => (string)this.Fields[(int)ControlEventTupleFields.DialogRef];
+            set => this.Set((int)ControlEventTupleFields.DialogRef, value);
         }
 
-        public string Control_
+        public string ControlRef
         {
-            get => (string)this.Fields[(int)ControlEventTupleFields.Control_];
-            set => this.Set((int)ControlEventTupleFields.Control_, value);
+            get => (string)this.Fields[(int)ControlEventTupleFields.ControlRef];
+            set => this.Set((int)ControlEventTupleFields.ControlRef, value);
         }
 
         public string Event

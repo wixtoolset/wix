@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiAssemblyName,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiAssemblyNameTupleFields.Value), IntermediateFieldType.String),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiAssemblyNameTupleFields
     {
-        Component_,
+        ComponentRef,
         Name,
         Value,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiAssemblyNameTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)MsiAssemblyNameTupleFields.Component_];
-            set => this.Set((int)MsiAssemblyNameTupleFields.Component_, value);
+            get => (string)this.Fields[(int)MsiAssemblyNameTupleFields.ComponentRef];
+            set => this.Set((int)MsiAssemblyNameTupleFields.ComponentRef, value);
         }
 
         public string Name

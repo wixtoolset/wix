@@ -17,7 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(RemoveIniFileTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveIniFileTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RemoveIniFileTupleFields.Action), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RemoveIniFileTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RemoveIniFileTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(RemoveIniFileTuple));
     }
@@ -34,7 +34,7 @@ namespace WixToolset.Data.Tuples
         Key,
         Value,
         Action,
-        Component_,
+        ComponentRef,
     }
 
     public class RemoveIniFileTuple : IntermediateTuple
@@ -91,10 +91,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)RemoveIniFileTupleFields.Action, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)RemoveIniFileTupleFields.Component_];
-            set => this.Set((int)RemoveIniFileTupleFields.Component_, value);
+            get => (string)this.Fields[(int)RemoveIniFileTupleFields.ComponentRef];
+            set => this.Set((int)RemoveIniFileTupleFields.ComponentRef, value);
         }
     }
 }

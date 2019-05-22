@@ -16,7 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.ValueType), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(RegistryTupleFields.ValueAction), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(RegistryTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(RegistryTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(RegistryTuple));
     }
@@ -32,7 +32,7 @@ namespace WixToolset.Data.Tuples
         Value,
         ValueType,
         ValueAction,
-        Component_,
+        ComponentRef,
     }
 
     public enum RegistryValueType
@@ -99,10 +99,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)RegistryTupleFields.ValueAction, (int)value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)RegistryTupleFields.Component_];
-            set => this.Set((int)RegistryTupleFields.Component_, value);
+            get => (string)this.Fields[(int)RegistryTupleFields.ComponentRef];
+            set => this.Set((int)RegistryTupleFields.ComponentRef, value);
         }
     }
 }

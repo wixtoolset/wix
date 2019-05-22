@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixFileSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.WixSearch_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.Path), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MaxVersion), IntermediateFieldType.String),
@@ -29,7 +29,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixFileSearchTupleFields
     {
-        WixSearch_,
+        WixSearchRef,
         Path,
         MinVersion,
         MaxVersion,
@@ -53,10 +53,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixFileSearchTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearch_
+        public string WixSearchRef
         {
-            get => (string)this.Fields[(int)WixFileSearchTupleFields.WixSearch_];
-            set => this.Set((int)WixFileSearchTupleFields.WixSearch_, value);
+            get => (string)this.Fields[(int)WixFileSearchTupleFields.WixSearchRef];
+            set => this.Set((int)WixFileSearchTupleFields.WixSearchRef, value);
         }
 
         public string Path

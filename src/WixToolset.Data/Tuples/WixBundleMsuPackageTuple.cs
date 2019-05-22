@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleMsuPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageTupleFields.WixBundlePackage_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsuPackageTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsuPackageTupleFields.DetectCondition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsuPackageTupleFields.MsuKB), IntermediateFieldType.String),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleMsuPackageTupleFields
     {
-        WixBundlePackage_,
+        WixBundlePackageRef,
         DetectCondition,
         MsuKB,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleMsuPackageTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackage_
+        public string WixBundlePackageRef
         {
-            get => (string)this.Fields[(int)WixBundleMsuPackageTupleFields.WixBundlePackage_];
-            set => this.Set((int)WixBundleMsuPackageTupleFields.WixBundlePackage_, value);
+            get => (string)this.Fields[(int)WixBundleMsuPackageTupleFields.WixBundlePackageRef];
+            set => this.Set((int)WixBundleMsuPackageTupleFields.WixBundlePackageRef, value);
         }
 
         public string DetectCondition

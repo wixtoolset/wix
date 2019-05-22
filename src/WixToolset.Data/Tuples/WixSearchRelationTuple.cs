@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.WixSearchRelation,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.WixSearch_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.ParentId_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.WixSearchRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.ParentSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(WixSearchRelationTuple));
@@ -22,8 +22,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixSearchRelationTupleFields
     {
-        WixSearch_,
-        ParentId_,
+        WixSearchRef,
+        ParentSearchRef,
         Attributes,
     }
 
@@ -39,16 +39,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixSearchRelationTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearch_
+        public string WixSearchRef
         {
-            get => (string)this.Fields[(int)WixSearchRelationTupleFields.WixSearch_];
-            set => this.Set((int)WixSearchRelationTupleFields.WixSearch_, value);
+            get => (string)this.Fields[(int)WixSearchRelationTupleFields.WixSearchRef];
+            set => this.Set((int)WixSearchRelationTupleFields.WixSearchRef, value);
         }
 
-        public string ParentId_
+        public string ParentSearchRef
         {
-            get => (string)this.Fields[(int)WixSearchRelationTupleFields.ParentId_];
-            set => this.Set((int)WixSearchRelationTupleFields.ParentId_, value);
+            get => (string)this.Fields[(int)WixSearchRelationTupleFields.ParentSearchRef];
+            set => this.Set((int)WixSearchRelationTupleFields.ParentSearchRef, value);
         }
 
         public int Attributes

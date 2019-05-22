@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.IniLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IniLocatorTupleFields.Signature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IniLocatorTupleFields.SignatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorTupleFields.FileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorTupleFields.Section), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniLocatorTupleFields.Key), IntermediateFieldType.String),
@@ -25,7 +25,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum IniLocatorTupleFields
     {
-        Signature_,
+        SignatureRef,
         FileName,
         Section,
         Key,
@@ -45,10 +45,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[IniLocatorTupleFields index] => this.Fields[(int)index];
 
-        public string Signature_
+        public string SignatureRef
         {
-            get => (string)this.Fields[(int)IniLocatorTupleFields.Signature_];
-            set => this.Set((int)IniLocatorTupleFields.Signature_, value);
+            get => (string)this.Fields[(int)IniLocatorTupleFields.SignatureRef];
+            set => this.Set((int)IniLocatorTupleFields.SignatureRef, value);
         }
 
         public string FileName

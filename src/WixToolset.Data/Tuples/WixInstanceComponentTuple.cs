@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixInstanceComponent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixInstanceComponentTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInstanceComponentTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(WixInstanceComponentTuple));
     }
@@ -20,7 +20,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixInstanceComponentTupleFields
     {
-        Component_,
+        ComponentRef,
     }
 
     public class WixInstanceComponentTuple : IntermediateTuple
@@ -35,10 +35,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixInstanceComponentTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)WixInstanceComponentTupleFields.Component_];
-            set => this.Set((int)WixInstanceComponentTupleFields.Component_, value);
+            get => (string)this.Fields[(int)WixInstanceComponentTupleFields.ComponentRef];
+            set => this.Set((int)WixInstanceComponentTupleFields.ComponentRef, value);
         }
     }
 }

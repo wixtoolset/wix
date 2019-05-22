@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiFileHash,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiFileHashTupleFields.File_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiFileHashTupleFields.FileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiFileHashTupleFields.Options), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MsiFileHashTupleFields.HashPart1), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MsiFileHashTupleFields.HashPart2), IntermediateFieldType.Number),
@@ -25,7 +25,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiFileHashTupleFields
     {
-        File_,
+        FileRef,
         Options,
         HashPart1,
         HashPart2,
@@ -45,10 +45,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[MsiFileHashTupleFields index] => this.Fields[(int)index];
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)MsiFileHashTupleFields.File_];
-            set => this.Set((int)MsiFileHashTupleFields.File_, value);
+            get => (string)this.Fields[(int)MsiFileHashTupleFields.FileRef];
+            set => this.Set((int)MsiFileHashTupleFields.FileRef, value);
         }
 
         public int Options

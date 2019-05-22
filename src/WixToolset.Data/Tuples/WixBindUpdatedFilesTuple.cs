@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBindUpdatedFiles,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBindUpdatedFilesTupleFields.File_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBindUpdatedFilesTupleFields.FileRef), IntermediateFieldType.String),
             },
             typeof(WixBindUpdatedFilesTuple));
     }
@@ -20,7 +20,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBindUpdatedFilesTupleFields
     {
-        File_,
+        FileRef,
     }
 
     public class WixBindUpdatedFilesTuple : IntermediateTuple
@@ -35,10 +35,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBindUpdatedFilesTupleFields index] => this.Fields[(int)index];
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)WixBindUpdatedFilesTupleFields.File_];
-            set => this.Set((int)WixBindUpdatedFilesTupleFields.File_, value);
+            get => (string)this.Fields[(int)WixBindUpdatedFilesTupleFields.FileRef];
+            set => this.Set((int)WixBindUpdatedFilesTupleFields.FileRef, value);
         }
     }
 }

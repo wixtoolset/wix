@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.BBControl,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(BBControlTupleFields.Billboard_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(BBControlTupleFields.BillboardRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.BBControl), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.Type), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(BBControlTupleFields.X), IntermediateFieldType.Number),
@@ -37,7 +37,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum BBControlTupleFields
     {
-        Billboard_,
+        BillboardRef,
         BBControl,
         Type,
         X,
@@ -69,10 +69,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[BBControlTupleFields index] => this.Fields[(int)index];
 
-        public string Billboard_
+        public string BillboardRef
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.Billboard_];
-            set => this.Set((int)BBControlTupleFields.Billboard_, value);
+            get => (string)this.Fields[(int)BBControlTupleFields.BillboardRef];
+            set => this.Set((int)BBControlTupleFields.BillboardRef, value);
         }
 
         public string BBControl

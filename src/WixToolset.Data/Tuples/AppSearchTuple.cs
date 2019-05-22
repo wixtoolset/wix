@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(AppSearchTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AppSearchTupleFields.Signature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(AppSearchTupleFields.SignatureRef), IntermediateFieldType.String),
             },
             typeof(AppSearchTuple));
     }
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
     public enum AppSearchTupleFields
     {
         Property,
-        Signature_,
+        SignatureRef,
     }
 
     public class AppSearchTuple : IntermediateTuple
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)AppSearchTupleFields.Property, value);
         }
 
-        public string Signature_
+        public string SignatureRef
         {
-            get => (string)this.Fields[(int)AppSearchTupleFields.Signature_];
-            set => this.Set((int)AppSearchTupleFields.Signature_, value);
+            get => (string)this.Fields[(int)AppSearchTupleFields.SignatureRef];
+            set => this.Set((int)AppSearchTupleFields.SignatureRef, value);
         }
     }
 }

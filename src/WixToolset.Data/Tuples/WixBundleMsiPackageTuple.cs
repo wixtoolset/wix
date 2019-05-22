@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleMsiPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.WixBundlePackage_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.UpgradeCode), IntermediateFieldType.String),
@@ -29,7 +29,7 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundleMsiPackageTupleFields
     {
-        WixBundlePackage_,
+        WixBundlePackageRef,
         Attributes,
         ProductCode,
         UpgradeCode,
@@ -60,10 +60,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleMsiPackageTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackage_
+        public string WixBundlePackageRef
         {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.WixBundlePackage_];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.WixBundlePackage_, value);
+            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.WixBundlePackageRef];
+            set => this.Set((int)WixBundleMsiPackageTupleFields.WixBundlePackageRef, value);
         }
 
         public WixBundleMsiPackageAttributes Attributes

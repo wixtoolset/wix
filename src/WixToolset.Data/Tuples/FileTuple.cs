@@ -10,9 +10,9 @@ namespace WixToolset.Data
             TupleDefinitionType.File,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.ShortFileName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.LongFileName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.ShortName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.FileSize), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Language), IntermediateFieldType.String),
@@ -34,9 +34,9 @@ namespace WixToolset.Data.Tuples
 {
     public enum FileTupleFields
     {
-        Component_,
-        ShortFileName,
-        LongFileName,
+        ComponentRef,
+        ShortName,
+        Name,
         FileSize,
         Version,
         Language,
@@ -63,22 +63,22 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[FileTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)FileTupleFields.Component_];
-            set => this.Set((int)FileTupleFields.Component_, value);
+            get => (string)this.Fields[(int)FileTupleFields.ComponentRef];
+            set => this.Set((int)FileTupleFields.ComponentRef, value);
         }
 
-        public string ShortFileName
+        public string ShortName
         {
-            get => (string)this.Fields[(int)FileTupleFields.ShortFileName];
-            set => this.Set((int)FileTupleFields.ShortFileName, value);
+            get => (string)this.Fields[(int)FileTupleFields.ShortName];
+            set => this.Set((int)FileTupleFields.ShortName, value);
         }
 
-        public string LongFileName
+        public string Name
         {
-            get => (string)this.Fields[(int)FileTupleFields.LongFileName];
-            set => this.Set((int)FileTupleFields.LongFileName, value);
+            get => (string)this.Fields[(int)FileTupleFields.Name];
+            set => this.Set((int)FileTupleFields.Name, value);
         }
 
         public int FileSize

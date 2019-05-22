@@ -12,16 +12,16 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.CLSID), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.Context), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.ProgId_Default), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassTupleFields.DefaultProgIdRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.AppId_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassTupleFields.AppIdRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.FileTypeMask), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Icon_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassTupleFields.IconRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.IconIndex), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.DefInprocHandler), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.Argument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ClassTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ClassTupleFields.FeatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ClassTupleFields.RelativePath), IntermediateFieldType.Bool),
             },
             typeof(ClassTuple));
@@ -34,16 +34,16 @@ namespace WixToolset.Data.Tuples
     {
         CLSID,
         Context,
-        Component_,
-        ProgId_Default,
+        ComponentRef,
+        DefaultProgIdRef,
         Description,
-        AppId_,
+        AppIdRef,
         FileTypeMask,
-        Icon_,
+        IconRef,
         IconIndex,
         DefInprocHandler,
         Argument,
-        Feature_,
+        FeatureRef,
         RelativePath,
     }
 
@@ -71,16 +71,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ClassTupleFields.Context, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Component_];
-            set => this.Set((int)ClassTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ClassTupleFields.ComponentRef];
+            set => this.Set((int)ClassTupleFields.ComponentRef, value);
         }
 
-        public string ProgId_Default
+        public string DefaultProgIdRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.ProgId_Default];
-            set => this.Set((int)ClassTupleFields.ProgId_Default, value);
+            get => (string)this.Fields[(int)ClassTupleFields.DefaultProgIdRef];
+            set => this.Set((int)ClassTupleFields.DefaultProgIdRef, value);
         }
 
         public string Description
@@ -89,10 +89,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ClassTupleFields.Description, value);
         }
 
-        public string AppId_
+        public string AppIdRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.AppId_];
-            set => this.Set((int)ClassTupleFields.AppId_, value);
+            get => (string)this.Fields[(int)ClassTupleFields.AppIdRef];
+            set => this.Set((int)ClassTupleFields.AppIdRef, value);
         }
 
         public string FileTypeMask
@@ -101,10 +101,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ClassTupleFields.FileTypeMask, value);
         }
 
-        public string Icon_
+        public string IconRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Icon_];
-            set => this.Set((int)ClassTupleFields.Icon_, value);
+            get => (string)this.Fields[(int)ClassTupleFields.IconRef];
+            set => this.Set((int)ClassTupleFields.IconRef, value);
         }
 
         public int IconIndex
@@ -125,10 +125,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ClassTupleFields.Argument, value);
         }
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)ClassTupleFields.Feature_];
-            set => this.Set((int)ClassTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)ClassTupleFields.FeatureRef];
+            set => this.Set((int)ClassTupleFields.FeatureRef, value);
         }
 
         public bool RelativePath

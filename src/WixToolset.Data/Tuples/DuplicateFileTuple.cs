@@ -10,10 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.DuplicateFile,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.File_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestFolder), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestinationName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DuplicateFileTupleFields.DestinationFolder), IntermediateFieldType.String),
             },
             typeof(DuplicateFileTuple));
     }
@@ -23,10 +23,10 @@ namespace WixToolset.Data.Tuples
 {
     public enum DuplicateFileTupleFields
     {
-        Component_,
-        File_,
-        DestName,
-        DestFolder,
+        ComponentRef,
+        FileRef,
+        DestinationName,
+        DestinationFolder,
     }
 
     public class DuplicateFileTuple : IntermediateTuple
@@ -41,28 +41,28 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[DuplicateFileTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.Component_];
-            set => this.Set((int)DuplicateFileTupleFields.Component_, value);
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.ComponentRef];
+            set => this.Set((int)DuplicateFileTupleFields.ComponentRef, value);
         }
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.File_];
-            set => this.Set((int)DuplicateFileTupleFields.File_, value);
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.FileRef];
+            set => this.Set((int)DuplicateFileTupleFields.FileRef, value);
         }
 
-        public string DestName
+        public string DestinationName
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestName];
-            set => this.Set((int)DuplicateFileTupleFields.DestName, value);
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestinationName];
+            set => this.Set((int)DuplicateFileTupleFields.DestinationName, value);
         }
 
-        public string DestFolder
+        public string DestinationFolder
         {
-            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestFolder];
-            set => this.Set((int)DuplicateFileTupleFields.DestFolder, value);
+            get => (string)this.Fields[(int)DuplicateFileTupleFields.DestinationFolder];
+            set => this.Set((int)DuplicateFileTupleFields.DestinationFolder, value);
         }
     }
 }

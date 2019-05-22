@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.Condition,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ConditionTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ConditionTupleFields.FeatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ConditionTupleFields.Level), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ConditionTupleFields.Condition), IntermediateFieldType.String),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum ConditionTupleFields
     {
-        Feature_,
+        FeatureRef,
         Level,
         Condition,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ConditionTupleFields index] => this.Fields[(int)index];
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)ConditionTupleFields.Feature_];
-            set => this.Set((int)ConditionTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)ConditionTupleFields.FeatureRef];
+            set => this.Set((int)ConditionTupleFields.FeatureRef, value);
         }
 
         public int Level

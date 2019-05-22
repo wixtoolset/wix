@@ -16,7 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(IniFileTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IniFileTupleFields.Action), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IniFileTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IniFileTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(IniFileTuple));
     }
@@ -32,7 +32,7 @@ namespace WixToolset.Data.Tuples
         Key,
         Value,
         Action,
-        Component_,
+        ComponentRef,
     }
 
     public class IniFileTuple : IntermediateTuple
@@ -83,10 +83,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)IniFileTupleFields.Action, (int)value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)IniFileTupleFields.Component_];
-            set => this.Set((int)IniFileTupleFields.Component_, value);
+            get => (string)this.Fields[(int)IniFileTupleFields.ComponentRef];
+            set => this.Set((int)IniFileTupleFields.ComponentRef, value);
         }
     }
 }

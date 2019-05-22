@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.DrLocator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Signature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.SignatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Parent), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Path), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DrLocatorTupleFields.Depth), IntermediateFieldType.Number),
@@ -23,7 +23,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum DrLocatorTupleFields
     {
-        Signature_,
+        SignatureRef,
         Parent,
         Path,
         Depth,
@@ -41,10 +41,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[DrLocatorTupleFields index] => this.Fields[(int)index];
 
-        public string Signature_
+        public string SignatureRef
         {
-            get => (string)this.Fields[(int)DrLocatorTupleFields.Signature_];
-            set => this.Set((int)DrLocatorTupleFields.Signature_, value);
+            get => (string)this.Fields[(int)DrLocatorTupleFields.SignatureRef];
+            set => this.Set((int)DrLocatorTupleFields.SignatureRef, value);
         }
 
         public string Parent

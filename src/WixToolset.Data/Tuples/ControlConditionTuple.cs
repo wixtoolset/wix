@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.ControlCondition,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.Dialog_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.Control_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.DialogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.ControlRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.Action), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ControlConditionTupleFields.Condition), IntermediateFieldType.String),
             },
@@ -23,8 +23,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum ControlConditionTupleFields
     {
-        Dialog_,
-        Control_,
+        DialogRef,
+        ControlRef,
         Action,
         Condition,
     }
@@ -41,16 +41,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ControlConditionTupleFields index] => this.Fields[(int)index];
 
-        public string Dialog_
+        public string DialogRef
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Dialog_];
-            set => this.Set((int)ControlConditionTupleFields.Dialog_, value);
+            get => (string)this.Fields[(int)ControlConditionTupleFields.DialogRef];
+            set => this.Set((int)ControlConditionTupleFields.DialogRef, value);
         }
 
-        public string Control_
+        public string ControlRef
         {
-            get => (string)this.Fields[(int)ControlConditionTupleFields.Control_];
-            set => this.Set((int)ControlConditionTupleFields.Control_, value);
+            get => (string)this.Fields[(int)ControlConditionTupleFields.ControlRef];
+            set => this.Set((int)ControlConditionTupleFields.ControlRef, value);
         }
 
         public string Action

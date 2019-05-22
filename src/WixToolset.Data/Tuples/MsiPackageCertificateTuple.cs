@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(MsiPackageCertificateTupleFields.PackageCertificate), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiPackageCertificateTupleFields.DigitalCertificate_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiPackageCertificateTupleFields.DigitalCertificateRef), IntermediateFieldType.String),
             },
             typeof(MsiPackageCertificateTuple));
     }
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
     public enum MsiPackageCertificateTupleFields
     {
         PackageCertificate,
-        DigitalCertificate_,
+        DigitalCertificateRef,
     }
 
     public class MsiPackageCertificateTuple : IntermediateTuple
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiPackageCertificateTupleFields.PackageCertificate, value);
         }
 
-        public string DigitalCertificate_
+        public string DigitalCertificateRef
         {
-            get => (string)this.Fields[(int)MsiPackageCertificateTupleFields.DigitalCertificate_];
-            set => this.Set((int)MsiPackageCertificateTupleFields.DigitalCertificate_, value);
+            get => (string)this.Fields[(int)MsiPackageCertificateTupleFields.DigitalCertificateRef];
+            set => this.Set((int)MsiPackageCertificateTupleFields.DigitalCertificateRef, value);
         }
     }
 }

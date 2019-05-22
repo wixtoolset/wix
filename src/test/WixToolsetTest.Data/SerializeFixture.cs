@@ -22,7 +22,7 @@ namespace WixToolsetTest.Data
             section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
-                Directory_ = "TestFolder",
+                DirectoryRef = "TestFolder",
                 Location = ComponentLocation.Either,
             });
 
@@ -37,7 +37,7 @@ namespace WixToolsetTest.Data
 
             Assert.Equal("TestComponent", tuple.Id.Id);
             Assert.Equal(AccessModifier.Public, tuple.Id.Access);
-            Assert.Equal("TestFolder", tuple.Directory_);
+            Assert.Equal("TestFolder", tuple.DirectoryRef);
             Assert.Equal(ComponentLocation.Either, tuple.Location);
         }
 
@@ -192,7 +192,7 @@ namespace WixToolsetTest.Data
             section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
-                Directory_ = "TestFolder",
+                DirectoryRef = "TestFolder",
                 Location = ComponentLocation.Either,
             });
 

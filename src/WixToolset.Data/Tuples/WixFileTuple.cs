@@ -11,9 +11,9 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.AssemblyType), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFileTupleFields.File_AssemblyManifest), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFileTupleFields.File_AssemblyApplication), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFileTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileTupleFields.AssemblyManifestFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileTupleFields.AssemblyApplicationFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFileTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.DiskId), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.Source), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixFileTupleFields.ProcessorArchitecture), IntermediateFieldType.String),
@@ -33,9 +33,9 @@ namespace WixToolset.Data.Tuples
     public enum WixFileTupleFields
     {
         AssemblyType,
-        File_AssemblyManifest,
-        File_AssemblyApplication,
-        Directory_,
+        AssemblyManifestFileRef,
+        AssemblyApplicationFileRef,
+        DirectoryRef,
         DiskId,
         Source,
         ProcessorArchitecture,
@@ -99,22 +99,22 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixFileTupleFields.AssemblyType, (int)value);
         }
 
-        public string File_AssemblyManifest
+        public string AssemblyManifestFileRef
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.File_AssemblyManifest];
-            set => this.Set((int)WixFileTupleFields.File_AssemblyManifest, value);
+            get => (string)this.Fields[(int)WixFileTupleFields.AssemblyManifestFileRef];
+            set => this.Set((int)WixFileTupleFields.AssemblyManifestFileRef, value);
         }
 
-        public string File_AssemblyApplication
+        public string AssemblyApplicationFileRef
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.File_AssemblyApplication];
-            set => this.Set((int)WixFileTupleFields.File_AssemblyApplication, value);
+            get => (string)this.Fields[(int)WixFileTupleFields.AssemblyApplicationFileRef];
+            set => this.Set((int)WixFileTupleFields.AssemblyApplicationFileRef, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)WixFileTupleFields.Directory_];
-            set => this.Set((int)WixFileTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)WixFileTupleFields.DirectoryRef];
+            set => this.Set((int)WixFileTupleFields.DirectoryRef, value);
         }
 
         public int DiskId

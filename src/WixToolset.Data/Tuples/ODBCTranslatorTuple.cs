@@ -10,10 +10,10 @@ namespace WixToolset.Data
             TupleDefinitionType.ODBCTranslator,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.File_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.File_Setup), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.FileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCTranslatorTupleFields.SetupFileRef), IntermediateFieldType.String),
             },
             typeof(ODBCTranslatorTuple));
     }
@@ -23,10 +23,10 @@ namespace WixToolset.Data.Tuples
 {
     public enum ODBCTranslatorTupleFields
     {
-        Component_,
+        ComponentRef,
         Description,
-        File_,
-        File_Setup,
+        FileRef,
+        SetupFileRef,
     }
 
     public class ODBCTranslatorTuple : IntermediateTuple
@@ -41,10 +41,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ODBCTranslatorTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.Component_];
-            set => this.Set((int)ODBCTranslatorTupleFields.Component_, value);
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.ComponentRef];
+            set => this.Set((int)ODBCTranslatorTupleFields.ComponentRef, value);
         }
 
         public string Description
@@ -53,16 +53,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ODBCTranslatorTupleFields.Description, value);
         }
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.File_];
-            set => this.Set((int)ODBCTranslatorTupleFields.File_, value);
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.FileRef];
+            set => this.Set((int)ODBCTranslatorTupleFields.FileRef, value);
         }
 
-        public string File_Setup
+        public string SetupFileRef
         {
-            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.File_Setup];
-            set => this.Set((int)ODBCTranslatorTupleFields.File_Setup, value);
+            get => (string)this.Fields[(int)ODBCTranslatorTupleFields.SetupFileRef];
+            set => this.Set((int)ODBCTranslatorTupleFields.SetupFileRef, value);
         }
     }
 }

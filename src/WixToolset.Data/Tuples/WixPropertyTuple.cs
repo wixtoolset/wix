@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixProperty,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Property_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.PropertyRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Admin), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Hidden), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixPropertyTupleFields.Secure), IntermediateFieldType.Bool),
@@ -23,7 +23,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixPropertyTupleFields
     {
-        Property_,
+        PropertyRef,
         Admin,
         Hidden,
         Secure,
@@ -41,10 +41,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixPropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Property_
+        public string PropertyRef
         {
-            get => (string)this.Fields[(int)WixPropertyTupleFields.Property_];
-            set => this.Set((int)WixPropertyTupleFields.Property_, value);
+            get => (string)this.Fields[(int)WixPropertyTupleFields.PropertyRef];
+            set => this.Set((int)WixPropertyTupleFields.PropertyRef, value);
         }
 
         public bool Admin

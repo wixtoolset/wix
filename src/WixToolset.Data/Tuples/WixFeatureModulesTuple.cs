@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.WixFeatureModules,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFeatureModulesTupleFields.Feature_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFeatureModulesTupleFields.WixMerge_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFeatureModulesTupleFields.FeatureRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFeatureModulesTupleFields.WixMergeRef), IntermediateFieldType.String),
             },
             typeof(WixFeatureModulesTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixFeatureModulesTupleFields
     {
-        Feature_,
-        WixMerge_,
+        FeatureRef,
+        WixMergeRef,
     }
 
     public class WixFeatureModulesTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixFeatureModulesTupleFields index] => this.Fields[(int)index];
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)WixFeatureModulesTupleFields.Feature_];
-            set => this.Set((int)WixFeatureModulesTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)WixFeatureModulesTupleFields.FeatureRef];
+            set => this.Set((int)WixFeatureModulesTupleFields.FeatureRef, value);
         }
 
-        public string WixMerge_
+        public string WixMergeRef
         {
-            get => (string)this.Fields[(int)WixFeatureModulesTupleFields.WixMerge_];
-            set => this.Set((int)WixFeatureModulesTupleFields.WixMerge_, value);
+            get => (string)this.Fields[(int)WixFeatureModulesTupleFields.WixMergeRef];
+            set => this.Set((int)WixFeatureModulesTupleFields.WixMergeRef, value);
         }
     }
 }

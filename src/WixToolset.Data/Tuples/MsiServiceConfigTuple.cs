@@ -16,7 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigFailureActionsTupleFields.OnUninstall), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.ConfigType), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Argument), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiServiceConfigTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(MsiServiceConfigTuple));
     }
@@ -33,7 +33,7 @@ namespace WixToolset.Data.Tuples
         OnUninstall,
         ConfigType,
         Argument,
-        Component_,
+        ComponentRef,
     }
 
     public enum MsiServiceConfigType
@@ -93,10 +93,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiServiceConfigTupleFields.Argument, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.Component_];
-            set => this.Set((int)MsiServiceConfigTupleFields.Component_, value);
+            get => (string)this.Fields[(int)MsiServiceConfigTupleFields.ComponentRef];
+            set => this.Set((int)MsiServiceConfigTupleFields.ComponentRef, value);
         }
     }
 }

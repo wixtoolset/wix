@@ -12,7 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.Table), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.SignObject), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.DigitalCertificate_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.DigitalCertificateRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiDigitalSignatureTupleFields.Hash), IntermediateFieldType.Path),
             },
             typeof(MsiDigitalSignatureTuple));
@@ -25,7 +25,7 @@ namespace WixToolset.Data.Tuples
     {
         Table,
         SignObject,
-        DigitalCertificate_,
+        DigitalCertificateRef,
         Hash,
     }
 
@@ -53,10 +53,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiDigitalSignatureTupleFields.SignObject, value);
         }
 
-        public string DigitalCertificate_
+        public string DigitalCertificateRef
         {
-            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.DigitalCertificate_];
-            set => this.Set((int)MsiDigitalSignatureTupleFields.DigitalCertificate_, value);
+            get => (string)this.Fields[(int)MsiDigitalSignatureTupleFields.DigitalCertificateRef];
+            set => this.Set((int)MsiDigitalSignatureTupleFields.DigitalCertificateRef, value);
         }
 
         public string Hash

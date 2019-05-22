@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.ODBCAttribute,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.Driver_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.DriverRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.Attribute), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ODBCAttributeTupleFields.Value), IntermediateFieldType.String),
             },
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum ODBCAttributeTupleFields
     {
-        Driver_,
+        DriverRef,
         Attribute,
         Value,
     }
@@ -39,10 +39,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[ODBCAttributeTupleFields index] => this.Fields[(int)index];
 
-        public string Driver_
+        public string DriverRef
         {
-            get => (string)this.Fields[(int)ODBCAttributeTupleFields.Driver_];
-            set => this.Set((int)ODBCAttributeTupleFields.Driver_, value);
+            get => (string)this.Fields[(int)ODBCAttributeTupleFields.DriverRef];
+            set => this.Set((int)ODBCAttributeTupleFields.DriverRef, value);
         }
 
         public string Attribute

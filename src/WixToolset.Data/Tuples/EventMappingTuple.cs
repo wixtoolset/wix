@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.EventMapping,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(EventMappingTupleFields.Dialog_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(EventMappingTupleFields.Control_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EventMappingTupleFields.DialogRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EventMappingTupleFields.ControlRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(EventMappingTupleFields.Event), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(EventMappingTupleFields.Attribute), IntermediateFieldType.String),
             },
@@ -23,8 +23,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum EventMappingTupleFields
     {
-        Dialog_,
-        Control_,
+        DialogRef,
+        ControlRef,
         Event,
         Attribute,
     }
@@ -41,16 +41,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[EventMappingTupleFields index] => this.Fields[(int)index];
 
-        public string Dialog_
+        public string DialogRef
         {
-            get => (string)this.Fields[(int)EventMappingTupleFields.Dialog_];
-            set => this.Set((int)EventMappingTupleFields.Dialog_, value);
+            get => (string)this.Fields[(int)EventMappingTupleFields.DialogRef];
+            set => this.Set((int)EventMappingTupleFields.DialogRef, value);
         }
 
-        public string Control_
+        public string ControlRef
         {
-            get => (string)this.Fields[(int)EventMappingTupleFields.Control_];
-            set => this.Set((int)EventMappingTupleFields.Control_, value);
+            get => (string)this.Fields[(int)EventMappingTupleFields.ControlRef];
+            set => this.Set((int)EventMappingTupleFields.ControlRef, value);
         }
 
         public string Event

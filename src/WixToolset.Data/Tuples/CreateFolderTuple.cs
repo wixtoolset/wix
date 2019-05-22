@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.CreateFolder,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CreateFolderTupleFields.Directory_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CreateFolderTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CreateFolderTupleFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CreateFolderTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(CreateFolderTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum CreateFolderTupleFields
     {
-        Directory_,
-        Component_,
+        DirectoryRef,
+        ComponentRef,
     }
 
     public class CreateFolderTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[CreateFolderTupleFields index] => this.Fields[(int)index];
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)CreateFolderTupleFields.Directory_];
-            set => this.Set((int)CreateFolderTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)CreateFolderTupleFields.DirectoryRef];
+            set => this.Set((int)CreateFolderTupleFields.DirectoryRef, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)CreateFolderTupleFields.Component_];
-            set => this.Set((int)CreateFolderTupleFields.Component_, value);
+            get => (string)this.Fields[(int)CreateFolderTupleFields.ComponentRef];
+            set => this.Set((int)CreateFolderTupleFields.ComponentRef, value);
         }
     }
 }

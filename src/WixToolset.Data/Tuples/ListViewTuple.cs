@@ -14,7 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ListViewTupleFields.Order), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ListViewTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ListViewTupleFields.Text), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ListViewTupleFields.Binary_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ListViewTupleFields.BinaryRef), IntermediateFieldType.String),
             },
             typeof(ListViewTuple));
     }
@@ -28,7 +28,7 @@ namespace WixToolset.Data.Tuples
         Order,
         Value,
         Text,
-        Binary_,
+        BinaryRef,
     }
 
     public class ListViewTuple : IntermediateTuple
@@ -67,10 +67,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ListViewTupleFields.Text, value);
         }
 
-        public string Binary_
+        public string BinaryRef
         {
-            get => (string)this.Fields[(int)ListViewTupleFields.Binary_];
-            set => this.Set((int)ListViewTupleFields.Binary_, value);
+            get => (string)this.Fields[(int)ListViewTupleFields.BinaryRef];
+            set => this.Set((int)ListViewTupleFields.BinaryRef, value);
         }
     }
 }

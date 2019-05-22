@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.Verb,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(VerbTupleFields.Extension_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(VerbTupleFields.ExtensionRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(VerbTupleFields.Verb), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(VerbTupleFields.Sequence), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(VerbTupleFields.Command), IntermediateFieldType.String),
@@ -24,7 +24,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum VerbTupleFields
     {
-        Extension_,
+        ExtensionRef,
         Verb,
         Sequence,
         Command,
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[VerbTupleFields index] => this.Fields[(int)index];
 
-        public string Extension_
+        public string ExtensionRef
         {
-            get => (string)this.Fields[(int)VerbTupleFields.Extension_];
-            set => this.Set((int)VerbTupleFields.Extension_, value);
+            get => (string)this.Fields[(int)VerbTupleFields.ExtensionRef];
+            set => this.Set((int)VerbTupleFields.ExtensionRef, value);
         }
 
         public string Verb

@@ -11,9 +11,9 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixOrderingTupleFields.ItemType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixOrderingTupleFields.ItemId_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixOrderingTupleFields.ItemIdRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixOrderingTupleFields.DependsOnType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixOrderingTupleFields.DependsOnId_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixOrderingTupleFields.DependsOnIdRef), IntermediateFieldType.String),
             },
             typeof(WixOrderingTuple));
     }
@@ -24,9 +24,9 @@ namespace WixToolset.Data.Tuples
     public enum WixOrderingTupleFields
     {
         ItemType,
-        ItemId_,
+        ItemIdRef,
         DependsOnType,
-        DependsOnId_,
+        DependsOnIdRef,
     }
 
     public class WixOrderingTuple : IntermediateTuple
@@ -47,10 +47,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixOrderingTupleFields.ItemType, (int)value);
         }
 
-        public string ItemId_
+        public string ItemIdRef
         {
-            get => (string)this.Fields[(int)WixOrderingTupleFields.ItemId_];
-            set => this.Set((int)WixOrderingTupleFields.ItemId_, value);
+            get => (string)this.Fields[(int)WixOrderingTupleFields.ItemIdRef];
+            set => this.Set((int)WixOrderingTupleFields.ItemIdRef, value);
         }
 
         public ComplexReferenceChildType DependsOnType
@@ -59,10 +59,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixOrderingTupleFields.DependsOnType, (int)value);
         }
 
-        public string DependsOnId_
+        public string DependsOnIdRef
         {
-            get => (string)this.Fields[(int)WixOrderingTupleFields.DependsOnId_];
-            set => this.Set((int)WixOrderingTupleFields.DependsOnId_, value);
+            get => (string)this.Fields[(int)WixOrderingTupleFields.DependsOnIdRef];
+            set => this.Set((int)WixOrderingTupleFields.DependsOnIdRef, value);
         }
     }
 }

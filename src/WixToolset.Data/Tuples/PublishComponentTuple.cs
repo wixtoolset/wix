@@ -12,9 +12,9 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.ComponentId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.Qualifier), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.AppData), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PublishComponentTupleFields.FeatureRef), IntermediateFieldType.String),
             },
             typeof(PublishComponentTuple));
     }
@@ -26,9 +26,9 @@ namespace WixToolset.Data.Tuples
     {
         ComponentId,
         Qualifier,
-        Component_,
+        ComponentRef,
         AppData,
-        Feature_,
+        FeatureRef,
     }
 
     public class PublishComponentTuple : IntermediateTuple
@@ -55,10 +55,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)PublishComponentTupleFields.Qualifier, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.Component_];
-            set => this.Set((int)PublishComponentTupleFields.Component_, value);
+            get => (string)this.Fields[(int)PublishComponentTupleFields.ComponentRef];
+            set => this.Set((int)PublishComponentTupleFields.ComponentRef, value);
         }
 
         public string AppData
@@ -67,10 +67,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)PublishComponentTupleFields.AppData, value);
         }
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)PublishComponentTupleFields.Feature_];
-            set => this.Set((int)PublishComponentTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)PublishComponentTupleFields.FeatureRef];
+            set => this.Set((int)PublishComponentTupleFields.FeatureRef, value);
         }
     }
 }

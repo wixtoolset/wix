@@ -10,8 +10,8 @@ namespace WixToolset.Data
             TupleDefinitionType.IsolatedComponent,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IsolatedComponentTupleFields.Component_Shared), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IsolatedComponentTupleFields.Component_Application), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IsolatedComponentTupleFields.SharedComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IsolatedComponentTupleFields.ApplicationComponentRef), IntermediateFieldType.String),
             },
             typeof(IsolatedComponentTuple));
     }
@@ -21,8 +21,8 @@ namespace WixToolset.Data.Tuples
 {
     public enum IsolatedComponentTupleFields
     {
-        Component_Shared,
-        Component_Application,
+        SharedComponentRef,
+        ApplicationComponentRef,
     }
 
     public class IsolatedComponentTuple : IntermediateTuple
@@ -37,16 +37,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[IsolatedComponentTupleFields index] => this.Fields[(int)index];
 
-        public string Component_Shared
+        public string SharedComponentRef
         {
-            get => (string)this.Fields[(int)IsolatedComponentTupleFields.Component_Shared];
-            set => this.Set((int)IsolatedComponentTupleFields.Component_Shared, value);
+            get => (string)this.Fields[(int)IsolatedComponentTupleFields.SharedComponentRef];
+            set => this.Set((int)IsolatedComponentTupleFields.SharedComponentRef, value);
         }
 
-        public string Component_Application
+        public string ApplicationComponentRef
         {
-            get => (string)this.Fields[(int)IsolatedComponentTupleFields.Component_Application];
-            set => this.Set((int)IsolatedComponentTupleFields.Component_Application, value);
+            get => (string)this.Fields[(int)IsolatedComponentTupleFields.ApplicationComponentRef];
+            set => this.Set((int)IsolatedComponentTupleFields.ApplicationComponentRef, value);
         }
     }
 }

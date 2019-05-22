@@ -10,12 +10,12 @@ namespace WixToolset.Data
             TupleDefinitionType.Feature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Feature_Parent), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureTupleFields.ParentFeatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Title), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Display), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.Level), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(FeatureTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FeatureTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.DisallowAbsent), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.DisallowAdvertise), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(FeatureTupleFields.InstallDefault), IntermediateFieldType.Number),
@@ -29,12 +29,12 @@ namespace WixToolset.Data.Tuples
 {
     public enum FeatureTupleFields
     {
-        Feature_Parent,
+        ParentFeatureRef,
         Title,
         Description,
         Display,
         Level,
-        Directory_,
+        DirectoryRef,
         DisallowAbsent,
         DisallowAdvertise,
         InstallDefault,
@@ -66,10 +66,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[FeatureTupleFields index] => this.Fields[(int)index];
 
-        public string Feature_Parent
+        public string ParentFeatureRef
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Feature_Parent];
-            set => this.Set((int)FeatureTupleFields.Feature_Parent, value);
+            get => (string)this.Fields[(int)FeatureTupleFields.ParentFeatureRef];
+            set => this.Set((int)FeatureTupleFields.ParentFeatureRef, value);
         }
 
         public string Title
@@ -96,10 +96,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)FeatureTupleFields.Level, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)FeatureTupleFields.Directory_];
-            set => this.Set((int)FeatureTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)FeatureTupleFields.DirectoryRef];
+            set => this.Set((int)FeatureTupleFields.DirectoryRef, value);
         }
 
         public bool DisallowAbsent

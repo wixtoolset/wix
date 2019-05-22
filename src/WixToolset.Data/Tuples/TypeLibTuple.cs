@@ -12,11 +12,11 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.LibId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Language), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Version), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Directory_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Feature_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(TypeLibTupleFields.FeatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TypeLibTupleFields.Cost), IntermediateFieldType.Number),
             },
             typeof(TypeLibTuple));
@@ -29,11 +29,11 @@ namespace WixToolset.Data.Tuples
     {
         LibId,
         Language,
-        Component_,
+        ComponentRef,
         Version,
         Description,
-        Directory_,
-        Feature_,
+        DirectoryRef,
+        FeatureRef,
         Cost,
     }
 
@@ -61,10 +61,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)TypeLibTupleFields.Language, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Component_];
-            set => this.Set((int)TypeLibTupleFields.Component_, value);
+            get => (string)this.Fields[(int)TypeLibTupleFields.ComponentRef];
+            set => this.Set((int)TypeLibTupleFields.ComponentRef, value);
         }
 
         public int Version
@@ -79,16 +79,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)TypeLibTupleFields.Description, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Directory_];
-            set => this.Set((int)TypeLibTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)TypeLibTupleFields.DirectoryRef];
+            set => this.Set((int)TypeLibTupleFields.DirectoryRef, value);
         }
 
-        public string Feature_
+        public string FeatureRef
         {
-            get => (string)this.Fields[(int)TypeLibTupleFields.Feature_];
-            set => this.Set((int)TypeLibTupleFields.Feature_, value);
+            get => (string)this.Fields[(int)TypeLibTupleFields.FeatureRef];
+            set => this.Set((int)TypeLibTupleFields.FeatureRef, value);
         }
 
         public int Cost

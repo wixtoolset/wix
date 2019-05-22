@@ -26,9 +26,9 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.SystemModal), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.TrackDiskSpace), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(DialogTupleFields.Title), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Control_First), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Control_Default), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DialogTupleFields.Control_Cancel), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.FirstControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.DefaultControlRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DialogTupleFields.CancelControlRef), IntermediateFieldType.String),
             },
             typeof(DialogTuple));
     }
@@ -54,9 +54,9 @@ namespace WixToolset.Data.Tuples
         SystemModal,
         TrackDiskSpace,
         Title,
-        Control_First,
-        Control_Default,
-        Control_Cancel,
+        FirstControlRef,
+        DefaultControlRef,
+        CancelControlRef,
     }
 
     public class DialogTuple : IntermediateTuple
@@ -167,22 +167,22 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)DialogTupleFields.Title, value);
         }
 
-        public string Control_First
+        public string FirstControlRef
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Control_First];
-            set => this.Set((int)DialogTupleFields.Control_First, value);
+            get => (string)this.Fields[(int)DialogTupleFields.FirstControlRef];
+            set => this.Set((int)DialogTupleFields.FirstControlRef, value);
         }
 
-        public string Control_Default
+        public string DefaultControlRef
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Control_Default];
-            set => this.Set((int)DialogTupleFields.Control_Default, value);
+            get => (string)this.Fields[(int)DialogTupleFields.DefaultControlRef];
+            set => this.Set((int)DialogTupleFields.DefaultControlRef, value);
         }
 
-        public string Control_Cancel
+        public string CancelControlRef
         {
-            get => (string)this.Fields[(int)DialogTupleFields.Control_Cancel];
-            set => this.Set((int)DialogTupleFields.Control_Cancel, value);
+            get => (string)this.Fields[(int)DialogTupleFields.CancelControlRef];
+            set => this.Set((int)DialogTupleFields.CancelControlRef, value);
         }
     }
 }

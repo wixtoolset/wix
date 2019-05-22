@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(MIMETupleFields.ContentType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MIMETupleFields.Extension_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MIMETupleFields.ExtensionRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MIMETupleFields.CLSID), IntermediateFieldType.String),
             },
             typeof(MIMETuple));
@@ -23,7 +23,7 @@ namespace WixToolset.Data.Tuples
     public enum MIMETupleFields
     {
         ContentType,
-        Extension_,
+        ExtensionRef,
         CLSID,
     }
 
@@ -45,10 +45,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MIMETupleFields.ContentType, value);
         }
 
-        public string Extension_
+        public string ExtensionRef
         {
-            get => (string)this.Fields[(int)MIMETupleFields.Extension_];
-            set => this.Set((int)MIMETupleFields.Extension_, value);
+            get => (string)this.Fields[(int)MIMETupleFields.ExtensionRef];
+            set => this.Set((int)MIMETupleFields.ExtensionRef, value);
         }
 
         public string CLSID

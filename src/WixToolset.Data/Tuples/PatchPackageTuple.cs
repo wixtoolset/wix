@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(PatchPackageTupleFields.PatchId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PatchPackageTupleFields.Media_), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(PatchPackageTupleFields.MediaDiskIdRef), IntermediateFieldType.Number),
             },
             typeof(PatchPackageTuple));
     }
@@ -22,7 +22,7 @@ namespace WixToolset.Data.Tuples
     public enum PatchPackageTupleFields
     {
         PatchId,
-        Media_,
+        MediaDiskIdRef,
     }
 
     public class PatchPackageTuple : IntermediateTuple
@@ -43,10 +43,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)PatchPackageTupleFields.PatchId, value);
         }
 
-        public int Media_
+        public int MediaDiskIdRef
         {
-            get => (int)this.Fields[(int)PatchPackageTupleFields.Media_];
-            set => this.Set((int)PatchPackageTupleFields.Media_, value);
+            get => (int)this.Fields[(int)PatchPackageTupleFields.MediaDiskIdRef];
+            set => this.Set((int)PatchPackageTupleFields.MediaDiskIdRef, value);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Part), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Permanent), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.System), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EnvironmentTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(EnvironmentTuple));
     }
@@ -34,7 +34,7 @@ namespace WixToolset.Data.Tuples
         Part,
         Permanent,
         System,
-        Component_,
+        ComponentRef,
     }
 
     public enum EnvironmentActionType
@@ -105,10 +105,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)EnvironmentTupleFields.System, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => (string)this.Fields[(int)EnvironmentTupleFields.Component_];
-            set => this.Set((int)EnvironmentTupleFields.Component_, value);
+            get => (string)this.Fields[(int)EnvironmentTupleFields.ComponentRef];
+            set => this.Set((int)EnvironmentTupleFields.ComponentRef, value);
         }
     }
 }

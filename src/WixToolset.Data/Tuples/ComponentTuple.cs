@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.ComponentId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComponentTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComponentTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.Location), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.DisableRegistryReflection), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ComponentTupleFields.NeverOverwrite), IntermediateFieldType.Bool),
@@ -34,7 +34,7 @@ namespace WixToolset.Data.Tuples
     public enum ComponentTupleFields
     {
         ComponentId,
-        Directory_,
+        DirectoryRef,
         Location,
         DisableRegistryReflection,
         NeverOverwrite,
@@ -74,10 +74,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ComponentTupleFields.ComponentId, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => (string)this.Fields[(int)ComponentTupleFields.Directory_];
-            set => this.Set((int)ComponentTupleFields.Directory_, value);
+            get => (string)this.Fields[(int)ComponentTupleFields.DirectoryRef];
+            set => this.Set((int)ComponentTupleFields.DirectoryRef, value);
         }
 
         public ComponentLocation Location

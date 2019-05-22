@@ -10,12 +10,12 @@ namespace WixToolset.Data
             TupleDefinitionType.Patch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.File_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchTupleFields.FileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PatchTupleFields.Sequence), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(PatchTupleFields.PatchSize), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(PatchTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(PatchTupleFields.Header), IntermediateFieldType.Path),
-                new IntermediateFieldDefinition(nameof(PatchTupleFields.StreamRef_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PatchTupleFields.StreamRef), IntermediateFieldType.String),
             },
             typeof(PatchTuple));
     }
@@ -25,12 +25,12 @@ namespace WixToolset.Data.Tuples
 {
     public enum PatchTupleFields
     {
-        File_,
+        FileRef,
         Sequence,
         PatchSize,
         Attributes,
         Header,
-        StreamRef_,
+        StreamRef,
     }
 
     public class PatchTuple : IntermediateTuple
@@ -45,10 +45,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[PatchTupleFields index] => this.Fields[(int)index];
 
-        public string File_
+        public string FileRef
         {
-            get => (string)this.Fields[(int)PatchTupleFields.File_];
-            set => this.Set((int)PatchTupleFields.File_, value);
+            get => (string)this.Fields[(int)PatchTupleFields.FileRef];
+            set => this.Set((int)PatchTupleFields.FileRef, value);
         }
 
         public int Sequence
@@ -75,10 +75,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)PatchTupleFields.Header, value);
         }
 
-        public string StreamRef_
+        public string StreamRef
         {
-            get => (string)this.Fields[(int)PatchTupleFields.StreamRef_];
-            set => this.Set((int)PatchTupleFields.StreamRef_, value);
+            get => (string)this.Fields[(int)PatchTupleFields.StreamRef];
+            set => this.Set((int)PatchTupleFields.StreamRef, value);
         }
     }
 }
