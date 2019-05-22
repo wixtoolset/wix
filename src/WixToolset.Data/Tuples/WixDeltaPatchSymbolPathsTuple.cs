@@ -48,7 +48,7 @@ namespace WixToolset.Data.Tuples
         {
         }
 
-        public WixDeltaPatchSymbolPathsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDeltaPatchSymbolPaths, sourceLineNumber, null)
+        public WixDeltaPatchSymbolPathsTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixDeltaPatchSymbolPaths, sourceLineNumber, id)
         {
         }
 

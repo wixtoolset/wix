@@ -11,7 +11,10 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ParentDirectoryRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.DefaultDir), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ShortName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.SourceName), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(DirectoryTupleFields.SourceShortName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(DirectoryTupleFields.ComponentGuidGenerationSeed), IntermediateFieldType.String),
             },
             typeof(DirectoryTuple));
@@ -23,7 +26,10 @@ namespace WixToolset.Data.Tuples
     public enum DirectoryTupleFields
     {
         ParentDirectoryRef,
-        DefaultDir,
+        Name,
+        ShortName,
+        SourceName,
+        SourceShortName,
         ComponentGuidGenerationSeed,
     }
 
@@ -45,10 +51,28 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)DirectoryTupleFields.ParentDirectoryRef, value);
         }
 
-        public string DefaultDir
+        public string Name
         {
-            get => (string)this.Fields[(int)DirectoryTupleFields.DefaultDir];
-            set => this.Set((int)DirectoryTupleFields.DefaultDir, value);
+            get => (string)this.Fields[(int)DirectoryTupleFields.Name];
+            set => this.Set((int)DirectoryTupleFields.Name, value);
+        }
+
+        public string ShortName
+        {
+            get => (string)this.Fields[(int)DirectoryTupleFields.ShortName];
+            set => this.Set((int)DirectoryTupleFields.ShortName, value);
+        }
+
+        public string SourceName
+        {
+            get => (string)this.Fields[(int)DirectoryTupleFields.SourceName];
+            set => this.Set((int)DirectoryTupleFields.SourceName, value);
+        }
+
+        public string SourceShortName
+        {
+            get => (string)this.Fields[(int)DirectoryTupleFields.SourceShortName];
+            set => this.Set((int)DirectoryTupleFields.SourceShortName, value);
         }
 
         public string ComponentGuidGenerationSeed

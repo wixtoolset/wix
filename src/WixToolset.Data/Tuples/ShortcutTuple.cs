@@ -12,6 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ShortcutTupleFields.ShortName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Target), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ShortcutTupleFields.Arguments), IntermediateFieldType.String),
@@ -36,6 +37,7 @@ namespace WixToolset.Data.Tuples
     {
         DirectoryRef,
         Name,
+        ShortName,
         ComponentRef,
         Target,
         Arguments,
@@ -80,6 +82,12 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)ShortcutTupleFields.Name];
             set => this.Set((int)ShortcutTupleFields.Name, value);
+        }
+
+        public string ShortName
+        {
+            get => (string)this.Fields[(int)ShortcutTupleFields.ShortName];
+            set => this.Set((int)ShortcutTupleFields.ShortName, value);
         }
 
         public string ComponentRef
