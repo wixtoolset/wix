@@ -1348,9 +1348,11 @@ namespace WixToolset.Core
                 throw new WixException(ErrorMessages.TooDeeplyIncluded(state.Context.CurrentSourceLineNumber, state.CurrentFileStack.Count));
             }
 
-            state.CurrentFileStack.Push(fileName);
+            var path = Path.GetFullPath(fileName);
+
+            state.CurrentFileStack.Push(path);
             state.SourceStack.Push(state.Context.CurrentSourceLineNumber);
-            state.Context.CurrentSourceLineNumber = new SourceLineNumber(fileName);
+            state.Context.CurrentSourceLineNumber = new SourceLineNumber(path);
             state.IncludeNextStack.Push(true);
         }
 
@@ -1468,8 +1470,10 @@ namespace WixToolset.Core
         {
             public ProcessingState(IServiceProvider serviceProvider, IPreprocessContext context)
             {
+                var path = Path.GetFullPath(context.SourcePath);
+
                 this.Context = context;
-                this.Context.CurrentSourceLineNumber = new SourceLineNumber(context.SourcePath);
+                this.Context.CurrentSourceLineNumber = new SourceLineNumber(path);
                 this.Context.Variables = this.Context.Variables == null ? new Dictionary<string, string>() : new Dictionary<string, string>(this.Context.Variables);
 
                 this.Helper = serviceProvider.GetService<IPreprocessHelper>();
