@@ -77,37 +77,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public Identifier CreateDirectoryTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, string name, ISet<string> sectionInlinedDirectoryIds, string shortName = null, string sourceName = null, string shortSourceName = null)
         {
-            string defaultDir;
-
-            if (name.Equals("SourceDir") || this.IsValidShortFilename(name, false))
+            if (String.IsNullOrEmpty(shortName) && !name.Equals("SourceDir") && !this.IsValidShortFilename(name))
             {
-                defaultDir = name;
-            }
-            else
-            {
-                if (String.IsNullOrEmpty(shortName))
-                {
-                    shortName = this.CreateShortName(name, false, false, "Directory", parentId);
-                }
-
-                defaultDir = String.Concat(shortName, "|", name);
+                shortName = this.CreateShortName(name, false, false, "Directory", parentId);
             }
 
-            if (!String.IsNullOrEmpty(sourceName))
+            if (String.IsNullOrEmpty(shortSourceName) && !String.IsNullOrEmpty(sourceName) && !this.IsValidShortFilename(sourceName))
             {
-                if (this.IsValidShortFilename(sourceName, false))
-                {
-                    defaultDir = String.Concat(defaultDir, ":", sourceName);
-                }
-                else
-                {
-                    if (String.IsNullOrEmpty(shortSourceName))
-                    {
-                        shortSourceName = this.CreateShortName(sourceName, false, false, "Directory", parentId);
-                    }
-
-                    defaultDir = String.Concat(defaultDir, ":", shortSourceName, "|", sourceName);
-                }
+                shortSourceName = this.CreateShortName(sourceName, false, false, "Directory", parentId);
             }
 
             // For anonymous directories, create the identifier. If this identifier already exists in the
@@ -126,7 +103,10 @@ namespace WixToolset.Core.ExtensibilityServices
             var tuple = new DirectoryTuple(sourceLineNumbers, id)
             {
                 ParentDirectoryRef = parentId,
-                DefaultDir = defaultDir,
+                Name = name,
+                ShortName = shortName,
+                SourceName = sourceName,
+                SourceShortName = shortSourceName
             };
 
             section.Tuples.Add(tuple);

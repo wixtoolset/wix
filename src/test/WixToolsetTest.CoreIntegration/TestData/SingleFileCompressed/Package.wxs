@@ -10,7 +10,7 @@
     <?elseif $(MediaTemplateCompressionLevel) = ""?>
     <MediaTemplate />
     <?else?>
-    <MediaTemplate CabinetTemplate="lowcab{0}.cab" CompressionLevel="$(MediaTemplateCompressionLevel)" />
+    <MediaTemplate CabinetTemplate="low{0}.cab" CompressionLevel="$(MediaTemplateCompressionLevel)" />
     <?endif?>
     
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">

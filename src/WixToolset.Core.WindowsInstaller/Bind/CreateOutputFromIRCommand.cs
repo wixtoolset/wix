@@ -146,7 +146,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
 
                 case TupleDefinitionType.Shortcut:
-                    this.AddTupleDefaultly(tuple, output, true);
+                    this.AddShortcutTuple((ShortcutTuple)tuple, output);
                     break;
 
                 case TupleDefinitionType.TextStyle:
@@ -338,11 +338,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddDirectoryTuple(DirectoryTuple tuple, Output output)
         {
+            var shortName = GetMsiFilenameValue(tuple.SourceShortName, tuple.SourceName);
+            var targetName = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
+
+            if (String.IsNullOrEmpty(targetName))
+            {
+                targetName = ".";
+            }
+
+            var defaultDir = String.IsNullOrEmpty(shortName)? targetName : shortName + ":" + targetName;
+
             var table = output.EnsureTable(this.TableDefinitions["Directory"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
             row[1] = tuple.ParentDirectoryRef;
-            row[2] = tuple.DefaultDir;
+            row[2] = defaultDir;
         }
 
         private void AddEnvironmentTuple(EnvironmentTuple tuple, Output output)
@@ -447,7 +457,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var table = output.EnsureTable(this.TableDefinitions["Media"]);
                 var row = (MediaRow)table.CreateRow(tuple.SourceLineNumbers);
                 row.DiskId = tuple.DiskId;
-                row.LastSequence = tuple.LastSequence;
+                row.LastSequence = tuple.LastSequence ?? 0;
                 row.DiskPrompt = tuple.DiskPrompt;
                 row.Cabinet = tuple.Cabinet;
                 row.VolumeLabel = tuple.VolumeLabel;
@@ -693,6 +703,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[10] = tuple.Arguments;
             row[11] = tuple.ComponentRef;
             row[12] = tuple.Description;
+        }
+
+        private void AddShortcutTuple(ShortcutTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["Shortcut"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.DirectoryRef;
+            row[2] = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
+            row[3] = tuple.ComponentRef;
+            row[4] = tuple.Target;
+            row[5] = tuple.Arguments;
+            row[6] = tuple.Description;
+            row[7] = tuple.Hotkey;
+            row[8] = tuple.IconRef;
+            row[9] = tuple.IconIndex;
+            row[10] = (int)tuple.Show;
+            row[11] = tuple.WorkingDirectory;
+            row[12] = tuple.DisplayResourceDll;
+            row[13] = tuple.DisplayResourceId;
+            row[14] = tuple.DescriptionResourceDll;
+            row[15] = tuple.DescriptionResourceId;
         }
 
         private void AddTextStyleTuple(TextStyleTuple tuple, Output output)

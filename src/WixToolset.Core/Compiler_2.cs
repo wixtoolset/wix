@@ -4401,7 +4401,8 @@ namespace WixToolset.Core
                 var tuple = new ShortcutTuple(sourceLineNumbers, id)
                 {
                     DirectoryRef = directory,
-                    Name = this.GetMsiFilenameValue(shortName, name),
+                    Name = name,
+                    ShortName = shortName,
                     ComponentRef = componentId,
                     Target = target,
                     Arguments = arguments,
@@ -4418,58 +4419,6 @@ namespace WixToolset.Core
                 };
 
                 this.Core.AddTuple(tuple);
-
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Shortcut, id);
-                //row.Set(1, directory);
-                //row.Set(2, this.GetMsiFilenameValue(shortName, name));
-                //row.Set(3, componentId);
-                //if (advertise)
-                //{
-                //    if (YesNoType.Yes != parentKeyPath && "Component" != parentElementLocalName)
-                //    {
-                //        this.Core.Write(WarningMessages.UnclearShortcut(sourceLineNumbers, id.Id, componentId, defaultTarget));
-                //    }
-                //    row.Set(4, Guid.Empty.ToString("B"));
-                //}
-                //else if (null != target)
-                //{
-                //    row.Set(4, target);
-                //}
-                //else if ("Component" == parentElementLocalName || "CreateFolder" == parentElementLocalName)
-                //{
-                //    row.Set(4, String.Format(CultureInfo.InvariantCulture, "[{0}]", defaultTarget));
-                //}
-                //else if ("File" == parentElementLocalName)
-                //{
-                //    row.Set(4, String.Format(CultureInfo.InvariantCulture, "[#{0}]", defaultTarget));
-                //}
-                //row.Set(5, arguments);
-                //row.Set(6, description);
-                //if (CompilerConstants.IntegerNotSet != hotkey)
-                //{
-                //    row.Set(7, hotkey);
-                //}
-                //row.Set(8, icon);
-                //if (CompilerConstants.IntegerNotSet != iconIndex)
-                //{
-                //    row.Set(9, iconIndex);
-                //}
-
-                //if (show.HasValue)
-                //{
-                //    row.Set(10, show.Value);
-                //}
-                //row.Set(11, workingDirectory);
-                //row.Set(12, displayResourceDll);
-                //if (CompilerConstants.IntegerNotSet != displayResourceId)
-                //{
-                //    row.Set(13, displayResourceId);
-                //}
-                //row.Set(14, descriptionResourceDll);
-                //if (CompilerConstants.IntegerNotSet != descriptionResourceId)
-                //{
-                //    row.Set(15, descriptionResourceId);
-                //}
             }
         }
 

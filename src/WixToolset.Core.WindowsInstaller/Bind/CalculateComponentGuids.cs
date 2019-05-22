@@ -76,18 +76,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         targetPathsByDirectoryId = new Dictionary<string, ResolvedDirectory>(directories.Count);
 
                         // Get the target paths for all directories.
-                        foreach (var row in directories)
+                        foreach (var directory in directories)
                         {
                             // If the directory Id already exists, we will skip it here since
                             // checking for duplicate primary keys is done later when importing tables
                             // into database
-                            if (targetPathsByDirectoryId.ContainsKey(row.Id.Id))
+                            if (targetPathsByDirectoryId.ContainsKey(directory.Id.Id))
                             {
                                 continue;
                             }
 
-                            var targetName = Common.GetName(row.DefaultDir, false, true);
-                            targetPathsByDirectoryId.Add(row.Id.Id, new ResolvedDirectory(row.ParentDirectoryRef, targetName));
+                            targetPathsByDirectoryId.Add(directory.Id.Id, new ResolvedDirectory(directory.ParentDirectoryRef, directory.Name));
                         }
                     }
 

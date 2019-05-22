@@ -4028,7 +4028,6 @@ namespace WixToolset.Core
             string shortName = null;
             string sourceName = null;
             string shortSourceName = null;
-            string defaultDir = null;
             string symbols = null;
 
             foreach (var attrib in node.Attributes())
@@ -4208,7 +4207,7 @@ namespace WixToolset.Core
             }
 
             // Calculate the DefaultDir for the directory row.
-            defaultDir = String.IsNullOrEmpty(shortName) ? name : String.Concat(shortName, "|", name);
+            var defaultDir = String.IsNullOrEmpty(shortName) ? name : String.Concat(shortName, "|", name);
             if (!String.IsNullOrEmpty(sourceName))
             {
                 defaultDir = String.Concat(defaultDir, ":", String.IsNullOrEmpty(shortSourceName) ? sourceName : String.Concat(shortSourceName, "|", sourceName));
@@ -4260,7 +4259,10 @@ namespace WixToolset.Core
                 var tuple = new DirectoryTuple(sourceLineNumbers, id)
                 {
                     ParentDirectoryRef = parentId,
-                    DefaultDir = defaultDir,
+                    Name = name,
+                    ShortName = shortName,
+                    SourceName = sourceName,
+                    SourceShortName = shortSourceName,
                     ComponentGuidGenerationSeed = componentGuidGenerationSeed
                 };
 
