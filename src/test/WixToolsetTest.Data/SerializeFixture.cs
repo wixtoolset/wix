@@ -19,7 +19,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Tuples.Add(new ComponentTuple(sln, new Identifier("TestComponent", AccessModifier.Public))
+            section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 Directory_ = "TestFolder",
@@ -189,7 +189,7 @@ namespace WixToolsetTest.Data
 
             var section = new IntermediateSection("test", SectionType.Product, 65001);
 
-            section.Tuples.Add(new ComponentTuple(sln, new Identifier("TestComponent", AccessModifier.Public))
+            section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
             {
                 ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
                 Directory_ = "TestFolder",

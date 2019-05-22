@@ -14,17 +14,10 @@ namespace WixToolset.Data
     {
         public static Identifier Invalid = new Identifier(AccessModifier.Private, (string)null);
 
-        // TODO: [Obsolete] this constructor.
+        [Obsolete]
         public Identifier(string id, AccessModifier access)
         {
             this.Id = id;
-            this.Access = access;
-        }
-
-        // TODO: [Obsolete] this constructor.
-        public Identifier(int id, AccessModifier access)
-        {
-            this.Id = id.ToString();
             this.Access = access;
         }
 
