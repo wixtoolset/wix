@@ -870,7 +870,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     switch (column.Type)
                     {
                         case ColumnType.Number:
-                            row[i + rowOffset] = tuple.AsNumber(i);
+                            row[i + rowOffset] = column.Nullable ? tuple.AsNullableNumber(i) : tuple.AsNumber(i);
                             break;
 
                         default:
