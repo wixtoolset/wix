@@ -163,8 +163,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // create the cabinet file
             var cabinetPath = Path.GetFullPath(cabinetWorkItem.CabinetFile);
-            string cabinetFileName = Path.GetFileName(cabinetWorkItem.CabinetFile);
-            string cabinetDirectory = Path.GetDirectoryName(cabinetWorkItem.CabinetFile);
 
             var files = cabinetWorkItem.FileFacades
                 .Select(facade => facade.Hash == null ?

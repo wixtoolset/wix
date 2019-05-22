@@ -28,17 +28,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (wixPropertyRow.Admin)
                 {
-                    adminProperties.Add(wixPropertyRow.Property_);
+                    adminProperties.Add(wixPropertyRow.PropertyRef);
                 }
 
                 if (wixPropertyRow.Hidden)
                 {
-                    hiddenProperties.Add(wixPropertyRow.Property_);
+                    hiddenProperties.Add(wixPropertyRow.PropertyRef);
                 }
 
                 if (wixPropertyRow.Secure)
                 {
-                    secureProperties.Add(wixPropertyRow.Property_);
+                    secureProperties.Add(wixPropertyRow.PropertyRef);
                 }
             }
 

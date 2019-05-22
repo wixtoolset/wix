@@ -464,8 +464,8 @@ namespace WixToolset.Core
                     foreach (var feature in connectToFeature.ConnectFeatures)
                     {
                         var row = new WixFeatureModulesTuple();
-                        row.Feature_ = feature;
-                        row.WixMerge_ = connectToFeature.ChildId;
+                        row.FeatureRef = feature;
+                        row.WixMergeRef = connectToFeature.ChildId;
 
                         resolvedSection.Tuples.Add(row);
                     }
@@ -1182,8 +1182,8 @@ namespace WixToolset.Core
 
                             // add a row to the FeatureComponents table
                             var featureComponent = new FeatureComponentsTuple();
-                            featureComponent.Feature_ = wixComplexReferenceRow.Parent;
-                            featureComponent.Component_ = wixComplexReferenceRow.Child;
+                            featureComponent.FeatureRef = wixComplexReferenceRow.Parent;
+                            featureComponent.ComponentRef = wixComplexReferenceRow.Child;
 
                             featureComponents.Add(featureComponent);
 

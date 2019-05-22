@@ -125,7 +125,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             var tuple = new DirectoryTuple(sourceLineNumbers, id)
             {
-                Directory_Parent = parentId,
+                ParentDirectoryRef = parentId,
                 DefaultDir = defaultDir,
             };
 
@@ -232,7 +232,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 Key = key,
                 Name = name,
                 Value = value,
-                Component_ = componentId,
+                ComponentRef = componentId,
             };
 
             section.Tuples.Add(tuple);

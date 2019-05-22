@@ -325,7 +325,7 @@ namespace WixToolset.Core
 
                 var tuple = new AppSearchTuple(sourceLineNumbers, propertyId)
                 {
-                    Signature_ = signature
+                    SignatureRef = signature
                 };
 
                 this.Core.AddTuple(tuple);
@@ -412,7 +412,7 @@ namespace WixToolset.Core
 
             var tuple = new WixPropertyTuple(sourceLineNumbers)
             {
-                Property_ = property.Id,
+                PropertyRef = property.Id,
                 Admin = admin,
                 Hidden = hidden,
                 Secure = secure
@@ -651,7 +651,7 @@ namespace WixToolset.Core
             {
                 var tuple = new MsiAssemblyNameTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, componentId, id))
                 {
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     Name = id,
                     Value = value
                 };
@@ -1012,9 +1012,9 @@ namespace WixToolset.Core
                 {
                     ComponentId = id,
                     Qualifier = qualifier,
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     AppData = appData,
-                    Feature_ = feature ?? Guid.Empty.ToString("B"),
+                    FeatureRef = feature ?? Guid.Empty.ToString("B"),
                 };
 
                 this.Core.AddTuple(tuple);
@@ -1271,25 +1271,25 @@ namespace WixToolset.Core
                         {
                             CLSID = classId,
                             Context = context,
-                            Component_ = componentId,
-                            ProgId_Default = defaultProgId,
+                            ComponentRef = componentId,
+                            DefaultProgIdRef = defaultProgId,
                             Description = description,
                             FileTypeMask = fileTypeMask,
                             DefInprocHandler = defaultInprocHandler,
                             Argument = argument,
-                            Feature_ = Guid.Empty.ToString("B"),
+                            FeatureRef = Guid.Empty.ToString("B"),
                             RelativePath = YesNoType.Yes == relativePath,
                         };
 
                         if (null != appId)
                         {
-                            tuple.AppId_ = appId;
+                            tuple.AppIdRef = appId;
                             this.Core.CreateSimpleReference(sourceLineNumbers, "AppId", appId);
                         }
 
                         if (null != icon)
                         {
-                            tuple.Icon_ = icon;
+                            tuple.IconRef = icon;
                             this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
                         }
 
@@ -2484,8 +2484,8 @@ namespace WixToolset.Core
             {
                 var tuple = new CreateFolderTuple(sourceLineNumbers)
                 {
-                    Directory_ = directoryId,
-                    Component_ = id.Id
+                    DirectoryRef = directoryId,
+                    ComponentRef = id.Id
                 };
 
                 this.Core.AddTuple(tuple);
@@ -2543,7 +2543,7 @@ namespace WixToolset.Core
                 var tuple = new ComponentTuple(sourceLineNumbers, id)
                 {
                     ComponentId = guid,
-                    Directory_ = directoryId,
+                    DirectoryRef = directoryId,
                     Location = location,
                     Condition = condition,
                     KeyPath = keyPath,
@@ -2564,7 +2564,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new WixInstanceComponentTuple(sourceLineNumbers, id)
                     {
-                        Component_ = id.Id,
+                        ComponentRef = id.Id,
                     });
                 }
 
@@ -2585,7 +2585,7 @@ namespace WixToolset.Core
                 {
                     var complusTuple = new ComplusTuple(sourceLineNumbers)
                     {
-                        Component_ = id.Id,
+                        ComponentRef = id.Id,
                         ExpType = comPlusBits,
                     };
 
@@ -2982,8 +2982,8 @@ namespace WixToolset.Core
             {
                 var tuple = new CreateFolderTuple(sourceLineNumbers)
                 {
-                    Directory_ = directoryId,
-                    Component_ = componentId
+                    DirectoryRef = directoryId,
+                    ComponentRef = componentId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -3109,7 +3109,7 @@ namespace WixToolset.Core
                 {
                     var tuple = new MoveFileTuple(sourceLineNumbers, id)
                     {
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                         SourceName  = sourceName,
                         DestName= String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
                         SourceFolder = sourceDirectory ?? sourceProperty,
@@ -3156,10 +3156,10 @@ namespace WixToolset.Core
                 {
                     var tuple = new DuplicateFileTuple(sourceLineNumbers, id)
                     {
-                        Component_ = componentId,
-                        File_ = fileId,
-                        DestName = String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
-                        DestFolder = destinationDirectory ?? destinationProperty
+                        ComponentRef = componentId,
+                        FileRef = fileId,
+                        DestinationName = String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
+                        DestinationFolder = destinationDirectory ?? destinationProperty
                     };
 
                     this.Core.AddTuple(tuple);
@@ -4259,7 +4259,7 @@ namespace WixToolset.Core
             {
                 var tuple = new DirectoryTuple(sourceLineNumbers, id)
                 {
-                    Directory_Parent = parentId,
+                    ParentDirectoryRef = parentId,
                     DefaultDir = defaultDir,
                     ComponentGuidGenerationSeed = componentGuidGenerationSeed
                 };
@@ -4492,7 +4492,7 @@ namespace WixToolset.Core
 
                 var tuple = new DrLocatorTuple(sourceLineNumbers)
                 {
-                    Signature_ = rowId,
+                    SignatureRef = rowId,
                     Parent = parentSignature,
                     Path = path,
                 };
@@ -4865,7 +4865,7 @@ namespace WixToolset.Core
                     Description = description,
                     Display = display,
                     Level = level,
-                    Directory_ = configurableDirectory,
+                    DirectoryRef = configurableDirectory,
                     DisallowAbsent = disallowAbsent,
                     DisallowAdvertise = disallowAdvertise,
                     InstallDefault = installDefault,
@@ -5300,7 +5300,7 @@ namespace WixToolset.Core
                     Part = part,
                     Permanent = permanent,
                     System = system,
-                    Component_ = componentId
+                    ComponentRef = componentId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -5446,10 +5446,10 @@ namespace WixToolset.Core
                     var tuple = new ExtensionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, extension, componentId))
                     {
                         Extension = extension,
-                        Component_ = componentId,
-                        ProgId_ = progId,
-                        MIME_ = mime,
-                        Feature_ = Guid.Empty.ToString("B")
+                        ComponentRef = componentId,
+                        ProgIdRef = progId,
+                        MimeRef = mime,
+                        FeatureRef = Guid.Empty.ToString("B")
                     };
 
                     this.Core.AddTuple(tuple);
@@ -5873,9 +5873,9 @@ namespace WixToolset.Core
 
                 var tuple = new FileTuple(sourceLineNumbers, id)
                 {
-                    Component_ = componentId,
-                    ShortFileName = shortName,
-                    LongFileName = name,
+                    ComponentRef = componentId,
+                    ShortName = shortName,
+                    Name = name,
                     FileSize = defaultSize,
                     Version = companionFile ?? defaultVersion,
                     Language = defaultLanguage,
@@ -5895,9 +5895,9 @@ namespace WixToolset.Core
                 // TODO: Remove all this.
                 var wixFileRow = (WixFileTuple)this.Core.CreateTuple(sourceLineNumbers, TupleDefinitionType.WixFile, id);
                 wixFileRow.AssemblyType = assemblyType;
-                wixFileRow.File_AssemblyManifest = assemblyManifest;
-                wixFileRow.File_AssemblyApplication = assemblyApplication;
-                wixFileRow.Directory_ = directoryId;
+                wixFileRow.AssemblyManifestFileRef = assemblyManifest;
+                wixFileRow.AssemblyApplicationFileRef = assemblyApplication;
+                wixFileRow.DirectoryRef = directoryId;
                 wixFileRow.DiskId = (CompilerConstants.IntegerNotSet == diskId) ? 0 : diskId;
                 wixFileRow.Source = new IntermediateFieldPathValue { Path = source };
                 wixFileRow.ProcessorArchitecture = procArch;
@@ -5929,10 +5929,10 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new MsiAssemblyTuple(sourceLineNumbers)
                     {
-                        Component_ = componentId,
-                        Feature_ = Guid.Empty.ToString("B"),
-                        File_Manifest = assemblyManifest,
-                        File_Application = assemblyApplication,
+                        ComponentRef = componentId,
+                        FeatureRef = Guid.Empty.ToString("B"),
+                        ManifestFileRef = assemblyManifest,
+                        ApplicationFileRef = assemblyApplication,
                         Type = assemblyType
                     });
                 }
@@ -6118,7 +6118,7 @@ namespace WixToolset.Core
                         // the parent DirectorySearch creates the file locator row.
                         this.Core.AddTuple(new DrLocatorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, parentSignature, id.Id, String.Empty))
                         {
-                            Signature_ = parentSignature,
+                            SignatureRef = parentSignature,
                             Parent = id.Id
                         });
                     }
@@ -6126,7 +6126,7 @@ namespace WixToolset.Core
                     {
                         this.Core.AddTuple(new DrLocatorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id.Id, parentSignature, String.Empty))
                         {
-                            Signature_ = id.Id,
+                            SignatureRef = id.Id,
                             Parent = parentSignature
                         });
                     }
@@ -6450,8 +6450,8 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
                     {
-                        Dialog_ = dialog,
-                        Control_ = id,
+                        DialogRef = dialog,
+                        ControlRef = id,
                         Action = action,
                         Condition = condition,
                     });
@@ -6468,7 +6468,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new ConditionTuple(sourceLineNumbers)
                     {
-                        Feature_ = id,
+                        FeatureRef = id,
                         Level = level,
                         Condition = condition
                     });
@@ -6639,7 +6639,7 @@ namespace WixToolset.Core
                     Key = key,
                     Value = value,
                     Action = action.Value,
-                    Component_ = componentId
+                    ComponentRef = componentId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -6878,8 +6878,8 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new IsolatedComponentTuple(sourceLineNumbers)
                 {
-                    Component_Shared = shared,
-                    Component_Application = componentId
+                    SharedComponentRef = shared,
+                    ApplicationComponentRef = componentId
                 });
             }
         }
@@ -7066,7 +7066,7 @@ namespace WixToolset.Core
                 {
                     Table = "Media",
                     SignObject = diskId,
-                    DigitalCertificate_ = certificateId,
+                    DigitalCertificateRef = certificateId,
                     Hash = sourceFile
                 });
             }
@@ -7686,12 +7686,12 @@ namespace WixToolset.Core
             {
                 var tuple = new WixMergeTuple(sourceLineNumbers, id)
                 {
-                    Directory_ = directoryId,
+                    DirectoryRef = directoryId,
                     SourceFile = sourceFile,
                     DiskId = diskId,
                     ConfigurationData = configData,
                     FileCompression = fileCompression,
-                    Feature_ = Guid.Empty.ToString("B")
+                    FeatureRef = Guid.Empty.ToString("B")
                 };
 
                 tuple.Set((int)WixMergeTupleFields.Language, language);
@@ -7877,7 +7877,7 @@ namespace WixToolset.Core
                     var tuple = new MIMETuple(sourceLineNumbers, new Identifier(AccessModifier.Private, contentType))
                     {
                         ContentType = contentType,
-                        Extension_ = extension,
+                        ExtensionRef = extension,
                         CLSID = classId
                     };
 

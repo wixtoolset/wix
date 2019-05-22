@@ -561,7 +561,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new ODBCDataSourceTuple(sourceLineNumbers, id)
                 {
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     Description = name,
                     DriverDescription = driverName,
                     Registration = registration
@@ -1364,14 +1364,14 @@ namespace WixToolset.Core
                     var tuple = new ProgIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, progId))
                     {
                         ProgId = progId,
-                        ProgId_Parent = parent,
-                        Class_ = classId,
+                        ParentProgIdRef = parent,
+                        ClassRef = classId,
                         Description = description,
                     };
 
                     if (null != icon)
                     {
-                        tuple.Icon_ = icon;
+                        tuple.IconRef = icon;
                         this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
                     }
 
@@ -1777,7 +1777,7 @@ namespace WixToolset.Core
                     Root = root.Value,
                     Key = key,
                     Name = name,
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                 };
 
                 this.Core.AddTuple(tuple);
@@ -2026,7 +2026,7 @@ namespace WixToolset.Core
                     Value = value,
                     ValueType = valueType,
                     ValueAction = actionType,
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                 };
 
                 this.Core.AddTuple(tuple);
@@ -2147,7 +2147,7 @@ namespace WixToolset.Core
                     Key = key,
                     Name = name,
                     Action = actionType.Value,
-                    Component_ = componentId
+                    ComponentRef = componentId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -2224,7 +2224,7 @@ namespace WixToolset.Core
                     Root = root.Value,
                     Key = key,
                     Name = name,
-                    Component_ = componentId
+                    ComponentRef = componentId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -2342,7 +2342,7 @@ namespace WixToolset.Core
             {
                 var tuple = new RemoveFileTuple(sourceLineNumbers, id)
                 {
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     FileName = this.GetMsiFilenameValue(shortName, name),
                     DirProperty = directory ?? property ?? parentDirectory,
                     OnInstall = onInstall,
@@ -2432,7 +2432,7 @@ namespace WixToolset.Core
             {
                 var tuple = new RemoveFileTuple(sourceLineNumbers, id)
                 {
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     DirProperty = directory ?? property ?? parentDirectory,
                     OnInstall = onInstall,
                     OnUninstall = onUninstall
@@ -2505,7 +2505,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new ReserveCostTuple(sourceLineNumbers, id)
                 {
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     ReserveFolder = directoryId,
                     ReserveLocal = runLocal,
                     ReserveSource = runFromSource
@@ -3023,7 +3023,7 @@ namespace WixToolset.Core
                         OnUninstall = uninstall,
                         ConfigType = MsiServiceConfigType.DelayedAutoStart,
                         Argument = delayedAutoStart,
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                     };
 
                     this.Core.AddTuple(tuple);
@@ -3045,7 +3045,7 @@ namespace WixToolset.Core
                         OnUninstall = uninstall,
                         ConfigType = MsiServiceConfigType.FailureActionsFlag,
                         Argument = failureActionsWhen,
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                     };
 
                     this.Core.AddTuple(tuple);
@@ -3067,7 +3067,7 @@ namespace WixToolset.Core
                         OnUninstall = uninstall,
                         ConfigType = MsiServiceConfigType.ServiceSidInfo,
                         Argument = sid,
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                     };
 
                     this.Core.AddTuple(tuple);
@@ -3089,7 +3089,7 @@ namespace WixToolset.Core
                         OnUninstall = uninstall,
                         ConfigType = MsiServiceConfigType.RequiredPrivilegesInfo,
                         Argument = requiredPrivileges,
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                     };
 
                     this.Core.AddTuple(tuple);
@@ -3111,7 +3111,7 @@ namespace WixToolset.Core
                         OnUninstall = uninstall,
                         ConfigType = MsiServiceConfigType.PreshutdownInfo,
                         Argument = preShutdownDelay,
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                     };
 
                     this.Core.AddTuple(tuple);
@@ -3302,7 +3302,7 @@ namespace WixToolset.Core
                     Command = command,
                     Actions = actions,
                     DelayActions = actionsDelays,
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                 };
 
                 this.Core.AddTuple(tuple);
@@ -3456,7 +3456,7 @@ namespace WixToolset.Core
                     UninstallStop = uninstallStop,
                     Arguments = arguments,
                     Wait = wait,
-                    Component_ = componentId
+                    ComponentRef = componentId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -3716,7 +3716,7 @@ namespace WixToolset.Core
                     StartName = account,
                     Password = password,
                     Arguments = arguments,
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     Description  = description,
                     Interactive = interactive,
                     Vital = vital
@@ -4032,8 +4032,8 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new FileSFPCatalogTuple(sourceLineNumbers)
                 {
-                    File_ = id,
-                    SFPCatalog_ = parentSFPCatalog
+                    FileRef = id,
+                    SFPCatalogRef = parentSFPCatalog
                 });
             }
         }
@@ -4400,14 +4400,14 @@ namespace WixToolset.Core
 
                 var tuple = new ShortcutTuple(sourceLineNumbers, id)
                 {
-                    Directory_ = directory,
+                    DirectoryRef = directory,
                     Name = this.GetMsiFilenameValue(shortName, name),
-                    Component_ = componentId,
+                    ComponentRef = componentId,
                     Target = target,
                     Arguments = arguments,
                     Description = description,
                     Hotkey = hotkey,
-                    Icon_ = icon,
+                    IconRef = icon,
                     IconIndex = iconIndex,
                     Show = show,
                     WorkingDirectory = workingDirectory,
@@ -4543,7 +4543,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new MsiShortcutPropertyTuple(sourceLineNumbers, id)
                 {
-                    Shortcut_ = shortcutId,
+                    ShortcutRef = shortcutId,
                     PropertyKey = key,
                     PropVariantValue = value
                 });
@@ -4742,10 +4742,10 @@ namespace WixToolset.Core
                     {
                         LibId = id,
                         Language = language,
-                        Component_ = componentId,
+                        ComponentRef = componentId,
                         Description = description,
-                        Directory_ = helpDirectory,
-                        Feature_ = Guid.Empty.ToString("B")
+                        DirectoryRef = helpDirectory,
+                        FeatureRef = Guid.Empty.ToString("B")
                     };
 
                     if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
@@ -5085,7 +5085,7 @@ namespace WixToolset.Core
                 {
                     var tuple = new VerbTuple(sourceLineNumbers)
                     {
-                        Extension_ = extension,
+                        ExtensionRef = extension,
                         Verb = id,
                         Command = command,
                         Argument = argument,

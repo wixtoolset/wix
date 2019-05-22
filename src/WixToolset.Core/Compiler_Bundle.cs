@@ -524,7 +524,7 @@ namespace WixToolset.Core
 
                 this.Core.AddTuple(new WixBundleCatalogTuple(sourceLineNumbers, id)
                 {
-                    Payload_ = id.Id,
+                    PayloadRef = id.Id,
                 });
             }
         }
@@ -1309,9 +1309,9 @@ namespace WixToolset.Core
                 var tuple = new WixOrderingTuple(sourceLineNumbers)
                 {
                     ItemType = type,
-                    ItemId_ = id,
+                    ItemIdRef = id,
                     DependsOnType = previousType,
-                    DependsOnId_ = previousId
+                    DependsOnIdRef = previousId
                 };
 
                 this.Core.AddTuple(tuple);
@@ -2041,7 +2041,7 @@ namespace WixToolset.Core
                 var chainPackageTuple = new WixBundlePackageTuple(sourceLineNumbers, id)
                 {
                     Type = packageType,
-                    Payload_ = id.Id,
+                    PayloadRef = id.Id,
                     Attributes = attributes,
                     InstallCondition = installCondition,
                     CacheId = cacheId,
@@ -2176,7 +2176,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new WixBundlePackageCommandLineTuple(sourceLineNumbers)
                 {
-                    WixBundlePackage_ = packageId,
+                    WixBundlePackageRef = packageId,
                     InstallArgument = installArgument,
                     UninstallArgument = uninstallArgument,
                     RepairArgument = repairArgument,
@@ -2460,7 +2460,7 @@ namespace WixToolset.Core
             {
                 var tuple = new WixBundleMsiPropertyTuple(sourceLineNumbers)
                 {
-                    WixBundlePackage_ = packageId,
+                    WixBundlePackageRef = packageId,
                     Name = name,
                     Value = value
                 };
@@ -2516,8 +2516,8 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new WixBundleSlipstreamMspTuple(sourceLineNumbers)
                 {
-                    WixBundlePackage_ = packageId,
-                    WixBundlePackage_Msp = id
+                    WixBundlePackageRef = packageId,
+                    MspWixBundlePackageRef = id
                 });
             }
         }

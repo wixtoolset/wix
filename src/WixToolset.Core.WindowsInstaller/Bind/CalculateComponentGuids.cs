@@ -87,7 +87,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
 
                             var targetName = Common.GetName(row.DefaultDir, false, true);
-                            targetPathsByDirectoryId.Add(row.Id.Id, new ResolvedDirectory(row.Directory_Parent, targetName));
+                            targetPathsByDirectoryId.Add(row.Id.Id, new ResolvedDirectory(row.ParentDirectoryRef, targetName));
                         }
                     }
 
@@ -112,10 +112,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         foreach (var file in files)
                         {
-                            if (!filesByComponentId.TryGetValue(file.Component_, out var componentFiles))
+                            if (!filesByComponentId.TryGetValue(file.ComponentRef, out var componentFiles))
                             {
                                 componentFiles = new List<FileTuple>();
-                                filesByComponentId.Add(file.Component_, componentFiles);
+                                filesByComponentId.Add(file.ComponentRef, componentFiles);
                             }
 
                             componentFiles.Add(file);
@@ -132,8 +132,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (fileRow.Id.Id == componentTuple.KeyPath)
                         {
                             // calculate the key file's canonical target path
-                            string directoryPath = PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentTuple.Directory_, true);
-                            string fileName = Common.GetName(fileRow.LongFileName, false, true).ToLowerInvariant();
+                            string directoryPath = PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentTuple.DirectoryRef, true);
+                            string fileName = Common.GetName(fileRow.Name, false, true).ToLowerInvariant();
                             path = Path.Combine(directoryPath, fileName);
 
                             // find paths that are not canonicalized
@@ -144,7 +144,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 path.StartsWith(@"StartMenuFolder\programs", StringComparison.Ordinal) ||
                                 path.StartsWith(@"WindowsFolder\fonts", StringComparison.Ordinal))
                             {
-                                this.Messaging.Write(ErrorMessages.IllegalPathForGeneratedComponentGuid(componentTuple.SourceLineNumbers, fileRow.Component_, path));
+                                this.Messaging.Write(ErrorMessages.IllegalPathForGeneratedComponentGuid(componentTuple.SourceLineNumbers, fileRow.ComponentRef, path));
                             }
 
                             // if component has more than one file, the key path must be versioned

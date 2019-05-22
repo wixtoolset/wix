@@ -163,7 +163,7 @@ namespace WixToolset.Core
 
                 foreach (var tuple in section.Tuples.OfType<ControlTuple>())
                 {
-                    if (context.VariableResolver.TryGetLocalizedControl(tuple.Dialog_, tuple.Control, out var localizedControl))
+                    if (context.VariableResolver.TryGetLocalizedControl(tuple.DialogRef, tuple.Control, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {

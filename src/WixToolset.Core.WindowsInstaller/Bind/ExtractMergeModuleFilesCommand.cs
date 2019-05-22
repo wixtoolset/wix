@@ -105,7 +105,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     fileRow.Compressed = wixMergeRow.FileCompression;
 
                                     var wixFileRow = new WixFileTuple(wixMergeRow.SourceLineNumbers);
-                                    wixFileRow.Directory_ = record[2];
+                                    wixFileRow.DirectoryRef = record[2];
                                     wixFileRow.DiskId = wixMergeRow.DiskId;
                                     wixFileRow.PatchGroup = -1;
                                     wixFileRow.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };

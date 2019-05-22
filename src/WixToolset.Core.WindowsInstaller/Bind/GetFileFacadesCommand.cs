@@ -62,7 +62,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolPathType.Component:
                         if (null == filesByComponent)
                         {
-                            filesByComponent = facades.ToLookup(f => f.File.Component_);
+                            filesByComponent = facades.ToLookup(f => f.File.ComponentRef);
                         }
 
                         foreach (var facade in filesByComponent[row.SymbolId])
@@ -74,7 +74,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolPathType.Directory:
                         if (null == filesByDirectory)
                         {
-                            filesByDirectory = facades.ToLookup(f => f.WixFile.Directory_);
+                            filesByDirectory = facades.ToLookup(f => f.WixFile.DirectoryRef);
                         }
 
                         foreach (var facade in filesByDirectory[row.SymbolId])

@@ -196,7 +196,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var table = output.EnsureTable(this.TableDefinitions["BBControl"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
-            row[0] = tuple.Billboard_;
+            row[0] = tuple.BillboardRef;
             row[1] = tuple.BBControl;
             row[2] = tuple.Type;
             row[3] = tuple.X;
@@ -234,7 +234,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var table = output.EnsureTable(this.TableDefinitions["Control"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
-            row[0] = tuple.Dialog_;
+            row[0] = tuple.DialogRef;
             row[1] = tuple.Control;
             row[2] = tuple.Type;
             row[3] = tuple.X;
@@ -243,7 +243,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[6] = tuple.Height;
             row[7] = attributes;
             row[8] = text;
-            row[9] = tuple.Control_Next;
+            row[9] = tuple.NextControlRef;
             row[10] = tuple.Help;
         }
 
@@ -266,7 +266,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
             row[1] = tuple.ComponentId;
-            row[2] = tuple.Directory_;
+            row[2] = tuple.DirectoryRef;
             row[3] = attributes;
             row[4] = tuple.Condition;
             row[5] = tuple.KeyPath;
@@ -331,9 +331,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = tuple.Height;
             row[5] = attributes;
             row[6] = tuple.Title;
-            row[7] = tuple.Control_First;
-            row[8] = tuple.Control_Default;
-            row[9] = tuple.Control_Cancel;
+            row[7] = tuple.FirstControlRef;
+            row[8] = tuple.DefaultControlRef;
+            row[9] = tuple.CancelControlRef;
         }
 
         private void AddDirectoryTuple(DirectoryTuple tuple, Output output)
@@ -341,7 +341,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var table = output.EnsureTable(this.TableDefinitions["Directory"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
-            row[1] = tuple.Directory_Parent;
+            row[1] = tuple.ParentDirectoryRef;
             row[2] = tuple.DefaultDir;
         }
 
@@ -380,7 +380,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[0] = tuple.Id.Id;
             row[1] = String.Concat(action, uninstall, system, tuple.Name);
             row[2] = value;
-            row[3] = tuple.Component_;
+            row[3] = tuple.ComponentRef;
         }
 
         private void AddFeatureTuple(FeatureTuple tuple, Output output)
@@ -394,12 +394,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var table = output.EnsureTable(this.TableDefinitions["Feature"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
-            row[1] = tuple.Feature_Parent;
+            row[1] = tuple.ParentFeatureRef;
             row[2] = tuple.Title;
             row[3] = tuple.Description;
             row[4] = tuple.Display;
             row[5] = tuple.Level;
-            row[6] = tuple.Directory_;
+            row[6] = tuple.DirectoryRef;
             row[7] = attributes;
         }
 
@@ -408,8 +408,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var table = output.EnsureTable(this.TableDefinitions["File"]);
             var row = (FileRow)table.CreateRow(tuple.SourceLineNumbers);
             row.File = tuple.Id.Id;
-            row.Component = tuple.Component_;
-            row.FileName = GetMsiFilenameValue(tuple.ShortFileName, tuple.LongFileName);
+            row.Component = tuple.ComponentRef;
+            row.FileName = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
             row.FileSize = tuple.FileSize;
             row.Version = tuple.Version;
             row.Language = tuple.Language;
@@ -437,7 +437,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = tuple.Key;
             row[5] = tuple.Value;
             row[6] = tuple.Action;
-            row[7] = tuple.Component_;
+            row[7] = tuple.ComponentRef;
         }
 
         private void AddMediaTuple(MediaTuple tuple, Output output)
@@ -499,7 +499,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = events;
             row[3] = tuple.ConfigType;
             row[4] = tuple.Argument;
-            row[5] = tuple.Component_;
+            row[5] = tuple.ComponentRef;
         }
 
         private void AddMsiServiceConfigFailureActionsTuple(MsiServiceConfigFailureActionsTuple tuple, Output output)
@@ -518,7 +518,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = tuple.Command ?? "[~]";
             row[6] = tuple.Actions;
             row[7] = tuple.DelayActions;
-            row[8] = tuple.Component_;
+            row[8] = tuple.ComponentRef;
         }
 
         private void AddMoveFileTuple(MoveFileTuple tuple, Output output)
@@ -526,7 +526,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var table = output.EnsureTable(this.TableDefinitions["MoveFile"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
-            row[1] = tuple.Component_;
+            row[1] = tuple.ComponentRef;
             row[2] = tuple.SourceName;
             row[3] = tuple.DestName;
             row[4] = tuple.SourceFolder;
@@ -555,7 +555,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var table = output.EnsureTable(this.TableDefinitions["RemoveFile"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
-            row[1] = tuple.Component_;
+            row[1] = tuple.ComponentRef;
             row[2] = tuple.FileName;
             row[3] = tuple.DirProperty;
             row[4] = installMode;
@@ -610,7 +610,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = tuple.Key;
             row[3] = tuple.Name;
             row[4] = value;
-            row[5] = tuple.Component_;
+            row[5] = tuple.ComponentRef;
         }
 
         private void AddRegLocatorTuple(RegLocatorTuple tuple, Output output)
@@ -637,7 +637,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 row[1] = tuple.Root;
                 row[2] = tuple.Key;
                 row[3] = tuple.Name;
-                row[4] = tuple.Component_;
+                row[4] = tuple.ComponentRef;
             }
             else // Registry table is used to remove registry keys on uninstall.
             {
@@ -647,7 +647,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 row[1] = tuple.Root;
                 row[2] = tuple.Key;
                 row[3] = tuple.Name;
-                row[5] = tuple.Component_;
+                row[5] = tuple.ComponentRef;
             }
         }
 
@@ -667,7 +667,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = events;
             row[3] = tuple.Arguments;
             row[4] = tuple.Wait;
-            row[5] = tuple.Component_;
+            row[5] = tuple.ComponentRef;
         }
 
         private void AddServiceInstallTuple(ServiceInstallTuple tuple, Output output)
@@ -691,7 +691,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[8] = tuple.StartName;
             row[9] = tuple.Password;
             row[10] = tuple.Arguments;
-            row[11] = tuple.Component_;
+            row[11] = tuple.ComponentRef;
             row[12] = tuple.Description;
         }
 

@@ -472,7 +472,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.AddTuple(new UpgradedFiles_OptionalDataTuple(sourceLineNumbers)
+                    this.Core.AddTuple(new UpgradedFilesOptionalDataTuple(sourceLineNumbers)
                     {
                         Upgraded = upgrade,
                         FTK = file,
@@ -675,7 +675,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new TargetFiles_OptionalDataTuple(sourceLineNumbers)
+                var tuple = new TargetFilesOptionalDataTuple(sourceLineNumbers)
                 {
                     Target = target,
                     FTK = file,

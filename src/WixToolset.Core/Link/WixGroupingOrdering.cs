@@ -361,9 +361,9 @@ namespace WixToolset.Core.Link
             foreach (var row in this.EntrySection.Tuples.OfType<WixOrderingTuple>())
             {
                 var rowItemType = row.ItemType.ToString();
-                var rowItemName = row.ItemId_;
+                var rowItemName = row.ItemIdRef;
                 var rowDependsOnType = row.DependsOnType.ToString();
-                var rowDependsOnName = row.DependsOnId_;
+                var rowDependsOnName = row.DependsOnIdRef;
 
                 // If this row specifies some other (unknown) type in either
                 // position, we assume it's not a row that we're concerned about.

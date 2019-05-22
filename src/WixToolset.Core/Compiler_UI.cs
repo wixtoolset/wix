@@ -488,7 +488,7 @@ namespace WixToolset.Core
             {
                 var tuple = new BillboardTuple(sourceLineNumbers, id)
                 {
-                    Feature_ = feature,
+                    FeatureRef = feature,
                     Action = action,
                     Ordering = order
                 };
@@ -1029,9 +1029,9 @@ namespace WixToolset.Core
                     SystemModal = systemModal,
                     TrackDiskSpace = trackDiskSpace,
                     Title = title,
-                    Control_First = firstControl,
-                    Control_Default = defaultControl,
-                    Control_Cancel = cancelControl,
+                    FirstControlRef = firstControl,
+                    DefaultControlRef = defaultControl,
+                    CancelControlRef = cancelControl,
                 };
 
                 this.Core.AddTuple(tuple);
@@ -1486,7 +1486,7 @@ namespace WixToolset.Core
                 {
                     var bbTuple = new BBControlTuple(sourceLineNumbers, id)
                     {
-                        Billboard_ = dialog,
+                        BillboardRef = dialog,
                         BBControl = controlId.Id,
                         Type = controlType,
                         Attributes = attributes,
@@ -1515,7 +1515,7 @@ namespace WixToolset.Core
                 {
                     var controlTuple = new ControlTuple(sourceLineNumbers, id)
                     {
-                        Dialog_ = dialog,
+                        DialogRef = dialog,
                         Control = controlId.Id,
                         Type = controlType,
                         Attributes = attributes,
@@ -1673,8 +1673,8 @@ namespace WixToolset.Core
             {
                 var tuple = new ControlEventTuple(sourceLineNumbers)
                 {
-                    Dialog_ = dialog,
-                    Control_ = control,
+                    DialogRef = dialog,
+                    ControlRef = control,
                     Event = controlEvent ?? property,
                     Argument = argument,
                     Condition = condition,
@@ -1742,8 +1742,8 @@ namespace WixToolset.Core
             {
                 var tuple = new EventMappingTuple(sourceLineNumbers)
                 {
-                    Dialog_ = dialog,
-                    Control_ = control,
+                    DialogRef = dialog,
+                    ControlRef = control,
                     Event = eventMapping,
                     Attribute = controlAttribute
                 }; ;

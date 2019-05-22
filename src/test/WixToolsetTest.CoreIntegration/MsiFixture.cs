@@ -641,9 +641,9 @@ namespace WixToolsetTest.CoreIntegration
                 var progids = section.Tuples.OfType<ProgIdTuple>().OrderBy(tuple => tuple.ProgId).ToList();
                 Assert.Equal(2, progids.Count);
                 Assert.Equal("Foo.File.hol", progids[0].ProgId);
-                Assert.Equal("Foo.File.hol.15", progids[0].ProgId_Parent);
+                Assert.Equal("Foo.File.hol.15", progids[0].ParentProgIdRef);
                 Assert.Equal("Foo.File.hol.15", progids[1].ProgId);
-                Assert.Null(progids[1].ProgId_Parent);
+                Assert.Null(progids[1].ParentProgIdRef);
             }
         }
 

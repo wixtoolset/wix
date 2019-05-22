@@ -53,7 +53,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var assemblyNameTuples = new Dictionary<string, MsiAssemblyNameTuple>();
             foreach (var assemblyTuple in this.Section.Tuples.OfType<MsiAssemblyNameTuple>())
             {
-                assemblyNameTuples.Add(assemblyTuple.Component_ + "/" + assemblyTuple.Name, assemblyTuple);
+                assemblyNameTuples.Add(assemblyTuple.ComponentRef + "/" + assemblyTuple.Name, assemblyTuple);
             }
 
             FileInfo fileInfo = null;
@@ -79,7 +79,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (!fileInfo.Exists)
             {
-                this.Messaging.Write(ErrorMessages.CannotFindFile(file.File.SourceLineNumbers, file.File.Id.Id, file.File.LongFileName, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.CannotFindFile(file.File.SourceLineNumbers, file.File.Id.Id, file.File.Name, file.WixFile.Source.Path));
                 return;
             }
 
@@ -162,7 +162,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.Section.Tuples.Add(file.Hash);
                     }
 
-                    file.Hash.File_ = file.File.Id.Id;
+                    file.Hash.FileRef = file.File.Id.Id;
                     file.Hash.Options = 0;
                     file.Hash.HashPart1 = hash[0];
                     file.Hash.HashPart2 = hash[1];
@@ -243,9 +243,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         this.SetMsiAssemblyName(assemblyNameTuples, file, "publicKeyToken", assemblyName.PublicKeyToken);
                     }
-                    else if (file.WixFile.File_AssemblyApplication == null)
+                    else if (file.WixFile.AssemblyApplicationFileRef == null)
                     {
-                        throw new WixException(ErrorMessages.GacAssemblyNoStrongName(file.File.SourceLineNumbers, fileInfo.FullName, file.File.Component_));
+                        throw new WixException(ErrorMessages.GacAssemblyNoStrongName(file.File.SourceLineNumbers, fileInfo.FullName, file.File.ComponentRef));
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.FileVersion))
@@ -269,10 +269,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // TODO: Consider passing in the this.FileFacades as an indexed collection instead of searching through
                 // all files like this. Even though this is a rare case it looks like we might be able to index the
                 // file earlier.
-                var fileManifest = this.FileFacades.FirstOrDefault(r => r.File.Id.Id.Equals(file.WixFile.File_AssemblyManifest, StringComparison.Ordinal));
+                var fileManifest = this.FileFacades.FirstOrDefault(r => r.File.Id.Id.Equals(file.WixFile.AssemblyManifestFileRef, StringComparison.Ordinal));
                 if (null == fileManifest)
                 {
-                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.Id.Id, file.WixFile.File_AssemblyManifest));
+                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.Id.Id, file.WixFile.AssemblyManifestFileRef));
                 }
 
                 try
@@ -324,24 +324,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // check for null value (this can occur when grabbing the file version from an assembly without one)
             if (String.IsNullOrEmpty(value))
             {
-                this.Messaging.Write(WarningMessages.NullMsiAssemblyNameValue(file.File.SourceLineNumbers, file.File.Component_, name));
+                this.Messaging.Write(WarningMessages.NullMsiAssemblyNameValue(file.File.SourceLineNumbers, file.File.ComponentRef, name));
             }
             else
             {
                 // if the assembly will be GAC'd and the name in the file table doesn't match the name in the MsiAssemblyName table, error because the install will fail.
                 if ("name" == name && FileAssemblyType.DotNetAssembly == file.WixFile.AssemblyType &&
-                    String.IsNullOrEmpty(file.WixFile.File_AssemblyApplication) &&
-                    !String.Equals(Path.GetFileNameWithoutExtension(file.File.LongFileName), value, StringComparison.OrdinalIgnoreCase))
+                    String.IsNullOrEmpty(file.WixFile.AssemblyApplicationFileRef) &&
+                    !String.Equals(Path.GetFileNameWithoutExtension(file.File.Name), value, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.Messaging.Write(ErrorMessages.GACAssemblyIdentityWarning(file.File.SourceLineNumbers, Path.GetFileNameWithoutExtension(file.File.LongFileName), value));
+                    this.Messaging.Write(ErrorMessages.GACAssemblyIdentityWarning(file.File.SourceLineNumbers, Path.GetFileNameWithoutExtension(file.File.Name), value));
                 }
 
                 // override directly authored value
-                var lookup = String.Concat(file.File.Component_, "/", name);
+                var lookup = String.Concat(file.File.ComponentRef, "/", name);
                 if (!assemblyNameTuples.TryGetValue(lookup, out var assemblyNameRow))
                 {
                     assemblyNameRow = new MsiAssemblyNameTuple(file.File.SourceLineNumbers);
-                    assemblyNameRow.Component_ = file.File.Component_;
+                    assemblyNameRow.ComponentRef = file.File.ComponentRef;
                     assemblyNameRow.Name = name;
                     assemblyNameRow.Value = value;
 

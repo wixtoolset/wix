@@ -119,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // TODO: Sort these facades even smarter by directory path and component id 
             //       and maybe file size or file extension and other creative ideas to
             //       get optimal install speed out of MSI.
-            return this.FileFacades.OrderBy(f => f.File.Component_);
+            return this.FileFacades.OrderBy(f => f.File.ComponentRef);
         }
     }
 }
