@@ -162,9 +162,6 @@ namespace WixToolset.Data.WindowsInstaller
                 case "WixDeltaPatchSymbolPaths":
                     row = new WixDeltaPatchSymbolPathsRow(sourceLineNumbers, this);
                     break;
-                case "WixFile":
-                    row = new WixFileRow(sourceLineNumbers, this);
-                    break;
                 case "WixGroup":
                     row = new WixGroupRow(sourceLineNumbers, this);
                     break;

@@ -24,8 +24,6 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
-    using System;
-
     public enum WixActionTupleFields
     {
         SequenceTable,

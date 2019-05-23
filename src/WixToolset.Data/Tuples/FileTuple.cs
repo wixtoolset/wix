@@ -16,15 +16,26 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(FileTupleFields.FileSize), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Language), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.ReadOnly), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Hidden), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.System), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Vital), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Checksum), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.Compressed), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.DiskId), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Source), IntermediateFieldType.Path),
+
                 new IntermediateFieldDefinition(nameof(FileTupleFields.FontTitle), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.SelfRegCost), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.BindPath), IntermediateFieldType.String),
+
+                new IntermediateFieldDefinition(nameof(FileTupleFields.Sequence), IntermediateFieldType.Number),
+
+                new IntermediateFieldDefinition(nameof(FileTupleFields.PatchGroup), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.PatchAttributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.DeltaPatchHeaderSource), IntermediateFieldType.String),
+
+                new IntermediateFieldDefinition(nameof(FileTupleFields.RetainLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.IgnoreOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.IgnoreLengths), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.RetainOffsets), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.SymbolPaths), IntermediateFieldType.String),
             },
             typeof(FileTuple));
     }
@@ -32,6 +43,8 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum FileTupleFields
     {
         ComponentRef,
@@ -40,15 +53,61 @@ namespace WixToolset.Data.Tuples
         FileSize,
         Version,
         Language,
-        ReadOnly,
-        Hidden,
-        System,
-        Vital,
-        Checksum,
-        Compressed,
+        Attributes,
+        DirectoryRef,
+        DiskId,
+        Source,
+
         FontTitle,
         SelfRegCost,
         BindPath,
+
+        Sequence,
+
+        PatchGroup,
+        PatchAttributes,
+        DeltaPatchHeaderSource,
+
+        RetainLengths,
+        IgnoreOffsets,
+        IgnoreLengths,
+        RetainOffsets,
+        SymbolPaths,
+    }
+
+    [Flags]
+    public enum FileTupleAttributes : int
+    {
+        None,
+        ReadOnly = 0x1,
+        Hidden = 0x2,
+        System = 0x4,
+        Vital = 0x8,
+        Compressed = 0x10,
+        Uncompressed = 0x20,
+        Checksum = 0x40,
+        GeneratedShortFileName = 0x80,
+    }
+
+    /// <summary>
+    /// PatchAttribute values
+    /// </summary>
+    [Flags]
+    public enum PatchAttributeType
+    {
+        None = 0,
+
+        /// <summary>Prevents the updating of the file that is in fact changed in the upgraded image relative to the target images.</summary>
+        Ignore = 1,
+
+        /// <summary>Set if the entire file should be installed rather than creating a binary patch.</summary>
+        IncludeWholeFile = 2,
+
+        /// <summary>Set to indicate that the patch is non-vital.</summary>
+        AllowIgnoreOnError = 4,
+
+        /// <summary>Allowed bits.</summary>
+        Defined = Ignore | IncludeWholeFile | AllowIgnoreOnError
     }
 
     public class FileTuple : IntermediateTuple
@@ -99,40 +158,28 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)FileTupleFields.Language, value);
         }
 
-        public bool ReadOnly
+        public FileTupleAttributes Attributes
         {
-            get => (bool)this.Fields[(int)FileTupleFields.ReadOnly];
-            set => this.Set((int)FileTupleFields.ReadOnly, value);
+            get => (FileTupleAttributes)this.Fields[(int)FileTupleFields.Attributes].AsNumber();
+            set => this.Set((int)FileTupleFields.Attributes, (int)value);
         }
 
-        public bool Hidden
+        public string DirectoryRef
         {
-            get => (bool)this.Fields[(int)FileTupleFields.Hidden];
-            set => this.Set((int)FileTupleFields.Hidden, value);
+            get => (string)this.Fields[(int)FileTupleFields.DirectoryRef];
+            set => this.Set((int)FileTupleFields.DirectoryRef, value);
         }
 
-        public bool System
+        public int? DiskId
         {
-            get => (bool)this.Fields[(int)FileTupleFields.System];
-            set => this.Set((int)FileTupleFields.System, value);
+            get => (int?)this.Fields[(int)FileTupleFields.DiskId];
+            set => this.Set((int)FileTupleFields.DiskId, value);
         }
 
-        public bool Vital
+        public IntermediateFieldPathValue Source
         {
-            get => (bool)this.Fields[(int)FileTupleFields.Vital];
-            set => this.Set((int)FileTupleFields.Vital, value);
-        }
-
-        public bool Checksum
-        {
-            get => (bool)this.Fields[(int)FileTupleFields.Checksum];
-            set => this.Set((int)FileTupleFields.Checksum, value);
-        }
-
-        public bool? Compressed
-        {
-            get => (bool?)this.Fields[(int)FileTupleFields.Compressed];
-            set => this.Set((int)FileTupleFields.Compressed, value);
+            get => this.Fields[(int)FileTupleFields.Source].AsPath();
+            set => this.Set((int)FileTupleFields.Source, value);
         }
 
         public string FontTitle
@@ -151,6 +198,60 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)FileTupleFields.BindPath];
             set => this.Set((int)FileTupleFields.BindPath, value);
+        }
+
+        public int Sequence
+        {
+            get => (int)this.Fields[(int)FileTupleFields.Sequence];
+            set => this.Set((int)FileTupleFields.Sequence, value);
+        }
+
+        public int? PatchGroup
+        {
+            get => (int?)this.Fields[(int)FileTupleFields.PatchGroup];
+            set => this.Set((int)FileTupleFields.PatchGroup, value);
+        }
+
+        public PatchAttributeType? PatchAttributes
+        {
+            get => (PatchAttributeType?)this.Fields[(int)FileTupleFields.PatchAttributes].AsNullableNumber();
+            set => this.Set((int)FileTupleFields.PatchAttributes, (int?)value);
+        }
+
+        public string DeltaPatchHeaderSource
+        {
+            get => (string)this.Fields[(int)FileTupleFields.DeltaPatchHeaderSource];
+            set => this.Set((int)FileTupleFields.DeltaPatchHeaderSource, value);
+        }
+
+        public string RetainLengths
+        {
+            get => (string)this.Fields[(int)FileTupleFields.RetainLengths];
+            set => this.Set((int)FileTupleFields.RetainLengths, value);
+        }
+
+        public string IgnoreOffsets
+        {
+            get => (string)this.Fields[(int)FileTupleFields.IgnoreOffsets];
+            set => this.Set((int)FileTupleFields.IgnoreOffsets, value);
+        }
+
+        public string IgnoreLengths
+        {
+            get => (string)this.Fields[(int)FileTupleFields.IgnoreLengths];
+            set => this.Set((int)FileTupleFields.IgnoreLengths, value);
+        }
+
+        public string RetainOffsets
+        {
+            get => (string)this.Fields[(int)FileTupleFields.RetainOffsets];
+            set => this.Set((int)FileTupleFields.RetainOffsets, value);
+        }
+
+        public string SymbolPaths
+        {
+            get => (string)this.Fields[(int)FileTupleFields.SymbolPaths];
+            set => this.Set((int)FileTupleFields.SymbolPaths, value);
         }
     }
 }

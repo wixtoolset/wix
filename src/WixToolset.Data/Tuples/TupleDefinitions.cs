@@ -663,9 +663,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixCustomTable:
                     return TupleDefinitions.WixCustomTable;
 
-                case TupleDefinitionType.WixDeltaPatchFile:
-                    return TupleDefinitions.WixDeltaPatchFile;
-
                 case TupleDefinitionType.WixDeltaPatchSymbolPaths:
                     return TupleDefinitions.WixDeltaPatchSymbolPaths;
 
@@ -677,9 +674,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixFeatureModules:
                     return TupleDefinitions.WixFeatureModules;
-
-                case TupleDefinitionType.WixFile:
-                    return TupleDefinitions.WixFile;
 
                 case TupleDefinitionType.WixFileSearch:
                     return TupleDefinitions.WixFileSearch;

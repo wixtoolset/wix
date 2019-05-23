@@ -15,6 +15,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.ManifestFileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.ApplicationFileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.Attributes), IntermediateFieldType.Number),
+                //new IntermediateFieldDefinition(nameof(MsiAssemblyTupleFields.ProcessorArchitecture), IntermediateFieldType.String),
             },
             typeof(MsiAssemblyTuple));
     }
@@ -29,6 +30,22 @@ namespace WixToolset.Data.Tuples
         ManifestFileRef,
         ApplicationFileRef,
         Attributes,
+        //ProcessorArchitecture,
+    }
+
+    /// <summary>
+    /// Every file row has an assembly type.
+    /// </summary>
+    public enum AssemblyType
+    {
+        /// <summary>File is not an assembly.</summary>
+        NotAnAssembly,
+
+        /// <summary>File is a Common Language Runtime Assembly.</summary>
+        DotNetAssembly,
+
+        /// <summary>File is Win32 SxS assembly.</summary>
+        Win32Assembly,
     }
 
     public class MsiAssemblyTuple : IntermediateTuple
@@ -67,10 +84,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiAssemblyTupleFields.ApplicationFileRef, value);
         }
 
-        public FileAssemblyType Type
+        public AssemblyType Type
         {
-            get => (FileAssemblyType)this.Fields[(int)MsiAssemblyTupleFields.Attributes].AsNumber();
+            get => (AssemblyType)this.Fields[(int)MsiAssemblyTupleFields.Attributes].AsNumber();
             set => this.Set((int)MsiAssemblyTupleFields.Attributes, (int)value);
         }
+
+        //public string ProcessorArchitecture
+        //{
+        //    get => (string)this.Fields[(int)MsiAssemblyTupleFields.ProcessorArchitecture];
+        //    set => this.Set((int)MsiAssemblyTupleFields.ProcessorArchitecture, value);
+        //}
     }
 }
