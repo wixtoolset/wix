@@ -43,10 +43,10 @@ namespace WixToolsetTest.Data
         public void CanCheckNameofField()
         {
             var fileTuple = new FileTuple();
-            Assert.Equal("Component_", fileTuple.Definition.FieldDefinitions[0].Name);
+            Assert.Equal("ComponentRef", fileTuple.Definition.FieldDefinitions[0].Name);
             Assert.Null(fileTuple.Fields[0]);
             fileTuple.ComponentRef = "Foo";
-            Assert.Equal("Component_", fileTuple.Fields[0].Name);
+            Assert.Equal("ComponentRef", fileTuple.Fields[0].Name);
             Assert.Same(fileTuple.Definition.FieldDefinitions[0].Name, fileTuple.Fields[0].Name);
         }
 

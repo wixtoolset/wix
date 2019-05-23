@@ -130,7 +130,7 @@ namespace WixToolset.Data
         /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediates</returns>
-        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles, bool suppressVersionCheck = false)
+        public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles)
         {
             var creator = new SimpleTupleDefinitionCreator();
 

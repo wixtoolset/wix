@@ -11,8 +11,8 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(FileTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileTupleFields.ShortName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileTupleFields.ShortName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.FileSize), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileTupleFields.Language), IntermediateFieldType.String),
@@ -35,8 +35,8 @@ namespace WixToolset.Data.Tuples
     public enum FileTupleFields
     {
         ComponentRef,
-        ShortName,
         Name,
+        ShortName,
         FileSize,
         Version,
         Language,
@@ -69,16 +69,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)FileTupleFields.ComponentRef, value);
         }
 
-        public string ShortName
-        {
-            get => (string)this.Fields[(int)FileTupleFields.ShortName];
-            set => this.Set((int)FileTupleFields.ShortName, value);
-        }
-
         public string Name
         {
             get => (string)this.Fields[(int)FileTupleFields.Name];
             set => this.Set((int)FileTupleFields.Name, value);
+        }
+
+        public string ShortName
+        {
+            get => (string)this.Fields[(int)FileTupleFields.ShortName];
+            set => this.Set((int)FileTupleFields.ShortName, value);
         }
 
         public int FileSize

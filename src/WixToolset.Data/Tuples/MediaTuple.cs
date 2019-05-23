@@ -55,9 +55,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MediaTupleFields.DiskId, value);
         }
 
-        public int LastSequence
+        public int? LastSequence
         {
-            get => (int)this.Fields[(int)MediaTupleFields.LastSequence];
+            get => (int?)this.Fields[(int)MediaTupleFields.LastSequence];
             set => this.Set((int)MediaTupleFields.LastSequence, value);
         }
 
