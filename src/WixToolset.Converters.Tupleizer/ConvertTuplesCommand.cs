@@ -23,16 +23,18 @@ namespace WixToolset.Converters.Tupleizer
             var section = new IntermediateSection(String.Empty, OutputType3ToSectionType4(output.Type), output.Codepage);
 
             var wixMediaByDiskId = IndexWixMediaTableByDiskId(output);
+            var componentsById = IndexById<Wix3.Row>(output, "Component");
             var bindPathsById = IndexById<Wix3.Row>(output, "BindPath");
             var fontsById = IndexById<Wix3.Row>(output, "Font");
             var selfRegById = IndexById<Wix3.Row>(output, "SelfReg");
             var wixDirectoryById = IndexById<Wix3.Row>(output, "WixDirectory");
+            var wixFileById = IndexById<Wix3.Row>(output, "WixFile");
 
             foreach (Wix3.Table table in output.Tables)
             {
                 foreach (Wix3.Row row in table.Rows)
                 {
-                    var tuple = GenerateTupleFromRow(row, wixMediaByDiskId, fontsById, bindPathsById, selfRegById, wixDirectoryById);
+                    var tuple = GenerateTupleFromRow(row, wixMediaByDiskId, componentsById, fontsById, bindPathsById, selfRegById, wixFileById, wixDirectoryById);
                     if (tuple != null)
                     {
                         section.Tuples.Add(tuple);
@@ -75,7 +77,7 @@ namespace WixToolset.Converters.Tupleizer
             return byId;
         }
 
-        private static IntermediateTuple GenerateTupleFromRow(Wix3.Row row, Dictionary<int, Wix3.WixMediaRow> wixMediaByDiskId, Dictionary<string, Wix3.Row> fontsById, Dictionary<string, Wix3.Row> bindPathsById, Dictionary<string, Wix3.Row> selfRegById, Dictionary<string, Wix3.Row> wixDirectoryById)
+        private static IntermediateTuple GenerateTupleFromRow(Wix3.Row row, Dictionary<int, Wix3.WixMediaRow> wixMediaByDiskId, Dictionary<string, Wix3.Row> componentsById, Dictionary<string, Wix3.Row> fontsById, Dictionary<string, Wix3.Row> bindPathsById, Dictionary<string, Wix3.Row> selfRegById, Dictionary<string, Wix3.Row> wixFileById, Dictionary<string, Wix3.Row> wixDirectoryById)
         {
             var name = row.Table.Name;
             switch (name)
@@ -234,20 +236,15 @@ namespace WixToolset.Converters.Tupleizer
             case "File":
             {
                 var attributes = FieldAsNullableInt(row, 6);
-                var readOnly = (attributes & WindowsInstallerConstants.MsidbFileAttributesReadOnly) == WindowsInstallerConstants.MsidbFileAttributesReadOnly;
-                var hidden = (attributes & WindowsInstallerConstants.MsidbFileAttributesHidden) == WindowsInstallerConstants.MsidbFileAttributesHidden;
-                var system = (attributes & WindowsInstallerConstants.MsidbFileAttributesSystem) == WindowsInstallerConstants.MsidbFileAttributesSystem;
-                var vital = (attributes & WindowsInstallerConstants.MsidbFileAttributesVital) == WindowsInstallerConstants.MsidbFileAttributesVital;
-                var checksum = (attributes & WindowsInstallerConstants.MsidbFileAttributesChecksum) == WindowsInstallerConstants.MsidbFileAttributesChecksum;
-                bool? compressed = null;
-                if ((attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) == WindowsInstallerConstants.MsidbFileAttributesNoncompressed)
-                {
-                    compressed = false;
-                }
-                else if ((attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed)
-                {
-                    compressed = true;
-                }
+
+                FileTupleAttributes tupleAttributes = 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesReadOnly) == WindowsInstallerConstants.MsidbFileAttributesReadOnly ? FileTupleAttributes.ReadOnly : 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesHidden) == WindowsInstallerConstants.MsidbFileAttributesHidden ? FileTupleAttributes.Hidden : 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesSystem) == WindowsInstallerConstants.MsidbFileAttributesSystem ? FileTupleAttributes.System : 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesVital) == WindowsInstallerConstants.MsidbFileAttributesVital ? FileTupleAttributes.Vital : 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesChecksum) == WindowsInstallerConstants.MsidbFileAttributesChecksum ? FileTupleAttributes.Checksum : 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesNoncompressed) == WindowsInstallerConstants.MsidbFileAttributesNoncompressed ? FileTupleAttributes.Uncompressed : 0;
+                tupleAttributes |= (attributes & WindowsInstallerConstants.MsidbFileAttributesCompressed) == WindowsInstallerConstants.MsidbFileAttributesCompressed ? FileTupleAttributes.Compressed : 0;
 
                 var id = FieldAsString(row, 0);
 
@@ -258,12 +255,7 @@ namespace WixToolset.Converters.Tupleizer
                     FileSize = FieldAsInt(row, 3),
                     Version = FieldAsString(row, 4),
                     Language = FieldAsString(row, 5),
-                    ReadOnly = readOnly,
-                    Hidden = hidden,
-                    System = system,
-                    Vital = vital,
-                    Checksum = checksum,
-                    Compressed = compressed,
+                    Attributes = tupleAttributes
                 };
 
                 if (bindPathsById.TryGetValue(id, out var bindPathRow))
@@ -279,6 +271,16 @@ namespace WixToolset.Converters.Tupleizer
                 if (selfRegById.TryGetValue(id, out var selfRegRow))
                 {
                     tuple.SelfRegCost = FieldAsNullableInt(selfRegRow, 1) ?? 0;
+                }
+
+                if (wixFileById.TryGetValue(id, out var wixFileRow))
+                {
+                    tuple.DirectoryRef = FieldAsString(wixFileRow, 4);
+                    tuple.DiskId = FieldAsNullableInt(wixFileRow, 5) ?? 0;
+                    tuple.Source = new IntermediateFieldPathValue() { Path = FieldAsString(wixFileRow, 6) };
+                    tuple.PatchGroup = FieldAsInt(wixFileRow, 8);
+                    tuple.Attributes |= FieldAsInt(wixFileRow, 9) != 0 ? FileTupleAttributes.GeneratedShortFileName : 0;
+                    tuple.PatchAttributes = (PatchAttributeType)FieldAsInt(wixFileRow, 10);
                 }
 
                 return tuple;
@@ -321,7 +323,22 @@ namespace WixToolset.Converters.Tupleizer
             case "MoveFile":
                 return DefaultTupleFromRow(typeof(MoveFileTuple), row, columnZeroIsId: true);
             case "MsiAssembly":
-                return DefaultTupleFromRow(typeof(MsiAssemblyTuple), row, columnZeroIsId: false);
+            {
+                var componentId = FieldAsString(row, 0);
+                if (componentsById.TryGetValue(componentId, out var componentRow))
+                {
+                    return new AssemblyTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(componentRow, 5)))
+                    {
+                        ComponentRef = componentId,
+                        FeatureRef = FieldAsString(row, 1),
+                        ManifestFileRef = FieldAsString(row, 2),
+                        ApplicationFileRef = FieldAsString(row, 3),
+                        Type = FieldAsNullableInt(row, 4) == 1 ? AssemblyType.Win32Assembly : AssemblyType.DotNetAssembly,
+                    };
+                }
+
+                return null;
+            }
             case "MsiLockPermissionsEx":
                 return DefaultTupleFromRow(typeof(MsiLockPermissionsExTuple), row, columnZeroIsId: true);
             case "MsiShortcutProperty":
@@ -504,6 +521,7 @@ namespace WixToolset.Converters.Tupleizer
             case "Verb":
                 return DefaultTupleFromRow(typeof(VerbTuple), row, columnZeroIsId: false);
             case "WixAction":
+            {
                 var sequenceTable = FieldAsString(row, 0);
                 return new WixActionTuple(SourceLineNumber4(row.SourceLineNumbers))
                 {
@@ -515,6 +533,7 @@ namespace WixToolset.Converters.Tupleizer
                     After = FieldAsString(row, 5),
                     Overridable = FieldAsNullableInt(row, 6) != 0,
                 };
+            }
             case "WixBootstrapperApplication":
                 return DefaultTupleFromRow(typeof(WixBootstrapperApplicationTuple), row, columnZeroIsId: true);
             case "WixBundleContainer":
@@ -525,25 +544,10 @@ namespace WixToolset.Converters.Tupleizer
                 return DefaultTupleFromRow(typeof(WixChainItemTuple), row, columnZeroIsId: true);
             case "WixCustomTable":
                 return DefaultTupleFromRow(typeof(WixCustomTableTuple), row, columnZeroIsId: true);
-            case "WixDeltaPatchFile":
-                return DefaultTupleFromRow(typeof(WixDeltaPatchFileTuple), row, columnZeroIsId: true);
             case "WixDirectory":
                 return null;
             case "WixFile":
-                var assemblyAttributes3 = FieldAsNullableInt(row, 1);
-                return new WixFileTuple(SourceLineNumber4(row.SourceLineNumbers), new Identifier(AccessModifier.Public, FieldAsString(row, 0)))
-                {
-                    AssemblyType = assemblyAttributes3 == 0 ? FileAssemblyType.DotNetAssembly : assemblyAttributes3 == 1 ? FileAssemblyType.Win32Assembly : FileAssemblyType.NotAnAssembly,
-                    AssemblyManifestFileRef = FieldAsString(row, 2),
-                    AssemblyApplicationFileRef = FieldAsString(row, 3),
-                    DirectoryRef = FieldAsString(row, 4),
-                    DiskId = FieldAsNullableInt(row, 5) ?? 0,
-                    Source = new IntermediateFieldPathValue() { Path = FieldAsString(row, 6) },
-                    ProcessorArchitecture = FieldAsString(row, 7),
-                    PatchGroup = FieldAsInt(row, 8),
-                    Attributes = FieldAsInt(row, 9),
-                    PatchAttributes = (PatchAttributeType)FieldAsInt(row, 10),
-                };
+                return null;
             case "WixInstanceTransforms":
                 return DefaultTupleFromRow(typeof(WixInstanceTransformsTuple), row, columnZeroIsId: true);
             case "WixMedia":

@@ -56,8 +56,11 @@ namespace WixToolsetTest.Converters.Tupleizer
                     .ToArray();
 
                 var tuples = intermediate.Sections.SelectMany(s => s.Tuples);
+
+                var assemblyTuplesByFileId = tuples.OfType<AssemblyTuple>().ToDictionary(a => a.Id.Id);
+
                 var wix4Dump = tuples
-                    .SelectMany(tuple => TupleToStrings(tuple))
+                    .SelectMany(tuple => TupleToStrings(tuple, assemblyTuplesByFileId))
                     .OrderBy(s => s)
                     .ToArray();
 
@@ -67,8 +70,11 @@ namespace WixToolsetTest.Converters.Tupleizer
                 var wix3TextDump = String.Join(Environment.NewLine, wix3Dump);
                 var wix4TextDump = String.Join(Environment.NewLine, wix4Dump);
 
-                File.WriteAllText(Path.Combine(Path.GetTempPath(), "~3.txt"), wix3TextDump);
-                File.WriteAllText(Path.Combine(Path.GetTempPath(), "~4.txt"), wix4TextDump);
+                var path3 = Path.Combine(Path.GetTempPath(), "~3.txt");
+                var path4 = Path.Combine(Path.GetTempPath(), "~4.txt");
+
+                File.WriteAllText(path3, wix3TextDump);
+                File.WriteAllText(path4, wix4TextDump);
 
                 Assert.Equal(wix3TextDump, wix4TextDump);
 #endif
@@ -143,12 +149,18 @@ namespace WixToolsetTest.Converters.Tupleizer
                 break;
             case "WixFile":
             {
-                var fieldValues = row.Fields.Take(10).Select(SafeConvertField).ToArray();
+                var fieldValues = row.Fields.Select(SafeConvertField).ToArray();
                 if (fieldValues[8] == null)
                 {
                     // "Somebody" sometimes writes out a null field even when the column definition says
                     // it's non-nullable. Not naming names or anything. (SWID tags.)
                     fieldValues[8] = "0";
+                }
+                if (fieldValues[10] == null)
+                {
+                    // WixFile rows that come from merge modules will not have the attributes column set
+                    // so initilaize with 0.
+                    fieldValues[10] = "0";
                 }
                 fields = String.Join(",", fieldValues);
                 break;
@@ -166,8 +178,11 @@ namespace WixToolsetTest.Converters.Tupleizer
             }
         }
 
-        private static IEnumerable<string> TupleToStrings(IntermediateTuple tuple)
+        private static IEnumerable<string> TupleToStrings(IntermediateTuple tuple, Dictionary<string, AssemblyTuple> assemblyTuplesByFileId)
         {
+            var name = tuple.Definition.Type == TupleDefinitionType.SummaryInformation ? "_SummaryInformation" : tuple.Definition.Name;
+            var id = tuple.Id?.Id ?? String.Empty;
+
             string fields;
             switch (tuple.Definition.Name)
             {
@@ -280,20 +295,53 @@ namespace WixToolsetTest.Converters.Tupleizer
                     yield return $"SelfReg:{fileTuple.Id.Id},{fileTuple.SelfRegCost}";
                 }
 
+                int? assemblyAttributes = null;
+                if (assemblyTuplesByFileId.TryGetValue(fileTuple.Id.Id, out var assemblyTuple))
+                {
+                    if (assemblyTuple.Type == AssemblyType.DotNetAssembly)
+                    {
+                        assemblyAttributes = 0;
+                    }
+                    else if (assemblyTuple.Type == AssemblyType.Win32Assembly)
+                    {
+                        assemblyAttributes = 1;
+                    }
+                }
+
+                yield return "WixFile:" + String.Join(",",
+                    fileTuple.Id.Id,
+                    assemblyAttributes,
+                    assemblyTuple?.ManifestFileRef,
+                    assemblyTuple?.ApplicationFileRef,
+                    fileTuple.DirectoryRef,
+                    fileTuple.DiskId,
+                    fileTuple.Source.Path,
+                    null, // assembly processor arch
+                    fileTuple.PatchGroup,
+                    (fileTuple.Attributes & FileTupleAttributes.GeneratedShortFileName) != 0 ? 1 : 0,
+                    (int)fileTuple.PatchAttributes,
+                    fileTuple.RetainLengths,
+                    fileTuple.IgnoreOffsets,
+                    fileTuple.IgnoreLengths,
+                    fileTuple.RetainOffsets
+                    );
+
+                var fileAttributes = 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.ReadOnly) != 0 ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.Hidden) != 0 ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.System) != 0 ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.Vital) != 0 ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.Checksum) != 0 ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.Compressed) != 0 ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;
+                fileAttributes |= (fileTuple.Attributes & FileTupleAttributes.Uncompressed) != 0 ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0;
+
                 fields = String.Join(",",
                 fileTuple.ComponentRef,
                 fileTuple.Name,
                 fileTuple.FileSize.ToString(),
                 fileTuple.Version,
                 fileTuple.Language,
-                ((fileTuple.ReadOnly ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0)
-                    | (fileTuple.Hidden ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0)
-                    | (fileTuple.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0)
-                    | (fileTuple.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0)
-                    | (fileTuple.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0)
-                    | ((fileTuple.Compressed.HasValue && fileTuple.Compressed.Value) ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0)
-                    | ((fileTuple.Compressed.HasValue && !fileTuple.Compressed.Value) ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0))
-                    .ToString());
+                fileAttributes);
                 break;
             }
 
@@ -301,6 +349,15 @@ namespace WixToolsetTest.Converters.Tupleizer
                 fields = String.Join(",", tuple.Fields.Skip(1).Select(SafeConvertField));
                 break;
 
+            case "Assembly":
+            {
+                var assemblyTuple = (AssemblyTuple)tuple;
+
+                id = null;
+                name = "MsiAssembly";
+                fields = String.Join(",", assemblyTuple.ComponentRef, assemblyTuple.FeatureRef, assemblyTuple.ManifestFileRef, assemblyTuple.ApplicationFileRef, assemblyTuple.Type == AssemblyType.Win32Assembly ? 1 : 0);
+                break;
+            }
             case "Registry":
             {
                 var registryTuple = (RegistryTuple)tuple;
@@ -468,15 +525,6 @@ namespace WixToolsetTest.Converters.Tupleizer
                 break;
             }
 
-            case "WixFile":
-            {
-                var wixFileTuple = (WixFileTuple)tuple;
-                fields = String.Concat(
-                    wixFileTuple.AssemblyType == FileAssemblyType.DotNetAssembly ? "0" : wixFileTuple.AssemblyType == FileAssemblyType.Win32Assembly ? "1" : String.Empty, ",",
-                    String.Join(",", tuple.Fields.Skip(1).Take(8).Select(field => (string)field)));
-                break;
-            }
-
             case "WixProperty":
             {
                 var wixPropertyTuple = (WixPropertyTuple)tuple;
@@ -496,8 +544,6 @@ namespace WixToolsetTest.Converters.Tupleizer
                 break;
             }
 
-            var name = tuple.Definition.Type == TupleDefinitionType.SummaryInformation ? "_SummaryInformation" : tuple.Definition.Name;
-            var id = tuple.Id?.Id ?? String.Empty;
             fields = String.IsNullOrEmpty(id) ? fields : String.IsNullOrEmpty(fields) ? id : $"{id},{fields}";
             yield return $"{name}:{fields}";
         }
