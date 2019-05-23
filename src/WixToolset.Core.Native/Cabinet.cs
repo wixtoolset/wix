@@ -5,6 +5,7 @@ namespace WixToolset.Core.Native
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using WixToolset.Data;
 
     /// <summary>
     /// Wrapper class around interop with wixcab.dll to compress files into a cabinet.
@@ -29,7 +30,7 @@ namespace WixToolset.Core.Native
         /// <param name="maxFiles">Maximum number of files that will be added to cabinet.</param>
         /// <param name="maxSize">Maximum size of cabinet.</param>
         /// <param name="maxThresh">Maximum threshold for each cabinet.</param>
-        public void Compress(IEnumerable<CabinetCompressFile> files, CabinetCompressionLevel compressionLevel, int maxSize = 0, int maxThresh = 0)
+        public void Compress(IEnumerable<CabinetCompressFile> files, CompressionLevel compressionLevel, int maxSize = 0, int maxThresh = 0)
         {
             var compressionLevelVariable = Environment.GetEnvironmentVariable(CompressionLevelVariable);
 
@@ -38,8 +39,7 @@ namespace WixToolset.Core.Native
             {
                 if (!Enum.TryParse(compressionLevelVariable, true, out compressionLevel))
                 {
-                    //throw new WixException(WixErrors.IllegalEnvironmentVariable(CompressionLevelVariable, compressionLevelVariable));
-                    throw new ArgumentException();
+                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable(CompressionLevelVariable, compressionLevelVariable));
                 }
             }
 

@@ -2,11 +2,11 @@
 
 namespace WixToolsetTest.CoreNative
 {
-    using System;
     using System.IO;
     using System.Linq;
     using WixToolset.Core.Native;
     using WixToolsetTest.CoreNative.Utility;
+    using WixToolset.Data;
     using Xunit;
 
     public class CabinetFixture
@@ -22,7 +22,7 @@ namespace WixToolsetTest.CoreNative
                 var files = new[] { new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test.txt") };
 
                 var cabinet = new Cabinet(cabPath);
-                cabinet.Compress(files, CabinetCompressionLevel.Low);
+                cabinet.Compress(files, CompressionLevel.Low);
 
                 Assert.True(File.Exists(cabPath));
             }
@@ -84,7 +84,7 @@ namespace WixToolsetTest.CoreNative
                     var files = new[] { new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test.txt") };
 
                     var cabinet = new Cabinet(cabinetPath);
-                    cabinet.Compress(files, CabinetCompressionLevel.Low);
+                    cabinet.Compress(files, CompressionLevel.Low);
                 }
 
                 // Extract.
