@@ -70,7 +70,7 @@ namespace WixToolset.Data
         ModuleSignature,
         ModuleSubstitution,
         MoveFile,
-        MsiAssembly,
+        Assembly,
         MsiAssemblyName,
         MsiDigitalCertificate,
         MsiDigitalSignature,
@@ -402,8 +402,8 @@ namespace WixToolset.Data
                 case TupleDefinitionType.MoveFile:
                     return TupleDefinitions.MoveFile;
 
-                case TupleDefinitionType.MsiAssembly:
-                    return TupleDefinitions.MsiAssembly;
+                case TupleDefinitionType.Assembly:
+                    return TupleDefinitions.Assembly;
 
                 case TupleDefinitionType.MsiAssemblyName:
                     return TupleDefinitions.MsiAssemblyName;
