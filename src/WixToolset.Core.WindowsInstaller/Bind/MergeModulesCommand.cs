@@ -11,6 +11,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Bind;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
@@ -297,8 +298,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 throw new InvalidOperationException("Failed to fetch a File row from the database that was merged in from a module.");
                             }
 
-                            //recordUpdate.SetInteger(1, file.File.Sequence);
-                            throw new NotImplementedException();
+                            recordUpdate.SetInteger(1, file.File.Sequence);
 
                             // Update the file attributes to match the compression specified
                             // on the Merge element or on the Package element.
@@ -310,21 +310,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 attributes = recordUpdate.GetInteger(2);
                             }
 
-                            if (!file.File.Compressed.HasValue)
-                            {
-                                // Clear all compression bits.
-                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
-                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
-                            }
-                            else if (file.File.Compressed.Value)
+                            if ((file.File.Attributes & FileTupleAttributes.Compressed) == FileTupleAttributes.Compressed)
                             {
                                 attributes |= WindowsInstallerConstants.MsidbFileAttributesCompressed;
                                 attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                             }
-                            else if (!file.File.Compressed.Value)
+                            else if ((file.File.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed)
                             {
                                 attributes |= WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                                 attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
+                            }
+                            else // clear all compression bits.
+                            {
+                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;
+                                attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                             }
 
                             recordUpdate.SetInteger(2, attributes);

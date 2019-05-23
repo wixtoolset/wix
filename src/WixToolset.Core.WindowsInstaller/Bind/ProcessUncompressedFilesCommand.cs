@@ -81,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // for each file in the array of uncompressed files
                         foreach (FileFacade facade in this.FileFacades)
                         {
-                            var mediaTuple = mediaRows[facade.WixFile.DiskId];
+                            var mediaTuple = mediaRows[facade.DiskId];
                             string relativeFileLayoutPath = null;
                             string mediaLayoutFolder = mediaTuple.Layout;
 
@@ -105,7 +105,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             // finally put together the base media layout path and the relative file layout path
                             var fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
 
-                            var transfer = this.BackendHelper.CreateFileTransfer(facade.WixFile.Source.Path, fileLayoutPath, false, facade.File.SourceLineNumbers);
+                            var transfer = this.BackendHelper.CreateFileTransfer(facade.File.Source.Path, fileLayoutPath, false, facade.File.SourceLineNumbers);
                             fileTransfers.Add(transfer);
 
                             // Track the location where the cabinet will be placed. If the transfer is

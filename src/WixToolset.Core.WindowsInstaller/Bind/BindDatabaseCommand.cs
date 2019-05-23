@@ -526,7 +526,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.FileTransfers = fileTransfers;
             // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
-            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.WixFile.Source.Path, TrackedFileType.Input, f.File.SourceLineNumbers))); 
+            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.File.Source.Path, TrackedFileType.Input, f.File.SourceLineNumbers))); 
             this.TrackedFiles = trackedFiles;
 
             // TODO: Eventually this gets removed

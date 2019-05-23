@@ -444,6 +444,8 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// <param name="output">The Output that represents the msi database.</param>
         private void GenerateWixFileTable(string databaseFile, Output output)
         {
+            throw new NotImplementedException();
+#if TODO_FIX_UNBINDING_FILES
             var adminRootPath = Path.GetDirectoryName(databaseFile);
 
             var componentDirectoryIndex = new Hashtable();
@@ -495,6 +497,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                 wixFileTable.Rows.Add(wixFileRow);
             }
+#endif
         }
 
         /// <summary>

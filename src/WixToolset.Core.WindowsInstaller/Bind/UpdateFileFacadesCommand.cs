@@ -48,7 +48,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void UpdateFileFacade(FileFacade file)
+        private void UpdateFileFacade(FileFacade facade)
         {
             var assemblyNameTuples = new Dictionary<string, MsiAssemblyNameTuple>();
             foreach (var assemblyTuple in this.Section.Tuples.OfType<MsiAssemblyNameTuple>())
@@ -59,27 +59,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             FileInfo fileInfo = null;
             try
             {
-                fileInfo = new FileInfo(file.WixFile.Source.Path);
+                fileInfo = new FileInfo(facade.File.Source.Path);
             }
             catch (ArgumentException)
             {
-                this.Messaging.Write(ErrorMessages.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.InvalidFileName(facade.File.SourceLineNumbers, facade.File.Source.Path));
                 return;
             }
             catch (PathTooLongException)
             {
-                this.Messaging.Write(ErrorMessages.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.InvalidFileName(facade.File.SourceLineNumbers, facade.File.Source.Path));
                 return;
             }
             catch (NotSupportedException)
             {
-                this.Messaging.Write(ErrorMessages.InvalidFileName(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.InvalidFileName(facade.File.SourceLineNumbers, facade.File.Source.Path));
                 return;
             }
 
             if (!fileInfo.Exists)
             {
-                this.Messaging.Write(ErrorMessages.CannotFindFile(file.File.SourceLineNumbers, file.File.Id.Id, file.File.Name, file.WixFile.Source.Path));
+                this.Messaging.Write(ErrorMessages.CannotFindFile(facade.File.SourceLineNumbers, facade.File.Id.Id, facade.File.Name, facade.File.Source.Path));
                 return;
             }
 
@@ -87,10 +87,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (Int32.MaxValue < fileStream.Length)
                 {
-                    throw new WixException(ErrorMessages.FileTooLarge(file.File.SourceLineNumbers, file.WixFile.Source.Path));
+                    throw new WixException(ErrorMessages.FileTooLarge(facade.File.SourceLineNumbers, facade.File.Source.Path));
                 }
 
-                file.File.FileSize = Convert.ToInt32(fileStream.Length, CultureInfo.InvariantCulture);
+                facade.File.FileSize = Convert.ToInt32(fileStream.Length, CultureInfo.InvariantCulture);
             }
 
             string version = null;
@@ -103,7 +103,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (0x2 == e.NativeErrorCode) // ERROR_FILE_NOT_FOUND
                 {
-                    throw new WixException(ErrorMessages.FileNotFound(file.File.SourceLineNumbers, fileInfo.FullName));
+                    throw new WixException(ErrorMessages.FileNotFound(facade.File.SourceLineNumbers, fileInfo.FullName));
                 }
                 else
                 {
@@ -118,7 +118,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     // not overwriting hash, so don't do the rest of these options.
                 }
-                else if (null != file.File.Version)
+                else if (null != facade.File.Version)
                 {
                     // Search all of the file rows available to see if the specified version is actually a companion file. Yes, this looks
                     // very expensive and you're probably thinking it would be better to create an index of some sort to do an O(1) look up.
@@ -127,16 +127,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     //
                     // Also, if we do not find a matching file identifier then the user provided a default version and is providing a version
                     // for unversioned file. That's allowed but generally a dangerous thing to do so let's point that out to the user.
-                    if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.Id.Id, StringComparison.Ordinal)))
+                    if (!this.FileFacades.Any(r => facade.File.Version.Equals(r.File.Id.Id, StringComparison.Ordinal)))
                     {
-                        this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Version, file.File.Id.Id));
+                        this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(facade.File.SourceLineNumbers, facade.File.Version, facade.File.Id.Id));
                     }
                 }
                 else
                 {
-                    if (null != file.File.Language)
+                    if (null != facade.File.Language)
                     {
-                        this.Messaging.Write(WarningMessages.DefaultLanguageUsedForUnversionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.Id.Id));
+                        this.Messaging.Write(WarningMessages.DefaultLanguageUsedForUnversionedFile(facade.File.SourceLineNumbers, facade.File.Language, facade.File.Id.Id));
                     }
 
                     int[] hash;
@@ -148,7 +148,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (0x2 == e.NativeErrorCode) // ERROR_FILE_NOT_FOUND
                         {
-                            throw new WixException(ErrorMessages.FileNotFound(file.File.SourceLineNumbers, fileInfo.FullName));
+                            throw new WixException(ErrorMessages.FileNotFound(facade.File.SourceLineNumbers, fileInfo.FullName));
                         }
                         else
                         {
@@ -156,29 +156,29 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                     }
 
-                    if (null == file.Hash)
+                    if (null == facade.Hash)
                     {
-                        file.Hash = new MsiFileHashTuple(file.File.SourceLineNumbers, file.File.Id);
-                        this.Section.Tuples.Add(file.Hash);
+                        facade.Hash = new MsiFileHashTuple(facade.File.SourceLineNumbers, facade.File.Id);
+                        this.Section.Tuples.Add(facade.Hash);
                     }
 
-                    file.Hash.FileRef = file.File.Id.Id;
-                    file.Hash.Options = 0;
-                    file.Hash.HashPart1 = hash[0];
-                    file.Hash.HashPart2 = hash[1];
-                    file.Hash.HashPart3 = hash[2];
-                    file.Hash.HashPart4 = hash[3];
+                    facade.Hash.FileRef = facade.File.Id.Id;
+                    facade.Hash.Options = 0;
+                    facade.Hash.HashPart1 = hash[0];
+                    facade.Hash.HashPart2 = hash[1];
+                    facade.Hash.HashPart3 = hash[2];
+                    facade.Hash.HashPart4 = hash[3];
                 }
             }
             else // update the file row with the version and language information.
             {
                 // If no version was provided by the user, use the version from the file itself.
                 // This is the most common case.
-                if (String.IsNullOrEmpty(file.File.Version))
+                if (String.IsNullOrEmpty(facade.File.Version))
                 {
-                    file.File.Version = version;
+                    facade.File.Version = version;
                 }
-                else if (!this.FileFacades.Any(r => file.File.Version.Equals(r.File.Id.Id, StringComparison.Ordinal))) // this looks expensive, but see explanation below.
+                else if (!this.FileFacades.Any(r => facade.File.Version.Equals(r.File.Id.Id, StringComparison.Ordinal))) // this looks expensive, but see explanation below.
                 {
                     // The user provided a default version for the file row so we looked for a companion file (a file row with Id matching
                     // the version value). We didn't find it so, we will override the default version they provided with the actual
@@ -189,49 +189,49 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     //
                     // Also note this case can occur when the file is being updated using the WixBindUpdatedFiles extension mechanism.
                     // That's typically even more rare than companion files so again, no index, just search.
-                    file.File.Version = version;
+                    facade.File.Version = version;
                 }
 
-                if (!String.IsNullOrEmpty(file.File.Language) && String.IsNullOrEmpty(language))
+                if (!String.IsNullOrEmpty(facade.File.Language) && String.IsNullOrEmpty(language))
                 {
-                    this.Messaging.Write(WarningMessages.DefaultLanguageUsedForVersionedFile(file.File.SourceLineNumbers, file.File.Language, file.File.Id.Id));
+                    this.Messaging.Write(WarningMessages.DefaultLanguageUsedForVersionedFile(facade.File.SourceLineNumbers, facade.File.Language, facade.File.Id.Id));
                 }
                 else // override the default provided by the user (usually nothing) with the actual language from the file itself.
                 {
-                    file.File.Language = language;
+                    facade.File.Language = language;
                 }
 
                 // Populate the binder variables for this file information if requested.
                 if (null != this.VariableCache)
                 {
-                    if (!String.IsNullOrEmpty(file.File.Version))
+                    if (!String.IsNullOrEmpty(facade.File.Version))
                     {
-                        var key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", file.File.Id.Id);
-                        this.VariableCache[key] = file.File.Version;
+                        var key = String.Format(CultureInfo.InvariantCulture, "fileversion.{0}", facade.File.Id.Id);
+                        this.VariableCache[key] = facade.File.Version;
                     }
 
-                    if (!String.IsNullOrEmpty(file.File.Language))
+                    if (!String.IsNullOrEmpty(facade.File.Language))
                     {
-                        var key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", file.File.Id.Id);
-                        this.VariableCache[key] = file.File.Language;
+                        var key = String.Format(CultureInfo.InvariantCulture, "filelanguage.{0}", facade.File.Id.Id);
+                        this.VariableCache[key] = facade.File.Language;
                     }
                 }
             }
 
             // If this is a CLR assembly, load the assembly and get the assembly name information
-            if (FileAssemblyType.DotNetAssembly == file.WixFile.AssemblyType)
+            if (AssemblyType.DotNetAssembly == facade.Assembly?.Type)
             {
                 try
                 {
-                    var assemblyName = AssemblyNameReader.ReadAssembly(file.File.SourceLineNumbers, fileInfo.FullName, version);
+                    var assemblyName = AssemblyNameReader.ReadAssembly(facade.File.SourceLineNumbers, fileInfo.FullName, version);
 
-                    this.SetMsiAssemblyName(assemblyNameTuples, file, "name", assemblyName.Name);
-                    this.SetMsiAssemblyName(assemblyNameTuples, file, "culture", assemblyName.Culture);
-                    this.SetMsiAssemblyName(assemblyNameTuples, file, "version", assemblyName.Version);
+                    this.SetMsiAssemblyName(assemblyNameTuples, facade, "name", assemblyName.Name);
+                    this.SetMsiAssemblyName(assemblyNameTuples, facade, "culture", assemblyName.Culture);
+                    this.SetMsiAssemblyName(assemblyNameTuples, facade, "version", assemblyName.Version);
 
                     if (!String.IsNullOrEmpty(assemblyName.Architecture))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "processorArchitecture", assemblyName.Architecture);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "processorArchitecture", assemblyName.Architecture);
                     }
                     // TODO: WiX v3 seemed to do this but not clear it should actually be done.
                     //else if (!String.IsNullOrEmpty(file.WixFile.ProcessorArchitecture))
@@ -241,22 +241,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (assemblyName.StrongNamedSigned)
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "publicKeyToken", assemblyName.PublicKeyToken);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "publicKeyToken", assemblyName.PublicKeyToken);
                     }
-                    else if (file.WixFile.AssemblyApplicationFileRef == null)
+                    else if (facade.Assembly.ApplicationFileRef == null)
                     {
-                        throw new WixException(ErrorMessages.GacAssemblyNoStrongName(file.File.SourceLineNumbers, fileInfo.FullName, file.File.ComponentRef));
+                        throw new WixException(ErrorMessages.GacAssemblyNoStrongName(facade.File.SourceLineNumbers, fileInfo.FullName, facade.File.ComponentRef));
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.FileVersion))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "fileVersion", assemblyName.FileVersion);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "fileVersion", assemblyName.FileVersion);
                     }
 
                     // add the assembly name to the information cache
                     if (null != this.VariableCache)
                     {
-                        this.VariableCache[$"assemblyfullname.{file.File.Id.Id}"] = assemblyName.GetFullName();
+                        this.VariableCache[$"assemblyfullname.{facade.File.Id.Id}"] = assemblyName.GetFullName();
                     }
                 }
                 catch (WixException e)
@@ -264,44 +264,44 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.Messaging.Write(e.Error);
                 }
             }
-            else if (FileAssemblyType.Win32Assembly == file.WixFile.AssemblyType)
+            else if (AssemblyType.Win32Assembly == facade.Assembly?.Type)
             {
                 // TODO: Consider passing in the this.FileFacades as an indexed collection instead of searching through
                 // all files like this. Even though this is a rare case it looks like we might be able to index the
                 // file earlier.
-                var fileManifest = this.FileFacades.FirstOrDefault(r => r.File.Id.Id.Equals(file.WixFile.AssemblyManifestFileRef, StringComparison.Ordinal));
+                var fileManifest = this.FileFacades.FirstOrDefault(r => r.File.Id.Id.Equals(facade.Assembly.ManifestFileRef, StringComparison.Ordinal));
                 if (null == fileManifest)
                 {
-                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(file.File.SourceLineNumbers, file.File.Id.Id, file.WixFile.AssemblyManifestFileRef));
+                    this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(facade.File.SourceLineNumbers, facade.File.Id.Id, facade.Assembly.ManifestFileRef));
                 }
 
                 try
                 {
-                    var assemblyName = AssemblyNameReader.ReadAssemblyManifest(file.File.SourceLineNumbers, fileManifest.WixFile.Source.Path);
+                    var assemblyName = AssemblyNameReader.ReadAssemblyManifest(facade.File.SourceLineNumbers, fileManifest.File.Source.Path);
 
                     if (!String.IsNullOrEmpty(assemblyName.Name))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "name", assemblyName.Name);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "name", assemblyName.Name);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.Version))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "version", assemblyName.Version);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "version", assemblyName.Version);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.Type))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "type", assemblyName.Type);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "type", assemblyName.Type);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.Architecture))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "processorArchitecture", assemblyName.Architecture);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "processorArchitecture", assemblyName.Architecture);
                     }
 
                     if (!String.IsNullOrEmpty(assemblyName.PublicKeyToken))
                     {
-                        this.SetMsiAssemblyName(assemblyNameTuples, file, "publicKeyToken", assemblyName.PublicKeyToken);
+                        this.SetMsiAssemblyName(assemblyNameTuples, facade, "publicKeyToken", assemblyName.PublicKeyToken);
                     }
                 }
                 catch (WixException e)
@@ -329,8 +329,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             else
             {
                 // if the assembly will be GAC'd and the name in the file table doesn't match the name in the MsiAssemblyName table, error because the install will fail.
-                if ("name" == name && FileAssemblyType.DotNetAssembly == file.WixFile.AssemblyType &&
-                    String.IsNullOrEmpty(file.WixFile.AssemblyApplicationFileRef) &&
+                if ("name" == name && AssemblyType.DotNetAssembly == file.Assembly.Type &&
+                    String.IsNullOrEmpty(file.Assembly.ApplicationFileRef) &&
                     !String.Equals(Path.GetFileNameWithoutExtension(file.File.Name), value, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Messaging.Write(ErrorMessages.GACAssemblyIdentityWarning(file.File.SourceLineNumbers, Path.GetFileNameWithoutExtension(file.File.Name), value));

@@ -485,7 +485,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case TupleDefinitionType.MoveFile:
                         set.Add("InstallExecuteSequence/MoveFiles");
                         break;
-                    case TupleDefinitionType.MsiAssembly:
+                    case TupleDefinitionType.Assembly:
                         set.Add("AdvtExecuteSequence/MsiPublishAssemblies");
                         set.Add("InstallExecuteSequence/MsiPublishAssemblies");
                         set.Add("InstallExecuteSequence/MsiUnpublishAssemblies");

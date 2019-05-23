@@ -7,27 +7,27 @@ namespace WixToolset.Core.Bind
 
     public class FileFacade
     {
-        public FileFacade(FileTuple file, WixFileTuple wixFile, WixDeltaPatchFileTuple deltaPatchFile)
+        public FileFacade(FileTuple file, AssemblyTuple assembly)
         {
             this.File = file;
-            this.WixFile = wixFile;
-            this.DeltaPatchFile = deltaPatchFile;
+            this.Assembly = assembly;
         }
 
-        public FileFacade(bool fromModule, FileTuple file, WixFileTuple wixFile)
+        public FileFacade(bool fromModule, FileTuple file)
         {
             this.FromModule = fromModule;
             this.File = file;
-            this.WixFile = wixFile;
         }
 
         public bool FromModule { get; }
 
         public FileTuple File { get; }
 
-        public WixFileTuple WixFile { get; }
+        public AssemblyTuple Assembly { get; }
 
-        public WixDeltaPatchFileTuple DeltaPatchFile { get; }
+        public int DiskId => this.File.DiskId ?? 0;
+
+        public bool Uncompressed => (this.File.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed;
 
         /// <summary>
         /// Gets the set of MsiAssemblyName rows created for this file.

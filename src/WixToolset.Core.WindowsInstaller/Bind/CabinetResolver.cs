@@ -113,7 +113,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var result = this.ServiceProvider.GetService<IBindFileWithPath>();
             result.Id = facade.File.Id.Id;
-            result.Path = facade.WixFile.Source.Path;
+            result.Path = facade.File.Source.Path;
 
             return result;
         }

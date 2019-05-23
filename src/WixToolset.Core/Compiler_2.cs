@@ -760,7 +760,6 @@ namespace WixToolset.Core
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
                             sourceBits |= 1;
-                            this.useShortFileNames = true;
                         }
                         break;
                     case "SummaryCodepage":

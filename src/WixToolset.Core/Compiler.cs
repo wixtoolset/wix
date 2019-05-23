@@ -32,7 +32,6 @@ namespace WixToolset.Core
         private bool compilingModule;
         private bool compilingProduct;
 
-        private bool useShortFileNames;
         private string activeName;
         private string activeLanguage;
 
@@ -4184,16 +4183,7 @@ namespace WixToolset.Core
             }
             else // add the appropriate part of this directory element to the file source.
             {
-                string append = null;
-                if (this.useShortFileNames)
-                {
-                    append = !String.IsNullOrEmpty(shortSourceName) ? shortSourceName : shortName;
-                }
-
-                if (String.IsNullOrEmpty(append))
-                {
-                    append = !String.IsNullOrEmpty(sourceName) ? sourceName : name;
-                }
+                string append = String.IsNullOrEmpty(sourceName) ? name : sourceName;
 
                 if (!String.IsNullOrEmpty(append))
                 {
@@ -5486,7 +5476,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            var assemblyType = FileAssemblyType.NotAnAssembly;
+            var assemblyType = AssemblyType.NotAnAssembly;
             string assemblyApplication = null;
             string assemblyManifest = null;
             string bindPath = null;
@@ -5538,13 +5528,13 @@ namespace WixToolset.Core
                         switch (assemblyValue)
                         {
                         case ".net":
-                            assemblyType = FileAssemblyType.DotNetAssembly;
+                            assemblyType = AssemblyType.DotNetAssembly;
                             break;
                         case "no":
-                            assemblyType = FileAssemblyType.NotAnAssembly;
+                            assemblyType = AssemblyType.NotAnAssembly;
                             break;
                         case "win32":
-                            assemblyType = FileAssemblyType.Win32Assembly;
+                            assemblyType = AssemblyType.Win32Assembly;
                             break;
                         default:
                             this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
@@ -5743,7 +5733,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DefaultVersion", "CompanionFile", companionFile));
             }
 
-            if (FileAssemblyType.NotAnAssembly == assemblyType)
+            if (AssemblyType.NotAnAssembly == assemblyType)
             {
                 if (null != assemblyManifest)
                 {
@@ -5757,7 +5747,7 @@ namespace WixToolset.Core
             }
             else
             {
-                if (FileAssemblyType.Win32Assembly == assemblyType && null == assemblyManifest)
+                if (AssemblyType.Win32Assembly == assemblyType && null == assemblyManifest)
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "AssemblyManifest", "Assembly", "win32"));
                 }
@@ -5765,7 +5755,7 @@ namespace WixToolset.Core
                 // allow "*" guid components to omit explicit KeyPath as they can have only one file and therefore this file is the keypath
                 if (YesNoType.Yes != keyPath && "*" != componentGuid)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", (FileAssemblyType.DotNetAssembly == assemblyType ? ".net" : "win32"), "KeyPath", "yes"));
+                    this.Core.Write(ErrorMessages.IllegalAttributeValueWithoutOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Assembly", (AssemblyType.DotNetAssembly == assemblyType ? ".net" : "win32"), "KeyPath", "yes"));
                 }
             }
 
@@ -5852,90 +5842,72 @@ namespace WixToolset.Core
 
                 if (String.IsNullOrEmpty(source))
                 {
-                    if (!this.useShortFileNames && null != name)
-                    {
-                        source = name;
-                    }
-                    else
-                    {
-                        source = shortName;
-                    }
+                    source = name ?? shortName;
                 }
                 else if (source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)) // if source relies on parent directories, append the file name
                 {
-                    if (!this.useShortFileNames && null != name)
-                    {
-                        source = Path.Combine(source, name);
-                    }
-                    else
-                    {
-                        source = Path.Combine(source, shortName);
-                    }
+                    source = null == name ? Path.Combine(source, shortName) : Path.Combine(source, name);
                 }
+
+                var attributes = FileTupleAttributes.None;
+                attributes |= readOnly ? FileTupleAttributes.ReadOnly : 0;
+                attributes |= hidden ? FileTupleAttributes.Hidden : 0;
+                attributes |= system ? FileTupleAttributes.System : 0;
+                attributes |= vital ? FileTupleAttributes.Vital : 0;
+                attributes |= checksum ? FileTupleAttributes.Checksum : 0;
+                attributes |= compressed.HasValue && compressed == true ? FileTupleAttributes.Compressed : 0;
+                attributes |= compressed.HasValue && compressed == false ? FileTupleAttributes.Uncompressed : 0;
+                attributes |= generatedShortFileName ? FileTupleAttributes.GeneratedShortFileName : 0;
 
                 var tuple = new FileTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
-                    ShortName = shortName,
                     Name = name,
+                    ShortName = shortName,
                     FileSize = defaultSize,
                     Version = companionFile ?? defaultVersion,
                     Language = defaultLanguage,
-                    ReadOnly = readOnly,
-                    Hidden = hidden,
-                    System = system,
-                    Vital = vital,
-                    Checksum = checksum,
-                    Compressed = compressed,
+                    Attributes = attributes,
+
+                    //ReadOnly = readOnly,
+                    //Hidden = hidden,
+                    //System = system,
+                    //Vital = vital,
+                    //Checksum = checksum,
+                    //Compressed = compressed,
+                    //GeneratedShortFileName = generatedShortFileName,
+
+                    DirectoryRef = directoryId,
+                    DiskId = (CompilerConstants.IntegerNotSet == diskId) ? null : (int?)diskId,
+                    Source = new IntermediateFieldPathValue { Path = source },
+
                     FontTitle = fontTitle,
                     SelfRegCost = selfRegCost,
                     BindPath = bindPath,
+
+                    PatchGroup = (CompilerConstants.IntegerNotSet == patchGroup) ? null : (int?)patchGroup,
+                    PatchAttributes = patchAttributes,
+
+                    // Delta patching information
+                    RetainLengths = protectLengths,
+                    IgnoreOffsets = ignoreOffsets,
+                    IgnoreLengths = ignoreLengths,
+                    RetainOffsets = protectOffsets,
+                    SymbolPaths = symbols
                 };
 
                 this.Core.AddTuple(tuple);
 
-                // TODO: Remove all this.
-                var wixFileRow = (WixFileTuple)this.Core.CreateTuple(sourceLineNumbers, TupleDefinitionType.WixFile, id);
-                wixFileRow.AssemblyType = assemblyType;
-                wixFileRow.AssemblyManifestFileRef = assemblyManifest;
-                wixFileRow.AssemblyApplicationFileRef = assemblyApplication;
-                wixFileRow.DirectoryRef = directoryId;
-                wixFileRow.DiskId = (CompilerConstants.IntegerNotSet == diskId) ? 0 : diskId;
-                wixFileRow.Source = new IntermediateFieldPathValue { Path = source };
-                wixFileRow.ProcessorArchitecture = procArch;
-                wixFileRow.PatchGroup = (CompilerConstants.IntegerNotSet != patchGroup ? patchGroup : -1);
-                wixFileRow.Attributes = (generatedShortFileName ? 0x1 : 0x0);
-                wixFileRow.PatchAttributes = patchAttributes;
-
-                // Always create a delta patch row for this file since other elements (like Component and Media) may
-                // want to add symbol paths to it.
-                this.Core.AddTuple(new WixDeltaPatchFileTuple(sourceLineNumbers, id)
+                if (AssemblyType.NotAnAssembly != assemblyType)
                 {
-                    RetainLengths = protectLengths,
-                    IgnoreOffsets = ignoreOffsets,
-                    IgnoreLengths = ignoreLengths,
-                    RetainOffsets = protectOffsets
-                });
-
-                if (null != symbols)
-                {
-                    this.Core.AddTuple(new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers)
-                    {
-                        SymbolType = SymbolPathType.File,
-                        SymbolId = id.Id,
-                        SymbolPaths = symbols
-                    });
-                }
-
-                if (FileAssemblyType.NotAnAssembly != assemblyType)
-                {
-                    this.Core.AddTuple(new MsiAssemblyTuple(sourceLineNumbers)
+                    this.Core.AddTuple(new AssemblyTuple(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
                         FeatureRef = Guid.Empty.ToString("B"),
                         ManifestFileRef = assemblyManifest,
                         ApplicationFileRef = assemblyApplication,
-                        Type = assemblyType
+                        Type = assemblyType,
+                        ProcessorArchitecture = procArch,
                     });
                 }
             }
@@ -7599,7 +7571,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
             var configData = String.Empty;
-            bool? fileCompression = null;
+            FileTupleAttributes attributes = 0;
             string language = null;
             string sourceFile = null;
 
@@ -7617,7 +7589,9 @@ namespace WixToolset.Core
                         this.Core.CreateSimpleReference(sourceLineNumbers, "Media", diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
                         break;
                     case "FileCompression":
-                        fileCompression = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        var compress = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        attributes |= compress == YesNoType.Yes ? FileTupleAttributes.Compressed : 0;
+                        attributes |= compress == YesNoType.No ? FileTupleAttributes.Uncompressed : 0;
                         break;
                     case "Language":
                         language = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
@@ -7692,7 +7666,7 @@ namespace WixToolset.Core
                     SourceFile = sourceFile,
                     DiskId = diskId,
                     ConfigurationData = configData,
-                    FileCompression = fileCompression,
+                    FileAttributes = attributes,
                     FeatureRef = Guid.Empty.ToString("B")
                 };
 

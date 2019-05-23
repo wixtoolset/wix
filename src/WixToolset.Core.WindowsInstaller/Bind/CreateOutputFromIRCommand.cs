@@ -424,13 +424,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.Version = tuple.Version;
             row.Language = tuple.Language;
 
-            var attributes = tuple.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
-            attributes |= (tuple.Compressed.HasValue && tuple.Compressed.Value) ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;
-            attributes |= (tuple.Compressed.HasValue && !tuple.Compressed.Value) ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0;
-            attributes |= tuple.Hidden ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0;
-            attributes |= tuple.ReadOnly ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0;
-            attributes |= tuple.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
-            attributes |= tuple.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
+            var attributes = (tuple.Attributes & FileTupleAttributes.Checksum) == FileTupleAttributes.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;
+            attributes |= (tuple.Attributes & FileTupleAttributes.Compressed) == FileTupleAttributes.Compressed ? WindowsInstallerConstants.MsidbFileAttributesCompressed : 0;
+            attributes |= (tuple.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed ? WindowsInstallerConstants.MsidbFileAttributesNoncompressed : 0;
+            attributes |= (tuple.Attributes & FileTupleAttributes.Hidden) == FileTupleAttributes.Hidden ? WindowsInstallerConstants.MsidbFileAttributesHidden : 0;
+            attributes |= (tuple.Attributes & FileTupleAttributes.ReadOnly) == FileTupleAttributes.ReadOnly ? WindowsInstallerConstants.MsidbFileAttributesReadOnly : 0;
+            attributes |= (tuple.Attributes & FileTupleAttributes.System) == FileTupleAttributes.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
+            attributes |= (tuple.Attributes & FileTupleAttributes.Vital) == FileTupleAttributes.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
         }
 

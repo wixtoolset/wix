@@ -51,25 +51,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (null == mediaRow)
                     {
-                        mediaRow = mediaRows.Get(facade.WixFile.DiskId);
+                        mediaRow = mediaRows.Get(facade.DiskId);
                         if (OutputType.Patch == this.Output.Type)
                         {
                             // patch Media cannot start at zero
                             lastSequence = mediaRow.LastSequence;
                         }
                     }
-                    else if (mediaRow.DiskId != facade.WixFile.DiskId)
+                    else if (mediaRow.DiskId != facade.DiskId)
                     {
                         mediaRow.LastSequence = lastSequence;
-                        mediaRow = mediaRows.Get(facade.WixFile.DiskId);
+                        mediaRow = mediaRows.Get(facade.DiskId);
                     }
 
-                    if (0 < facade.WixFile.PatchGroup)
+                    if (facade.File.PatchGroup.HasValue)
                     {
-                        if (patchGroups.TryGetValue(facade.WixFile.PatchGroup, out var patchGroup))
+                        if (patchGroups.TryGetValue(facade.File.PatchGroup.Value, out var patchGroup))
                         {
                             patchGroup = new List<FileFacade>();
-                            patchGroups.Add(facade.WixFile.PatchGroup, patchGroup);
+                            patchGroups.Add(facade.File.PatchGroup.Value, patchGroup);
                         }
 
                         patchGroup.Add(facade);
@@ -94,12 +94,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (null == mediaRow)
                         {
-                            mediaRow = mediaRows.Get(facade.WixFile.DiskId);
+                            mediaRow = mediaRows.Get(facade.DiskId);
                         }
-                        else if (mediaRow.DiskId != facade.WixFile.DiskId)
+                        else if (mediaRow.DiskId != facade.DiskId)
                         {
                             mediaRow.LastSequence = lastSequence;
-                            mediaRow = mediaRows.Get(facade.WixFile.DiskId);
+                            mediaRow = mediaRows.Get(facade.DiskId);
                         }
 
                         var fileRow = fileRows.Get(facade.File.Id.Id);

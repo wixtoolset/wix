@@ -320,7 +320,7 @@ namespace WixToolset.Core
                                 break;
 #endif
 
-                        case TupleDefinitionType.MsiAssembly:
+                        case TupleDefinitionType.Assembly:
                             if (SectionType.Product == resolvedSection.Type)
                             {
                                 this.ResolveFeatures(tuple, 0, 1, componentsToFeatures, multipleFeatureComponents);

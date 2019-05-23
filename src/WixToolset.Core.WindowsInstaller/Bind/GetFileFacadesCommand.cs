@@ -25,23 +25,29 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var facades = new List<FileFacade>();
 
-            var wixFiles = this.Section.Tuples.OfType<WixFileTuple>().ToDictionary(t => t.Id.Id);
-            var deltaPatchFiles = this.Section.Tuples.OfType<WixDeltaPatchFileTuple>().ToDictionary(t => t.Id.Id);
+            var assemblyFile = this.Section.Tuples.OfType<AssemblyTuple>().ToDictionary(t => t.Id.Id);
+            //var wixFiles = this.Section.Tuples.OfType<WixFileTuple>().ToDictionary(t => t.Id.Id);
+            //var deltaPatchFiles = this.Section.Tuples.OfType<WixDeltaPatchFileTuple>().ToDictionary(t => t.Id.Id);
 
             foreach (var file in this.Section.Tuples.OfType<FileTuple>())
             {
-                var wixFile = wixFiles[file.Id.Id];
+                //var wixFile = wixFiles[file.Id.Id];
 
-                deltaPatchFiles.TryGetValue(file.Id.Id, out var deltaPatchFile);
+                //deltaPatchFiles.TryGetValue(file.Id.Id, out var deltaPatchFile);
 
-                facades.Add(new FileFacade(file, wixFile, deltaPatchFile));
+                //facades.Add(new FileFacade(file, wixFile, deltaPatchFile));
+
+                assemblyFile.TryGetValue(file.Id.Id, out var assembly);
+
+                facades.Add(new FileFacade(file, assembly));
             }
 
-            this.ResolveDeltaPatchSymbolPaths(deltaPatchFiles, facades);
+            //this.ResolveDeltaPatchSymbolPaths(deltaPatchFiles, facades);
 
             this.FileFacades = facades;
         }
 
+#if FIX_THIS
         /// <summary>
         /// Merge data from the WixPatchSymbolPaths rows into the WixDeltaPatchFile rows.
         /// </summary>
@@ -74,7 +80,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolPathType.Directory:
                         if (null == filesByDirectory)
                         {
-                            filesByDirectory = facades.ToLookup(f => f.WixFile.DirectoryRef);
+                            filesByDirectory = facades.ToLookup(f => f.File.DirectoryRef);
                         }
 
                         foreach (var facade in filesByDirectory[row.SymbolId])
@@ -86,7 +92,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case SymbolPathType.Media:
                         if (null == filesByDiskId)
                         {
-                            filesByDiskId = facades.ToLookup(f => f.WixFile.DiskId.ToString(CultureInfo.InvariantCulture));
+                            filesByDiskId = facades.ToLookup(f => f.File.DiskId.ToString(CultureInfo.InvariantCulture));
                         }
 
                         foreach (var facade in filesByDiskId[row.SymbolId])
@@ -141,5 +147,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 #endif
         }
+#endif
     }
 }

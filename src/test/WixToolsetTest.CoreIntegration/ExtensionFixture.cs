@@ -58,9 +58,9 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"extest.wir"));
                 var section = intermediate.Sections.Single();
 
-                var wixFile = section.Tuples.OfType<WixFileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\example.txt"), wixFile[WixFileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"example.txt", wixFile[WixFileTupleFields.Source].PreviousValue.AsPath().Path);
+                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
+                Assert.Equal(Path.Combine(folder, @"data\example.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
+                Assert.Equal(@"example.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
 
                 var example = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
                 Assert.Equal("Foo", example.Id.Id);

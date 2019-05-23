@@ -101,16 +101,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     // NOTE: this is very tricky - the merge module file rows are not added to the
                                     // file table because they should not be created via idt import.  Instead, these
                                     // rows are created by merging in the actual modules.
-                                    var fileRow = new FileTuple(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Private, record[1]));
-                                    fileRow.Compressed = wixMergeRow.FileCompression;
+                                    var fileTuple = new FileTuple(wixMergeRow.SourceLineNumbers, new Identifier(AccessModifier.Private, record[1]));
+                                    fileTuple.Attributes = wixMergeRow.FileAttributes;
+                                    fileTuple.DirectoryRef = record[2];
+                                    fileTuple.DiskId = wixMergeRow.DiskId;
+                                    fileTuple.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
 
-                                    var wixFileRow = new WixFileTuple(wixMergeRow.SourceLineNumbers);
-                                    wixFileRow.DirectoryRef = record[2];
-                                    wixFileRow.DiskId = wixMergeRow.DiskId;
-                                    wixFileRow.PatchGroup = -1;
-                                    wixFileRow.Source = new IntermediateFieldPathValue { Path = Path.Combine(this.IntermediateFolder, wixMergeRow.Id.Id, record[1]) };
-
-                                    var mergeModuleFileFacade = new FileFacade(true, fileRow, wixFileRow);
+                                    var mergeModuleFileFacade = new FileFacade(true, fileTuple);
 
                                     // If case-sensitive collision with another merge module or a user-authored file identifier.
                                     if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.File.Id.Id, out var collidingFacade))

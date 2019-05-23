@@ -296,6 +296,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="fileToken">The file token of the first file present in the splitting cabinet</param>
         internal void NewCabNamesCallBack([MarshalAs(UnmanagedType.LPWStr)]string firstCabName, [MarshalAs(UnmanagedType.LPWStr)]string newCabinetName, [MarshalAs(UnmanagedType.LPWStr)]string fileToken)
         {
+            throw new NotImplementedException();
+#if TODO_CAB_SPANNING
             // Locking Mutex here as this callback can come from Multiple Cabinet Builder Threads
             var mutex = new Mutex(false, "WixCabinetSplitBinderCallback");
             try
@@ -417,6 +419,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Releasing the Mutex here
                 mutex.ReleaseMutex();
             }
+#endif
         }
 
 
