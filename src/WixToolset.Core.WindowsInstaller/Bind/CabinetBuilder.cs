@@ -170,10 +170,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     new CabinetCompressFile(facade.File.Source.Path, facade.File.Id.Id, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
                 .ToList();
 
-            var cabinetCompressionLevel = (CabinetCompressionLevel)cabinetWorkItem.CompressionLevel;
-
             var cab = new Cabinet(cabinetPath);
-            cab.Compress(files, cabinetCompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
+            cab.Compress(files, cabinetWorkItem.CompressionLevel, maxCabinetSize, cabinetWorkItem.MaxThreshold);
 
             // TODO: Handle newCabNamesCallBackAddress from compression.
         }
