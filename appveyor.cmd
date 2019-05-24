@@ -18,8 +18,7 @@ dotnet publish -c Release -o %_P%\WixToolset.MSBuild\netcoreapp2.1\ -f netcoreap
 dotnet pack -c Release src\dotnet-wix
 dotnet pack -c Release src\WixToolset.MSBuild
 
-@rem Enable this build when WixToolset.Core is fixed to build the setup code correctly.
-@rem msbuild -p:Configuration=Release .\src\ThmViewerPackage\ThmViewerPackage.wixproj
+msbuild -p:Configuration=Release .\src\ThmViewerPackage\ThmViewerPackage.wixproj
 
 @popd
 @endlocal
