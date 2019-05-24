@@ -31,150 +31,142 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public IMessaging Messaging { private get; set; }
 
         /// <summary>
-        /// Set sequence numbers for all the actions and create rows in the output object.
+        /// Set sequence numbers for all the actions and create tuples in the output object.
         /// </summary>
         public void Execute()
         {
-            var overridableActionRows = new Dictionary<string, WixActionTuple>();
-            var requiredActionRows = new Dictionary<string, WixActionTuple>();
+            var requiredActionTuples = new Dictionary<string, WixActionTuple>();
 
             // Get the standard actions required based on tuples in the section.
-            var requiredActionIds = this.GetRequiredActionIds();
+            var overridableActionTuples = this.GetRequiredStandardActions();
 
-            foreach (var actionId in requiredActionIds)
+            // Index all the action tuples and look for collisions.
+            foreach (var actionTuple in this.Section.Tuples.OfType<WixActionTuple>())
             {
-                var standardAction = this.StandardActionsById[actionId];
-
-                overridableActionRows.Add(standardAction.Id.Id, standardAction);
-            }
-
-            // Index all the action rows and look for collisions.
-            foreach (var actionRow in this.Section.Tuples.OfType<WixActionTuple>())
-            {
-                if (actionRow.Overridable) // overridable action
+                if (actionTuple.Overridable) // overridable action
                 {
-                    if (overridableActionRows.TryGetValue(actionRow.Id.Id, out var collidingActionRow))
+                    if (overridableActionTuples.TryGetValue(actionTuple.Id.Id, out var collidingActionTuple))
                     {
-                        this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
-                        if (null != collidingActionRow.SourceLineNumbers)
+                        this.Messaging.Write(ErrorMessages.OverridableActionCollision(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                        if (null != collidingActionTuple.SourceLineNumbers)
                         {
-                            this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.OverridableActionCollision2(collidingActionTuple.SourceLineNumbers));
                         }
                     }
                     else
                     {
-                        overridableActionRows.Add(actionRow.Id.Id, actionRow);
+                        overridableActionTuples.Add(actionTuple.Id.Id, actionTuple);
                     }
                 }
                 else // unsequenced or sequenced action.
                 {
                     // Unsequenced action (allowed for certain standard actions).
-                    if (null == actionRow.Before && null == actionRow.After && 0 == actionRow.Sequence)
+                    if (null == actionTuple.Before && null == actionTuple.After && !actionTuple.Sequence.HasValue)
                     {
-                        if (this.StandardActionsById.TryGetValue(actionRow.Id.Id, out var standardAction))
+                        if (this.StandardActionsById.TryGetValue(actionTuple.Id.Id, out var standardAction))
                         {
                             // Populate the sequence from the standard action
-                            actionRow.Sequence = standardAction.Sequence;
+                            actionTuple.Sequence = standardAction.Sequence;
                         }
                         else // not a supported unscheduled action.
                         {
-                            throw new InvalidOperationException("Found an ActionRow with no Sequence, Before, or After column set.");
+                            throw new InvalidOperationException("Found an action with no Sequence, Before, or After column set.");
                         }
                     }
 
-                    if (requiredActionRows.TryGetValue(actionRow.Id.Id, out var collidingActionRow))
+                    if (requiredActionTuples.TryGetValue(actionTuple.Id.Id, out var collidingActionTuple))
                     {
-                        this.Messaging.Write(ErrorMessages.ActionCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
-                        if (null != collidingActionRow.SourceLineNumbers)
+                        this.Messaging.Write(ErrorMessages.ActionCollision(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
+                        if (null != collidingActionTuple.SourceLineNumbers)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionCollision2(collidingActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.ActionCollision2(collidingActionTuple.SourceLineNumbers));
                         }
                     }
                     else
                     {
-                        requiredActionRows.Add(actionRow.Id.Id, actionRow);
+                        requiredActionTuples.Add(actionTuple.Id.Id, actionTuple);
                     }
                 }
             }
 
-            // Add the overridable action rows that are not overridden to the required action rows.
-            foreach (var actionRow in overridableActionRows.Values)
+            // Add the overridable action tuples that are not overridden to the required action tuples.
+            foreach (var actionTuple in overridableActionTuples.Values)
             {
-                if (!requiredActionRows.ContainsKey(actionRow.Id.Id))
+                if (!requiredActionTuples.ContainsKey(actionTuple.Id.Id))
                 {
-                    requiredActionRows.Add(actionRow.Id.Id, actionRow);
+                    requiredActionTuples.Add(actionTuple.Id.Id, actionTuple);
                 }
             }
 
             // Suppress the required actions that are overridable.
-            foreach (var suppressActionRow in this.Section.Tuples.OfType<WixSuppressActionTuple>())
+            foreach (var suppressActionTuple in this.Section.Tuples.OfType<WixSuppressActionTuple>())
             {
-                var key = suppressActionRow.Id.Id;
+                var key = suppressActionTuple.Id.Id;
 
-                // If there is an overridable row to suppress; suppress it. There is no warning if there
+                // If there is an overridable tuple to suppress; suppress it. There is no warning if there
                 // is no action to suppress because the action may be suppressed from a merge module in
                 // the binder.
-                if (requiredActionRows.TryGetValue(key, out var requiredActionRow))
+                if (requiredActionTuples.TryGetValue(key, out var requiredActionTuple))
                 {
-                    if (requiredActionRow.Overridable)
+                    if (requiredActionTuple.Overridable)
                     {
-                        this.Messaging.Write(WarningMessages.SuppressAction(suppressActionRow.SourceLineNumbers, suppressActionRow.Action, suppressActionRow.SequenceTable.ToString()));
-                        if (null != requiredActionRow.SourceLineNumbers)
+                        this.Messaging.Write(WarningMessages.SuppressAction(suppressActionTuple.SourceLineNumbers, suppressActionTuple.Action, suppressActionTuple.SequenceTable.ToString()));
+                        if (null != requiredActionTuple.SourceLineNumbers)
                         {
-                            this.Messaging.Write(WarningMessages.SuppressAction2(requiredActionRow.SourceLineNumbers));
+                            this.Messaging.Write(WarningMessages.SuppressAction2(requiredActionTuple.SourceLineNumbers));
                         }
 
-                        requiredActionRows.Remove(key);
+                        requiredActionTuples.Remove(key);
                     }
-                    else // suppressing a non-overridable action row
+                    else // suppressing a non-overridable action tuple
                     {
-                        this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction(suppressActionRow.SourceLineNumbers, suppressActionRow.SequenceTable.ToString(), suppressActionRow.Action));
-                        if (null != requiredActionRow.SourceLineNumbers)
+                        this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction(suppressActionTuple.SourceLineNumbers, suppressActionTuple.SequenceTable.ToString(), suppressActionTuple.Action));
+                        if (null != requiredActionTuple.SourceLineNumbers)
                         {
-                            this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction2(requiredActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.SuppressNonoverridableAction2(requiredActionTuple.SourceLineNumbers));
                         }
                     }
                 }
             }
 
             // Build up dependency trees of the relatively scheduled actions.
-            // Use ToList() to create a copy of the required action rows so that new tuples can
+            // Use ToList() to create a copy of the required action tuples so that new tuples can
             // be added while enumerating.
-            foreach (var actionRow in requiredActionRows.Values.ToList())
+            foreach (var actionTuple in requiredActionTuples.Values.ToList())
             {
-                if (0 == actionRow.Sequence)
+                if (!actionTuple.Sequence.HasValue)
                 {
                     // check for standard actions that don't have a sequence number in a merge module
-                    if (SectionType.Module == this.Section.Type && WindowsInstallerStandard.IsStandardAction(actionRow.Action))
+                    if (SectionType.Module == this.Section.Type && WindowsInstallerStandard.IsStandardAction(actionTuple.Action))
                     {
-                        this.Messaging.Write(ErrorMessages.StandardActionRelativelyScheduledInModule(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
+                        this.Messaging.Write(ErrorMessages.StandardActionRelativelyScheduledInModule(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
                     }
 
-                    this.SequenceActionRow(actionRow, requiredActionRows);
+                    this.SequenceActionTuple(actionTuple, requiredActionTuples);
                 }
-                else if (SectionType.Module == this.Section.Type && 0 < actionRow.Sequence && !WindowsInstallerStandard.IsStandardAction(actionRow.Action)) // check for custom actions and dialogs that have a sequence number
+                else if (SectionType.Module == this.Section.Type && 0 < actionTuple.Sequence && !WindowsInstallerStandard.IsStandardAction(actionTuple.Action)) // check for custom actions and dialogs that have a sequence number
                 {
-                    this.Messaging.Write(ErrorMessages.CustomActionSequencedInModule(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action));
+                    this.Messaging.Write(ErrorMessages.CustomActionSequencedInModule(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action));
                 }
             }
 
             // Look for standard actions with sequence restrictions that aren't necessarily scheduled based
             // on the presence of a particular table.
-            if (requiredActionRows.ContainsKey("InstallExecuteSequence/DuplicateFiles") && !requiredActionRows.ContainsKey("InstallExecuteSequence/InstallFiles"))
+            if (requiredActionTuples.ContainsKey("InstallExecuteSequence/DuplicateFiles") && !requiredActionTuples.ContainsKey("InstallExecuteSequence/InstallFiles"))
             {
                 var standardAction = this.StandardActionsById["InstallExecuteSequence/InstallFiles"];
-                requiredActionRows.Add(standardAction.Id.Id, standardAction);
+                requiredActionTuples.Add(standardAction.Id.Id, standardAction);
             }
 
             // Schedule actions.
-            List<WixActionTuple> scheduledActionRows;
+            List<WixActionTuple> scheduledActionTuples;
             if (SectionType.Module == this.Section.Type)
             {
-                scheduledActionRows = requiredActionRows.Values.ToList();
+                scheduledActionTuples = requiredActionTuples.Values.ToList();
             }
             else
             {
-                scheduledActionRows = this.ScheduleActions(requiredActionRows);
+                scheduledActionTuples = this.ScheduleActions(requiredActionTuples);
             }
 
             // Remove all existing WixActionTuples from the section then add the
@@ -195,146 +187,162 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.Section.Tuples.RemoveAt(removeIndex);
             }
 
-            foreach (var action in scheduledActionRows)
+            foreach (var action in scheduledActionTuples)
             {
                 this.Section.Tuples.Add(action);
             }
         }
 
-        private List<WixActionTuple> ScheduleActions(Dictionary<string, WixActionTuple> requiredActionRows)
+        private Dictionary<string, WixActionTuple> GetRequiredStandardActions()
         {
-            var scheduledActionRows = new List<WixActionTuple>();
+            var overridableActionTuples = new Dictionary<string, WixActionTuple>();
+
+            var requiredActionIds = this.GetRequiredActionIds();
+
+            foreach (var actionId in requiredActionIds)
+            {
+                var standardAction = this.StandardActionsById[actionId];
+
+                overridableActionTuples.Add(standardAction.Id.Id, standardAction);
+            }
+
+            return overridableActionTuples;
+        }
+
+        private List<WixActionTuple> ScheduleActions(Dictionary<string, WixActionTuple> requiredActionTuples)
+        {
+            var scheduledActionTuples = new List<WixActionTuple>();
 
             // Process each sequence table individually.
             foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
             {
-                // Create a collection of just the action rows in this sequence
-                var sequenceActionRows = requiredActionRows.Values.Where(a => a.SequenceTable == sequenceTable).ToList();
+                // Create a collection of just the action tuples in this sequence
+                var sequenceActionTuples = requiredActionTuples.Values.Where(a => a.SequenceTable == sequenceTable).ToList();
 
                 // Schedule the absolutely scheduled actions (by sorting them by their sequence numbers).
-                var absoluteActionRows = new List<WixActionTuple>();
-                foreach (var actionRow in sequenceActionRows)
+                var absoluteActionTuples = new List<WixActionTuple>();
+                foreach (var actionTuple in sequenceActionTuples)
                 {
-                    if (0 != actionRow.Sequence)
+                    if (actionTuple.Sequence.HasValue)
                     {
                         // Look for sequence number collisions
-                        foreach (var sequenceScheduledActionRow in absoluteActionRows)
+                        foreach (var sequenceScheduledActionTuple in absoluteActionTuples)
                         {
-                            if (sequenceScheduledActionRow.Sequence == actionRow.Sequence)
+                            if (sequenceScheduledActionTuple.Sequence == actionTuple.Sequence)
                             {
-                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, sequenceScheduledActionRow.Action, actionRow.Sequence ?? 0));
-                                if (null != sequenceScheduledActionRow.SourceLineNumbers)
+                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, sequenceScheduledActionTuple.Action, actionTuple.Sequence ?? 0));
+                                if (null != sequenceScheduledActionTuple.SourceLineNumbers)
                                 {
-                                    this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionRow.SourceLineNumbers));
+                                    this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionTuple.SourceLineNumbers));
                                 }
                             }
                         }
 
-                        absoluteActionRows.Add(actionRow);
+                        absoluteActionTuples.Add(actionTuple);
                     }
                 }
 
-                absoluteActionRows.Sort((x, y) => (x.Sequence ?? 0).CompareTo(y.Sequence ?? 0));
+                absoluteActionTuples.Sort((x, y) => (x.Sequence ?? 0).CompareTo(y.Sequence ?? 0));
 
                 // Schedule the relatively scheduled actions (by resolving the dependency trees).
                 var previousUsedSequence = 0;
-                var relativeActionRows = new List<WixActionTuple>();
-                for (int j = 0; j < absoluteActionRows.Count; j++)
+                var relativeActionTuples = new List<WixActionTuple>();
+                for (int j = 0; j < absoluteActionTuples.Count; j++)
                 {
-                    var absoluteActionRow = absoluteActionRows[j];
+                    var absoluteActionTuple = absoluteActionTuples[j];
 
-                    // Get all the relatively scheduled action rows occuring before and after this absolutely scheduled action row.
-                    var relativeActions = this.GetAllRelativeActionsForSequenceType(sequenceTable, absoluteActionRow);
+                    // Get all the relatively scheduled action tuples occuring before and after this absolutely scheduled action tuple.
+                    var relativeActions = this.GetAllRelativeActionsForSequenceType(sequenceTable, absoluteActionTuple);
 
                     // Check for relatively scheduled actions occuring before/after a special action
                     // (those actions with a negative sequence number).
-                    if (absoluteActionRow.Sequence < 0 && (relativeActions.PreviousActions.Any() || relativeActions.NextActions.Any()))
+                    if (absoluteActionTuple.Sequence < 0 && (relativeActions.PreviousActions.Any() || relativeActions.NextActions.Any()))
                     {
                         // Create errors for all the before actions.
-                        foreach (var actionRow in relativeActions.PreviousActions)
+                        foreach (var actionTuple in relativeActions.PreviousActions)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, absoluteActionRow.Action));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, absoluteActionTuple.Action));
                         }
 
                         // Create errors for all the after actions.
-                        foreach (var actionRow in relativeActions.NextActions)
+                        foreach (var actionTuple in relativeActions.NextActions)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, absoluteActionRow.Action));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, absoluteActionTuple.Action));
                         }
 
                         // If there is source line information for the absolutely scheduled action display it
-                        if (absoluteActionRow.SourceLineNumbers != null)
+                        if (absoluteActionTuple.SourceLineNumbers != null)
                         {
-                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction2(absoluteActionRow.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.ActionScheduledRelativeToTerminationAction2(absoluteActionTuple.SourceLineNumbers));
                         }
 
                         continue;
                     }
 
-                    // Schedule the action rows before this one.
-                    var unusedSequence = absoluteActionRow.Sequence - 1;
+                    // Schedule the action tuples before this one.
+                    var unusedSequence = absoluteActionTuple.Sequence - 1;
                     for (var i = relativeActions.PreviousActions.Count - 1; i >= 0; i--)
                     {
-                        var relativeActionRow = relativeActions.PreviousActions[i];
+                        var relativeActionTuple = relativeActions.PreviousActions[i];
 
                         // look for collisions
                         if (unusedSequence == previousUsedSequence)
                         {
-                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionRow.SourceLineNumbers, relativeActionRow.SequenceTable.ToString(), relativeActionRow.Action, absoluteActionRow.Action));
-                            if (absoluteActionRow.SourceLineNumbers != null)
+                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionTuple.SourceLineNumbers, relativeActionTuple.SequenceTable.ToString(), relativeActionTuple.Action, absoluteActionTuple.Action));
+                            if (absoluteActionTuple.SourceLineNumbers != null)
                             {
-                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionRow.SourceLineNumbers));
+                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionTuple.SourceLineNumbers));
                             }
 
                             unusedSequence++;
                         }
 
-                        relativeActionRow.Sequence = unusedSequence;
-                        relativeActionRows.Add(relativeActionRow);
+                        relativeActionTuple.Sequence = unusedSequence;
+                        relativeActionTuples.Add(relativeActionTuple);
 
                         unusedSequence--;
                     }
 
                     // Determine the next used action sequence number.
                     var nextUsedSequence = Int16.MaxValue + 1;
-                    if (absoluteActionRows.Count > j + 1)
+                    if (absoluteActionTuples.Count > j + 1)
                     {
-                        nextUsedSequence = absoluteActionRows[j + 1].Sequence ?? 0;
+                        nextUsedSequence = absoluteActionTuples[j + 1].Sequence ?? 0;
                     }
 
-                    // Schedule the action rows after this one.
-                    unusedSequence = absoluteActionRow.Sequence + 1;
+                    // Schedule the action tuples after this one.
+                    unusedSequence = absoluteActionTuple.Sequence + 1;
                     for (var i = 0; i < relativeActions.NextActions.Count; i++)
                     {
-                        var relativeActionRow = relativeActions.NextActions[i];
+                        var relativeActionTuple = relativeActions.NextActions[i];
 
                         if (unusedSequence == nextUsedSequence)
                         {
-                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionRow.SourceLineNumbers, relativeActionRow.SequenceTable.ToString(), relativeActionRow.Action, absoluteActionRow.Action));
-                            if (absoluteActionRow.SourceLineNumbers != null)
+                            this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber(relativeActionTuple.SourceLineNumbers, relativeActionTuple.SequenceTable.ToString(), relativeActionTuple.Action, absoluteActionTuple.Action));
+                            if (absoluteActionTuple.SourceLineNumbers != null)
                             {
-                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionRow.SourceLineNumbers));
+                                this.Messaging.Write(ErrorMessages.NoUniqueActionSequenceNumber2(absoluteActionTuple.SourceLineNumbers));
                             }
 
                             unusedSequence--;
                         }
 
-                        relativeActionRow.Sequence = unusedSequence;
-                        relativeActionRows.Add(relativeActionRow);
+                        relativeActionTuple.Sequence = unusedSequence;
+                        relativeActionTuples.Add(relativeActionTuple);
 
                         unusedSequence++;
                     }
 
                     // keep track of this sequence number as the previous used sequence number for the next iteration
-                    previousUsedSequence = absoluteActionRow.Sequence ?? 0;
+                    previousUsedSequence = absoluteActionTuple.Sequence ?? 0;
                 }
 
                 // add the absolutely and relatively scheduled actions to the list of scheduled actions
-                scheduledActionRows.AddRange(absoluteActionRows);
-                scheduledActionRows.AddRange(relativeActionRows);
+                scheduledActionTuples.AddRange(absoluteActionTuples);
+                scheduledActionTuples.AddRange(relativeActionTuples);
             }
 
-            return scheduledActionRows;
+            return scheduledActionTuples;
         }
 
         private IEnumerable<string> GetRequiredActionIds()
@@ -568,51 +576,51 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Sequence an action before or after a standard action.
         /// </summary>
-        /// <param name="actionRow">The action row to be sequenced.</param>
-        /// <param name="requiredActionRows">Collection of actions which must be included.</param>
-        private void SequenceActionRow(WixActionTuple actionRow, Dictionary<string, WixActionTuple> requiredActionRows)
+        /// <param name="actionTuple">The action tuple to be sequenced.</param>
+        /// <param name="requiredActionTuples">Collection of actions which must be included.</param>
+        private void SequenceActionTuple(WixActionTuple actionTuple, Dictionary<string, WixActionTuple> requiredActionTuples)
         {
             var after = false;
 
-            if (actionRow.After != null)
+            if (actionTuple.After != null)
             {
                 after = true;
             }
-            else if (actionRow.Before == null)
+            else if (actionTuple.Before == null)
             {
-                throw new InvalidOperationException("Found an ActionRow with no Sequence, Before, or After column set.");
+                throw new InvalidOperationException("Found an action with no Sequence, Before, or After column set.");
             }
 
-            var parentActionName = (after ? actionRow.After : actionRow.Before);
-            var parentActionKey = actionRow.SequenceTable.ToString() + "/" + parentActionName;
+            var parentActionName = (after ? actionTuple.After : actionTuple.Before);
+            var parentActionKey = actionTuple.SequenceTable.ToString() + "/" + parentActionName;
 
-            if (!requiredActionRows.TryGetValue(parentActionKey, out var parentActionRow))
+            if (!requiredActionTuples.TryGetValue(parentActionKey, out var parentActionTuple))
             {
                 // If the missing parent action is a standard action (with a suggested sequence number), add it.
-                if (this.StandardActionsById.TryGetValue(parentActionKey, out parentActionRow))
+                if (this.StandardActionsById.TryGetValue(parentActionKey, out parentActionTuple))
                 {
                     // Create a clone to avoid modifying the static copy of the object.
-                    // TODO: consider this: parentActionRow = parentActionRow.Clone();
+                    // TODO: consider this: parentActionTuple = parentActionTuple.Clone();
 
-                    requiredActionRows.Add(parentActionRow.Id.Id, parentActionRow);
+                    requiredActionTuples.Add(parentActionTuple.Id.Id, parentActionTuple);
                 }
                 else
                 {
-                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Found an ActionRow with a non-existent {0} action: {1}.", (after ? "After" : "Before"), parentActionName));
+                    throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Found an action with a non-existent {0} action: {1}.", (after ? "After" : "Before"), parentActionName));
                 }
             }
-            else if (actionRow == parentActionRow || this.ContainsChildActionRow(actionRow, parentActionRow)) // cycle detected
+            else if (actionTuple == parentActionTuple || this.ContainsChildActionTuple(actionTuple, parentActionTuple)) // cycle detected
             {
-                throw new WixException(ErrorMessages.ActionCircularDependency(actionRow.SourceLineNumbers, actionRow.SequenceTable.ToString(), actionRow.Action, parentActionRow.Action));
+                throw new WixException(ErrorMessages.ActionCircularDependency(actionTuple.SourceLineNumbers, actionTuple.SequenceTable.ToString(), actionTuple.Action, parentActionTuple.Action));
             }
 
-            // Add this action to the appropriate list of dependent action rows.
-            var relativeActions = this.GetRelativeActions(parentActionRow);
-            var relatedRows = (after ? relativeActions.NextActions : relativeActions.PreviousActions);
-            relatedRows.Add(actionRow);
+            // Add this action to the appropriate list of dependent action tuples.
+            var relativeActions = this.GetRelativeActions(parentActionTuple);
+            var relatedTuples = (after ? relativeActions.NextActions : relativeActions.PreviousActions);
+            relatedTuples.Add(actionTuple);
         }
 
-        private bool ContainsChildActionRow(WixActionTuple childTuple, WixActionTuple parentTuple)
+        private bool ContainsChildActionTuple(WixActionTuple childTuple, WixActionTuple parentTuple)
         {
             var result = false;
 
