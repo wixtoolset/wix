@@ -1,10 +1,12 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Data
 {
     using System;
+    using System.Diagnostics;
     using SimpleJson;
 
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IntermediateTuple
     {
         public IntermediateTuple(IntermediateTupleDefinition definition) : this(definition, null, null)
@@ -28,6 +30,8 @@ namespace WixToolset.Data
         public Identifier Id { get; set; }
 
         public IntermediateField this[int index] => this.Fields[index];
+
+        private string DebuggerDisplay => $"{this.Definition?.Name} {this.Id?.Id}";
 
         internal static IntermediateTuple Deserialize(ITupleDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)
         {
