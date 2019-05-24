@@ -687,7 +687,7 @@ namespace WixToolset.Core
             // Add the application as an attached container and if an Id was provided add that too.
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, Compiler.BurnUXContainerId))
+                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, Compiler.BurnUXContainerId)
                 {
                     Name = "bundle-ux.cab",
                     Type = ContainerType.Attached
@@ -1148,7 +1148,7 @@ namespace WixToolset.Core
 
                 this.Core.AddTuple(tuple);
 
-                this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId.Id, ComplexReferenceChildType.Payload, id.Id, previousType, previousId.Id);
+                this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId.Id, ComplexReferenceChildType.Payload, id.Id, previousType, previousId?.Id);
             }
 
             return tuple;
