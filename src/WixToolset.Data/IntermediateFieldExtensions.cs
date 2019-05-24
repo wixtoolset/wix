@@ -9,6 +9,8 @@ namespace WixToolset.Data
         [ThreadStatic]
         internal static string valueContext;
 
+        public static bool IsNull(this IntermediateField field) => field?.Value?.Data == null;
+
         public static bool AsBool(this IntermediateField field)
         {
             if (field == null || field.Value == null || field.Value.Data == null)

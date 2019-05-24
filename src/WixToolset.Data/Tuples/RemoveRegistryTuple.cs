@@ -51,7 +51,7 @@ namespace WixToolset.Data.Tuples
 
         public RegistryRootType Root
         {
-            get => (RegistryRootType)this.Fields[(int)RemoveRegistryTupleFields.Root]?.AsNumber();
+            get => (RegistryRootType)this.Fields[(int)RemoveRegistryTupleFields.Root].AsNumber();
             set => this.Set((int)RemoveRegistryTupleFields.Root, (int)value);
         }
 

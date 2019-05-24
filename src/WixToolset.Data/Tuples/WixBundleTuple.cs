@@ -32,7 +32,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleTupleFields.UpgradeCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleTupleFields.BundleId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleTupleFields.ProviderKey), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.PerMachine), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleTupleFields.PerMachine), IntermediateFieldType.Bool),
             },
             typeof(WixBundleTuple));
     }
@@ -211,9 +211,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundleTupleFields.ProviderKey, value);
         }
 
-        public int PerMachine
+        public bool PerMachine
         {
-            get => (int)this.Fields[(int)WixBundleTupleFields.PerMachine];
+            get => (bool)this.Fields[(int)WixBundleTupleFields.PerMachine];
             set => this.Set((int)WixBundleTupleFields.PerMachine, value);
         }
     }

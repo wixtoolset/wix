@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Data
 {
@@ -9,10 +9,7 @@ namespace WixToolset.Data
     [DebuggerDisplay("Name={Name,nq} Type={Type} Value={Value?.AsString()}")]
     public class IntermediateField
     {
-        public IntermediateField(IntermediateFieldDefinition definition)
-        {
-            this.Definition = definition;
-        }
+        public IntermediateField(IntermediateFieldDefinition definition) => this.Definition = definition;
 
         public IntermediateFieldDefinition Definition { get; }
 
@@ -26,46 +23,30 @@ namespace WixToolset.Data
 
         internal IntermediateFieldValue Value { get; set; }
 
-        public static explicit operator bool(IntermediateField field)
-        {
-            return field.AsBool();
-        }
+        public static explicit operator bool(IntermediateField field) => field.AsBool();
 
-        public static explicit operator bool? (IntermediateField field)
-        {
-            return field.AsNullableBool();
-        }
+        public static explicit operator bool? (IntermediateField field) => field.AsNullableBool();
 
-        public static explicit operator int(IntermediateField field)
-        {
-            return field.AsNumber();
-        }
+        public static explicit operator int(IntermediateField field) => field.AsNumber();
 
-        public static explicit operator int? (IntermediateField field)
-        {
-            return field.AsNullableNumber();
-        }
+        public static explicit operator int? (IntermediateField field) => field.AsNullableNumber();
 
-        public static explicit operator string(IntermediateField field)
-        {
-            return field.AsString();
-        }
+        public static explicit operator string(IntermediateField field) => field.AsString();
 
         internal static IntermediateField Deserialize(IntermediateFieldDefinition definition, Uri baseUri, JsonObject jsonObject)
         {
-            var field = new IntermediateField(definition);
+            IntermediateField field = null;
 
             if (jsonObject != null)
             {
+                field = new IntermediateField(definition);
+
                 field.Value = IntermediateFieldValue.Deserialize(jsonObject, baseUri, definition.Type);
             }
 
             return field;
         }
 
-        internal JsonObject Serialize()
-        {
-            return this.Value?.Serialize();
-        }
+        internal JsonObject Serialize() => this.Value?.Serialize();
     }
 }

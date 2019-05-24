@@ -15,35 +15,17 @@ namespace WixToolset.Data
 
         public IntermediateFieldValue PreviousValue { get; internal set; }
 
-        public static explicit operator bool(IntermediateFieldValue value)
-        {
-            return value.AsBool();
-        }
+        public static explicit operator bool(IntermediateFieldValue value) => value.AsBool();
 
-        public static explicit operator bool? (IntermediateFieldValue value)
-        {
-            return value.AsNullableBool();
-        }
+        public static explicit operator bool? (IntermediateFieldValue value) => value.AsNullableBool();
 
-        public static explicit operator int(IntermediateFieldValue value)
-        {
-            return value.AsNumber();
-        }
+        public static explicit operator int(IntermediateFieldValue value) => value.AsNumber();
 
-        public static explicit operator int? (IntermediateFieldValue value)
-        {
-            return value.AsNullableNumber();
-        }
+        public static explicit operator int? (IntermediateFieldValue value) => value.AsNullableNumber();
 
-        public static explicit operator IntermediateFieldPathValue(IntermediateFieldValue value)
-        {
-            return value.AsPath();
-        }
+        public static explicit operator IntermediateFieldPathValue(IntermediateFieldValue value) => value.AsPath();
 
-        public static explicit operator string(IntermediateFieldValue value)
-        {
-            return value.AsString();
-        }
+        public static explicit operator string(IntermediateFieldValue value) => value.AsString();
 
         internal static IntermediateFieldValue Deserialize(JsonObject jsonObject, Uri baseUri, IntermediateFieldType type)
         {

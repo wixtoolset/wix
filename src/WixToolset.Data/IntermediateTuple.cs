@@ -46,9 +46,9 @@ namespace WixToolset.Data
             creator.TryGetTupleDefinitionByName(definitionName, out var definition); // TODO: this isn't sufficient.
             var tuple = definition.CreateTuple(sourceLineNumbers, id);
 
-            for (var i = 0; i < fieldsJson.Count; ++i)
+            for (var i = 0; i < fieldsJson.Count && i < tuple.Fields.Length; ++i)
             {
-                if (tuple.Fields.Length > i && fieldsJson[i] is JsonObject fieldJson)
+                if (fieldsJson[i] is JsonObject fieldJson)
                 {
                     tuple.Fields[i] = IntermediateField.Deserialize(tuple.Definition.FieldDefinitions[i], baseUri, fieldJson);
                 }
