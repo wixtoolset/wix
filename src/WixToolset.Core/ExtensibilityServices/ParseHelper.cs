@@ -88,7 +88,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
 
             // For anonymous directories, create the identifier. If this identifier already exists in the
-            // active section, bail so we don't add duplicate anonymous directory rows (which are legal
+            // active section, bail so we don't add duplicate anonymous directory tuples (which are legal
             // but bloat the intermediate and ultimately make the linker do "busy work").
             if (null == id)
             {
@@ -126,9 +126,9 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (1 == inlineSyntax.Length)
                 {
                     id = inlineSyntax[0];
-                    this.CreateSimpleReference(section, sourceLineNumbers, "Directory", id);
+                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.Directory), id);
                 }
-                else // start creating rows for the entries in the inline syntax
+                else // start creating tuples for the entries in the inline syntax
                 {
                     id = parentId;
 
@@ -142,7 +142,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         //}
 
                         id = inlineSyntax[0].TrimEnd(':');
-                        this.CreateSimpleReference(section, sourceLineNumbers, "Directory", id);
+                        this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.Directory), id);
 
                         pathStartsAt = 1;
                     }
@@ -284,14 +284,14 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentException(nameof(tableName));
             }
 
-            return CreateRow(section, sourceLineNumbers, tupleDefinition, identifier);
+            return CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
         }
 
         public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
         {
             var tupleDefinition = TupleDefinitions.ByType(tupleType);
 
-            return CreateRow(section, sourceLineNumbers, tupleDefinition, identifier);
+            return CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
         }
 
         public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
@@ -346,8 +346,10 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName)
         {
-            var row = this.CreateTuple(section, sourceLineNumbers, TupleDefinitionType.WixEnsureTable);
-            row.Set(0, tableName);
+            section.Tuples.Add(new WixEnsureTableTuple(sourceLineNumbers)
+            {
+                Table = tableName
+            });
 
             if (this.Creator == null)
             {
@@ -359,7 +361,7 @@ namespace WixToolset.Core.ExtensibilityServices
             // instead of a custom table, we get an unresolved reference at link time.
             if (!this.Creator.TryGetTupleDefinitionByName(tableName, out var ignored))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, "WixCustomTable", tableName);
+                this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.WixCustomTable), tableName);
             }
         }
 
@@ -867,11 +869,11 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (WindowsInstallerStandard.IsStandardAction(beforeAction))
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, "WixAction", sequence.ToString(), beforeAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.WixAction), sequence.ToString(), beforeAction);
                 }
                 else
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", beforeAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), beforeAction);
                 }
             }
 
@@ -879,11 +881,11 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (WindowsInstallerStandard.IsStandardAction(afterAction))
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, "WixAction", sequence.ToString(), afterAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.WixAction), sequence.ToString(), afterAction);
                 }
                 else
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", afterAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), afterAction);
                 }
             }
 
@@ -907,25 +909,25 @@ namespace WixToolset.Core.ExtensibilityServices
             this.Creator = (ITupleDefinitionCreator)this.ServiceProvider.GetService(typeof(ITupleDefinitionCreator));
         }
 
-        private static IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier)
+        private static IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier)
         {
-            var row = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
+            var tuple = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
 
             if (null != identifier)
             {
-                if (row.Definition.FieldDefinitions[0].Type == IntermediateFieldType.Number)
+                if (tuple.Definition.FieldDefinitions[0].Type == IntermediateFieldType.Number)
                 {
-                    row.Set(0, Convert.ToInt32(identifier.Id));
+                    tuple.Set(0, Convert.ToInt32(identifier.Id));
                 }
                 else
                 {
-                    row.Set(0, identifier.Id);
+                    tuple.Set(0, identifier.Id);
                 }
             }
 
-            section.Tuples.Add(row);
+            section.Tuples.Add(tuple);
 
-            return row;
+            return tuple;
         }
 
         private static bool TryFindExtension(IEnumerable<ICompilerExtension> extensions, XNamespace ns, out ICompilerExtension extension)
