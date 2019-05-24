@@ -719,7 +719,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[7] = tuple.Hotkey;
             row[8] = tuple.IconRef;
             row[9] = tuple.IconIndex;
-            row[10] = (int)tuple.Show;
+            row[10] = (int?)tuple.Show;
             row[11] = tuple.WorkingDirectory;
             row[12] = tuple.DisplayResourceDll;
             row[13] = tuple.DisplayResourceId;
