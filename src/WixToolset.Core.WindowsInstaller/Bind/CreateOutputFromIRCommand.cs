@@ -149,6 +149,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddShortcutTuple((ShortcutTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.SummaryInformation:
+                    this.AddTupleDefaultly(tuple, output, tableName: "_SummaryInformation");
+                    break;
+
                 case TupleDefinitionType.TextStyle:
                     this.AddTextStyleTuple((TextStyleTuple)tuple, output);
                     break;
@@ -876,9 +880,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddTupleDefaultly(IntermediateTuple tuple, Output output, bool idIsPrimaryKey = false)
+        private void AddTupleDefaultly(IntermediateTuple tuple, Output output, bool idIsPrimaryKey = false, string tableName = null)
         {
-            if (!this.TableDefinitions.TryGet(tuple.Definition.Name, out var tableDefinition))
+            if (!this.TableDefinitions.TryGet(tableName ?? tuple.Definition.Name, out var tableDefinition))
             {
                 return;
             }
