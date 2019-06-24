@@ -358,6 +358,13 @@ namespace WixToolsetTest.Converters.Tupleizer
                 fields = String.Join(",", assemblyTuple.ComponentRef, assemblyTuple.FeatureRef, assemblyTuple.ManifestFileRef, assemblyTuple.ApplicationFileRef, assemblyTuple.Type == AssemblyType.Win32Assembly ? 1 : 0);
                 break;
             }
+            case "RegLocator":
+            {
+                var locatorTuple = (RegLocatorTuple)tuple;
+
+                fields = String.Join(",", (int)locatorTuple.Root, locatorTuple.Key, locatorTuple.Name, (int)locatorTuple.Type, locatorTuple.Win64);
+                break;
+            }
             case "Registry":
             {
                 var registryTuple = (RegistryTuple)tuple;
