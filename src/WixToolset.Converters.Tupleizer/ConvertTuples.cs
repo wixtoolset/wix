@@ -10,15 +10,15 @@ namespace WixToolset.Converters.Tupleizer
     using WixToolset.Data.WindowsInstaller;
     using Wix3 = Microsoft.Tools.WindowsInstallerXml;
 
-    public class ConvertTuplesCommand
+    public static class ConvertTuples
     {
-        public Intermediate Execute(string path)
+        public static Intermediate ConvertFile(string path)
         {
             var output = Wix3.Output.Load(path, suppressVersionCheck: true, suppressSchema: true);
-            return this.Execute(output);
+            return ConvertOutput(output);
         }
 
-        public Intermediate Execute(Wix3.Output output)
+        public static Intermediate ConvertOutput(Wix3.Output output)
         {
             var section = new IntermediateSection(String.Empty, OutputType3ToSectionType4(output.Type), output.Codepage);
 
@@ -118,7 +118,8 @@ namespace WixToolset.Converters.Tupleizer
                     location = ComponentLocation.Either;
                 }
 
-                var keyPathType = ComponentKeyPathType.File;
+                var keyPath = FieldAsString(row, 5);
+                var keyPathType = String.IsNullOrEmpty(keyPath) ? ComponentKeyPathType.Directory : ComponentKeyPathType.File;
                 if ((attributes & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath) == WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath)
                 {
                     keyPathType = ComponentKeyPathType.Registry;
@@ -133,7 +134,7 @@ namespace WixToolset.Converters.Tupleizer
                     ComponentId = FieldAsString(row, 1),
                     DirectoryRef = FieldAsString(row, 2),
                     Condition = FieldAsString(row, 4),
-                    KeyPath = FieldAsString(row, 5),
+                    KeyPath = keyPath,
                     Location = location,
                     DisableRegistryReflection = (attributes & WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection) == WindowsInstallerConstants.MsidbComponentAttributesDisableRegistryReflection,
                     NeverOverwrite = (attributes & WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite) == WindowsInstallerConstants.MsidbComponentAttributesNeverOverwrite,

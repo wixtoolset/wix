@@ -27,10 +27,8 @@ namespace WixToolsetTest.Converters.Tupleizer
                 var intermediateFolder = fs.GetFolder();
 
                 var path = Path.Combine(dataFolder, "test.wixout");
-                var output = Wix3.Output.Load(path, suppressVersionCheck: true, suppressSchema: true);
 
-                var command = new ConvertTuplesCommand();
-                var intermediate = command.Execute(output);
+                var intermediate = ConvertTuples.ConvertFile(path);
 
                 Assert.NotNull(intermediate);
                 Assert.Single(intermediate.Sections);
@@ -43,6 +41,7 @@ namespace WixToolsetTest.Converters.Tupleizer
 
                 intermediate = Intermediate.Load(wixiplFile);
 
+                var output = Wix3.Output.Load(path, suppressVersionCheck: true, suppressSchema: true);
                 var wixMediaByDiskId = IndexWixMediaTableByDiskId(output);
 
                 // Dump to text for easy diffing, with some massaging to keep v3 and v4 diffable.
