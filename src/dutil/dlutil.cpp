@@ -558,7 +558,11 @@ static HRESULT OpenRequest(
     {
         dwRequestFlags |= INTERNET_FLAG_SECURE;
     }
-
+    else if (INTERNET_SCHEME_HTTP == scheme)
+    {
+        dwRequestFlags |= INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS;
+    }
+    
     // Allocate the resource name.
     hr = StrAllocString(&sczResource, wzResource, 0);
     ExitOnFailure(hr, "Failed to allocate string for resource URI.");
