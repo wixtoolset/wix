@@ -342,7 +342,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddDirectoryTuple(DirectoryTuple tuple, Output output)
         {
-            var shortName = GetMsiFilenameValue(tuple.SourceShortName, tuple.SourceName);
+            var sourceName = GetMsiFilenameValue(tuple.SourceShortName, tuple.SourceName);
             var targetName = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
 
             if (String.IsNullOrEmpty(targetName))
@@ -350,7 +350,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 targetName = ".";
             }
 
-            var defaultDir = String.IsNullOrEmpty(shortName)? targetName : shortName + ":" + targetName;
+            var defaultDir = String.IsNullOrEmpty(sourceName) ? targetName :  targetName + ":" + sourceName ;
 
             var table = output.EnsureTable(this.TableDefinitions["Directory"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
