@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Project Sdk="Microsoft.NET.Sdk">
@@ -13,10 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\ProductWithComponentGroupRef\Product.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.wxs" CopyToOutputDirectory="PreserveNewest" />

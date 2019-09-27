@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Directory Id="NAMEWITHSHORTVALUE" Name="SHORTVAL"></Directory>
+            <Directory Id="NAMEANDSHORTNAME" Name="NameAndShortName" ShortName="SHORTNAM"></Directory>
+            <Directory Id="SHORTNAMEONLY" Name="SHORTONL"></Directory>
+            <Directory Id="SOURCENAME" Name="NameAndSourceName" SourceName="SourceNameWithName"></Directory>
+            <Directory Id="SOURCENAMESONLY" SourceName="SourceNameOnly" ShortSourceName="SRCNAMON"></Directory>
+            <Directory Id="NAMEANDSHORTSOURCENAME" Name="NameAndShortSourceName" ShortName="NAMEASSN"></Directory>
+            <Directory Id="SHORTNAMEANDLONGSOURCENAME" SourceName="ShortNameAndLongSourceName" Name="SHNALSNM"></Directory>
+            <Directory Id="SOURCENAMEWITHSHORTVALUE" SourceName="SRTSRCVL"></Directory>
+        </DirectoryRef>
+    </Fragment>
+</Wix>
