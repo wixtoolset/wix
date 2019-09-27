@@ -50,5 +50,40 @@ namespace WixToolsetTest.CoreIntegration
                 }, results);
             }
         }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesFeatureTableWithParent()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "FeatureGroup", "FeatureGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Feature" });
+                Assert.Equal(new[]
+                {
+                    "Feature:ChildFeature\tParentFeature\tChildFeatureTitle\t\t2\t1\t\t0",
+                    "Feature:ParentFeature\t\tParentFeatureTitle\t\t2\t1\t\t0",
+                    "Feature:ProductFeature\t\tMsiPackageTitle\t\t2\t1\t\t0",
+                }, results);
+            }
+        }
     }
 }
