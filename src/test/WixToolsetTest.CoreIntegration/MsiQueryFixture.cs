@@ -10,6 +10,143 @@ namespace WixToolsetTest.CoreIntegration
     public class MsiQueryFixture
     {
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesAppSearchTablesFromComponentSearch()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "AppSearch", "ComponentSearch.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "CompLocator" });
+                Assert.Equal(new[]
+                {
+                    "AppSearch:SAMPLECOMPFOUND\tSampleCompSearch",
+                    "CompLocator:SampleCompSearch\t{4D9A0D20-D0CC-40DE-B580-EAD38B985217}\t1",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesAppSearchTablesFromDirectorySearch()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "AppSearch", "DirectorySearch.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "DrLocator" });
+                Assert.Equal(new[]
+                {
+                    "AppSearch:SAMPLECOMPFOUND\tSampleCompSearch",
+                    "DrLocator:SampleDirSearch\t\tC:\\SampleDir\t",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesAppSearchTablesFromFileSearch()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "AppSearch", "FileSearch.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "DrLocator", "IniLocator" });
+                Assert.Equal(new[]
+                {
+                    "AppSearch:SAMPLEFILEFOUND\tSampleFileSearch",
+                    "DrLocator:SampleFileSearch\tSampleIniFileSearch\t\t",
+                    "IniLocator:SampleFileSearch\tsample.fil\tMySection\tMyKey\t\t1",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesAppSearchTablesFromRegistrySearch()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "AppSearch", "RegistrySearch.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "RegLocator" });
+                Assert.Equal(new[]
+                {
+                    "AppSearch:SAMPLEREGFOUND\tSampleRegSearch",
+                    "RegLocator:SampleRegSearch\t2\tSampleReg\t\t2",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesDirectoryTableWithValidDefaultDir()
         {
             var folder = TestData.Get(@"TestData");

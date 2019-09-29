@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\AppSearch\ComponentSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\AppSearch\DirectorySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\AppSearch\FileSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\AppSearch\RegistrySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
