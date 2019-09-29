@@ -87,6 +87,57 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesInstallExecuteSequenceTable()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Upgrade", "DetectOnly.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "InstallExecuteSequence" });
+                Assert.Equal(new[]
+                {
+                    "InstallExecuteSequence:CostFinalize\t\t1000",
+                    "InstallExecuteSequence:CostInitialize\t\t800",
+                    "InstallExecuteSequence:FileCost\t\t900",
+                    "InstallExecuteSequence:FindRelatedProducts\t\t25",
+                    "InstallExecuteSequence:InstallFiles\t\t4000",
+                    "InstallExecuteSequence:InstallFinalize\t\t6600",
+                    "InstallExecuteSequence:InstallInitialize\t\t1500",
+                    "InstallExecuteSequence:InstallValidate\t\t1400",
+                    "InstallExecuteSequence:LaunchConditions\t\t100",
+                    "InstallExecuteSequence:MigrateFeatureStates\t\t1200",
+                    "InstallExecuteSequence:ProcessComponents\t\t1600",
+                    "InstallExecuteSequence:PublishFeatures\t\t6300",
+                    "InstallExecuteSequence:PublishProduct\t\t6400",
+                    "InstallExecuteSequence:RegisterProduct\t\t6100",
+                    "InstallExecuteSequence:RegisterUser\t\t6000",
+                    "InstallExecuteSequence:RemoveExistingProducts\t\t1401",
+                    "InstallExecuteSequence:RemoveFiles\t\t3500",
+                    "InstallExecuteSequence:UnpublishFeatures\t\t1800",
+                    "InstallExecuteSequence:ValidateProductID\t\t700",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesUpgradeTableFromManualUpgrade()
         {
             var folder = TestData.Get(@"TestData\ManualUpgrade");
