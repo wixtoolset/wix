@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+            <Component Id="MiscComponent" Guid="D1414BA5-F8DE-4979-938D-C8D0F61A62C9" Directory="INSTALLFOLDER">
+                <CreateFolder>
+                    <Permission User="Administrator"></Permission>
+                </CreateFolder>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

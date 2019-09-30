@@ -24,6 +24,7 @@
     <Content Include="TestData\DialogsInInstallUISequence\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\FeatureGroup\FeatureGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\LockPermissions\EmptyPermissions.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\MinimalComponentGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\Product.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
