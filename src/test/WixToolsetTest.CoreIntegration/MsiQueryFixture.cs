@@ -147,6 +147,43 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesClassTablesWhenProgIdIsNestedUnderAdvertisedClass()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ProgId", "NestedUnderClass.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Class", "ProgId", "Registry" });
+                Assert.Equal(new[]
+                {
+                    "Class:{F12A6F69-117F-471F-AE73-F8E74218F498}\tLocalServer32\tProgIdComp\t73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D\tFakeClassF12A\t\t\t\t\t\t\tProductFeature\t",
+                    "ProgId:73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D\t\t{F12A6F69-117F-471F-AE73-F8E74218F498}\tFakeClassF12A\t\t",
+                    "Registry:regUIIK326nDZpkWHuexeF58EikQvA\t0\t73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D\tNoOpen\tNoOpen73E7\tProgIdComp",
+                    "Registry:regvrhMurMp98anbQJkpgA8yJCefdM\t0\tCLSID\\{F12A6F69-117F-471F-AE73-F8E74218F498}\\Version\t\t0.0.0.1\tProgIdComp",
+                    "Registry:regY1F4E2lvu_Up6gV6c3jeN5ukn8s\t0\tCLSID\\{F12A6F69-117F-471F-AE73-F8E74218F498}\\LocalServer32\tThreadingModel\tApartment\tProgIdComp",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesCustomActionTable()
         {
             var folder = TestData.Get(@"TestData");

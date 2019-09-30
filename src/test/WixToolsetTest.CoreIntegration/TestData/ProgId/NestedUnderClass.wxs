@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="ProgIdComp" Directory="INSTALLFOLDER" Guid="5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8">
+                <File Source="test.txt" Name="ProgIdComp.txt"></File>
+                <Class Id="F12A6F69-117F-471F-AE73-F8E74218F498" Advertise="yes" Context="LocalServer32" Description="FakeClassF12A" ThreadingModel="apartment" Version="0.0.0.1">
+                    <ProgId Id="73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D" NoOpen="NoOpen73E7" />
+                </Class>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
