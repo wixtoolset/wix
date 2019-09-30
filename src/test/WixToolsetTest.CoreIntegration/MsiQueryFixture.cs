@@ -295,6 +295,39 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesFontTable()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Font", "FontTitle.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Font" });
+                Assert.Equal(new[]
+                {
+                    "Font:test.txt\tFakeFont",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesInstallExecuteSequenceTable()
         {
             var folder = TestData.Get(@"TestData");
