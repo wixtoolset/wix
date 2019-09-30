@@ -514,6 +514,39 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesServiceInstallTable()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ServiceInstall", "OwnProcess.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "ServiceInstall" });
+                Assert.Equal(new[]
+                {
+                    "ServiceInstall:SampleService\tSampleService\t\t16\t4\t0\t\t\t\t\t\ttest.txt\t",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesUpgradeTableFromManualUpgrade()
         {
             var folder = TestData.Get(@"TestData\ManualUpgrade");
