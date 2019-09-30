@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Directory="INSTALLFOLDER">
+                <File Source="test.txt" Assembly="win32" AssemblyManifest="test.dll.manifest" />
+            </Component>
+            <Component Id="test.dll.manifest" Directory="INSTALLFOLDER">
+                <File Id="test.dll.manifest" Source="test.manifest" Name="test.dll.manifest"></File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

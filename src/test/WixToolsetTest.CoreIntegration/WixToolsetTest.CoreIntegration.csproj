@@ -87,9 +87,11 @@
     <Content Include="TestData\ManualUpgrade\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ManualUpgrade\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Assembly\data\candle.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Assembly\data\test.manifest" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Assembly\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Assembly\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Assembly\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Assembly\Win32Assembly.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Upgrade\DetectOnly.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Variables\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Variables\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
