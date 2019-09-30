@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+        </ComponentGroup>
+
+        <Binary Id="Binary1" SourceFile="test.txt"></Binary>
+        <CustomAction Id="CustomAction1" BinaryKey="Binary1" DllEntry="InvalidEntryPoint"></CustomAction>
+    </Fragment>
+</Wix>
