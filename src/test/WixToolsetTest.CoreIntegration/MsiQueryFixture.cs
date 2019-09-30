@@ -412,6 +412,39 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesReserveCostTable()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ReserveCost", "ReserveCost.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "ReserveCost" });
+                Assert.Equal(new[]
+                {
+                    "ReserveCost:TestCost\tReserveCostComp\tINSTALLFOLDER\t100\t200",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesUpgradeTableFromManualUpgrade()
         {
             var folder = TestData.Get(@"TestData\ManualUpgrade");
