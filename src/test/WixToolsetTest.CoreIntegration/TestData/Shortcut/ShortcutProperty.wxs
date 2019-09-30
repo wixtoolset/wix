@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="ShortcutComp" Directory="INSTALLFOLDER" Guid="5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8">
+                <File Source="test.txt">
+                    <Shortcut Id="TheShortcut" Name="TestShortcut" Directory="INSTALLFOLDER">
+                        <ShortcutProperty Key="CustomShortcutKey" Value="CustomShortcutValue"></ShortcutProperty>
+                    </Shortcut>
+                </File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
