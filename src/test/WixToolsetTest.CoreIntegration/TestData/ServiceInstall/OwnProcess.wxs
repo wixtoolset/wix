@@ -3,7 +3,7 @@
     <Fragment>
         <ComponentGroup Id="ProductComponents">
             <Component Directory="INSTALLFOLDER">
-                <File Source="test.txt" />
+                <File Id="test.txt" Source="test.txt" />
                 <ServiceInstall Name="SampleService" ErrorControl="ignore" Start="disabled" Type="ownProcess"></ServiceInstall>
             </Component>
         </ComponentGroup>
