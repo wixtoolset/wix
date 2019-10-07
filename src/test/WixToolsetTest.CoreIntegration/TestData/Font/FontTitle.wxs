@@ -3,7 +3,7 @@
     <Fragment>
         <ComponentGroup Id="ProductComponents">
             <Component Id="FontComp" Directory="INSTALLFOLDER">
-                <File Source="test.txt" FontTitle="FakeFont" />
+                <File Id="test.txt" Source="test.txt" FontTitle="FakeFont" />
             </Component>
         </ComponentGroup>
     </Fragment>

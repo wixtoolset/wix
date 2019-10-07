@@ -445,6 +445,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             attributes |= (tuple.Attributes & FileTupleAttributes.System) == FileTupleAttributes.System ? WindowsInstallerConstants.MsidbFileAttributesSystem : 0;
             attributes |= (tuple.Attributes & FileTupleAttributes.Vital) == FileTupleAttributes.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
+
+            if (!String.IsNullOrEmpty(tuple.FontTitle))
+            {
+                var fontTable = output.EnsureTable(this.TableDefinitions["Font"]);
+                var fontRow = fontTable.CreateRow(tuple.SourceLineNumbers);
+                fontRow[0] = tuple.Id.Id;
+                fontRow[1] = tuple.FontTitle;
+            }
         }
 
         private void AddIniFileTuple(IniFileTuple tuple, Output output)

@@ -294,7 +294,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesFontTable()
         {
             var folder = TestData.Get(@"TestData");
