@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Signature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SignatureTupleFields.Signature), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SignatureTupleFields.FileName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SignatureTupleFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SignatureTupleFields.MaxVersion), IntermediateFieldType.String),
@@ -28,7 +27,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum SignatureTupleFields
     {
-        Signature,
         FileName,
         MinVersion,
         MaxVersion,
@@ -50,12 +48,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[SignatureTupleFields index] => this.Fields[(int)index];
-
-        public string Signature
-        {
-            get => (string)this.Fields[(int)SignatureTupleFields.Signature];
-            set => this.Set((int)SignatureTupleFields.Signature, value);
-        }
 
         public string FileName
         {

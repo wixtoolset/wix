@@ -69,15 +69,15 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)IniLocatorTupleFields.Key, value);
         }
 
-        public int Field
+        public int? Field
         {
-            get => (int)this.Fields[(int)IniLocatorTupleFields.Field];
+            get => (int?)this.Fields[(int)IniLocatorTupleFields.Field];
             set => this.Set((int)IniLocatorTupleFields.Field, value);
         }
 
-        public int Type
+        public int? Type
         {
-            get => (int)this.Fields[(int)IniLocatorTupleFields.Type];
+            get => this.Fields[(int)IniLocatorTupleFields.Type].AsNullableNumber();
             set => this.Set((int)IniLocatorTupleFields.Type, value);
         }
     }
