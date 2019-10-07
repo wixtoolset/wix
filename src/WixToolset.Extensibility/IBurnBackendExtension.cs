@@ -3,7 +3,6 @@
 namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
     using WixToolset.Extensibility.Data;
 
     public interface IBurnBackendExtension
@@ -13,7 +12,7 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreBackendBind(IBindContext context);
 
-        string ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage);
+        IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage);
 
         string ResolveUrl(string url, string fallbackUrl, string packageId, string payloadId, string fileName);
 

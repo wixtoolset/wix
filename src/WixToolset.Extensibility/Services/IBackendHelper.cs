@@ -28,6 +28,14 @@ namespace WixToolset.Extensibility.Services
         string CreateGuid(Guid namespaceGuid, string value);
 
         /// <summary>
+        /// Creates a resolved directory.
+        /// </summary>
+        /// <param name="directoryParent">Directory parent identifier.</param>
+        /// <param name="name">Name of directory.</param>
+        /// <returns>Resolved directory.</returns>
+        IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name);
+
+        /// <summary>
         /// Creates a tracked file.
         /// </summary>
         /// <param name="path">Destination path for the build output.</param>

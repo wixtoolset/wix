@@ -11,5 +11,7 @@ namespace WixToolset.Extensibility.Services
     public interface IWindowsInstallerBackendHelper
     {
         bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions);
+
+        bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions, bool columnZeroIsId);
     }
 }
