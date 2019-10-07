@@ -3,61 +3,69 @@
 namespace WixToolset.Core.Burn.Bundles
 {
     using System.Collections.Generic;
+    using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
 
     internal class GetPackageFacadesCommand
     {
-#if TODO
-        public Table PackageTable { private get; set; }
+        public GetPackageFacadesCommand(IEnumerable<WixBundlePackageTuple> chainPackageTuples, IntermediateSection section)
+        {
+            this.ChainPackageTuples = chainPackageTuples;
+            this.Section = section;
+        }
 
-        public Table ExePackageTable { private get; set; }
+        private IEnumerable<WixBundlePackageTuple> ChainPackageTuples { get; }
 
-        public Table MsiPackageTable { private get; set; }
-
-        public Table MspPackageTable { private get; set; }
-
-        public Table MsuPackageTable { private get; set; }
+        private IntermediateSection Section { get; }
 
         public IDictionary<string, PackageFacade> PackageFacades { get; private set; }
 
         public void Execute()
         {
-            RowDictionary<WixBundleExePackageRow> exePackages = new RowDictionary<WixBundleExePackageRow>(this.ExePackageTable);
-            RowDictionary<WixBundleMsiPackageRow> msiPackages = new RowDictionary<WixBundleMsiPackageRow>(this.MsiPackageTable);
-            RowDictionary<WixBundleMspPackageRow> mspPackages = new RowDictionary<WixBundleMspPackageRow>(this.MspPackageTable);
-            RowDictionary<WixBundleMsuPackageRow> msuPackages = new RowDictionary<WixBundleMsuPackageRow>(this.MsuPackageTable);
+            var exePackages = this.Section.Tuples.OfType<WixBundleExePackageTuple>().ToDictionary(t => t.Id.Id);
+            var msiPackages = this.Section.Tuples.OfType<WixBundleMsiPackageTuple>().ToDictionary(t => t.Id.Id);
+            var mspPackages = this.Section.Tuples.OfType<WixBundleMspPackageTuple>().ToDictionary(t => t.Id.Id);
+            var msuPackages = this.Section.Tuples.OfType<WixBundleMsuPackageTuple>().ToDictionary(t => t.Id.Id);
 
-            Dictionary<string, PackageFacade> facades = new Dictionary<string, PackageFacade>(this.PackageTable.Rows.Count);
+            var facades = new Dictionary<string, PackageFacade>();
 
-            foreach (WixBundlePackageRow package in this.PackageTable.Rows)
+            foreach (var package in this.ChainPackageTuples)
             {
-                string id = package.WixChainItemId;
-                PackageFacade facade = null;
-
+                var id = package.Id.Id;
                 switch (package.Type)
                 {
-                    case WixBundlePackageType.Exe:
-                        facade = new PackageFacade(package, exePackages.Get(id));
-                        break;
+                case WixBundlePackageType.Exe:
+                    if (exePackages.TryGetValue(id, out var exePackage))
+                    {
+                        facades.Add(id, new PackageFacade(package, exePackage));
+                    }
+                    break;
 
-                    case WixBundlePackageType.Msi:
-                        facade = new PackageFacade(package, msiPackages.Get(id));
-                        break;
+                case WixBundlePackageType.Msi:
+                    if (msiPackages.TryGetValue(id, out var msiPackage))
+                    {
+                        facades.Add(id, new PackageFacade(package, msiPackage));
+                    }
+                    break;
 
-                    case WixBundlePackageType.Msp:
-                        facade = new PackageFacade(package, mspPackages.Get(id));
-                        break;
+                case WixBundlePackageType.Msp:
+                    if (mspPackages.TryGetValue(id, out var mspPackage))
+                    {
+                        facades.Add(id, new PackageFacade(package, mspPackage));
+                    }
+                    break;
 
-                    case WixBundlePackageType.Msu:
-                        facade = new PackageFacade(package, msuPackages.Get(id));
-                        break;
+                case WixBundlePackageType.Msu:
+                    if (msuPackages.TryGetValue(id, out var msuPackage))
+                    {
+                        facades.Add(id, new PackageFacade(package, msuPackage));
+                    }
+                    break;
                 }
-
-                facades.Add(id, facade);
             }
 
             this.PackageFacades = facades;
         }
-#endif
     }
 }

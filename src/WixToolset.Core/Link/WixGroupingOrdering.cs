@@ -12,19 +12,19 @@ namespace WixToolset.Core.Link
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Services;
+    using WixToolset.Data.Burn;
 
     /// <summary>
     /// Grouping and Ordering class of the WiX toolset.
     /// </summary>
     internal class WixGroupingOrdering
     {
-        private readonly IMessaging messageHandler;
+        private readonly IMessaging Messaging;
         private List<string> groupTypes;
         private List<string> itemTypes;
         private ItemCollection items;
         private readonly List<int> rowsUsed;
         private bool loaded;
-        private bool encounteredError;
 
         /// <summary>
         /// Creates a WixGroupingOrdering object.
@@ -36,11 +36,10 @@ namespace WixToolset.Core.Link
         public WixGroupingOrdering(IntermediateSection entrySections, IMessaging messageHandler)
         {
             this.EntrySection = entrySections;
-            this.messageHandler = messageHandler;
+            this.Messaging = messageHandler;
 
             this.rowsUsed = new List<int>();
             this.loaded = false;
-            this.encounteredError = false;
         }
 
         private IntermediateSection EntrySection { get; }
@@ -71,7 +70,7 @@ namespace WixToolset.Core.Link
             Debug.Assert(this.groupTypes.Contains(parentTypeString));
 
             this.CreateOrderedList(parentTypeString, parentId, out var orderedItems);
-            if (this.encounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -95,7 +94,7 @@ namespace WixToolset.Core.Link
             Debug.Assert(this.groupTypes.Contains(parentTypeString));
 
             this.LoadFlattenOrderGroups();
-            if (this.encounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
@@ -127,14 +126,14 @@ namespace WixToolset.Core.Link
             orderedItems = null;
 
             this.LoadFlattenOrderGroups();
-            if (this.encounteredError)
+            if (this.Messaging.EncounteredError)
             {
                 return;
             }
 
             if (!this.items.TryGetValue(parentType, parentId, out var parentItem))
             {
-                this.messageHandler.Write(ErrorMessages.IdentifierNotFound(parentType, parentId));
+                this.Messaging.Write(ErrorMessages.IdentifierNotFound(parentType, parentId));
                 return;
             }
 
@@ -216,7 +215,7 @@ namespace WixToolset.Core.Link
                 // dependencies. Group references, however, we can check directly.
                 this.FindCircularGroupReferences();
 
-                if (!this.encounteredError)
+                if (!this.Messaging.EncounteredError)
                 {
                     this.FlattenGroups();
                     this.FlattenOrdering();
@@ -304,7 +303,7 @@ namespace WixToolset.Core.Link
                 if (this.FindCircularGroupReference(item, item, itemsSeen, out circularReference))
                 {
                     itemsInKnownLoops.Add(itemsSeen);
-                    this.messageHandler.Write(ErrorMessages.ReferenceLoopDetected(item.Row.SourceLineNumbers, circularReference));
+                    this.Messaging.Write(ErrorMessages.ReferenceLoopDetected(item.Row.SourceLineNumbers, circularReference));
                 }
             }
         }
@@ -376,12 +375,12 @@ namespace WixToolset.Core.Link
 
                 if (!this.items.TryGetValue(rowItemType, rowItemName, out var item))
                 {
-                    this.messageHandler.Write(ErrorMessages.IdentifierNotFound(rowItemType, rowItemName));
+                    this.Messaging.Write(ErrorMessages.IdentifierNotFound(rowItemType, rowItemName));
                 }
 
                 if (!this.items.TryGetValue(rowDependsOnType, rowDependsOnName, out var dependsOn))
                 {
-                    this.messageHandler.Write(ErrorMessages.IdentifierNotFound(rowDependsOnType, rowDependsOnName));
+                    this.Messaging.Write(ErrorMessages.IdentifierNotFound(rowDependsOnType, rowDependsOnName));
                 }
 
                 if (null == item || null == dependsOn)
@@ -389,7 +388,7 @@ namespace WixToolset.Core.Link
                     continue;
                 }
 
-                item.AddAfter(dependsOn, this.messageHandler);
+                item.AddAfter(dependsOn, this.Messaging);
             }
         }
 
@@ -404,12 +403,12 @@ namespace WixToolset.Core.Link
             // ordering.
             foreach (Item item in this.items)
             {
-                item.PropagateAfterToChildItems(this.messageHandler);
+                item.PropagateAfterToChildItems(this.Messaging);
             }
 
             foreach (Item item in this.items)
             {
-                item.FlattenAfters(this.messageHandler);
+                item.FlattenAfters(this.Messaging);
             }
         }
 
@@ -668,7 +667,7 @@ namespace WixToolset.Core.Link
             {
                 if (String.Equals(nameof(ComplexReferenceChildType.Package), this.Type, StringComparison.Ordinal) ||
                     (String.Equals(nameof(ComplexReferenceParentType.Container), this.Type, StringComparison.Ordinal) &&
-                    !String.Equals(Compiler.BurnUXContainerId.Id, this.Id, StringComparison.Ordinal)))
+                    !String.Equals(BurnConstants.BurnUXContainerName, this.Id, StringComparison.Ordinal)))
                 {
                     return false;
                 }

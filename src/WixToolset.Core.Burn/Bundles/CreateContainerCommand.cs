@@ -4,24 +4,39 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using WixToolset.Core.Native;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
 
     /// <summary>
     /// Creates cabinet files.
     /// </summary>
     internal class CreateContainerCommand
     {
-#if TODO
-        public CompressionLevel DefaultCompressionLevel { private get; set; }
+        public CreateContainerCommand(IEnumerable<WixBundlePayloadTuple> payloads, string outputPath, CompressionLevel? compressionLevel)
+        {
+            this.Payloads = payloads;
+            this.OutputPath = outputPath;
+            this.CompressionLevel = compressionLevel;
+        }
 
-        public IEnumerable<WixBundlePayloadRow> Payloads { private get; set; }
+        public CreateContainerCommand(string manifestPath, IEnumerable<WixBundlePayloadTuple> payloads, string outputPath, CompressionLevel? compressionLevel)
+        {
+            this.ManifestFile = manifestPath;
+            this.Payloads = payloads;
+            this.OutputPath = outputPath;
+            this.CompressionLevel = compressionLevel;
+        }
 
-        public string ManifestFile { private get; set; }
+        private CompressionLevel? CompressionLevel { get; }
 
-        public string OutputPath { private get; set; }
+        private string ManifestFile { get; }
+
+        private string OutputPath { get; }
+
+        private IEnumerable<WixBundlePayloadTuple> Payloads { get; }
 
         public string Hash { get; private set; }
 
@@ -29,40 +44,34 @@ namespace WixToolset.Core.Burn.Bundles
 
         public void Execute()
         {
-            int payloadCount = this.Payloads.Count(); // The number of embedded payloads
+            var payloadCount = this.Payloads.Count(); // The number of embedded payloads
 
             if (!String.IsNullOrEmpty(this.ManifestFile))
             {
                 ++payloadCount;
             }
 
-            using (var cab = new WixCreateCab(Path.GetFileName(this.OutputPath), Path.GetDirectoryName(this.OutputPath), payloadCount, 0, 0, this.DefaultCompressionLevel))
+            var cabinetPath = Path.GetFullPath(this.OutputPath);
+
+            var files = new List<CabinetCompressFile>();
+
+            // If a manifest was provided always add it as "payload 0" to the container.
+            if (!String.IsNullOrEmpty(this.ManifestFile))
             {
-                // If a manifest was provided always add it as "payload 0" to the container.
-                if (!String.IsNullOrEmpty(this.ManifestFile))
-                {
-                    cab.AddFile(this.ManifestFile, "0");
-                }
-
-                foreach (WixBundlePayloadRow payload in this.Payloads)
-                {
-                    Debug.Assert(PackagingType.Embedded == payload.Packaging);
-
-                    Messaging.Instance.OnMessage(WixVerboses.LoadingPayload(payload.FullFileName));
-
-                    cab.AddFile(payload.FullFileName, payload.EmbeddedId);
-                }
-
-                cab.Complete();
+                files.Add(new CabinetCompressFile(this.ManifestFile, "0"));
             }
 
-            // Now that the container is created, set the outputs of the command.
-            FileInfo fileInfo = new FileInfo(this.OutputPath);
+            files.AddRange(this.Payloads.Select(p => new CabinetCompressFile(p.SourceFile.Path, p.EmbeddedId)));
 
-            this.Hash = Common.GetFileHash(fileInfo.FullName);
+            var cab = new Cabinet(cabinetPath);
+            cab.Compress(files, this.CompressionLevel ?? Data.CompressionLevel.Mszip);
+
+            // Now that the container is created, set the outputs of the command.
+            var fileInfo = new FileInfo(cabinetPath);
+
+            this.Hash = BundleHashAlgorithm.Hash(fileInfo);
 
             this.Size = fileInfo.Length;
         }
-#endif
     }
 }

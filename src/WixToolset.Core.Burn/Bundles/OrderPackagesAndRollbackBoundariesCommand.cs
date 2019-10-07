@@ -5,24 +5,35 @@ namespace WixToolset.Core.Burn.Bundles
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     internal class OrderPackagesAndRollbackBoundariesCommand
     {
-#if TODO
-        public Table WixGroupTable { private get; set; }
+        public OrderPackagesAndRollbackBoundariesCommand(IMessaging messaging, IEnumerable<WixGroupTuple> groupTuples, Dictionary<string, WixBundleRollbackBoundaryTuple> boundaryTuples, IDictionary<string, PackageFacade> packageFacades)
+        {
+            this.Messaging = messaging;
+            this.GroupTuples = groupTuples;
+            this.Boundaries = boundaryTuples;
+            this.PackageFacades = packageFacades;
+        }
 
-        public RowDictionary<WixBundleRollbackBoundaryRow> Boundaries { private get; set; }
+        private IMessaging Messaging { get; }
 
-        public IDictionary<string, PackageFacade> PackageFacades { private get; set; }
+        public IEnumerable<WixGroupTuple> GroupTuples { get; }
+
+        public Dictionary<string, WixBundleRollbackBoundaryTuple> Boundaries { get; }
+
+        public IDictionary<string, PackageFacade> PackageFacades { get; }
 
         public IEnumerable<PackageFacade> OrderedPackageFacades { get; private set; }
 
-        public IEnumerable<WixBundleRollbackBoundaryRow> UsedRollbackBoundaries { get; private set; }
+        public IEnumerable<WixBundleRollbackBoundaryTuple> UsedRollbackBoundaries { get; private set; }
 
         public void Execute()
         {
-            List<PackageFacade> orderedFacades = new List<PackageFacade>();
-            List<WixBundleRollbackBoundaryRow> usedBoundaries = new List<WixBundleRollbackBoundaryRow>();
+            var orderedFacades = new List<PackageFacade>();
+            var usedBoundaries = new List<WixBundleRollbackBoundaryTuple>();
 
             // Process the chain of packages to add them in the correct order
             // and assign the forward rollback boundaries as appropriate. Remember
@@ -33,44 +44,44 @@ namespace WixToolset.Core.Burn.Bundles
             // We handle uninstall (aka: backwards) rollback boundaries after
             // we get these install/repair (aka: forward) rollback boundaries
             // defined.
-            WixBundleRollbackBoundaryRow previousRollbackBoundary = null;
-            WixBundleRollbackBoundaryRow lastRollbackBoundary = null;
-            bool boundaryHadX86Package = false;
+            WixBundleRollbackBoundaryTuple previousRollbackBoundary = null;
+            WixBundleRollbackBoundaryTuple lastRollbackBoundary = null;
+            var boundaryHadX86Package = false;
 
-            foreach (WixGroupRow row in this.WixGroupTable.Rows)
+            foreach (var groupTuple in this.GroupTuples)
             {
-                if (ComplexReferenceChildType.Package == row.ChildType && ComplexReferenceParentType.PackageGroup == row.ParentType && "WixChain" == row.ParentId)
+                if (ComplexReferenceChildType.Package == groupTuple.ChildType && ComplexReferenceParentType.PackageGroup == groupTuple.ParentType && "WixChain" == groupTuple.ParentId)
                 {
-                    PackageFacade facade = null;
-                    if (PackageFacades.TryGetValue(row.ChildId, out facade))
+                    if (this.PackageFacades.TryGetValue(groupTuple.ChildId, out var facade))
                     {
                         if (null != previousRollbackBoundary)
                         {
                             usedBoundaries.Add(previousRollbackBoundary);
-                            facade.Package.RollbackBoundary = previousRollbackBoundary.ChainPackageId;
+                            facade.PackageTuple.RollbackBoundaryRef = previousRollbackBoundary.Id.Id;
                             previousRollbackBoundary = null;
 
-                            boundaryHadX86Package = (facade.Package.x64 == YesNoType.Yes);
+                            boundaryHadX86Package = facade.PackageTuple.Win64;
                         }
 
                         // Error if MSI transaction has x86 package preceding x64 packages
-                        if ((lastRollbackBoundary != null) && (lastRollbackBoundary.Transaction == YesNoType.Yes) 
+                        if ((lastRollbackBoundary != null)
+                            && lastRollbackBoundary.Transaction == true
                             && boundaryHadX86Package 
-                            && (facade.Package.x64 == YesNoType.Yes))
+                            && facade.PackageTuple.Win64)
                         {
-                            Messaging.Instance.OnMessage(WixErrors.MsiTransactionX86BeforeX64(lastRollbackBoundary.SourceLineNumbers));
+                            this.Messaging.Write(ErrorMessages.MsiTransactionX86BeforeX64(lastRollbackBoundary.SourceLineNumbers));
                         }
-                        boundaryHadX86Package = boundaryHadX86Package || (facade.Package.x64 == YesNoType.No);
+                        boundaryHadX86Package |= facade.PackageTuple.Win64;
 
                         orderedFacades.Add(facade);
                     }
                     else // must be a rollback boundary.
                     {
                         // Discard the next rollback boundary if we have a previously defined boundary.
-                        WixBundleRollbackBoundaryRow nextRollbackBoundary = Boundaries.Get(row.ChildId);
+                        var nextRollbackBoundary = this.Boundaries[groupTuple.ChildId];
                         if (null != previousRollbackBoundary)
                         {
-                            Messaging.Instance.OnMessage(WixWarnings.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.ChainPackageId));
+                            this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
                         }
                         else
                         {
@@ -83,7 +94,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (null != previousRollbackBoundary)
             {
-                Messaging.Instance.OnMessage(WixWarnings.DiscardedRollbackBoundary(previousRollbackBoundary.SourceLineNumbers, previousRollbackBoundary.ChainPackageId));
+                this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(previousRollbackBoundary.SourceLineNumbers, previousRollbackBoundary.Id.Id));
             }
 
             // With the forward rollback boundaries assigned, we can now go
@@ -120,14 +131,14 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (PackageFacade package in orderedFacades)
             {
-                if (null != package.Package.RollbackBoundary)
+                if (null != package.PackageTuple.RollbackBoundaryRef)
                 {
                     if (null != previousFacade)
                     {
-                        previousFacade.Package.RollbackBoundaryBackward = previousRollbackBoundaryId;
+                        previousFacade.PackageTuple.RollbackBoundaryBackwardRef = previousRollbackBoundaryId;
                     }
 
-                    previousRollbackBoundaryId = package.Package.RollbackBoundary;
+                    previousRollbackBoundaryId = package.PackageTuple.RollbackBoundaryRef;
                 }
 
                 previousFacade = package;
@@ -135,12 +146,11 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (!String.IsNullOrEmpty(previousRollbackBoundaryId) && null != previousFacade)
             {
-                previousFacade.Package.RollbackBoundaryBackward = previousRollbackBoundaryId;
+                previousFacade.PackageTuple.RollbackBoundaryBackwardRef = previousRollbackBoundaryId;
             }
 
             this.OrderedPackageFacades = orderedFacades;
             this.UsedRollbackBoundaries = usedBoundaries;
         }
-#endif
     }
 }

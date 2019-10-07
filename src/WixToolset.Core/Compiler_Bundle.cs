@@ -9,6 +9,7 @@ namespace WixToolset.Core
     using System.IO;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
 
@@ -17,15 +18,9 @@ namespace WixToolset.Core
     /// </summary>
     internal partial class Compiler : ICompiler
     {
-        public static readonly Identifier BurnUXContainerId = new Identifier(AccessModifier.Private, "WixUXContainer");
-        public static readonly Identifier BurnDefaultAttachedContainerId = new Identifier(AccessModifier.Private, "WixAttachedContainer");
-        public static readonly Identifier BundleLayoutOnlyPayloads = new Identifier(AccessModifier.Private, "BundleLayoutOnlyPayloads");
-        
-        // The following constants must stay in sync with src\burn\engine\core.h
-        private const string BURN_BUNDLE_NAME = "WixBundleName";
-        private const string BURN_BUNDLE_ORIGINAL_SOURCE = "WixBundleOriginalSource";
-        private const string BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER = "WixBundleOriginalSourceFolder";
-        private const string BURN_BUNDLE_LAST_USED_SOURCE = "WixBundleLastUsedSource";
+        private static readonly Identifier BurnUXContainerId = new Identifier(AccessModifier.Private, BurnConstants.BurnUXContainerName);
+        private static readonly Identifier BurnDefaultAttachedContainerId = new Identifier(AccessModifier.Private, BurnConstants.BurnDefaultAttachedContainerName);
+        private static readonly Identifier BundleLayoutOnlyPayloads = new Identifier(AccessModifier.Private, BurnConstants.BundleLayoutOnlyPayloadsName);
 
         /// <summary>
         /// Parses an ApprovedExeForElevation element.
@@ -78,11 +73,11 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Key"));
             }
 
-            var attributes = BundleApprovedExeForElevationAttributes.None;
+            var attributes = WixApprovedExeForElevationAttributes.None;
 
             if (win64 == YesNoType.Yes)
             {
-                attributes |= BundleApprovedExeForElevationAttributes.Win64;
+                attributes |= WixApprovedExeForElevationAttributes.Win64;
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -92,7 +87,7 @@ namespace WixToolset.Core
                 var tuple = new WixApprovedExeForElevationTuple(sourceLineNumbers, id)
                 {
                     Key = key,
-                    Value = valueName,
+                    ValueName = valueName,
                     Attributes = attributes
                 };
 
@@ -110,8 +105,7 @@ namespace WixToolset.Core
             string copyright = null;
             string aboutUrl = null;
             var compressed = YesNoDefaultType.Default;
-            var disableModify = -1;
-            var disableRemove = YesNoType.NotSet;
+            WixBundleAttributes attributes = 0;
             string helpTelephone = null;
             string helpUrl = null;
             string manufacturer = null;
@@ -152,13 +146,12 @@ namespace WixToolset.Core
                         switch (value)
                         {
                         case "button":
-                            disableModify = 2;
+                            attributes |= WixBundleAttributes.SingleChangeUninstallButton;
                             break;
                         case "yes":
-                            disableModify = 1;
+                            attributes |= WixBundleAttributes.DisableModify;
                             break;
                         case "no":
-                            disableModify = 0;
                             break;
                         default:
                             this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "button", "yes", "no"));
@@ -166,10 +159,10 @@ namespace WixToolset.Core
                         }
                         break;
                     case "DisableRemove":
-                        disableRemove = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisableRepair":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                        {
+                            attributes |= WixBundleAttributes.DisableRemove;
+                        }
                         break;
                     case "HelpTelephone":
                         helpTelephone = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -239,13 +232,13 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(name))
             {
-                logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup.log");
+                logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup:.log");
             }
             else
             {
                 // Ensure only allowable path characters are in "name" (and change spaces to underscores).
                 fileSystemSafeBundleName = CompilerCore.MakeValidLongFileName(name.Replace(' ', '_'), "_");
-                logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ".log");
+                logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ":.log");
             }
 
             this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;
@@ -351,6 +344,37 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
+                var tuple = new WixBundleTuple(sourceLineNumbers)
+                {
+                    UpgradeCode = upgradeCode,
+                    Version = version,
+                    Copyright = copyright,
+                    Name = name,
+                    Manufacturer = manufacturer,
+                    Attributes = attributes,
+                    AboutUrl = aboutUrl,
+                    HelpUrl = helpUrl,
+                    HelpTelephone = helpTelephone,
+                    UpdateUrl = updateUrl,
+                    Compressed = YesNoDefaultType.Yes == compressed ? true : YesNoDefaultType.No == compressed ? (bool?)false : null,
+                    IconSourceFile = iconSourceFile,
+                    SplashScreenSourceFile = splashScreenSourceFile,
+                    Condition = condition,
+                    Tag = tag,
+                    Platform = this.CurrentPlatform,
+                    ParentName = parentName,
+                };
+
+                if (!String.IsNullOrEmpty(logVariablePrefixAndExtension))
+                {
+                    var split = logVariablePrefixAndExtension.Split(':');
+                    tuple.LogPathVariable = split[0];
+                    tuple.LogPrefix = split[1];
+                    tuple.LogExtension = split[2];
+                }
+
+                this.Core.AddTuple(tuple);;
+
                 if (null != upgradeCode)
                 {
                     this.Core.AddTuple(new WixRelatedBundleTuple(sourceLineNumbers)
@@ -360,64 +384,32 @@ namespace WixToolset.Core
                     });
                 }
 
-                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, Compiler.BurnDefaultAttachedContainerId))
+                this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, Compiler.BurnDefaultAttachedContainerId)
                 {
                     Name = "bundle-attached.cab",
                     Type = ContainerType.Attached
                 });
 
-                var bundleTuple = this.Core.CreateTuple(sourceLineNumbers, TupleDefinitionType.WixBundle);
-                bundleTuple.Set(0, version);
-                bundleTuple.Set(1, copyright);
-                bundleTuple.Set(2, name);
-                bundleTuple.Set(3, aboutUrl);
-                if (-1 != disableModify)
-                {
-                    bundleTuple.Set(4, disableModify);
-                }
-                if (YesNoType.NotSet != disableRemove)
-                {
-                    bundleTuple.Set(5, (YesNoType.Yes == disableRemove) ? 1 : 0);
-                }
-                // row.Set(6] - (deprecated) "disable repair"
-                bundleTuple.Set(7, helpTelephone);
-                bundleTuple.Set(8, helpUrl);
-                bundleTuple.Set(9, manufacturer);
-                bundleTuple.Set(10, updateUrl);
-                if (YesNoDefaultType.Default != compressed)
-                {
-                    bundleTuple.Set(11, (YesNoDefaultType.Yes == compressed) ? 1 : 0);
-                }
-
-                bundleTuple.Set(12, logVariablePrefixAndExtension);
-                bundleTuple.Set(13, iconSourceFile);
-                bundleTuple.Set(14, splashScreenSourceFile);
-                bundleTuple.Set(15, condition);
-                bundleTuple.Set(16, tag);
-                bundleTuple.Set(17, this.CurrentPlatform.ToString());
-                bundleTuple.Set(18, parentName);
-                bundleTuple.Set(19, upgradeCode);
-
                 // Ensure that the bundle stores the well-known persisted values.
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, Compiler.BURN_BUNDLE_NAME))
+                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_NAME))
                 {
                     Hidden = false,
                     Persisted = true
                 });
 
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, Compiler.BURN_BUNDLE_ORIGINAL_SOURCE))
+                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
                 {
                     Hidden = false,
                     Persisted = true
                 });
 
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, Compiler.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
+                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
                 {
                     Hidden = false,
                     Persisted = true
                 });
 
-                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, Compiler.BURN_BUNDLE_LAST_USED_SOURCE))
+                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
                 {
                     Hidden = false,
                     Persisted = true
@@ -473,7 +465,7 @@ namespace WixToolset.Core
 
             this.Core.ParseForExtensionElements(node);
 
-            return YesNoType.Yes == disableLog ? null : String.Concat(variable, ":", logPrefix, logExtension);
+            return YesNoType.Yes == disableLog ? null : String.Join(":", variable, logPrefix, logExtension);
         }
 
         /// <summary>
@@ -1126,9 +1118,9 @@ namespace WixToolset.Core
                 tuple = new WixBundlePayloadTuple(sourceLineNumbers, id)
                 {
                     Name = String.IsNullOrEmpty(name) ? Path.GetFileName(sourceFile) : name,
-                    SourceFile = sourceFile,
+                    SourceFile = new IntermediateFieldPathValue { Path = sourceFile },
                     DownloadUrl = downloadUrl,
-                    Compressed = compressed,
+                    Compressed = (compressed == YesNoDefaultType.Yes) ? true : (compressed == YesNoDefaultType.No) ? (bool?)false : null,
                     UnresolvedSourceFile = sourceFile, // duplicate of sourceFile but in a string column so it won't get resolved to a full path during binding.
                     DisplayName = displayName,
                     Description = description,
@@ -1665,14 +1657,12 @@ namespace WixToolset.Core
             var vital = YesNoType.Yes;
             string installCommand = null;
             string repairCommand = null;
-            var repairable = YesNoType.NotSet;
             string uninstallCommand = null;
             var perMachine = YesNoDefaultType.NotSet;
             string detectCondition = null;
             string protocol = null;
             var installSize = CompilerConstants.IntegerNotSet;
             string msuKB = null;
-            var suppressLooseFilePayloadGeneration = YesNoType.NotSet;
             var enableSignatureVerification = YesNoType.No;
             var compressed = YesNoDefaultType.Default;
             var displayInternalUI = YesNoType.NotSet;
@@ -1779,7 +1769,6 @@ namespace WixToolset.Core
                         break;
                     case "RepairCommand":
                         repairCommand = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        repairable = YesNoType.Yes;
                         allowed = (packageType == WixBundlePackageType.Exe);
                         break;
                     case "UninstallCommand":
@@ -1807,11 +1796,6 @@ namespace WixToolset.Core
                         break;
                     case "Compressed":
                         compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SuppressLooseFilePayloadGeneration":
-                        this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        suppressLooseFilePayloadGeneration = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi);
                         break;
                     case "EnableSignatureVerification":
                         enableSignatureVerification = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2076,7 +2060,7 @@ namespace WixToolset.Core
                 case WixBundlePackageType.Exe:
                     this.Core.AddTuple(new WixBundleExePackageTuple(sourceLineNumbers, id)
                     {
-                        Attributes = (YesNoType.Yes == repairable) ? WixBundleExePackageAttributes.Repairable : 0,
+                        Attributes = WixBundleExePackageAttributes.None,
                         DetectCondition = detectCondition,
                         InstallCommand = installCommand,
                         RepairCommand = repairCommand,
@@ -2090,7 +2074,6 @@ namespace WixToolset.Core
                     msiAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMsiPackageAttributes.DisplayInternalUI : 0;
                     msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
                     msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
-                    msiAttributes |= (YesNoType.Yes == suppressLooseFilePayloadGeneration) ? WixBundleMsiPackageAttributes.SuppressLooseFilePayloadGeneration : 0;
 
                     this.Core.AddTuple(new WixBundleMsiPackageTuple(sourceLineNumbers, id)
                     {
@@ -2458,9 +2441,9 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixBundleMsiPropertyTuple(sourceLineNumbers)
+                var tuple = new WixBundleMsiPropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, name))
                 {
-                    WixBundlePackageRef = packageId,
+                    PackageRef = packageId,
                     Name = name,
                     Value = value
                 };
@@ -2514,10 +2497,10 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddTuple(new WixBundleSlipstreamMspTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixBundleSlipstreamMspTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, id))
                 {
-                    WixBundlePackageRef = packageId,
-                    MspWixBundlePackageRef = id
+                    TargetPackageRef = packageId,
+                    MspPackageRef = id
                 });
             }
         }

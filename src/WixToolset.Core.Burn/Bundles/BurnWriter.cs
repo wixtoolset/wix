@@ -67,19 +67,21 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="stubSize">Size of the stub engine "burn.exe".</param>
         /// <param name="bundleId">Unique identifier for this bundle.</param>
         /// <returns></returns>
-        public bool InitializeBundleSectionData(long stubSize, Guid bundleId)
+        public bool InitializeBundleSectionData(long stubSize, string bundleId)
         {
             if (this.invalidBundle)
             {
                 return false;
             }
 
+            var bundleGuid = Guid.Parse(bundleId);
+
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_MAGIC, BURN_SECTION_MAGIC);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_VERSION, BURN_SECTION_VERSION);
 
-            this.messaging.Write(VerboseMessages.BundleGuid(bundleId.ToString("B")));
+            this.messaging.Write(VerboseMessages.BundleGuid(bundleId));
             this.binaryWriter.BaseStream.Seek(this.wixburnDataOffset + BURN_SECTION_OFFSET_BUNDLEGUID, SeekOrigin.Begin);
-            this.binaryWriter.Write(bundleId.ToByteArray());
+            this.binaryWriter.Write(bundleGuid.ToByteArray());
 
             this.StubSize = (uint)stubSize;
 
@@ -146,7 +148,7 @@ namespace WixToolset.Core.Burn.Bundles
                     return false;
             }
 
-            return AppendContainer(containerStream, (UInt32)containerSize, burnSectionOffsetSize, burnSectionCount);
+            return this.AppendContainer(containerStream, (UInt32)containerSize, burnSectionOffsetSize, burnSectionCount);
         }
 
         public void RememberThenResetSignature()

@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.ExtensibilityServices
 {
@@ -38,6 +38,15 @@ namespace WixToolset.Core.ExtensibilityServices
         public string CreateGuid(Guid namespaceGuid, string value)
         {
             return Uuid.NewUuid(namespaceGuid, value).ToString("B").ToUpperInvariant();
+        }
+
+        public IResolvedDirectory CreateResolvedDirectory(string directoryParent, string name)
+        {
+            return new ResolvedDirectory
+            {
+                DirectoryParent = directoryParent,
+                Name = name
+            };
         }
 
         public ITrackedFile TrackFile(string path, TrackedFileType type, SourceLineNumber sourceLineNumbers = null)

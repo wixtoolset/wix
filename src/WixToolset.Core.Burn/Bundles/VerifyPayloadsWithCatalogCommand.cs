@@ -9,31 +9,42 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Runtime.InteropServices;
     using System.Text;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Services;
 
     internal class VerifyPayloadsWithCatalogCommand
     {
-#if TODO
-        public IEnumerable<WixBundleCatalogRow> Catalogs { private get; set; }
+        public VerifyPayloadsWithCatalogCommand(IMessaging messaging, IEnumerable<WixBundleCatalogTuple> catalogs, IEnumerable<WixBundlePayloadTuple> payloads)
+        {
+            this.Messaging = messaging;
+            this.Catalogs = catalogs;
+            this.Payloads = payloads;
+        }
 
-        public IEnumerable<WixBundlePayloadRow> Payloads { private get; set; }
+        private IMessaging Messaging { get; }
+
+        private IEnumerable<WixBundleCatalogTuple> Catalogs { get; }
+
+        private IEnumerable<WixBundlePayloadTuple> Payloads { get; }
 
         public void Execute()
         {
-            List<CatalogIdWithPath> catalogIdsWithPaths = this.Catalogs
+            var catalogIdsWithPaths = this.Catalogs
                 .Join(this.Payloads,
-                    catalog => catalog.Payload,
-                    payload => payload.Id,
-                    (catalog, payload) => new CatalogIdWithPath() { Id = catalog.Id, FullPath = Path.GetFullPath(payload.SourceFile) })
+                    catalog => catalog.PayloadRef,
+                    payload => payload.Id.Id,
+                    (catalog, payload) => new CatalogIdWithPath() { Id = catalog.Id.Id, FullPath = Path.GetFullPath(payload.SourceFile.Path) })
                 .ToList();
 
-            foreach (WixBundlePayloadRow payloadInfo in this.Payloads)
+            foreach (var payloadInfo in this.Payloads)
             {
                 // Payloads that are not embedded should be verfied.
                 if (String.IsNullOrEmpty(payloadInfo.EmbeddedId))
                 {
-                    bool validated = false;
+                    var sourceFile = payloadInfo.SourceFile.Path;
+                    var validated = false;
 
-                    foreach (CatalogIdWithPath catalog in catalogIdsWithPaths)
+                    foreach (var catalog in catalogIdsWithPaths)
                     {
                         if (!validated)
                         {
@@ -41,11 +52,10 @@ namespace WixToolset.Core.Burn.Bundles
                             uint cryptHashSize = 20;
                             byte[] cryptHashBytes = new byte[cryptHashSize];
                             int error;
-                            IntPtr fileHandle = IntPtr.Zero;
-                            using (FileStream payloadStream = File.OpenRead(payloadInfo.FullFileName))
+                            using (var payloadStream = File.OpenRead(sourceFile))
                             {
                                 // Get the file handle
-                                fileHandle = payloadStream.SafeFileHandle.DangerousGetHandle();
+                                var fileHandle = payloadStream.SafeFileHandle.DangerousGetHandle();
 
                                 // 20 bytes is usually the hash size.  Future hashes may be bigger
                                 if (!VerifyInterop.CryptCATAdminCalcHashFromFileHandle(fileHandle, ref cryptHashSize, cryptHashBytes, 0))
@@ -64,7 +74,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                                     if (0 != error)
                                     {
-                                        Messaging.Instance.OnMessage(WixErrors.CatalogFileHashFailed(payloadInfo.FullFileName, error));
+                                        this.Messaging.Write(ErrorMessages.CatalogFileHashFailed(sourceFile, error));
                                     }
                                 }
                             }
@@ -79,15 +89,15 @@ namespace WixToolset.Core.Burn.Bundles
                                 catalogData.pbCalculatedFileHash = Marshal.AllocCoTaskMem((int)cryptHashSize);
                                 Marshal.Copy(cryptHashBytes, 0, catalogData.pbCalculatedFileHash, (int)cryptHashSize);
 
-                                StringBuilder hashString = new StringBuilder();
-                                foreach (byte hashByte in cryptHashBytes)
+                                var hashString = new StringBuilder();
+                                foreach (var hashByte in cryptHashBytes)
                                 {
                                     hashString.Append(hashByte.ToString("X2"));
                                 }
                                 catalogData.pcwszMemberTag = hashString.ToString();
 
                                 // The file names need to be lower case for older OSes
-                                catalogData.pcwszMemberFilePath = payloadInfo.FullFileName.ToLowerInvariant();
+                                catalogData.pcwszMemberFilePath = sourceFile.ToLowerInvariant();
                                 catalogData.pcwszCatalogFilePath = catalog.FullPath.ToLowerInvariant();
 
                                 // Create WINTRUST_DATA structure
@@ -108,7 +118,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 long verifyResult = VerifyInterop.WinVerifyTrust(noWindow, ref verifyGuid, ref trustData);
                                 if (0 == verifyResult)
                                 {
-                                    payloadInfo.Catalog = catalog.Id;
+                                    payloadInfo.CatalogRef = catalog.Id;
                                     validated = true;
                                     break;
                                 }
@@ -132,7 +142,7 @@ namespace WixToolset.Core.Burn.Bundles
                     // Error message if the file was not validated by one of the catalogs
                     if (!validated)
                     {
-                        Messaging.Instance.OnMessage(WixErrors.CatalogVerificationFailed(payloadInfo.FullFileName));
+                        this.Messaging.Write(ErrorMessages.CatalogVerificationFailed(sourceFile));
                     }
                 }
             }
@@ -144,6 +154,5 @@ namespace WixToolset.Core.Burn.Bundles
 
             public string FullPath { get; set; }
         }
-#endif
     }
 }

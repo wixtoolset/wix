@@ -113,7 +113,7 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        public static string ResolveDelayedVariables(SourceLineNumber sourceLineNumbers, string value, IDictionary<string, string> resolutionData)
+        private static string ResolveDelayedVariables(SourceLineNumber sourceLineNumbers, string value, IDictionary<string, string> resolutionData)
         {
             var matches = Common.WixVariableRegex.Matches(value);
 

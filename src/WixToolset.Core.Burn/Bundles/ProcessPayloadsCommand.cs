@@ -9,58 +9,73 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
+    using WixToolset.Data;
+    using WixToolset.Data.Burn;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class ProcessPayloadsCommand
     {
-#if TODO
         private static readonly Version EmptyVersion = new Version(0, 0, 0, 0);
 
-        public IEnumerable<WixBundlePayloadRow> Payloads { private get; set; }
+        public ProcessPayloadsCommand(IServiceProvider serviceProvider, IBackendHelper backendHelper, IEnumerable<WixBundlePayloadTuple> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        {
+            this.Messaging = serviceProvider.GetService<IMessaging>();
 
-        public PackagingType DefaultPackaging { private get; set; }
+            this.BackendHelper = backendHelper;
+            this.Payloads = payloads;
+            this.DefaultPackaging = defaultPackaging;
+            this.LayoutDirectory = layoutDirectory;
+        }
 
-        public string LayoutDirectory { private get; set; }
+        public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
-        public IEnumerable<FileTransfer> FileTransfers { get; private set; }
+        private IMessaging Messaging { get; }
+
+        private IBackendHelper BackendHelper { get; }
+
+        private IEnumerable<WixBundlePayloadTuple> Payloads { get; }
+
+        private PackagingType DefaultPackaging { get; }
+
+        private string LayoutDirectory { get; }
 
         public void Execute()
         {
-            List<FileTransfer> fileTransfers = new List<FileTransfer>();
+            var fileTransfers = new List<IFileTransfer>();
 
-            foreach (WixBundlePayloadRow payload in this.Payloads)
+            foreach (var payload in this.Payloads)
             {
-                string normalizedPath = payload.Name.Replace('\\', '/');
+                var normalizedPath = payload.Name.Replace('\\', '/');
                 if (normalizedPath.StartsWith("../", StringComparison.Ordinal) || normalizedPath.Contains("/../"))
                 {
-                    Messaging.Instance.OnMessage(WixErrors.PayloadMustBeRelativeToCache(payload.SourceLineNumbers, "Payload", "Name", payload.Name));
+                    this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(payload.SourceLineNumbers, "Payload", "Name", payload.Name));
                 }
 
                 // Embedded files (aka: files from binary .wixlibs) are not content files (because they are hidden
                 // in the .wixlib).
-                ObjectField field = (ObjectField)payload.Fields[2];
-                payload.ContentFile = !field.EmbeddedFileIndex.HasValue;
+                var sourceFile = payload.SourceFile;
+                payload.ContentFile = !sourceFile.EmbeddedFileIndex.HasValue;
 
                 this.UpdatePayloadPackagingType(payload);
 
-                if (String.IsNullOrEmpty(payload.SourceFile))
+                if (String.IsNullOrEmpty(sourceFile?.Path))
                 {
                     // Remote payloads obviously cannot be embedded.
                     Debug.Assert(PackagingType.Embedded != payload.Packaging);
                 }
                 else // not a remote payload so we have a lot more to update.
                 {
-                    this.UpdatePayloadFileInformation(payload);
+                    this.UpdatePayloadFileInformation(payload, sourceFile);
 
-                    this.UpdatePayloadVersionInformation(payload);
+                    this.UpdatePayloadVersionInformation(payload, sourceFile);
 
                     // External payloads need to be transfered.
                     if (PackagingType.External == payload.Packaging)
                     {
-                        FileTransfer transfer;
-                        if (FileTransfer.TryCreate(payload.FullFileName, Path.Combine(this.LayoutDirectory, payload.Name), false, "Payload", payload.SourceLineNumbers, out transfer))
-                        {
-                            fileTransfers.Add(transfer);
-                        }
+                        var transfer = this.BackendHelper.CreateFileTransfer(sourceFile.Path, Path.Combine(this.LayoutDirectory, payload.Name), false, payload.SourceLineNumbers);
+                        fileTransfers.Add(transfer);
                     }
                 }
             }
@@ -68,41 +83,41 @@ namespace WixToolset.Core.Burn.Bundles
             this.FileTransfers = fileTransfers;
         }
 
-        private void UpdatePayloadPackagingType(WixBundlePayloadRow payload)
+        private void UpdatePayloadPackagingType(WixBundlePayloadTuple payload)
         {
             if (PackagingType.Unknown == payload.Packaging)
             {
-                if (YesNoDefaultType.Yes == payload.Compressed)
+                if (!payload.Compressed.HasValue)
+                {
+                    payload.Packaging = this.DefaultPackaging;
+                }
+                else if (payload.Compressed.Value)
                 {
                     payload.Packaging = PackagingType.Embedded;
                 }
-                else if (YesNoDefaultType.No == payload.Compressed)
-                {
-                    payload.Packaging = PackagingType.External;
-                }
                 else
                 {
-                    payload.Packaging = this.DefaultPackaging;
+                    payload.Packaging = PackagingType.External;
                 }
             }
 
             // Embedded payloads that are not assigned a container already are placed in the default attached
             // container.
-            if (PackagingType.Embedded == payload.Packaging && String.IsNullOrEmpty(payload.Container))
+            if (PackagingType.Embedded == payload.Packaging && String.IsNullOrEmpty(payload.ContainerRef))
             {
-                payload.Container = Compiler.BurnDefaultAttachedContainerId;
+                payload.ContainerRef = BurnConstants.BurnDefaultAttachedContainerName;
             }
         }
 
-        private void UpdatePayloadFileInformation(WixBundlePayloadRow payload)
+        private void UpdatePayloadFileInformation(WixBundlePayloadTuple payload, IntermediateFieldPathValue sourceFile)
         {
-            FileInfo fileInfo = new FileInfo(payload.SourceFile);
+            var fileInfo = new FileInfo(sourceFile.Path);
 
             if (null != fileInfo)
             {
                 payload.FileSize = (int)fileInfo.Length;
 
-                payload.Hash = Common.GetFileHash(fileInfo.FullName);
+                payload.Hash = BundleHashAlgorithm.Hash(fileInfo);
 
                 // Try to get the certificate if the payload is a signed file and we're not suppressing signature validation.
                 if (payload.EnableSignatureValidation)
@@ -122,9 +137,10 @@ namespace WixToolset.Core.Burn.Bundles
                         byte[] publicKeyIdentifierHash = new byte[128];
                         uint publicKeyIdentifierHashSize = (uint)publicKeyIdentifierHash.Length;
 
-                        WixToolset.Core.Native.NativeMethods.HashPublicKeyInfo(certificate.Handle, publicKeyIdentifierHash, ref publicKeyIdentifierHashSize);
-                        StringBuilder sb = new StringBuilder(((int)publicKeyIdentifierHashSize + 1) * 2);
-                        for (int i = 0; i < publicKeyIdentifierHashSize; ++i)
+                        Native.NativeMethods.HashPublicKeyInfo(certificate.Handle, publicKeyIdentifierHash, ref publicKeyIdentifierHashSize);
+
+                        var sb = new StringBuilder(((int)publicKeyIdentifierHashSize + 1) * 2);
+                        for (var i = 0; i < publicKeyIdentifierHashSize; ++i)
                         {
                             sb.AppendFormat("{0:X2}", publicKeyIdentifierHash[i]);
                         }
@@ -136,14 +152,14 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void UpdatePayloadVersionInformation(WixBundlePayloadRow payload)
+        private void UpdatePayloadVersionInformation(WixBundlePayloadTuple payload, IntermediateFieldPathValue sourceFile)
         {
-            FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(payload.SourceFile);
+            var versionInfo = FileVersionInfo.GetVersionInfo(sourceFile.Path);
 
             if (null != versionInfo)
             {
                 // Use the fixed version info block for the file since the resource text may not be a dotted quad.
-                Version version = new Version(versionInfo.ProductMajorPart, versionInfo.ProductMinorPart, versionInfo.ProductBuildPart, versionInfo.ProductPrivatePart);
+                var version = new Version(versionInfo.ProductMajorPart, versionInfo.ProductMinorPart, versionInfo.ProductBuildPart, versionInfo.ProductPrivatePart);
 
                 if (ProcessPayloadsCommand.EmptyVersion != version)
                 {
@@ -154,6 +170,5 @@ namespace WixToolset.Core.Burn.Bundles
                 payload.DisplayName = versionInfo.ProductName;
             }
         }
-#endif
     }
 }

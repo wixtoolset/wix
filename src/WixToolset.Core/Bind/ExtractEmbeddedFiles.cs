@@ -30,10 +30,10 @@ namespace WixToolset.Core.Bind
         {
             // If the uri to the file that contains the embedded file does not already have embedded files
             // being extracted, create the dictionary to track that.
-            if (!filesWithEmbeddedFiles.TryGetValue(uri, out var extracts))
+            if (!this.filesWithEmbeddedFiles.TryGetValue(uri, out var extracts))
             {
                 extracts = new SortedList<int, string>();
-                filesWithEmbeddedFiles.Add(uri, extracts);
+                this.filesWithEmbeddedFiles.Add(uri, extracts);
             }
 
             // If the embedded file is not already tracked in the dictionary of extracts, add it.
@@ -52,7 +52,7 @@ namespace WixToolset.Core.Bind
 
         public IEnumerable<ExpectedExtractFile> GetExpectedEmbeddedFiles()
         {
-            foreach (var uriWithExtracts in filesWithEmbeddedFiles)
+            foreach (var uriWithExtracts in this.filesWithEmbeddedFiles)
             {
                 foreach (var extracts in uriWithExtracts.Value)
                 {
@@ -68,7 +68,7 @@ namespace WixToolset.Core.Bind
 
         public IEnumerable<ExpectedExtractFile> GetExtractFilesForUri(Uri uri)
         {
-            if (!filesWithEmbeddedFiles.TryGetValue(uri, out var extracts))
+            if (!this.filesWithEmbeddedFiles.TryGetValue(uri, out var extracts))
             {
                 extracts = new SortedList<int, string>();
             }

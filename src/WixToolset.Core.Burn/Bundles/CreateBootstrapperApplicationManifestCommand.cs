@@ -7,236 +7,268 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Xml;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
+    using WixToolset.Data.Tuples;
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
-#if TODO
-        public WixBundleRow BundleRow { private get; set; }
+        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadTuple> payloadTuples, string intermediateFolder)
+        {
+            this.Section = section;
+            this.BundleTuple = bundleTuple;
+            this.ChainPackages = chainPackages;
+            this.LastUXPayloadIndex = lastUXPayloadIndex;
+            this.Payloads = payloadTuples;
+            this.IntermediateFolder = intermediateFolder;
+        }
 
-        public IEnumerable<PackageFacade> ChainPackages { private get; set; }
+        private IntermediateSection Section { get; }
 
-        public int LastUXPayloadIndex { private get; set; }
+        private WixBundleTuple BundleTuple { get; }
 
-        public IEnumerable<WixBundleMsiFeatureRow> MsiFeatures { private get; set; }
+        private IEnumerable<PackageFacade> ChainPackages { get; }
 
-        public Output Output { private get; set; }
+        private int LastUXPayloadIndex { get; }
 
-        public RowDictionary<WixBundlePayloadRow> Payloads { private get; set; }
+        private Dictionary<string, WixBundlePayloadTuple> Payloads { get; }
 
-        public TableDefinitionCollection TableDefinitions { private get; set; }
+        private string IntermediateFolder { get; }
 
-        public string TempFilesLocation { private get; set; }
-
-        public WixBundlePayloadRow BootstrapperApplicationManifestPayloadRow { get; private set; }
+        public WixBundlePayloadTuple BootstrapperApplicationManifestPayloadRow { get; private set; }
 
         public void Execute()
         {
-            this.GenerateBAManifestBundleTables();
-
-            this.GenerateBAManifestMsiFeatureTables();
-
-            this.GenerateBAManifestPackageTables();
-
-            this.GenerateBAManifestPayloadTables();
-
-            string baManifestPath = Path.Combine(this.TempFilesLocation, "wix-badata.xml");
-
-            this.CreateBootstrapperApplicationManifest(baManifestPath);
+            var baManifestPath = this.CreateBootstrapperApplicationManifest();
 
             this.BootstrapperApplicationManifestPayloadRow = this.CreateBootstrapperApplicationManifestPayloadRow(baManifestPath);
         }
 
-        private void GenerateBAManifestBundleTables()
+        private string CreateBootstrapperApplicationManifest()
         {
-            Table wixBundlePropertiesTable = this.Output.EnsureTable(this.TableDefinitions["WixBundleProperties"]);
+            var path = Path.Combine(this.IntermediateFolder, "wix-badata.xml");
 
-            Row row = wixBundlePropertiesTable.CreateRow(this.BundleRow.SourceLineNumbers);
-            row[0] = this.BundleRow.Name;
-            row[1] = this.BundleRow.LogPathVariable;
-            row[2] = (YesNoDefaultType.Yes == this.BundleRow.Compressed) ? "yes" : "no";
-            row[3] = this.BundleRow.BundleId.ToString("B");
-            row[4] = this.BundleRow.UpgradeCode;
-            row[5] = this.BundleRow.PerMachine ? "yes" : "no";
-        }
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-        private void GenerateBAManifestPackageTables()
-        {
-            Table wixPackagePropertiesTable = this.Output.EnsureTable(this.TableDefinitions["WixPackageProperties"]);
-
-            foreach (PackageFacade package in this.ChainPackages)
-            {
-                WixBundlePayloadRow packagePayload = this.Payloads[package.Package.PackagePayload];
-
-                Row row = wixPackagePropertiesTable.CreateRow(package.Package.SourceLineNumbers);
-                row[0] = package.Package.WixChainItemId;
-                row[1] = (YesNoType.Yes == package.Package.Vital) ? "yes" : "no";
-                row[2] = package.Package.DisplayName;
-                row[3] = package.Package.Description;
-                row[4] = package.Package.Size.ToString(CultureInfo.InvariantCulture); // TODO: DownloadSize (compressed) (what does this mean when it's embedded?)
-                row[5] = package.Package.Size.ToString(CultureInfo.InvariantCulture); // Package.Size (uncompressed)
-                row[6] = package.Package.InstallSize.Value.ToString(CultureInfo.InvariantCulture); // InstallSize (required disk space)
-                row[7] = package.Package.Type.ToString();
-                row[8] = package.Package.Permanent ? "yes" : "no";
-                row[9] = package.Package.LogPathVariable;
-                row[10] = package.Package.RollbackLogPathVariable;
-                row[11] = (PackagingType.Embedded == packagePayload.Packaging) ? "yes" : "no";
-
-                if (WixBundlePackageType.Msi == package.Package.Type)
-                {
-                    row[12] = package.MsiPackage.DisplayInternalUI ? "yes" : "no";
-
-                    if (!String.IsNullOrEmpty(package.MsiPackage.ProductCode))
-                    {
-                        row[13] = package.MsiPackage.ProductCode;
-                    }
-
-                    if (!String.IsNullOrEmpty(package.MsiPackage.UpgradeCode))
-                    {
-                        row[14] = package.MsiPackage.UpgradeCode;
-                    }
-                }
-                else if (WixBundlePackageType.Msp == package.Package.Type)
-                {
-                    row[12] = package.MspPackage.DisplayInternalUI ? "yes" : "no";
-
-                    if (!String.IsNullOrEmpty(package.MspPackage.PatchCode))
-                    {
-                        row[13] = package.MspPackage.PatchCode;
-                    }
-                }
-
-                if (!String.IsNullOrEmpty(package.Package.Version))
-                {
-                    row[15] = package.Package.Version;
-                }
-
-                if (!String.IsNullOrEmpty(package.Package.InstallCondition))
-                {
-                    row[16] = package.Package.InstallCondition;
-                }
-
-                switch (package.Package.Cache)
-                {
-                    case YesNoAlwaysType.No:
-                        row[17] = "no";
-                        break;
-                    case YesNoAlwaysType.Yes:
-                        row[17] = "yes";
-                        break;
-                    case YesNoAlwaysType.Always:
-                        row[17] = "always";
-                        break;
-                }
-            }
-        }
-
-        private void GenerateBAManifestMsiFeatureTables()
-        {
-            Table wixPackageFeatureInfoTable = this.Output.EnsureTable(this.TableDefinitions["WixPackageFeatureInfo"]);
-
-            foreach (WixBundleMsiFeatureRow feature in this.MsiFeatures)
-            {
-                Row row = wixPackageFeatureInfoTable.CreateRow(feature.SourceLineNumbers);
-                row[0] = feature.ChainPackageId;
-                row[1] = feature.Name;
-                row[2] = Convert.ToString(feature.Size, CultureInfo.InvariantCulture);
-                row[3] = feature.Parent;
-                row[4] = feature.Title;
-                row[5] = feature.Description;
-                row[6] = Convert.ToString(feature.Display, CultureInfo.InvariantCulture);
-                row[7] = Convert.ToString(feature.Level, CultureInfo.InvariantCulture);
-                row[8] = feature.Directory;
-                row[9] = Convert.ToString(feature.Attributes, CultureInfo.InvariantCulture);
-            }
-
-        }
-
-        private void GenerateBAManifestPayloadTables()
-        {
-            Table wixPayloadPropertiesTable = this.Output.EnsureTable(this.TableDefinitions["WixPayloadProperties"]);
-
-            foreach (WixBundlePayloadRow payload in this.Payloads.Values)
-            {
-                WixPayloadPropertiesRow row = (WixPayloadPropertiesRow)wixPayloadPropertiesTable.CreateRow(payload.SourceLineNumbers);
-                row.Id = payload.Id;
-                row.Package = payload.Package;
-                row.Container = payload.Container;
-                row.Name = payload.Name;
-                row.Size = payload.FileSize.ToString();
-                row.DownloadUrl = payload.DownloadUrl;
-                row.LayoutOnly = payload.LayoutOnly ? "yes" : "no";
-            }
-        }
-
-        private void CreateBootstrapperApplicationManifest(string path)
-        {
-            using (XmlTextWriter writer = new XmlTextWriter(path, Encoding.Unicode))
+            using (var writer = new XmlTextWriter(path, Encoding.Unicode))
             {
                 writer.Formatting = Formatting.Indented;
                 writer.WriteStartDocument();
-                writer.WriteStartElement("BootstrapperApplicationData", "http://wixtoolset.org/schemas/v4/2010/BootstrapperApplicationData");
+                writer.WriteStartElement("BootstrapperApplicationData", "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData");
 
-                foreach (Table table in this.Output.Tables)
-                {
-                    if (table.Definition.BootstrapperApplicationData)
-                    {
-                        // We simply assert that the table (and field) name is valid, because
-                        // this is up to the extension developer to get right. An author will
-                        // only affect the attribute value, and that will get properly escaped.
-#if DEBUG
-                        Debug.Assert(Common.IsIdentifier(table.Name));
-                        foreach (ColumnDefinition column in table.Definition.Columns)
-                        {
-                            Debug.Assert(Common.IsIdentifier(column.Name));
-                        }
-#endif // DEBUG
+                this.WriteBundleInfo(writer);
 
-                        foreach (Row row in table.Rows)
-                        {
-                            writer.WriteStartElement(table.Name);
+                this.WritePackageInfo(writer);
 
-                            foreach (Field field in row.Fields)
-                            {
-                                if (null != field.Data)
-                                {
-                                    writer.WriteAttributeString(field.Column.Name, field.Data.ToString());
-                                }
-                            }
+                this.WriteFeatureInfo(writer);
 
-                            writer.WriteEndElement();
-                        }
-                    }
-                }
+                this.WritePayloadInfo(writer);
+
+                this.WriteCustomBootstrapperApplicationData(writer);
 
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
             }
+
+            return path;
         }
 
-        private WixBundlePayloadRow CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
+        private void WriteBundleInfo(XmlTextWriter writer)
         {
-            Table payloadTable = this.Output.EnsureTable(this.TableDefinitions["WixBundlePayload"]);
-            WixBundlePayloadRow row = (WixBundlePayloadRow)payloadTable.CreateRow(this.BundleRow.SourceLineNumbers);
-            row.Id = Common.GenerateIdentifier("ux", "BootstrapperApplicationData.xml");
-            row.Name = "BootstrapperApplicationData.xml";
-            row.SourceFile = baManifestPath;
-            row.Compressed = YesNoDefaultType.Yes;
-            row.UnresolvedSourceFile = baManifestPath;
-            row.Container = Compiler.BurnUXContainerId;
-            row.EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnUXContainerEmbeddedIdFormat, this.LastUXPayloadIndex);
-            row.Packaging = PackagingType.Embedded;
+            writer.WriteStartElement("WixBundleProperties");
 
-            FileInfo fileInfo = new FileInfo(row.SourceFile);
+            writer.WriteAttributeString("DisplayName", this.BundleTuple.Name);
+            writer.WriteAttributeString("LogPathVariable", this.BundleTuple.LogPathVariable);
+            writer.WriteAttributeString("Compressed", this.BundleTuple.Compressed == true ? "yes" : "no");
+            writer.WriteAttributeString("BundleId", this.BundleTuple.BundleId.ToUpperInvariant());
+            writer.WriteAttributeString("UpgradeCode", this.BundleTuple.UpgradeCode);
+            writer.WriteAttributeString("PerMachine", this.BundleTuple.PerMachine ? "yes" : "no");
 
-            row.FileSize = (int)fileInfo.Length;
-
-            row.Hash = Common.GetFileHash(fileInfo.FullName);
-
-            return row;
+            writer.WriteEndElement();
         }
-#endif
+
+        private void WritePackageInfo(XmlTextWriter writer)
+        {
+            foreach (var package in this.ChainPackages)
+            {
+                var packagePayload = this.Payloads[package.PackageTuple.PayloadRef];
+
+                var size = package.PackageTuple.Size.ToString(CultureInfo.InvariantCulture);
+
+                writer.WriteStartElement("WixBundleProperties");
+
+                writer.WriteAttributeString("Package", package.PackageId);
+                writer.WriteAttributeString("Vital", package.PackageTuple.Vital == true ? "yes" : "no");
+                writer.WriteAttributeString("DisplayName", package.PackageTuple.DisplayName);
+                writer.WriteAttributeString("Description", package.PackageTuple.Description);
+                writer.WriteAttributeString("DownloadSize", size);
+                writer.WriteAttributeString("PackageSize", size);
+                writer.WriteAttributeString("InstalledSize", package.PackageTuple.InstallSize?.ToString(CultureInfo.InvariantCulture) ?? size);
+                writer.WriteAttributeString("PackageType", package.PackageTuple.Type.ToString());
+                writer.WriteAttributeString("Permanent", package.PackageTuple.Permanent ? "yes" : "no");
+                writer.WriteAttributeString("LogPathVariable", package.PackageTuple.LogPathVariable);
+                writer.WriteAttributeString("RollbackLogPathVariable", package.PackageTuple.RollbackLogPathVariable);
+                writer.WriteAttributeString("Compressed", packagePayload.Compressed == true ? "yes" : "no");
+
+                if (package.SpecificPackageTuple is WixBundleMsiPackageTuple msiPackage)
+                {
+                    writer.WriteAttributeString("DisplayInternalUI", msiPackage.DisplayInternalUI ? "yes" : "no");
+
+                    if (!String.IsNullOrEmpty(msiPackage.ProductCode))
+                    {
+                        writer.WriteAttributeString("ProductCode", msiPackage.ProductCode);
+                    }
+
+                    if (!String.IsNullOrEmpty(msiPackage.UpgradeCode))
+                    {
+                        writer.WriteAttributeString("UpgradeCode", msiPackage.UpgradeCode);
+                    }
+                }
+                else if (package.SpecificPackageTuple is WixBundleMspPackageTuple mspPackage)
+                {
+                    writer.WriteAttributeString("DisplayInternalUI", mspPackage.DisplayInternalUI ? "yes" : "no");
+
+                    if (!String.IsNullOrEmpty(mspPackage.PatchCode))
+                    {
+                        writer.WriteAttributeString("ProductCode", mspPackage.PatchCode);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(package.PackageTuple.Version))
+                {
+                    writer.WriteAttributeString("Version", package.PackageTuple.Version);
+                }
+
+                if (!String.IsNullOrEmpty(package.PackageTuple.InstallCondition))
+                {
+                    writer.WriteAttributeString("InstallCondition", package.PackageTuple.InstallCondition);
+                }
+
+                switch (package.PackageTuple.Cache)
+                {
+                    case YesNoAlwaysType.No:
+                        writer.WriteAttributeString("Cache", "no");
+                        break;
+                    case YesNoAlwaysType.Yes:
+                        writer.WriteAttributeString("Cache", "yes");
+                        break;
+                    case YesNoAlwaysType.Always:
+                        writer.WriteAttributeString("Cache", "always");
+                        break;
+                }
+
+                writer.WriteEndElement();
+            }
+        }
+
+        private void WriteFeatureInfo(XmlTextWriter writer)
+        {
+            var featureTuples = this.Section.Tuples.OfType<WixBundleMsiFeatureTuple>();
+
+            foreach (var featureTuple in featureTuples)
+            {
+                writer.WriteStartElement("WixPackageFeatureInfo");
+
+                writer.WriteAttributeString("Package", featureTuple.PackageRef);
+                writer.WriteAttributeString("Feature", featureTuple.Name);
+                writer.WriteAttributeString("Size", featureTuple.Size.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Parent", featureTuple.Parent);
+                writer.WriteAttributeString("Title", featureTuple.Title);
+                writer.WriteAttributeString("Description", featureTuple.Description);
+                writer.WriteAttributeString("Display", featureTuple.Display.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Level", featureTuple.Level.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Directory", featureTuple.Directory);
+                writer.WriteAttributeString("Attributes", featureTuple.Attributes.ToString(CultureInfo.InvariantCulture));
+
+                writer.WriteEndElement();
+            }
+        }
+
+        private void WritePayloadInfo(XmlTextWriter writer)
+        {
+            var payloadTuples = this.Section.Tuples.OfType<WixBundlePayloadTuple>();
+
+            foreach (var payloadTuple in payloadTuples)
+            {
+                writer.WriteStartElement("WixPackageFeatureInfo");
+
+                writer.WriteAttributeString("Id", payloadTuple.Id.Id);
+                writer.WriteAttributeString("Package", payloadTuple.PackageRef);
+                writer.WriteAttributeString("Container", payloadTuple.ContainerRef);
+                writer.WriteAttributeString("Name", payloadTuple.Name);
+                writer.WriteAttributeString("Size", payloadTuple.FileSize.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("DownloadUrl", payloadTuple.DownloadUrl);
+                writer.WriteAttributeString("LayoutOnly", payloadTuple.LayoutOnly ? "yes" : "no");
+
+                writer.WriteEndElement();
+            }
+        }
+
+        private void WriteCustomBootstrapperApplicationData(XmlTextWriter writer)
+        {
+            var dataTuplesGroupedByDefinitionName = this.Section.Tuples
+                .Where(t => t.Definition.HasTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag))
+                .GroupBy(t => t.Definition);
+
+            foreach (var group in dataTuplesGroupedByDefinitionName)
+            {
+                var definition = group.Key;
+
+                // We simply assert that the table (and field) name is valid, because
+                // this is up to the extension developer to get right. An author will
+                // only affect the attribute value, and that will get properly escaped.
+#if DEBUG
+                Debug.Assert(Common.IsIdentifier(definition.Name));
+                foreach (var fieldDef in definition.FieldDefinitions)
+                {
+                    Debug.Assert(Common.IsIdentifier(fieldDef.Name));
+                }
+#endif // DEBUG
+
+                foreach (var row in group)
+                {
+                    writer.WriteStartElement(definition.Name);
+
+                    foreach (var field in row.Fields)
+                    {
+                        if (!field.IsNull())
+                        {
+                            writer.WriteAttributeString(field.Definition.Name, field.AsString());
+                        }
+                    }
+
+                    writer.WriteEndElement();
+                }
+            }
+        }
+
+        private WixBundlePayloadTuple CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
+        {
+            var generatedId = Common.GenerateIdentifier("ux", "BootstrapperApplicationData.xml");
+
+            var tuple = new WixBundlePayloadTuple(this.BundleTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+            {
+                Name = "BootstrapperApplicationData.xml",
+                SourceFile = new IntermediateFieldPathValue { Path = baManifestPath },
+                Compressed = true,
+                UnresolvedSourceFile = baManifestPath,
+                ContainerRef = BurnConstants.BurnUXContainerName,
+                EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnUXContainerEmbeddedIdFormat, this.LastUXPayloadIndex),
+                Packaging = PackagingType.Embedded,
+            };
+
+            var fileInfo = new FileInfo(baManifestPath);
+
+            tuple.FileSize = (int)fileInfo.Length;
+
+            tuple.Hash = BundleHashAlgorithm.Hash(fileInfo);
+
+            this.Section.Tuples.Add(tuple);
+
+            return tuple;
+        }
     }
 }

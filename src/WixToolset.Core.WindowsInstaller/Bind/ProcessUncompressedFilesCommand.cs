@@ -18,15 +18,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class ProcessUncompressedFilesCommand
     {
-        public ProcessUncompressedFilesCommand(IntermediateSection section, IBackendHelper backendHelper)
+        public ProcessUncompressedFilesCommand(IntermediateSection section, IBackendHelper backendHelper, IPathResolver pathResolver)
         {
             this.Section = section;
             this.BackendHelper = backendHelper;
+            this.PathResolver = pathResolver;
         }
 
         private IntermediateSection Section { get; }
 
         public IBackendHelper BackendHelper { get; }
+
+        public IPathResolver PathResolver { get; }
 
         public string DatabasePath { private get; set; }
 
@@ -50,7 +53,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var trackedFiles = new List<ITrackedFile>();
 
-            var directories = new Dictionary<string, ResolvedDirectory>();
+            var directories = new Dictionary<string, IResolvedDirectory>();
 
             var mediaRows = this.Section.Tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
 
@@ -69,7 +72,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             string sourceName = Common.GetName(directoryRecord.GetString(3), true, this.LongNamesInImage);
 
-                            directories.Add(directoryRecord.GetString(1), new ResolvedDirectory(directoryRecord.GetString(2), sourceName));
+                            var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(directoryRecord.GetString(2), sourceName);
+
+                            directories.Add(directoryRecord.GetString(1), resolvedDirectory);
                         }
                     }
                 }
@@ -99,7 +104,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.Id.Id));
                                 }
 
-                                relativeFileLayoutPath = PathResolver.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);
+                                relativeFileLayoutPath = this.PathResolver.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);
                             }
 
                             // finally put together the base media layout path and the relative file layout path

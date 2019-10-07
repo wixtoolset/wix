@@ -7,107 +7,116 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Diagnostics;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
 
     internal class AutomaticallySlipstreamPatchesCommand
     {
-#if TODO
-        public IEnumerable<PackageFacade> PackageFacades { private get; set; }
+        public AutomaticallySlipstreamPatchesCommand(IntermediateSection section, ICollection<PackageFacade> packageFacades)
+        {
+            this.Section = section;
+            this.PackageFacades = packageFacades;
+        }
 
-        public Table WixBundlePatchTargetCodeTable { private get; set; }
+        private IntermediateSection Section { get; }
 
-        public Table SlipstreamMspTable { private get; set; }
+        private IEnumerable<PackageFacade> PackageFacades { get; }
 
         public void Execute()
         {
-            List<WixBundleMsiPackageRow> msiPackages = new List<WixBundleMsiPackageRow>();
-            Dictionary<string, List<WixBundlePatchTargetCodeRow>> targetsProductCode = new Dictionary<string, List<WixBundlePatchTargetCodeRow>>();
-            Dictionary<string, List<WixBundlePatchTargetCodeRow>> targetsUpgradeCode = new Dictionary<string, List<WixBundlePatchTargetCodeRow>>();
+            var msiPackages = new List<WixBundleMsiPackageTuple>();
+            var targetsProductCode = new Dictionary<string, List<WixBundlePatchTargetCodeTuple>>();
+            var targetsUpgradeCode = new Dictionary<string, List<WixBundlePatchTargetCodeTuple>>();
 
-            foreach (PackageFacade facade in this.PackageFacades)
+            foreach (var facade in this.PackageFacades)
             {
-                if (WixBundlePackageType.Msi == facade.Package.Type)
+                // Keep track of all MSI packages.
+                if (facade.SpecificPackageTuple is WixBundleMsiPackageTuple msiPackage)
                 {
-                    // Keep track of all MSI packages.
-                    msiPackages.Add(facade.MsiPackage);
+                    msiPackages.Add(msiPackage);
                 }
-                else if (WixBundlePackageType.Msp == facade.Package.Type && facade.MspPackage.Slipstream)
+                else if (facade.SpecificPackageTuple is WixBundleMspPackageTuple mspPackage && mspPackage.Slipstream)
                 {
-                    IEnumerable<WixBundlePatchTargetCodeRow> patchTargetCodeRows = this.WixBundlePatchTargetCodeTable.RowsAs<WixBundlePatchTargetCodeRow>().Where(r => r.MspPackageId == facade.Package.WixChainItemId);
+                    var patchTargetCodeTuples = this.Section.Tuples
+                        .OfType<WixBundlePatchTargetCodeTuple>()
+                        .Where(r => r.PackageRef == facade.PackageId);
 
                     // Index target ProductCodes and UpgradeCodes for slipstreamed MSPs.
-                    foreach (WixBundlePatchTargetCodeRow row in patchTargetCodeRows)
+                    foreach (var tuple in patchTargetCodeTuples)
                     {
-                        if (row.TargetsProductCode)
+                        if (tuple.TargetsProductCode)
                         {
-                            List<WixBundlePatchTargetCodeRow> rows;
-                            if (!targetsProductCode.TryGetValue(row.TargetCode, out rows))
+                            if (!targetsProductCode.TryGetValue(tuple.TargetCode, out var tuples))
                             {
-                                rows = new List<WixBundlePatchTargetCodeRow>();
-                                targetsProductCode.Add(row.TargetCode, rows);
+                                tuples = new List<WixBundlePatchTargetCodeTuple>();
+                                targetsProductCode.Add(tuple.TargetCode, tuples);
                             }
 
-                            rows.Add(row);
+                            tuples.Add(tuple);
                         }
-                        else if (row.TargetsUpgradeCode)
+                        else if (tuple.TargetsUpgradeCode)
                         {
-                            List<WixBundlePatchTargetCodeRow> rows;
-                            if (!targetsUpgradeCode.TryGetValue(row.TargetCode, out rows))
+                            if (!targetsUpgradeCode.TryGetValue(tuple.TargetCode, out var tuples))
                             {
-                                rows = new List<WixBundlePatchTargetCodeRow>();
-                                targetsUpgradeCode.Add(row.TargetCode, rows);
+                                tuples = new List<WixBundlePatchTargetCodeTuple>();
+                                targetsUpgradeCode.Add(tuple.TargetCode, tuples);
                             }
                         }
                     }
                 }
             }
 
-            RowIndexedList<Row> slipstreamMspRows = new RowIndexedList<Row>(SlipstreamMspTable);
+            var slipstreamMspIds = new HashSet<string>();
 
             // Loop through the MSI and slipstream patches targeting it.
-            foreach (WixBundleMsiPackageRow msi in msiPackages)
+            foreach (var msi in msiPackages)
             {
-                List<WixBundlePatchTargetCodeRow> rows;
-                if (targetsProductCode.TryGetValue(msi.ProductCode, out rows))
+                if (targetsProductCode.TryGetValue(msi.ProductCode, out var tuples))
                 {
-                    foreach (WixBundlePatchTargetCodeRow row in rows)
+                    foreach (var tuple in tuples)
                     {
-                        Debug.Assert(row.TargetsProductCode);
-                        Debug.Assert(!row.TargetsUpgradeCode);
+                        Debug.Assert(tuple.TargetsProductCode);
+                        Debug.Assert(!tuple.TargetsUpgradeCode);
 
-                        Row slipstreamMspRow = SlipstreamMspTable.CreateRow(row.SourceLineNumbers, false);
-                        slipstreamMspRow[0] = msi.ChainPackageId;
-                        slipstreamMspRow[1] = row.MspPackageId;
-
-                        if (slipstreamMspRows.TryAdd(slipstreamMspRow))
-                        {
-                            SlipstreamMspTable.Rows.Add(slipstreamMspRow);
-                        }
+                        this.TryAddSlipstreamTuple(slipstreamMspIds, msi, tuple);
                     }
-
-                    rows = null;
                 }
 
-                if (!String.IsNullOrEmpty(msi.UpgradeCode) && targetsUpgradeCode.TryGetValue(msi.UpgradeCode, out rows))
+                if (!String.IsNullOrEmpty(msi.UpgradeCode) && targetsUpgradeCode.TryGetValue(msi.UpgradeCode, out tuples))
                 {
-                    foreach (WixBundlePatchTargetCodeRow row in rows)
+                    foreach (var tuple in tuples)
                     {
-                        Debug.Assert(!row.TargetsProductCode);
-                        Debug.Assert(row.TargetsUpgradeCode);
+                        Debug.Assert(!tuple.TargetsProductCode);
+                        Debug.Assert(tuple.TargetsUpgradeCode);
 
-                        Row slipstreamMspRow = SlipstreamMspTable.CreateRow(row.SourceLineNumbers, false);
-                        slipstreamMspRow[0] = msi.ChainPackageId;
-                        slipstreamMspRow[1] = row.MspPackageId;
-
-                        if (slipstreamMspRows.TryAdd(slipstreamMspRow))
-                        {
-                            SlipstreamMspTable.Rows.Add(slipstreamMspRow);
-                        }
+                        this.TryAddSlipstreamTuple(slipstreamMspIds, msi, tuple);
                     }
 
-                    rows = null;
+                    tuples = null;
                 }
             }
         }
-#endif
+
+        private bool TryAddSlipstreamTuple(HashSet<string> slipstreamMspIds, WixBundleMsiPackageTuple msiPackage, WixBundlePatchTargetCodeTuple patchTargetCode)
+        {
+            var id = new Identifier(AccessModifier.Private, msiPackage.Id.Id, patchTargetCode.PackageRef);
+
+            if (slipstreamMspIds.Add(id.Id))
+            {
+                var slipstreamTuple = new WixBundleSlipstreamMspTuple(patchTargetCode.SourceLineNumbers)
+                {
+                    TargetPackageRef = msiPackage.Id.Id,
+                    MspPackageRef = patchTargetCode.PackageRef
+                };
+
+                //var slipstreamMspRow = SlipstreamMspTable.CreateRow(tuple.SourceLineNumbers, false);
+                //slipstreamMspRow[0] = msi.ChainPackageId;
+                //slipstreamMspRow[1] = tuple.MspPackageId;
+
+                this.Section.Tuples.Add(slipstreamTuple);
+                return true;
+            }
+
+            return false;
+        }
     }
 }

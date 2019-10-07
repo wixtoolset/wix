@@ -24,7 +24,8 @@ namespace WixToolset.Core
             this.AddService((provider, singletons) => AddSingleton<IParseHelper>(singletons, new ParseHelper(provider)));
             this.AddService((provider, singletons) => AddSingleton<IPreprocessHelper>(singletons, new PreprocessHelper(provider)));
             this.AddService((provider, singletons) => AddSingleton<IBackendHelper>(singletons, new BackendHelper(provider)));
-            this.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper(provider)));
+            this.AddService((provider, singletons) => AddSingleton<IPathResolver>(singletons, new PathResolver()));
+            this.AddService((provider, singletons) => AddSingleton<IWindowsInstallerBackendHelper>(singletons, new WindowsInstallerBackendHelper()));
 
             // Transients.
             this.AddService<ICommandLineArguments>((provider, singletons) => new CommandLineArguments(provider));
@@ -47,6 +48,7 @@ namespace WixToolset.Core
             this.AddService<IDecompileResult>((provider, singletons) => new DecompileResult());
             this.AddService<IIncludedFile>((provider, singletons) => new IncludedFile());
             this.AddService<IPreprocessResult>((provider, singletons) => new PreprocessResult());
+            this.AddService<IResolvedDirectory>((provider, singletons) => new ResolvedDirectory());
             this.AddService<IResolveFileResult>((provider, singletons) => new ResolveFileResult());
             this.AddService<IResolveResult>((provider, singletons) => new ResolveResult());
             this.AddService<IResolvedCabinet>((provider, singletons) => new ResolvedCabinet());

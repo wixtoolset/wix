@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Security.Permissions" Version="4.6.0" />
     <PackageReference Include="WixToolset.Core.Native" Version="4.0.*" />
     <PackageReference Include="WixToolset.Dtf.Resources" Version="4.0.*" NoWarn="NU1701" />
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" NoWarn="NU1701" />

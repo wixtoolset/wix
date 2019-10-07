@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\.Data\burn.exe" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\ComponentSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\DirectorySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\FileSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -31,6 +32,9 @@
     <Content Include="TestData\ReserveCost\ReserveCost.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ServiceInstall\OwnProcess.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Shortcut\ShortcutProperty.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleBundle\data\fakeba.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleBundle\data\MsiPackage\Shared.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleBundle\data\MsiPackage\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -66,6 +70,9 @@
     <Content Include="TestData\SetProperty\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SetProperty\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SetProperty\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleBundle\data\test.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleBundle\Bundle.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

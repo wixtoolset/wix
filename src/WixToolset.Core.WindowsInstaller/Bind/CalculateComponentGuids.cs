@@ -6,9 +6,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -16,10 +16,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class CalculateComponentGuids
     {
-        internal CalculateComponentGuids(IMessaging messaging, IBackendHelper helper, IntermediateSection section)
+        internal CalculateComponentGuids(IMessaging messaging, IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section)
         {
             this.Messaging = messaging;
             this.BackendHelper = helper;
+            this.PathResolver = pathResolver;
             this.Section = section;
         }
 
@@ -27,12 +28,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IBackendHelper BackendHelper { get; }
 
+        private IPathResolver PathResolver { get; }
+
         private IntermediateSection Section { get; }
 
         public void Execute()
         {
             Dictionary<string, RegistryTuple> registryKeyRows = null;
-            Dictionary<string, ResolvedDirectory> targetPathsByDirectoryId = null;
+            Dictionary<string, IResolvedDirectory> targetPathsByDirectoryId = null;
             Dictionary<string, string> componentIdGenSeeds = null;
             Dictionary<string, List<FileTuple>> filesByComponentId = null;
 
@@ -73,7 +76,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         var directories = this.Section.Tuples.OfType<DirectoryTuple>().ToList();
 
-                        targetPathsByDirectoryId = new Dictionary<string, ResolvedDirectory>(directories.Count);
+                        targetPathsByDirectoryId = new Dictionary<string, IResolvedDirectory>(directories.Count);
 
                         // Get the target paths for all directories.
                         foreach (var directory in directories)
@@ -86,7 +89,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 continue;
                             }
 
-                            targetPathsByDirectoryId.Add(directory.Id.Id, new ResolvedDirectory(directory.ParentDirectoryRef, directory.Name));
+                            var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(directory.ParentDirectoryRef, directory.Name);
+                            targetPathsByDirectoryId.Add(directory.Id.Id, resolvedDirectory);
                         }
                     }
 
@@ -131,7 +135,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (fileRow.Id.Id == componentTuple.KeyPath)
                         {
                             // calculate the key file's canonical target path
-                            string directoryPath = PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentTuple.DirectoryRef, true);
+                            string directoryPath = this.PathResolver.GetDirectoryPath(targetPathsByDirectoryId, componentIdGenSeeds, componentTuple.DirectoryRef, true);
                             string fileName = Common.GetName(fileRow.Name, false, true).ToLowerInvariant();
                             path = Path.Combine(directoryPath, fileName);
 

@@ -1,8 +1,7 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.ExtensibilityServices
 {
-    using System;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
@@ -10,14 +9,9 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class WindowsInstallerBackendHelper : IWindowsInstallerBackendHelper
     {
-        public WindowsInstallerBackendHelper(IServiceProvider serviceProvider)
-        {
-            this.ServiceProvider = serviceProvider;
-        }
+        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions) => this.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, tableDefinitions, false);
 
-        private IServiceProvider ServiceProvider { get; }
-
-        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions)
+        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions, bool columnZeroIsId)
         {
             var tableDefinition = tableDefinitions.FirstOrDefault(t => t.Name == tuple.Definition.Name);
 
@@ -28,6 +22,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
             var table = output.EnsureTable(tableDefinition);
             var row = table.CreateRow(tuple.SourceLineNumbers);
+            var rowOffset = 0;
+
+            if (columnZeroIsId)
+            {
+                row[0] = tuple.Id.Id;
+                rowOffset = 1;
+            }
+
             for (var i = 0; i < tuple.Fields.Length; ++i)
             {
                 if (i < tableDefinition.Columns.Length)
@@ -36,13 +38,13 @@ namespace WixToolset.Core.ExtensibilityServices
 
                     switch (column.Type)
                     {
-                        case ColumnType.Number:
-                            row[i] = tuple.AsNumber(i);
-                            break;
+                    case ColumnType.Number:
+                        row[i + rowOffset] = column.Nullable ? tuple.AsNullableNumber(i) : tuple.AsNumber(i);
+                        break;
 
-                        default:
-                            row[i] = tuple.AsString(i);
-                            break;
+                    default:
+                        row[i + rowOffset] = tuple.AsString(i);
+                        break;
                     }
                 }
             }

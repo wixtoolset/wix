@@ -105,6 +105,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddMsiEmbeddedUITuple((MsiEmbeddedUITuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.MsiFileHash:
+                    this.AddMsiFileHashTuple((MsiFileHashTuple)tuple, output);
+                    break;
+
                 case TupleDefinitionType.MsiServiceConfig:
                     this.AddMsiServiceConfigTuple((MsiServiceConfigTuple)tuple, output);
                     break;
@@ -498,6 +502,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = attributes;
             row[3] = tuple.MessageFilter;
             row[4] = tuple.Source;
+        }
+
+        private void AddMsiFileHashTuple(MsiFileHashTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["MsiFileHash"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.Id.Id;
+            row[1] = tuple.Options;
+            row[2] = tuple.HashPart1;
+            row[3] = tuple.HashPart2;
+            row[4] = tuple.HashPart3;
+            row[5] = tuple.HashPart4;
         }
 
         private void AddMsiServiceConfigTuple(MsiServiceConfigTuple tuple, Output output)

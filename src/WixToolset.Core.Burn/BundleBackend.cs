@@ -15,20 +15,26 @@ namespace WixToolset.Core.Burn
     {
         public IBindResult Bind(IBindContext context)
         {
-            BindBundleCommand command = new BindBundleCommand(context);
-            //command.DefaultCompressionLevel = context.DefaultCompressionLevel;
-            //command.Extensions = context.Extensions;
-            //command.IntermediateFolder = context.IntermediateFolder;
-            //command.Output = context.IntermediateRepresentation;
-            //command.OutputPath = context.OutputPath;
-            //command.PdbFile = context.OutputPdbPath;
-            //command.WixVariableResolver = context.WixVariableResolver;
+            var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
+
+            var backendExtensions = extensionManager.GetServices<IBurnBackendExtension>();
+
+            foreach (var extension in backendExtensions)
+            {
+                extension.PreBackendBind(context);
+            }
+
+            var command = new BindBundleCommand(context, backendExtensions);
             command.Execute();
 
             var result = context.ServiceProvider.GetService<IBindResult>();
             result.FileTransfers = command.FileTransfers;
             result.TrackedFiles = command.TrackedFiles;
 
+            foreach (var extension in backendExtensions)
+            {
+                extension.PostBackendBind(result);
+            }
             return result;
         }
 
@@ -53,10 +59,10 @@ namespace WixToolset.Core.Burn
 
         public Intermediate Unbind(IUnbindContext context)
         {
-            string uxExtractPath = Path.Combine(context.ExportBasePath, "UX");
-            string acExtractPath = Path.Combine(context.ExportBasePath, "AttachedContainer");
+            var uxExtractPath = Path.Combine(context.ExportBasePath, "UX");
+            var acExtractPath = Path.Combine(context.ExportBasePath, "AttachedContainer");
 
-            using (BurnReader reader = BurnReader.Open(context.InputFilePath))
+            using (var reader = BurnReader.Open(context.InputFilePath))
             {
                 reader.ExtractUXContainer(uxExtractPath, context.IntermediateFolder);
                 reader.ExtractAttachedContainer(acExtractPath, context.IntermediateFolder);

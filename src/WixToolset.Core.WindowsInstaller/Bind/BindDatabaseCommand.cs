@@ -30,6 +30,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
 
+            this.PathResolver = this.ServiceProvider.GetService<IPathResolver>();
+
             this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
 
             this.CabbingThreadCount = context.CabbingThreadCount;
@@ -53,6 +55,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IPathResolver PathResolver { get; }
 
         private int Codepage { get; }
 
@@ -241,7 +245,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Set generated component guids.
             {
-                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, section);
+                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section);
                 command.Execute();
             }
 
@@ -501,7 +505,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Process uncompressed files.
             if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
             {
-                var command = new ProcessUncompressedFilesCommand(section, this.BackendHelper);
+                var command = new ProcessUncompressedFilesCommand(section, this.BackendHelper, this.PathResolver);
                 command.Compressed = compressed;
                 command.FileFacades = uncompressedFiles;
                 command.LayoutDirectory = layoutDirectory;

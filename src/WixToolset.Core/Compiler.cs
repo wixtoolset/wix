@@ -818,7 +818,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new IconTuple(sourceLineNumbers, id)
                 {
-                    Data = sourceFile
+                    Data = new IntermediateFieldPathValue { Path = sourceFile }
                 });
             }
 

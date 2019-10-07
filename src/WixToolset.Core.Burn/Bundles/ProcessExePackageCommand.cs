@@ -3,32 +3,37 @@
 namespace WixToolset.Core.Burn.Bundles
 {
     using System;
-    using WixToolset.Data;
+    using System.Collections.Generic;
+    using WixToolset.Data.Tuples;
 
     /// <summary>
     /// Initializes package state from the Exe contents.
     /// </summary>
     internal class ProcessExePackageCommand
     {
-#if TODO
-        public RowDictionary<WixBundlePayloadRow> AuthoredPayloads { private get; set; }
+        public ProcessExePackageCommand(PackageFacade facade, Dictionary<string, WixBundlePayloadTuple> payloadTuples)
+        {
+            this.AuthoredPayloads = payloadTuples;
+            this.Facade = facade;
+        }
 
-        public PackageFacade Facade { private get; set; }
+        public Dictionary<string, WixBundlePayloadTuple> AuthoredPayloads { get; }
+
+        public PackageFacade Facade { get; }
 
         /// <summary>
         /// Processes the Exe packages to add properties and payloads from the Exe packages.
         /// </summary>
         public void Execute()
         {
-            WixBundlePayloadRow packagePayload = this.AuthoredPayloads.Get(this.Facade.Package.PackagePayload);
+            var packagePayload = this.AuthoredPayloads[this.Facade.PackageTuple.PayloadRef];
 
-            if (String.IsNullOrEmpty(this.Facade.Package.CacheId))
+            if (String.IsNullOrEmpty(this.Facade.PackageTuple.CacheId))
             {
-                this.Facade.Package.CacheId = packagePayload.Hash;
+                this.Facade.PackageTuple.CacheId = packagePayload.Hash;
             }
 
-            this.Facade.Package.Version = packagePayload.Version;
+            this.Facade.PackageTuple.Version = packagePayload.Version;
         }
-#endif
     }
 }

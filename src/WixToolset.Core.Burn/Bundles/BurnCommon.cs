@@ -128,7 +128,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
 
             GC.SuppressFinalize(this);
         }
@@ -238,7 +238,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             if (UInt32.MaxValue == this.wixburnDataOffset)
             {
-                if (!EnsureNTHeader(reader))
+                if (!this.EnsureNTHeader(reader))
                 {
                     return false;
                 }
@@ -286,7 +286,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             if (UInt32.MaxValue == this.firstSectionOffset)
             {
-                if (!EnsureDosHeader(reader))
+                if (!this.EnsureDosHeader(reader))
                 {
                     return false;
                 }

@@ -162,7 +162,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.Section.Tuples.Add(facade.Hash);
                     }
 
-                    facade.Hash.FileRef = facade.File.Id.Id;
                     facade.Hash.Options = 0;
                     facade.Hash.HashPart1 = hash[0];
                     facade.Hash.HashPart2 = hash[1];
