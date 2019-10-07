@@ -4855,6 +4855,7 @@ namespace WixToolset.Core
             {
                 var tuple = new FeatureTuple(sourceLineNumbers, id)
                 {
+                    ParentFeatureRef = null, // this field is set in the linker
                     Title = title,
                     Description = description,
                     Display = display,
@@ -4867,46 +4868,6 @@ namespace WixToolset.Core
                 };
 
                 this.Core.AddTuple(tuple);
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Feature, id);
-                //// row.Set(1, null); - this column is set in the linker
-                //row.Set(2, title);
-                //row.Set(3, description);
-                //if (0 < display.Length)
-                //{
-                //    switch (display)
-                //    {
-                //    case "collapse":
-                //        lastDisplay = (lastDisplay | 1) + 1;
-                //        row.Set(4, lastDisplay);
-                //        break;
-                //    case "expand":
-                //        lastDisplay = (lastDisplay + 1) | 1;
-                //        row.Set(4, lastDisplay);
-                //        break;
-                //    case "hidden":
-                //        row.Set(4, 0);
-                //        break;
-                //    default:
-                //        int value;
-                //        if (!Int32.TryParse(display, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
-                //        {
-                //            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", display, "collapse", "expand", "hidden"));
-                //        }
-                //        else
-                //        {
-                //            row.Set(4, value);
-                //            // save the display value of this row (if its not hidden) for subsequent rows
-                //            if (0 != (int)row[4])
-                //            {
-                //                lastDisplay = (int)row[4];
-                //            }
-                //        }
-                //        break;
-                //    }
-                //}
-                //row.Set(5, level);
-                //row.Set(6, configurableDirectory);
-                //row.Set(7, bits);
 
                 if (ComplexReferenceParentType.Unknown != parentType)
                 {
@@ -6228,7 +6189,7 @@ namespace WixToolset.Core
                         this.ParseFeatureElement(child, ComplexReferenceParentType.Unknown, null, ref featureDisplay);
                         break;
                     case "FeatureGroup":
-                        this.ParseFeatureGroupElement(child, ComplexReferenceParentType.Unknown, id.Id);
+                        this.ParseFeatureGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
                         break;
                     case "FeatureRef":
                         this.ParseFeatureRefElement(child, ComplexReferenceParentType.Unknown, null);

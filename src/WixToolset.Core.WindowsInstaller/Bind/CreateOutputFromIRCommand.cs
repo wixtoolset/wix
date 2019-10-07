@@ -185,6 +185,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 case TupleDefinitionType.WixFile:
                 case TupleDefinitionType.WixComponentGroup:
                 case TupleDefinitionType.WixDeltaPatchFile:
+                case TupleDefinitionType.WixFeatureGroup:
                     break;
 
                 default:
