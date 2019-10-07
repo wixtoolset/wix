@@ -141,6 +141,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddRemoveRegistryTuple((RemoveRegistryTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.ReserveCost:
+                    this.AddTupleDefaultly(tuple, output, true);
+                    break;
+
                 case TupleDefinitionType.ServiceControl:
                     this.AddServiceControlTuple((ServiceControlTuple)tuple, output);
                     break;
