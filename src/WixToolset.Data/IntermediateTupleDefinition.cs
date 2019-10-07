@@ -7,6 +7,8 @@ namespace WixToolset.Data
 
     public class IntermediateTupleDefinition
     {
+        private object tags;
+
         public IntermediateTupleDefinition(string name, IntermediateFieldDefinition[] fieldDefinitions, Type strongTupleType)
             : this(TupleDefinitionType.MustBeFromAnExtension, name, 0, fieldDefinitions, strongTupleType)
         {
@@ -53,11 +55,131 @@ namespace WixToolset.Data
             return result;
         }
 
+        public bool AddTag(string add)
+        {
+            if (this.tags == null)
+            {
+                this.tags = add;
+            }
+            else if (this.tags is string tag)
+            {
+                if (tag == add)
+                {
+                    return false;
+                }
+
+                this.tags = new[] { tag, add };
+            }
+            else
+            {
+                var tagsArray = (string[])this.tags;
+                var array = new string[tagsArray.Length + 1];
+
+                for (var i = 0; i < tagsArray.Length; ++i)
+                {
+                    if (tagsArray[i] == add)
+                    {
+                        return false;
+                    }
+
+                    array[i] = tagsArray[i];
+                }
+
+                array[tagsArray.Length] = add;
+
+                this.tags = array;
+            }
+
+            return true;
+        }
+
+        public bool HasTag(string has)
+        {
+            if (this.tags == null)
+            {
+                return false;
+            }
+            else if (this.tags is string tag)
+            {
+                return tag == has;
+            }
+            else
+            {
+                foreach (var element in (string[])this.tags)
+                {
+                    if (element == has)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool RemoveTag(string remove)
+        {
+            if (this.tags is string tag)
+            {
+                if (tag == remove)
+                {
+                    this.tags = null;
+                    return true;
+                }
+            }
+            else if (this.tags is string[] tagsArray)
+            {
+                if (tagsArray.Length == 2)
+                {
+                    if (tagsArray[0] == remove)
+                    {
+                        this.tags = tagsArray[1];
+                        return true;
+                    }
+                    else if (tagsArray[1] == remove)
+                    {
+                        this.tags = tagsArray[0];
+                        return true;
+                    }
+                }
+                else
+                {
+                    var array = new string[tagsArray.Length - 1];
+                    var arrayIndex = 0;
+                    var found = false;
+
+                    for (var i = 0; i < tagsArray.Length; ++i)
+                    {
+                        if (tagsArray[i] == remove)
+                        {
+                            found = true;
+                            continue;
+                        }
+                        else if (arrayIndex == array.Length)
+                        {
+                            break;
+                        }
+
+                        array[arrayIndex++] = tagsArray[i];
+                    }
+
+                    if (found)
+                    {
+                        this.tags = array;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         internal static IntermediateTupleDefinition Deserialize(JsonObject jsonObject)
         {
             var name = jsonObject.GetValueOrDefault<string>("name");
             var revision = jsonObject.GetValueOrDefault("rev", 0);
             var definitionsJson = jsonObject.GetValueOrDefault<JsonArray>("fields");
+            var tagsJson = jsonObject.GetValueOrDefault<JsonArray>("tags");
 
             var fieldDefinitions = new IntermediateFieldDefinition[definitionsJson.Count];
 
@@ -69,7 +191,28 @@ namespace WixToolset.Data
                 fieldDefinitions[i] = new IntermediateFieldDefinition(fieldName, fieldType);
             }
 
-            return new IntermediateTupleDefinition(name, revision, fieldDefinitions, null);
+            var definition = new IntermediateTupleDefinition(name, revision, fieldDefinitions, null);
+
+            if (tagsJson == null || tagsJson.Count == 0)
+            {
+            }
+            else if (tagsJson.Count == 1)
+            {
+                definition.tags = (string)tagsJson[0];
+            }
+            else
+            {
+                var tags = new string[tagsJson.Count];
+
+                for (var i = 0; i < tagsJson.Count; ++i)
+                {
+                    tags[i] = (string)tagsJson[i];
+                }
+
+                definition.tags = tags;
+            }
+
+            return definition;
         }
 
         internal JsonObject Serialize()
@@ -102,6 +245,24 @@ namespace WixToolset.Data
             }
 
             jsonObject.Add("fields", fieldsJson);
+
+            if (this.tags is string || this.tags is string[])
+            {
+                JsonArray tagsJson;
+
+                if (this.tags is string tag)
+                {
+                    tagsJson = new JsonArray(1) { tag };
+                }
+                else
+                {
+                    var array = (string[])this.tags;
+                    tagsJson = new JsonArray(array.Length);
+                    tagsJson.AddRange(array);
+                }
+
+                jsonObject.Add("tags", tagsJson);
+            }
 
             return jsonObject;
         }
