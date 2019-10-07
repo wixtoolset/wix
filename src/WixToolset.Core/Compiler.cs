@@ -7170,7 +7170,6 @@ namespace WixToolset.Core
                         VersionMin = productVersion,
                         Language = productLanguage,
                         OnlyDetect = true,
-                        MigrateFeatures = migrateFeatures,
                         IgnoreRemoveFailures = ignoreRemoveFailure,
                         ActionProperty = Common.DowngradeDetectedProperty
                     };

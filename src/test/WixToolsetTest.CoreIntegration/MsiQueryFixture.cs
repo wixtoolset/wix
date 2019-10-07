@@ -578,7 +578,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesUpgradeTableFromDetectOnlyUpgrade()
         {
             var folder = TestData.Get(@"TestData");
@@ -607,7 +607,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(new[]
                 {
                     "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
-                    "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t1.0.0.0\t1033\t\t2\t\tWIX_DOWNGRADE_DETECTED",
+                    "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
                     "Upgrade:{B05772EA-82B8-4DE0-B7EB-45B5F0CCFE6D}\t1.0.0\t\t\t256\t\tRELPRODFOUND",
                 }, results);
             }
