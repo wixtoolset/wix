@@ -2,6 +2,8 @@
 
 namespace WixToolset.Data.WindowsInstaller.Rows
 {
+    using WixToolset.Data.Tuples;
+
     /// <summary>
     /// Specialization of a row for the WixApprovedExeForElevation table.
     /// </summary>
@@ -61,9 +63,9 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// Gets or sets the attibutes.
         /// </summary>
         /// <value>The BundleApprovedExeForElevationAttributes.</value>
-        public BundleApprovedExeForElevationAttributes Attributes
+        public WixApprovedExeForElevationAttributes Attributes
         {
-            get { return (BundleApprovedExeForElevationAttributes)this.Fields[3].Data; }
+            get { return (WixApprovedExeForElevationAttributes)this.Fields[3].Data; }
             set { this.Fields[3].Data = (int)value; }
         }
 
@@ -72,7 +74,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// </summary>
         public bool Win64
         {
-            get { return BundleApprovedExeForElevationAttributes.Win64 == (this.Attributes & BundleApprovedExeForElevationAttributes.Win64); }
+            get { return WixApprovedExeForElevationAttributes.Win64 == (this.Attributes & WixApprovedExeForElevationAttributes.Win64); }
         }
     }
 }

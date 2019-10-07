@@ -20,20 +20,21 @@ namespace WixToolset.Data
 
             switch (field.Definition.Type)
             {
-                case IntermediateFieldType.Bool:
-                    return field.Value.AsBool();
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool();
 
-                case IntermediateFieldType.Number:
-                    return field.Value.AsNumber() != 0;
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsLargeNumber() != 0;
 
-                case IntermediateFieldType.String:
-                    return !String.IsNullOrEmpty(field.Value.AsString());
+            case IntermediateFieldType.String:
+                return !String.IsNullOrEmpty(field.Value.AsString());
 
-                case IntermediateFieldType.Path:
-                    return !String.IsNullOrEmpty(field.Value.AsPath()?.Path);
+            case IntermediateFieldType.Path:
+                return !String.IsNullOrEmpty(field.Value.AsPath()?.Path);
 
-                default:
-                    throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to boolean");
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to boolean");
             }
         }
 
@@ -46,20 +47,68 @@ namespace WixToolset.Data
 
             switch (field.Definition.Type)
             {
-                case IntermediateFieldType.Bool:
-                    return field.Value.AsBool();
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool();
 
-                case IntermediateFieldType.Number:
-                    return field.Value.AsNumber() != 0;
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsLargeNumber() != 0;
 
-                case IntermediateFieldType.String:
-                    return !String.IsNullOrEmpty(field.Value.AsString());
+            case IntermediateFieldType.String:
+                return !String.IsNullOrEmpty(field.Value.AsString());
 
-                default:
-                    throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to boolean");
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to boolean");
             }
         }
 
+        public static long AsLargeNumber(this IntermediateField field)
+        {
+            if (field == null || field.Value == null || field.Value.Data == null)
+            {
+                return 0;
+            }
+
+            switch (field.Definition.Type)
+            {
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool() ? 1 : 0;
+
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsLargeNumber();
+
+            case IntermediateFieldType.String:
+                return Convert.ToInt64(field.Value.AsString());
+
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to large number");
+            }
+        }
+
+        public static long? AsNullableLargeNumber(this IntermediateField field)
+        {
+            if (field == null || field.Value == null || field.Value.Data == null)
+            {
+                return null;
+            }
+
+            switch (field.Definition.Type)
+            {
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool() ? 1 : 0;
+
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsLargeNumber();
+
+            case IntermediateFieldType.String:
+                return Convert.ToInt64(field.Value.AsString());
+
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to large number");
+            }
+        }
 
         public static int AsNumber(this IntermediateField field)
         {
@@ -70,17 +119,18 @@ namespace WixToolset.Data
 
             switch (field.Definition.Type)
             {
-                case IntermediateFieldType.Bool:
-                    return field.Value.AsBool() ? 1 : 0;
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool() ? 1 : 0;
 
-                case IntermediateFieldType.Number:
-                    return field.Value.AsNumber();
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsNumber();
 
-                case IntermediateFieldType.String:
-                    return Convert.ToInt32(field.Value.AsString());
+            case IntermediateFieldType.String:
+                return Convert.ToInt32(field.Value.AsString());
 
-                default:
-                    throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to number");
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to number");
             }
         }
 
@@ -93,17 +143,18 @@ namespace WixToolset.Data
 
             switch (field.Definition.Type)
             {
-                case IntermediateFieldType.Bool:
-                    return field.Value.AsBool() ? 1 : 0;
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool() ? 1 : 0;
 
-                case IntermediateFieldType.Number:
-                    return field.Value.AsNumber();
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsNumber();
 
-                case IntermediateFieldType.String:
-                    return Convert.ToInt32(field.Value.AsString());
+            case IntermediateFieldType.String:
+                return Convert.ToInt32(field.Value.AsString());
 
-                default:
-                    throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to number");
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to number");
             }
         }
 
@@ -116,14 +167,14 @@ namespace WixToolset.Data
 
             switch (field.Definition.Type)
             {
-                case IntermediateFieldType.String:
-                    return new IntermediateFieldPathValue { Path = field.Value.AsString() };
+            case IntermediateFieldType.String:
+                return new IntermediateFieldPathValue { Path = field.Value.AsString() };
 
-                case IntermediateFieldType.Path:
-                    return field.Value.AsPath();
+            case IntermediateFieldType.Path:
+                return field.Value.AsPath();
 
-                default:
-                    throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to string");
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to string");
             }
         }
 
@@ -136,20 +187,21 @@ namespace WixToolset.Data
 
             switch (field.Definition.Type)
             {
-                case IntermediateFieldType.Bool:
-                    return field.Value.AsBool() ? "true" : "false";
+            case IntermediateFieldType.Bool:
+                return field.Value.AsBool() ? "true" : "false";
 
-                case IntermediateFieldType.Number:
-                    return field.Value.AsNumber().ToString();
+            case IntermediateFieldType.LargeNumber:
+            case IntermediateFieldType.Number:
+                return field.Value.AsLargeNumber().ToString();
 
-                case IntermediateFieldType.String:
-                    return field.Value.AsString();
+            case IntermediateFieldType.String:
+                return field.Value.AsString();
 
-                case IntermediateFieldType.Path:
-                    return field.Value.AsPath()?.Path;
+            case IntermediateFieldType.Path:
+                return field.Value.AsPath()?.Path;
 
-                default:
-                    throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to string");
+            default:
+                throw new InvalidCastException($"Cannot convert field {field.Name} with type {field.Type} to string");
             }
         }
 
@@ -169,27 +221,27 @@ namespace WixToolset.Data
 
             switch (field.Type)
             {
-                case IntermediateFieldType.Bool:
-                    data = value;
-                    break;
+            case IntermediateFieldType.Bool:
+                data = value;
+                break;
 
-                case IntermediateFieldType.LargeNumber:
-                    data = value ? (long)1 : (long)0;
-                    break;
+            case IntermediateFieldType.LargeNumber:
+                data = value ? (long)1 : (long)0;
+                break;
 
-                case IntermediateFieldType.Number:
-                    data = value ? 1 : 0;
-                    break;
+            case IntermediateFieldType.Number:
+                data = value ? 1 : 0;
+                break;
 
-                case IntermediateFieldType.Path:
-                    throw new ArgumentException($"Cannot convert bool '{value}' to a 'Path' field type.", nameof(value));
+            case IntermediateFieldType.Path:
+                throw new ArgumentException($"Cannot convert bool '{value}' to a 'Path' field type.", nameof(value));
 
-                case IntermediateFieldType.String:
-                    data = value ? "true" : "false";
-                    break;
+            case IntermediateFieldType.String:
+                data = value ? "true" : "false";
+                break;
 
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
             };
 
             return AssignFieldValue(field, data);
@@ -216,27 +268,27 @@ namespace WixToolset.Data
 
             switch (field.Type)
             {
-                case IntermediateFieldType.Bool:
-                    data = (value != 0);
-                    break;
+            case IntermediateFieldType.Bool:
+                data = (value != 0);
+                break;
 
-                case IntermediateFieldType.LargeNumber:
-                    data = value;
-                    break;
+            case IntermediateFieldType.LargeNumber:
+                data = value;
+                break;
 
-                case IntermediateFieldType.Number:
-                    data = (int)value;
-                    break;
+            case IntermediateFieldType.Number:
+                data = (int)value;
+                break;
 
-                case IntermediateFieldType.Path:
-                    throw new ArgumentException($"Cannot convert large number '{value}' to a 'Path' field type.", nameof(value));
+            case IntermediateFieldType.Path:
+                throw new ArgumentException($"Cannot convert large number '{value}' to a 'Path' field type.", nameof(value));
 
-                case IntermediateFieldType.String:
-                    data = value.ToString();
-                    break;
+            case IntermediateFieldType.String:
+                data = value.ToString();
+                break;
 
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
             };
 
             return AssignFieldValue(field, data);
@@ -263,27 +315,27 @@ namespace WixToolset.Data
 
             switch (field.Type)
             {
-                case IntermediateFieldType.Bool:
-                    data = (value != 0);
-                    break;
+            case IntermediateFieldType.Bool:
+                data = (value != 0);
+                break;
 
-                case IntermediateFieldType.LargeNumber:
-                    data = (long)value;
-                    break;
+            case IntermediateFieldType.LargeNumber:
+                data = (long)value;
+                break;
 
-                case IntermediateFieldType.Number:
-                    data = value;
-                    break;
+            case IntermediateFieldType.Number:
+                data = value;
+                break;
 
-                case IntermediateFieldType.Path:
-                    throw new ArgumentException($"Cannot convert number '{value}' to a 'Path' field type.", nameof(value));
+            case IntermediateFieldType.Path:
+                throw new ArgumentException($"Cannot convert number '{value}' to a 'Path' field type.", nameof(value));
 
-                case IntermediateFieldType.String:
-                    data = value.ToString();
-                    break;
+            case IntermediateFieldType.String:
+                data = value.ToString();
+                break;
 
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
             };
 
             return AssignFieldValue(field, data);
@@ -315,25 +367,25 @@ namespace WixToolset.Data
             {
                 switch (field.Type)
                 {
-                    case IntermediateFieldType.Bool:
-                        throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'bool' field type.", nameof(value));
+                case IntermediateFieldType.Bool:
+                    throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'bool' field type.", nameof(value));
 
-                    case IntermediateFieldType.LargeNumber:
-                        throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'large number' field type.", nameof(value));
+                case IntermediateFieldType.LargeNumber:
+                    throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'large number' field type.", nameof(value));
 
-                    case IntermediateFieldType.Number:
-                        throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'number' field type.", nameof(value));
+                case IntermediateFieldType.Number:
+                    throw new ArgumentException($"Cannot convert path '{value.Path}' to a 'number' field type.", nameof(value));
 
-                    case IntermediateFieldType.Path:
-                        data = value;
-                        break;
+                case IntermediateFieldType.Path:
+                    data = value;
+                    break;
 
-                    case IntermediateFieldType.String:
-                        data = value.Path;
-                        break;
+                case IntermediateFieldType.String:
+                    data = value.Path;
+                    break;
 
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
                 };
             }
 
@@ -356,53 +408,53 @@ namespace WixToolset.Data
             {
                 switch (field.Type)
                 {
-                    case IntermediateFieldType.Bool:
-                        if (value.Equals("yes", StringComparison.OrdinalIgnoreCase) || value.Equals("true", StringComparison.OrdinalIgnoreCase))
-                        {
-                            data = true;
-                        }
-                        else if (value.Equals("no", StringComparison.OrdinalIgnoreCase) || value.Equals("false", StringComparison.OrdinalIgnoreCase))
-                        {
-                            data = false;
-                        }
-                        else
-                        {
-                            throw new ArgumentException($"Cannot convert string '{value}' to a 'bool' field type.", nameof(value));
-                        }
-                        break;
+                case IntermediateFieldType.Bool:
+                    if (value.Equals("yes", StringComparison.OrdinalIgnoreCase) || value.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        data = true;
+                    }
+                    else if (value.Equals("no", StringComparison.OrdinalIgnoreCase) || value.Equals("false", StringComparison.OrdinalIgnoreCase))
+                    {
+                        data = false;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Cannot convert string '{value}' to a 'bool' field type.", nameof(value));
+                    }
+                    break;
 
-                    case IntermediateFieldType.LargeNumber:
-                        if (Int64.TryParse(value, out var largeNumber))
-                        {
-                            data = largeNumber;
-                        }
-                        else
-                        {
-                            throw new ArgumentException($"Cannot convert string '{value}' to a 'large number' field type.", nameof(value));
-                        }
-                        break;
+                case IntermediateFieldType.LargeNumber:
+                    if (Int64.TryParse(value, out var largeNumber))
+                    {
+                        data = largeNumber;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Cannot convert string '{value}' to a 'large number' field type.", nameof(value));
+                    }
+                    break;
 
-                    case IntermediateFieldType.Number:
-                        if (Int32.TryParse(value, out var number))
-                        {
-                            data = number;
-                        }
-                        else
-                        {
-                            throw new ArgumentException($"Cannot convert string '{value}' to a 'number' field type.", nameof(value));
-                        }
-                        break;
+                case IntermediateFieldType.Number:
+                    if (Int32.TryParse(value, out var number))
+                    {
+                        data = number;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Cannot convert string '{value}' to a 'number' field type.", nameof(value));
+                    }
+                    break;
 
-                    case IntermediateFieldType.Path:
-                        data = new IntermediateFieldPathValue { Path = value };
-                        break;
+                case IntermediateFieldType.Path:
+                    data = new IntermediateFieldPathValue { Path = value };
+                    break;
 
-                    case IntermediateFieldType.String:
-                        data = value;
-                        break;
+                case IntermediateFieldType.String:
+                    data = value;
+                    break;
 
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
                 };
             }
 

@@ -45,6 +45,45 @@ namespace WixToolset.Data
             return (bool)value.Data;
         }
 
+        public static long AsLargeNumber(this IntermediateFieldValue value)
+        {
+            var result = value.AsNullableLargeNumber();
+            return result ?? 0;
+        }
+
+        public static long? AsNullableLargeNumber(this IntermediateFieldValue value)
+        {
+            if (value?.Data == null)
+            {
+                return null;
+            }
+            else if (value.Data is int n)
+            {
+                return n;
+            }
+            else if (value.Data is long l)
+            {
+                return l;
+            }
+            else if (value.Data is bool b)
+            {
+                return b ? 1 : 0;
+            }
+            else if (value.Data is string s)
+            {
+                try
+                {
+                    return Convert.ToInt32(s);
+                }
+                catch (FormatException)
+                {
+                    throw new WixException(ErrorMessages.UnableToConvertFieldToNumber(s));
+                }
+            }
+
+            return (long)value.Data;
+        }
+
         public static int AsNumber(this IntermediateFieldValue value)
         {
             var result = value.AsNullableNumber();

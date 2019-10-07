@@ -10,9 +10,9 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleMsiFeature,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.Size), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.Size), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.Parent), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.Title), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiFeatureTupleFields.Description), IntermediateFieldType.String),
@@ -29,7 +29,7 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleMsiFeatureTupleFields
     {
-        WixBundlePackageRef,
+        PackageRef,
         Name,
         Size,
         Parent,
@@ -53,10 +53,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleMsiFeatureTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackageRef
+        public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.WixBundlePackageRef];
-            set => this.Set((int)WixBundleMsiFeatureTupleFields.WixBundlePackageRef, value);
+            get => (string)this.Fields[(int)WixBundleMsiFeatureTupleFields.PackageRef];
+            set => this.Set((int)WixBundleMsiFeatureTupleFields.PackageRef, value);
         }
 
         public string Name
@@ -65,9 +65,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Name, value);
         }
 
-        public int Size
+        public long Size
         {
-            get => (int)this.Fields[(int)WixBundleMsiFeatureTupleFields.Size];
+            get => (long)this.Fields[(int)WixBundleMsiFeatureTupleFields.Size];
             set => this.Set((int)WixBundleMsiFeatureTupleFields.Size, value);
         }
 

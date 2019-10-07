@@ -126,13 +126,5 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
             get { return 0 != (this.Attributes & WixBundleMsiPackageAttributes.ForcePerMachine); }
         }
-
-        /// <summary>
-        /// Gets the suppress loose file payload generation of a package.
-        /// </summary>
-        public bool SuppressLooseFilePayloadGeneration
-        {
-            get { return 0 != (this.Attributes & WixBundleMsiPackageAttributes.SuppressLooseFilePayloadGeneration); }
-        }
     }
 }

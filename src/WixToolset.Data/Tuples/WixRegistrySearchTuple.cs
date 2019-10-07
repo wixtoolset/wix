@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixRegistrySearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Root), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Key), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRegistrySearchTupleFields.Value), IntermediateFieldType.String),
@@ -22,13 +21,25 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixRegistrySearchTupleFields
     {
-        WixSearchRef,
         Root,
         Key,
         Value,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixRegistrySearchAttributes
+    {
+        Raw = 0x01,
+        Compatible = 0x02,
+        ExpandEnvironmentVariables = 0x04,
+        WantValue = 0x08,
+        WantExists = 0x10,
+        Win64 = 0x20,
     }
 
     public class WixRegistrySearchTuple : IntermediateTuple
@@ -43,16 +54,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixRegistrySearchTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearchRef
+        public RegistryRootType Root
         {
-            get => (string)this.Fields[(int)WixRegistrySearchTupleFields.WixSearchRef];
-            set => this.Set((int)WixRegistrySearchTupleFields.WixSearchRef, value);
-        }
-
-        public int Root
-        {
-            get => (int)this.Fields[(int)WixRegistrySearchTupleFields.Root];
-            set => this.Set((int)WixRegistrySearchTupleFields.Root, value);
+            get => (RegistryRootType)this.Fields[(int)WixRegistrySearchTupleFields.Root].AsNumber();
+            set => this.Set((int)WixRegistrySearchTupleFields.Root, (int)value);
         }
 
         public string Key
@@ -67,10 +72,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixRegistrySearchTupleFields.Value, value);
         }
 
-        public int Attributes
+        public WixRegistrySearchAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixRegistrySearchTupleFields.Attributes];
-            set => this.Set((int)WixRegistrySearchTupleFields.Attributes, value);
+            get => (WixRegistrySearchAttributes)this.Fields[(int)WixRegistrySearchTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixRegistrySearchTupleFields.Attributes, (int)value);
         }
     }
 }

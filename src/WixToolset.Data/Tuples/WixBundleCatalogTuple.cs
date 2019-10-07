@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleCatalog,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleCatalogTupleFields.WixBundleCatalog), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleCatalogTupleFields.PayloadRef), IntermediateFieldType.String),
             },
             typeof(WixBundleCatalogTuple));
@@ -21,7 +20,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixBundleCatalogTupleFields
     {
-        WixBundleCatalog,
         PayloadRef,
     }
 
@@ -36,12 +34,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixBundleCatalogTupleFields index] => this.Fields[(int)index];
-
-        public string WixBundleCatalog
-        {
-            get => (string)this.Fields[(int)WixBundleCatalogTupleFields.WixBundleCatalog];
-            set => this.Set((int)WixBundleCatalogTupleFields.WixBundleCatalog, value);
-        }
 
         public string PayloadRef
         {

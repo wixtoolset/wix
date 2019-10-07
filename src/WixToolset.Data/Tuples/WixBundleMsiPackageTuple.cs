@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleMsiPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMsiPackageTupleFields.UpgradeCode), IntermediateFieldType.String),
@@ -29,7 +28,6 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundleMsiPackageTupleFields
     {
-        WixBundlePackageRef,
         Attributes,
         ProductCode,
         UpgradeCode,
@@ -45,7 +43,6 @@ namespace WixToolset.Data.Tuples
         DisplayInternalUI = 0x1,
         EnableFeatureSelection = 0x4,
         ForcePerMachine = 0x2,
-        SuppressLooseFilePayloadGeneration = 0x8,
     }
 
     public class WixBundleMsiPackageTuple : IntermediateTuple
@@ -59,12 +56,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixBundleMsiPackageTupleFields index] => this.Fields[(int)index];
-
-        public string WixBundlePackageRef
-        {
-            get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.WixBundlePackageRef];
-            set => this.Set((int)WixBundleMsiPackageTupleFields.WixBundlePackageRef, value);
-        }
 
         public WixBundleMsiPackageAttributes Attributes
         {
@@ -107,5 +98,11 @@ namespace WixToolset.Data.Tuples
             get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.Manufacturer];
             set => this.Set((int)WixBundleMsiPackageTupleFields.Manufacturer, value);
         }
+
+        public bool DisplayInternalUI => (this.Attributes & WixBundleMsiPackageAttributes.DisplayInternalUI) == WixBundleMsiPackageAttributes.DisplayInternalUI;
+
+        public bool EnableFeatureSelection => (this.Attributes & WixBundleMsiPackageAttributes.EnableFeatureSelection) == WixBundleMsiPackageAttributes.EnableFeatureSelection;
+
+        public bool ForcePerMachine => (this.Attributes & WixBundleMsiPackageAttributes.ForcePerMachine) == WixBundleMsiPackageAttributes.ForcePerMachine;
     }
 }

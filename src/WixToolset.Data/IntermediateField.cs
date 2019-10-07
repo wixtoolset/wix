@@ -27,6 +27,10 @@ namespace WixToolset.Data
 
         public static explicit operator bool? (IntermediateField field) => field.AsNullableBool();
 
+        public static explicit operator long(IntermediateField field) => field.AsLargeNumber();
+
+        public static explicit operator long?(IntermediateField field) => field.AsNullableLargeNumber();
+
         public static explicit operator int(IntermediateField field) => field.AsNumber();
 
         public static explicit operator int? (IntermediateField field) => field.AsNullableNumber();

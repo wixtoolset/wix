@@ -56,9 +56,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePackageExitCodeTupleFields.ChainPackageId, value);
         }
 
-        public int Code
+        public int? Code
         {
-            get => (int)this.Fields[(int)WixBundlePackageExitCodeTupleFields.Code];
+            get => (int?)this.Fields[(int)WixBundlePackageExitCodeTupleFields.Code];
             set => this.Set((int)WixBundlePackageExitCodeTupleFields.Code, value);
         }
 

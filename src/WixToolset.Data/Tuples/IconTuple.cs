@@ -35,9 +35,9 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[IconTupleFields index] => this.Fields[(int)index];
 
-        public string Data
+        public IntermediateFieldPathValue Data
         {
-            get => (string)this.Fields[(int)IconTupleFields.Data];
+            get => this.Fields[(int)IconTupleFields.Data].AsPath();
             set => this.Set((int)IconTupleFields.Data, value);
         }
     }

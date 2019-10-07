@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundlePackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.WixChainItemRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Type), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.PayloadRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Attributes), IntermediateFieldType.Number),
@@ -22,14 +21,14 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.LogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackLogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Size), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.InstallSize), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.InstallSize), IntermediateFieldType.LargeNumber),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Language), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackBoundaryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackBoundaryBackwardRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Win64), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Win64), IntermediateFieldType.Bool),
             },
             typeof(WixBundlePackageTuple));
     }
@@ -41,7 +40,6 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundlePackageTupleFields
     {
-        WixChainItemRef,
         Type,
         PayloadRef,
         Attributes,
@@ -79,6 +77,8 @@ namespace WixToolset.Data.Tuples
     {
         Permanent = 0x1,
         Visible = 0x2,
+        PerMachine = 0x4,
+        Win64 = 0x8,
     }
 
     public class WixBundlePackageTuple : IntermediateTuple
@@ -92,12 +92,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixBundlePackageTupleFields index] => this.Fields[(int)index];
-
-        public string WixChainItemRef
-        {
-            get => (string)this.Fields[(int)WixBundlePackageTupleFields.WixChainItemRef];
-            set => this.Set((int)WixBundlePackageTupleFields.WixChainItemRef, value);
-        }
 
         public WixBundlePackageType Type
         {
@@ -165,9 +159,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePackageTupleFields.Size, value);
         }
 
-        public int InstallSize
+        public long? InstallSize
         {
-            get => (int)this.Fields[(int)WixBundlePackageTupleFields.InstallSize];
+            get => (long?)this.Fields[(int)WixBundlePackageTupleFields.InstallSize];
             set => this.Set((int)WixBundlePackageTupleFields.InstallSize, value);
         }
 
@@ -207,10 +201,12 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePackageTupleFields.RollbackBoundaryBackwardRef, value);
         }
 
-        public int Win64
+        public bool Win64
         {
-            get => (int)this.Fields[(int)WixBundlePackageTupleFields.Win64];
+            get => (bool)this.Fields[(int)WixBundlePackageTupleFields.Win64];
             set => this.Set((int)WixBundlePackageTupleFields.Win64, value);
         }
+
+        public bool Permanent => (this.Attributes & WixBundlePackageAttributes.Permanent) == WixBundlePackageAttributes.Permanent;
     }
 }

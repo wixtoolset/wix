@@ -10,14 +10,12 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleRelatedPackage,
             new[]
             {
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.RelatedId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MaxVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.Languages), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MinInclusive), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.MaxInclusive), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.LangInclusive), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.OnlyDetect), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleRelatedPackageTupleFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(WixBundleRelatedPackageTuple));
     }
@@ -25,16 +23,26 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixBundleRelatedPackageTupleFields
     {
+        PackageRef,
         RelatedId,
         MinVersion,
         MaxVersion,
         Languages,
-        MinInclusive,
-        MaxInclusive,
-        LangInclusive,
-        OnlyDetect,
+        Attributes,
+    }
+
+    [Flags]
+    public enum WixBundleRelatedPackageAttributes
+    {
+        None,
+        OnlyDetect = 0x1,
+        MinInclusive = 0x2,
+        MaxInclusive = 0x4,
+        LangInclusive = 0x8,
     }
 
     public class WixBundleRelatedPackageTuple : IntermediateTuple
@@ -48,6 +56,12 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixBundleRelatedPackageTupleFields index] => this.Fields[(int)index];
+
+        public string PackageRef
+        {
+            get => (string)this.Fields[(int)WixBundleRelatedPackageTupleFields.PackageRef];
+            set => this.Set((int)WixBundleRelatedPackageTupleFields.PackageRef, value);
+        }
 
         public string RelatedId
         {
@@ -73,28 +87,18 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundleRelatedPackageTupleFields.Languages, value);
         }
 
-        public int MinInclusive
+        public WixBundleRelatedPackageAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.MinInclusive];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.MinInclusive, value);
+            get => (WixBundleRelatedPackageAttributes)this.Fields[(int)WixBundleRelatedPackageTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundleRelatedPackageTupleFields.Attributes, (int)value);
         }
 
-        public int MaxInclusive
-        {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.MaxInclusive];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.MaxInclusive, value);
-        }
+        public bool MinInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.MinInclusive) == WixBundleRelatedPackageAttributes.MinInclusive;
 
-        public int LangInclusive
-        {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.LangInclusive];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.LangInclusive, value);
-        }
+        public bool MaxInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.MaxInclusive) == WixBundleRelatedPackageAttributes.MaxInclusive;
 
-        public int OnlyDetect
-        {
-            get => (int)this.Fields[(int)WixBundleRelatedPackageTupleFields.OnlyDetect];
-            set => this.Set((int)WixBundleRelatedPackageTupleFields.OnlyDetect, value);
-        }
+        public bool OnlyDetect => (this.Attributes & WixBundleRelatedPackageAttributes.OnlyDetect) == WixBundleRelatedPackageAttributes.OnlyDetect;
+
+        public bool LangInclusive => (this.Attributes & WixBundleRelatedPackageAttributes.LangInclusive) == WixBundleRelatedPackageAttributes.LangInclusive;
     }
 }

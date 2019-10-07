@@ -10,7 +10,7 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundlePatchTargetCode,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.PackageId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.TargetCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePatchTargetCodeTupleFields.Attributes), IntermediateFieldType.Number),
             },
@@ -20,11 +20,29 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixBundlePatchTargetCodeTupleFields
     {
-        PackageId,
+        PackageRef,
         TargetCode,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixBundlePatchTargetCodeAttributes : int
+    {
+        None = 0,
+
+        /// <summary>
+        /// The transform targets a specific ProductCode.
+        /// </summary>
+        TargetsProductCode = 1,
+
+        /// <summary>
+        /// The transform targets a specific UpgradeCode.
+        /// </summary>
+        TargetsUpgradeCode = 2,
     }
 
     public class WixBundlePatchTargetCodeTuple : IntermediateTuple
@@ -39,10 +57,10 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundlePatchTargetCodeTupleFields index] => this.Fields[(int)index];
 
-        public string PackageId
+        public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.PackageId];
-            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.PackageId, value);
+            get => (string)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.PackageRef];
+            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.PackageRef, value);
         }
 
         public string TargetCode
@@ -51,10 +69,14 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePatchTargetCodeTupleFields.TargetCode, value);
         }
 
-        public int Attributes
+        public WixBundlePatchTargetCodeAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.Attributes];
-            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.Attributes, value);
+            get => (WixBundlePatchTargetCodeAttributes)this.Fields[(int)WixBundlePatchTargetCodeTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixBundlePatchTargetCodeTupleFields.Attributes, (int)value);
         }
+
+        public bool TargetsProductCode => (this.Attributes & WixBundlePatchTargetCodeAttributes.TargetsProductCode) == WixBundlePatchTargetCodeAttributes.TargetsProductCode;
+
+        public bool TargetsUpgradeCode => (this.Attributes & WixBundlePatchTargetCodeAttributes.TargetsUpgradeCode) == WixBundlePatchTargetCodeAttributes.TargetsUpgradeCode;
     }
 }

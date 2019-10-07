@@ -100,6 +100,7 @@ namespace WixToolset.Data
         ProgId,
         Properties,
         Property,
+        ProvidesDependency,
         PublishComponent,
         RadioButton,
         Registry,
@@ -144,7 +145,6 @@ namespace WixToolset.Data
         WixBundlePatchTargetCode,
         WixBundlePayload,
         WixBundlePayloadGroup,
-        WixBundleProperties,
         WixBundleRelatedPackage,
         WixBundleRollbackBoundary,
         WixBundleSlipstreamMsp,
@@ -159,6 +159,7 @@ namespace WixToolset.Data
         WixCustomTable,
         WixDeltaPatchFile,
         WixDeltaPatchSymbolPaths,
+        WixDependencyProvider,
         WixEnsureTable,
         WixFeatureGroup,
         WixFeatureModules,
@@ -171,15 +172,12 @@ namespace WixToolset.Data
         WixMediaTemplate,
         WixMerge,
         WixOrdering,
-        WixPackageFeatureInfo,
-        WixPackageProperties,
         WixPatchBaseline,
         WixPatchFamilyGroup,
         WixPatchId,
         WixPatchMetadata,
         WixPatchRef,
         WixPatchTarget,
-        WixPayloadProperties,
         WixProductSearch,
         WixProperty,
         WixRegistrySearch,
@@ -495,6 +493,9 @@ namespace WixToolset.Data
                 case TupleDefinitionType.PublishComponent:
                     return TupleDefinitions.PublishComponent;
 
+                case TupleDefinitionType.ProvidesDependency:
+                    return TupleDefinitions.ProvidesDependency;
+
                 case TupleDefinitionType.RadioButton:
                     return TupleDefinitions.RadioButton;
 
@@ -624,9 +625,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixBundlePayloadGroup:
                     return TupleDefinitions.WixBundlePayloadGroup;
 
-                case TupleDefinitionType.WixBundleProperties:
-                    return TupleDefinitions.WixBundleProperties;
-
                 case TupleDefinitionType.WixBundleRelatedPackage:
                     return TupleDefinitions.WixBundleRelatedPackage;
 
@@ -699,12 +697,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixOrdering:
                     return TupleDefinitions.WixOrdering;
 
-                case TupleDefinitionType.WixPackageFeatureInfo:
-                    return TupleDefinitions.WixPackageFeatureInfo;
-
-                case TupleDefinitionType.WixPackageProperties:
-                    return TupleDefinitions.WixPackageProperties;
-
                 case TupleDefinitionType.WixPatchBaseline:
                     return TupleDefinitions.WixPatchBaseline;
 
@@ -722,9 +714,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixPatchTarget:
                     return TupleDefinitions.WixPatchTarget;
-
-                case TupleDefinitionType.WixPayloadProperties:
-                    return TupleDefinitions.WixPayloadProperties;
 
                 case TupleDefinitionType.WixProductSearch:
                     return TupleDefinitions.WixProductSearch;

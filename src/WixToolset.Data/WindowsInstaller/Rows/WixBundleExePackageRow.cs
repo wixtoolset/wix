@@ -2,6 +2,7 @@
 
 namespace WixToolset.Data.WindowsInstaller.Rows
 {
+    using System;
     using WixToolset.Data.Tuples;
 
     /// <summary>
@@ -97,7 +98,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         /// </summary>
         public bool Repairable
         {
-            get { return 0 != (this.Attributes & WixBundleExePackageAttributes.Repairable); }
+            get { return !String.IsNullOrEmpty(this.RepairCommand); }
         }
     }
 }

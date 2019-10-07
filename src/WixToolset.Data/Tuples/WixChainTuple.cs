@@ -51,5 +51,11 @@ namespace WixToolset.Data.Tuples
             get => (WixChainAttributes)(int)this.Fields[(int)WixChainTupleFields.Attributes];
             set => this.Set((int)WixChainTupleFields.Attributes, (int)value);
         }
+
+        public bool DisableRollback => (this.Attributes & WixChainAttributes.DisableRollback) == WixChainAttributes.DisableRollback;
+
+        public bool DisableSystemRestore => (this.Attributes & WixChainAttributes.DisableSystemRestore) == WixChainAttributes.DisableSystemRestore;
+
+        public bool ParallelCache => (this.Attributes & WixChainAttributes.ParallelCache) == WixChainAttributes.ParallelCache;
     }
 }

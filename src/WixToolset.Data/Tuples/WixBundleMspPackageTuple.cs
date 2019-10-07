@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundleMspPackage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundleMspPackageTupleFields.WixBundlePackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMspPackageTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleMspPackageTupleFields.PatchCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleMspPackageTupleFields.Manufacturer), IntermediateFieldType.String),
@@ -26,7 +25,6 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundleMspPackageTupleFields
     {
-        WixBundlePackageRef,
         Attributes,
         PatchCode,
         Manufacturer,
@@ -53,12 +51,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundleMspPackageTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePackageRef
-        {
-            get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.WixBundlePackageRef];
-            set => this.Set((int)WixBundleMspPackageTupleFields.WixBundlePackageRef, value);
-        }
-
         public WixBundleMspPackageAttributes Attributes
         {
             get => (WixBundleMspPackageAttributes)(int)this.Fields[(int)WixBundleMspPackageTupleFields.Attributes];
@@ -82,5 +74,11 @@ namespace WixToolset.Data.Tuples
             get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.PatchXml];
             set => this.Set((int)WixBundleMspPackageTupleFields.PatchXml, value);
         }
+
+        public bool DisplayInternalUI => (this.Attributes & WixBundleMspPackageAttributes.DisplayInternalUI) == WixBundleMspPackageAttributes.DisplayInternalUI;
+
+        public bool Slipstream => (this.Attributes & WixBundleMspPackageAttributes.Slipstream) == WixBundleMspPackageAttributes.Slipstream;
+
+        public bool TargetUnspecified => (this.Attributes & WixBundleMspPackageAttributes.TargetUnspecified) == WixBundleMspPackageAttributes.TargetUnspecified;
     }
 }

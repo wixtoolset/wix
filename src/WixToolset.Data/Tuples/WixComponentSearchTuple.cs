@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixComponentSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.Guid), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixComponentSearchTupleFields.Attributes), IntermediateFieldType.Number),
@@ -21,12 +20,21 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixComponentSearchTupleFields
     {
-        WixSearchRef,
         Guid,
         ProductCode,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixComponentSearchAttributes
+    {
+        KeyPath = 0x1,
+        State = 0x2,
+        WantDirectory = 0x4,
     }
 
     public class WixComponentSearchTuple : IntermediateTuple
@@ -41,12 +49,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixComponentSearchTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearchRef
-        {
-            get => (string)this.Fields[(int)WixComponentSearchTupleFields.WixSearchRef];
-            set => this.Set((int)WixComponentSearchTupleFields.WixSearchRef, value);
-        }
-
         public string Guid
         {
             get => (string)this.Fields[(int)WixComponentSearchTupleFields.Guid];
@@ -59,10 +61,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixComponentSearchTupleFields.ProductCode, value);
         }
 
-        public int Attributes
+        public WixComponentSearchAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixComponentSearchTupleFields.Attributes];
-            set => this.Set((int)WixComponentSearchTupleFields.Attributes, value);
+            get => (WixComponentSearchAttributes)this.Fields[(int)WixComponentSearchTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixComponentSearchTupleFields.Attributes, (int)value);
         }
     }
 }

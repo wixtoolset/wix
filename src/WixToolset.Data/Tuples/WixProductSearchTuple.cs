@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixProductSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.Guid), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixProductSearchTupleFields.Attributes), IntermediateFieldType.Number),
             },
@@ -20,11 +19,22 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixProductSearchTupleFields
     {
-        WixSearchRef,
         Guid,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixProductSearchAttributes
+    {
+        Version = 0x1,
+        Language = 0x2,
+        State = 0x4,
+        Assignment = 0x8,
+        UpgradeCode = 0x10,
     }
 
     public class WixProductSearchTuple : IntermediateTuple
@@ -39,22 +49,16 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixProductSearchTupleFields index] => this.Fields[(int)index];
 
-        public string WixSearchRef
-        {
-            get => (string)this.Fields[(int)WixProductSearchTupleFields.WixSearchRef];
-            set => this.Set((int)WixProductSearchTupleFields.WixSearchRef, value);
-        }
-
         public string Guid
         {
             get => (string)this.Fields[(int)WixProductSearchTupleFields.Guid];
             set => this.Set((int)WixProductSearchTupleFields.Guid, value);
         }
 
-        public int Attributes
+        public WixProductSearchAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixProductSearchTupleFields.Attributes];
-            set => this.Set((int)WixProductSearchTupleFields.Attributes, value);
+            get => (WixProductSearchAttributes)this.Fields[(int)WixProductSearchTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixProductSearchTupleFields.Attributes, (int)value);
         }
     }
 }

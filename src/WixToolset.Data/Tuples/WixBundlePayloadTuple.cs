@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixBundlePayload,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.WixBundlePayload), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.SourceFile), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.DownloadUrl), IntermediateFieldType.String),
@@ -26,10 +25,10 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Thumbprint), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.CatalogRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ContainerRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Package), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.PackageRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ContentFile), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.EmbeddedId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.LayoutOnly), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.LayoutOnly), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Packaging), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.ParentPackagePayloadRef), IntermediateFieldType.String),
             },
@@ -43,7 +42,6 @@ namespace WixToolset.Data.Tuples
 
     public enum WixBundlePayloadTupleFields
     {
-        WixBundlePayload,
         Name,
         SourceFile,
         DownloadUrl,
@@ -59,7 +57,7 @@ namespace WixToolset.Data.Tuples
         Thumbprint,
         CatalogRef,
         ContainerRef,
-        Package,
+        PackageRef,
         ContentFile,
         EmbeddedId,
         LayoutOnly,
@@ -79,21 +77,15 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[WixBundlePayloadTupleFields index] => this.Fields[(int)index];
 
-        public string WixBundlePayload
-        {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.WixBundlePayload];
-            set => this.Set((int)WixBundlePayloadTupleFields.WixBundlePayload, value);
-        }
-
         public string Name
         {
             get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Name];
             set => this.Set((int)WixBundlePayloadTupleFields.Name, value);
         }
 
-        public string SourceFile
+        public IntermediateFieldPathValue SourceFile
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.SourceFile];
+            get => this.Fields[(int)WixBundlePayloadTupleFields.SourceFile].AsPath();
             set => this.Set((int)WixBundlePayloadTupleFields.SourceFile, value);
         }
 
@@ -103,10 +95,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.DownloadUrl, value);
         }
 
-        public YesNoDefaultType Compressed
+        public bool? Compressed
         {
-            get => Enum.TryParse((string)this.Fields[(int)WixBundlePayloadTupleFields.Compressed], true, out YesNoDefaultType value) ? value : YesNoDefaultType.NotSet;
-            set => this.Set((int)WixBundlePayloadTupleFields.Compressed, value.ToString().ToLowerInvariant());
+            get => (bool?)this.Fields[(int)WixBundlePayloadTupleFields.Compressed];
+            set => this.Set((int)WixBundlePayloadTupleFields.Compressed, value);
         }
 
         public string UnresolvedSourceFile
@@ -175,10 +167,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.ContainerRef, value);
         }
 
-        public string Package
+        public string PackageRef
         {
-            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.Package];
-            set => this.Set((int)WixBundlePayloadTupleFields.Package, value);
+            get => (string)this.Fields[(int)WixBundlePayloadTupleFields.PackageRef];
+            set => this.Set((int)WixBundlePayloadTupleFields.PackageRef, value);
         }
 
         public bool ContentFile
@@ -193,16 +185,16 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.EmbeddedId, value);
         }
 
-        public int LayoutOnly
+        public bool LayoutOnly
         {
-            get => (int)this.Fields[(int)WixBundlePayloadTupleFields.LayoutOnly];
+            get => (bool)this.Fields[(int)WixBundlePayloadTupleFields.LayoutOnly];
             set => this.Set((int)WixBundlePayloadTupleFields.LayoutOnly, value);
         }
 
-        public int Packaging
+        public PackagingType Packaging
         {
-            get => (int)this.Fields[(int)WixBundlePayloadTupleFields.Packaging];
-            set => this.Set((int)WixBundlePayloadTupleFields.Packaging, value);
+            get => (PackagingType)this.Fields[(int)WixBundlePayloadTupleFields.Packaging].AsNumber();
+            set => this.Set((int)WixBundlePayloadTupleFields.Packaging, (int)value);
         }
 
         public string ParentPackagePayloadRef

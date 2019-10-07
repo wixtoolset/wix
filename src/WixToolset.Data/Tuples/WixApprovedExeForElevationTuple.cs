@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Key), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Value), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.ValueName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixApprovedExeForElevationTupleFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(WixApprovedExeForElevationTuple));
@@ -20,11 +20,20 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixApprovedExeForElevationTupleFields
     {
         Key,
-        Value,
+        ValueName,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixApprovedExeForElevationAttributes
+    {
+        None = 0x0,
+        Win64 = 0x1,
     }
 
     public class WixApprovedExeForElevationTuple : IntermediateTuple
@@ -45,16 +54,18 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Key, value);
         }
 
-        public string Value
+        public string ValueName
         {
-            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.Value];
-            set => this.Set((int)WixApprovedExeForElevationTupleFields.Value, value);
+            get => (string)this.Fields[(int)WixApprovedExeForElevationTupleFields.ValueName];
+            set => this.Set((int)WixApprovedExeForElevationTupleFields.ValueName, value);
         }
 
-        public BundleApprovedExeForElevationAttributes Attributes
+        public WixApprovedExeForElevationAttributes Attributes
         {
-            get => (BundleApprovedExeForElevationAttributes)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes].AsNumber();
+            get => (WixApprovedExeForElevationAttributes)this.Fields[(int)WixApprovedExeForElevationTupleFields.Attributes].AsNumber();
             set => this.Set((int)WixApprovedExeForElevationTupleFields.Attributes, (int)value);
         }
+
+        public bool Win64 => (this.Attributes & WixApprovedExeForElevationAttributes.Win64) == WixApprovedExeForElevationAttributes.Win64;
     }
 }

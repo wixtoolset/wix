@@ -3,25 +3,7 @@
 namespace WixToolset.Data.WindowsInstaller.Rows
 {
     using System;
-
-    /// <summary>
-    /// Attributes for the PatchTargetCode table.
-    /// </summary>
-    [Flags]
-    public enum WixBundlePatchTargetCodeAttributes : int
-    {
-        None = 0,
-
-        /// <summary>
-        /// The transform targets a specific ProductCode.
-        /// </summary>
-        TargetsProductCode = 1,
-
-        /// <summary>
-        /// The transform targets a specific UpgradeCode.
-        /// </summary>
-        TargetsUpgradeCode = 2,
-    }
+    using WixToolset.Data.Tuples;
 
     /// <summary>
     /// Specialization of a row for the PatchTargetCode table.

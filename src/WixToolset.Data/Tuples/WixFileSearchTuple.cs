@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixFileSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.Path), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFileSearchTupleFields.MaxVersion), IntermediateFieldType.String),
@@ -27,9 +26,10 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Tuples
 {
+    using System;
+
     public enum WixFileSearchTupleFields
     {
-        WixSearchRef,
         Path,
         MinVersion,
         MaxVersion,
@@ -39,6 +39,21 @@ namespace WixToolset.Data.Tuples
         MaxDate,
         Languages,
         Attributes,
+    }
+
+    [Flags]
+    public enum WixFileSearchAttributes
+    {
+        Default = 0x001,
+        MinVersionInclusive = 0x002,
+        MaxVersionInclusive = 0x004,
+        MinSizeInclusive = 0x008,
+        MaxSizeInclusive = 0x010,
+        MinDateInclusive = 0x020,
+        MaxDateInclusive = 0x040,
+        WantVersion = 0x080,
+        WantExists = 0x100,
+        IsDirectory = 0x200,
     }
 
     public class WixFileSearchTuple : IntermediateTuple
@@ -52,12 +67,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixFileSearchTupleFields index] => this.Fields[(int)index];
-
-        public string WixSearchRef
-        {
-            get => (string)this.Fields[(int)WixFileSearchTupleFields.WixSearchRef];
-            set => this.Set((int)WixFileSearchTupleFields.WixSearchRef, value);
-        }
 
         public string Path
         {
@@ -107,10 +116,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixFileSearchTupleFields.Languages, value);
         }
 
-        public int Attributes
+        public WixFileSearchAttributes Attributes
         {
-            get => (int)this.Fields[(int)WixFileSearchTupleFields.Attributes];
-            set => this.Set((int)WixFileSearchTupleFields.Attributes, value);
+            get => (WixFileSearchAttributes)this.Fields[(int)WixFileSearchTupleFields.Attributes].AsNumber();
+            set => this.Set((int)WixFileSearchTupleFields.Attributes, (int)value);
         }
     }
 }
