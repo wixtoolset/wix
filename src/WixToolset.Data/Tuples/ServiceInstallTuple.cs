@@ -53,9 +53,9 @@ namespace WixToolset.Data.Tuples
     {
         KernelDriver,
         SystemDriver,
-        OwnProcess = 4,
-        ShareProcess = 8,
-        InteractiveProcess = 256,
+        OwnProcess = 0x10,
+        ShareProcess = 0x20,
+        InteractiveProcess = 0x100,
     }
 
     public enum ServiceStartType
