@@ -4849,7 +4849,7 @@ namespace WixToolset.Core
                         includeMax = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "IncludeMinimum": // this is "yes" by default
-                        includeMin = YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        includeMin = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "Language":
                         language = this.Core.GetAttributeValue(sourceLineNumbers, attrib);

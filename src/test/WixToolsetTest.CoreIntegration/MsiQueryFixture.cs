@@ -546,7 +546,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesUpgradeTableFromManualUpgrade()
         {
             var folder = TestData.Get(@"TestData\ManualUpgrade");
