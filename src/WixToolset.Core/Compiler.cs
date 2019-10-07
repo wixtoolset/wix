@@ -322,8 +322,9 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.SearchPropertyNotUppercase(sourceLineNumbers, "Property", "Id", propertyId.Id));
                 }
 
-                var tuple = new AppSearchTuple(sourceLineNumbers, propertyId)
+                var tuple = new AppSearchTuple(sourceLineNumbers, new Identifier(propertyId.Access, propertyId.Id, signature))
                 {
+                    PropertyRef = propertyId.Id,
                     SignatureRef = signature
                 };
 
@@ -2905,6 +2906,7 @@ namespace WixToolset.Core
             {
                 var tuple = new CompLocatorTuple(sourceLineNumbers, id)
                 {
+                    SignatureRef = id.Id,
                     ComponentId = componentId,
                     Type = type,
                 };
@@ -4482,7 +4484,7 @@ namespace WixToolset.Core
                     signature = id.Id;
                 }
 
-                var tuple = new DrLocatorTuple(sourceLineNumbers)
+                var tuple = new DrLocatorTuple(sourceLineNumbers, new Identifier(access, rowId, parentSignature, path))
                 {
                     SignatureRef = rowId,
                     Parent = parentSignature,
@@ -6793,6 +6795,7 @@ namespace WixToolset.Core
             {
                 var tuple = new IniLocatorTuple(sourceLineNumbers, id)
                 {
+                    SignatureRef = id.Id,
                     FileName = this.GetMsiFilenameValue(shortName, name),
                     Section = section,
                     Key = key,

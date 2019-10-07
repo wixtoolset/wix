@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class MsiQueryFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesAppSearchTablesFromComponentSearch()
         {
             var folder = TestData.Get(@"TestData");
@@ -43,7 +43,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesAppSearchTablesFromDirectorySearch()
         {
             var folder = TestData.Get(@"TestData");
@@ -71,13 +71,13 @@ namespace WixToolsetTest.CoreIntegration
                 var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "DrLocator" });
                 Assert.Equal(new[]
                 {
-                    "AppSearch:SAMPLECOMPFOUND\tSampleCompSearch",
+                    "AppSearch:SAMPLEDIRFOUND\tSampleDirSearch",
                     "DrLocator:SampleDirSearch\t\tC:\\SampleDir\t",
                 }, results);
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesAppSearchTablesFromFileSearch()
         {
             var folder = TestData.Get(@"TestData");
@@ -112,7 +112,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesAppSearchTablesFromRegistrySearch()
         {
             var folder = TestData.Get(@"TestData");

@@ -152,6 +152,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 case TupleDefinitionType.Shortcut:
                     this.AddShortcutTuple((ShortcutTuple)tuple, output);
                     break;
+                        
+                case TupleDefinitionType.Signature:
+                    this.AddTupleDefaultly(tuple, output, true);
+                    break;
 
                 case TupleDefinitionType.SummaryInformation:
                     this.AddTupleDefaultly(tuple, output, tableName: "_SummaryInformation");
@@ -917,7 +921,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (i < tableDefinition.Columns.Length)
                 {
-                    var column = tableDefinition.Columns[i];
+                    var column = tableDefinition.Columns[i + rowOffset];
 
                     switch (column.Type)
                     {
