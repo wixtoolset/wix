@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup" />
+        </ComponentGroup>
+
+        <CustomTable Id="CustomTable1">
+            <Column Id="Column1" Type="string" PrimaryKey="yes" />
+            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" />
+            <Row>
+                <Data Column="Column1">Row1</Data>
+                <Data Column="Component_">test.txt</Data>
+            </Row>
+            <Row>
+                <Data Column="Column1">Row2</Data>
+                <Data Column="Component_">test.txt</Data>
+            </Row>
+        </CustomTable>
+    </Fragment>
+</Wix>
