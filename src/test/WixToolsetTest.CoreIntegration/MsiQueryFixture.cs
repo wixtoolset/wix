@@ -412,7 +412,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesLockPermissionsTableWithEmptyPermissions()
         {
             var folder = TestData.Get(@"TestData");

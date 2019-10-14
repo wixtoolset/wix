@@ -1053,7 +1053,6 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var bits = new BitArray(32);
             string domain = null;
-            var permission = 0;
             string[] specialPermissions = null;
             string user = null;
 
@@ -1115,12 +1114,12 @@ namespace WixToolset.Core
                 }
             }
 
-            permission = this.Core.CreateIntegerFromBitArray(bits);
-
             if (null == user)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "User"));
             }
+
+            var permission = this.Core.CreateIntegerFromBitArray(bits);
 
             if (Int32.MinValue == permission) // just GENERIC_READ, which is MSI_NULL
             {
