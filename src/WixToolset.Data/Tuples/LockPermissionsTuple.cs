@@ -67,9 +67,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)LockPermissionsTupleFields.User, value);
         }
 
-        public int Permission
+        public int? Permission
         {
-            get => (int)this.Fields[(int)LockPermissionsTupleFields.Permission];
+            get => (int?)this.Fields[(int)LockPermissionsTupleFields.Permission];
             set => this.Set((int)LockPermissionsTupleFields.Permission, value);
         }
     }
