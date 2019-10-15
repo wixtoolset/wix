@@ -647,6 +647,39 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesTextStyleTableWhenColorIsNull()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "TextStyle", "ColorNull.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "TextStyle" });
+                Assert.Equal(new[]
+                {
+                    "TextStyle:FirstTextStyle\tArial\t2\t\t",
+                }, results);
+            }
+        }
+
         [Fact]
         public void PopulatesUpgradeTableFromManualUpgrade()
         {
