@@ -147,6 +147,41 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesClassTablesWhenIconIndexIsZero()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Class", "IconIndex0.wxs"),
+                    Path.Combine(folder, "Icon", "SampleIcon.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Class" });
+                Assert.Equal(new[]
+                {
+                    "Class:{3FAED4CC-C473-4B8A-BE8B-303871377A4A}\tLocalServer32\tClassComp\t\tFakeClass3FAE\t\t\tSampleIcon\t0\t\t\tProductFeature\t",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesClassTablesWhenProgIdIsNestedUnderAdvertisedClass()
         {
             var folder = TestData.Get(@"TestData");

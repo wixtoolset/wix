@@ -18,6 +18,7 @@
     <Content Include="TestData\AppSearch\DirectorySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\FileSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\RegistrySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\UnscheduledCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -27,6 +28,7 @@
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\FeatureGroup\FeatureGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Font\FontTitle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Icon\SampleIcon.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\LockPermissions\EmptyPermissions.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\MinimalComponentGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\Product.wxs" CopyToOutputDirectory="PreserveNewest" />
