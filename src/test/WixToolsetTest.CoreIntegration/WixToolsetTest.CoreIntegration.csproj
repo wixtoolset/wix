@@ -114,6 +114,7 @@
     <Content Include="TestData\OverridableActions\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\OverridableActions\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\TextStyle\ColorNull.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\TypeLib\Language0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Wixipl\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Wixipl\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Wixipl\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

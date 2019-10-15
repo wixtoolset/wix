@@ -681,6 +681,38 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void PopulatesTypeLibTableWhenLanguageIsZero()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "TypeLib", "Language0.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "TypeLib" });
+                Assert.Equal(new[]
+                {
+                    "TypeLib:{765BE8EE-BD7F-491E-90D2-C5A972462B50}\t0\tTypeLibComp\t\t\t\tProductFeature\t",
+                }, results);
+            }
+        }
+
+        [Fact]
         public void PopulatesUpgradeTableFromManualUpgrade()
         {
             var folder = TestData.Get(@"TestData\ManualUpgrade");

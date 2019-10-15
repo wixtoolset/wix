@@ -21,24 +21,60 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
 
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "DetectOnly.wxs"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(intermediateFolder, @"test.wixlib"),
+                    "-o", wixlibPath,
                 });
 
                 result.AssertSuccess();
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wixlib"));
+                var intermediate = Intermediate.Load(wixlibPath);
                 var allTuples = intermediate.Sections.SelectMany(s => s.Tuples);
                 var wixSimpleRefTuples = allTuples.OfType<WixSimpleReferenceTuple>();
                 var repRef = wixSimpleRefTuples.Where(t => t.Table == "WixAction" &&
                                                            t.PrimaryKeys == "InstallExecuteSequence/RemoveExistingProducts")
                                                .SingleOrDefault();
                 Assert.NotNull(repRef);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void TypeLibLanguageAsStringReturnsZero()
+        {
+            var folder = TestData.Get(@"TestData\TypeLib");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Language0.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(wixlibPath);
+                var allTuples = intermediate.Sections.SelectMany(s => s.Tuples);
+                var typeLibTuple = allTuples.OfType<TypeLibTuple>()
+                                            .SingleOrDefault();
+                Assert.NotNull(typeLibTuple);
+
+                var fields = typeLibTuple.Fields.Select(field => field?.Type == IntermediateFieldType.Bool
+                                                        ? field.AsNullableNumber()?.ToString()
+                                                        : field?.AsString())
+                                                .ToList();
+                Assert.Equal("0", fields[1]);
             }
         }
     }
