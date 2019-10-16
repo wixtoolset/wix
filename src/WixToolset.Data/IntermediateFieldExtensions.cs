@@ -441,7 +441,7 @@ namespace WixToolset.Data
                     }
                     else
                     {
-                        throw new ArgumentException($"Cannot convert string '{value}' to a 'number' field type.", nameof(value));
+                        throw new ArgumentException($"Cannot convert string '{value}' to a 'number' field type.", field.Name);
                     }
                     break;
 
