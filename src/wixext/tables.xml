@@ -57,7 +57,7 @@
         <columnDefinition name="User_" type="string" length="72" modularize="column" nullable="yes"
                 keyTable="User" keyColumn="1" category="identifier" description="Foreign key, User to give access permissions to"/>
         <columnDefinition name="Permissions" type="number" length="4" nullable="yes"
-                description="Permissions int, as on EXPLICIT_ACCESS.grfAccessPermissions in MSDN"/>
+                description="Permissions int, as in EXPLICIT_ACCESS.grfAccessPermissions in MSDN"/>
     </tableDefinition>
     <tableDefinition name="FileSharePermissions">
         <columnDefinition name="FileShare_" type="string" length="72" primaryKey="yes" modularize="column"
@@ -65,7 +65,7 @@
         <columnDefinition name="User_" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="User that these premissions are to apply to."/>
         <columnDefinition name="Permissions" type="number" length="4"
-                description="Permissions int, as on EXPLICIT_ACCESS.grfAccessPermissions in MSDN"/>
+                description="Permissions int, as in EXPLICIT_ACCESS.grfAccessPermissions in MSDN"/>
     </tableDefinition>
     <tableDefinition name="Group" createSymbols="yes">
         <columnDefinition name="Group" type="string" length="72" primaryKey="yes" modularize="column"

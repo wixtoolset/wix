@@ -19,7 +19,7 @@ namespace WixToolsetTest.Util
             var results = build.BuildAndQuery(Build, "FileShare", "FileSharePermissions");
             Assert.Equal(new[]
             {
-                "FileShare:ExampleFileShare\texample\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example file share\tINSTALLFOLDER\t\t0",
+                "FileShare:ExampleFileShare\texample\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example file share\tINSTALLFOLDER\t\t",
                 "FileSharePermissions:ExampleFileShare\tEveryone\t1",
             }, results.OrderBy(s => s).ToArray());
         }

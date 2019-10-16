@@ -86,9 +86,9 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)FileShareTupleFields.User_, value);
         }
 
-        public int Permissions
+        public int? Permissions
         {
-            get => this.Fields[(int)FileShareTupleFields.Permissions].AsNumber();
+            get => this.Fields[(int)FileShareTupleFields.Permissions].AsNullableNumber();
             set => this.Set((int)FileShareTupleFields.Permissions, value);
         }
     }

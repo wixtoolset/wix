@@ -505,7 +505,7 @@ namespace WixToolset.Util
                         break;
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixComponentSearch", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixComponentSearch", id);
                 row.Set(1, guid);
                 row.Set(2, productCode);
                 row.Set(3, (int)attributes);
@@ -662,26 +662,26 @@ namespace WixToolset.Util
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             string eventSourceKey = $@"SYSTEM\CurrentControlSet\Services\EventLog\{logName}\{sourceName}";
-            Identifier id = this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
+            Identifier id = this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
 
             if (null != categoryMessageFile)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryMessageFile", String.Concat("#%", categoryMessageFile), componentId, false);
             }
 
             if (CompilerConstants.IntegerNotSet != categoryCount)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "CategoryCount", String.Concat("#", categoryCount), componentId, false);
             }
 
             if (null != parameterMessageFile)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "ParameterMessageFile", String.Concat("#%", parameterMessageFile), componentId, false);
             }
 
             if (0 != typesSupported)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "TypesSupported", String.Concat("#", typesSupported), componentId, false);
             }
 
             var componentKeyPath = this.CreateComponentKeyPath();
@@ -845,7 +845,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixCloseApplication", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixCloseApplication", id);
                 row.Set(1, target);
                 row.Set(2, description);
                 row.Set(3, condition);
@@ -1087,7 +1087,7 @@ namespace WixToolset.Util
         /// <param name="attributes"></param>
         private void CreateWixFileSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string path, WixFileSearchAttributes attributes)
         {
-            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixFileSearch", id);
+            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixFileSearch", id);
             row.Set(1, path);
             //row.Set(2, minVersion;
             //row.Set(3, maxVersion;
@@ -1108,7 +1108,7 @@ namespace WixToolset.Util
         /// <param name="condition">A condition to test before evaluating the search.</param>
         private void CreateWixSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string variable, string condition)
         {
-            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixSearch", id);
+            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixSearch", id);
             row.Set(1, variable);
             row.Set(2, condition);
         }
@@ -1122,7 +1122,7 @@ namespace WixToolset.Util
         /// <param name="attributes">Further details about the relation between id and parentId.</param>
         private void CreateWixSearchRelationRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
         {
-            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixSearchRelation", id);
+            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixSearchRelation", id);
             row.Set(1, parentId);
             row.Set(2, attributes);
         }
@@ -1217,7 +1217,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "FileShare");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "FileShare");
                 row.Set(0, id);
                 row.Set(1, name);
                 row.Set(2, componentId);
@@ -1286,7 +1286,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "FileSharePermissions");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "FileSharePermissions");
                 row.Set(0, fileShareId);
                 row.Set(1, user);
                 row.Set(2, permission);
@@ -1340,7 +1340,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Group");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Group");
                 row.Set(0, id);
                 row.Set(1, componentId);
                 row.Set(2, name);
@@ -1383,7 +1383,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "UserGroup");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "UserGroup");
                 row.Set(0, userId);
                 row.Set(1, groupId);
             }
@@ -1504,7 +1504,7 @@ namespace WixToolset.Util
             // add the appropriate extension based on type of shortcut
             name = String.Concat(name, InternetShortcutType.Url == type ? ".url" : ".lnk");
 
-            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixInternetShortcut");
+            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixInternetShortcut");
             row.Set(0, shortcutId);
             row.Set(1, componentId);
             row.Set(2, directoryId);
@@ -1530,7 +1530,7 @@ namespace WixToolset.Util
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CreateFolder");
 
             // use built-in MSI functionality to remove the shortcuts rather than doing so via CA
-            row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "RemoveFile");
+            row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "RemoveFile");
             row.Set(0, shortcutId);
             row.Set(1, componentId);
             row.Set(2, this.ParseHelper.IsValidShortFilename(name, false) ? name : String.Concat(this.ParseHelper.CreateShortName(name, true, false, directoryId, name), "|", name));
@@ -1683,7 +1683,7 @@ namespace WixToolset.Util
                 sbSymbolicConstants.AppendFormat("#define LAST_{0}_COUNTER_OFFSET    {1}\r\n", objectName, symbolConstantsCounter);
 
                 // Add the calculated INI and H strings to the PerformanceCategory table.
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "PerformanceCategory");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "PerformanceCategory");
                 row.Set(0, id);
                 row.Set(1, componentId);
                 row.Set(2, name);
@@ -1695,15 +1695,15 @@ namespace WixToolset.Util
                 string linkageKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Linkage", escapedName);
                 string performanceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Performance", escapedName);
 
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Library", library, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Open", openEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Collect", collectEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Close", closeEntryPoint, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "IsMultiInstance", YesNoType.Yes == multiInstance ? "#1" : "#0", componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Names", sbCounterNames.ToString(), componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
             }
 
             // Reference InstallPerfCounterData and UninstallPerfCounterData since nothing will happen without them
@@ -2188,7 +2188,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Perfmon");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Perfmon");
                 row.Set(0, componentId);
                 row.Set(1, $"[#{fileId}]");
                 row.Set(2, name);
@@ -2245,7 +2245,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "PerfmonManifest");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "PerfmonManifest");
                 row.Set(0, componentId);
                 row.Set(1, $"[#{fileId}]");
                 row.Set(2, resourceFileDirectory);
@@ -2319,7 +2319,7 @@ namespace WixToolset.Util
                         break;
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixFormatFiles");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixFormatFiles");
                 row.Set(0, binaryId);
                 row.Set(1, fileId);
 
@@ -2370,13 +2370,13 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "EventManifest");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "EventManifest");
                 row.Set(0, componentId);
                 row.Set(1, $"[#{fileId}]");
 
                 if (null != messageFile)
                 {
-                    var messageRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "XmlFile");
+                    var messageRow = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
                     messageRow.Set(0, String.Concat("Config_", fileId, "MessageFile"));
                     messageRow.Set(1, $"[#{fileId}]");
                     messageRow.Set(2, "/*/*/*/*[\\[]@messageFileName[\\]]");
@@ -2387,7 +2387,7 @@ namespace WixToolset.Util
                 }
                 if (null != parameterFile)
                 {
-                    var resourceRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "XmlFile");
+                    var resourceRow = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
                     resourceRow.Set(0, String.Concat("Config_", fileId, "ParameterFile"));
                     resourceRow.Set(1, $"[#{fileId}]");
                     resourceRow.Set(2, "/*/*/*/*[\\[]@parameterFileName[\\]]");
@@ -2398,7 +2398,7 @@ namespace WixToolset.Util
                 }
                 if (null != resourceFile)
                 {
-                    var resourceRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "XmlFile");
+                    var resourceRow = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
                     resourceRow.Set(0, String.Concat("Config_", fileId, "ResourceFile"));
                     resourceRow.Set(1, $"[#{fileId}]");
                     resourceRow.Set(2, "/*/*/*/*[\\[]@resourceFileName[\\]]");
@@ -2558,7 +2558,7 @@ namespace WixToolset.Util
                     this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedSecureObjects");
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SecureObjects");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "SecureObjects");
                 row.Set(0, objectId);
                 row.Set(1, tableName);
                 row.Set(2, domain);
@@ -2680,7 +2680,7 @@ namespace WixToolset.Util
                     attributes |= WixProductSearchAttributes.UpgradeCode;
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixProductSearch", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixProductSearch", id);
                 row.Set(1, productCode ?? upgradeCode);
                 row.Set(2, (int)attributes);
             }
@@ -2836,7 +2836,7 @@ namespace WixToolset.Util
                     this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixRegistrySearch", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixRegistrySearch", id);
                 row.Set(1, (int)root);
                 row.Set(2, key);
                 row.Set(3, value);
@@ -2919,7 +2919,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixRemoveFolderEx", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixRemoveFolderEx", id);
                 row.Set(1, componentId);
                 row.Set(2, property);
                 row.Set(3, on);
@@ -3004,7 +3004,7 @@ namespace WixToolset.Util
                     this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixRegisterRestartResources");
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixRestartResource", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixRestartResource", id);
                 row.Set(1, componentId);
                 row.Set(2, resource);
                 row.Set(3, attributes);
@@ -3104,7 +3104,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "ServiceConfig");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "ServiceConfig");
                 row.Set(0, serviceName);
                 row.Set(1, componentId);
                 row.Set(2, (newService ? 1 : 0));
@@ -3204,7 +3204,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixTouchFile", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixTouchFile", id);
                 row.Set(1, componentId);
                 row.Set(2, path);
                 row.Set(3, attributes);
@@ -3428,7 +3428,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "User", id);
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "User", id);
                 row.Set(1, componentId);
                 row.Set(2, name);
                 row.Set(3, domain);
@@ -3560,7 +3560,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "XmlFile");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
                 row.Set(0, id);
                 row.Set(1, file);
                 row.Set(2, elementPath);
@@ -3798,7 +3798,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "XmlConfig");
+                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlConfig");
                 row.Set(0, id);
                 row.Set(1, file);
                 row.Set(2, elementId ?? elementPath);
