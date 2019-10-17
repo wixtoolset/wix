@@ -12,8 +12,8 @@ namespace WixToolsetTest.CoreIntegration
 
     public class WixlibQueryFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
-        public void DetectOnlyUpgradeProducesReferenceToRemoveExistingProducts()
+        [Fact]
+        public void UpgradeProducesReferenceToRemoveExistingProducts()
         {
             var folder = TestData.Get(@"TestData\Upgrade");
 

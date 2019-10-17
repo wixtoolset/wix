@@ -181,7 +181,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesClassTablesWhenProgIdIsNestedUnderAdvertisedClass()
         {
             var folder = TestData.Get(@"TestData");
@@ -396,7 +396,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesInstallExecuteSequenceTable()
         {
             var folder = TestData.Get(@"TestData");
@@ -516,7 +516,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesMsiShortcutPropertyTable()
         {
             var folder = TestData.Get(@"TestData");
@@ -549,7 +549,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesRegistryTableFromRegistryValue()
         {
             var folder = TestData.Get(@"TestData");

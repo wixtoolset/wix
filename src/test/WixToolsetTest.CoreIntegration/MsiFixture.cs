@@ -608,7 +608,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildVersionIndependentProgId()
         {
             var folder = TestData.Get(@"TestData\ProgId");
@@ -639,11 +639,17 @@ namespace WixToolsetTest.CoreIntegration
                 var section = intermediate.Sections.Single();
 
                 var progids = section.Tuples.OfType<ProgIdTuple>().OrderBy(tuple => tuple.ProgId).ToList();
-                Assert.Equal(2, progids.Count);
-                Assert.Equal("Foo.File.hol", progids[0].ProgId);
-                Assert.Equal("Foo.File.hol.15", progids[0].ParentProgIdRef);
-                Assert.Equal("Foo.File.hol.15", progids[1].ProgId);
-                Assert.Null(progids[1].ParentProgIdRef);
+                Assert.Equal(new[]
+                {
+                    "Foo.File.hol",
+                    "Foo.File.hol.15"
+                }, progids.Select(p => p.ProgId).ToArray());
+
+                Assert.Equal(new[]
+                {
+                    "Foo.File.hol.15",
+                    null
+                }, progids.Select(p => p.ParentProgIdRef).ToArray());
             }
         }
 

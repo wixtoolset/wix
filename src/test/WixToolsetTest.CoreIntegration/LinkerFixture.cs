@@ -13,7 +13,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class LinkerFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildWithOverridableActions()
         {
             var folder = TestData.Get(@"TestData\OverridableActions");

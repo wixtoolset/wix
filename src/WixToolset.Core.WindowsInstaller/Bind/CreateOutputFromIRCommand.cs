@@ -117,6 +117,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.MsiShortcutProperty:
+                    this.AddTupleDefaultly(tuple, output, true);
+                    break;
+
                 case TupleDefinitionType.MoveFile:
                     this.AddMoveFileTuple((MoveFileTuple)tuple, output);
                     break;

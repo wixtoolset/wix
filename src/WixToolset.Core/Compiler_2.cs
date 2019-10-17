@@ -1297,7 +1297,7 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), progIdAdvertise.ToString()));
             }
-            else
+            else if (YesNoType.NotSet != progIdAdvertise)
             {
                 advertise = progIdAdvertise;
             }
@@ -2020,6 +2020,7 @@ namespace WixToolset.Core
                 var tuple = new RegistryTuple(sourceLineNumbers, id)
                 {
                     Root = root.Value,
+                    Key = key,
                     Name = name,
                     Value = value,
                     ValueType = valueType,
@@ -4923,7 +4924,7 @@ namespace WixToolset.Core
 
                 // Ensure that RemoveExistingProducts is authored in InstallExecuteSequence
                 // if at least one row in Upgrade table lacks the OnlyDetect attribute.
-                if (onlyDetect)
+                if (!onlyDetect)
                 {
                     this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", "InstallExecuteSequence", "RemoveExistingProducts");
                 }
