@@ -107,9 +107,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ClassTupleFields.IconRef, value);
         }
 
-        public int IconIndex
+        public int? IconIndex
         {
-            get => (int)this.Fields[(int)ClassTupleFields.IconIndex];
+            get => (int?)this.Fields[(int)ClassTupleFields.IconIndex];
             set => this.Set((int)ClassTupleFields.IconIndex, value);
         }
 

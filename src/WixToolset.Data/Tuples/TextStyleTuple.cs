@@ -10,10 +10,11 @@ namespace WixToolset.Data
             TupleDefinitionType.TextStyle,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.TextStyle), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TextStyleTupleFields.FaceName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Size), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Color), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Red), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Green), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Blue), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Bold), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Italic), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(TextStyleTupleFields.Strike), IntermediateFieldType.Bool),
@@ -27,10 +28,11 @@ namespace WixToolset.Data.Tuples
 {
     public enum TextStyleTupleFields
     {
-        TextStyle,
         FaceName,
         Size,
-        Color,
+        Red,
+        Green,
+        Blue,
         Bold,
         Italic,
         Strike,
@@ -49,12 +51,6 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[TextStyleTupleFields index] => this.Fields[(int)index];
 
-        public string TextStyle
-        {
-            get => (string)this.Fields[(int)TextStyleTupleFields.TextStyle];
-            set => this.Set((int)TextStyleTupleFields.TextStyle, value);
-        }
-
         public string FaceName
         {
             get => (string)this.Fields[(int)TextStyleTupleFields.FaceName];
@@ -63,37 +59,49 @@ namespace WixToolset.Data.Tuples
 
         public int Size
         {
-            get => this.Fields[(int)TextStyleTupleFields.Size].AsNumber();
+            get => (int)this.Fields[(int)TextStyleTupleFields.Size];
             set => this.Set((int)TextStyleTupleFields.Size, value);
         }
 
-        public int Color
+        public int? Red
         {
-            get => (int)this.Fields[(int)TextStyleTupleFields.Color].AsNumber();
-            set => this.Set((int)TextStyleTupleFields.Color, value);
+            get => (int?)this.Fields[(int)TextStyleTupleFields.Red];
+            set => this.Set((int)TextStyleTupleFields.Red, value);
+        }
+
+        public int? Green
+        {
+            get => (int?)this.Fields[(int)TextStyleTupleFields.Green];
+            set => this.Set((int)TextStyleTupleFields.Green, value);
+        }
+
+        public int? Blue
+        {
+            get => (int?)this.Fields[(int)TextStyleTupleFields.Blue];
+            set => this.Set((int)TextStyleTupleFields.Blue, value);
         }
 
         public bool Bold
         {
-            get => this.Fields[(int)TextStyleTupleFields.Bold].AsBool();
+            get => (bool)this.Fields[(int)TextStyleTupleFields.Bold];
             set => this.Set((int)TextStyleTupleFields.Bold, value);
         }
 
         public bool Italic
         {
-            get => this.Fields[(int)TextStyleTupleFields.Italic].AsBool();
+            get => (bool)this.Fields[(int)TextStyleTupleFields.Italic];
             set => this.Set((int)TextStyleTupleFields.Italic, value);
         }
 
         public bool Strike
         {
-            get => this.Fields[(int)TextStyleTupleFields.Strike].AsBool();
+            get => (bool)this.Fields[(int)TextStyleTupleFields.Strike];
             set => this.Set((int)TextStyleTupleFields.Strike, value);
         }
 
         public bool Underline
         {
-            get => this.Fields[(int)TextStyleTupleFields.Underline].AsBool();
+            get => (bool)this.Fields[(int)TextStyleTupleFields.Underline];
             set => this.Set((int)TextStyleTupleFields.Underline, value);
         }
     }

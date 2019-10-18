@@ -16,11 +16,6 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, bool value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
-            {
-                return tuple.Fields[index] = null;
-            }
-
             var definition = tuple.Definition.FieldDefinitions[index];
 
             var field = tuple.Fields[index].Set(definition, value);
@@ -30,7 +25,7 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, bool? value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(tuple, index))
             {
                 return tuple.Fields[index] = null;
             }
@@ -44,11 +39,6 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, long value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
-            {
-                return tuple.Fields[index] = null;
-            }
-
             var definition = tuple.Definition.FieldDefinitions[index];
 
             var field = tuple.Fields[index].Set(definition, value);
@@ -58,7 +48,7 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, long? value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(tuple, index))
             {
                 return tuple.Fields[index] = null;
             }
@@ -72,11 +62,6 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, int value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
-            {
-                return tuple.Fields[index] = null;
-            }
-
             var definition = tuple.Definition.FieldDefinitions[index];
 
             var field = tuple.Fields[index].Set(definition, value);
@@ -86,7 +71,7 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, int? value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(tuple, index))
             {
                 return tuple.Fields[index] = null;
             }
@@ -100,7 +85,7 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, IntermediateFieldPathValue value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(tuple, index))
             {
                 return tuple.Fields[index] = null;
             }
@@ -114,7 +99,7 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, string value)
         {
-            if (value == default && NoFieldMetadata(tuple, index))
+            if (value == null && NoFieldMetadata(tuple, index))
             {
                 return tuple.Fields[index] = null;
             }
