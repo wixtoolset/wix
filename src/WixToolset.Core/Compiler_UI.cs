@@ -746,7 +746,9 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
-            var color = CompilerConstants.IntegerNotSet;
+            int? red = null;
+            int? green = null;
+            int? blue = null;
             var bold = false;
             var italic = false;
             var strike = false;
@@ -769,42 +771,21 @@ namespace WixToolset.Core
                         var redColor = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
                         if (CompilerConstants.IllegalInteger != redColor)
                         {
-                            if (CompilerConstants.IntegerNotSet == color)
-                            {
-                                color = redColor;
-                            }
-                            else
-                            {
-                                color += redColor;
-                            }
+                            red = redColor;
                         }
                         break;
                     case "Green":
                         var greenColor = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
                         if (CompilerConstants.IllegalInteger != greenColor)
                         {
-                            if (CompilerConstants.IntegerNotSet == color)
-                            {
-                                color = greenColor * 256;
-                            }
-                            else
-                            {
-                                color += greenColor * 256;
-                            }
+                            green = greenColor;
                         }
                         break;
                     case "Blue":
                         var blueColor = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Byte.MaxValue);
                         if (CompilerConstants.IllegalInteger != blueColor)
                         {
-                            if (CompilerConstants.IntegerNotSet == color)
-                            {
-                                color = blueColor * 65536;
-                            }
-                            else
-                            {
-                                color += blueColor * 65536;
-                            }
+                            blue = blueColor;
                         }
                         break;
 
@@ -843,7 +824,7 @@ namespace WixToolset.Core
 
             if (null == id)
             {
-                this.Core.CreateIdentifier("txs", faceName, size.ToString(), color.ToString(), bold.ToString(), italic.ToString(), strike.ToString(), underline.ToString());
+                this.Core.CreateIdentifier("txs", faceName, size.ToString(), (red ?? 0).ToString(), (green ?? 0).ToString(), (blue ?? 0).ToString(), bold.ToString(), italic.ToString(), strike.ToString(), underline.ToString());
             }
 
             if (null == faceName)
@@ -858,7 +839,9 @@ namespace WixToolset.Core
                 var tuple = new TextStyleTuple(sourceLineNumbers, id)
                 {
                     FaceName = faceName,
-                    Color = color,
+                    Red = red,
+                    Green = green,
+                    Blue = blue,
                     Bold = bold,
                     Italic = italic,
                     Strike = strike,

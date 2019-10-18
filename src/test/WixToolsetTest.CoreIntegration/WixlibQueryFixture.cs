@@ -43,7 +43,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void TypeLibLanguageAsStringReturnsZero()
         {
             var folder = TestData.Get(@"TestData\TypeLib");

@@ -50,11 +50,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 switch (tuple.Definition.Type)
                 {
                 case TupleDefinitionType.Binary:
-                    this.AddTupleDefaultly(tuple, output, true);
+                    this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
                     break;
 
                 case TupleDefinitionType.BBControl:
                     this.AddBBControlTuple((BBControlTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.Class:
+                    this.AddClassTuple((ClassTuple)tuple, output);
                     break;
 
                 case TupleDefinitionType.Control:
@@ -89,6 +93,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddFileTuple((FileTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.Icon:
+                    this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
+                    break;
+
                 case TupleDefinitionType.IniFile:
                     this.AddIniFileTuple((IniFileTuple)tuple, output);
                     break;
@@ -118,7 +126,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
 
                 case TupleDefinitionType.MsiShortcutProperty:
-                    this.AddTupleDefaultly(tuple, output, true);
+                    this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
                     break;
 
                 case TupleDefinitionType.MoveFile:
@@ -146,7 +154,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
 
                 case TupleDefinitionType.ReserveCost:
-                    this.AddTupleDefaultly(tuple, output, true);
+                    this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
                     break;
 
                 case TupleDefinitionType.ServiceControl:
@@ -162,7 +170,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
                         
                 case TupleDefinitionType.Signature:
-                    this.AddTupleDefaultly(tuple, output, true);
+                    this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
                     break;
 
                 case TupleDefinitionType.SummaryInformation:
@@ -226,6 +234,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[6] = tuple.Height;
             row[7] = attributes;
             row[8] = tuple.Text;
+        }
+
+        private void AddClassTuple(ClassTuple tuple, Output output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["Class"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.CLSID;
+            row[1] = tuple.Context;
+            row[2] = tuple.ComponentRef;
+            row[3] = tuple.DefaultProgIdRef;
+            row[4] = tuple.Description;
+            row[5] = tuple.AppIdRef;
+            row[6] = tuple.FileTypeMask;
+            row[7] = tuple.IconRef;
+            row[8] = tuple.IconIndex;
+            row[9] = tuple.DefInprocHandler;
+            row[10] = tuple.Argument;
+            row[11] = tuple.FeatureRef;
+            row[12] = tuple.RelativePath ? (int?)1 : null;
         }
 
         private void AddControlTuple(ControlTuple tuple, Output output)
@@ -326,7 +353,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[1] = type;
             row[2] = tuple.Source;
             row[3] = tuple.Target;
-            row[4] = tuple.PatchUninstall ? WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : 0;
+            row[4] = tuple.PatchUninstall ? (int?)WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : null;
         }
 
         private void AddDialogTuple(DialogTuple tuple, Output output)
@@ -775,13 +802,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             styleBits |= tuple.Strike ? WindowsInstallerConstants.MsidbTextStyleStyleBitsStrike : 0;
             styleBits |= tuple.Underline ? WindowsInstallerConstants.MsidbTextStyleStyleBitsUnderline : 0;
 
+            long? color = null;
+
+            if (tuple.Red.HasValue || tuple.Green.HasValue || tuple.Blue.HasValue)
+            {
+                color = tuple.Red ?? 0;
+                color += (long)(tuple.Green ?? 0) * 256;
+                color += (long)(tuple.Blue ?? 0) * 65536;
+            }
+
             var table = output.EnsureTable(this.TableDefinitions["TextStyle"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
             row[0] = tuple.Id.Id;
             row[1] = tuple.FaceName;
             row[2] = tuple.Size;
-            row[3] = tuple.Color;
-            row[4] = styleBits;
+            row[3] = color;
+            row[4] = styleBits == 0 ? null : (int?)styleBits;
         }
 
         private void AddUpgradeTuple(UpgradeTuple tuple, Output output)

@@ -146,7 +146,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesClassTablesWhenIconIndexIsZero()
         {
             var folder = TestData.Get(@"TestData");
@@ -218,7 +218,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesCustomActionTable()
         {
             var folder = TestData.Get(@"TestData");
@@ -647,7 +647,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesTextStyleTableWhenColorIsNull()
         {
             var folder = TestData.Get(@"TestData");
