@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Product Id="{FE17A505-11A9-44D2-8D94-EB6BEAB8FF93}" Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0">
+    <Package Description="MsiPackage" InstallerVersion="500" Languages="1033" Manufacturer="Example Corporation" Platform="x86" />
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="oekcr5lq">
+          <Component Id="ProgIdComp" Guid="{5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8}" Win64="no">
+            <Class Id="{F12A6F69-117F-471F-AE73-F8E74218F498}" Context="LocalServer32" Description="FakeClassF12A" Advertise="yes">
+              <ProgId Id="73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D" Description="FakeClassF12A" Advertise="yes" />
+            </Class>
+            <File Id="filTki4JQ2gSapF7wK4K1vd.4mDSFQ" Name="ProgIdComp.txt" KeyPath="yes" ShortName="bnvvntsc.txt" Source="SourceDir\\MsiPackage\ProgIdComp.txt" />
+            <RegistryValue Id="regUIIK326nDZpkWHuexeF58EikQvA" Root="HKCR" Key="73E7DF7E-EFAC-4E11-90E2-6EBAEB8DE58D" Name="NoOpen" Value="NoOpen73E7" Type="string" />
+            <RegistryValue Id="regY1F4E2lvu_Up6gV6c3jeN5ukn8s" Root="HKCR" Key="CLSID\{F12A6F69-117F-471F-AE73-F8E74218F498}\LocalServer32" Name="ThreadingModel" Value="Apartment" Type="string" />
+            <RegistryValue Id="regvrhMurMp98anbQJkpgA8yJCefdM" Root="HKCR" Key="CLSID\{F12A6F69-117F-471F-AE73-F8E74218F498}\Version" Value="0.0.0.1" Type="string" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id="ProductFeature" Level="1" Title="MsiPackageTitle">
+      <ComponentRef Id="ProgIdComp" Primary="yes" />
+    </Feature>
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Media Id="1" />
+    <Property Id="ALLUSERS" Value="1" />
+  </Product>
+</Wix>

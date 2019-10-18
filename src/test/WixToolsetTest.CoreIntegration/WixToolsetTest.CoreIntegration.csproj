@@ -18,7 +18,9 @@
     <Content Include="TestData\AppSearch\DirectorySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\FileSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\RegistrySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Class\DecompiledOldClassTableDef.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Class\OldClassTableDef.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\UnscheduledCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
