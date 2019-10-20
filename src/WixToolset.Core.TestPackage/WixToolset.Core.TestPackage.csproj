@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
     <Description>Internal WiX Toolset Test Package</Description>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -13,22 +13,6 @@
     <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" IncludeAssets="true" />
     <ProjectReference Include="..\WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" IncludeAssets="true" />
     <ProjectReference Include="..\WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" IncludeAssets="true" />
-  </ItemGroup>
-
-  <!-- This is a workaround until https://github.com/NuGet/Home/issues/3891 is resolved -->
-  <ItemGroup>
-    <_PackageFiles Include="$(OutputPath)\WixToolset.Core.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
-    <_PackageFiles Include="$(OutputPath)\WixToolset.Core.Burn.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
-    <_PackageFiles Include="$(OutputPath)\WixToolset.Core.WindowsInstaller.dll" BuildAction="None" PackagePath="lib\$(TargetFramework)\" />
-  </ItemGroup>
-
-  <!--
-    These package references duplicate the dependencies in WixToolset.Core.csproj to ensure
-    WixToolset.Core.dll's dependencies are referenced by this test .nupkg.
-  -->
-  <ItemGroup>
-    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.5.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,5 +29,4 @@
   <ItemGroup>
     <PackageReference Include="xunit.assert" Version="2.4.0" />
   </ItemGroup>
-
 </Project>

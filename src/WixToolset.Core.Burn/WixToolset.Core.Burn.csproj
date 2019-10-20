@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
     <Description>Core Burn</Description>
     <Title>WiX Toolset Core Burn</Title>
     <DebugType>embedded</DebugType>
