@@ -103,7 +103,7 @@ namespace WixToolset.Converters.Tupleizer
             case "Class":
                 return DefaultTupleFromRow(typeof(ClassTuple), row, columnZeroIsId: false);
             case "CompLocator":
-                return DefaultTupleFromRow(typeof(CompLocatorTuple), row, columnZeroIsId: true);
+                return DefaultTupleFromRow(typeof(CompLocatorTuple), row, columnZeroIsId: false);
             case "Component":
             {
                 var attributes = FieldAsNullableInt(row, 3);
@@ -278,7 +278,7 @@ namespace WixToolset.Converters.Tupleizer
                 {
                     tuple.DirectoryRef = FieldAsString(wixFileRow, 4);
                     tuple.DiskId = FieldAsNullableInt(wixFileRow, 5) ?? 0;
-                    tuple.Source = new IntermediateFieldPathValue() { Path = FieldAsString(wixFileRow, 6) };
+                    tuple.Source = new IntermediateFieldPathValue { Path = FieldAsString(wixFileRow, 6) };
                     tuple.PatchGroup = FieldAsInt(wixFileRow, 8);
                     tuple.Attributes |= FieldAsInt(wixFileRow, 9) != 0 ? FileTupleAttributes.GeneratedShortFileName : 0;
                     tuple.PatchAttributes = (PatchAttributeType)FieldAsInt(wixFileRow, 10);
@@ -290,6 +290,8 @@ namespace WixToolset.Converters.Tupleizer
                 return null;
             case "Icon":
                 return DefaultTupleFromRow(typeof(IconTuple), row, columnZeroIsId: true);
+            case "IniLocator":
+                return DefaultTupleFromRow(typeof(IniLocatorTuple), row, columnZeroIsId: false);
             case "InstallExecuteSequence":
                 return DefaultTupleFromRow(typeof(InstallExecuteSequenceTuple), row, columnZeroIsId: false);
             case "LockPermissions":
@@ -497,7 +499,7 @@ namespace WixToolset.Converters.Tupleizer
                 };
             }
             case "Signature":
-                return DefaultTupleFromRow(typeof(SignatureTuple), row, columnZeroIsId: false);
+                return DefaultTupleFromRow(typeof(SignatureTuple), row, columnZeroIsId: true);
             case "UIText":
                 return DefaultTupleFromRow(typeof(UITextTuple), row, columnZeroIsId: true);
             case "Upgrade":
