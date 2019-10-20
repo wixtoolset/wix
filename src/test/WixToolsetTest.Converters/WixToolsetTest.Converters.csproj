@@ -7,6 +7,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="TestData\SingleFile\ConvertedSingleFile.wxs" />
     <None Remove="TestData\SingleFile\SingleFile.wxs" />
