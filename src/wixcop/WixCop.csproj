@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net461;net472</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>Converter</Description>
     <Title>WiX Error Correction Tool</Title>

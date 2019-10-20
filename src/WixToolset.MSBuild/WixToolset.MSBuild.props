@@ -3,7 +3,7 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
-    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\tools\netcoreapp2.1\wix.targets'))</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\tools\netstandard2.0\wix.targets'))</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\tools\net461\wix.targets'))</WixTargetsPath>
   </PropertyGroup>
 </Project>

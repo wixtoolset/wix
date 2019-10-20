@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
     <Description></Description>
     <Title>WiX Toolset MSBuild Tasks</Title>
     <DebugType>embedded</DebugType>
@@ -12,10 +12,6 @@
 
   <PropertyGroup>
     <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <!-- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,8 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" Condition="'$(TargetFramework)'=='net461' " />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" Condition="'$(TargetFramework)'=='netcoreapp2.1' " />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net472'" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" Condition="'$(TargetFramework)'=='netstandard2.0' " />
   </ItemGroup>
 
   <ItemGroup>

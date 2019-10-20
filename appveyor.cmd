@@ -4,12 +4,12 @@
 
 nuget restore
 
-dotnet build -c Release src\test\WixToolsetTest.BuildTasks
-dotnet build -c Release src\test\WixToolsetTest.WixCop
+dotnet test -c Release src\test\WixToolsetTest.BuildTasks
+dotnet test -c Release src\test\WixToolsetTest.WixCop
 
 dotnet publish -c Release -o %_P%\dotnet-wix\ -f netcoreapp2.1 src\wix
 dotnet publish -c Release -o %_P%\WixToolset.MSBuild\net461\ -f net461 src\WixToolset.BuildTasks
-dotnet publish -c Release -o %_P%\WixToolset.MSBuild\netcoreapp2.1\ -f netcoreapp2.1 src\WixToolset.BuildTasks
+dotnet publish -c Release -o %_P%\WixToolset.MSBuild\netstandard2.0\ -f netstandard2.0 src\WixToolset.BuildTasks
 
 @rem dotnet publish -c Release -o %_P%\netcoreapp2.1 -r win-x86 src\wix
 @rem dotnet publish -c Release -o %_P%\net461 -r win-x86 src\light

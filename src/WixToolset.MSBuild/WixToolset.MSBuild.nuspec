@@ -13,7 +13,6 @@
   <files>
     <file src="$projectFolder$$id$.props" target="build" />
     <file src="net461\*" target="tools\net461" />
-    <file src="netcoreapp2.1\*" target="tools\netcoreapp2.1" />
-    <file src="netcoreapp2.1\runtimes\**" target="tools\netcoreapp2.1\runtimes" />
+    <file src="netstandard2.0\*" target="tools\netstandard2.0" />
   </files>
 </package>
