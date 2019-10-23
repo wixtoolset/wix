@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixSearch,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSearchTupleFields.WixSearch), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchTupleFields.Variable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchTupleFields.Condition), IntermediateFieldType.String),
             },
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixSearchTupleFields
     {
-        WixSearch,
         Variable,
         Condition,
     }
@@ -38,12 +36,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixSearchTupleFields index] => this.Fields[(int)index];
-
-        public string WixSearch
-        {
-            get => (string)this.Fields[(int)WixSearchTupleFields.WixSearch];
-            set => this.Set((int)WixSearchTupleFields.WixSearch, value);
-        }
 
         public string Variable
         {
