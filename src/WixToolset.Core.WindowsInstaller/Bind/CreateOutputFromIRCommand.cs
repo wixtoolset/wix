@@ -11,20 +11,26 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class CreateOutputFromIRCommand
     {
         private const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
         private const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
 
-        public CreateOutputFromIRCommand(IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
+        private static readonly char[] ColonCharacter = new[] { ':' };
+
+        public CreateOutputFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
+            this.Messaging = messaging;
             this.Section = section;
             this.TableDefinitions = tableDefinitions;
             this.BackendExtensions = backendExtensions;
         }
 
         private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
+
+        private IMessaging Messaging { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 
@@ -49,6 +55,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 switch (tuple.Definition.Type)
                 {
+                case TupleDefinitionType.AppSearch:
+                    this.AddTupleDefaultly(tuple, output);
+                    output.EnsureTable(this.TableDefinitions["Signature"]);
+                    break;
+
                 case TupleDefinitionType.Binary:
                     this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
                     break;
@@ -133,6 +144,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddMoveFileTuple((MoveFileTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.ProgId:
+                    this.AddTupleDefaultly(tuple, output);
+                    output.EnsureTable(this.TableDefinitions["Extension"]);
+                    break;
+
                 case TupleDefinitionType.Property:
                     this.AddPropertyTuple((PropertyTuple)tuple, output);
                     break;
@@ -197,11 +213,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddTupleFromExtension(tuple, output);
                     break;
 
+                case TupleDefinitionType.WixCustomRow:
+                    this.AddWixCustomRowTuple((WixCustomRowTuple)tuple, output);
+                    break;
+
+                case TupleDefinitionType.WixEnsureTable:
+                    this.AddWixEnsureTableTuple((WixEnsureTableTuple)tuple, output);
+                    break;
+
                 // ignored.
                 case TupleDefinitionType.WixFile:
                 case TupleDefinitionType.WixComponentGroup:
                 case TupleDefinitionType.WixDeltaPatchFile:
                 case TupleDefinitionType.WixFeatureGroup:
+                    break;
+
+                // Already processed.
+                case TupleDefinitionType.WixCustomTable:
                     break;
 
                 default:
@@ -382,6 +410,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[7] = tuple.FirstControlRef;
             row[8] = tuple.DefaultControlRef;
             row[9] = tuple.CancelControlRef;
+
+            output.EnsureTable(this.TableDefinitions["ListBox"]);
         }
 
         private void AddDirectoryTuple(DirectoryTuple tuple, Output output)
@@ -928,6 +958,93 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 row[1] = tuple.Condition;
                 row[2] = tuple.Sequence;
             }
+        }
+        
+        private void AddWixCustomRowTuple(WixCustomRowTuple tuple, Output output)
+        {
+            var customTableDefinition = this.TableDefinitions[tuple.Table];
+
+            if (customTableDefinition.Unreal)
+            {
+
+                return;
+            }
+
+            var customTable = output.EnsureTable(customTableDefinition);
+            var customRow = customTable.CreateRow(tuple.SourceLineNumbers);
+
+#if TODO // SectionId seems like a good thing to preserve.
+            customRow.SectionId = tuple.SectionId;
+#endif
+
+            var data = tuple.FieldDataSeparated;
+
+            for (var i = 0; i < data.Length; ++i)
+            {
+                var foundColumn = false;
+                var item = data[i].Split(ColonCharacter, 2);
+
+                for (var j = 0; j < customRow.Fields.Length; ++j)
+                {
+                    if (customRow.Fields[j].Column.Name == item[0])
+                    {
+                        if (0 < item[1].Length)
+                        {
+                            if (ColumnType.Number == customRow.Fields[j].Column.Type)
+                            {
+                                try
+                                {
+                                    customRow.Fields[j].Data = Convert.ToInt32(item[1], CultureInfo.InvariantCulture);
+                                }
+                                catch (FormatException)
+                                {
+                                    this.Messaging.Write(ErrorMessages.IllegalIntegerValue(tuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name, item[1]));
+                                }
+                                catch (OverflowException)
+                                {
+                                    this.Messaging.Write(ErrorMessages.IllegalIntegerValue(tuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name, item[1]));
+                                }
+                            }
+                            else if (ColumnCategory.Identifier == customRow.Fields[j].Column.Category)
+                            {
+                                if (Common.IsIdentifier(item[1]) || Common.IsValidBinderVariable(item[1]) || ColumnCategory.Formatted == customRow.Fields[j].Column.Category)
+                                {
+                                    customRow.Fields[j].Data = item[1];
+                                }
+                                else
+                                {
+                                    this.Messaging.Write(ErrorMessages.IllegalIdentifier(tuple.SourceLineNumbers, "Data", item[1]));
+                                }
+                            }
+                            else
+                            {
+                                customRow.Fields[j].Data = item[1];
+                            }
+                        }
+                        foundColumn = true;
+                        break;
+                    }
+                }
+
+                if (!foundColumn)
+                {
+                    this.Messaging.Write(ErrorMessages.UnexpectedCustomTableColumn(tuple.SourceLineNumbers, item[0]));
+                }
+            }
+
+            for (var i = 0; i < customTableDefinition.Columns.Length; ++i)
+            {
+                if (!customTableDefinition.Columns[i].Nullable && (null == customRow.Fields[i].Data || 0 == customRow.Fields[i].Data.ToString().Length))
+                {
+                    this.Messaging.Write(ErrorMessages.NoDataForColumn(tuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
+                }
+            }
+        }
+
+        private void AddWixEnsureTableTuple(WixEnsureTableTuple tuple, Output output)
+        {
+            var tableDefinition = this.TableDefinitions[tuple.Table];
+            output.EnsureTable(tableDefinition);
         }
 
         private void AddWixMediaTemplateTuple(WixMediaTemplateTuple tuple, Output output)

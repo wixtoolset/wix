@@ -30,7 +30,6 @@ namespace WixToolset.Core
         /// <summary>
         /// Create a library by combining several intermediates (objects).
         /// </summary>
-        /// <param name="sections">The sections to combine into a library.</param>
         /// <returns>Returns the new library.</returns>
         public Intermediate Combine(ILibraryContext context)
         {
@@ -79,26 +78,6 @@ namespace WixToolset.Core
             return this.Messaging.EncounteredError ? null : library;
         }
 
-        /// <summary>
-        /// Validate that a library contains one entry section and no duplicate symbols.
-        /// </summary>
-        /// <param name="library">Library to validate.</param>
-        private void Validate(Intermediate library)
-        {
-            var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, library.Sections);
-            find.Execute();
-
-            // TODO: Consider bringing this sort of verification back.
-            // foreach (Section section in library.Sections)
-            // {
-            //     ResolveReferencesCommand resolve = new ResolveReferencesCommand(find.EntrySection, find.Symbols);
-            //     resolve.Execute();
-            //
-            //     ReportDuplicateResolvedSymbolErrorsCommand reportDupes = new ReportDuplicateResolvedSymbolErrorsCommand(find.SymbolsWithDuplicates, resolve.ResolvedSections);
-            //     reportDupes.Execute();
-            // }
-        }
-
         private List<string> ResolveFilePathsToEmbed(ILibraryContext context, IEnumerable<IntermediateSection> sections)
         {
             var embedFilePaths = new List<string>();
@@ -139,6 +118,22 @@ namespace WixToolset.Core
             }
 
             return embedFilePaths;
+        }
+
+        private void Validate(Intermediate library)
+        {
+            var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, library.Sections, OutputType.Library);
+            find.Execute();
+
+            // TODO: Consider bringing this sort of verification back.
+            // foreach (Section section in library.Sections)
+            // {
+            //     ResolveReferencesCommand resolve = new ResolveReferencesCommand(find.EntrySection, find.Symbols);
+            //     resolve.Execute();
+            //
+            //     ReportDuplicateResolvedSymbolErrorsCommand reportDupes = new ReportDuplicateResolvedSymbolErrorsCommand(find.SymbolsWithDuplicates, resolve.ResolvedSections);
+            //     reportDupes.Execute();
+            // }
         }
     }
 }

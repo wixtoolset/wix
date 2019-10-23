@@ -32,8 +32,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.PathResolver = this.ServiceProvider.GetService<IPathResolver>();
 
-            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
-
             this.CabbingThreadCount = context.CabbingThreadCount;
             this.CabCachePath = context.CabCachePath;
             this.Codepage = context.Codepage;
@@ -86,8 +84,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private bool SuppressLayout { get; }
 
-        private TableDefinitionCollection TableDefinitions { get; }
-
         private string IntermediateFolder { get; }
 
         private Validator Validator { get; }
@@ -110,6 +106,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // If there are any fields to resolve later, create the cache to populate during bind.
             var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
+
+            TableDefinitionCollection tableDefinitions;
+            {
+                var command = new LoadTableDefinitionsCommand(section);
+                command.Execute();
+
+                tableDefinitions = command.TableDefinitions;
+            }
 
             // Process the summary information table before the other tables.
             bool compressed;
@@ -231,7 +235,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.FileFacades = fileFacades;
                 command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
                 command.OverwriteHash = true;
-                command.TableDefinitions = this.TableDefinitions;
+                command.TableDefinitions = tableDefinitions;
                 command.VariableCache = variableCache;
                 command.Execute();
             }
@@ -308,7 +312,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
             Output output;
             {
-                var command = new CreateOutputFromIRCommand(section, this.TableDefinitions, this.BackendExtensions);
+                var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);
                 command.Execute();
 
                 output = command.Output;
@@ -402,7 +406,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Compressed = compressed;
                 command.FileRowsByCabinet = filesByCabinetMedia;
                 command.ResolveMedia = this.ResolveMedia;
-                command.TableDefinitions = this.TableDefinitions;
+                command.TableDefinitions = tableDefinitions;
                 command.TempFilesLocation = this.IntermediateFolder;
                 command.Execute();
 
@@ -429,11 +433,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Generate database file.
             this.Messaging.Write(VerboseMessages.GeneratingDatabase());
 
-            var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
-            trackedFiles.Add(trackMsi);
+            {
+                var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
+                trackedFiles.Add(trackMsi);
 
-            var temporaryFiles = this.GenerateDatabase(output, trackMsi.Path, false, false);
-            trackedFiles.AddRange(temporaryFiles);
+                var temporaryFiles = this.GenerateDatabase(output, tableDefinitions, trackMsi.Path, false, false);
+                trackedFiles.AddRange(temporaryFiles);
+            }
 
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)
@@ -456,7 +462,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (null == sequenceTable)
                     {
-                        sequenceTable = output.EnsureTable(this.TableDefinitions[sequenceTableName]);
+                        sequenceTable = output.EnsureTable(tableDefinitions[sequenceTableName]);
                     }
 
                     if (0 == sequenceTable.Rows.Count)
@@ -911,7 +917,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="databaseFile">The database file to create.</param>
         /// <param name="keepAddedColumns">Whether to keep columns added in a transform.</param>
         /// <param name="useSubdirectory">Whether to use a subdirectory based on the <paramref name="databaseFile"/> file name for intermediate files.</param>
-        private IEnumerable<ITrackedFile> GenerateDatabase(Output output, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
+        private IEnumerable<ITrackedFile> GenerateDatabase(Output output, TableDefinitionCollection tableDefinitions, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
         {
             var command = new GenerateDatabaseCommand();
             command.BackendHelper = this.BackendHelper;
@@ -921,7 +927,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.KeepAddedColumns = keepAddedColumns;
             command.UseSubDirectory = useSubdirectory;
             command.SuppressAddingValidationRows = this.SuppressAddingValidationRows;
-            command.TableDefinitions = this.TableDefinitions;
+            command.TableDefinitions = tableDefinitions;
             command.IntermediateFolder = this.IntermediateFolder;
             command.Codepage = this.Codepage;
             command.Execute();

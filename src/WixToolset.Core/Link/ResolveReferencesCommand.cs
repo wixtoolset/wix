@@ -14,8 +14,8 @@ namespace WixToolset.Core.Link
     /// </summary>
     internal class ResolveReferencesCommand
     {
-        private IntermediateSection entrySection;
-        private IDictionary<string, Symbol> symbols;
+        private readonly IntermediateSection entrySection;
+        private readonly IDictionary<string, Symbol> symbols;
         private HashSet<Symbol> referencedSymbols;
         private HashSet<IntermediateSection> resolvedSections;
 
@@ -24,13 +24,14 @@ namespace WixToolset.Core.Link
             this.Messaging = messaging;
             this.entrySection = entrySection;
             this.symbols = symbols;
+            this.BuildingMergeModule = (SectionType.Module == entrySection.Type);
         }
 
-        public bool BuildingMergeModule { private get; set; }
+        public IEnumerable<Symbol> ReferencedSymbols => this.referencedSymbols;
 
-        public IEnumerable<Symbol> ReferencedSymbols { get { return this.referencedSymbols; } }
+        public IEnumerable<IntermediateSection> ResolvedSections => this.resolvedSections;
 
-        public IEnumerable<IntermediateSection> ResolvedSections { get { return this.resolvedSections; } }
+        private bool BuildingMergeModule { get; }
 
         private IMessaging Messaging { get; }
 

@@ -271,7 +271,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                                     }
                                 }
 
-                                var tableDefinition = new TableDefinition(tableName, columns, false, false);
+                                var tableDefinition = new TableDefinition(tableName, columns, false);
 
                                 // use our table definitions if core properties are the same; this allows us to take advantage
                                 // of wix concepts like localizable columns which current code assumes

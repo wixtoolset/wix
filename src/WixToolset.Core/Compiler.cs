@@ -3750,7 +3750,7 @@ namespace WixToolset.Core
                     case "Id":
                         tableId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
-                    case "BootstrapperApplicationData":
+                    case "Unreal":
                         bootstrapperApplicationData = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     default:
@@ -3951,7 +3951,7 @@ namespace WixToolset.Core
                                     this.Core.Write(ErrorMessages.ExpectedAttribute(dataSourceLineNumbers, data.Name.LocalName, "Column"));
                                 }
 
-                                dataValue = String.Concat(dataValue, null == dataValue ? String.Empty : Common.CustomRowFieldSeparator.ToString(), columnName, ":", Common.GetInnerText(data));
+                                dataValue = String.Concat(dataValue, null == dataValue ? String.Empty : WixCustomRowTuple.FieldSeparator.ToString(), columnName, ":", Common.GetInnerText(data));
                                 break;
                             }
                         }
@@ -4001,7 +4001,7 @@ namespace WixToolset.Core
                         Sets = sets,
                         Descriptions = descriptions,
                         Modularizations = modularizations,
-                        BootstrapperApplicationData = bootstrapperApplicationData
+                        Unreal = bootstrapperApplicationData
                     };
 
                     this.Core.AddTuple(tuple);

@@ -10,20 +10,18 @@ namespace WixToolset.Core.Link
 
     internal class FindEntrySectionAndLoadSymbolsCommand
     {
-        public FindEntrySectionAndLoadSymbolsCommand(IMessaging messaging, IEnumerable<IntermediateSection> sections)
+        public FindEntrySectionAndLoadSymbolsCommand(IMessaging messaging, IEnumerable<IntermediateSection> sections, OutputType expectedOutpuType)
         {
             this.Messaging = messaging;
             this.Sections = sections;
+            this.ExpectedOutputType = expectedOutpuType;
         }
 
         private IMessaging Messaging { get; }
 
         private IEnumerable<IntermediateSection> Sections { get; }
 
-        /// <summary>
-        /// Sets the expected entry output type, based on output file extension provided to the linker.
-        /// </summary>
-        public OutputType ExpectedOutputType { private get; set; }
+        private OutputType ExpectedOutputType { get; }
 
         /// <summary>
         /// Gets the located entry section after the command is executed.
@@ -42,8 +40,8 @@ namespace WixToolset.Core.Link
 
         public void Execute()
         {
-            Dictionary<string, Symbol> symbols = new Dictionary<string, Symbol>();
-            HashSet<Symbol> possibleConflicts = new HashSet<Symbol>();
+            var symbols = new Dictionary<string, Symbol>();
+            var possibleConflicts = new HashSet<Symbol>();
 
             if (!Enum.TryParse(this.ExpectedOutputType.ToString(), out SectionType expectedEntrySectionType))
             {
@@ -74,9 +72,9 @@ namespace WixToolset.Core.Link
                 }
 
                 // Load all the symbols from the section's tables that create symbols.
-                foreach (var row in section.Tuples.Where(t => t.Id != null))
+                foreach (var tuple in section.Tuples.Where(t => t.Id != null))
                 {
-                    var symbol = new Symbol(section, row);
+                    var symbol = new Symbol(section, tuple);
 
                     if (!symbols.TryGetValue(symbol.Name, out var existingSymbol))
                     {

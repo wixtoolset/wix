@@ -20,7 +20,6 @@ namespace WixToolset.Core
     /// </summary>
     internal class Linker : ILinker
     {
-        private static readonly char[] ColonCharacter = new[] { ':' };
         private static readonly string EmptyGuid = Guid.Empty.ToString("B");
 
         private readonly bool sectionIdOnRows;
@@ -56,9 +55,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Links a collection of sections into an output.
         /// </summary>
-        /// <param name="inputs">The collection of sections to link together.</param>
-        /// <param name="expectedOutputType">Expected output type, based on output file extension provided to the linker.</param>
-        /// <returns>Output object from the linking.</returns>
+        /// <returns>Output intermediate from the linking.</returns>
         public Intermediate Link(ILinkContext context)
         {
             this.Context = context;
@@ -97,9 +94,6 @@ namespace WixToolset.Core
 
                 //this.activeOutput = null;
 
-                //TableDefinitionCollection customTableDefinitions = new TableDefinitionCollection();
-                //IntermediateTuple customRows = new List<IntermediateTuple>();
-
 #if MOVE_TO_BACKEND
                 StringCollection generatedShortFileNameIdentifiers = new StringCollection();
                 Hashtable generatedShortFileNames = new Hashtable();
@@ -123,11 +117,11 @@ namespace WixToolset.Core
 
                                 if (0 >= columnDefinition.KeyColumn || keyTableDefinition.Columns.Count < columnDefinition.KeyColumn)
                                 {
-                                    this.OnMessage(WixErrors.InvalidKeyColumn(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, columnDefinition.KeyColumn));
+                                    this.Messaging.Write(WixErrors.InvalidKeyColumn(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, columnDefinition.KeyColumn));
                                 }
                                 else if (keyTableDefinition.Columns[columnDefinition.KeyColumn - 1].ModularizeType != columnDefinition.ModularizeType && ColumnModularizeType.CompanionFile != columnDefinition.ModularizeType)
                                 {
-                                    this.OnMessage(WixErrors.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, columnDefinition.KeyColumn, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[columnDefinition.KeyColumn - 1].ModularizeType.ToString()));
+                                    this.Messaging.Write(WixErrors.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, columnDefinition.KeyColumn, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[columnDefinition.KeyColumn - 1].ModularizeType.ToString()));
                                 }
                             }
                             catch (WixMissingTableDefinitionException)
@@ -141,8 +135,7 @@ namespace WixToolset.Core
 
                 // First find the entry section and while processing all sections load all the symbols from all of the sections.
                 // sections.FindEntrySectionAndLoadSymbols(false, this, expectedOutputType, out entrySection, out allSymbols);
-                var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, sections);
-                find.ExpectedOutputType = this.Context.ExpectedOutputType;
+                var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, sections, this.Context.ExpectedOutputType);
                 find.Execute();
 
                 // Must have found the entry section by now.
@@ -157,7 +150,6 @@ namespace WixToolset.Core
                 // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
                 var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.Symbols);
-                resolve.BuildingMergeModule = (SectionType.Module == find.EntrySection.Type);
 
                 resolve.Execute();
 
@@ -197,7 +189,7 @@ namespace WixToolset.Core
                 {
                     if (!referencedComponents.Contains(symbol.Name))
                     {
-                        this.OnMessage(ErrorMessages.OrphanedComponent(symbol.Row.SourceLineNumbers, symbol.Row.Id.Id));
+                        this.Messaging.Write(ErrorMessages.OrphanedComponent(symbol.Row.SourceLineNumbers, symbol.Row.Id.Id));
                     }
                 }
 
@@ -238,12 +230,6 @@ namespace WixToolset.Core
                         // handle special tables
                         switch (tuple.Definition.Type)
                         {
-#if MOVE_TO_BACKEND
-                            case "AppSearch":
-                                this.activeOutput.EnsureTable(this.tableDefinitions["Signature"]);
-                                break;
-#endif
-
                             case TupleDefinitionType.Class:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
@@ -261,10 +247,6 @@ namespace WixToolset.Core
                                     this.activeOutput.EnsureTable(this.tableDefinitions["InstallExecuteSequence"]);
                                     this.activeOutput.EnsureTable(this.tableDefinitions["InstallUISequence"]);
                                 }
-                                break;
-
-                            case "Dialog":
-                                this.activeOutput.EnsureTable(this.tableDefinitions["ListBox"]);
                                 break;
 
                             case "Directory":
@@ -295,7 +277,7 @@ namespace WixToolset.Core
                                             {
                                                 if (directory.StartsWith(standardDirectory, StringComparison.Ordinal))
                                                 {
-                                                    this.OnMessage(WixWarnings.StandardDirectoryConflictInMergeModule(row.SourceLineNumbers, directory, standardDirectory));
+                                                    this.Messaging.Write(WixWarnings.StandardDirectoryConflictInMergeModule(row.SourceLineNumbers, directory, standardDirectory));
                                                 }
                                             }
                                         }
@@ -327,26 +309,6 @@ namespace WixToolset.Core
                                 }
                                 break;
 
-#if MOVE_TO_BACKEND
-                            case "ProgId":
-                                // the Extension table is required with a ProgId table
-                                this.activeOutput.EnsureTable(this.tableDefinitions["Extension"]);
-                                break;
-
-                            case "Property":
-                                // Remove property rows with no value. These are properties associated with
-                                // AppSearch but without a default value.
-                                for (int i = 0; i < table.Rows.Count; i++)
-                                {
-                                    if (null == table.Rows[i][1])
-                                    {
-                                        table.Rows.RemoveAt(i);
-                                        i--;
-                                    }
-                                }
-                                break;
-#endif
-
                             case TupleDefinitionType.PublishComponent:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
@@ -368,26 +330,9 @@ namespace WixToolset.Core
                                 }
                                 break;
 
-#if SOLVE_CUSTOM_TABLE
-                            case "WixCustomTable":
-                                this.LinkCustomTable(table, customTableDefinitions);
-                                copyTuple = false; // we've created table definitions from these rows, no need to process them any longer
-                                break;
-
-                            case "WixCustomRow":
-                                foreach (Row row in table.Rows)
-                                {
-                                    row.SectionId = (this.sectionIdOnRows ? sectionId : null);
-                                    customRows.Add(row);
-                                }
-                                copyTuple = false;
-                                break;
-#endif
-
                             case TupleDefinitionType.WixEnsureTable:
                                 ensureTableRows.Add(tuple);
                                 break;
-
 
 #if MOVE_TO_BACKEND
                             case "WixFile":
@@ -427,23 +372,23 @@ namespace WixToolset.Core
                             case TupleDefinitionType.WixVariable:
                             // check for colliding values and collect the wix variable rows
                             {
-                                var row = (WixVariableTuple)tuple;
-                                var id = row.Id.Id;
+                                var wixVariableTuple = (WixVariableTuple)tuple;
+                                var id = wixVariableTuple.Id.Id;
 
-                                if (wixVariables.TryGetValue(id, out var collidingRow))
+                                if (wixVariables.TryGetValue(id, out var collidingTuple))
                                 {
-                                    if (collidingRow.Overridable && !row.Overridable)
+                                    if (collidingTuple.Overridable && !wixVariableTuple.Overridable)
                                     {
-                                        wixVariables[id] = row;
+                                        wixVariables[id] = wixVariableTuple;
                                     }
-                                    else if (!row.Overridable || (collidingRow.Overridable && row.Overridable))
+                                    else if (!wixVariableTuple.Overridable || (collidingTuple.Overridable && wixVariableTuple.Overridable))
                                     {
-                                        this.OnMessage(ErrorMessages.WixVariableCollision(row.SourceLineNumbers, id));
+                                        this.Messaging.Write(ErrorMessages.WixVariableCollision(wixVariableTuple.SourceLineNumbers, id));
                                     }
                                 }
                                 else
                                 {
-                                    wixVariables.Add(id, row);
+                                    wixVariables.Add(id, wixVariableTuple);
                                 }
                             }
 
@@ -463,36 +408,15 @@ namespace WixToolset.Core
                 {
                     foreach (var feature in connectToFeature.ConnectFeatures)
                     {
-                        var row = new WixFeatureModulesTuple();
-                        row.FeatureRef = feature;
-                        row.WixMergeRef = connectToFeature.ChildId;
+                        var row = new WixFeatureModulesTuple
+                        {
+                            FeatureRef = feature,
+                            WixMergeRef = connectToFeature.ChildId
+                        };
 
                         resolvedSection.Tuples.Add(row);
                     }
                 }
-
-#if MOVE_TO_BACKEND
-                // ensure the creation of tables that need to exist
-                if (0 < ensureTableRows.Count)
-                {
-                    foreach (Row row in ensureTableRows)
-                    {
-                        string tableId = (string)row[0];
-                        TableDefinition tableDef = null;
-
-                        try
-                        {
-                            tableDef = this.tableDefinitions[tableId];
-                        }
-                        catch (WixMissingTableDefinitionException)
-                        {
-                            tableDef = customTableDefinitions[tableId];
-                        }
-
-                        this.activeOutput.EnsureTable(tableDef);
-                    }
-                }
-#endif
 
 #if MOVE_TO_BACKEND
                 // check for missing table and add them or display an error as appropriate
@@ -513,17 +437,17 @@ namespace WixToolset.Core
 
                         if (null == imageFamiliesTable || 1 > imageFamiliesTable.Rows.Count)
                         {
-                            this.OnMessage(WixErrors.ExpectedRowInPatchCreationPackage("ImageFamilies"));
+                            this.Messaging.Write(WixErrors.ExpectedRowInPatchCreationPackage("ImageFamilies"));
                         }
 
                         if (null == targetImagesTable || 1 > targetImagesTable.Rows.Count)
                         {
-                            this.OnMessage(WixErrors.ExpectedRowInPatchCreationPackage("TargetImages"));
+                            this.Messaging.Write(WixErrors.ExpectedRowInPatchCreationPackage("TargetImages"));
                         }
 
                         if (null == upgradedImagesTable || 1 > upgradedImagesTable.Rows.Count)
                         {
-                            this.OnMessage(WixErrors.ExpectedRowInPatchCreationPackage("UpgradedImages"));
+                            this.Messaging.Write(WixErrors.ExpectedRowInPatchCreationPackage("UpgradedImages"));
                         }
 
                         this.activeOutput.EnsureTable(this.tableDefinitions["Properties"]);
@@ -535,81 +459,6 @@ namespace WixToolset.Core
                 }
 
                 this.CheckForIllegalTables(this.activeOutput);
-#endif
-
-#if SOLVE_CUSTOM_TABLE
-                // add the custom row data
-                foreach (Row row in customRows)
-                {
-                    TableDefinition customTableDefinition = (TableDefinition)customTableDefinitions[row[0].ToString()];
-                    Table customTable = this.activeOutput.EnsureTable(customTableDefinition);
-                    Row customRow = customTable.CreateRow(row.SourceLineNumbers);
-
-                    customRow.SectionId = row.SectionId;
-
-                    string[] data = row[1].ToString().Split(Common.CustomRowFieldSeparator);
-
-                    for (int i = 0; i < data.Length; ++i)
-                    {
-                        bool foundColumn = false;
-                        string[] item = data[i].Split(colonCharacter, 2);
-
-                        for (int j = 0; j < customRow.Fields.Length; ++j)
-                        {
-                            if (customRow.Fields[j].Column.Name == item[0])
-                            {
-                                if (0 < item[1].Length)
-                                {
-                                    if (ColumnType.Number == customRow.Fields[j].Column.Type)
-                                    {
-                                        try
-                                        {
-                                            customRow.Fields[j].Data = Convert.ToInt32(item[1], CultureInfo.InvariantCulture);
-                                        }
-                                        catch (FormatException)
-                                        {
-                                            this.OnMessage(WixErrors.IllegalIntegerValue(row.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name, item[1]));
-                                        }
-                                        catch (OverflowException)
-                                        {
-                                            this.OnMessage(WixErrors.IllegalIntegerValue(row.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name, item[1]));
-                                        }
-                                    }
-                                    else if (ColumnCategory.Identifier == customRow.Fields[j].Column.Category)
-                                    {
-                                        if (Common.IsIdentifier(item[1]) || Common.IsValidBinderVariable(item[1]) || ColumnCategory.Formatted == customRow.Fields[j].Column.Category)
-                                        {
-                                            customRow.Fields[j].Data = item[1];
-                                        }
-                                        else
-                                        {
-                                            this.OnMessage(WixErrors.IllegalIdentifier(row.SourceLineNumbers, "Data", item[1]));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        customRow.Fields[j].Data = item[1];
-                                    }
-                                }
-                                foundColumn = true;
-                                break;
-                            }
-                        }
-
-                        if (!foundColumn)
-                        {
-                            this.OnMessage(WixErrors.UnexpectedCustomTableColumn(row.SourceLineNumbers, item[0]));
-                        }
-                    }
-
-                    for (int i = 0; i < customTableDefinition.Columns.Count; ++i)
-                    {
-                        if (!customTableDefinition.Columns[i].Nullable && (null == customRow.Fields[i].Data || 0 == customRow.Fields[i].Data.ToString().Length))
-                        {
-                            this.OnMessage(WixErrors.NoDataForColumn(row.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
-                        }
-                    }
-                }
 #endif
 
                 //correct the section Id in FeatureComponents table
@@ -683,7 +532,7 @@ namespace WixToolset.Core
                         // sort the rows by DiskId
                         fileRows.Sort();
 
-                        this.OnMessage(WixWarnings.GeneratedShortFileNameConflict(((FileRow)fileRows[0]).SourceLineNumbers, shortFileName));
+                        this.Messaging.Write(WixWarnings.GeneratedShortFileNameConflict(((FileRow)fileRows[0]).SourceLineNumbers, shortFileName));
 
                         for (int i = 1; i < fileRows.Count; i++)
                         {
@@ -691,7 +540,7 @@ namespace WixToolset.Core
 
                             if (null != fileRow.SourceLineNumbers)
                             {
-                                this.OnMessage(WixWarnings.GeneratedShortFileNameConflict2(fileRow.SourceLineNumbers));
+                                this.Messaging.Write(WixWarnings.GeneratedShortFileNameConflict2(fileRow.SourceLineNumbers));
                             }
                         }
                     }
@@ -732,223 +581,6 @@ namespace WixToolset.Core
             return this.Messaging.EncounteredError ? null : intermediate;
         }
 
-#if SOLVE_CUSTOM_TABLE
-        /// <summary>
-        /// Links the definition of a custom table.
-        /// </summary>
-        /// <param name="table">The table to link.</param>
-        /// <param name="customTableDefinitions">Receives the linked definition of the custom table.</param>
-        private void LinkCustomTable(Table table, TableDefinitionCollection customTableDefinitions)
-        {
-            foreach (Row row in table.Rows)
-            {
-                bool bootstrapperApplicationData = (null != row[13] && 1 == (int)row[13]);
-
-                if (null == row[4])
-                {
-                    this.OnMessage(WixErrors.ExpectedAttribute(row.SourceLineNumbers, "CustomTable/Column", "PrimaryKey"));
-                }
-
-                string[] columnNames = row[2].ToString().Split('\t');
-                string[] columnTypes = row[3].ToString().Split('\t');
-                string[] primaryKeys = row[4].ToString().Split('\t');
-                string[] minValues = row[5] == null ? null : row[5].ToString().Split('\t');
-                string[] maxValues = row[6] == null ? null : row[6].ToString().Split('\t');
-                string[] keyTables = row[7] == null ? null : row[7].ToString().Split('\t');
-                string[] keyColumns = row[8] == null ? null : row[8].ToString().Split('\t');
-                string[] categories = row[9] == null ? null : row[9].ToString().Split('\t');
-                string[] sets = row[10] == null ? null : row[10].ToString().Split('\t');
-                string[] descriptions = row[11] == null ? null : row[11].ToString().Split('\t');
-                string[] modularizations = row[12] == null ? null : row[12].ToString().Split('\t');
-
-                int currentPrimaryKey = 0;
-
-                List<ColumnDefinition> columns = new List<ColumnDefinition>(columnNames.Length);
-                for (int i = 0; i < columnNames.Length; ++i)
-                {
-                    string name = columnNames[i];
-                    ColumnType type = ColumnType.Unknown;
-
-                    if (columnTypes[i].StartsWith("s", StringComparison.OrdinalIgnoreCase))
-                    {
-                        type = ColumnType.String;
-                    }
-                    else if (columnTypes[i].StartsWith("l", StringComparison.OrdinalIgnoreCase))
-                    {
-                        type = ColumnType.Localized;
-                    }
-                    else if (columnTypes[i].StartsWith("i", StringComparison.OrdinalIgnoreCase))
-                    {
-                        type = ColumnType.Number;
-                    }
-                    else if (columnTypes[i].StartsWith("v", StringComparison.OrdinalIgnoreCase))
-                    {
-                        type = ColumnType.Object;
-                    }
-                    else
-                    {
-                        throw new WixException(WixErrors.UnknownCustomTableColumnType(row.SourceLineNumbers, columnTypes[i]));
-                    }
-
-                    bool nullable = columnTypes[i].Substring(0, 1) == columnTypes[i].Substring(0, 1).ToUpper(CultureInfo.InvariantCulture);
-                    int length = Convert.ToInt32(columnTypes[i].Substring(1), CultureInfo.InvariantCulture);
-
-                    bool primaryKey = false;
-                    if (currentPrimaryKey < primaryKeys.Length && primaryKeys[currentPrimaryKey] == columnNames[i])
-                    {
-                        primaryKey = true;
-                        currentPrimaryKey++;
-                    }
-
-                    bool minValSet = null != minValues && null != minValues[i] && 0 < minValues[i].Length;
-                    int minValue = 0;
-                    if (minValSet)
-                    {
-                        minValue = Convert.ToInt32(minValues[i], CultureInfo.InvariantCulture);
-                    }
-
-                    bool maxValSet = null != maxValues && null != maxValues[i] && 0 < maxValues[i].Length;
-                    int maxValue = 0;
-                    if (maxValSet)
-                    {
-                        maxValue = Convert.ToInt32(maxValues[i], CultureInfo.InvariantCulture);
-                    }
-
-                    bool keyColumnSet = null != keyColumns && null != keyColumns[i] && 0 < keyColumns[i].Length;
-                    int keyColumn = 0;
-                    if (keyColumnSet)
-                    {
-                        keyColumn = Convert.ToInt32(keyColumns[i], CultureInfo.InvariantCulture);
-                    }
-
-                    ColumnCategory category = ColumnCategory.Unknown;
-                    if (null != categories && null != categories[i] && 0 < categories[i].Length)
-                    {
-                        switch (categories[i])
-                        {
-                            case "Text":
-                                category = ColumnCategory.Text;
-                                break;
-                            case "UpperCase":
-                                category = ColumnCategory.UpperCase;
-                                break;
-                            case "LowerCase":
-                                category = ColumnCategory.LowerCase;
-                                break;
-                            case "Integer":
-                                category = ColumnCategory.Integer;
-                                break;
-                            case "DoubleInteger":
-                                category = ColumnCategory.DoubleInteger;
-                                break;
-                            case "TimeDate":
-                                category = ColumnCategory.TimeDate;
-                                break;
-                            case "Identifier":
-                                category = ColumnCategory.Identifier;
-                                break;
-                            case "Property":
-                                category = ColumnCategory.Property;
-                                break;
-                            case "Filename":
-                                category = ColumnCategory.Filename;
-                                break;
-                            case "WildCardFilename":
-                                category = ColumnCategory.WildCardFilename;
-                                break;
-                            case "Path":
-                                category = ColumnCategory.Path;
-                                break;
-                            case "Paths":
-                                category = ColumnCategory.Paths;
-                                break;
-                            case "AnyPath":
-                                category = ColumnCategory.AnyPath;
-                                break;
-                            case "DefaultDir":
-                                category = ColumnCategory.DefaultDir;
-                                break;
-                            case "RegPath":
-                                category = ColumnCategory.RegPath;
-                                break;
-                            case "Formatted":
-                                category = ColumnCategory.Formatted;
-                                break;
-                            case "FormattedSddl":
-                                category = ColumnCategory.FormattedSDDLText;
-                                break;
-                            case "Template":
-                                category = ColumnCategory.Template;
-                                break;
-                            case "Condition":
-                                category = ColumnCategory.Condition;
-                                break;
-                            case "Guid":
-                                category = ColumnCategory.Guid;
-                                break;
-                            case "Version":
-                                category = ColumnCategory.Version;
-                                break;
-                            case "Language":
-                                category = ColumnCategory.Language;
-                                break;
-                            case "Binary":
-                                category = ColumnCategory.Binary;
-                                break;
-                            case "CustomSource":
-                                category = ColumnCategory.CustomSource;
-                                break;
-                            case "Cabinet":
-                                category = ColumnCategory.Cabinet;
-                                break;
-                            case "Shortcut":
-                                category = ColumnCategory.Shortcut;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    string keyTable = keyTables != null ? keyTables[i] : null;
-                    string setValue = sets != null ? sets[i] : null;
-                    string description = descriptions != null ? descriptions[i] : null;
-                    string modString = modularizations != null ? modularizations[i] : null;
-                    ColumnModularizeType modularization = ColumnModularizeType.None;
-                    if (modString != null)
-                    {
-                        switch (modString)
-                        {
-                            case "None":
-                                modularization = ColumnModularizeType.None;
-                                break;
-                            case "Column":
-                                modularization = ColumnModularizeType.Column;
-                                break;
-                            case "Property":
-                                modularization = ColumnModularizeType.Property;
-                                break;
-                            case "Condition":
-                                modularization = ColumnModularizeType.Condition;
-                                break;
-                            case "CompanionFile":
-                                modularization = ColumnModularizeType.CompanionFile;
-                                break;
-                            case "SemicolonDelimited":
-                                modularization = ColumnModularizeType.SemicolonDelimited;
-                                break;
-                        }
-                    }
-
-                    ColumnDefinition columnDefinition = new ColumnDefinition(name, type, length, primaryKey, nullable, modularization, ColumnType.Localized == type, minValSet, minValue, maxValSet, maxValue, keyTable, keyColumnSet, keyColumn, category, setValue, description, true, true);
-                    columns.Add(columnDefinition);
-                }
-
-                TableDefinition customTable = new TableDefinition((string)row[0], columns, false, bootstrapperApplicationData, bootstrapperApplicationData);
-                customTableDefinitions.Add(customTable);
-            }
-        }
-#endif
-
 #if MOVE_TO_BACKEND
         /// <summary>
         /// Checks for any tables in the output which are not allowed in the output type.
@@ -973,14 +605,14 @@ namespace WixToolset.Core
                         {
                             foreach (Row row in table.Rows)
                             {
-                                this.OnMessage(WixErrors.UnexpectedTableInMergeModule(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WixErrors.UnexpectedTableInMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         else if ("Error" == table.Name)
                         {
                             foreach (Row row in table.Rows)
                             {
-                                this.OnMessage(WixWarnings.DangerousTableInMergeModule(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WixWarnings.DangerousTableInMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1001,7 +633,7 @@ namespace WixToolset.Core
                         {
                             foreach (Row row in table.Rows)
                             {
-                                this.OnMessage(WixErrors.UnexpectedTableInPatchCreationPackage(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WixErrors.UnexpectedTableInPatchCreationPackage(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1014,7 +646,7 @@ namespace WixToolset.Core
                         {
                             foreach (Row row in table.Rows)
                             {
-                                this.OnMessage(WixErrors.UnexpectedTableInPatch(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WixErrors.UnexpectedTableInPatch(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1035,7 +667,7 @@ namespace WixToolset.Core
                         {
                             foreach (Row row in table.Rows)
                             {
-                                this.OnMessage(WixWarnings.UnexpectedTableInProduct(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WixWarnings.UnexpectedTableInProduct(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1080,7 +712,7 @@ namespace WixToolset.Core
                 {
                     foreach (Row row in isolatedComponentTable.Rows)
                     {
-                        this.OnMessage(WixWarnings.TableIncompatibleWithInstallerVersion(row.SourceLineNumbers, "IsolatedComponent", outputInstallerVersion));
+                        this.Messaging.Write(WixWarnings.TableIncompatibleWithInstallerVersion(row.SourceLineNumbers, "IsolatedComponent", outputInstallerVersion));
                     }
                 }
             }
@@ -1095,22 +727,13 @@ namespace WixToolset.Core
                     {
                         if (null != row[12] || null != row[13] || null != row[14] || null != row[15])
                         {
-                            this.OnMessage(WixWarnings.ColumnsIncompatibleWithInstallerVersion(row.SourceLineNumbers, "Shortcut", outputInstallerVersion));
+                            this.Messaging.Write(WixWarnings.ColumnsIncompatibleWithInstallerVersion(row.SourceLineNumbers, "Shortcut", outputInstallerVersion));
                         }
                     }
                 }
             }
         }
 #endif
-
-        /// <summary>
-        /// Sends a message to the message delegate if there is one.
-        /// </summary>
-        /// <param name="message">Message event arguments.</param>
-        public void OnMessage(Message message)
-        {
-            this.Messaging.Write(message);
-        }
 
         /// <summary>
         /// Load the standard action symbols.
@@ -1165,7 +788,7 @@ namespace WixToolset.Core
                                     {
                                         if (connection.IsExplicitPrimaryFeature)
                                         {
-                                            this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), connection.PrimaryFeature ?? resolvedSection.Id));
                                             continue;
                                         }
                                         else
@@ -1197,7 +820,7 @@ namespace WixToolset.Core
                                     connection = featuresToFeatures[wixComplexReferenceRow.Child];
                                     if (null != connection)
                                     {
-                                        this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
                                         continue;
                                     }
 
@@ -1214,7 +837,7 @@ namespace WixToolset.Core
                                     {
                                         if (connection.IsExplicitPrimaryFeature)
                                         {
-                                            this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
                                             continue;
                                         }
                                         else
@@ -1241,7 +864,7 @@ namespace WixToolset.Core
                                 case ComplexReferenceChildType.Component:
                                     if (componentsToModules.ContainsKey(wixComplexReferenceRow.Child))
                                     {
-                                        this.OnMessage(ErrorMessages.ComponentReferencedTwice(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.Child));
+                                        this.Messaging.Write(ErrorMessages.ComponentReferencedTwice(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.Child));
                                         continue;
                                     }
                                     else
@@ -1285,7 +908,7 @@ namespace WixToolset.Core
                                     connection = featuresToFeatures[wixComplexReferenceRow.Child];
                                     if (null != connection)
                                     {
-                                        this.OnMessage(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
+                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Product"), (null != connection.PrimaryFeature ? connection.PrimaryFeature : resolvedSection.Id)));
                                         continue;
                                     }
 
@@ -1470,7 +1093,7 @@ namespace WixToolset.Core
                         // way up to present the loop as a directed graph.
                         var loop = String.Join(" -> ", loopDetector);
 
-                        this.OnMessage(ErrorMessages.ReferenceLoopDetected(wixComplexReferenceRow?.SourceLineNumbers, loop));
+                        this.Messaging.Write(ErrorMessages.ReferenceLoopDetected(wixComplexReferenceRow?.SourceLineNumbers, loop));
 
                         // Cleanup the parentGroupsNeedingProcessing and the loopDetector just like the 
                         // exit of this method does at the end because we are exiting early.
@@ -1712,11 +1335,11 @@ namespace WixToolset.Core
                     // display an error for the component or merge module as approrpriate
                     if (null != multipleFeatureComponents)
                     {
-                        this.OnMessage(ErrorMessages.ComponentExpectedFeature(row.SourceLineNumbers, connectionId, row.Definition.Name, row.Id.Id));
+                        this.Messaging.Write(ErrorMessages.ComponentExpectedFeature(row.SourceLineNumbers, connectionId, row.Definition.Name, row.Id.Id));
                     }
                     else
                     {
-                        this.OnMessage(ErrorMessages.MergeModuleExpectedFeature(row.SourceLineNumbers, connectionId));
+                        this.Messaging.Write(ErrorMessages.MergeModuleExpectedFeature(row.SourceLineNumbers, connectionId));
                     }
                 }
                 else
@@ -1731,7 +1354,7 @@ namespace WixToolset.Core
                         {
                             if (!multipleFeatureComponents.Contains(connectionId))
                             {
-                                this.OnMessage(WarningMessages.ImplicitComponentPrimaryFeature(connectionId));
+                                this.Messaging.Write(WarningMessages.ImplicitComponentPrimaryFeature(connectionId));
 
                                 // remember this component so only one warning is generated for it
                                 multipleFeatureComponents[connectionId] = null;
@@ -1739,7 +1362,7 @@ namespace WixToolset.Core
                         }
                         else
                         {
-                            this.OnMessage(WarningMessages.ImplicitMergeModulePrimaryFeature(connectionId));
+                            this.Messaging.Write(WarningMessages.ImplicitMergeModulePrimaryFeature(connectionId));
                         }
                     }
 
