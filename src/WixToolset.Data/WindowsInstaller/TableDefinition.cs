@@ -4,7 +4,7 @@ namespace WixToolset.Data.WindowsInstaller
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Xml;
 
     /// <summary>
@@ -24,14 +24,12 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="name">Name of table to create.</param>
         /// <param name="columns">Column definitions for the table.</param>
         /// <param name="unreal">Flag if table is unreal.</param>
-        /// <param name="bootstrapperApplicationData">Flag if table is part of UX Manifest.</param>
-        public TableDefinition(string name, ColumnDefinition[] columns, bool unreal = false, bool bootstrapperApplicationData = false)
+        public TableDefinition(string name, IEnumerable<ColumnDefinition> columns, bool unreal = false)
         {
             this.Name = name;
             this.Unreal = unreal;
-            this.BootstrapperApplicationData = bootstrapperApplicationData;
 
-            this.Columns = columns;
+            this.Columns = columns.ToArray();
         }
 
         /// <summary>
@@ -45,12 +43,6 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         /// <value>Flag if table is unreal.</value>
         public bool Unreal { get; private set; }
-
-        /// <summary>
-        /// Gets if the table is a part of the bootstrapper application data manifest.
-        /// </summary>
-        /// <value>Flag if table is a part of the bootstrapper application data manifest.</value>
-        public bool BootstrapperApplicationData { get; private set; }
 
         /// <summary>
         /// Gets the collection of column definitions for this table.
@@ -82,7 +74,7 @@ namespace WixToolset.Data.WindowsInstaller
             }
 
             // compare the table names
-            int ret = String.Compare(this.Name, updated.Name, StringComparison.Ordinal);
+            var ret = String.Compare(this.Name, updated.Name, StringComparison.Ordinal);
 
             // compare the column count
             if (0 == ret)
@@ -91,10 +83,10 @@ namespace WixToolset.Data.WindowsInstaller
                 ret = Math.Min(0, updated.Columns.Length - this.Columns.Length);
 
                 // compare name, type, and length of each column
-                for (int i = 0; 0 == ret && this.Columns.Length > i; i++)
+                for (var i = 0; 0 == ret && this.Columns.Length > i; i++)
                 {
-                    ColumnDefinition thisColumnDef = this.Columns[i];
-                    ColumnDefinition updatedColumnDef = updated.Columns[i];
+                    var thisColumnDef = this.Columns[i];
+                    var updatedColumnDef = updated.Columns[i];
 
                     ret = thisColumnDef.CompareTo(updatedColumnDef);
                 }
@@ -124,9 +116,6 @@ namespace WixToolset.Data.WindowsInstaller
                         break;
                     case "unreal":
                         unreal = reader.Value.Equals("yes");
-                        break;
-                    case "bootstrapperApplicationData":
-                        bootstrapperApplicationData = reader.Value.Equals("yes");
                         break;
                 }
             }
@@ -181,7 +170,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            return new TableDefinition(name, columns.ToArray(), unreal, bootstrapperApplicationData);
+            return new TableDefinition(name, columns.ToArray(), unreal);
         }
 
         /// <summary>
@@ -199,12 +188,7 @@ namespace WixToolset.Data.WindowsInstaller
                 writer.WriteAttributeString("unreal", "yes");
             }
 
-            if (this.BootstrapperApplicationData)
-            {
-                writer.WriteAttributeString("bootstrapperApplicationData", "yes");
-            }
-
-            foreach (ColumnDefinition columnDefinition in this.Columns)
+            foreach (var columnDefinition in this.Columns)
             {
                 columnDefinition.Write(writer);
             }

@@ -22,7 +22,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Sets), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Descriptions), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Modularizations), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.BootstrapperApplicationData), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Unreal), IntermediateFieldType.Number),
             },
             typeof(WixCustomTableTuple));
     }
@@ -44,7 +44,7 @@ namespace WixToolset.Data.Tuples
         Sets,
         Descriptions,
         Modularizations,
-        BootstrapperApplicationData,
+        Unreal,
     }
 
     public class WixCustomTableTuple : IntermediateTuple
@@ -131,10 +131,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixCustomTableTupleFields.Modularizations, value);
         }
 
-        public bool BootstrapperApplicationData
+        public bool Unreal
         {
-            get => (bool)this.Fields[(int)WixCustomTableTupleFields.BootstrapperApplicationData];
-            set => this.Set((int)WixCustomTableTupleFields.BootstrapperApplicationData, value);
+            get => (bool)this.Fields[(int)WixCustomTableTupleFields.Unreal];
+            set => this.Set((int)WixCustomTableTupleFields.Unreal, value);
         }
     }
 }

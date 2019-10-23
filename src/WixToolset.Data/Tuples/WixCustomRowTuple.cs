@@ -27,6 +27,8 @@ namespace WixToolset.Data.Tuples
 
     public class WixCustomRowTuple : IntermediateTuple
     {
+        public const char FieldSeparator = '\x85';
+
         public WixCustomRowTuple() : base(TupleDefinitions.WixCustomRow, null, null)
         {
         }
@@ -48,5 +50,7 @@ namespace WixToolset.Data.Tuples
             get => (string)this.Fields[(int)WixCustomRowTupleFields.FieldData];
             set => this.Set((int)WixCustomRowTupleFields.FieldData, value);
         }
+
+        public string[] FieldDataSeparated => this.FieldData.Split(FieldSeparator);
     }
 }
