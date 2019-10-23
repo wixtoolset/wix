@@ -913,6 +913,18 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             var tuple = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
 
+            if (null != identifier)
+            {
+                if (tuple.Definition.FieldDefinitions[0].Type == IntermediateFieldType.Number)
+                {
+                    tuple.Set(0, Convert.ToInt32(identifier.Id));
+                }
+                else
+                {
+                    tuple.Set(0, identifier.Id);
+                }
+            }
+
             section.Tuples.Add(tuple);
 
             return tuple;

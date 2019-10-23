@@ -248,6 +248,42 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWithErrorTable()
+        {
+            var folder = TestData.Get(@"TestData\ErrorsInUI");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var error = section.Tuples.OfType<ErrorTuple>().Single();
+                Assert.Equal(1234, error.Error);
+                Assert.Equal("Category 55 Emergency Doomsday Crisis", error.Message.Trim());
+            }
+        }
+
+        [Fact]
         public void CanLoadPdbGeneratedByBuild()
         {
             var folder = TestData.Get(@"TestData\MultiFileCompressed");
