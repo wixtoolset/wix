@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\.Data\burn.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithSearches\data\fakeba.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithSearches\data\MsiPackage\Shared.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithSearches\data\MsiPackage\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithSearches\data\test.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithSearches\Bundle.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithSearches\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingFileShare\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingFileShare\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingFileShare\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

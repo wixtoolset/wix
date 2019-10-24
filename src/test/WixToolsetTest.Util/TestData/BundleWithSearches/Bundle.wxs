@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Bundle Name="!(loc.BundleName)" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <BootstrapperApplication SourceFile="fakeba.dll" />
+
+        <util:RegistrySearchRef Id="RegistrySearchId" />
+        <util:ProductSearchRef Id="ProductSearchId" />
+        <util:FileSearchRef Id="FileSearchId" />
+
+        <Chain>
+            <MsiPackage SourceFile="test.msi">
+                <MsiProperty Name="TEST" Value="1" />
+            </MsiPackage>
+        </Chain>
+    </Bundle>
+
+    <Fragment>
+        <util:RegistrySearch
+            Id="RegistrySearchId"
+            Variable="RegistrySearchVariable"
+            Root="HKLM"
+            Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
+            Value="Release"
+            Result="value" />
+    </Fragment>
+
+    <Fragment>
+        <util:ProductSearch Id="ProductSearchId" Variable="ProductSearchVariable" UpgradeCode="738D02BF-E231-4370-8209-E9FD4E1BE2A1" Condition="1 &amp; 2 &lt; 3" Result="version" />
+    </Fragment>
+
+    <Fragment>
+        <util:FileSearch Id="FileSearchId" Variable="FileSearchVariable" Path="%windir%\System32\mscoree.dll" Result="exists" />
+    </Fragment>
+</Wix>

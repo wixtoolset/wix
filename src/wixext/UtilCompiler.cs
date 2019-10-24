@@ -34,53 +34,10 @@ namespace WixToolset.Util
         internal const int UserDontCreateUser = 0x00000200;
         internal const int UserNonVital = 0x00000400;
 
-        [Flags]
-        internal enum WixFileSearchAttributes
-        {
-            Default = 0x001,
-            MinVersionInclusive = 0x002,
-            MaxVersionInclusive = 0x004,
-            MinSizeInclusive = 0x008,
-            MaxSizeInclusive = 0x010,
-            MinDateInclusive = 0x020,
-            MaxDateInclusive = 0x040,
-            WantVersion = 0x080,
-            WantExists = 0x100,
-            IsDirectory = 0x200,
-        }
-
         internal enum WixRegistrySearchFormat
         {
             Raw,
             Compatible,
-        }
-
-        [Flags]
-        internal enum WixRegistrySearchAttributes
-        {
-            Raw = 0x01,
-            Compatible = 0x02,
-            ExpandEnvironmentVariables = 0x04,
-            WantValue = 0x08,
-            WantExists = 0x10,
-            Win64 = 0x20,
-        }
-
-        internal enum WixComponentSearchAttributes
-        {
-            KeyPath = 0x1,
-            State = 0x2,
-            WantDirectory = 0x4,
-        }
-
-        [Flags]
-        internal enum WixProductSearchAttributes
-        {
-            Version = 0x01,
-            Language = 0x02,
-            State = 0x04,
-            Assignment = 0x08,
-            UpgradeCode = 0x10,
         }
 
         internal enum WixRestartResourceAttributes
@@ -505,10 +462,12 @@ namespace WixToolset.Util
                         break;
                 }
 
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixComponentSearch", id);
-                row.Set(1, guid);
-                row.Set(2, productCode);
-                row.Set(3, (int)attributes);
+                section.Tuples.Add(new WixComponentSearchTuple(sourceLineNumbers, id)
+                {
+                    Guid = guid,
+                    ProductCode = productCode,
+                    Attributes = attributes,
+                });
             }
         }
 
@@ -1087,16 +1046,11 @@ namespace WixToolset.Util
         /// <param name="attributes"></param>
         private void CreateWixFileSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string path, WixFileSearchAttributes attributes)
         {
-            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixFileSearch", id);
-            row.Set(1, path);
-            //row.Set(2, minVersion;
-            //row.Set(3, maxVersion;
-            //row.Set(4, minSize;
-            //row.Set(5, maxSize;
-            //row.Set(6, minDate;
-            //row.Set(7, maxDate;
-            //row.Set(8, languages;
-            row.Set(9, (int)attributes);
+            section.Tuples.Add(new WixFileSearchTuple(sourceLineNumbers, id)
+            {
+                Path = path,
+                Attributes = attributes,
+            });
         }
 
         /// <summary>
@@ -1108,9 +1062,11 @@ namespace WixToolset.Util
         /// <param name="condition">A condition to test before evaluating the search.</param>
         private void CreateWixSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string variable, string condition)
         {
-            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixSearch", id);
-            row.Set(1, variable);
-            row.Set(2, condition);
+            section.Tuples.Add(new WixSearchTuple(sourceLineNumbers, id)
+            {
+                Variable = variable,
+                Condition = condition,
+            });
         }
 
         /// <summary>
@@ -1122,9 +1078,11 @@ namespace WixToolset.Util
         /// <param name="attributes">Further details about the relation between id and parentId.</param>
         private void CreateWixSearchRelationRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
         {
-            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixSearchRelation", id);
-            row.Set(1, parentId);
-            row.Set(2, attributes);
+            section.Tuples.Add(new WixSearchRelationTuple(sourceLineNumbers, id)
+            {
+                ParentSearchRef = parentId,
+                Attributes = attributes,
+            });
         }
 
         /// <summary>
@@ -2680,9 +2638,11 @@ namespace WixToolset.Util
                     attributes |= WixProductSearchAttributes.UpgradeCode;
                 }
 
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixProductSearch", id);
-                row.Set(1, productCode ?? upgradeCode);
-                row.Set(2, (int)attributes);
+                section.Tuples.Add(new WixProductSearchTuple(sourceLineNumbers, id)
+                {
+                    Guid = productCode ?? upgradeCode,
+                    Attributes = attributes,
+                });
             }
         }
 
@@ -2836,11 +2796,13 @@ namespace WixToolset.Util
                     this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
                 }
 
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixRegistrySearch", id);
-                row.Set(1, (int)root);
-                row.Set(2, key);
-                row.Set(3, value);
-                row.Set(4, (int)attributes);
+                section.Tuples.Add(new WixRegistrySearchTuple(sourceLineNumbers, id)
+                {
+                    Root = (RegistryRootType)root,
+                    Key = key,
+                    Value = value,
+                    Attributes = attributes,
+                });
             }
         }
 
