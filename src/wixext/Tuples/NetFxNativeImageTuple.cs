@@ -6,12 +6,11 @@ namespace WixToolset.Netfx.Tuples
 
     public enum NetFxNativeImageTupleFields
     {
-        NetFxNativeImage,
-        File_,
+        FileRef,
         Priority,
         Attributes,
-        File_Application,
-        Directory_ApplicationBase,
+        ApplicationFileRef,
+        ApplicationBaseDirectoryRef,
     }
 
     public class NetFxNativeImageTuple : IntermediateTuple
@@ -26,16 +25,10 @@ namespace WixToolset.Netfx.Tuples
 
         public IntermediateField this[NetFxNativeImageTupleFields index] => this.Fields[(int)index];
 
-        public string NetFxNativeImage
+        public string FileRef
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.NetFxNativeImage].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.NetFxNativeImage, value);
-        }
-
-        public string File_
-        {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.File_].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.File_, value);
+            get => this.Fields[(int)NetFxNativeImageTupleFields.FileRef].AsString();
+            set => this.Set((int)NetFxNativeImageTupleFields.FileRef, value);
         }
 
         public int Priority
@@ -50,16 +43,16 @@ namespace WixToolset.Netfx.Tuples
             set => this.Set((int)NetFxNativeImageTupleFields.Attributes, value);
         }
 
-        public string File_Application
+        public string ApplicationFileRef
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.File_Application].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.File_Application, value);
+            get => this.Fields[(int)NetFxNativeImageTupleFields.ApplicationFileRef].AsString();
+            set => this.Set((int)NetFxNativeImageTupleFields.ApplicationFileRef, value);
         }
 
-        public string Directory_ApplicationBase
+        public string ApplicationBaseDirectoryRef
         {
-            get => this.Fields[(int)NetFxNativeImageTupleFields.Directory_ApplicationBase].AsString();
-            set => this.Set((int)NetFxNativeImageTupleFields.Directory_ApplicationBase, value);
+            get => this.Fields[(int)NetFxNativeImageTupleFields.ApplicationBaseDirectoryRef].AsString();
+            set => this.Set((int)NetFxNativeImageTupleFields.ApplicationBaseDirectoryRef, value);
         }
     }
 }

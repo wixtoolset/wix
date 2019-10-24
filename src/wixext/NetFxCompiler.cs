@@ -7,6 +7,7 @@ namespace WixToolset.Netfx
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Netfx.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset .NET Framework Extension.
@@ -147,12 +148,14 @@ namespace WixToolset.Netfx
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "NetFxNativeImage", id);
-                row.Set(1, fileId);
-                row.Set(2, priority);
-                row.Set(3, attributes);
-                row.Set(4, assemblyApplication);
-                row.Set(5, appBaseDirectory);
+                section.Tuples.Add(new NetFxNativeImageTuple(sourceLineNumbers, id)
+                {
+                    FileRef=fileId,
+                    Priority=priority,
+                    Attributes=attributes,
+                    ApplicationFileRef=assemblyApplication,
+                    ApplicationBaseDirectoryRef=appBaseDirectory,
+                });
             }
         }
     }

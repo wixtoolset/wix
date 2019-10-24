@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Netfx.Tuples
 {
@@ -15,12 +15,11 @@ namespace WixToolset.Netfx.Tuples
             NetfxTupleDefinitionNames.NetFxNativeImage,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.NetFxNativeImage), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.File_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.FileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.Priority), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.File_Application), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.Directory_ApplicationBase), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.ApplicationFileRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(NetFxNativeImageTupleFields.ApplicationBaseDirectoryRef), IntermediateFieldType.String),
             },
             typeof(NetFxNativeImageTuple));
     }
