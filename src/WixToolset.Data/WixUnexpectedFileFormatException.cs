@@ -9,7 +9,7 @@ namespace WixToolset.Data
     /// </summary>
     public class WixUnexpectedFileFormatException : WixException
     {
-        public WixUnexpectedFileFormatException(string path, FileFormat expectedFormat, FileFormat format, Exception innerException = null)
+        public WixUnexpectedFileFormatException(string path, string expectedFormat, string format, Exception innerException = null)
             : base(ErrorMessages.UnexpectedFileFormat(path, expectedFormat, format), innerException)
         {
             this.Path = path;
@@ -20,12 +20,12 @@ namespace WixToolset.Data
         /// <summary>
         /// Gets the expected file format.
         /// </summary>
-        public FileFormat ExpectedFileFormat { get; }
+        public string ExpectedFileFormat { get; }
 
         /// <summary>
         /// Gets the actual file format found in the file.
         /// </summary>
-        public FileFormat FileFormat { get; }
+        public string FileFormat { get; }
 
         /// <summary>
         /// Gets the path to the file with unexpected format.

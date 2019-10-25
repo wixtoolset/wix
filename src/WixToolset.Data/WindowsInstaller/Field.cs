@@ -154,7 +154,7 @@ namespace WixToolset.Data.WindowsInstaller
                     // be enhanced if that ever changes.
                     if (value is int || value.GetType().IsEnum)
                     {
-                        int intValue = (int)value;
+                        var intValue = (int)value;
 
                         // validate the value against the minimum allowed value
                         if (column.MinValue.HasValue && column.MinValue > intValue)
@@ -275,7 +275,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="writer">XmlWriter where the Field should persist itself as XML.</param>
         internal virtual void Write(XmlWriter writer)
         {
-            writer.WriteStartElement("field", Intermediate.XmlNamespaceUri);
+            writer.WriteStartElement("field", Output.XmlNamespaceUri);
 
             if (this.Modified)
             {

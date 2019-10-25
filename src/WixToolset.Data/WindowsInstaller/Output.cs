@@ -5,7 +5,6 @@ namespace WixToolset.Data.WindowsInstaller
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Xml;
 
@@ -16,6 +15,7 @@ namespace WixToolset.Data.WindowsInstaller
     {
         public const string XmlNamespaceUri = "http://wixtoolset.org/schemas/v4/wixout";
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
+        private const string WixOutputStreamName = "wix-wi.xml";
 
         /// <summary>
         /// Creates a new empty output object.
@@ -66,41 +66,29 @@ namespace WixToolset.Data.WindowsInstaller
         /// <returns>Output object.</returns>
         public static Output Load(string path, bool suppressVersionCheck)
         {
-            using (FileStream stream = File.OpenRead(path))
-            using (FileStructure fs = FileStructure.Read(stream))
+            using (var wixout = WixOutput.Read(path))
+            using (var stream = wixout.GetDataStream(WixOutputStreamName))
+            using (var reader = XmlReader.Create(stream, null, wixout.Uri.AbsoluteUri))
             {
-                if (FileFormat.Wixout != fs.FileFormat)
+                try
                 {
-                    throw new WixUnexpectedFileFormatException(path, FileFormat.Wixout, fs.FileFormat);
+                    reader.MoveToContent();
+                    return Output.Read(reader, suppressVersionCheck);
                 }
-
-                Uri uri = new Uri(Path.GetFullPath(path));
-                using (XmlReader reader = XmlReader.Create(fs.GetDataStream(), null, uri.AbsoluteUri))
+                catch (XmlException xe)
                 {
-                    try
-                    {
-                        reader.MoveToContent();
-                        return Output.Read(reader, suppressVersionCheck);
-                    }
-                    catch (XmlException xe)
-                    {
-                        throw new WixCorruptFileException(path, fs.FileFormat, xe);
-                    }
+                    throw new WixCorruptFileException(path, "wixout", xe);
                 }
             }
         }
 
         /// <summary>
-        /// Saves an output to a path on disk.
+        /// Saves an output to a <c>WixOutput</c> container.
         /// </summary>
-        /// <param name="path">Path to save output file to on disk.</param>
-        public void Save(string path)
+        /// <param name="wixout">Container to save to.</param>
+        public void Save(WixOutput wixout)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
-
-            using (FileStream stream = File.Create(path))
-            using (FileStructure fs = FileStructure.Create(stream, FileFormat.Wixout, null))
-            using (XmlWriter writer = XmlWriter.Create(fs.GetDataStream()))
+            using (var writer = XmlWriter.Create(wixout.CreateDataStream(WixOutputStreamName)))
             {
                 writer.WriteStartDocument();
                 this.Write(writer);
@@ -121,8 +109,8 @@ namespace WixToolset.Data.WindowsInstaller
                 throw new XmlException();
             }
 
-            bool empty = reader.IsEmptyElement;
-            Output output = new Output(SourceLineNumber.CreateFromUri(reader.BaseURI));
+            var empty = reader.IsEmptyElement;
+            var output = new Output(SourceLineNumber.CreateFromUri(reader.BaseURI));
             Version version = null;
 
             while (reader.MoveToNextAttribute())
@@ -170,10 +158,10 @@ namespace WixToolset.Data.WindowsInstaller
 
             // loop through the rest of the xml building up the Output object
             TableDefinitionCollection tableDefinitions = null;
-            List<Table> tables = new List<Table>();
+            var tables = new List<Table>();
             if (!empty)
             {
-                bool done = false;
+                var done = false;
 
                 // loop through all the fields in a row
                 while (!done && reader.Read())
@@ -224,7 +212,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <returns>The table in this output.</returns>
         public Table EnsureTable(TableDefinition tableDefinition)
         {
-            if (!this.Tables.TryGetTable(tableDefinition.Name, out Table table))
+            if (!this.Tables.TryGetTable(tableDefinition.Name, out var table))
             {
                 table = new Table(tableDefinition);
                 this.Tables.Add(table);
@@ -251,19 +239,19 @@ namespace WixToolset.Data.WindowsInstaller
             writer.WriteAttributeString("version", Output.CurrentVersion.ToString());
 
             // Collect all the table definitions and write them.
-            TableDefinitionCollection tableDefinitions = new TableDefinitionCollection();
-            foreach (Table table in this.Tables)
+            var tableDefinitions = new TableDefinitionCollection();
+            foreach (var table in this.Tables)
             {
                 tableDefinitions.Add(table.Definition);
             }
             tableDefinitions.Write(writer);
 
-            foreach (Table table in this.Tables.OrderBy(t => t.Name))
+            foreach (var table in this.Tables.OrderBy(t => t.Name))
             {
                 table.Write(writer);
             }
 
-            foreach (SubStorage subStorage in this.SubStorages)
+            foreach (var subStorage in this.SubStorages)
             {
                 subStorage.Write(writer);
             }

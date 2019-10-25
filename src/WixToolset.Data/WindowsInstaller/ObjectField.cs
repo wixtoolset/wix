@@ -130,7 +130,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="writer">XmlWriter where the Field should persist itself as XML.</param>
         internal override void Write(XmlWriter writer)
         {
-            writer.WriteStartElement("field", Intermediate.XmlNamespaceUri);
+            writer.WriteStartElement("field", Output.XmlNamespaceUri);
 
             if (this.EmbeddedFileIndex.HasValue)
             {

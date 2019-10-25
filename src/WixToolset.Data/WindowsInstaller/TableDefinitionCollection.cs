@@ -227,7 +227,7 @@ namespace WixToolset.Data.WindowsInstaller
         {
             writer.WriteStartElement("tableDefinitions", XmlNamespaceUri);
 
-            foreach (TableDefinition tableDefinition in this.collection.Values.OrderBy(t => t.Name))
+            foreach (var tableDefinition in this.collection.Values.OrderBy(t => t.Name))
             {
                 tableDefinition.Write(writer);
             }

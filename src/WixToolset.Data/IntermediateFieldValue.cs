@@ -76,19 +76,19 @@ namespace WixToolset.Data
                 break;
 
             case JsonObject jsonData:
-                jsonData.TryGetValue("embeddedIndex", out var embeddedIndex);
+                jsonData.TryGetValue("embed", out var embed);
 
                 value = new IntermediateFieldPathValue
                 {
-                    BaseUri = (embeddedIndex == null) ? null : baseUri,
-                    EmbeddedFileIndex = (embeddedIndex == null) ? null : (int?)Convert.ToInt32(embeddedIndex),
+                    BaseUri = (embed != null) ? baseUri : null,
+                    Embed = embed != null,
                     Path = jsonData.GetValueOrDefault<string>("path"),
                 };
                 break;
 
-                // Nothing to do for this case, so leave it out.
-                // case string stringData:
-                //     break;
+            // Nothing to do for this case, so leave it out.
+            // case string stringData:
+            //     break;
             }
 
             var previousValueJson = jsonObject.GetValueOrDefault<JsonObject>("prev");
@@ -117,9 +117,9 @@ namespace WixToolset.Data
 
                 // pathField.BaseUri is set during load, not saved.
 
-                if (pathField.EmbeddedFileIndex.HasValue)
+                if (pathField.Embed)
                 {
-                    jsonData.Add("embeddedIndex", pathField.EmbeddedFileIndex.Value);
+                    jsonData.Add("embed", "true");
                 }
 
                 if (!String.IsNullOrEmpty(pathField.Path))

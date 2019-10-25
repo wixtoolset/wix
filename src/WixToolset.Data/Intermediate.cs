@@ -14,8 +14,8 @@ namespace WixToolset.Data
     /// </summary>
     public sealed class Intermediate
     {
-        public const string XmlNamespaceUri = "http://wixtoolset.org/schemas/v4/wixobj";
         private static readonly Version CurrentVersion = new Version("4.0.0.0");
+        private const string WixOutputStreamName = "wix-ir.json";
 
         private readonly Dictionary<string, Localization> localizationsByCulture;
 
@@ -25,15 +25,13 @@ namespace WixToolset.Data
         public Intermediate()
         {
             this.Id = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).TrimEnd('=').Replace('+', '.').Replace('/', '_');
-            this.EmbedFilePaths = new List<string>();
             this.localizationsByCulture = new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
             this.Sections = new List<IntermediateSection>();
         }
 
-        public Intermediate(string id, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture, IEnumerable<string> embedFilePaths)
+        public Intermediate(string id, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture)
         {
             this.Id = id;
-            this.EmbedFilePaths = (embedFilePaths != null) ? new List<string>(embedFilePaths) : new List<string>();
             this.localizationsByCulture = (localizationsByCulture != null) ? new Dictionary<string, Localization>(localizationsByCulture, StringComparer.OrdinalIgnoreCase) : new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
             this.Sections = (sections != null) ? new List<IntermediateSection>(sections) : new List<IntermediateSection>();
         }
@@ -42,11 +40,6 @@ namespace WixToolset.Data
         /// Get the id for the intermediate.
         /// </summary>
         public string Id { get; }
-
-        /// <summary>
-        /// Get the embed file paths in this intermediate.
-        /// </summary>
-        public IList<string> EmbedFilePaths { get; }
 
         /// <summary>
         /// Get the localizations contained in this intermediate.
@@ -66,12 +59,8 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(string path, bool suppressVersionCheck = false)
         {
-            using (var stream = File.OpenRead(path))
-            {
-                var uri = new Uri(Path.GetFullPath(path));
-                var creator = new SimpleTupleDefinitionCreator();
-                return Intermediate.LoadIntermediate(stream, uri, creator, suppressVersionCheck);
-            }
+            var creator = new SimpleTupleDefinitionCreator();
+            return Intermediate.Load(path, creator, suppressVersionCheck);
         }
 
         /// <summary>
@@ -97,13 +86,9 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(Assembly assembly, string resourceName, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
         {
-            using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
+            using (var wixout = WixOutput.Read(assembly, resourceName))
             {
-                var uriBuilder = new UriBuilder(assembly.CodeBase);
-                uriBuilder.Scheme = "embeddedresource";
-                uriBuilder.Fragment = resourceName;
-
-                return Intermediate.LoadIntermediate(resourceStream, uriBuilder.Uri, creator, suppressVersionCheck);
+                return Intermediate.LoadIntermediate(wixout, creator, suppressVersionCheck);
             }
         }
 
@@ -116,11 +101,9 @@ namespace WixToolset.Data
         /// <returns>Returns the loaded intermediate.</returns>
         public static Intermediate Load(string path, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
         {
-            using (var stream = File.OpenRead(path))
+            using (var wixout = WixOutput.Read(path))
             {
-                var uri = new Uri(Path.GetFullPath(path));
-
-                return Intermediate.LoadIntermediate(stream, uri, creator, suppressVersionCheck);
+                return Intermediate.LoadIntermediate(wixout, creator, suppressVersionCheck);
             }
         }
 
@@ -133,7 +116,6 @@ namespace WixToolset.Data
         public static IEnumerable<Intermediate> Load(IEnumerable<string> intermediateFiles)
         {
             var creator = new SimpleTupleDefinitionCreator();
-
             return Intermediate.Load(intermediateFiles, creator);
         }
 
@@ -151,15 +133,14 @@ namespace WixToolset.Data
 
             foreach (var path in intermediateFiles)
             {
-                using (var stream = File.OpenRead(path))
+                using (var wixout = WixOutput.Read(path))
                 {
-                    var uri = new Uri(Path.GetFullPath(path));
-
-                    var json = Intermediate.LoadJson(stream, uri, suppressVersionCheck);
+                    var data = wixout.GetData(WixOutputStreamName);
+                    var json = Intermediate.LoadJson(data, wixout.Uri, suppressVersionCheck);
 
                     Intermediate.LoadDefinitions(json, creator);
 
-                    jsons.Enqueue(new JsonWithPath { Json = json, Path = uri });
+                    jsons.Enqueue(new JsonWithPath { Json = json, Path = wixout.Uri });
                 }
             }
 
@@ -183,55 +164,21 @@ namespace WixToolset.Data
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
 
-            using (var stream = File.Create(path))
-            using (var fs = FileStructure.Create(stream, FileFormat.WixIR, this.EmbedFilePaths))
-            using (var writer = new StreamWriter(fs.GetDataStream()))
+            using (var wixout = WixOutput.Create(path))
             {
-                var jsonObject = new JsonObject
-                {
-                    { "id", this.Id },
-                    { "version", Intermediate.CurrentVersion.ToString() }
-                };
-
-                var sectionsJson = new JsonArray(this.Sections.Count);
-                foreach (var section in this.Sections)
-                {
-                    var sectionJson = section.Serialize();
-                    sectionsJson.Add(sectionJson);
-                }
-
-                jsonObject.Add("sections", sectionsJson);
-
-                var customDefinitions = this.GetCustomDefinitionsInSections();
-
-                if (customDefinitions.Count > 0)
-                {
-                    var customDefinitionsJson = new JsonArray(customDefinitions.Count);
-
-                    foreach (var kvp in customDefinitions.OrderBy(d => d.Key))
-                    {
-                        var customDefinitionJson = kvp.Value.Serialize();
-                        customDefinitionsJson.Add(customDefinitionJson);
-                    }
-
-                    jsonObject.Add("definitions", customDefinitionsJson);
-                }
-
-                if (this.Localizations.Any())
-                {
-                    var localizationsJson = new JsonArray();
-                    foreach (var localization in this.Localizations)
-                    {
-                        var localizationJson = localization.Serialize();
-                        localizationsJson.Add(localizationJson);
-                    }
-
-                    jsonObject.Add("localizations", localizationsJson);
-                }
-
-                var json = SimpleJson.SerializeObject(jsonObject);
-                writer.Write(json);
+                this.Save(wixout);
             }
+        }
+
+        /// <summary>
+        /// Saves an intermediate to a path on disk.
+        /// </summary>
+        /// <param name="path">Path to save intermediate file to disk.</param>
+        public void Save(WixOutput wixout)
+        {
+            this.SaveEmbedFiles(wixout);
+
+            this.SaveIR(wixout);
         }
 
         /// <summary>
@@ -242,13 +189,14 @@ namespace WixToolset.Data
         /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded intermediate.</returns>
-        private static Intermediate LoadIntermediate(Stream stream, Uri baseUri, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        private static Intermediate LoadIntermediate(WixOutput wixout, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
         {
-            var json = Intermediate.LoadJson(stream, baseUri, suppressVersionCheck);
+            var data = wixout.GetData(WixOutputStreamName);
+            var json = Intermediate.LoadJson(data, wixout.Uri, suppressVersionCheck);
 
             Intermediate.LoadDefinitions(json, creator);
 
-            return Intermediate.FinalizeLoad(json, baseUri, creator);
+            return Intermediate.FinalizeLoad(json, wixout.Uri, creator);
         }
 
         /// <summary>
@@ -258,19 +206,9 @@ namespace WixToolset.Data
         /// <param name="baseUri">Path name of intermediate file.</param>
         /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
         /// <returns>Returns the loaded json.</returns>
-        private static JsonObject LoadJson(Stream stream, Uri baseUri, bool suppressVersionCheck)
+        private static JsonObject LoadJson(string json, Uri baseUri, bool suppressVersionCheck)
         {
-            JsonObject jsonObject;
-            using (var fs = FileStructure.Read(stream))
-            {
-                if (FileFormat.WixIR != fs.FileFormat)
-                {
-                    throw new WixUnexpectedFileFormatException(baseUri.LocalPath, FileFormat.WixIR, fs.FileFormat);
-                }
-
-                var json = fs.GetData();
-                jsonObject = SimpleJson.DeserializeObject(json) as JsonObject;
-            }
+            var jsonObject = SimpleJson.DeserializeObject(json) as JsonObject;
 
             if (!suppressVersionCheck)
             {
@@ -333,153 +271,118 @@ namespace WixToolset.Data
                 localizations.Add(localization.Culture, localization);
             }
 
-            return new Intermediate(id, sections, localizations, null);
+            return new Intermediate(id, sections, localizations);
         }
 
-#if false
-        /// <summary>
-        /// Loads an intermediate from a path on disk.
-        /// </summary>
-        /// <param name="path">Path to intermediate file saved on disk.</param>
-        /// <param name="tableDefinitions">Collection containing TableDefinitions to use when reconstituting the intermediate.</param>
-        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
-        /// <returns>Returns the loaded intermediate.</returns>
-        public static Intermediate Load(string path, TableDefinitionCollection tableDefinitions, bool suppressVersionCheck)
+        private void SaveEmbedFiles(WixOutput wixout)
         {
-            using (FileStream stream = File.OpenRead(path))
-            using (FileStructure fs = FileStructure.Read(stream))
-            {
-                if (FileFormat.Wixobj != fs.FileFormat)
-                {
-                    throw new WixUnexpectedFileFormatException(path, FileFormat.Wixobj, fs.FileFormat);
-                }
+            var embeddedFields = this.Sections.SelectMany(s => s.Tuples)
+                .SelectMany(t => t.Fields)
+                .Where(f => f?.Type == IntermediateFieldType.Path)
+                .Select(f => f.AsPath())
+                .Where(f => f.Embed)
+                .ToList();
 
-                Uri uri = new Uri(Path.GetFullPath(path));
-                using (XmlReader reader = XmlReader.Create(fs.GetDataStream(), null, uri.AbsoluteUri))
+            var savedEmbedFields = new Dictionary<string, IntermediateFieldPathValue>(StringComparer.OrdinalIgnoreCase);
+            var uniqueEntryNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var embeddedField in embeddedFields)
+            {
+                var key = String.Concat(embeddedField.BaseUri?.AbsoluteUri, "?", embeddedField.Path);
+
+                if (savedEmbedFields.TryGetValue(key, out var existing))
                 {
-                    try
+                    embeddedField.Path = existing.Path;
+                }
+                else
+                {
+                    var entryName = CalculateUniqueEntryName(uniqueEntryNames, embeddedField.Path);
+
+                    if (embeddedField.BaseUri == null)
                     {
-                        reader.MoveToContent();
-                        return Intermediate.Read(reader, tableDefinitions, suppressVersionCheck);
+                        wixout.ImportDataStream(entryName, embeddedField.Path);
                     }
-                    catch (XmlException xe)
+                    else // open the container specified in baseUri and copy the correct stream out of it.
                     {
-                        throw new WixCorruptFileException(path, fs.FileFormat, xe);
+                        using (var otherWixout = WixOutput.Read(embeddedField.BaseUri))
+                        using (var stream = otherWixout.GetDataStream(embeddedField.Path))
+                        using (var target = wixout.CreateDataStream(entryName))
+                        {
+                            stream.CopyTo(target);
+                        }
                     }
+
+                    embeddedField.Path = entryName;
+
+                    savedEmbedFields.Add(key, embeddedField);
                 }
             }
         }
 
-        /// <summary>
-        /// Saves an intermediate to a path on disk.
-        /// </summary>
-        /// <param name="path">Path to save intermediate file to disk.</param>
-        public void Save(string path)
+        private void SaveIR(WixOutput wixout)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
-
-            using (var stream = File.Create(path))
-            using (var fs = FileStructure.Create(stream, FileFormat.Wixobj, null))
-            using (var writer = XmlWriter.Create(fs.GetDataStream()))
+            using (var writer = new StreamWriter(wixout.CreateDataStream(WixOutputStreamName)))
             {
-                writer.WriteStartDocument();
-                this.Write(writer);
-                writer.WriteEndDocument();
-            }
-        }
-
-        /// <summary>
-        /// Parse an intermediate from an XML format.
-        /// </summary>
-        /// <param name="reader">XmlReader where the intermediate is persisted.</param>
-        /// <param name="tableDefinitions">TableDefinitions to use in the intermediate.</param>
-        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatch.</param>
-        /// <returns>The parsed Intermediate.</returns>
-        private static Intermediate Read(XmlReader reader, TableDefinitionCollection tableDefinitions, bool suppressVersionCheck)
-        {
-            if ("wixObject" != reader.LocalName)
-            {
-                throw new XmlException();
-            }
-
-            bool empty = reader.IsEmptyElement;
-            Version objVersion = null;
-            string id = null;
-
-            while (reader.MoveToNextAttribute())
-            {
-                switch (reader.LocalName)
+                var jsonObject = new JsonObject
                 {
-                    case "version":
-                        objVersion = new Version(reader.Value);
-                        break;
-                    case "id":
-                        id = reader.Value;
-                        break;
+                    { "id", this.Id },
+                    { "version", Intermediate.CurrentVersion.ToString() }
+                };
+
+                var sectionsJson = new JsonArray(this.Sections.Count);
+                foreach (var section in this.Sections)
+                {
+                    var sectionJson = section.Serialize();
+                    sectionsJson.Add(sectionJson);
                 }
-            }
 
-            if (!suppressVersionCheck && null != objVersion && !Intermediate.CurrentVersion.Equals(objVersion))
-            {
-                throw new WixException(WixDataErrors.VersionMismatch(SourceLineNumber.CreateFromUri(reader.BaseURI), "object", objVersion.ToString(), Intermediate.CurrentVersion.ToString()));
-            }
+                jsonObject.Add("sections", sectionsJson);
 
-            Intermediate intermediate = new Intermediate();
-            intermediate.id = id;
+                var customDefinitions = this.GetCustomDefinitionsInSections();
 
-            if (!empty)
-            {
-                bool done = false;
-
-                while (!done && reader.Read())
+                if (customDefinitions.Count > 0)
                 {
-                    switch (reader.NodeType)
+                    var customDefinitionsJson = new JsonArray(customDefinitions.Count);
+
+                    foreach (var kvp in customDefinitions.OrderBy(d => d.Key))
                     {
-                        case XmlNodeType.Element:
-                            switch (reader.LocalName)
-                            {
-                                case "section":
-                                    intermediate.AddSection(Section.Read(reader, tableDefinitions));
-                                    break;
-                                default:
-                                    throw new XmlException();
-                            }
-                            break;
-                        case XmlNodeType.EndElement:
-                            done = true;
-                            break;
+                        var customDefinitionJson = kvp.Value.Serialize();
+                        customDefinitionsJson.Add(customDefinitionJson);
                     }
+
+                    jsonObject.Add("definitions", customDefinitionsJson);
                 }
 
-                if (!done)
+                if (this.Localizations.Any())
                 {
-                    throw new XmlException();
+                    var localizationsJson = new JsonArray();
+                    foreach (var localization in this.Localizations)
+                    {
+                        var localizationJson = localization.Serialize();
+                        localizationsJson.Add(localizationJson);
+                    }
+
+                    jsonObject.Add("localizations", localizationsJson);
                 }
-            }
 
-            return intermediate;
+                var json = SimpleJson.SerializeObject(jsonObject);
+                writer.Write(json);
+            }
         }
 
-        /// <summary>
-        /// Persists an intermediate in an XML format.
-        /// </summary>
-        /// <param name="writer">XmlWriter where the Intermediate should persist itself as XML.</param>
-        private void Write(XmlWriter writer)
+        private static string CalculateUniqueEntryName(ISet<string> entryNames, string path)
         {
-            writer.WriteStartElement("wixObject", XmlNamespaceUri);
+            var filename = Path.GetFileName(path);
+            var entryName = "wix-ir/" + filename;
+            var i = 0;
 
-            writer.WriteAttributeString("version", Intermediate.CurrentVersion.ToString());
-
-            writer.WriteAttributeString("id", this.id);
-
-            foreach (Section section in this.Sections)
+            while (!entryNames.Add(entryName))
             {
-                section.Write(writer);
+                entryName = $"wix-ir/{filename}-{++i}";
             }
 
-            writer.WriteEndElement();
+            return entryName;
         }
-#endif
 
         private Dictionary<string, IntermediateTupleDefinition> GetCustomDefinitionsInSections()
         {

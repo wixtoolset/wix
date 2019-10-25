@@ -291,7 +291,7 @@ namespace WixToolset.Data.WindowsInstaller
                 throw new ArgumentNullException("writer");
             }
 
-            writer.WriteStartElement("table", Intermediate.XmlNamespaceUri);
+            writer.WriteStartElement("table", Output.XmlNamespaceUri);
             writer.WriteAttributeString("name", this.Name);
 
             if (TableOperation.None != this.Operation)

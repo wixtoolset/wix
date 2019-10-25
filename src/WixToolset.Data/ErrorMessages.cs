@@ -198,9 +198,9 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.ConditionExpected, "The {0} element's inner text cannot be an empty string or completely whitespace.  If you don't want a condition, then simply remove the entire {0} element.", elementName);
         }
 
-        public static Message CorruptFileFormat(string path, FileFormat format)
+        public static Message CorruptFileFormat(string path, string format)
         {
-            return Message(null, Ids.CorruptFileFormat, "Attempted to load corrupt file from path: {0}. The file with format {1} contained unexpected content. Ensure the correct path was provided and that the file has not been incorrectly modified.", path, format.ToString().ToLowerInvariant());
+            return Message(null, Ids.CorruptFileFormat, "Attempted to load corrupt file from path: {0}. The file with format {1} contained unexpected content. Ensure the correct path was provided and that the file has not been incorrectly modified.", path, format.ToLowerInvariant());
         }
 
         public static Message CreateCabAddFileFailed()
@@ -2049,9 +2049,9 @@ namespace WixToolset.Data
             return Message(null, Ids.UnexpectedFileExtension, "The file '{0}' has an unexpected extension. Expected one of the following: '{1}'.", fileName, expectedExtensions);
         }
 
-        public static Message UnexpectedFileFormat(string path, FileFormat expectedFormat, FileFormat actualFormat)
+        public static Message UnexpectedFileFormat(string path, string expectedFormat, string actualFormat)
         {
-            return Message(null, Ids.UnexpectedFileFormat, "Unexpected file format loaded from path: {0}. The file was expected to be a {1} but was actually: {2}. Ensure the correct path was provided.", path, expectedFormat.ToString().ToLowerInvariant(), actualFormat.ToString().ToLowerInvariant());
+            return Message(null, Ids.UnexpectedFileFormat, "Unexpected file format loaded from path: {0}. The file was expected to be a {1} but was actually: {2}. Ensure the correct path was provided.", path, expectedFormat.ToLowerInvariant(), actualFormat.ToLowerInvariant());
         }
 
         public static Message UnexpectedGroupChild(string parentType, string parentId, string childType, string childId)

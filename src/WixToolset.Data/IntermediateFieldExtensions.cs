@@ -386,7 +386,7 @@ namespace WixToolset.Data
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
-                };
+                }
             }
 
             return AssignFieldValue(field, data);
@@ -455,7 +455,7 @@ namespace WixToolset.Data
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), $"Unknown intermediate field type: {value.GetType()}");
-                };
+                }
             }
 
             return AssignFieldValue(field, data);

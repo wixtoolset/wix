@@ -26,7 +26,7 @@ namespace WixToolsetTest.Data
                 Location = ComponentLocation.Either,
             });
 
-            var intermediate = new Intermediate("TestIntermediate", new[] { section }, null, null);
+            var intermediate = new Intermediate("TestIntermediate", new[] { section }, null);
 
             var path = Path.GetTempFileName();
             intermediate.Save(path);
@@ -64,7 +64,7 @@ namespace WixToolsetTest.Data
 
             section.Tuples.Add(tuple);
 
-            var intermediate = new Intermediate("TestIntermediate", new[] { section }, null, null);
+            var intermediate = new Intermediate("TestIntermediate", new[] { section }, null);
 
             var path = Path.GetTempFileName();
             try
@@ -108,7 +108,7 @@ namespace WixToolsetTest.Data
             var section = new IntermediateSection("test", SectionType.Product, 65001);
             section.Tuples.Add(tuple);
 
-            var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null, null);
+            var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
 
             // Intermediate #2
             var fieldDefs2 = new[]
@@ -130,7 +130,7 @@ namespace WixToolsetTest.Data
             var section2 = new IntermediateSection("test2", SectionType.Fragment, 65001);
             section2.Tuples.Add(tuple2);
 
-            var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null, null);
+            var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null);
 
             // Save
             var path1 = Path.GetTempFileName();
@@ -191,7 +191,7 @@ namespace WixToolsetTest.Data
             var section = new IntermediateSection("test", SectionType.Product, 65001);
             section.Tuples.Add(tuple);
 
-            var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null, null);
+            var intermediate1 = new Intermediate("TestIntermediate", new[] { section }, null);
 
             // Intermediate #2
             var fieldDefs2 = new[]
@@ -219,7 +219,7 @@ namespace WixToolsetTest.Data
             var section2 = new IntermediateSection("test2", SectionType.Fragment, 65001);
             section2.Tuples.Add(tuple2);
 
-            var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null, null);
+            var intermediate2 = new Intermediate("TestIntermediate2", new[] { section2 }, null);
 
             // Save
             var path1 = Path.GetTempFileName();
@@ -290,7 +290,7 @@ namespace WixToolsetTest.Data
                 Location = ComponentLocation.Either,
             });
 
-            var intermediate = new Intermediate("TestIntermediate", new[] { section }, localizations.ToDictionary(l => l.Culture), null);
+            var intermediate = new Intermediate("TestIntermediate", new[] { section }, localizations.ToDictionary(l => l.Culture));
 
             var path = Path.GetTempFileName();
             try

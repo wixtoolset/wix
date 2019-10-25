@@ -354,7 +354,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="writer">XmlWriter where the Row should persist itself as XML.</param>
         internal void Write(XmlWriter writer)
         {
-            writer.WriteStartElement("row", Intermediate.XmlNamespaceUri);
+            writer.WriteStartElement("row", Output.XmlNamespaceUri);
 
             if (RowOperation.None != this.Operation)
             {
