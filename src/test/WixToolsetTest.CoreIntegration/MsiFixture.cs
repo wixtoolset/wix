@@ -312,9 +312,8 @@ namespace WixToolsetTest.CoreIntegration
                 var pdbPath = Path.Combine(intermediateFolder, @"bin\test.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
-                var pdb = Pdb.Load(pdbPath, suppressVersionCheck: true);
-                Assert.NotNull(pdb);
-                Assert.NotNull(pdb.Output);
+                var output = Output.Load(pdbPath, suppressVersionCheck: true);
+                Assert.NotNull(output);
             }
         }
 
@@ -449,6 +448,74 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildBinaryWixlib()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindfiles",
+                    "-o", Path.Combine(baseFolder, @"bin\test.wixlib"));
+
+                result.AssertSuccess();
+
+                using (var wixout = WixOutput.Read(Path.Combine(baseFolder, @"bin\test.wixlib")))
+                {
+                    Assert.NotNull(wixout.GetDataStream("wix-ir.json"));
+
+                    var text = wixout.GetData("wix-ir/test.txt");
+                    Assert.Equal("This is test.txt.", text);
+                }
+            }
+        }
+
+        [Fact]
+        public void CanBuildBinaryWixlibWithCollidingFilenames()
+        {
+            var folder = TestData.Get(@"TestData\SameFileFolders");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(
+                    "build",
+                    Path.Combine(folder, "TestComponents.wxs"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindfiles",
+                    "-o", Path.Combine(baseFolder, @"bin\test.wixlib"));
+
+                result.AssertSuccess();
+
+                using (var wixout = WixOutput.Read(Path.Combine(baseFolder, @"bin\test.wixlib")))
+                {
+                    Assert.NotNull(wixout.GetDataStream("wix-ir.json"));
+
+                    var text = wixout.GetData("wix-ir/test.txt");
+                    Assert.Equal(@"This is a\test.txt.", text);
+
+                    var text2 = wixout.GetData("wix-ir/test.txt-1");
+                    Assert.Equal(@"This is b\test.txt.", text2);
+
+                    var text3 = wixout.GetData("wix-ir/test.txt-2");
+                    Assert.Equal(@"This is c\test.txt.", text3);
+                }
+            }
+        }
+
+        [Fact]
         public void CanBuildWithIncludePath()
         {
             var folder = TestData.Get(@"TestData\IncludePath");
@@ -459,8 +526,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var result = WixRunner.Execute(new[]
-                {
+                var result = WixRunner.Execute(
                     "build",
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
@@ -468,8 +534,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", bindpath,
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi"),
-                    "-i", bindpath,
-                });
+                    "-i", bindpath);
 
                 result.AssertSuccess();
 
@@ -635,8 +700,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var pdb = Pdb.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"), false);
-                var caRows = pdb.Output.Tables["CustomAction"].Rows.Single();
+                var output = Output.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"), false);
+                var caRows = output.Tables["CustomAction"].Rows.Single();
                 Assert.Equal("SetINSTALLLOCATION", caRows.FieldAsString(0));
                 Assert.Equal("51", caRows.FieldAsString(1));
                 Assert.Equal("INSTALLLOCATION", caRows.FieldAsString(2));
@@ -711,8 +776,8 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var pdb = Pdb.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
-                Assert.NotEmpty(pdb.Output.SubStorages);
+                var output = Output.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
+                Assert.NotEmpty(output.SubStorages);
             }
         }
     }

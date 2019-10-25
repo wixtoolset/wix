@@ -56,14 +56,14 @@ namespace WixToolset.Core
                     return null;
                 }
 
-                var embedFilePaths = this.ResolveFilePathsToEmbed(context, sections);
+                this.ResolveFilePathsToEmbed(context, sections);
 
                 foreach (var section in sections)
                 {
                     section.LibraryId = context.LibraryId;
                 }
 
-                library = new Intermediate(context.LibraryId, sections, localizationsByCulture, embedFilePaths);
+                library = new Intermediate(context.LibraryId, sections, localizationsByCulture);
 
                 this.Validate(library);
             }
@@ -78,10 +78,8 @@ namespace WixToolset.Core
             return this.Messaging.EncounteredError ? null : library;
         }
 
-        private List<string> ResolveFilePathsToEmbed(ILibraryContext context, IEnumerable<IntermediateSection> sections)
+        private void ResolveFilePathsToEmbed(ILibraryContext context, IEnumerable<IntermediateSection> sections)
         {
-            var embedFilePaths = new List<string>();
-
             // Resolve paths to files that are to be embedded in the library.
             if (context.BindFiles)
             {
@@ -104,9 +102,7 @@ namespace WixToolset.Core
                             if (!String.IsNullOrEmpty(file))
                             {
                                 // File was successfully resolved so track the embedded index as the embedded file index.
-                                field.Set(new IntermediateFieldPathValue { EmbeddedFileIndex = embedFilePaths.Count });
-
-                                embedFilePaths.Add(file);
+                                field.Set(new IntermediateFieldPathValue { Embed = true, Path = file });
                             }
                             else
                             {
@@ -116,8 +112,6 @@ namespace WixToolset.Core
                     }
                 }
             }
-
-            return embedFilePaths;
         }
 
         private void Validate(Intermediate library)

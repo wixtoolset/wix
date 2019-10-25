@@ -17,10 +17,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// <summary>
     /// Binds a databse.
     /// </summary>
-    internal class BindDatabaseCommand
+    internal class BindDatabaseCommand : IDisposable
     {
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
+
+        private bool disposed;
 
         public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator)
         {
@@ -92,7 +94,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
-        public Pdb Pdb { get; private set; }
+        public WixOutput Wixout { get; private set; }
 
         public void Execute()
         {
@@ -524,29 +526,41 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 trackedFiles.AddRange(command.TrackedFiles);
             }
 
-            this.Pdb = new Pdb { Output = output };
+            this.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, output);
 
-            if (!String.IsNullOrEmpty(this.OutputPdbPath))
+            this.FileTransfers = fileTransfers;
+            // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
+            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.File.Source.Path, TrackedFileType.Input, f.File.SourceLineNumbers)));
+            this.TrackedFiles = trackedFiles;
+
+            // TODO: Eventually this gets removed
+            var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase));
+            var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
+            intermediate.Save(trackIntermediate.Path);
+            trackedFiles.Add(trackIntermediate);
+        }
+
+        private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, Output output)
+        {
+            WixOutput wixout;
+
+            if (String.IsNullOrEmpty(this.OutputPdbPath))
+            {
+                wixout = WixOutput.Create();
+            }
+            else
             {
                 var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
                 trackedFiles.Add(trackPdb);
 
-                this.Pdb.Save(trackPdb.Path);
+                wixout = WixOutput.Create(trackPdb.Path);
             }
 
-            this.FileTransfers = fileTransfers;
-            // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
-            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.File.Source.Path, TrackedFileType.Input, f.File.SourceLineNumbers))); 
-            this.TrackedFiles = trackedFiles;
+            intermediate.Save(wixout);
 
-            // TODO: Eventually this gets removed
-            var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase), this.Intermediate.EmbedFilePaths);
-            var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
-            intermediate.Save(trackIntermediate.Path);
-            trackedFiles.Add(trackIntermediate);
+            output.Save(wixout);
 
-            //transfer = this.BackendHelper.CreateFileTransfer(intermediatePath, Path.ChangeExtension(this.OutputPath, "wir"), true, FileTransferType.Built);
-            //fileTransfers.Add(transfer);
+            return wixout;
         }
 
 #if TODO_FINISH_PATCH
@@ -934,5 +948,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             return command.GeneratedTemporaryFiles;
         }
+
+        #region IDisposable Support
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.Wixout?.Dispose();
+                }
+
+                this.disposed = true;
+            }
+        }
+
+        #endregion
     }
 }

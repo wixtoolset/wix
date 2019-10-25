@@ -564,7 +564,7 @@ namespace WixToolset.Core
                 var collate = new CollateLocalizationsCommand(this.Messaging, localizations);
                 var localizationsByCulture = collate.Execute();
 
-                intermediate = new Intermediate(resolvedSection.Id, new[] { resolvedSection }, localizationsByCulture, null);
+                intermediate = new Intermediate(resolvedSection.Id, new[] { resolvedSection }, localizationsByCulture);
 
 #if MOVE_TO_BACKEND
                 this.CheckOutputConsistency(output);

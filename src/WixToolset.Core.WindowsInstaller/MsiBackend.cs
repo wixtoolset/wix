@@ -2,7 +2,6 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
-    using System;
     using WixToolset.Core.WindowsInstaller.Bind;
     using WixToolset.Core.WindowsInstaller.Inscribe;
     using WixToolset.Core.WindowsInstaller.Unbind;
@@ -26,18 +25,21 @@ namespace WixToolset.Core.WindowsInstaller
 
             var validator = Validator.CreateFromContext(context, "darice.cub");
 
-            var command = new BindDatabaseCommand(context, backendExtensions, validator);
-            command.Execute();
-
-            var result = context.ServiceProvider.GetService<IBindResult>();
-            result.FileTransfers = command.FileTransfers;
-            result.TrackedFiles = command.TrackedFiles;
-
-            foreach (var extension in backendExtensions)
+            using (var command = new BindDatabaseCommand(context, backendExtensions, validator))
             {
-                extension.PostBackendBind(result, command.Pdb);
+                command.Execute();
+
+                var result = context.ServiceProvider.GetService<IBindResult>();
+                result.FileTransfers = command.FileTransfers;
+                result.TrackedFiles = command.TrackedFiles;
+
+                foreach (var extension in backendExtensions)
+                {
+                    extension.PostBackendBind(result, command.Wixout);
+                }
+
+                return result;
             }
-            return result;
         }
 
         public IDecompileResult Decompile(IDecompileContext context)

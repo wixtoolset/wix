@@ -128,14 +128,14 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     var binary = section.Tuples.OfType<BinaryTuple>().Single();
                     var path = binary[BinaryTupleFields.Data].AsPath().Path;
-                    Assert.Contains("Example.Extension", path);
-                    Assert.EndsWith(@"\0", path);
+                    Assert.StartsWith(Path.Combine(baseFolder, @"obj\Example.Extension"), path);
+                    Assert.EndsWith(@"wix-ir\example.txt", path);
                     Assert.Equal(@"BinFromWir", binary.Id.Id);
                 }
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildWixiplUsingExtensionLibrary()
         {
             var folder = TestData.Get(@"TestData\Wixipl");
@@ -171,7 +171,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"obj\test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 {
@@ -183,8 +183,8 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     var binary = section.Tuples.OfType<BinaryTuple>().Single();
                     var path = binary[BinaryTupleFields.Data].AsPath().Path;
-                    Assert.Contains("Example.Extension", path);
-                    Assert.EndsWith(@"\0", path);
+                    Assert.StartsWith(Path.Combine(baseFolder, @"obj\test"), path);
+                    Assert.EndsWith(@"wix-ir\example.txt", path);
                     Assert.Equal(@"BinFromWir", binary.Id.Id);
                 }
             }

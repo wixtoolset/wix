@@ -16,7 +16,7 @@ namespace WixToolset.Core.TestPackage
             return Execute(args, serviceProvider, out messages);
         }
 
-        public static WixRunnerResult Execute(string[] args)
+        public static WixRunnerResult Execute(params string[] args)
         {
             var serviceProvider = new WixToolsetServiceProvider();
             var exitCode = Execute(args, serviceProvider, out var messages);

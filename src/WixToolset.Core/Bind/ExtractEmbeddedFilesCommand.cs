@@ -2,10 +2,9 @@
 
 namespace WixToolset.Core.Bind
 {
+    using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
@@ -26,40 +25,17 @@ namespace WixToolset.Core.Bind
             {
                 var baseUri = expectedEmbeddedFileByUri.Key;
 
-                Stream stream = null;
-                try
+                using (var wixout = WixOutput.Read(baseUri))
                 {
-                    // If the embedded files are stored in an assembly resource stream (usually
-                    // a .wixlib embedded in a WixExtension).
-                    if ("embeddedresource" == baseUri.Scheme)
-                    {
-                        var assemblyPath = Path.GetFullPath(baseUri.LocalPath);
-                        var resourceName = baseUri.Fragment.TrimStart('#');
+                    var uniqueIds = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                        var assembly = Assembly.LoadFile(assemblyPath);
-                        stream = assembly.GetManifestResourceStream(resourceName);
-                    }
-                    else // normal file (usually a binary .wixlib on disk).
+                    foreach (var embeddedFile in expectedEmbeddedFileByUri)
                     {
-                        stream = File.OpenRead(baseUri.LocalPath);
-                    }
-
-                    using (var fs = FileStructure.Read(stream))
-                    {
-                        var uniqueIndicies = new SortedSet<int>();
-
-                        foreach (var embeddedFile in expectedEmbeddedFileByUri)
+                        if (uniqueIds.Add(embeddedFile.EmbeddedFileId))
                         {
-                            if (uniqueIndicies.Add(embeddedFile.EmbeddedFileIndex))
-                            {
-                                fs.ExtractEmbeddedFile(embeddedFile.EmbeddedFileIndex, embeddedFile.OutputPath);
-                            }
+                            wixout.ExtractEmbeddedFile(embeddedFile.EmbeddedFileId, embeddedFile.OutputPath);
                         }
                     }
-                }
-                finally
-                {
-                    stream?.Close();
                 }
             }
         }

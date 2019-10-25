@@ -462,7 +462,7 @@ namespace WixToolset.Core.Burn
             this.TrackedFiles = trackedFiles;
 
             // TODO: Eventually this gets removed
-            var intermediate = new Intermediate(this.Output.Id, new[] { section }, this.Output.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase), this.Output.EmbedFilePaths);
+            var intermediate = new Intermediate(this.Output.Id, new[] { section }, this.Output.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase));
             var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
             intermediate.Save(trackIntermediate.Path);
             trackedFiles.Add(trackIntermediate);

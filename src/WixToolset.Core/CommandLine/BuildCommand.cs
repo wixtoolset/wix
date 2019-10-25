@@ -100,29 +100,38 @@ namespace WixToolset.Core.CommandLine
 
             if (this.OutputType == OutputType.Library)
             {
-                var wixlib = this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths);
-
-                if (!this.Messaging.EncounteredError)
+                using (new IntermediateFieldContext("wix.lib"))
                 {
-                    wixlib.Save(this.commandLine.OutputFile);
+                    var wixlib = this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths);
+
+                    if (!this.Messaging.EncounteredError)
+                    {
+                        wixlib.Save(this.commandLine.OutputFile);
+                    }
                 }
             }
             else
             {
-                if (wixipl == null)
+                using (new IntermediateFieldContext("wix.link"))
                 {
-                    wixipl = this.LinkPhase(wixobjs, this.commandLine.LibraryFilePaths, creator);
-                }
-
-                if (!this.Messaging.EncounteredError)
-                {
-                    if (this.OutputType == OutputType.IntermediatePostLink)
+                    if (wixipl == null)
                     {
-                        wixipl.Save(this.commandLine.OutputFile);
+                        wixipl = this.LinkPhase(wixobjs, this.commandLine.LibraryFilePaths, creator);
                     }
-                    else
+
+                    if (!this.Messaging.EncounteredError)
                     {
-                        this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, this.commandLine.BurnStubPath);
+                        if (this.OutputType == OutputType.IntermediatePostLink)
+                        {
+                            wixipl.Save(this.commandLine.OutputFile);
+                        }
+                        else
+                        {
+                            using (new IntermediateFieldContext("wix.bind"))
+                            {
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, this.commandLine.BurnStubPath);
+                            }
+                        }
                     }
                 }
             }
@@ -469,6 +478,7 @@ namespace WixToolset.Core.CommandLine
                             break;
                         }
 
+                        case "bf":
                         case "bindfiles":
                             this.BindFiles = true;
                             return true;

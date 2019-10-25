@@ -98,9 +98,9 @@ namespace WixToolset.Core.Bind
 #endif
 
                             // File is embedded and path to it was not modified above.
-                            if (objectField.EmbeddedFileIndex.HasValue && isDefault)
+                            if (isDefault && objectField.Embed)
                             {
-                                var extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileIndex(objectField.BaseUri, objectField.EmbeddedFileIndex.Value, this.IntermediateFolder);
+                                var extractPath = this.FilesWithEmbeddedFiles.AddEmbeddedFileToExtract(objectField.BaseUri, objectField.Path, this.IntermediateFolder);
 
                                 // Set the path to the embedded file once where it will be extracted.
                                 field.Set(extractPath);

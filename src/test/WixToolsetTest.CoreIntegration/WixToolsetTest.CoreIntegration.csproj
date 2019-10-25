@@ -36,6 +36,10 @@
     <Content Include="TestData\Font\FontTitle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Icon\SampleIcon.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\LockPermissions\EmptyPermissions.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SameFileFolders\data\a\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SameFileFolders\data\c\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SameFileFolders\data\b\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SameFileFolders\TestComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\MinimalComponentGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\Product.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Registry\RegistryValue.wxs" CopyToOutputDirectory="PreserveNewest" />
