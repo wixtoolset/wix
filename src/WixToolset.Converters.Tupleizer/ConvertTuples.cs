@@ -42,7 +42,7 @@ namespace WixToolset.Converters.Tupleizer
                 }
             }
 
-            return new Intermediate(String.Empty, new[] { section }, localizationsByCulture: null, embedFilePaths: null);
+            return new Intermediate(String.Empty, new[] { section }, localizationsByCulture: null);
         }
 
         private static Dictionary<int, Wix3.WixMediaRow> IndexWixMediaTableByDiskId(Wix3.Output output)
