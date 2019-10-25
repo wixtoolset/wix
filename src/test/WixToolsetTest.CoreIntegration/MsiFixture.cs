@@ -40,7 +40,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().First();
@@ -75,7 +75,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example.cab")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
@@ -274,7 +274,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var error = section.Tuples.OfType<ErrorTuple>().Single();
@@ -341,7 +341,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msm")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
@@ -376,7 +376,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
@@ -542,7 +542,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
@@ -578,7 +578,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\AssemblyMsiPackage\candle.exe")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
@@ -632,7 +632,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var platformSummary = section.Tuples.OfType<SummaryInformationTuple>().Single(s => s.PropertyId == SumaryInformationType.PlatformAndLanguage);
@@ -664,7 +664,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 // Only one component is shared.
@@ -736,7 +736,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\Foo.exe")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var progids = section.Tuples.OfType<ProgIdTuple>().OrderBy(tuple => tuple.ProgId).ToList();

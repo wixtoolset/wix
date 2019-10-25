@@ -532,12 +532,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
             trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.File.Source.Path, TrackedFileType.Input, f.File.SourceLineNumbers)));
             this.TrackedFiles = trackedFiles;
-
-            // TODO: Eventually this gets removed
-            var intermediate = new Intermediate(this.Intermediate.Id, new[] { section }, this.Intermediate.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase));
-            var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
-            intermediate.Save(trackIntermediate.Path);
-            trackedFiles.Add(trackIntermediate);
         }
 
         private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, Output output)
