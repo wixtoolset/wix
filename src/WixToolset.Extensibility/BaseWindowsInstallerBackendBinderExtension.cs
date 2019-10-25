@@ -68,7 +68,7 @@ namespace WixToolset.Extensibility
             return false;
         }
 
-        public virtual void PostBackendBind(IBindResult result, Pdb pdb)
+        public virtual void PostBackendBind(IBindResult result, WixOutput wixout)
         {
         }
     }

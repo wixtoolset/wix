@@ -27,6 +27,6 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
         /// </summary>
-        void PostBackendBind(IBindResult result, Pdb wixpdb);
+        void PostBackendBind(IBindResult result, WixOutput wixout);
     }
 }
