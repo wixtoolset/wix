@@ -60,6 +60,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     output.EnsureTable(this.TableDefinitions["Signature"]);
                     break;
 
+                case TupleDefinitionType.Assembly:
+                    this.AddAssemblyTuple((AssemblyTuple)tuple, output);
+                    break;
+
                 case TupleDefinitionType.Binary:
                     this.AddTupleDefaultly(tuple, output, idIsPrimaryKey: true);
                     break;
@@ -237,6 +241,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     break;
                 }
             }
+        }
+
+        private void AddAssemblyTuple(AssemblyTuple tuple, Output output)
+        {
+            var attributes = tuple.Type == AssemblyType.Win32Assembly ? 1 : (int?)null;
+
+            var table = output.EnsureTable(this.TableDefinitions["MsiAssembly"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = tuple.ComponentRef;
+            row[1] = tuple.FeatureRef;
+            row[2] = tuple.ManifestFileRef;
+            row[3] = tuple.ApplicationFileRef;
+            row[4] = attributes;
         }
 
         private void AddBBControlTuple(BBControlTuple tuple, Output output)

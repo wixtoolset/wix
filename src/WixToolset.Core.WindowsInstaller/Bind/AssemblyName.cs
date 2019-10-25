@@ -16,7 +16,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Architecture = architecture;
 
             this.StrongNamedSigned = !String.IsNullOrEmpty(publicKeyToken);
-            this.PublicKeyToken = publicKeyToken ?? "null";
+            this.PublicKeyToken = publicKeyToken;
             this.Type = type;
         }
 
@@ -46,7 +46,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             assemblyName.Append(", Culture=");
             assemblyName.Append(this.Culture);
             assemblyName.Append(", PublicKeyToken=");
-            assemblyName.Append(this.PublicKeyToken);
+            assemblyName.Append(this.PublicKeyToken ?? "null");
 
             if (!String.IsNullOrEmpty(this.Architecture))
             {

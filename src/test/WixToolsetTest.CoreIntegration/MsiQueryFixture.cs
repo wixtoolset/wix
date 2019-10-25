@@ -480,7 +480,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesMsiAssemblyTables()
         {
             var folder = TestData.Get(@"TestData");
