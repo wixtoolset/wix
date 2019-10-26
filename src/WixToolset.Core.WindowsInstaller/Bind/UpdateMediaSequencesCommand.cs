@@ -11,13 +11,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class UpdateMediaSequencesCommand
     {
-        public UpdateMediaSequencesCommand(Output output, List<FileFacade> fileFacades)
+        public UpdateMediaSequencesCommand(WindowsInstallerData output, List<FileFacade> fileFacades)
         {
             this.Output = output;
             this.FileFacades = fileFacades;
         }
 
-        private Output Output { get; }
+        private WindowsInstallerData Output { get; }
 
         private List<FileFacade> FileFacades { get; }
 

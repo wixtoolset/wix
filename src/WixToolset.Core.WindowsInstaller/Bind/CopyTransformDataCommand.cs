@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IMessaging Messaging { private get; set; }
 
-        public Output Output { private get; set; }
+        public WindowsInstallerData Output { private get; set; }
 
         public TableDefinitionCollection TableDefinitions { private get; set; }
 
@@ -431,7 +431,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="mainTransform">The primary authoring transform.</param>
         /// <param name="pairedTransform">The secondary patch transform.</param>
         /// <param name="mainFileRow">The file row that contains information about the patched file.</param>
-        private void AddPatchFilesActionToSequenceTable(SequenceTable table, Output mainTransform, Output pairedTransform, Row mainFileRow)
+        private void AddPatchFilesActionToSequenceTable(SequenceTable table, WindowsInstallerData mainTransform, WindowsInstallerData pairedTransform, Row mainFileRow)
         {
             // Find/add PatchFiles action (also determine sequence for it).
             // Search mainTransform first, then pairedTransform (pairedTransform overrides).
@@ -524,7 +524,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Signal a warning if a non-keypath file was changed in a patch without also changing the keypath file of the component.
         /// </summary>
         /// <param name="output">The output to validate.</param>
-        private void ValidateFileRowChanges(Output transform)
+        private void ValidateFileRowChanges(WindowsInstallerData transform)
         {
             Table componentTable = transform.Tables["Component"];
             Table fileTable = transform.Tables["File"];

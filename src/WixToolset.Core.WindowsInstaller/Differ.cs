@@ -81,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="targetOutput">The target output.</param>
         /// <param name="updatedOutput">The updated output.</param>
         /// <returns>The transform.</returns>
-        public Output Diff(Output targetOutput, Output updatedOutput)
+        public WindowsInstallerData Diff(WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput)
         {
             return this.Diff(targetOutput, updatedOutput, 0);
         }
@@ -93,9 +93,9 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="updatedOutput">The updated output.</param>
         /// <param name="validationFlags"></param>
         /// <returns>The transform.</returns>
-        public Output Diff(Output targetOutput, Output updatedOutput, TransformFlags validationFlags)
+        public WindowsInstallerData Diff(WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput, TransformFlags validationFlags)
         {
-            Output transform = new Output(null);
+            WindowsInstallerData transform = new WindowsInstallerData(null);
             transform.Type = OutputType.Transform;
             transform.Codepage = updatedOutput.Codepage;
             this.transformSummaryInfo = new SummaryInformationStreams();
@@ -338,7 +338,7 @@ namespace WixToolset.Core.WindowsInstaller
             return comparedRow;
         }
 
-        private List<Row> CompareTables(Output targetOutput, Table targetTable, Table updatedTable, out TableOperation operation)
+        private List<Row> CompareTables(WindowsInstallerData targetOutput, Table targetTable, Table updatedTable, out TableOperation operation)
         {
             List<Row> rows = new List<Row>();
             operation = TableOperation.None;

@@ -57,12 +57,12 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private int SectionCount { get; set; }
 
-        public Output Execute()
+        public WindowsInstallerData Execute()
         {
             this.exportedFiles = new List<string>();
 
             string modularizationGuid = null;
-            var output = new Output(new SourceLineNumber(this.DatabasePath));
+            var output = new WindowsInstallerData(new SourceLineNumber(this.DatabasePath));
             View validationView = null;
 
             // set the output type
@@ -442,7 +442,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// </summary>
         /// <param name="databaseFile">The path to the msi database file in an admin image.</param>
         /// <param name="output">The Output that represents the msi database.</param>
-        private void GenerateWixFileTable(string databaseFile, Output output)
+        private void GenerateWixFileTable(string databaseFile, WindowsInstallerData output)
         {
             throw new NotImplementedException();
 #if TODO_FIX_UNBINDING_FILES
@@ -605,7 +605,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
         /// Creates section ids on rows which form logical groupings of resources.
         /// </summary>
         /// <param name="output">The Output that represents the msi database.</param>
-        private void GenerateSectionIds(Output output)
+        private void GenerateSectionIds(WindowsInstallerData output)
         {
             // First assign and index section ids for the tables that are in their own sections.
             this.AssignSectionIdsToTable(output.Tables["Binary"], 0);

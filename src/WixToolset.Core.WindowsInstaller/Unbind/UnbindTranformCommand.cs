@@ -39,9 +39,9 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private string EmptyFile { get; set; }
         
-        public Output Execute()
+        public WindowsInstallerData Execute()
         {
-            Output transform = new Output(new SourceLineNumber(this.TransformFile));
+            WindowsInstallerData transform = new WindowsInstallerData(new SourceLineNumber(this.TransformFile));
             transform.Type = OutputType.Transform;
 
             // get the summary information table
@@ -63,7 +63,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             // create a schema msi which hopefully matches the table schemas in the transform
-            Output schemaOutput = new Output(null);
+            WindowsInstallerData schemaOutput = new WindowsInstallerData(null);
             string msiDatabaseFile = Path.Combine(this.IntermediateFolder, "schema.msi");
             foreach (TableDefinition tableDefinition in this.TableDefinitions)
             {
@@ -88,7 +88,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                 // unbind the database
                 var unbindCommand = new UnbindDatabaseCommand(this.Messaging, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
-                Output transformViewOutput = unbindCommand.Execute();
+                WindowsInstallerData transformViewOutput = unbindCommand.Execute();
 
                 // index the added and possibly modified rows (added rows may also appears as modified rows)
                 transformViewTable = transformViewOutput.Tables["_TransformView"];
@@ -158,7 +158,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                 // unbind the database
                 var unbindCommand = new UnbindDatabaseCommand(this.Messaging, msiDatabase, msiDatabaseFile, OutputType.Product, this.ExportBasePath, this.IntermediateFolder, false, false, skipSummaryInfo: true);
-                Output output = unbindCommand.Execute();
+                WindowsInstallerData output = unbindCommand.Execute();
 
                 // index all the rows to easily find modified rows
                 Hashtable rows = new Hashtable();
@@ -240,7 +240,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             return transform;
         }
 
-        private void GenerateDatabase(Output output, string databaseFile)
+        private void GenerateDatabase(WindowsInstallerData output, string databaseFile)
         {
             var command = new GenerateDatabaseCommand();
             command.Extensions = Array.Empty<IFileSystemExtension>();

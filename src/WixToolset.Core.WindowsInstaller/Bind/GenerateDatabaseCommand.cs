@@ -30,7 +30,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IMessaging Messaging { private get; set; }
 
-        public Output Output { private get; set; }
+        public WindowsInstallerData Output { private get; set; }
 
         public string OutputPath { private get; set; }
 
@@ -350,7 +350,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void BindTransform(Output transform, string outputPath)
+        private void BindTransform(WindowsInstallerData transform, string outputPath)
         {
             var command = new BindTransformCommand();
             command.Messaging = this.Messaging;

@@ -36,11 +36,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IntermediateSection Section { get; }
 
-        public Output Output { get; private set; }
+        public WindowsInstallerData Output { get; private set; }
 
         public void Execute()
         {
-            var output = new Output(this.Section.Tuples.First().SourceLineNumbers);
+            var output = new WindowsInstallerData(this.Section.Tuples.First().SourceLineNumbers);
             output.Codepage = this.Section.Codepage;
             output.Type = SectionTypeToOutputType(this.Section.Type);
 
@@ -49,7 +49,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Output = output;
         }
 
-        private void AddSectionToOutput(IntermediateSection section, Output output)
+        private void AddSectionToOutput(IntermediateSection section, WindowsInstallerData output)
         {
             foreach (var tuple in section.Tuples)
             {
@@ -243,7 +243,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddAssemblyTuple(AssemblyTuple tuple, Output output)
+        private void AddAssemblyTuple(AssemblyTuple tuple, WindowsInstallerData output)
         {
             var attributes = tuple.Type == AssemblyType.Win32Assembly ? 1 : (int?)null;
 
@@ -256,7 +256,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = attributes;
         }
 
-        private void AddBBControlTuple(BBControlTuple tuple, Output output)
+        private void AddBBControlTuple(BBControlTuple tuple, WindowsInstallerData output)
         {
             var attributes = tuple.Attributes;
             attributes |= tuple.Enabled ? WindowsInstallerConstants.MsidbControlAttributesEnabled : 0;
@@ -281,7 +281,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[8] = tuple.Text;
         }
 
-        private void AddClassTuple(ClassTuple tuple, Output output)
+        private void AddClassTuple(ClassTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["Class"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
@@ -300,7 +300,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[12] = tuple.RelativePath ? (int?)1 : null;
         }
 
-        private void AddControlTuple(ControlTuple tuple, Output output)
+        private void AddControlTuple(ControlTuple tuple, WindowsInstallerData output)
         {
             var text = tuple.Text;
             var attributes = tuple.Attributes;
@@ -340,7 +340,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[10] = tuple.Help;
         }
 
-        private void AddComponentTuple(ComponentTuple tuple, Output output)
+        private void AddComponentTuple(ComponentTuple tuple, WindowsInstallerData output)
         {
             var attributes = ComponentLocation.Either == tuple.Location ? WindowsInstallerConstants.MsidbComponentAttributesOptional : 0;
             attributes |= ComponentLocation.SourceOnly == tuple.Location ? WindowsInstallerConstants.MsidbComponentAttributesSourceOnly : 0;
@@ -365,7 +365,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = tuple.KeyPath;
         }
 
-        private void AddCustomActionTuple(CustomActionTuple tuple, Output output)
+        private void AddCustomActionTuple(CustomActionTuple tuple, WindowsInstallerData output)
         {
             var type = tuple.Win64 ? WindowsInstallerConstants.MsidbCustomActionType64BitScript : 0;
             type |= tuple.IgnoreResult ? WindowsInstallerConstants.MsidbCustomActionTypeContinue : 0;
@@ -401,7 +401,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = tuple.PatchUninstall ? (int?)WindowsInstallerConstants.MsidbCustomActionTypePatchUninstall : null;
         }
 
-        private void AddDialogTuple(DialogTuple tuple, Output output)
+        private void AddDialogTuple(DialogTuple tuple, WindowsInstallerData output)
         {
             var attributes = tuple.Visible ? WindowsInstallerConstants.MsidbDialogAttributesVisible : 0;
             attributes|= tuple.Modal ? WindowsInstallerConstants.MsidbDialogAttributesModal : 0;
@@ -431,7 +431,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             output.EnsureTable(this.TableDefinitions["ListBox"]);
         }
 
-        private void AddDirectoryTuple(DirectoryTuple tuple, Output output)
+        private void AddDirectoryTuple(DirectoryTuple tuple, WindowsInstallerData output)
         {
             var sourceName = GetMsiFilenameValue(tuple.SourceShortName, tuple.SourceName);
             var targetName = GetMsiFilenameValue(tuple.ShortName, tuple.Name);
@@ -450,7 +450,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = defaultDir;
         }
 
-        private void AddEnvironmentTuple(EnvironmentTuple tuple, Output output)
+        private void AddEnvironmentTuple(EnvironmentTuple tuple, WindowsInstallerData output)
         {
             var action = String.Empty;
             var system = tuple.System ? "*" : String.Empty;
@@ -488,7 +488,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[3] = tuple.ComponentRef;
         }
 
-        private void AddFeatureTuple(FeatureTuple tuple, Output output)
+        private void AddFeatureTuple(FeatureTuple tuple, WindowsInstallerData output)
         {
             var attributes = tuple.DisallowAbsent ? WindowsInstallerConstants.MsidbFeatureAttributesUIDisallowAbsent : 0;
             attributes |= tuple.DisallowAdvertise ? WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise : 0;
@@ -508,7 +508,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[7] = attributes;
         }
 
-        private void AddFileTuple(FileTuple tuple, Output output)
+        private void AddFileTuple(FileTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["File"]);
             var row = (FileRow)table.CreateRow(tuple.SourceLineNumbers);
@@ -537,7 +537,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddIniFileTuple(IniFileTuple tuple, Output output)
+        private void AddIniFileTuple(IniFileTuple tuple, WindowsInstallerData output)
         {
             var tableName = (InifFileActionType.AddLine == tuple.Action || InifFileActionType.AddTag == tuple.Action || InifFileActionType.CreateLine == tuple.Action) ? "IniFile" : "RemoveIniFile";
 
@@ -553,7 +553,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[7] = tuple.ComponentRef;
         }
 
-        private void AddMediaTuple(MediaTuple tuple, Output output)
+        private void AddMediaTuple(MediaTuple tuple, WindowsInstallerData output)
         {
             if (this.Section.Type != SectionType.Module)
             {
@@ -568,7 +568,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddModuleConfigurationTuple(ModuleConfigurationTuple tuple, Output output)
+        private void AddModuleConfigurationTuple(ModuleConfigurationTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["ModuleConfiguration"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
@@ -585,7 +585,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[9] = tuple.HelpKeyword;
         }
 
-        private void AddMsiEmbeddedUITuple(MsiEmbeddedUITuple tuple, Output output)
+        private void AddMsiEmbeddedUITuple(MsiEmbeddedUITuple tuple, WindowsInstallerData output)
         {
             var attributes = tuple.EntryPoint ? WindowsInstallerConstants.MsidbEmbeddedUI : 0;
             attributes |= tuple.SupportsBasicUI ? WindowsInstallerConstants.MsidbEmbeddedHandlesBasic : 0;
@@ -599,7 +599,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = tuple.Source;
         }
 
-        private void AddMsiFileHashTuple(MsiFileHashTuple tuple, Output output)
+        private void AddMsiFileHashTuple(MsiFileHashTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["MsiFileHash"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
@@ -611,7 +611,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = tuple.HashPart4;
         }
 
-        private void AddMsiServiceConfigTuple(MsiServiceConfigTuple tuple, Output output)
+        private void AddMsiServiceConfigTuple(MsiServiceConfigTuple tuple, WindowsInstallerData output)
         {
             var events = tuple.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
             events |= tuple.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
@@ -627,7 +627,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = tuple.ComponentRef;
         }
 
-        private void AddMsiServiceConfigFailureActionsTuple(MsiServiceConfigFailureActionsTuple tuple, Output output)
+        private void AddMsiServiceConfigFailureActionsTuple(MsiServiceConfigFailureActionsTuple tuple, WindowsInstallerData output)
         {
             var events = tuple.OnInstall ? WindowsInstallerConstants.MsidbServiceConfigEventInstall : 0;
             events |= tuple.OnReinstall ? WindowsInstallerConstants.MsidbServiceConfigEventReinstall : 0;
@@ -646,7 +646,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[8] = tuple.ComponentRef;
         }
 
-        private void AddMoveFileTuple(MoveFileTuple tuple, Output output)
+        private void AddMoveFileTuple(MoveFileTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["MoveFile"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
@@ -659,7 +659,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[6] = tuple.Delete ? WindowsInstallerConstants.MsidbMoveFileOptionsMove : 0;
         }
 
-        private void AddPropertyTuple(PropertyTuple tuple, Output output)
+        private void AddPropertyTuple(PropertyTuple tuple, WindowsInstallerData output)
         {
             if (String.IsNullOrEmpty(tuple.Value))
             {
@@ -672,7 +672,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.Value = tuple.Value;
         }
 
-        private void AddRemoveFileTuple(RemoveFileTuple tuple, Output output)
+        private void AddRemoveFileTuple(RemoveFileTuple tuple, WindowsInstallerData output)
         {
             var installMode = tuple.OnInstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall : 0;
             installMode |= tuple.OnUninstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove : 0;
@@ -686,7 +686,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = installMode;
         }
 
-        private void AddRegistryTuple(RegistryTuple tuple, Output output)
+        private void AddRegistryTuple(RegistryTuple tuple, WindowsInstallerData output)
         {
             var value = tuple.Value;
 
@@ -738,7 +738,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = tuple.ComponentRef;
         }
 
-        private void AddRegLocatorTuple(RegLocatorTuple tuple, Output output)
+        private void AddRegLocatorTuple(RegLocatorTuple tuple, WindowsInstallerData output)
         {
             var type = (int)tuple.Type;
             type |= tuple.Win64 ? WindowsInstallerConstants.MsidbLocatorType64bit : 0;
@@ -752,7 +752,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = type;
         }
 
-        private void AddRemoveRegistryTuple(RemoveRegistryTuple tuple, Output output)
+        private void AddRemoveRegistryTuple(RemoveRegistryTuple tuple, WindowsInstallerData output)
         {
             if (tuple.Action == RemoveRegistryActionType.RemoveOnInstall)
             {
@@ -776,7 +776,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddServiceControlTuple(ServiceControlTuple tuple, Output output)
+        private void AddServiceControlTuple(ServiceControlTuple tuple, WindowsInstallerData output)
         {
             var events = tuple.InstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventDelete : 0;
             events |= tuple.UninstallRemove ? WindowsInstallerConstants.MsidbServiceControlEventUninstallDelete : 0;
@@ -795,7 +795,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[5] = tuple.ComponentRef;
         }
 
-        private void AddServiceInstallTuple(ServiceInstallTuple tuple, Output output)
+        private void AddServiceInstallTuple(ServiceInstallTuple tuple, WindowsInstallerData output)
         {
             var errorControl = (int)tuple.ErrorControl;
             errorControl |= tuple.Vital ? WindowsInstallerConstants.MsidbServiceInstallErrorControlVital : 0;
@@ -820,7 +820,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[12] = tuple.Description;
         }
 
-        private void AddShortcutTuple(ShortcutTuple tuple, Output output)
+        private void AddShortcutTuple(ShortcutTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["Shortcut"]);
             var row = table.CreateRow(tuple.SourceLineNumbers);
@@ -842,7 +842,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[15] = tuple.DescriptionResourceId;
         }
 
-        private void AddTextStyleTuple(TextStyleTuple tuple, Output output)
+        private void AddTextStyleTuple(TextStyleTuple tuple, WindowsInstallerData output)
         {
             var styleBits = tuple.Bold ? WindowsInstallerConstants.MsidbTextStyleStyleBitsBold : 0;
             styleBits |= tuple.Italic ? WindowsInstallerConstants.MsidbTextStyleStyleBitsItalic : 0;
@@ -867,7 +867,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[4] = styleBits == 0 ? null : (int?)styleBits;
         }
 
-        private void AddUpgradeTuple(UpgradeTuple tuple, Output output)
+        private void AddUpgradeTuple(UpgradeTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["Upgrade"]);
             var row = (UpgradeRow)table.CreateRow(tuple.SourceLineNumbers);
@@ -887,7 +887,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.Attributes = attributes;
         }
 
-        private void AddWixActionTuple(WixActionTuple tuple, Output output)
+        private void AddWixActionTuple(WixActionTuple tuple, WindowsInstallerData output)
         {
             // Get the table definition for the action (and ensure the proper table exists for a module).
             TableDefinition sequenceTableDefinition = null;
@@ -977,7 +977,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
         
-        private void AddWixCustomRowTuple(WixCustomRowTuple tuple, Output output)
+        private void AddWixCustomRowTuple(WixCustomRowTuple tuple, WindowsInstallerData output)
         {
             var customTableDefinition = this.TableDefinitions[tuple.Table];
 
@@ -1058,13 +1058,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddWixEnsureTableTuple(WixEnsureTableTuple tuple, Output output)
+        private void AddWixEnsureTableTuple(WixEnsureTableTuple tuple, WindowsInstallerData output)
         {
             var tableDefinition = this.TableDefinitions[tuple.Table];
             output.EnsureTable(tableDefinition);
         }
 
-        private void AddWixMediaTemplateTuple(WixMediaTemplateTuple tuple, Output output)
+        private void AddWixMediaTemplateTuple(WixMediaTemplateTuple tuple, WindowsInstallerData output)
         {
             var table = output.EnsureTable(this.TableDefinitions["WixMediaTemplate"]);
             var row = (WixMediaTemplateRow)table.CreateRow(tuple.SourceLineNumbers);
@@ -1076,7 +1076,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.MaximumCabinetSizeForLargeFileSplitting = tuple.MaximumCabinetSizeForLargeFileSplitting ?? MaxValueOfMaxCabSizeForLargeFileSplitting;
         }
 
-        private void AddTupleFromExtension(IntermediateTuple tuple, Output output)
+        private void AddTupleFromExtension(IntermediateTuple tuple, WindowsInstallerData output)
         {
             foreach (var extension in this.BackendExtensions)
             {
@@ -1087,7 +1087,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddTupleDefaultly(IntermediateTuple tuple, Output output, bool idIsPrimaryKey = false, string tableName = null)
+        private void AddTupleDefaultly(IntermediateTuple tuple, WindowsInstallerData output, bool idIsPrimaryKey = false, string tableName = null)
         {
             if (!this.TableDefinitions.TryGet(tableName ?? tuple.Definition.Name, out var tableDefinition))
             {

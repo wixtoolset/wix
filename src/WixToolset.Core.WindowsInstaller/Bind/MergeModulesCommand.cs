@@ -25,7 +25,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IMessaging Messaging { private get; set; }
 
-        public Output Output { private get; set; }
+        public WindowsInstallerData Output { private get; set; }
 
         public string OutputPath { private get; set; }
 

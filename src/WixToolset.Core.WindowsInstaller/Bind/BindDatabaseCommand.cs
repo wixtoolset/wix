@@ -312,7 +312,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
-            Output output;
+            WindowsInstallerData output;
             {
                 var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);
                 command.Execute();
@@ -534,7 +534,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.TrackedFiles = trackedFiles;
         }
 
-        private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, Output output)
+        private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, WindowsInstallerData output)
         {
             WixOutput wixout;
 
@@ -834,7 +834,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Duplicate GUIDs without conditions are an error condition; with conditions, it's a
         /// warning, as the conditions might be mutually exclusive.
         /// </remarks>
-        private void ValidateComponentGuids(Output output)
+        private void ValidateComponentGuids(WindowsInstallerData output)
         {
             Table componentTable = output.Tables["Component"];
             if (null != componentTable)
@@ -874,7 +874,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Update Control and BBControl text by reading from files when necessary.
         /// </summary>
         /// <param name="output">Internal representation of the msi database to operate upon.</param>
-        private void UpdateControlText(Output output)
+        private void UpdateControlText(WindowsInstallerData output)
         {
             var command = new UpdateControlTextCommand();
             command.Messaging = this.Messaging;
@@ -925,7 +925,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="databaseFile">The database file to create.</param>
         /// <param name="keepAddedColumns">Whether to keep columns added in a transform.</param>
         /// <param name="useSubdirectory">Whether to use a subdirectory based on the <paramref name="databaseFile"/> file name for intermediate files.</param>
-        private IEnumerable<ITrackedFile> GenerateDatabase(Output output, TableDefinitionCollection tableDefinitions, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
+        private IEnumerable<ITrackedFile> GenerateDatabase(WindowsInstallerData output, TableDefinitionCollection tableDefinitions, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
         {
             var command = new GenerateDatabaseCommand();
             command.BackendHelper = this.BackendHelper;

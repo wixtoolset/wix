@@ -15,7 +15,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
     internal class ExtractCabinetsCommand
     {
-        public ExtractCabinetsCommand(Output output, Database database, string inputFilePath, string exportBasePath, string intermediateFolder, bool treatOutputAsModule = false)
+        public ExtractCabinetsCommand(WindowsInstallerData output, Database database, string inputFilePath, string exportBasePath, string intermediateFolder, bool treatOutputAsModule = false)
         {
             this.Output = output;
             this.Database = database;
@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public string[] ExtractedFiles { get; private set; }
 
-        private Output Output { get; }
+        private WindowsInstallerData Output { get; }
 
         private Database Database { get; }
 

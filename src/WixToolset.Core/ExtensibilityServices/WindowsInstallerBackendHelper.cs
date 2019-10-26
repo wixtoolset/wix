@@ -9,9 +9,9 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class WindowsInstallerBackendHelper : IWindowsInstallerBackendHelper
     {
-        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions) => this.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, tableDefinitions, false);
+        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, TableDefinition[] tableDefinitions) => this.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, tableDefinitions, false);
 
-        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, Output output, TableDefinition[] tableDefinitions, bool columnZeroIsId)
+        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, TableDefinition[] tableDefinitions, bool columnZeroIsId)
         {
             var tableDefinition = tableDefinitions.FirstOrDefault(t => t.Name == tuple.Definition.Name);
 

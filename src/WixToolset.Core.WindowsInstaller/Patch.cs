@@ -15,10 +15,10 @@ namespace WixToolset.Data
     public class Patch
     {
         private List<IInspectorExtension> inspectorExtensions;
-        private Output patch;
+        private WindowsInstallerData patch;
         private TableDefinitionCollection tableDefinitions;
 
-        public Output PatchOutput
+        public WindowsInstallerData PatchOutput
         {
             get { return this.patch; }
         }
@@ -40,7 +40,7 @@ namespace WixToolset.Data
 
         public void Load(string patchPath)
         {
-            this.patch = Output.Load(patchPath, false);
+            this.patch = WindowsInstallerData.Load(patchPath, false);
         }
 
         /// <summary>

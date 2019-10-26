@@ -100,7 +100,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// </summary>
         /// <param name="output">The output to decompile.</param>
         /// <returns>The serialized WiX source code.</returns>
-        public XDocument Decompile(Output output)
+        public XDocument Decompile(WindowsInstallerData output)
         {
             if (null == output)
             {
@@ -3024,7 +3024,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// Decompile the tables.
         /// </summary>
         /// <param name="output">The output being decompiled.</param>
-        private void DecompileTables(Output output)
+        private void DecompileTables(WindowsInstallerData output)
         {
             var sortedTableNames = this.GetSortedTableNames();
 
@@ -3387,7 +3387,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// <param name="output">The output being decompiled.</param>
         /// <param name="tableName">The name of a table.</param>
         /// <returns>true if the table should be decompiled; false otherwise.</returns>
-        private bool DecompilableTable(Output output, string tableName)
+        private bool DecompilableTable(WindowsInstallerData output, string tableName)
         {
             switch (tableName)
             {

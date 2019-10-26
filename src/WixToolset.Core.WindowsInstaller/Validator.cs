@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller
         private string actionName;
         private StringCollection cubeFiles;
         private ValidatorExtension extension;
-        private Output output;
+        private WindowsInstallerData output;
         private InstallUIHandler validationUIHandler;
         private bool validationSessionComplete;
         private readonly IMessaging messaging;
@@ -64,7 +64,7 @@ namespace WixToolset.Core.WindowsInstaller
         /// Gets or sets the output used for finding source line information.
         /// </summary>
         /// <value>The output used for finding source line information.</value>
-        public Output Output
+        public WindowsInstallerData Output
         {
             // cache Output object until validation for changes in extension
             get { return this.output; }

@@ -312,7 +312,7 @@ namespace WixToolsetTest.CoreIntegration
                 var pdbPath = Path.Combine(intermediateFolder, @"bin\test.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
-                var output = Output.Load(pdbPath, suppressVersionCheck: true);
+                var output = WindowsInstallerData.Load(pdbPath, suppressVersionCheck: true);
                 Assert.NotNull(output);
             }
         }
@@ -700,7 +700,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var output = Output.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"), false);
+                var output = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"), false);
                 var caRows = output.Tables["CustomAction"].Rows.Single();
                 Assert.Equal("SetINSTALLLOCATION", caRows.FieldAsString(0));
                 Assert.Equal("51", caRows.FieldAsString(1));
@@ -776,7 +776,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var output = Output.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
+                var output = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
                 Assert.NotEmpty(output.SubStorages);
             }
         }

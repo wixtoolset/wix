@@ -8,7 +8,7 @@ namespace Example.Extension
 
     internal class ExampleWindowsInstallerBackendExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        public override bool TryAddTupleToOutput(IntermediateTuple tuple, Output output)
+        public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
         {
 #if ALTERNATIVE_TO_USING_HELPER
             switch (tuple.Definition.Name)

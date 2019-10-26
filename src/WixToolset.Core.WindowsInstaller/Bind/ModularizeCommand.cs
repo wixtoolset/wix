@@ -15,7 +15,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class ModularizeCommand
     {
-        public ModularizeCommand(Output output, string modularizationGuid, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
+        public ModularizeCommand(WindowsInstallerData output, string modularizationGuid, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
         {
             this.Output = output;
             this.ModularizationGuid = modularizationGuid;
@@ -24,7 +24,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.SuppressModularizationIdentifiers = new HashSet<string>(suppressTuples.Select(s => s.Id.Id));
         }
 
-        private Output Output { get; }
+        private WindowsInstallerData Output { get; }
 
         private string ModularizationGuid { get; }
 

@@ -69,7 +69,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { private get; set; }
 
-        public Output Output { private get; set; }
+        public WindowsInstallerData Output { private get; set; }
 
         public string LayoutDirectory { private get; set; }
 
@@ -180,7 +180,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="mediaRow">MediaRow containing information about the cabinet.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(Output output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
+        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
             string tempCabinetFileX = Path.Combine(this.TempFilesLocation, mediaRow.Cabinet);

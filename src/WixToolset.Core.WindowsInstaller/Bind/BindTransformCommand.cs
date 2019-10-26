@@ -21,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public string TempFilesLocation { private get; set; }
 
-        public Output Transform { private get; set; }
+        public WindowsInstallerData Transform { private get; set; }
 
         public IMessaging Messaging { private get; set; }
 
@@ -31,8 +31,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             int transformFlags = 0;
 
-            Output targetOutput = new Output(null);
-            Output updatedOutput = new Output(null);
+            WindowsInstallerData targetOutput = new WindowsInstallerData(null);
+            WindowsInstallerData updatedOutput = new WindowsInstallerData(null);
 
             // TODO: handle added columns
 
@@ -456,7 +456,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return compared.Value;
         }
 
-        private void GenerateDatabase(Output output, string outputPath, bool keepAddedColumns)
+        private void GenerateDatabase(WindowsInstallerData output, string outputPath, bool keepAddedColumns)
         {
             var command = new GenerateDatabaseCommand();
             command.Codepage = output.Codepage;

@@ -16,7 +16,7 @@ namespace WixToolset.Extensibility
     {
         private string databaseFile;
         private Hashtable indexedSourceLineNumbers;
-        private Output output;
+        private WindowsInstallerData output;
         private SourceLineNumber sourceLineNumbers;
         private readonly IMessaging messaging;
 
@@ -42,7 +42,7 @@ namespace WixToolset.Extensibility
         /// Gets or sets the <see cref="Output"/> for finding source line information.
         /// </summary>
         /// <value>The <see cref="Output"/> for finding source line information.</value>
-        public Output Output
+        public WindowsInstallerData Output
         {
             get { return this.output; }
             set { this.output = value; }
