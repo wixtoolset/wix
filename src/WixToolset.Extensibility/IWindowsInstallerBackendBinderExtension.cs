@@ -22,7 +22,7 @@ namespace WixToolset.Extensibility
 
         string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory);
 
-        bool TryAddTupleToOutput(IntermediateTuple tuple, Output output);
+        bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output);
 
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.

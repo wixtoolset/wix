@@ -58,7 +58,7 @@ namespace WixToolset.Extensibility
             return null;
         }
 
-        public virtual bool TryAddTupleToOutput(IntermediateTuple tuple, Output output)
+        public virtual bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
         {
             if (this.TableDefinitionsForTuples != null)
             {
