@@ -14,7 +14,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         /// <param name="name">The substorage name.</param>
         /// <param name="data">The substorage data.</param>
-        public SubStorage(string name, Output data)
+        public SubStorage(string name, WindowsInstallerData data)
         {
             this.Name = name;
             this.Data = data;
@@ -30,7 +30,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// Gets the substorage data.
         /// </summary>
         /// <value>The substorage data.</value>
-        public Output Data { get; }
+        public WindowsInstallerData Data { get; }
 
         /// <summary>
         /// Creates a SubStorage from the XmlReader.
@@ -44,7 +44,7 @@ namespace WixToolset.Data.WindowsInstaller
                 throw new XmlException();
             }
 
-            Output data = null;
+            WindowsInstallerData data = null;
             bool empty = reader.IsEmptyElement;
             string name = null;
 
@@ -69,8 +69,8 @@ namespace WixToolset.Data.WindowsInstaller
                         case XmlNodeType.Element:
                             switch (reader.LocalName)
                             {
-                                case "wixOutput":
-                                    data = Output.Read(reader, true);
+                                case WindowsInstallerData.XmlElementName:
+                                    data = WindowsInstallerData.Read(reader, true);
                                     break;
                                 default:
                                     throw new XmlException();
@@ -97,7 +97,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="writer">XmlWriter where the SubStorage should persist itself as XML.</param>
         internal void Write(XmlWriter writer)
         {
-            writer.WriteStartElement("subStorage", Output.XmlNamespaceUri);
+            writer.WriteStartElement("subStorage", WindowsInstallerData.XmlNamespaceUri);
 
             writer.WriteAttributeString("name", this.Name);
 

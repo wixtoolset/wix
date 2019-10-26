@@ -3,20 +3,20 @@
 
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://wixtoolset.org/schemas/v4/wixout"
-              xmlns="http://wixtoolset.org/schemas/v4/wixout"
+    targetNamespace="http://wixtoolset.org/schemas/v4/windowsinstallerdata"
+              xmlns="http://wixtoolset.org/schemas/v4/windowsinstallerdata"
          xmlns:objs="http://wixtoolset.org/schemas/v4/wixobj"
          xmlns:tbls="http://wixtoolset.org/schemas/v4/wi/tables">
     <xs:annotation>
         <xs:documentation>
-            Schema for describing WiX Output files (.wixout).
+            Schema for describing WiX Windows Installer Data files.
         </xs:documentation>
     </xs:annotation>
 
     <xs:import namespace="http://wixtoolset.org/schemas/v4/wixobj" schemaLocation="objects.xsd" />
     <xs:import namespace="http://wixtoolset.org/schemas/v4/wi/tables" schemaLocation="tables.xsd" />
 
-    <xs:element name="wixOutput">
+    <xs:element name="windowsInstallerData">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="tbls:tableDefinitions" />
@@ -54,7 +54,7 @@
     <xs:element name="subStorage">
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="1">
-                <xs:element ref="wixOutput" />
+                <xs:element ref="windowsInstallerData" />
             </xs:sequence>
             <xs:attribute name="name" type="xs:string">
                 <xs:annotation>

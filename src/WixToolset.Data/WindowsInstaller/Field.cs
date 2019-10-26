@@ -275,7 +275,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="writer">XmlWriter where the Field should persist itself as XML.</param>
         internal virtual void Write(XmlWriter writer)
         {
-            writer.WriteStartElement("field", Output.XmlNamespaceUri);
+            writer.WriteStartElement("field", WindowsInstallerData.XmlNamespaceUri);
 
             if (this.Modified)
             {
