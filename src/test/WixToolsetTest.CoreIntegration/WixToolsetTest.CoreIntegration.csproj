@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Content Include="TestData\.Data\burn.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\AppId\Advertised.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\ComponentSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\DirectorySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\FileSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
