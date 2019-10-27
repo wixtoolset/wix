@@ -34,7 +34,7 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (i < tableDefinition.Columns.Length)
                 {
-                    var column = tableDefinition.Columns[i];
+                    var column = tableDefinition.Columns[i + rowOffset];
 
                     switch (column.Type)
                     {

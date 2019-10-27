@@ -119,7 +119,7 @@ namespace WixToolset.Core
                     {
                         variableDefaultValue = matches[i].Groups["value"].Value;
 
-                        // localization variables to not support inline default values
+                        // localization variables do not support inline default values
                         if ("loc" == variableNamespace)
                         {
                             this.Messaging.Write(ErrorMessages.IllegalInlineLocVariable(sourceLineNumbers, variableId, variableDefaultValue));
