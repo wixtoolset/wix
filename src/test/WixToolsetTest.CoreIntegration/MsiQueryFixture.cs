@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class MsiQueryFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesAppIdTableWhenAdvertised()
         {
             var folder = TestData.Get(@"TestData");

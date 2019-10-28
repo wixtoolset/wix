@@ -548,10 +548,9 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var id = new Identifier(AccessModifier.Public, appId);
-
-                    var tuple = new AppIdTuple(sourceLineNumbers, id)
+                    var tuple = new AppIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, appId))
                     {
+                        AppId = appId,
                         RemoteServerName = remoteServerName,
                         LocalService = localService,
                         ServiceParameters = serviceParameters,
