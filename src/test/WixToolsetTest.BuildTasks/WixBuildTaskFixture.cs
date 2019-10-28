@@ -52,7 +52,7 @@ namespace WixToolsetTest.BuildTasks
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\cab1.cab")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
