@@ -23,6 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="WixToolset.Core" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" PrivateAssets="all" />
     <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 

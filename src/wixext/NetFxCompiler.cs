@@ -150,11 +150,11 @@ namespace WixToolset.Netfx
             {
                 section.Tuples.Add(new NetFxNativeImageTuple(sourceLineNumbers, id)
                 {
-                    FileRef=fileId,
-                    Priority=priority,
-                    Attributes=attributes,
-                    ApplicationFileRef=assemblyApplication,
-                    ApplicationBaseDirectoryRef=appBaseDirectory,
+                    FileRef = fileId,
+                    Priority = priority,
+                    Attributes = attributes,
+                    ApplicationFileRef = assemblyApplication,
+                    ApplicationBaseDirectoryRef = appBaseDirectory,
                 });
             }
         }
