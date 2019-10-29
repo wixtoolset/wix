@@ -15,7 +15,6 @@ namespace WixToolset.Firewall.Tuples
             FirewallTupleDefinitionNames.WixFirewallException,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.WixFirewallException), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.RemoteAddresses), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Port), IntermediateFieldType.String),
@@ -23,7 +22,7 @@ namespace WixToolset.Firewall.Tuples
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Program), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Profile), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Description), IntermediateFieldType.String),
             },
             typeof(WixFirewallExceptionTuple));

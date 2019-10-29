@@ -17,7 +17,7 @@
         <columnDefinition name="Program" type="string" length="255" nullable="yes" modularize="property"
             category="formatted" description="Exception for a program (formatted path name)." />
         <columnDefinition name="Attributes" type="number" length="4" nullable="yes" 
-            minValue="0" maxValue="65536" description="Vital=1" />
+            description="Vital=1" />
         <columnDefinition name="Profile" type="number" length="4" nullable="no"
             category="integer" minValue="1" maxValue="2147483647" description="Profile (1=domain; 2=private; 4=public; 2147483647=all)." />
         <columnDefinition name="Component_" type="string" length="72" modularize="column"

@@ -6,7 +6,6 @@ namespace WixToolset.Firewall.Tuples
 
     public enum WixFirewallExceptionTupleFields
     {
-        WixFirewallException,
         Name,
         RemoteAddresses,
         Port,
@@ -14,7 +13,7 @@ namespace WixToolset.Firewall.Tuples
         Program,
         Attributes,
         Profile,
-        Component_,
+        ComponentRef,
         Description,
     }
 
@@ -29,12 +28,6 @@ namespace WixToolset.Firewall.Tuples
         }
 
         public IntermediateField this[WixFirewallExceptionTupleFields index] => this.Fields[(int)index];
-
-        public string WixFirewallException
-        {
-            get => this.Fields[(int)WixFirewallExceptionTupleFields.WixFirewallException].AsString();
-            set => this.Set((int)WixFirewallExceptionTupleFields.WixFirewallException, value);
-        }
 
         public string Name
         {
@@ -54,9 +47,9 @@ namespace WixToolset.Firewall.Tuples
             set => this.Set((int)WixFirewallExceptionTupleFields.Port, value);
         }
 
-        public int Protocol
+        public int? Protocol
         {
-            get => this.Fields[(int)WixFirewallExceptionTupleFields.Protocol].AsNumber();
+            get => this.Fields[(int)WixFirewallExceptionTupleFields.Protocol].AsNullableNumber();
             set => this.Set((int)WixFirewallExceptionTupleFields.Protocol, value);
         }
 
@@ -78,10 +71,10 @@ namespace WixToolset.Firewall.Tuples
             set => this.Set((int)WixFirewallExceptionTupleFields.Profile, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)WixFirewallExceptionTupleFields.Component_].AsString();
-            set => this.Set((int)WixFirewallExceptionTupleFields.Component_, value);
+            get => this.Fields[(int)WixFirewallExceptionTupleFields.ComponentRef].AsString();
+            set => this.Set((int)WixFirewallExceptionTupleFields.ComponentRef, value);
         }
 
         public string Description

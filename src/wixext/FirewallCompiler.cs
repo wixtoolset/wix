@@ -4,10 +4,10 @@ namespace WixToolset.Firewall
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Firewall.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset Firewall Extension.
@@ -255,13 +255,18 @@ namespace WixToolset.Firewall
                     fileId = file;
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixFirewallException", id);
-                row.Set(1, name);
-                row.Set(2, remoteAddresses);
+                var tuple = new WixFirewallExceptionTuple(sourceLineNumbers, id)
+                {
+                    Name = name,
+                    RemoteAddresses = remoteAddresses,
+                    Profile = profile ?? FirewallConstants.NET_FW_PROFILE2_ALL,
+                    ComponentRef = componentId,
+                    Description = description,
+                };
 
                 if (!String.IsNullOrEmpty(port))
                 {
-                    row.Set(3, port);
+                    tuple.Port = port;
 
                     if (!protocol.HasValue)
                     {
@@ -270,32 +275,24 @@ namespace WixToolset.Firewall
                     }
                 }
 
-                if (protocol.HasValue)
-                {
-                    row.Set(4, protocol);
-                }
+                tuple.Protocol = protocol.Value;
 
                 if (!String.IsNullOrEmpty(fileId))
                 {
-                    row.Set(5, $"[#{fileId}]");
+                    tuple.Program = $"[#{fileId}]";
                     this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", fileId);
                 }
                 else if (!String.IsNullOrEmpty(program))
                 {
-                    row.Set(5, program);
+                    tuple.Program = program;
                 }
 
                 if (CompilerConstants.IntegerNotSet != attributes)
                 {
-                    row.Set(6, attributes);
+                    tuple.Attributes = attributes;
                 }
 
-                // Default is "all"
-                row.Set(7, profile ?? FirewallConstants.NET_FW_PROFILE2_ALL);
-
-                row.Set(8, componentId);
-
-                row.Set(9, description);
+                section.Tuples.Add(tuple);
 
                 if (this.Context.Platform == Platform.ARM)
                 {
