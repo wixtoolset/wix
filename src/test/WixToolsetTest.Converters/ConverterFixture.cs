@@ -450,6 +450,34 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void CanConvertCustomTableBootstrapperApplicationData()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes' />",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\" />",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Wix3Converter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(1, errors);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void CanConvertShortNameDirectoryWithoutName()
         {
             var parse = String.Join(Environment.NewLine,

@@ -25,6 +25,7 @@ namespace WixToolset.Converters
         private const char XDocumentNewLine = '\n'; // XDocument normalizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
 
+        private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
         private static readonly XName FileElementName = WixNamespace + "File";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
@@ -78,6 +79,7 @@ namespace WixToolset.Converters
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
             {
+                { Wix3Converter.CustomTableElementName, this.ConvertCustomTableElement },
                 { Wix3Converter.DirectoryElementName, this.ConvertDirectoryElement },
                 { Wix3Converter.FileElementName, this.ConvertFileElement },
                 { Wix3Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
@@ -292,363 +294,379 @@ namespace WixToolset.Converters
             }
         }
 
-        private void ConvertDirectoryElement(XElement element)
+        private void ConvertCustomTableElement(XElement element)
         {
-            if (null == element.Attribute("Name"))
+            var bootstrapperApplicationData = element.Attribute("BootstrapperApplicationData");
+            if (bootstrapperApplicationData != null
+                && this.OnError(ConverterTestType.BootstrapperApplicationDataDeprecated, element, "The CustomTable element contains deprecated '{0}' attribute. Use the 'Unreal' attribute instead.", bootstrapperApplicationData.Name))
             {
-                var attribute = element.Attribute("ShortName");
-                if (null != attribute)
+                element.Add(new XAttribute("Unreal", bootstrapperApplicationData.Value));
+                bootstrapperApplicationData.Remove();
+            }
+        }
+
+    private void ConvertDirectoryElement(XElement element)
+    {
+        if (null == element.Attribute("Name"))
+        {
+            var attribute = element.Attribute("ShortName");
+            if (null != attribute)
+            {
+                var shortName = attribute.Value;
+                if (this.OnError(ConverterTestType.AssignDirectoryNameFromShortName, element, "The directory ShortName attribute is being renamed to Name since Name wasn't specified for value '{0}'", shortName))
                 {
-                    var shortName = attribute.Value;
-                    if (this.OnError(ConverterTestType.AssignDirectoryNameFromShortName, element, "The directory ShortName attribute is being renamed to Name since Name wasn't specified for value '{0}'", shortName))
-                    {
-                        element.Add(new XAttribute("Name", shortName));
-                        attribute.Remove();
-                    }
+                    element.Add(new XAttribute("Name", shortName));
+                    attribute.Remove();
                 }
             }
-        }
-
-        private void ConvertFileElement(XElement element)
-        {
-            if (null == element.Attribute("Id"))
-            {
-                var attribute = element.Attribute("Name");
-
-                if (null == attribute)
-                {
-                    attribute = element.Attribute("Source");
-                }
-
-                if (null != attribute)
-                {
-                    var name = Path.GetFileName(attribute.Value);
-
-                    if (this.OnError(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the default", name))
-                    {
-                        IEnumerable<XAttribute> attributes = element.Attributes().ToList();
-                        element.RemoveAttributes();
-                        element.Add(new XAttribute("Id", GetIdentifierFromName(name)));
-                        element.Add(attributes);
-                    }
-                }
-            }
-        }
-
-        private void ConvertSuppressSignatureValidation(XElement element)
-        {
-            var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
-
-            if (null != suppressSignatureValidation)
-            {
-                if (this.OnError(ConverterTestType.SuppressSignatureValidationDeprecated, element, "The chain package element contains deprecated '{0}' attribute. Use the 'EnableSignatureValidation' attribute instead.", suppressSignatureValidation))
-                {
-                    if ("no" == suppressSignatureValidation.Value)
-                    {
-                        element.Add(new XAttribute("EnableSignatureValidation", "yes"));
-                    }
-                }
-
-                suppressSignatureValidation.Remove();
-            }
-        }
-
-        private void ConvertCustomActionElement(XElement xCustomAction)
-        {
-            var xBinaryKey = xCustomAction.Attribute("BinaryKey");
-
-            if (xBinaryKey?.Value == "WixCA")
-            {
-                if (this.OnError(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA custom action DLL Binary table id has been renamed. Use the id 'UtilCA' instead."))
-                {
-                    xBinaryKey.Value = "UtilCA";
-                }
-            }
-
-            var xDllEntry = xCustomAction.Attribute("DllEntry");
-
-            if (xDllEntry?.Value == "CAQuietExec" || xDllEntry?.Value == "CAQuietExec64")
-            {
-                if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The CAQuietExec and CAQuietExec64 custom action ids have been renamed. Use the ids 'WixQuietExec' and 'WixQuietExec64' instead."))
-                {
-                    xDllEntry.Value = xDllEntry.Value.Replace("CAQuietExec", "WixQuietExec");
-                }
-            }
-
-            var xProperty = xCustomAction.Attribute("Property");
-
-            if (xProperty?.Value == "QtExecCmdLine" || xProperty?.Value == "QtExec64CmdLine")
-            {
-                if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The QtExecCmdLine and QtExec64CmdLine property ids have been renamed. Use the ids 'WixQuietExecCmdLine' and 'WixQuietExec64CmdLine' instead."))
-                {
-                    xProperty.Value = xProperty.Value.Replace("QtExec", "WixQuietExec");
-                }
-            }
-        }
-
-        private void ConvertPropertyElement(XElement xProperty)
-        {
-            var xId = xProperty.Attribute("Id");
-
-            if (xId.Value == "QtExecCmdTimeout")
-            {
-                this.OnError(ConverterTestType.QtExecCmdTimeoutAmbiguous, xProperty, "QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.");
-            }
-        }
-
-        /// <summary>
-        /// Converts a Wix element.
-        /// </summary>
-        /// <param name="element">The Wix element to convert.</param>
-        /// <returns>The converted element.</returns>
-        private void ConvertElementWithoutNamespace(XElement element)
-        {
-            if (this.OnError(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
-            {
-                element.Name = WixNamespace.GetName(element.Name.LocalName);
-
-                element.Add(new XAttribute("xmlns", WixNamespace.NamespaceName)); // set the default namespace.
-
-                foreach (var elementWithoutNamespace in element.Elements().Where(e => XNamespace.None == e.Name.Namespace))
-                {
-                    elementWithoutNamespace.Name = WixNamespace.GetName(elementWithoutNamespace.Name.LocalName);
-                }
-            }
-        }
-
-        private IEnumerable<ConverterTestType> YieldConverterTypes(IEnumerable<string> types)
-        {
-            if (null != types)
-            {
-                foreach (var type in types)
-                {
-
-                    if (Enum.TryParse<ConverterTestType>(type, true, out var itt))
-                    {
-                        yield return itt;
-                    }
-                    else // not a known ConverterTestType
-                    {
-                        this.OnError(ConverterTestType.ConverterTestTypeUnknown, null, "Unknown error type: '{0}'.", type);
-                    }
-                }
-            }
-        }
-
-        private static void UpdateElementsWithDeprecatedNamespaces(IEnumerable<XElement> elements, Dictionary<XNamespace, XNamespace> deprecatedToUpdatedNamespaces)
-        {
-            foreach (var element in elements)
-            {
-
-                if (deprecatedToUpdatedNamespaces.TryGetValue(element.Name.Namespace, out var ns))
-                {
-                    element.Name = ns.GetName(element.Name.LocalName);
-                }
-
-                // Remove all the attributes and add them back to with their namespace updated (as necessary).
-                IEnumerable<XAttribute> attributes = element.Attributes().ToList();
-                element.RemoveAttributes();
-
-                foreach (var attribute in attributes)
-                {
-                    var convertedAttribute = attribute;
-
-                    if (attribute.IsNamespaceDeclaration)
-                    {
-                        if (deprecatedToUpdatedNamespaces.TryGetValue(attribute.Value, out ns))
-                        {
-                            convertedAttribute = ("xmlns" == attribute.Name.LocalName) ? new XAttribute(attribute.Name.LocalName, ns.NamespaceName) : new XAttribute(XNamespace.Xmlns + attribute.Name.LocalName, ns.NamespaceName);
-                        }
-                    }
-                    else if (deprecatedToUpdatedNamespaces.TryGetValue(attribute.Name.Namespace, out ns))
-                    {
-                        convertedAttribute = new XAttribute(ns.GetName(attribute.Name.LocalName), attribute.Value);
-                    }
-
-                    element.Add(convertedAttribute);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Determine if the whitespace preceding a node is appropriate for its depth level.
-        /// </summary>
-        /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
-        /// <param name="level">The depth level that should match this whitespace.</param>
-        /// <param name="whitespace">The whitespace to validate.</param>
-        /// <returns>true if the whitespace is legal; false otherwise.</returns>
-        private static bool LeadingWhitespaceValid(int indentationAmount, int level, string whitespace)
-        {
-            // Strip off leading newlines; there can be an arbitrary number of these.
-            whitespace = whitespace.TrimStart(XDocumentNewLine);
-
-            var indentation = new string(' ', level * indentationAmount);
-
-            return whitespace == indentation;
-        }
-
-        /// <summary>
-        /// Fix the whitespace in a whitespace node.
-        /// </summary>
-        /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
-        /// <param name="level">The depth level of the desired whitespace.</param>
-        /// <param name="whitespace">The whitespace node to fix.</param>
-        private static void FixupWhitespace(int indentationAmount, int level, XText whitespace)
-        {
-            var value = new StringBuilder(whitespace.Value.Length);
-
-            // Keep any previous preceeding new lines.
-            var newlines = whitespace.Value.TakeWhile(c => c == XDocumentNewLine).Count();
-
-            // Ensure there is always at least one new line before the indentation.
-            value.Append(XDocumentNewLine, newlines == 0 ? 1 : newlines);
-
-            whitespace.Value = value.Append(' ', level * indentationAmount).ToString();
-        }
-
-        /// <summary>
-        /// Output an error message to the console.
-        /// </summary>
-        /// <param name="converterTestType">The type of converter test.</param>
-        /// <param name="node">The node that caused the error.</param>
-        /// <param name="message">Detailed error message.</param>
-        /// <param name="args">Additional formatted string arguments.</param>
-        /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
-        private bool OnError(ConverterTestType converterTestType, XObject node, string message, params object[] args)
-        {
-            if (this.IgnoreErrors.Contains(converterTestType)) // ignore the error
-            {
-                return false;
-            }
-
-            // Increase the error count.
-            this.Errors++;
-
-            var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wixcop.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
-            var warning = this.ErrorsAsWarnings.Contains(converterTestType);
-            var display = String.Format(CultureInfo.CurrentCulture, message, args);
-
-            var msg = new Message(sourceLine, warning ? MessageLevel.Warning : MessageLevel.Error, (int)converterTestType, "{0} ({1})", display, converterTestType.ToString());
-
-            this.Messaging.Write(msg);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Return an identifier based on passed file/directory name
-        /// </summary>
-        /// <param name="name">File/directory name to generate identifer from</param>
-        /// <returns>A version of the name that is a legal identifier.</returns>
-        /// <remarks>This is duplicated from WiX's Common class.</remarks>
-        private static string GetIdentifierFromName(string name)
-        {
-            string result = IllegalIdentifierCharacters.Replace(name, "_"); // replace illegal characters with "_".
-
-            // MSI identifiers must begin with an alphabetic character or an
-            // underscore. Prefix all other values with an underscore.
-            if (AddPrefix.IsMatch(name))
-            {
-                result = String.Concat("_", result);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Converter test types.  These are used to condition error messages down to warnings.
-        /// </summary>
-        private enum ConverterTestType
-        {
-            /// <summary>
-            /// Internal-only: displayed when a string cannot be converted to an ConverterTestType.
-            /// </summary>
-            ConverterTestTypeUnknown,
-
-            /// <summary>
-            /// Displayed when an XML loading exception has occurred.
-            /// </summary>
-            XmlException,
-
-            /// <summary>
-            /// Displayed when a file cannot be accessed; typically when trying to save back a fixed file.
-            /// </summary>
-            UnauthorizedAccessException,
-
-            /// <summary>
-            /// Displayed when the encoding attribute in the XML declaration is not 'UTF-8'.
-            /// </summary>
-            DeclarationEncodingWrong,
-
-            /// <summary>
-            /// Displayed when the XML declaration is missing from the source file.
-            /// </summary>
-            DeclarationMissing,
-
-            /// <summary>
-            /// Displayed when the whitespace preceding a CDATA node is wrong.
-            /// </summary>
-            WhitespacePrecedingCDATAWrong,
-
-            /// <summary>
-            /// Displayed when the whitespace preceding a node is wrong.
-            /// </summary>
-            WhitespacePrecedingNodeWrong,
-
-            /// <summary>
-            /// Displayed when an element is not empty as it should be.
-            /// </summary>
-            NotEmptyElement,
-
-            /// <summary>
-            /// Displayed when the whitespace following a CDATA node is wrong.
-            /// </summary>
-            WhitespaceFollowingCDATAWrong,
-
-            /// <summary>
-            /// Displayed when the whitespace preceding an end element is wrong.
-            /// </summary>
-            WhitespacePrecedingEndElementWrong,
-
-            /// <summary>
-            /// Displayed when the xmlns attribute is missing from the document element.
-            /// </summary>
-            XmlnsMissing,
-
-            /// <summary>
-            /// Displayed when the xmlns attribute on the document element is wrong.
-            /// </summary>
-            XmlnsValueWrong,
-
-            /// <summary>
-            /// Assign an identifier to a File element when on Id attribute is specified.
-            /// </summary>
-            AssignAnonymousFileId,
-
-            /// <summary>
-            /// SuppressSignatureValidation attribute is deprecated and replaced with EnableSignatureValidation.
-            /// </summary>
-            SuppressSignatureValidationDeprecated,
-
-            /// <summary>
-            /// WixCA Binary/@Id has been renamed to UtilCA.
-            /// </summary>
-            WixCABinaryIdRenamed,
-
-            /// <summary>
-            /// QtExec custom actions have been renamed.
-            /// </summary>
-            QuietExecCustomActionsRenamed,
-
-            /// <summary>
-            /// QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.
-            /// </summary>
-            QtExecCmdTimeoutAmbiguous,
-
-            /// <summary>
-            /// Directory/@ShortName may only be specified with Directory/@Name.
-            /// </summary>
-            AssignDirectoryNameFromShortName,
         }
     }
+
+    private void ConvertFileElement(XElement element)
+    {
+        if (null == element.Attribute("Id"))
+        {
+            var attribute = element.Attribute("Name");
+
+            if (null == attribute)
+            {
+                attribute = element.Attribute("Source");
+            }
+
+            if (null != attribute)
+            {
+                var name = Path.GetFileName(attribute.Value);
+
+                if (this.OnError(ConverterTestType.AssignAnonymousFileId, element, "The file id is being updated to '{0}' to ensure it remains the same as the default", name))
+                {
+                    IEnumerable<XAttribute> attributes = element.Attributes().ToList();
+                    element.RemoveAttributes();
+                    element.Add(new XAttribute("Id", GetIdentifierFromName(name)));
+                    element.Add(attributes);
+                }
+            }
+        }
+    }
+
+    private void ConvertSuppressSignatureValidation(XElement element)
+    {
+        var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
+
+        if (null != suppressSignatureValidation)
+        {
+            if (this.OnError(ConverterTestType.SuppressSignatureValidationDeprecated, element, "The chain package element contains deprecated '{0}' attribute. Use the 'EnableSignatureValidation' attribute instead.", suppressSignatureValidation.Name))
+            {
+                if ("no" == suppressSignatureValidation.Value)
+                {
+                    element.Add(new XAttribute("EnableSignatureValidation", "yes"));
+                }
+            }
+
+            suppressSignatureValidation.Remove();
+        }
+    }
+
+    private void ConvertCustomActionElement(XElement xCustomAction)
+    {
+        var xBinaryKey = xCustomAction.Attribute("BinaryKey");
+
+        if (xBinaryKey?.Value == "WixCA")
+        {
+            if (this.OnError(ConverterTestType.WixCABinaryIdRenamed, xCustomAction, "The WixCA custom action DLL Binary table id has been renamed. Use the id 'UtilCA' instead."))
+            {
+                xBinaryKey.Value = "UtilCA";
+            }
+        }
+
+        var xDllEntry = xCustomAction.Attribute("DllEntry");
+
+        if (xDllEntry?.Value == "CAQuietExec" || xDllEntry?.Value == "CAQuietExec64")
+        {
+            if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The CAQuietExec and CAQuietExec64 custom action ids have been renamed. Use the ids 'WixQuietExec' and 'WixQuietExec64' instead."))
+            {
+                xDllEntry.Value = xDllEntry.Value.Replace("CAQuietExec", "WixQuietExec");
+            }
+        }
+
+        var xProperty = xCustomAction.Attribute("Property");
+
+        if (xProperty?.Value == "QtExecCmdLine" || xProperty?.Value == "QtExec64CmdLine")
+        {
+            if (this.OnError(ConverterTestType.QuietExecCustomActionsRenamed, xCustomAction, "The QtExecCmdLine and QtExec64CmdLine property ids have been renamed. Use the ids 'WixQuietExecCmdLine' and 'WixQuietExec64CmdLine' instead."))
+            {
+                xProperty.Value = xProperty.Value.Replace("QtExec", "WixQuietExec");
+            }
+        }
+    }
+
+    private void ConvertPropertyElement(XElement xProperty)
+    {
+        var xId = xProperty.Attribute("Id");
+
+        if (xId.Value == "QtExecCmdTimeout")
+        {
+            this.OnError(ConverterTestType.QtExecCmdTimeoutAmbiguous, xProperty, "QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.");
+        }
+    }
+
+    /// <summary>
+    /// Converts a Wix element.
+    /// </summary>
+    /// <param name="element">The Wix element to convert.</param>
+    /// <returns>The converted element.</returns>
+    private void ConvertElementWithoutNamespace(XElement element)
+    {
+        if (this.OnError(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
+        {
+            element.Name = WixNamespace.GetName(element.Name.LocalName);
+
+            element.Add(new XAttribute("xmlns", WixNamespace.NamespaceName)); // set the default namespace.
+
+            foreach (var elementWithoutNamespace in element.Elements().Where(e => XNamespace.None == e.Name.Namespace))
+            {
+                elementWithoutNamespace.Name = WixNamespace.GetName(elementWithoutNamespace.Name.LocalName);
+            }
+        }
+    }
+
+    private IEnumerable<ConverterTestType> YieldConverterTypes(IEnumerable<string> types)
+    {
+        if (null != types)
+        {
+            foreach (var type in types)
+            {
+
+                if (Enum.TryParse<ConverterTestType>(type, true, out var itt))
+                {
+                    yield return itt;
+                }
+                else // not a known ConverterTestType
+                {
+                    this.OnError(ConverterTestType.ConverterTestTypeUnknown, null, "Unknown error type: '{0}'.", type);
+                }
+            }
+        }
+    }
+
+    private static void UpdateElementsWithDeprecatedNamespaces(IEnumerable<XElement> elements, Dictionary<XNamespace, XNamespace> deprecatedToUpdatedNamespaces)
+    {
+        foreach (var element in elements)
+        {
+
+            if (deprecatedToUpdatedNamespaces.TryGetValue(element.Name.Namespace, out var ns))
+            {
+                element.Name = ns.GetName(element.Name.LocalName);
+            }
+
+            // Remove all the attributes and add them back to with their namespace updated (as necessary).
+            IEnumerable<XAttribute> attributes = element.Attributes().ToList();
+            element.RemoveAttributes();
+
+            foreach (var attribute in attributes)
+            {
+                var convertedAttribute = attribute;
+
+                if (attribute.IsNamespaceDeclaration)
+                {
+                    if (deprecatedToUpdatedNamespaces.TryGetValue(attribute.Value, out ns))
+                    {
+                        convertedAttribute = ("xmlns" == attribute.Name.LocalName) ? new XAttribute(attribute.Name.LocalName, ns.NamespaceName) : new XAttribute(XNamespace.Xmlns + attribute.Name.LocalName, ns.NamespaceName);
+                    }
+                }
+                else if (deprecatedToUpdatedNamespaces.TryGetValue(attribute.Name.Namespace, out ns))
+                {
+                    convertedAttribute = new XAttribute(ns.GetName(attribute.Name.LocalName), attribute.Value);
+                }
+
+                element.Add(convertedAttribute);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Determine if the whitespace preceding a node is appropriate for its depth level.
+    /// </summary>
+    /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
+    /// <param name="level">The depth level that should match this whitespace.</param>
+    /// <param name="whitespace">The whitespace to validate.</param>
+    /// <returns>true if the whitespace is legal; false otherwise.</returns>
+    private static bool LeadingWhitespaceValid(int indentationAmount, int level, string whitespace)
+    {
+        // Strip off leading newlines; there can be an arbitrary number of these.
+        whitespace = whitespace.TrimStart(XDocumentNewLine);
+
+        var indentation = new string(' ', level * indentationAmount);
+
+        return whitespace == indentation;
+    }
+
+    /// <summary>
+    /// Fix the whitespace in a whitespace node.
+    /// </summary>
+    /// <param name="indentationAmount">Indentation value to use when validating leading whitespace.</param>
+    /// <param name="level">The depth level of the desired whitespace.</param>
+    /// <param name="whitespace">The whitespace node to fix.</param>
+    private static void FixupWhitespace(int indentationAmount, int level, XText whitespace)
+    {
+        var value = new StringBuilder(whitespace.Value.Length);
+
+        // Keep any previous preceeding new lines.
+        var newlines = whitespace.Value.TakeWhile(c => c == XDocumentNewLine).Count();
+
+        // Ensure there is always at least one new line before the indentation.
+        value.Append(XDocumentNewLine, newlines == 0 ? 1 : newlines);
+
+        whitespace.Value = value.Append(' ', level * indentationAmount).ToString();
+    }
+
+    /// <summary>
+    /// Output an error message to the console.
+    /// </summary>
+    /// <param name="converterTestType">The type of converter test.</param>
+    /// <param name="node">The node that caused the error.</param>
+    /// <param name="message">Detailed error message.</param>
+    /// <param name="args">Additional formatted string arguments.</param>
+    /// <returns>Returns true indicating that action should be taken on this error, and false if it should be ignored.</returns>
+    private bool OnError(ConverterTestType converterTestType, XObject node, string message, params object[] args)
+    {
+        if (this.IgnoreErrors.Contains(converterTestType)) // ignore the error
+        {
+            return false;
+        }
+
+        // Increase the error count.
+        this.Errors++;
+
+        var sourceLine = (null == node) ? new SourceLineNumber(this.SourceFile ?? "wixcop.exe") : new SourceLineNumber(this.SourceFile, ((IXmlLineInfo)node).LineNumber);
+        var warning = this.ErrorsAsWarnings.Contains(converterTestType);
+        var display = String.Format(CultureInfo.CurrentCulture, message, args);
+
+        var msg = new Message(sourceLine, warning ? MessageLevel.Warning : MessageLevel.Error, (int)converterTestType, "{0} ({1})", display, converterTestType.ToString());
+
+        this.Messaging.Write(msg);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Return an identifier based on passed file/directory name
+    /// </summary>
+    /// <param name="name">File/directory name to generate identifer from</param>
+    /// <returns>A version of the name that is a legal identifier.</returns>
+    /// <remarks>This is duplicated from WiX's Common class.</remarks>
+    private static string GetIdentifierFromName(string name)
+    {
+        string result = IllegalIdentifierCharacters.Replace(name, "_"); // replace illegal characters with "_".
+
+        // MSI identifiers must begin with an alphabetic character or an
+        // underscore. Prefix all other values with an underscore.
+        if (AddPrefix.IsMatch(name))
+        {
+            result = String.Concat("_", result);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Converter test types.  These are used to condition error messages down to warnings.
+    /// </summary>
+    private enum ConverterTestType
+    {
+        /// <summary>
+        /// Internal-only: displayed when a string cannot be converted to an ConverterTestType.
+        /// </summary>
+        ConverterTestTypeUnknown,
+
+        /// <summary>
+        /// Displayed when an XML loading exception has occurred.
+        /// </summary>
+        XmlException,
+
+        /// <summary>
+        /// Displayed when a file cannot be accessed; typically when trying to save back a fixed file.
+        /// </summary>
+        UnauthorizedAccessException,
+
+        /// <summary>
+        /// Displayed when the encoding attribute in the XML declaration is not 'UTF-8'.
+        /// </summary>
+        DeclarationEncodingWrong,
+
+        /// <summary>
+        /// Displayed when the XML declaration is missing from the source file.
+        /// </summary>
+        DeclarationMissing,
+
+        /// <summary>
+        /// Displayed when the whitespace preceding a CDATA node is wrong.
+        /// </summary>
+        WhitespacePrecedingCDATAWrong,
+
+        /// <summary>
+        /// Displayed when the whitespace preceding a node is wrong.
+        /// </summary>
+        WhitespacePrecedingNodeWrong,
+
+        /// <summary>
+        /// Displayed when an element is not empty as it should be.
+        /// </summary>
+        NotEmptyElement,
+
+        /// <summary>
+        /// Displayed when the whitespace following a CDATA node is wrong.
+        /// </summary>
+        WhitespaceFollowingCDATAWrong,
+
+        /// <summary>
+        /// Displayed when the whitespace preceding an end element is wrong.
+        /// </summary>
+        WhitespacePrecedingEndElementWrong,
+
+        /// <summary>
+        /// Displayed when the xmlns attribute is missing from the document element.
+        /// </summary>
+        XmlnsMissing,
+
+        /// <summary>
+        /// Displayed when the xmlns attribute on the document element is wrong.
+        /// </summary>
+        XmlnsValueWrong,
+
+        /// <summary>
+        /// Assign an identifier to a File element when on Id attribute is specified.
+        /// </summary>
+        AssignAnonymousFileId,
+
+        /// <summary>
+        /// SuppressSignatureValidation attribute is deprecated and replaced with EnableSignatureValidation.
+        /// </summary>
+        SuppressSignatureValidationDeprecated,
+
+        /// <summary>
+        /// WixCA Binary/@Id has been renamed to UtilCA.
+        /// </summary>
+        WixCABinaryIdRenamed,
+
+        /// <summary>
+        /// QtExec custom actions have been renamed.
+        /// </summary>
+        QuietExecCustomActionsRenamed,
+
+        /// <summary>
+        /// QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.
+        /// </summary>
+        QtExecCmdTimeoutAmbiguous,
+
+        /// <summary>
+        /// Directory/@ShortName may only be specified with Directory/@Name.
+        /// </summary>
+        AssignDirectoryNameFromShortName,
+
+        /// <summary>
+        /// BootstrapperApplicationData attribute is deprecated and replaced with Unreal.
+        /// </summary>
+        BootstrapperApplicationDataDeprecated,
+    }
+}
 }
