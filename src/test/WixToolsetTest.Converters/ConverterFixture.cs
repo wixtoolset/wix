@@ -364,7 +364,7 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void CanConvertMissingNamespace()
+        public void CanConvertMissingWixNamespace()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version='1.0' encoding='utf-8'?>",
@@ -377,6 +377,35 @@ namespace WixToolsetTest.Converters
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment />",
                 "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Wix3Converter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(1, errors);
+            Assert.Equal(expected, actual);
+            Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
+        }
+
+        [Fact]
+        public void CanConvertMissingIncludeNamespace()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Include>",
+                "  <?define Version = 1.2.3 ?>",
+                "</Include>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <?define Version = 1.2.3 ?>",
+                "</Include>");
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 

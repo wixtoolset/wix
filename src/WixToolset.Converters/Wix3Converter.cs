@@ -35,6 +35,7 @@ namespace WixToolset.Converters
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
         private static readonly XName WixElementWithoutNamespaceName = XNamespace.None + "Wix";
+        private static readonly XName IncludeElementWithoutNamespaceName = XNamespace.None + "Include";
 
         private static readonly Dictionary<string, XNamespace> OldToNewNamespaceMapping = new Dictionary<string, XNamespace>()
         {
@@ -86,7 +87,8 @@ namespace WixToolset.Converters
                 { Wix3Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.CustomActionElementName, this.ConvertCustomActionElement },
                 { Wix3Converter.PropertyElementName, this.ConvertPropertyElement },
-                { Wix3Converter.WixElementWithoutNamespaceName, this.ConvertWixElementWithoutNamespace },
+                { Wix3Converter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
+                { Wix3Converter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
             };
 
             this.Messaging = messaging;
@@ -399,7 +401,7 @@ namespace WixToolset.Converters
         /// </summary>
         /// <param name="element">The Wix element to convert.</param>
         /// <returns>The converted element.</returns>
-        private void ConvertWixElementWithoutNamespace(XElement element)
+        private void ConvertElementWithoutNamespace(XElement element)
         {
             if (this.OnError(ConverterTestType.XmlnsMissing, element, "The xmlns attribute is missing.  It must be present with a value of '{0}'.", WixNamespace.NamespaceName))
             {
