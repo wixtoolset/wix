@@ -281,6 +281,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "Binary:Binary1\t[Binary data]",
                     "CustomAction:CustomAction1\t1\tBinary1\tInvalidEntryPoint\t",
+                    "CustomAction:DiscardOptimismAllBeingsWhoProceed\t19\t\tAbandon hope all ye who enter here.\t",
                 }, results);
             }
         }
