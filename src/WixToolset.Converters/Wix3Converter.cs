@@ -422,7 +422,7 @@ namespace WixToolset.Converters
 
             element.Add(new XAttribute("xmlns", WixNamespace.NamespaceName)); // set the default namespace.
 
-            foreach (var elementWithoutNamespace in element.Elements().Where(e => XNamespace.None == e.Name.Namespace))
+            foreach (var elementWithoutNamespace in element.DescendantsAndSelf().Where(e => XNamespace.None == e.Name.Namespace))
             {
                 elementWithoutNamespace.Name = WixNamespace.GetName(elementWithoutNamespace.Name.LocalName);
             }

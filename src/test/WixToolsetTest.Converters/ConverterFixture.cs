@@ -399,12 +399,18 @@ namespace WixToolsetTest.Converters
                 "<?xml version='1.0' encoding='utf-8'?>",
                 "<Include>",
                 "  <?define Version = 1.2.3 ?>",
+                "  <Fragment>",
+                "    <DirectoryRef Id='TARGETDIR' />",
+                "  </Fragment>",
                 "</Include>");
 
             var expected = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <?define Version = 1.2.3 ?>",
+                "  <Fragment>",
+                "    <DirectoryRef Id=\"TARGETDIR\" />",
+                "  </Fragment>",
                 "</Include>");
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
