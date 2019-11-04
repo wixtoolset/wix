@@ -610,6 +610,7 @@ namespace WixToolsetTest.CoreIntegration
                 var results = Query.QueryDatabase(msiPath, new[] { "Registry" });
                 Assert.Equal(new[]
                 {
+                    "Registry:reg04OIwIchl.9ZTjisTT6NzGSsQSM\t2\tPath\\To\\AnotherKey\tSecret\t#x\tMiscComponent",
                     "Registry:regEblTuusqFNSUQNy88zaP_UA5kIY\t2\tPath\\To\\Key\t\t1.0.1234.123\tMiscComponent",
                 }, results);
             }

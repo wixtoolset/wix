@@ -4,6 +4,7 @@
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component Id="MiscComponent" Guid="7C40C257-AB36-4B8C-8FD1-C56E0AC4AAEF">
                 <RegistryValue Root="HKLM" Key="Path\To\Key" Value="1.0.1234.123" Type="string" KeyPath="yes" />
+                <RegistryValue Root="HKLM" Key="Path\To\AnotherKey" Name="Secret" Type="binary"  />
             </Component>
         </ComponentGroup>
     </Fragment>

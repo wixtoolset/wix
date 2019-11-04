@@ -2006,11 +2006,11 @@ namespace WixToolset.Core
             //}
 
             // value may be set by child MultiStringValue elements, so it must be checked here
-            if (null == value)
+            if (null == value && valueType != RegistryValueType.Binary)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
-            else if (0 == value.Length && ("+" == name || "-" == name || "*" == name)) // prevent accidental authoring of special name values
+            else if (0 == value?.Length && ("+" == name || "-" == name || "*" == name)) // prevent accidental authoring of special name values
             {
                 this.Core.Write(ErrorMessages.RegistryNameValueIncorrect(sourceLineNumbers, node.Name.LocalName, "Name", name));
             }
