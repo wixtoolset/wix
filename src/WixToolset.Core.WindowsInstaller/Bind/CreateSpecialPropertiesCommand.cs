@@ -20,9 +20,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public void Execute()
         {
             // Create lists of the properties that contribute to the special lists of properties.
-            SortedSet<string> adminProperties = new SortedSet<string>();
-            SortedSet<string> secureProperties = new SortedSet<string>();
-            SortedSet<string> hiddenProperties = new SortedSet<string>();
+            var adminProperties = new SortedSet<string>();
+            var secureProperties = new SortedSet<string>();
+            var hiddenProperties = new SortedSet<string>();
 
             foreach (var wixPropertyRow in this.Section.Tuples.OfType<WixPropertyTuple>())
             {
@@ -41,6 +41,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     secureProperties.Add(wixPropertyRow.PropertyRef);
                 }
             }
+
+            // Hide properties for in-script custom actions that have HideTarget set.
+            var hideTargetCustomActions = this.Section.Tuples.OfType<CustomActionTuple>().Where(
+                ca => ca.Hidden
+                && (ca.ExecutionType == CustomActionExecutionType.Deferred
+                || ca.ExecutionType == CustomActionExecutionType.Commit
+                || ca.ExecutionType == CustomActionExecutionType.Rollback))
+                .Select(ca => ca.Id.Id);
+            hiddenProperties.UnionWith(hideTargetCustomActions);
 
             if (0 < adminProperties.Count)
             {

@@ -6,7 +6,8 @@
         </ComponentGroup>
 
         <Binary Id="Binary1" SourceFile="test.txt"></Binary>
-        <CustomAction Id="CustomAction1" BinaryKey="Binary1" DllEntry="InvalidEntryPoint"></CustomAction>
+        <CustomAction Id="CustomAction1" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" />
         <CustomAction Id="DiscardOptimismAllBeingsWhoProceed" Error="Abandon hope all ye who enter here." />
+        <CustomAction Id="CustomActionWithHiddenTarget" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" Execute="deferred" HideTarget="yes" />
     </Fragment>
 </Wix>

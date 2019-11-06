@@ -3561,6 +3561,7 @@ namespace WixToolset.Core
                     PatchUninstall = patchUninstall,
                     TSAware = tsAware,
                     Win64 = win64,
+                    Hidden = hidden,
                 };
 
                 this.Core.AddTuple(tuple);
@@ -3568,15 +3569,6 @@ namespace WixToolset.Core
                 if (YesNoType.Yes == suppressModularization)
                 {
                     this.Core.AddTuple(new WixSuppressModularizationTuple(sourceLineNumbers, id));
-                }
-
-                // For deferred CAs that specify HideTarget we should also hide the CA data property for the action.
-                if (hidden &&
-                    (CustomActionExecutionType.Deferred == executionType ||
-                     CustomActionExecutionType.Commit == executionType ||
-                     CustomActionExecutionType.Rollback == executionType))
-                {
-                    this.AddWixPropertyRow(sourceLineNumbers, id, false, false, hidden);
                 }
             }
         }

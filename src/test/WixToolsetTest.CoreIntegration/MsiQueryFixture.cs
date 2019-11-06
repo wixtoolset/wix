@@ -3,6 +3,7 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
+    using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
@@ -281,8 +282,12 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "Binary:Binary1\t[Binary data]",
                     "CustomAction:CustomAction1\t1\tBinary1\tInvalidEntryPoint\t",
+                    "CustomAction:CustomActionWithHiddenTarget\t9217\tBinary1\tInvalidEntryPoint\t",
                     "CustomAction:DiscardOptimismAllBeingsWhoProceed\t19\t\tAbandon hope all ye who enter here.\t",
                 }, results);
+                var properties = Query.QueryDatabase(msiPath, new[] { "Property" });
+                var hiddenProperties = properties.Where(q => q.StartsWith("Property:MsiHiddenProperties")).Single();
+                Assert.Equal("Property:MsiHiddenProperties\tCustomActionWithHiddenTarget", hiddenProperties);
             }
         }
 
