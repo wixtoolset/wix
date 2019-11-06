@@ -153,12 +153,11 @@ namespace WixToolset.Core.Bind
                     }
                     else
                     {
-                        string key = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", variableId, variableScope).ToLower(CultureInfo.InvariantCulture);
-                        string resolvedValue = variableDefaultValue;
+                        var key = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", variableId, variableScope).ToLower(CultureInfo.InvariantCulture);
 
-                        if (resolutionData.ContainsKey(key))
+                        if (!resolutionData.TryGetValue(key, out var resolvedValue))
                         {
-                            resolvedValue = resolutionData[key];
+                            resolvedValue = variableDefaultValue;
                         }
 
                         if ("bind" == variableNamespace)

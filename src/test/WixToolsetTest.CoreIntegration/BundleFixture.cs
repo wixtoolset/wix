@@ -44,6 +44,12 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
                 var section = intermediate.Sections.Single();
 
+                var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
+                Assert.Equal("1.0.0.0", bundleTuple.Version);
+
+                var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
+                Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
+
                 var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
                 Assert.Equal("test.msi", msiTuple.Id.Id );
             }

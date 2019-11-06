@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Bundle Name="!(loc.BundleName)" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+  <Bundle Name="!(loc.BundleName)" Version="!(bind.packageVersion.test.msi)" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
       <BootstrapperApplication SourceFile="fakeba.dll" />
       <Chain>
           <MsiPackage SourceFile="test.msi">

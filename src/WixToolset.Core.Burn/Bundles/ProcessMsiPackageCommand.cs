@@ -135,6 +135,11 @@ namespace WixToolset.Core.Burn.Bundles
                         this.Facade.PackageTuple.Description = ProcessMsiPackageCommand.GetProperty(db, "ARPCOMMENTS");
                     }
 
+                    if (String.IsNullOrEmpty(this.Facade.PackageTuple.Version))
+                    {
+                        this.Facade.PackageTuple.Version = msiPackage.ProductVersion;
+                    }
+
                     var payloadNames = this.GetPayloadTargetNames(packagePayload.Id.Id);
 
                     var msiPropertyNames = this.GetMsiPropertyNames(packagePayload.Id.Id);
