@@ -6,6 +6,10 @@
 <?define Bar = "Bar" ?>
 <?define Bar = "Baz" ?>
 
+<?if $(sys.WIXMAJORVERSION) >= 4 AND $(sys.WIXMAJORVERSION) < 5 ?>
+  <?warning WiX v4 is in effect! ?>
+<?endif?>
+
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Product Id="*" Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
     <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />

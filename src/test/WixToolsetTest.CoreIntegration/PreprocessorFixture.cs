@@ -7,6 +7,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixBuildTools.TestSupport;
     using WixToolset.Core;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using Xunit;
 
@@ -61,8 +62,36 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var warnings = result.Messages.Where(message => message.Id == 1118);
-                Assert.Single(warnings);
+                var warning = result.Messages.Where(message => message.Id == (int)WarningMessages.Ids.VariableDeclarationCollision);
+                Assert.Single(warning);
+            }
+        }
+
+        [Fact]
+        public void WixVersionVariablesWork()
+        {
+            var folder = TestData.Get(@"TestData\Variables");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                var warning = result.Messages.Where(message => message.Id == (int)WarningMessages.Ids.PreprocessorWarning);
+                Assert.Single(warning);
             }
         }
 

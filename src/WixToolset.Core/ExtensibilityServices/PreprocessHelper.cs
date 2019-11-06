@@ -248,6 +248,12 @@ namespace WixToolset.Core.ExtensibilityServices
                                     throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", context.Platform.ToString());
                             }
 
+                        case "WIXMAJORVERSION":
+                            return ThisAssembly.AssemblyFileVersion.Split('.')[0];
+
+                        case "WIXVERSION":
+                            return ThisAssembly.AssemblyFileVersion;
+
                         default:
                             return null;
                     }
