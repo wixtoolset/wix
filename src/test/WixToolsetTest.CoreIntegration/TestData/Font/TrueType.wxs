@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <Component Id="TrueTypeFontComp" Directory="INSTALLFOLDER" Guid="C8116E5E-F731-427C-AF43-6FF8B8D7DA64">
+                <File Source="test.txt" Name="TrueTypeFontComp.ttf" TrueType="yes" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

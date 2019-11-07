@@ -35,6 +35,7 @@
     <Content Include="TestData\ErrorsInUI\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\FeatureGroup\FeatureGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Font\FontTitle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Font\TrueType.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Icon\SampleIcon.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\LockPermissions\EmptyPermissions.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SameFileFolders\data\a\test.txt" CopyToOutputDirectory="PreserveNewest" />
