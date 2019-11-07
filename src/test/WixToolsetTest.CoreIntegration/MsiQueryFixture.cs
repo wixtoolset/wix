@@ -714,6 +714,38 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void PopulatesRegistryTableFromRemoveRegistryKey()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Registry", "RemoveRegistryKey.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Registry" });
+                Assert.Equal(new[]
+                {
+                    "Registry:RemoveAKeyName\t2\tAKeyName\t-\t\tRemoveRegistryKeyComp",
+                }, results);
+            }
+        }
+
+        [Fact]
         public void PopulatesReserveCostTable()
         {
             var folder = TestData.Get(@"TestData");
