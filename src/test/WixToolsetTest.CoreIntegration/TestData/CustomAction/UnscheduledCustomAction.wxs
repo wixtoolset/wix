@@ -9,5 +9,21 @@
         <CustomAction Id="CustomAction1" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" />
         <CustomAction Id="DiscardOptimismAllBeingsWhoProceed" Error="Abandon hope all ye who enter here." />
         <CustomAction Id="CustomActionWithHiddenTarget" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" Execute="deferred" HideTarget="yes" />
+        <CustomAction Id="CustomAction2" Property="TestAdvtExecuteSequenceProperty" Value="1" />
+        <AdminExecuteSequence>
+            <Custom Action="CustomAction2" After="CostInitialize" />
+        </AdminExecuteSequence>
+        <AdminUISequence>
+            <Custom Action="CustomAction2" After="CostInitialize" />
+        </AdminUISequence>
+        <AdvertiseExecuteSequence>
+            <Custom Action="CustomAction2" After="CostInitialize" />
+        </AdvertiseExecuteSequence>
+        <InstallExecuteSequence>
+            <Custom Action="CustomAction2" After="CostInitialize" />
+        </InstallExecuteSequence>
+        <InstallUISequence>
+            <Custom Action="CustomAction2" After="CostInitialize" />
+        </InstallUISequence>
     </Fragment>
 </Wix>
