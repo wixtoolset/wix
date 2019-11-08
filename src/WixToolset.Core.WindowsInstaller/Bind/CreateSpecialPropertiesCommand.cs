@@ -51,6 +51,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 .Select(ca => ca.Id.Id);
             hiddenProperties.UnionWith(hideTargetCustomActions);
 
+            // Ensure upgrade action properties are secure.
+            var actionProperties = this.Section.Tuples.OfType<UpgradeTuple>().Select(u => u.ActionProperty);
+            secureProperties.UnionWith(actionProperties);
+
             if (0 < adminProperties.Count)
             {
                 var tuple = new PropertyTuple(null, new Identifier(AccessModifier.Private, "AdminProperties"));

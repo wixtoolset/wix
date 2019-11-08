@@ -6,6 +6,7 @@
     <Upgrade Id="01120000-00E0-0000-0000-0000000FF1CE">
       <UpgradeVersion ExcludeLanguages="no" IgnoreRemoveFailure="yes" IncludeMaximum="no" IncludeMinimum="yes" Maximum="13.0.0" Minimum="12.0.0" OnlyDetect="no" Property="BLAHBLAHBLAH" />
     </Upgrade>
+    <!--<Property Id="BLAHBLAHBLAH" Secure="yes" />-->
 
     <InstallExecuteSequence>
       <RemoveExistingProducts After="InstallValidate" />

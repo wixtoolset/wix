@@ -372,16 +372,27 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal(0, result);
 
+                var pdbPath = Path.Combine(intermediateFolder, @"bin\test.wixpdb");
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(pdbPath));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\MsiPackage\test.txt")));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
-                var fileTuple = section.Tuples.OfType<FileTuple>().Single();
-                Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
-                Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+                var upgradeTuple = section.Tuples.OfType<UpgradeTuple>().Single();
+                Assert.False(upgradeTuple.ExcludeLanguages);
+                Assert.True(upgradeTuple.IgnoreRemoveFailures);
+                Assert.False(upgradeTuple.VersionMaxInclusive);
+                Assert.True(upgradeTuple.VersionMinInclusive);
+                Assert.Equal("13.0.0", upgradeTuple.VersionMax);
+                Assert.Equal("12.0.0", upgradeTuple.VersionMin);
+                Assert.False(upgradeTuple.OnlyDetect);
+                Assert.Equal("BLAHBLAHBLAH", upgradeTuple.ActionProperty);
+
+                var pdb = WindowsInstallerData.Load(pdbPath, suppressVersionCheck: false);
+                var secureProperties = pdb.Tables["Property"].Rows.Where(row => row.GetKey() == "SecureCustomProperties").Single();
+                Assert.Contains("BLAHBLAHBLAH", secureProperties.FieldAsString(1));
             }
         }
 

@@ -4919,9 +4919,6 @@ namespace WixToolset.Core
 
                 this.Core.AddTuple(tuple);
 
-                // Ensure the action property is secure.
-                this.AddWixPropertyRow(sourceLineNumbers, new Identifier(AccessModifier.Private, actionProperty), false, true, false);
-
                 // Ensure that RemoveExistingProducts is authored in InstallExecuteSequence
                 // if at least one row in Upgrade table lacks the OnlyDetect attribute.
                 if (!onlyDetect)
