@@ -48,7 +48,9 @@
     <Content Include="TestData\Registry\RemoveRegistryKey.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ReserveCost\ReserveCost.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ServiceInstall\OwnProcess.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Shortcut\DecompiledShortcuts.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Shortcut\ShortcutProperty.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Shortcut\shortcuts.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\data\fakeba.dll" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\data\MsiPackage\Shared.dll" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\data\MsiPackage\test.txt" CopyToOutputDirectory="PreserveNewest" />

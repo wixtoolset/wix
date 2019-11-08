@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Product Id="{6CA94D1D-B568-4ED6-9EBC-3534C85970BB}" Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0">
+    <Package Description="MsiPackage" InstallerVersion="500" Languages="1033" Manufacturer="Example Corporation" Platform="x86" />
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="ykd0udtb">
+          <Component Id="ShortcutComp" Guid="{5B3B3FC1-533D-4C29-BFB3-0E88B51E59D8}" Win64="no">
+            <File Id="test.txt" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
+            <Shortcut Id="FileTargetShortcut" Directory="INSTALLFOLDER" Name="FileTargetShortcut" ShortName="lm2tdtqp" Target="[#test.txt]" />
+            <Shortcut Id="CustomTargetShortcut" Directory="INSTALLFOLDER" Name="CustomTargetShortcut" ShortName="treusbt_" Target="[INSTALLFOLDER]custom.target" />
+            <Shortcut Id="AdvtShortcut" Directory="INSTALLFOLDER" Name="AdvtShortcut" ShortName="mdbqel9r" Advertise="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id="ProductFeature" Level="1" Title="MsiPackageTitle">
+      <ComponentRef Id="ShortcutComp" Primary="yes" />
+    </Feature>
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Media Id="1" />
+    <Property Id="ALLUSERS" Value="1" />
+  </Product>
+</Wix>
