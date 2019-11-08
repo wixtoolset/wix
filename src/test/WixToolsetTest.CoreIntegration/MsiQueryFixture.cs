@@ -672,10 +672,11 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "MsiShortcutProperty" });
+                var results = Query.QueryDatabase(msiPath, new[] { "MsiShortcutProperty", "Shortcut" });
                 Assert.Equal(new[]
                 {
                     "MsiShortcutProperty:scp4GOCIx4Eskci4nBG1MV_vSUOZt4\tTheShortcut\tCustomShortcutKey\tCustomShortcutValue",
+                    "Shortcut:TheShortcut\tINSTALLFOLDER\td|\tShortcutComp\t[#filcV1yrx0x8wJWj4qMzcH21jwkPko]\t\t\t\t\t\t\t\t\t\t\t",
                 }, results);
             }
         }

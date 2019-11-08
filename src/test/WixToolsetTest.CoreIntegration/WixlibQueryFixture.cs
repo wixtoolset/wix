@@ -12,6 +12,36 @@ namespace WixToolsetTest.CoreIntegration
 
     public class WixlibQueryFixture
     {
+        [Fact(Skip = "Test demonstrates failure")]
+        public void ShortcutNameWithPreprocessorVariableIsResolved()
+        {
+            var folder = TestData.Get(@"TestData\Shortcut");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ShortcutProperty.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(wixlibPath);
+                var allTuples = intermediate.Sections.SelectMany(s => s.Tuples);
+                var shortcutTuple = allTuples.OfType<ShortcutTuple>()
+                                             .SingleOrDefault();
+                Assert.NotNull(shortcutTuple);
+                Assert.Equal("d", shortcutTuple.Name);
+            }
+        }
+
         [Fact]
         public void UpgradeProducesReferenceToRemoveExistingProducts()
         {
