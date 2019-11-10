@@ -6,8 +6,10 @@
 <?define Bar = "Bar" ?>
 <?define Bar = "Baz" ?>
 
+<?ifdef $(sys.WIXVERSION) ?>
 <?if $(sys.WIXMAJORVERSION) >= 4 AND $(sys.WIXMAJORVERSION) < 5 ?>
   <?warning WiX v4 is in effect! ?>
+<?endif?>
 <?endif?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">

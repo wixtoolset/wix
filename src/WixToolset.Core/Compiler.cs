@@ -7137,9 +7137,6 @@ namespace WixToolset.Core
 
                 this.Core.AddTuple(tuple);
 
-                // Ensure the action property is secure.
-                this.AddWixPropertyRow(sourceLineNumbers, new Identifier(AccessModifier.Public, Common.UpgradeDetectedProperty), false, true, false);
-
                 // Add launch condition that blocks upgrades
                 if (blockUpgrades)
                 {
@@ -7166,9 +7163,6 @@ namespace WixToolset.Core
                     };
 
                     this.Core.AddTuple(upgradeTuple);
-
-                    // Ensure the action property is secure.
-                    this.AddWixPropertyRow(sourceLineNumbers, new Identifier(AccessModifier.Public, Common.DowngradeDetectedProperty), false, true, false);
 
                     var conditionTuple = new LaunchConditionTuple(sourceLineNumbers)
                     {

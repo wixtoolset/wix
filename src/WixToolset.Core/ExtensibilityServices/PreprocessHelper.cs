@@ -154,10 +154,10 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public string GetVariableValue(IPreprocessContext context, string variable, bool allowMissingPrefix)
         {
-            // Strip the "$(" off the front.
+            // Strip the "$(" off the front and the ")" off the back.
             if (variable.StartsWith("$(", StringComparison.Ordinal))
             {
-                variable = variable.Substring(2);
+                variable = variable.Substring(2, variable.Length - 3);
             }
 
             var parts = variable.Split(VariableSplitter, 2);
