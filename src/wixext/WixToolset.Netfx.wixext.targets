@@ -3,7 +3,7 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
-    <WixToolsetNetfxWixextPath Condition=" '$(WixToolsetNetfxWixextPath)' == '' ">$(MSBuildThisFileDirectory)..\tools\WixToolset.Netfx.wixext.dll"</WixToolsetNetfxWixextPath>
+    <WixToolsetNetfxWixextPath Condition=" '$(WixToolsetNetfxWixextPath)' == '' ">$(MSBuildThisFileDirectory)..\tools\WixToolset.Netfx.wixext.dll</WixToolsetNetfxWixextPath>
   </PropertyGroup>
   <ItemGroup>
     <WixExtension Include="$(WixToolsetNetfxWixextPath)" />
