@@ -647,7 +647,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesMsiShortcutPropertyTable()
         {
             var folder = TestData.Get(@"TestData");
@@ -676,7 +676,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(new[]
                 {
                     "MsiShortcutProperty:scp4GOCIx4Eskci4nBG1MV_vSUOZt4\tTheShortcut\tCustomShortcutKey\tCustomShortcutValue",
-                    "Shortcut:TheShortcut\tINSTALLFOLDER\td|\tShortcutComp\t[#filcV1yrx0x8wJWj4qMzcH21jwkPko]\t\t\t\t\t\t\t\t\t\t\t",
+                    "Shortcut:TheShortcut\tINSTALLFOLDER\td\tShortcutComp\t[#filcV1yrx0x8wJWj4qMzcH21jwkPko]\t\t\t\t\t\t\t\t\t\t\t",
                 }, results);
             }
         }
