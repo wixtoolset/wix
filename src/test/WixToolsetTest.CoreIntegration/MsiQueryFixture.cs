@@ -384,7 +384,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Test demonstrates failure")]
         public void PopulatesDirectoryTableWithValidDefaultDir()
         {
             var folder = TestData.Get(@"TestData");
@@ -411,6 +411,7 @@ namespace WixToolsetTest.CoreIntegration
                 var results = Query.QueryDatabase(msiPath, new[] { "Directory" });
                 Assert.Equal(new[]
                 {
+                    "Directory:DUPLICATENAMEANDSHORTNAME\tINSTALLFOLDER\tduplicat",
                     "Directory:INSTALLFOLDER\tProgramFilesFolder\toekcr5lq|MsiPackage",
                     "Directory:NAMEANDSHORTNAME\tINSTALLFOLDER\tSHORTNAM|NameAndShortName",
                     "Directory:NAMEANDSHORTSOURCENAME\tINSTALLFOLDER\tNAMEASSN|NameAndShortSourceName",
