@@ -47,6 +47,8 @@
     <Content Include="TestData\Registry\RegistryValue.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Registry\RemoveRegistryKey.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ReserveCost\ReserveCost.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SequenceTables\DecompiledSequenceTables.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SequenceTables\SequenceTables.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ServiceInstall\OwnProcess.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Shortcut\DecompiledShortcuts.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Shortcut\ShortcutProperty.wxs" CopyToOutputDirectory="PreserveNewest" />

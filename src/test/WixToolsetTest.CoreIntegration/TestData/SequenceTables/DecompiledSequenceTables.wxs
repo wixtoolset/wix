@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Product Id="{74C29381-1915-4948-B8B4-5646806A0BD4}" Codepage="1252" Language="1033" Manufacturer="Example Corporation" Name="MsiPackage" UpgradeCode="{12E4699F-E774-4D05-8A01-5BDD41BBA127}" Version="1.0.0.0">
+    <Package Description="MsiPackage" InstallerVersion="500" Languages="1033" Manufacturer="Example Corporation" Platform="x86" />
+    <CustomAction Id="CustomAction2" Property="TestAdvtExecuteSequenceProperty" Value="1" />
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MsiPackage" ShortName="ykd0udtb">
+          <Component Id="test.txt" Guid="{E597A58A-03CB-50D8-93E3-DABA263F233A}" Win64="no">
+            <File Id="test.txt" Name="test.txt" KeyPath="yes" Source="SourceDir\\MsiPackage\test.txt" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id="ProductFeature" Level="1" Title="MsiPackageTitle">
+      <ComponentRef Id="test.txt" />
+    </Feature>
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Media Id="1" />
+    <Property Id="ALLUSERS" Value="1" />
+    <InstallExecuteSequence>
+      <Custom Action="CustomAction2" After="CostInitialize" />
+    </InstallExecuteSequence>
+    <InstallUISequence>
+      <Custom Action="CustomAction2" After="CostInitialize" />
+    </InstallUISequence>
+    <AdminExecuteSequence>
+      <Custom Action="CustomAction2" After="CostInitialize" />
+    </AdminExecuteSequence>
+    <AdminUISequence>
+      <Custom Action="CustomAction2" After="CostInitialize" />
+    </AdminUISequence>
+    <AdvertiseExecuteSequence>
+      <Custom Action="CustomAction2" After="CostInitialize" />
+    </AdvertiseExecuteSequence>
+  </Product>
+</Wix>
