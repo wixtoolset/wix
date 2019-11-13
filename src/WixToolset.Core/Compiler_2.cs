@@ -4328,7 +4328,6 @@ namespace WixToolset.Core
                     if (null == shortName)
                     {
                         shortName = name;
-                        name = null;
                     }
                     else
                     {

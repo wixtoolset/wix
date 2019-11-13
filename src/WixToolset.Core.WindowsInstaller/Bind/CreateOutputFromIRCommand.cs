@@ -1146,7 +1146,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private static string GetMsiFilenameValue(string shortName, string longName)
         {
-            if (String.IsNullOrEmpty(shortName))
+            if (String.IsNullOrEmpty(shortName) || String.Equals(shortName, longName, StringComparison.OrdinalIgnoreCase))
             {
                 return longName;
             }
