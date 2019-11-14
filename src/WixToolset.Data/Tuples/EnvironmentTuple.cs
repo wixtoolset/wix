@@ -84,13 +84,13 @@ namespace WixToolset.Data.Tuples
         public EnvironmentActionType? Action
         {
             get => (EnvironmentActionType?)this.Fields[(int)EnvironmentTupleFields.Action].AsNullableNumber();
-            set => this.Set((int)EnvironmentTupleFields.Action, (int)value);
+            set => this.Set((int)EnvironmentTupleFields.Action, (int?)value);
         }
 
         public EnvironmentPartType? Part
         {
             get => (EnvironmentPartType?)this.Fields[(int)EnvironmentTupleFields.Part].AsNullableNumber();
-            set => this.Set((int)EnvironmentTupleFields.Part, (int)value);
+            set => this.Set((int)EnvironmentTupleFields.Part, (int?)value);
         }
 
         public bool Permanent
