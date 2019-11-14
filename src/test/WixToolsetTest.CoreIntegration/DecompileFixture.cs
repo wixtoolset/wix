@@ -67,6 +67,34 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact(Skip = "Test demonstrates failure")]
+        public void CanDecompileNestedDirSearchUnderRegSearch()
+        {
+            var folder = TestData.Get(@"TestData\AppSearch");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var outputPath = Path.Combine(intermediateFolder, @"Actual.wxs");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "decompile",
+                    Path.Combine(folder, "NestedDirSearchUnderRegSearch.msi"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", outputPath
+                });
+
+                result.AssertSuccess();
+
+                var actual = File.ReadAllText(outputPath);
+                var actualFormatted = XDocument.Parse(actual, LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
+                var expected = XDocument.Load(Path.Combine(folder, "DecompiledNestedDirSearchUnderRegSearch.wxs"), LoadOptions.PreserveWhitespace | LoadOptions.SetBaseUri | LoadOptions.SetLineInfo).ToString();
+
+                Assert.Equal(expected, actualFormatted);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
         public void CanDecompileOldClassTableDefinition()
         {
             // The input MSI was not created using standard methods, it is an example of a real world database that needs to be decompiled.
