@@ -5203,7 +5203,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
-            if (!part.HasValue && action == EnvironmentActionType.Create)
+            if (part.HasValue && action == EnvironmentActionType.Create)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "Part", "Action", "create"));
             }

@@ -428,6 +428,41 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void PopulatesEnvironmentTable()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Environment", "Environment.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Environment" });
+                Assert.Equal(new[]
+                {
+                    "Environment:WixEnvironmentTest1\t=-WixEnvTest1\t\tWixEnvironmentTest",
+                    "Environment:WixEnvironmentTest2\t+-WixEnvTest1\t\tWixEnvironmentTest",
+                    "Environment:WixEnvironmentTest3\t!-WixEnvTest1\t\tWixEnvironmentTest",
+                    "Environment:WixEnvironmentTest4\t=-*WIX\t[INSTALLFOLDER]\tWixEnvironmentTest",
+                }, results);
+            }
+        }
+
+        [Fact]
         public void PopulatesFeatureTableWithParent()
         {
             var folder = TestData.Get(@"TestData");
@@ -942,6 +977,15 @@ namespace WixToolsetTest.CoreIntegration
                     "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
                     "Upgrade:{B05772EA-82B8-4DE0-B7EB-45B5F0CCFE6D}\t1.0.0\t\t\t256\t\tRELPRODFOUND",
                 }, results);
+
+                var prefix = "Property:SecureCustomProperties\t";
+                var secureProperties = Query.QueryDatabase(msiPath, new[] { "Property" }).Where(p => p.StartsWith(prefix)).Single();
+                Assert.Equal(new[]
+                {
+                    "RELPRODFOUND",
+                    "WIX_DOWNGRADE_DETECTED",
+                    "WIX_UPGRADE_DETECTED",
+                }, secureProperties.Substring(prefix.Length).Split(';').OrderBy(p => p));
             }
         }
     }
