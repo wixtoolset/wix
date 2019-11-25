@@ -2292,6 +2292,14 @@ namespace WixToolset.Core.WindowsInstaller
                                             usedDrLocator = true;
                                         }
                                     }
+                                    else if ("RegLocator" == parentLocatorRow.TableDefinition.Name)
+                                    {
+                                        var parentSearchElement = (Wix.IParentElement)this.core.GetIndexedElement(parentLocatorRow);
+
+                                        parentSearchElement.AddChild(searchElement);
+                                        usedSearchElements[searchElement] = null;
+                                        usedDrLocator = true;
+                                    }
                                 }
 
                                 // keep track of unused DrLocator rows
@@ -2362,7 +2370,8 @@ namespace WixToolset.Core.WindowsInstaller
                     }
                     else
                     {
-                        if ("DrLocator" == locatorRow.TableDefinition.Name)
+                        if ("DrLocator" == locatorRow.TableDefinition.Name ||
+                            "RegLocator" == locatorRow.TableDefinition.Name)
                         {
                             unusedSearchElements.Add(searchElement);
                         }
@@ -2385,32 +2394,45 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 var used = false;
 
-                foreach (Wix.ISchemaElement schemaElement in unusedSearchElement.Children)
+                Wix.DirectorySearch leafDirectorySearch = null;
+                var parentElement = unusedSearchElement;
+                var updatedLeaf = true;
+                while (updatedLeaf)
                 {
-                    var directorySearch = schemaElement as Wix.DirectorySearch;
-                    if (null != directorySearch)
+                    updatedLeaf = false;
+                    foreach (var schemaElement in parentElement.Children)
                     {
-                        var appSearchProperties = (StringCollection)appSearches[directorySearch.Id];
-
-                        var unusedSearchSchemaElement = unusedSearchElement as Wix.ISchemaElement;
-                        if (null != appSearchProperties)
+                        if (schemaElement is Wix.DirectorySearch directorySearch)
                         {
-                            var property = this.EnsureProperty(appSearchProperties[0]);
-
-                            property.AddChild(unusedSearchSchemaElement);
-                            used = true;
+                            parentElement = leafDirectorySearch = directorySearch;
+                            updatedLeaf = true;
                             break;
                         }
-                        else if (ccpSearches.Contains(directorySearch.Id))
-                        {
-                            complianceCheck.AddChild(unusedSearchSchemaElement);
-                            used = true;
-                            break;
-                        }
-                        else
-                        {
-                            // TODO: warn
-                        }
+                    }
+                }
+
+                if (leafDirectorySearch != null)
+                {
+                    var appSearchProperties = (StringCollection)appSearches[leafDirectorySearch.Id];
+
+                    var unusedSearchSchemaElement = unusedSearchElement as Wix.ISchemaElement;
+                    if (null != appSearchProperties)
+                    {
+                        var property = this.EnsureProperty(appSearchProperties[0]);
+
+                        property.AddChild(unusedSearchSchemaElement);
+                        used = true;
+                        break;
+                    }
+                    else if (ccpSearches.Contains(leafDirectorySearch.Id))
+                    {
+                        complianceCheck.AddChild(unusedSearchSchemaElement);
+                        used = true;
+                        break;
+                    }
+                    else
+                    {
+                        // TODO: warn
                     }
                 }
 

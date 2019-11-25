@@ -18,7 +18,7 @@
     <Media Id="1" />
     <Property Id="ALLUSERS" Value="1" />
     <Property Id="SAMPLEDIRFOUND">
-      <RegistrySearch Id="SubRegSearch" Root="HKLM" Key="SampleReg" Type="raw">
+      <RegistrySearch Id="SubRegSearch" Root="HKLM" Key="SampleReg" Type="raw" Win64="no">
         <DirectorySearch Id="SampleDirSearch" Path="SampleDir">
           <DirectorySearch Id="SubDirSearch" Path="Subdir" />
         </DirectorySearch>
