@@ -2000,7 +2000,7 @@ namespace WixToolset.Core.WindowsInstaller
             var drLocators = new Hashtable();
             var locators = new Hashtable();
             var usedSearchElements = new Hashtable();
-            var unusedSearchElements = new ArrayList();
+            var unusedSearchElements = new Dictionary<string, Wix.IParentElement>();
 
             Wix.ComplianceCheck complianceCheck = null;
 
@@ -2131,6 +2131,7 @@ namespace WixToolset.Core.WindowsInstaller
                     }
                     else if ("DrLocator" == locatorRow.TableDefinition.Name && null != locatorRow[1])
                     {
+                        var drSearchElement = (Wix.DirectorySearch)searchElement;
                         var parentSignature = Convert.ToString(locatorRow[1]);
 
                         if ("CCP_DRIVE" == parentSignature)
@@ -2266,7 +2267,7 @@ namespace WixToolset.Core.WindowsInstaller
                                             }
 
                                             parentSearchElement = directorySeachRef;
-                                            unusedSearchElements.Add(directorySeachRef);
+                                            unusedSearchElements.Add(directorySeachRef.Id, directorySeachRef);
                                         }
 
                                         if (!usedSearchElements.Contains(searchElement))
@@ -2305,7 +2306,7 @@ namespace WixToolset.Core.WindowsInstaller
                                 // keep track of unused DrLocator rows
                                 if (!usedDrLocator)
                                 {
-                                    unusedSearchElements.Add(searchElement);
+                                    unusedSearchElements.Add(drSearchElement.Id, drSearchElement);
                                 }
                             }
                             else
@@ -2370,10 +2371,13 @@ namespace WixToolset.Core.WindowsInstaller
                     }
                     else
                     {
-                        if ("DrLocator" == locatorRow.TableDefinition.Name ||
-                            "RegLocator" == locatorRow.TableDefinition.Name)
+                        if (searchElement is Wix.DirectorySearch directorySearch)
                         {
-                            unusedSearchElements.Add(searchElement);
+                            unusedSearchElements.Add(directorySearch.Id, directorySearch);
+                        }
+                        else if (searchElement is Wix.RegistrySearch registrySearch)
+                        {
+                            unusedSearchElements.Add(registrySearch.Id, registrySearch);
                         }
                         else
                         {
@@ -2390,8 +2394,12 @@ namespace WixToolset.Core.WindowsInstaller
                 }
             }
 
-            foreach (Wix.IParentElement unusedSearchElement in unusedSearchElements)
+            // Iterate through the unused elements through a sorted list of their ids so the output is deterministic.
+            var unusedSearchElementKeys = unusedSearchElements.Keys.ToList();
+            unusedSearchElementKeys.Sort();
+            foreach (var unusedSearchElementKey in unusedSearchElementKeys)
             {
+                var unusedSearchElement = unusedSearchElements[unusedSearchElementKey];
                 var used = false;
 
                 Wix.DirectorySearch leafDirectorySearch = null;
@@ -2422,13 +2430,11 @@ namespace WixToolset.Core.WindowsInstaller
 
                         property.AddChild(unusedSearchSchemaElement);
                         used = true;
-                        break;
                     }
                     else if (ccpSearches.Contains(leafDirectorySearch.Id))
                     {
                         complianceCheck.AddChild(unusedSearchSchemaElement);
                         used = true;
-                        break;
                     }
                     else
                     {
