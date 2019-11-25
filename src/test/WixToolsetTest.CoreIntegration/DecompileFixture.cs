@@ -94,7 +94,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanDecompileOldClassTableDefinition()
         {
             // The input MSI was not created using standard methods, it is an example of a real world database that needs to be decompiled.

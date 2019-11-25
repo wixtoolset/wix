@@ -294,6 +294,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private TableDefinition GetTableDefinition(string tableName, View tableView, View validationView)
         {
+            // Use our table definitions whenever possible since they will be used when compiling the source code anyway.
+            // This also allows us to take advantage of WiX concepts like localizable columns which current code assumes.
+            if (this.TableDefinitions.Contains(tableName))
+            {
+                return this.TableDefinitions[tableName];
+            }
+
             ColumnDefinition[] columns;
             using (Record columnNameRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFONAMES),
                           columnTypeRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFOTYPES))
@@ -431,15 +438,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
             }
 
-            var tableDefinition = new TableDefinition(tableName, columns, false);
-
-            // use our table definitions if core properties are the same; this allows us to take advantage
-            // of wix concepts like localizable columns which current code assumes
-            if (this.TableDefinitions.Contains(tableName) && 0 == tableDefinition.CompareTo(this.TableDefinitions[tableName]))
-            {
-                tableDefinition = this.TableDefinitions[tableName];
-            }
-            return tableDefinition;
+            return new TableDefinition(tableName, columns, false);
         }
 
         /// <summary>
