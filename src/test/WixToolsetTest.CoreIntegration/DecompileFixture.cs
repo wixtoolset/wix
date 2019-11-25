@@ -125,7 +125,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanDecompileSequenceTables()
         {
             var folder = TestData.Get(@"TestData\SequenceTables");

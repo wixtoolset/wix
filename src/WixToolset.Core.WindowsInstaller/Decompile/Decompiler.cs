@@ -2470,14 +2470,16 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
                 {
+                    var sequenceTableName = GetSequenceTableName(sequenceTable);
+
                     // if suppressing UI elements, skip UI-related sequence tables
-                    if (this.SuppressUI && ("AdminUISequence" == sequenceTable.ToString() || "InstallUISequence" == sequenceTable.ToString()))
+                    if (this.SuppressUI && ("AdminUISequence" == sequenceTableName || "InstallUISequence" == sequenceTableName))
                     {
                         continue;
                     }
 
                     var actionsTable = new Table(this.tableDefinitions["WixAction"]);
-                    var table = tables[sequenceTable.ToString()];
+                    var table = tables[sequenceTableName];
 
                     if (null != table)
                     {
@@ -2607,14 +2609,16 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 foreach (SequenceTable sequenceTable in Enum.GetValues(typeof(SequenceTable)))
                 {
+                    var sequenceTableName = GetSequenceTableName(sequenceTable);
+
                     // if suppressing UI elements, skip UI-related sequence tables
-                    if (this.SuppressUI && ("AdminUISequence" == sequenceTable.ToString() || "InstallUISequence" == sequenceTable.ToString()))
+                    if (this.SuppressUI && ("AdminUISequence" == sequenceTableName || "InstallUISequence" == sequenceTableName))
                     {
                         continue;
                     }
 
                     var actionsTable = new Table(this.tableDefinitions["WixAction"]);
-                    var table = tables[String.Concat("Module", sequenceTable.ToString())];
+                    var table = tables[String.Concat("Module", sequenceTableName)];
 
                     if (null != table)
                     {
@@ -2810,6 +2814,17 @@ namespace WixToolset.Core.WindowsInstaller
                         this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, verbTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Extension_", Convert.ToString(row[0]), "Extension"));
                     }
                 }
+            }
+        }
+
+        private static string GetSequenceTableName(SequenceTable sequenceTable)
+        {
+            switch (sequenceTable)
+            {
+                case SequenceTable.AdvertiseExecuteSequence:
+                    return "AdvtExecuteSequence";
+                default:
+                    return sequenceTable.ToString();
             }
         }
 

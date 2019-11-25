@@ -369,13 +369,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 set.Add("AdminUISequence/FileCost");
 
                 // AdvtExecuteSequence table
-                set.Add("AdvtExecuteSequence/CostFinalize");
-                set.Add("AdvtExecuteSequence/CostInitialize");
-                set.Add("AdvtExecuteSequence/InstallInitialize");
-                set.Add("AdvtExecuteSequence/InstallFinalize");
-                set.Add("AdvtExecuteSequence/InstallValidate");
-                set.Add("AdvtExecuteSequence/PublishFeatures");
-                set.Add("AdvtExecuteSequence/PublishProduct");
+                set.Add("AdvertiseExecuteSequence/CostFinalize");
+                set.Add("AdvertiseExecuteSequence/CostInitialize");
+                set.Add("AdvertiseExecuteSequence/InstallInitialize");
+                set.Add("AdvertiseExecuteSequence/InstallFinalize");
+                set.Add("AdvertiseExecuteSequence/InstallValidate");
+                set.Add("AdvertiseExecuteSequence/PublishFeatures");
+                set.Add("AdvertiseExecuteSequence/PublishProduct");
 
                 // InstallExecuteSequence table
                 set.Add("InstallExecuteSequence/CostFinalize");
@@ -418,7 +418,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallUISequence/RMCCPSearch");
                         break;
                     case TupleDefinitionType.Class:
-                        set.Add("AdvtExecuteSequence/RegisterClassInfo");
+                        set.Add("AdvertiseExecuteSequence/RegisterClassInfo");
                         set.Add("InstallExecuteSequence/RegisterClassInfo");
                         set.Add("InstallExecuteSequence/UnregisterClassInfo");
                         break;
@@ -439,7 +439,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallExecuteSequence/RemoveEnvironmentStrings");
                         break;
                     case TupleDefinitionType.Extension:
-                        set.Add("AdvtExecuteSequence/RegisterExtensionInfo");
+                        set.Add("AdvertiseExecuteSequence/RegisterExtensionInfo");
                         set.Add("InstallExecuteSequence/RegisterExtensionInfo");
                         set.Add("InstallExecuteSequence/UnregisterExtensionInfo");
                         break;
@@ -486,7 +486,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallUISequence/LaunchConditions");
                         break;
                     case TupleDefinitionType.MIME:
-                        set.Add("AdvtExecuteSequence/RegisterMIMEInfo");
+                        set.Add("AdvertiseExecuteSequence/RegisterMIMEInfo");
                         set.Add("InstallExecuteSequence/RegisterMIMEInfo");
                         set.Add("InstallExecuteSequence/UnregisterMIMEInfo");
                         break;
@@ -494,7 +494,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallExecuteSequence/MoveFiles");
                         break;
                     case TupleDefinitionType.Assembly:
-                        set.Add("AdvtExecuteSequence/MsiPublishAssemblies");
+                        set.Add("AdvertiseExecuteSequence/MsiPublishAssemblies");
                         set.Add("InstallExecuteSequence/MsiPublishAssemblies");
                         set.Add("InstallExecuteSequence/MsiUnpublishAssemblies");
                         break;
@@ -510,12 +510,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallExecuteSequence/RemoveODBC");
                         break;
                     case TupleDefinitionType.ProgId:
-                        set.Add("AdvtExecuteSequence/RegisterProgIdInfo");
+                        set.Add("AdvertiseExecuteSequence/RegisterProgIdInfo");
                         set.Add("InstallExecuteSequence/RegisterProgIdInfo");
                         set.Add("InstallExecuteSequence/UnregisterProgIdInfo");
                         break;
                     case TupleDefinitionType.PublishComponent:
-                        set.Add("AdvtExecuteSequence/PublishComponents");
+                        set.Add("AdvertiseExecuteSequence/PublishComponents");
                         set.Add("InstallExecuteSequence/PublishComponents");
                         set.Add("InstallExecuteSequence/UnpublishComponents");
                         break;
@@ -536,7 +536,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         set.Add("InstallExecuteSequence/InstallServices");
                         break;
                     case TupleDefinitionType.Shortcut:
-                        set.Add("AdvtExecuteSequence/CreateShortcuts");
+                        set.Add("AdvertiseExecuteSequence/CreateShortcuts");
                         set.Add("InstallExecuteSequence/CreateShortcuts");
                         set.Add("InstallExecuteSequence/RemoveShortcuts");
                         break;

@@ -252,7 +252,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesCustomActionTable()
         {
             var folder = TestData.Get(@"TestData");
