@@ -134,152 +134,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                             using (var tableView = this.Database.OpenExecuteView(String.Format(CultureInfo.InvariantCulture, "SELECT * FROM `{0}`", tableName)))
                             {
-                                ColumnDefinition[] columns;
-                                using (Record columnNameRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFONAMES),
-                                              columnTypeRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFOTYPES))
-                                {
-                                    // index the primary keys
-                                    var tablePrimaryKeys = new HashSet<string>();
-                                    using (var primaryKeysRecord = this.Database.PrimaryKeys(tableName))
-                                    {
-                                        var primaryKeysFieldCount = primaryKeysRecord.GetFieldCount();
-
-                                        for (var i = 1; i <= primaryKeysFieldCount; i++)
-                                        {
-                                            tablePrimaryKeys.Add(primaryKeysRecord.GetString(i));
-                                        }
-                                    }
-
-                                    var columnCount = columnNameRecord.GetFieldCount();
-                                    columns = new ColumnDefinition[columnCount];
-                                    for (var i = 1; i <= columnCount; i++)
-                                    {
-                                        var columnName = columnNameRecord.GetString(i);
-                                        var idtType = columnTypeRecord.GetString(i);
-
-                                        ColumnType columnType;
-                                        int length;
-                                        bool nullable;
-
-                                        var columnCategory = ColumnCategory.Unknown;
-                                        var columnModularizeType = ColumnModularizeType.None;
-                                        var primary = tablePrimaryKeys.Contains(columnName);
-                                        int? minValue = null;
-                                        int? maxValue = null;
-                                        string keyTable = null;
-                                        int? keyColumn = null;
-                                        string category = null;
-                                        string set = null;
-                                        string description = null;
-
-                                        // get the column type, length, and whether its nullable
-                                        switch (Char.ToLower(idtType[0], CultureInfo.InvariantCulture))
-                                        {
-                                        case 'i':
-                                            columnType = ColumnType.Number;
-                                            break;
-                                        case 'l':
-                                            columnType = ColumnType.Localized;
-                                            break;
-                                        case 's':
-                                            columnType = ColumnType.String;
-                                            break;
-                                        case 'v':
-                                            columnType = ColumnType.Object;
-                                            break;
-                                        default:
-                                            // TODO: error
-                                            columnType = ColumnType.Unknown;
-                                            break;
-                                        }
-                                        length = Convert.ToInt32(idtType.Substring(1), CultureInfo.InvariantCulture);
-                                        nullable = Char.IsUpper(idtType[0]);
-
-                                        // try to get validation information
-                                        if (null != validationView)
-                                        {
-                                            using (var validationRecord = new Record(2))
-                                            {
-                                                validationRecord.SetString(1, tableName);
-                                                validationRecord.SetString(2, columnName);
-
-                                                validationView.Execute(validationRecord);
-                                            }
-
-                                            using (var validationRecord = validationView.Fetch())
-                                            {
-                                                if (null != validationRecord)
-                                                {
-                                                    var validationNullable = validationRecord.GetString(3);
-                                                    minValue = validationRecord.IsNull(4) ? null : (int?)validationRecord.GetInteger(4);
-                                                    maxValue = validationRecord.IsNull(5) ? null : (int?)validationRecord.GetInteger(5);
-                                                    keyTable = validationRecord.IsNull(6) ? null : validationRecord.GetString(6);
-                                                    keyColumn = validationRecord.IsNull(7) ? null : (int?)validationRecord.GetInteger(7);
-                                                    category = validationRecord.IsNull(8) ? null : validationRecord.GetString(8);
-                                                    set = validationRecord.IsNull(9) ? null : validationRecord.GetString(9);
-                                                    description = validationRecord.IsNull(10) ? null : validationRecord.GetString(10);
-
-                                                    // check the validation nullable value against the column definition
-                                                    if (null == validationNullable)
-                                                    {
-                                                        // TODO: warn for illegal validation nullable column
-                                                    }
-                                                    else if ((nullable && "Y" != validationNullable) || (!nullable && "N" != validationNullable))
-                                                    {
-                                                        // TODO: warn for mismatch between column definition and validation nullable
-                                                    }
-
-                                                    // convert category to ColumnCategory
-                                                    if (null != category)
-                                                    {
-                                                        try
-                                                        {
-                                                            columnCategory = (ColumnCategory)Enum.Parse(typeof(ColumnCategory), category, true);
-                                                        }
-                                                        catch (ArgumentException)
-                                                        {
-                                                            columnCategory = ColumnCategory.Unknown;
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    // TODO: warn about no validation information
-                                                }
-                                            }
-                                        }
-
-                                        // guess the modularization type
-                                        if ("Icon" == keyTable && 1 == keyColumn)
-                                        {
-                                            columnModularizeType = ColumnModularizeType.Icon;
-                                        }
-                                        else if ("Condition" == columnName)
-                                        {
-                                            columnModularizeType = ColumnModularizeType.Condition;
-                                        }
-                                        else if (ColumnCategory.Formatted == columnCategory || ColumnCategory.FormattedSDDLText == columnCategory)
-                                        {
-                                            columnModularizeType = ColumnModularizeType.Property;
-                                        }
-                                        else if (ColumnCategory.Identifier == columnCategory)
-                                        {
-                                            columnModularizeType = ColumnModularizeType.Column;
-                                        }
-
-                                        columns[i - 1] = new ColumnDefinition(columnName, columnType, length, primary, nullable, columnCategory, minValue, maxValue, keyTable, keyColumn, set, description, columnModularizeType, (ColumnType.Localized == columnType), true);
-                                    }
-                                }
-
-                                var tableDefinition = new TableDefinition(tableName, columns, false);
-
-                                // use our table definitions if core properties are the same; this allows us to take advantage
-                                // of wix concepts like localizable columns which current code assumes
-                                if (this.TableDefinitions.Contains(tableName) && 0 == tableDefinition.CompareTo(this.TableDefinitions[tableName]))
-                                {
-                                    tableDefinition = this.TableDefinitions[tableName];
-                                }
-
+                                var tableDefinition = this.GetTableDefinition(tableName, tableView, validationView);
                                 var table = new Table(tableDefinition);
 
                                 while (true)
@@ -435,6 +290,156 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             }
 
             return output;
+        }
+
+        private TableDefinition GetTableDefinition(string tableName, View tableView, View validationView)
+        {
+            ColumnDefinition[] columns;
+            using (Record columnNameRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFONAMES),
+                          columnTypeRecord = tableView.GetColumnInfo(MsiInterop.MSICOLINFOTYPES))
+            {
+                // index the primary keys
+                var tablePrimaryKeys = new HashSet<string>();
+                using (var primaryKeysRecord = this.Database.PrimaryKeys(tableName))
+                {
+                    var primaryKeysFieldCount = primaryKeysRecord.GetFieldCount();
+
+                    for (var i = 1; i <= primaryKeysFieldCount; i++)
+                    {
+                        tablePrimaryKeys.Add(primaryKeysRecord.GetString(i));
+                    }
+                }
+
+                var columnCount = columnNameRecord.GetFieldCount();
+                columns = new ColumnDefinition[columnCount];
+                for (var i = 1; i <= columnCount; i++)
+                {
+                    var columnName = columnNameRecord.GetString(i);
+                    var idtType = columnTypeRecord.GetString(i);
+
+                    ColumnType columnType;
+                    int length;
+                    bool nullable;
+
+                    var columnCategory = ColumnCategory.Unknown;
+                    var columnModularizeType = ColumnModularizeType.None;
+                    var primary = tablePrimaryKeys.Contains(columnName);
+                    int? minValue = null;
+                    int? maxValue = null;
+                    string keyTable = null;
+                    int? keyColumn = null;
+                    string category = null;
+                    string set = null;
+                    string description = null;
+
+                    // get the column type, length, and whether its nullable
+                    switch (Char.ToLower(idtType[0], CultureInfo.InvariantCulture))
+                    {
+                        case 'i':
+                            columnType = ColumnType.Number;
+                            break;
+                        case 'l':
+                            columnType = ColumnType.Localized;
+                            break;
+                        case 's':
+                            columnType = ColumnType.String;
+                            break;
+                        case 'v':
+                            columnType = ColumnType.Object;
+                            break;
+                        default:
+                            // TODO: error
+                            columnType = ColumnType.Unknown;
+                            break;
+                    }
+                    length = Convert.ToInt32(idtType.Substring(1), CultureInfo.InvariantCulture);
+                    nullable = Char.IsUpper(idtType[0]);
+
+                    // try to get validation information
+                    if (null != validationView)
+                    {
+                        using (var validationRecord = new Record(2))
+                        {
+                            validationRecord.SetString(1, tableName);
+                            validationRecord.SetString(2, columnName);
+
+                            validationView.Execute(validationRecord);
+                        }
+
+                        using (var validationRecord = validationView.Fetch())
+                        {
+                            if (null != validationRecord)
+                            {
+                                var validationNullable = validationRecord.GetString(3);
+                                minValue = validationRecord.IsNull(4) ? null : (int?)validationRecord.GetInteger(4);
+                                maxValue = validationRecord.IsNull(5) ? null : (int?)validationRecord.GetInteger(5);
+                                keyTable = validationRecord.IsNull(6) ? null : validationRecord.GetString(6);
+                                keyColumn = validationRecord.IsNull(7) ? null : (int?)validationRecord.GetInteger(7);
+                                category = validationRecord.IsNull(8) ? null : validationRecord.GetString(8);
+                                set = validationRecord.IsNull(9) ? null : validationRecord.GetString(9);
+                                description = validationRecord.IsNull(10) ? null : validationRecord.GetString(10);
+
+                                // check the validation nullable value against the column definition
+                                if (null == validationNullable)
+                                {
+                                    // TODO: warn for illegal validation nullable column
+                                }
+                                else if ((nullable && "Y" != validationNullable) || (!nullable && "N" != validationNullable))
+                                {
+                                    // TODO: warn for mismatch between column definition and validation nullable
+                                }
+
+                                // convert category to ColumnCategory
+                                if (null != category)
+                                {
+                                    try
+                                    {
+                                        columnCategory = (ColumnCategory)Enum.Parse(typeof(ColumnCategory), category, true);
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        columnCategory = ColumnCategory.Unknown;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // TODO: warn about no validation information
+                            }
+                        }
+                    }
+
+                    // guess the modularization type
+                    if ("Icon" == keyTable && 1 == keyColumn)
+                    {
+                        columnModularizeType = ColumnModularizeType.Icon;
+                    }
+                    else if ("Condition" == columnName)
+                    {
+                        columnModularizeType = ColumnModularizeType.Condition;
+                    }
+                    else if (ColumnCategory.Formatted == columnCategory || ColumnCategory.FormattedSDDLText == columnCategory)
+                    {
+                        columnModularizeType = ColumnModularizeType.Property;
+                    }
+                    else if (ColumnCategory.Identifier == columnCategory)
+                    {
+                        columnModularizeType = ColumnModularizeType.Column;
+                    }
+
+                    columns[i - 1] = new ColumnDefinition(columnName, columnType, length, primary, nullable, columnCategory, minValue, maxValue, keyTable, keyColumn, set, description, columnModularizeType, (ColumnType.Localized == columnType), true);
+                }
+            }
+
+            var tableDefinition = new TableDefinition(tableName, columns, false);
+
+            // use our table definitions if core properties are the same; this allows us to take advantage
+            // of wix concepts like localizable columns which current code assumes
+            if (this.TableDefinitions.Contains(tableName) && 0 == tableDefinition.CompareTo(this.TableDefinitions[tableName]))
+            {
+                tableDefinition = this.TableDefinitions[tableName];
+            }
+            return tableDefinition;
         }
 
         /// <summary>
