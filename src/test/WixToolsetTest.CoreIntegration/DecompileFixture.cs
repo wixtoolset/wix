@@ -153,7 +153,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanDecompileShortcuts()
         {
             var folder = TestData.Get(@"TestData\Shortcut");

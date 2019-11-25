@@ -783,6 +783,7 @@ namespace WixToolset.Core.WindowsInstaller
                 this.FinalizePropertyTable(tables);
                 this.FinalizeRemoveFileTable(tables);
                 this.FinalizeSearchTables(tables);
+                this.FinalizeShortcutTable(tables);
                 this.FinalizeUpgradeTable(tables);
                 this.FinalizeSequenceTables(tables);
                 this.FinalizeVerbTable(tables);
@@ -1360,7 +1361,6 @@ namespace WixToolset.Core.WindowsInstaller
             var extensionTable = tables["Extension"];
             var msiAssemblyTable = tables["MsiAssembly"];
             var publishComponentTable = tables["PublishComponent"];
-            var shortcutTable = tables["Shortcut"];
             var typeLibTable = tables["TypeLib"];
 
             if (null != classTable)
@@ -1392,19 +1392,6 @@ namespace WixToolset.Core.WindowsInstaller
                 foreach (var row in publishComponentTable.Rows)
                 {
                     this.SetPrimaryFeature(row, 4, 2);
-                }
-            }
-
-            if (null != shortcutTable)
-            {
-                foreach (var row in shortcutTable.Rows)
-                {
-                    var target = Convert.ToString(row[4]);
-
-                    if (!target.StartsWith("[", StringComparison.Ordinal) && !target.EndsWith("]", StringComparison.Ordinal))
-                    {
-                        this.SetPrimaryFeature(row, 4, 3);
-                    }
                 }
             }
 
@@ -2430,6 +2417,40 @@ namespace WixToolset.Core.WindowsInstaller
                 if (!used)
                 {
                     // TODO: warn
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finalize the Shortcut table.
+        /// </summary>
+        /// <param name="tables">The collection of all tables.</param>
+        /// <remarks>
+        /// Sets Advertise to yes if Target points to a Feature.
+        /// Occurs during finalization because it has to check against every feature row.
+        /// </remarks>
+        private void FinalizeShortcutTable(TableIndexedCollection tables)
+        {
+            var shortcutTable = tables["Shortcut"];
+            if (null == shortcutTable)
+            {
+                return;
+            }
+
+            foreach (var row in shortcutTable.Rows)
+            {
+                var shortcut = (Wix.Shortcut)this.core.GetIndexedElement(row);
+                var target = Convert.ToString(row[4]);
+                var feature = this.core.GetIndexedElement("Feature", target);
+                if (feature == null)
+                {
+                    // TODO: use this value to do a "more-correct" nesting under the indicated File or CreateDirectory element
+                    shortcut.Target = target;
+                }
+                else
+                {
+                    shortcut.Advertise = Wix.YesNoType.yes;
+                    this.SetPrimaryFeature(row, 4, 3);
                 }
             }
         }
@@ -8439,19 +8460,6 @@ namespace WixToolset.Core.WindowsInstaller
                 else if (null != names[0])
                 {
                     shortcut.Name = names[0];
-                }
-
-                var target = Convert.ToString(row[4]);
-                if (target.StartsWith("[", StringComparison.Ordinal) && target.EndsWith("]", StringComparison.Ordinal))
-                {
-                    // TODO: use this value to do a "more-correct" nesting under the indicated File or CreateDirectory element
-                    shortcut.Target = target;
-                }
-                else
-                {
-                    shortcut.Advertise = Wix.YesNoType.yes;
-
-                    // primary feature is set in FinalizeFeatureComponentsTable
                 }
 
                 if (null != row[5])
