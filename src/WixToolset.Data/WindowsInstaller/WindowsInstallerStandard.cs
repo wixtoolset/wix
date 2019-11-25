@@ -90,7 +90,7 @@ namespace WixToolset.Data.WindowsInstaller
         private static readonly WixActionTuple[] standardActions = new[]
         {
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminExecuteSequence/InstallInitialize")) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.AdminExecuteSequence, Overridable = true },
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/InstallInitialize")) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.AdvertiseExecuteSequence, Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/InstallInitialize")) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.AdvertiseExecuteSequence, Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/InstallInitialize")) { Action="InstallInitialize", Sequence=1500, SequenceTable=SequenceTable.InstallExecuteSequence, Overridable = true },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/InstallExecute")) { Action="InstallExecute", Sequence=6500, SequenceTable=SequenceTable.InstallExecuteSequence, Overridable = true, Condition="NOT Installed" },
@@ -98,7 +98,7 @@ namespace WixToolset.Data.WindowsInstaller
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/InstallExecuteAgain")) { Action="InstallExecuteAgain", Sequence=6550, SequenceTable=SequenceTable.InstallExecuteSequence, Overridable = true, Condition="NOT Installed" },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminExecuteSequence/InstallFinalize")) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.AdminExecuteSequence, Overridable = true },
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/InstallFinalize")) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.AdvertiseExecuteSequence, Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/InstallFinalize")) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.AdvertiseExecuteSequence, Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/InstallFinalize")) { Action="InstallFinalize", Sequence=6600, SequenceTable=SequenceTable.InstallExecuteSequence, Overridable = true },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminExecuteSequence/InstallFiles")) { Action="InstallFiles", Sequence=4000, SequenceTable=SequenceTable.AdminExecuteSequence, Overridable = true },
@@ -113,48 +113,48 @@ namespace WixToolset.Data.WindowsInstaller
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminExecuteSequence/CostInitialize")) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdminExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminUISequence/CostInitialize")) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdminUISequence , Overridable = true },
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/CostInitialize")) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/CostInitialize")) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/CostInitialize")) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallUISequence/CostInitialize")) { Action="CostInitialize", Sequence=800, SequenceTable=SequenceTable.InstallUISequence , Overridable = true },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminExecuteSequence/CostFinalize")) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdminExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminUISequence/CostFinalize")) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdminUISequence , Overridable = true },
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/CostFinalize")) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/CostFinalize")) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/CostFinalize")) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallUISequence/CostFinalize")) { Action="CostFinalize", Sequence=1000, SequenceTable=SequenceTable.InstallUISequence , Overridable = true },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminExecuteSequence/InstallValidate")) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.AdminExecuteSequence , Overridable = true },
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/InstallValidate")) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/InstallValidate")) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/InstallValidate")) { Action="InstallValidate", Sequence=1400, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdminUISequence/ExecuteAction")) { Action="ExecuteAction", Sequence=1300, SequenceTable=SequenceTable.AdminUISequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallUISequence/ExecuteAction")) { Action="ExecuteAction", Sequence=1300, SequenceTable=SequenceTable.InstallUISequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/CreateShortcuts")) { Action="CreateShortcuts", Sequence=4500, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/CreateShortcuts")) { Action="CreateShortcuts", Sequence=4500, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/CreateShortcuts")) { Action="CreateShortcuts", Sequence=4500, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/MsiPublishAssemblies")) { Action="MsiPublishAssemblies", Sequence=6250, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/MsiPublishAssemblies")) { Action="MsiPublishAssemblies", Sequence=6250, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/MsiPublishAssemblies")) { Action="MsiPublishAssemblies", Sequence=6250, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/PublishComponents")) { Action="PublishComponents", Sequence=6200, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/PublishComponents")) { Action="PublishComponents", Sequence=6200, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/PublishComponents")) { Action="PublishComponents", Sequence=6200, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/PublishFeatures")) { Action="PublishFeatures", Sequence=6300, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/PublishFeatures")) { Action="PublishFeatures", Sequence=6300, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/PublishFeatures")) { Action="PublishFeatures", Sequence=6300, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/PublishProduct")) { Action="PublishProduct", Sequence=6400, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/PublishProduct")) { Action="PublishProduct", Sequence=6400, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/PublishProduct")) { Action="PublishProduct", Sequence=6400, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/RegisterClassInfo")) { Action="RegisterClassInfo", Sequence=4600, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/RegisterClassInfo")) { Action="RegisterClassInfo", Sequence=4600, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/RegisterClassInfo")) { Action="RegisterClassInfo", Sequence=4600, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/RegisterExtensionInfo")) { Action="RegisterExtensionInfo", Sequence=4700, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/RegisterExtensionInfo")) { Action="RegisterExtensionInfo", Sequence=4700, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/RegisterExtensionInfo")) { Action="RegisterExtensionInfo", Sequence=4700, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/RegisterMIMEInfo")) { Action="RegisterMIMEInfo", Sequence=4900, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/RegisterMIMEInfo")) { Action="RegisterMIMEInfo", Sequence=4900, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/RegisterMIMEInfo")) { Action="RegisterMIMEInfo", Sequence=4900, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
-            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvtExecuteSequence/RegisterProgIdInfo")) { Action="RegisterProgIdInfo", Sequence=4800, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
+            new WixActionTuple(null, new Identifier(AccessModifier.Public, "AdvertiseExecuteSequence/RegisterProgIdInfo")) { Action="RegisterProgIdInfo", Sequence=4800, SequenceTable=SequenceTable.AdvertiseExecuteSequence , Overridable = true },
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/RegisterProgIdInfo")) { Action="RegisterProgIdInfo", Sequence=4800, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
 
             new WixActionTuple(null, new Identifier(AccessModifier.Public, "InstallExecuteSequence/AllocateRegistrySpace")) { Action="AllocateRegistrySpace", Sequence=1550, SequenceTable=SequenceTable.InstallExecuteSequence , Overridable = true },
