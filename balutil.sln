@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "balutil", "src\balutil\balutil.vcxproj", "{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixToolset.Mba.Core", "src\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj", "{E7E1841E-A58E-4901-B9CA-4845B807D45F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}.Release|x64.Build.0 = Release|x64
 		{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}.Release|x86.ActiveCfg = Release|Win32
 		{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}.Release|x86.Build.0 = Release|Win32
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Debug|x64.Build.0 = Debug|Any CPU
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Debug|x86.Build.0 = Debug|Any CPU
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Release|x64.ActiveCfg = Release|Any CPU
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Release|x64.Build.0 = Release|Any 
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Release|x86.ActiveCfg = Release|Any CPU
+		{E7E1841E-A58E-4901-B9CA-4845B807D45F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

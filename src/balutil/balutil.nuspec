@@ -12,7 +12,7 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <dependencies>
-        <dependency id="WixToolset.BootstrapperCore" version="[4,5)" />
+        <dependency id="WixToolset.BootstrapperCore.Native" version="[4,5)" />
         <dependency id="WixToolset.DUtil" version="[4,5)" />
     </dependencies>
   </metadata>
