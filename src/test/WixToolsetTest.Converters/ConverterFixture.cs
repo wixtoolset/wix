@@ -243,6 +243,25 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
+        public void CanKeepCdataWithOnlyWhitespace()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "    <Property Id='Prop'><![CDATA[ ]]></Property>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Wix3Converter(messaging, 2, null, null);
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(0, errors);
+        }
+
+        [Fact]
         public void CanConvertMainNamespace()
         {
             var parse = String.Join(Environment.NewLine,
@@ -400,7 +419,9 @@ namespace WixToolsetTest.Converters
                 "<Include>",
                 "  <?define Version = 1.2.3 ?>",
                 "  <Fragment>",
-                "    <DirectoryRef Id='TARGETDIR' />",
+                "    <DirectoryRef Id='TARGETDIR'>",
+                "      <Directory Id='ANOTHERDIR' Name='Another' />",
+                "    </DirectoryRef>",
                 "  </Fragment>",
                 "</Include>");
 
@@ -409,7 +430,9 @@ namespace WixToolsetTest.Converters
                 "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <?define Version = 1.2.3 ?>",
                 "  <Fragment>",
-                "    <DirectoryRef Id=\"TARGETDIR\" />",
+                "    <DirectoryRef Id=\"TARGETDIR\">",
+                "      <Directory Id=\"ANOTHERDIR\" Name=\"Another\" />",
+                "    </DirectoryRef>",
                 "  </Fragment>",
                 "</Include>");
 

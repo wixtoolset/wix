@@ -255,7 +255,7 @@ namespace WixToolset.Converters
 
         private void EnsurePrecedingWhitespaceRemoved(XText whitespace, XNode node, ConverterTestType testType)
         {
-            if (!String.IsNullOrEmpty(whitespace.Value))
+            if (!String.IsNullOrEmpty(whitespace.Value) && whitespace.NodeType != XmlNodeType.CDATA)
             {
                 var message = testType == ConverterTestType.WhitespacePrecedingEndElementWrong ? "The whitespace preceding this end element is incorrect." : "The whitespace preceding this node is incorrect.";
 
