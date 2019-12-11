@@ -1,11 +1,12 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.BootstrapperCore
+namespace WixToolset.Mba.Core
 {
     using System;
     using System.Configuration;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// Entry point for the MBA host to create and return the IBootstrapperApplication implementation to the engine.
