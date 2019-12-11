@@ -9,11 +9,12 @@ namespace Native
 {
     using namespace System;
     using namespace WixToolset::BootstrapperCore;
+    using namespace WixToolset::Mba::Core;
 
     public ref class TestManagedBootstrapperApplication : BootstrapperApplication
     {
     public:
-        TestManagedBootstrapperApplication(WixToolset::BootstrapperCore::IEngine^ engine)
+        TestManagedBootstrapperApplication(WixToolset::Mba::Core::IEngine^ engine)
             : BootstrapperApplication(engine)
         {
 
