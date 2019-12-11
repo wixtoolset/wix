@@ -85,7 +85,7 @@
 
     <!-- BootstrapperApplicationData tables definition -->
     <Fragment>
-        <CustomTable Id='WixStdbaInformation' BootstrapperApplicationData='yes'>
+        <CustomTable Id='WixStdbaInformation' Unreal='yes'>
             <Column Id='LicenseFile' Category='Text' Type='string' Width='0' Nullable='yes' PrimaryKey='yes' />
             <Column Id='LicenseUrl' Category='Text' Type='string' Width='0' Nullable='yes' PrimaryKey='yes' />
         </CustomTable>

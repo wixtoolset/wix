@@ -62,7 +62,7 @@
     
     <!-- Not sure why we have to redefine the table here. -->
     <Fragment>
-        <CustomTable Id='WixMbaPrereqInformation' BootstrapperApplicationData='yes'>
+        <CustomTable Id='WixMbaPrereqInformation' Unreal='yes'>
             <Column Id='PackageId' Category='Identifier' Type='string' Width='72' PrimaryKey ='yes'/>
             <Column Id='LicenseUrl' Category='Formatted' Type='string' Width='0' Nullable='yes'/>
             <Column Id='LicenseFile' Category='Formatted' Type='string' Width='0' Nullable='yes'/>

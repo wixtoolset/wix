@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <Compile Include="BalExtension.wxs" />
-    <!-- TODO: Reenable when compiling Bundle elements is supported
     <Compile Include="Mba.wxs" />
     <Compile Include="NetFx4AsPrereq.wxs" />
     <Compile Include="NetFx45AsPrereq.wxs" />
@@ -25,7 +24,11 @@
     <Compile Include="NetFx462AsPrereq.wxs" />
     <Compile Include="wixstdba.wxs" />
     <Compile Include="wixstdba_x86.wxs" />
-    -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="caSuffix.wxi" />
+    <None Include="wixstdba_platform.wxi" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <BindInputPaths Include="$(OutputPath)WixstdbaResources\" />
+    <BindInputPaths Include="..\wixstdba\Resources\" />
   </ItemGroup>
 
   <ItemGroup>

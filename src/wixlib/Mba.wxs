@@ -40,39 +40,39 @@
 
     <Fragment>
         <PayloadGroup Id='Mba'>
-            <Payload Compressed='yes' SourceFile='BootstrapperCore.dll' />
+            <Payload Compressed='yes' SourceFile='WixToolset.BootstrapperCore.dll' />
             <Payload Compressed='yes' SourceFile='wixstdba.dll' Name='mbapreq.dll' />
         </PayloadGroup>
     </Fragment>
 
     <Fragment>
         <PayloadGroup Id='MbaPreqStandard'>
-            <Payload Name='mbapreq.thm' Compressed='yes' SourceFile='!(wix.PreqbaThemeXml=SourceDir\WixstdbaResources\mbapreq.thm)' />
-            <Payload Name='mbapreq.png' Compressed='yes' SourceFile='!(wix.PreqbaLogo=SourceDir\WixstdbaResources\mbapreq.png)' />
-            <Payload Name='mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl=SourceDir\WixstdbaResources\mbapreq.wxl)' />
-            <Payload Name='1028\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1028=SourceDir\WixstdbaResources\1028\mbapreq.wxl)' />
-            <Payload Name='1029\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1029=SourceDir\WixstdbaResources\1029\mbapreq.wxl)' />
-            <Payload Name='1030\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1030=SourceDir\WixstdbaResources\1030\mbapreq.wxl)' />
-            <Payload Name='1031\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1031=SourceDir\WixstdbaResources\1031\mbapreq.wxl)' />
-            <Payload Name='1032\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1032=SourceDir\WixstdbaResources\1032\mbapreq.wxl)' />
-            <Payload Name='1035\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1035=SourceDir\WixstdbaResources\1035\mbapreq.wxl)' />
-            <Payload Name='1036\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1036=SourceDir\WixstdbaResources\1036\mbapreq.wxl)' />
-            <Payload Name='1038\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1038=SourceDir\WixstdbaResources\1038\mbapreq.wxl)' />
-            <Payload Name='1040\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1040=SourceDir\WixstdbaResources\1040\mbapreq.wxl)' />
-            <Payload Name='1041\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1041=SourceDir\WixstdbaResources\1041\mbapreq.wxl)' />
-            <Payload Name='1042\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1042=SourceDir\WixstdbaResources\1042\mbapreq.wxl)' />
-            <Payload Name='1043\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1043=SourceDir\WixstdbaResources\1043\mbapreq.wxl)' />
-            <Payload Name='1044\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1044=SourceDir\WixstdbaResources\1044\mbapreq.wxl)' />
-            <Payload Name='1045\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1045=SourceDir\WixstdbaResources\1045\mbapreq.wxl)' />
-            <Payload Name='1046\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1046=SourceDir\WixstdbaResources\1046\mbapreq.wxl)' />
-            <Payload Name='1049\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1049=SourceDir\WixstdbaResources\1049\mbapreq.wxl)' />
-            <Payload Name='1051\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1051=SourceDir\WixstdbaResources\1051\mbapreq.wxl)' />
-            <Payload Name='1053\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1053=SourceDir\WixstdbaResources\1053\mbapreq.wxl)' />
-            <Payload Name='1055\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1055=SourceDir\WixstdbaResources\1055\mbapreq.wxl)' />
-            <Payload Name='1060\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1060=SourceDir\WixstdbaResources\1060\mbapreq.wxl)' />
-            <Payload Name='2052\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl2052=SourceDir\WixstdbaResources\2052\mbapreq.wxl)' />
-            <Payload Name='2070\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl2070=SourceDir\WixstdbaResources\2070\mbapreq.wxl)' />
-            <Payload Name='3082\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl3082=SourceDir\WixstdbaResources\3082\mbapreq.wxl)' />
+            <Payload Name='mbapreq.thm' Compressed='yes' SourceFile='!(wix.PreqbaThemeXml=SourceDir\mbapreq.thm)' />
+            <Payload Name='mbapreq.png' Compressed='yes' SourceFile='!(wix.PreqbaLogo=SourceDir\mbapreq.png)' />
+            <Payload Name='mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl=SourceDir\mbapreq.wxl)' />
+            <Payload Name='1028\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1028=SourceDir\1028\mbapreq.wxl)' />
+            <Payload Name='1029\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1029=SourceDir\1029\mbapreq.wxl)' />
+            <Payload Name='1030\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1030=SourceDir\1030\mbapreq.wxl)' />
+            <Payload Name='1031\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1031=SourceDir\1031\mbapreq.wxl)' />
+            <Payload Name='1032\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1032=SourceDir\1032\mbapreq.wxl)' />
+            <Payload Name='1035\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1035=SourceDir\1035\mbapreq.wxl)' />
+            <Payload Name='1036\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1036=SourceDir\1036\mbapreq.wxl)' />
+            <Payload Name='1038\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1038=SourceDir\1038\mbapreq.wxl)' />
+            <Payload Name='1040\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1040=SourceDir\1040\mbapreq.wxl)' />
+            <Payload Name='1041\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1041=SourceDir\1041\mbapreq.wxl)' />
+            <Payload Name='1042\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1042=SourceDir\1042\mbapreq.wxl)' />
+            <Payload Name='1043\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1043=SourceDir\1043\mbapreq.wxl)' />
+            <Payload Name='1044\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1044=SourceDir\1044\mbapreq.wxl)' />
+            <Payload Name='1045\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1045=SourceDir\1045\mbapreq.wxl)' />
+            <Payload Name='1046\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1046=SourceDir\1046\mbapreq.wxl)' />
+            <Payload Name='1049\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1049=SourceDir\1049\mbapreq.wxl)' />
+            <Payload Name='1051\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1051=SourceDir\1051\mbapreq.wxl)' />
+            <Payload Name='1053\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1053=SourceDir\1053\mbapreq.wxl)' />
+            <Payload Name='1055\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1055=SourceDir\1055\mbapreq.wxl)' />
+            <Payload Name='1060\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl1060=SourceDir\1060\mbapreq.wxl)' />
+            <Payload Name='2052\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl2052=SourceDir\2052\mbapreq.wxl)' />
+            <Payload Name='2070\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl2070=SourceDir\2070\mbapreq.wxl)' />
+            <Payload Name='3082\mbapreq.wxl' Compressed='yes' SourceFile='!(wix.PreqbaThemeWxl3082=SourceDir\3082\mbapreq.wxl)' />
         </PayloadGroup>
     </Fragment>
 </Wix>

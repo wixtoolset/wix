@@ -50,6 +50,10 @@
     <None Include="packages.config" />
   </ItemGroup>
 
+  <ItemGroup>
+    <MbaHostDependency Include="..\..\packages\WixToolset.BootstrapperCore.4.0.5\lib\net20\WixToolset.BootstrapperCore.dll" />
+  </ItemGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -60,5 +64,9 @@
     <Error Condition="!Exists('..\..\packages\WixToolset.BootstrapperCore.4.0.5\build\WixToolset.BootstrapperCore.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.BootstrapperCore.4.0.5\build\WixToolset.BootstrapperCore.props'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props'))" />
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+  </Target>
+
+  <Target Name="CopyMbaHostDependencies" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(MbaHostDependency)" SkipUnchangedFiles="true" />
   </Target>
 </Project>
