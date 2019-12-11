@@ -3,6 +3,6 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <WixTargetsPath Condition=" '$(Configuration)' == 'Debug' And Exists('$(MSBuildThisFileDirectory)..\..\Tools\README.md') ">$(MSBuildThisFileDirectory)..\..\Tools\build\Debug\net461\wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(Configuration)' == 'Debug' And Exists('$(MSBuildThisFileDirectory)..\..\Tools\README.md') And Exists('$(MSBuildThisFileDirectory)..\..\Tools\build\Debug\net461\wix.targets') ">$(MSBuildThisFileDirectory)..\..\Tools\build\Debug\net461\wix.targets</WixTargetsPath>
   </PropertyGroup>
 </Project>
