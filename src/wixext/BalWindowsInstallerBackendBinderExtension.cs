@@ -6,6 +6,7 @@ namespace WixToolset.Bal
     using System.Linq;
     using System.Xml;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
@@ -13,9 +14,6 @@ namespace WixToolset.Bal
 
     public class BalWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        // TODO: don't duplicate this from WixToolset.Core.Compiler
-        public const string BurnUXContainerId = "WixUXContainer";
-
         private static readonly TableDefinition[] Tables = LoadTables();
 
         protected override TableDefinition[] TableDefinitionsForTuples => Tables;
@@ -30,11 +28,11 @@ namespace WixToolset.Bal
             }
         }
 
-        public override void PostBackendBind(BindResult result, Pdb pdb)
+        public override void PostBackendBind(IBindResult result, WixOutput wixout)
         {
-            base.PostBackendBind(result, pdb);
+            base.PostBackendBind(result, wixout);
 
-            var output = pdb.Output;
+            var output = WindowsInstallerData.Load(wixout.Uri.AbsoluteUri, false);
 
             // Only process Bundles.
             if (OutputType.Bundle != output.Type)
@@ -64,7 +62,7 @@ namespace WixToolset.Bal
             }
         }
 
-        private void VerifyBAFunctions(Output output)
+        private void VerifyBAFunctions(WindowsInstallerData output)
         {
             Row baFunctionsRow = null;
             var baFunctionsTable = output.Tables["WixBalBAFunctions"];
@@ -98,14 +96,14 @@ namespace WixToolset.Bal
                 // TODO: May need to revisit this depending on the outcome of #5273.
                 var payloadId = (string)baFunctionsRow[0];
                 var bundlePayloadRow = payloadPropertiesRows.Single(x => payloadId == x.Id);
-                if (BurnUXContainerId != bundlePayloadRow.Container)
+                if (BurnConstants.BurnUXContainerName != bundlePayloadRow.Container)
                 {
                     this.Messaging.Write(BalErrors.BAFunctionsPayloadRequiredInUXContainer(baFunctionsRow.SourceLineNumbers));
                 }
             }
         }
 
-        private void VerifyPrereqPackages(Output output)
+        private void VerifyPrereqPackages(WindowsInstallerData output)
         {
             var prereqInfoTable = output.Tables["WixMbaPrereqInformation"];
             if (null == prereqInfoTable || prereqInfoTable.Rows.Count == 0)
