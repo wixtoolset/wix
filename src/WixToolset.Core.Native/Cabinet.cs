@@ -108,7 +108,7 @@ namespace WixToolset.Core.Native
             }
 
             var wixnative = new WixNativeExe("extractcab", this.Path, outputFolder);
-            return wixnative.Run();
+            return wixnative.Run().Where(output => !String.IsNullOrWhiteSpace(output));
         }
 
 #if TOOD_ERROR_HANDLING

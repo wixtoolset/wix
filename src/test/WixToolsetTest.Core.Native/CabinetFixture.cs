@@ -56,9 +56,9 @@ namespace WixToolsetTest.CoreNative
                 var extractFolder = fs.GetFolder(true);
 
                 var cabinet = new Cabinet(cabinetPath);
-                cabinet.Extract(extractFolder);
-
+                var reportedFiles = cabinet.Extract(extractFolder);
                 var files = Directory.EnumerateFiles(extractFolder);
+                Assert.Equal(reportedFiles, files.Select(f => Path.GetFileName(f)));
 
                 var file = new FileInfo(files.Single());
                 CabInterop.DateTimeToCabDateAndTime(file.CreationTime, out var date, out var time);
@@ -81,7 +81,10 @@ namespace WixToolsetTest.CoreNative
 
                 // Compress.
                 {
-                    var files = new[] { new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test.txt") };
+                    var files = new[] {
+                        new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test1.txt"),
+                        new CabinetCompressFile(TestData.Get(@"TestData\test.txt"), "test2.txt"),
+                    };
 
                     var cabinet = new Cabinet(cabinetPath);
                     cabinet.Compress(files, CompressionLevel.Low);
@@ -90,7 +93,8 @@ namespace WixToolsetTest.CoreNative
                 // Extract.
                 {
                     var cabinet = new Cabinet(cabinetPath);
-                    cabinet.Extract(extractFolder);
+                    var reportedFiles = cabinet.Extract(extractFolder);
+                    Assert.Equal(2, reportedFiles.Count());
                 }
 
                 // Enumerate to compare cabinet to extracted files.
@@ -100,7 +104,7 @@ namespace WixToolsetTest.CoreNative
 
                     var files = Directory.EnumerateFiles(extractFolder).OrderBy(f => f).ToArray();
 
-                    for (var i =0; i < enumerated.Length; ++i)
+                    for (var i = 0; i < enumerated.Length; ++i)
                     {
                         var cabFileInfo = enumerated[i];
                         var fileInfo = new FileInfo(files[i]);
