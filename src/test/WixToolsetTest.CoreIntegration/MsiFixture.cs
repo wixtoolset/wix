@@ -277,9 +277,9 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var error = section.Tuples.OfType<ErrorTuple>().Single();
-                Assert.Equal(1234, error.Error);
-                Assert.Equal("Category 55 Emergency Doomsday Crisis", error.Message.Trim());
+                var errors = section.Tuples.OfType<ErrorTuple>().ToDictionary(t => t.Error);
+                Assert.Equal("Category 55 Emergency Doomsday Crisis", errors[1234].Message.Trim());
+                Assert.Equal(" ", errors[5678].Message);
             }
         }
 

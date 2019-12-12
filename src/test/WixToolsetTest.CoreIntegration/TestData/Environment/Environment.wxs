@@ -7,6 +7,7 @@
                 <Environment Id="WixEnvironmentTest2" Action="create" Name="WixEnvTest1"/>
                 <Environment Id="WixEnvironmentTest3" Action="remove" Name="WixEnvTest1"/>
                 <Environment Id="WixEnvironmentTest4" Name="WIX" Action="set" System="yes" Value="[INSTALLFOLDER]" />
+                <Environment Id="PATH" Name="PATH" Action="set" Part="first" Value="[INSTALLFOLDER]; " System="yes" />
             </Component>
         </ComponentGroup>
     </Fragment>

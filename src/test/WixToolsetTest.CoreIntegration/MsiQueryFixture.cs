@@ -454,6 +454,7 @@ namespace WixToolsetTest.CoreIntegration
                 var results = Query.QueryDatabase(msiPath, new[] { "Environment" });
                 Assert.Equal(new[]
                 {
+                    "Environment:PATH\t=-*PATH\t[INSTALLFOLDER]; ;[~]\tWixEnvironmentTest",
                     "Environment:WixEnvironmentTest1\t=-WixEnvTest1\t\tWixEnvironmentTest",
                     "Environment:WixEnvironmentTest2\t+-WixEnvTest1\t\tWixEnvironmentTest",
                     "Environment:WixEnvironmentTest3\t!-WixEnvTest1\t\tWixEnvironmentTest",

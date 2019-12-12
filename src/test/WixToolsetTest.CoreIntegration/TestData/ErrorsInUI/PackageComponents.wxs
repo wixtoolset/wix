@@ -5,6 +5,7 @@
             <Error Id="1234">
                 Category 55 Emergency Doomsday Crisis
             </Error>
+            <Error Id="5678"><![CDATA[ ]]></Error>
         </UI>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component>
