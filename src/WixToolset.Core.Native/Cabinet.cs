@@ -100,7 +100,7 @@ namespace WixToolset.Core.Native
         /// Extracts all the files from a cabinet to a directory.
         /// </summary>
         /// <param name="outputFolder">Directory to extract files to.</param>
-        public void Extract(string outputFolder)
+        public IEnumerable<string> Extract(string outputFolder)
         {
             if (!outputFolder.EndsWith("\\", StringComparison.Ordinal))
             {
@@ -108,7 +108,7 @@ namespace WixToolset.Core.Native
             }
 
             var wixnative = new WixNativeExe("extractcab", this.Path, outputFolder);
-            wixnative.Run();
+            return wixnative.Run();
         }
 
 #if TOOD_ERROR_HANDLING
