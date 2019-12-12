@@ -7,6 +7,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
@@ -129,15 +130,13 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     try
                     {
                         var cabinet = new Cabinet(cabinetFile);
-                        cabinet.Extract(this.ExportBasePath);
+                        this.ExtractedFiles = cabinet.Extract(this.ExportBasePath).ToArray();
                     }
                     catch (FileNotFoundException)
                     {
                         throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.InputFilePath), cabinetFile));
                     }
                 }
-
-                this.ExtractedFiles = Directory.GetFiles(this.ExportBasePath);
             }
             else
             {
