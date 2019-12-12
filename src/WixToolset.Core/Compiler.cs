@@ -7299,7 +7299,7 @@ namespace WixToolset.Core
                 }
             }
 
-            if (!compressionLevel.HasValue && null == cabinet)
+            if (compressionLevel.HasValue && String.IsNullOrEmpty(cabinet))
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Cabinet", "CompressionLevel"));
             }
