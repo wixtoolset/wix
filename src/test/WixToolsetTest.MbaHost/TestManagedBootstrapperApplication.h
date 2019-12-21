@@ -8,7 +8,6 @@ namespace MbaHost
 namespace Native
 {
     using namespace System;
-    using namespace WixToolset::BootstrapperCore;
     using namespace WixToolset::Mba::Core;
 
     public ref class TestManagedBootstrapperApplication : BootstrapperApplication

@@ -40,8 +40,7 @@
 
     <Fragment>
         <PayloadGroup Id='Mba'>
-            <Payload Compressed='yes' SourceFile='WixToolset.BootstrapperCore.dll' />
-            <Payload Compressed='yes' SourceFile='WixToolset.Mba.Core.dll' />
+            <Payload Compressed='yes' SourceFile='WixToolset.Mba.Host.dll' />
             <Payload Compressed='yes' SourceFile='wixstdba.dll' Name='mbapreq.dll' />
         </PayloadGroup>
     </Fragment>

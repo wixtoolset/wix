@@ -1,8 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include <WixToolset.Mba.Core.h> // includes the generated assembly name macros.
-#include "BalBaseBootstrapperApplicationProc.h"
+#include <WixToolset.Mba.Host.h> // includes the generated assembly name macros.
 
 static const DWORD NET452_RELEASE = 379893;
 
@@ -50,7 +49,6 @@ static HRESULT GetCLRHost(
     );
 static HRESULT CreateManagedBootstrapperApplication(
     __in _AppDomain* pAppDomain,
-    __in IBootstrapperEngine* pEngine,
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
     __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
     );
@@ -109,7 +107,7 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     {
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading managed bootstrapper application.");
 
-        hr = CreateManagedBootstrapperApplication(vpAppDomain, pEngine, pArgs, pResults);
+        hr = CreateManagedBootstrapperApplication(vpAppDomain, pArgs, pResults);
         BalExitOnFailure(hr, "Failed to create the managed bootstrapper application.");
     }
     else // fallback to the prerequisite BA.
@@ -185,7 +183,7 @@ static HRESULT GetAppDomain(
     hr = GetAppBase(&sczAppBase);
     ExitOnFailure(hr, "Failed to get the host base path.");
 
-    hr = PathConcat(sczAppBase, L"WixToolset.Mba.Core.config", &sczConfigPath);
+    hr = PathConcat(sczAppBase, MBA_CONFIG_FILE_NAME, &sczConfigPath);
     ExitOnFailure(hr, "Failed to get the full path to the application configuration file.");
 
     // Check that the supported framework is installed.
@@ -514,27 +512,20 @@ LExit:
 // Creates the bootstrapper app and returns it for the engine.
 static HRESULT CreateManagedBootstrapperApplication(
     __in _AppDomain* pAppDomain,
-    __in IBootstrapperEngine* pEngine,
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
     __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
     )
 {
     HRESULT hr = S_OK;
     IBootstrapperApplicationFactory* pAppFactory = NULL;
-    IBootstrapperApplication* pApp = NULL;
 
     hr = CreateManagedBootstrapperApplicationFactory(pAppDomain, &pAppFactory);
     ExitOnFailure(hr, "Failed to create the factory to create the bootstrapper application.");
 
-    hr = pAppFactory->Create(pEngine, pArgs->pCommand, &pApp);
+    hr = pAppFactory->Create(pArgs, pResults);
     ExitOnFailure(hr, "Failed to create the bootstrapper application.");
 
-    pResults->pfnBootstrapperApplicationProc = BalBaseBootstrapperApplicationProc;
-    pResults->pvBootstrapperApplicationProcContext = pApp;
-    pApp = NULL;
-
 LExit:
-    ReleaseNullObject(pApp);
     ReleaseNullObject(pAppFactory);
 
     return hr;
@@ -557,7 +548,7 @@ static HRESULT CreateManagedBootstrapperApplicationFactory(
     bstrAssemblyName = ::SysAllocString(MBA_ASSEMBLY_FULL_NAME);
     ExitOnNull(bstrAssemblyName, hr, E_OUTOFMEMORY, "Failed to allocate the full assembly name for the bootstrapper application factory.");
 
-    bstrTypeName = ::SysAllocString(L"WixToolset.Mba.Core.BootstrapperApplicationFactory");
+    bstrTypeName = ::SysAllocString(MBA_ENTRY_TYPE);
     ExitOnNull(bstrTypeName, hr, E_OUTOFMEMORY, "Failed to allocate the full type name for the BA factory.");
 
     hr = pAppDomain->CreateInstance(bstrAssemblyName, bstrTypeName, &pObj);
