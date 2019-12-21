@@ -98,6 +98,7 @@ extern "C" HRESULT EngineRun(
     BOOL fRestart = FALSE;
 
     BURN_ENGINE_STATE engineState = { };
+    engineState.command.cbSize = sizeof(BOOTSTRAPPER_COMMAND);
 
     // Always initialize logging first
     LogInitialize(::GetModuleHandleW(NULL));
