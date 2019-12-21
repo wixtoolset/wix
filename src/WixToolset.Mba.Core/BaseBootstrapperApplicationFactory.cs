@@ -2,8 +2,6 @@
 
 namespace WixToolset.Mba.Core
 {
-    using WixToolset.BootstrapperCore;
-
     public abstract class BaseBootstrapperApplicationFactory : IBootstrapperApplicationFactory
     {
         public IBootstrapperApplication Create(IBootstrapperEngine pEngine, ref Command command)

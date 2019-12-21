@@ -5,7 +5,6 @@ namespace WixToolset.Mba.Core
     using System;
     using System.ComponentModel;
     using System.Security;
-    using WixToolset.BootstrapperCore;
 
     public interface IEngine
     {

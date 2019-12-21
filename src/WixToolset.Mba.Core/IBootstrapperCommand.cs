@@ -3,7 +3,6 @@
 namespace WixToolset.Mba.Core
 {
     using System;
-    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// Command information passed from the engine for the BA to perform.

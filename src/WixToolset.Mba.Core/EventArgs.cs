@@ -5,7 +5,6 @@ namespace WixToolset.Mba.Core
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// Base class for BA <see cref="EventArgs"/> classes.

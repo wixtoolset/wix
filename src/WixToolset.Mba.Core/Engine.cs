@@ -7,7 +7,6 @@ namespace WixToolset.Mba.Core
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Text;
-    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// Container class for the <see cref="IBootstrapperEngine"/> interface.

@@ -5,7 +5,6 @@ namespace WixToolset.Mba.Core
     using System;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// The default bootstrapper application.
@@ -1574,7 +1573,7 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.BAProc(BOOTSTRAPPER_APPLICATION_MESSAGE message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
+        int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
         {
             switch (message)
             {
@@ -1583,7 +1582,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        void IBootstrapperApplication.BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE message, IntPtr pvArgs, IntPtr pvResults, ref int phr, IntPtr pvContext)
+        void IBootstrapperApplication.BAProcFallback(int message, IntPtr pvArgs, IntPtr pvResults, ref int phr, IntPtr pvContext)
         {
         }
 

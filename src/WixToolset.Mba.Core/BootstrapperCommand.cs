@@ -5,7 +5,6 @@ namespace WixToolset.Mba.Core
     using System;
     using System.ComponentModel;
     using System.Runtime.InteropServices;
-    using WixToolset.BootstrapperCore;
 
     public sealed class BootstrapperCommand : IBootstrapperCommand
     {

@@ -35,9 +35,11 @@
     <Compile Include="EventArgs.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="HostSection.cs" />
+    <Compile Include="IBootstrapperApplication.cs" />
     <Compile Include="IBootstrapperApplicationData.cs" />
     <Compile Include="IBootstrapperApplicationFactory.cs" />
     <Compile Include="IBootstrapperCommand.cs" />
+    <Compile Include="IBootstrapperEngine.cs" />
     <Compile Include="IBundleInfo.cs" />
     <Compile Include="IDefaultBootstrapperApplication.cs" />
     <Compile Include="IEngine.cs" />
@@ -62,9 +64,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WixToolset.BootstrapperCore">
-      <HintPath>..\..\packages\WixToolset.BootstrapperCore.4.0.8\lib\net20\WixToolset.BootstrapperCore.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <HeaderPath Include="$(BaseOutputPath)$(Configuration)\$(AssemblyName).h">

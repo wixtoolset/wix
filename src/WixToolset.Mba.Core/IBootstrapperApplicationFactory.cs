@@ -5,7 +5,6 @@ namespace WixToolset.Mba.Core
     using System;
     using System.CodeDom.Compiler;
     using System.Runtime.InteropServices;
-    using WixToolset.BootstrapperCore;
 
     [ComVisible(true)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

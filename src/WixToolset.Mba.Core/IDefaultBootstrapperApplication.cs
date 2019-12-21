@@ -3,7 +3,6 @@
 namespace WixToolset.Mba.Core
 {
     using System;
-    using WixToolset.BootstrapperCore;
 
     public interface IDefaultBootstrapperApplication : IBootstrapperApplication
     {

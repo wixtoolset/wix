@@ -6,7 +6,6 @@ namespace WixToolset.Mba.Core
     using System.Configuration;
     using System.Reflection;
     using System.Runtime.InteropServices;
-    using WixToolset.BootstrapperCore;
 
     /// <summary>
     /// Entry point for the MBA host to create and return the IBootstrapperApplication implementation to the engine.
