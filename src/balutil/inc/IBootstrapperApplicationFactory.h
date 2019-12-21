@@ -7,8 +7,7 @@
 DECLARE_INTERFACE_IID_(IBootstrapperApplicationFactory, IUnknown, "2965A12F-AC7B-43A0-85DF-E4B2168478A4")
 {
     STDMETHOD(Create)(
-        __in IBootstrapperEngine* pEngine,
-        __in const BOOTSTRAPPER_COMMAND *pCommand,
-        __out IBootstrapperApplication **ppApplication
+        __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
+        __inout BOOTSTRAPPER_CREATE_RESULTS *pResults
         );
 };

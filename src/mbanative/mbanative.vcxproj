@@ -25,67 +25,46 @@
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}</ProjectGuid>
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <TargetName>balutil</TargetName>
+    <ProjectGuid>{665E0441-17F9-4105-B202-EDF274657F6E}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <Description>WiX Toolset Bootstrapper Application Layer native utility library</Description>
+    <CharacterSet>Unicode</CharacterSet>
+    <TargetName>mbanative</TargetName>
+    <ProjectModuleDefinitionFile>mbanative.def</ProjectModuleDefinitionFile>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
   <Import Project="..\NativeMultiTargeting.Build.props" />
 
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>..\balutil\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>balutil.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="BalBootstrapperEngine.cpp" />
-    <ClCompile Include="balcondition.cpp" />
-    <ClCompile Include="balinfo.cpp" />
-    <ClCompile Include="balretry.cpp" />
-    <ClCompile Include="balutil.cpp" />
+    <ClCompile Include="mbanative.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\BAFunctions.h" />
-    <ClInclude Include="inc\BalBaseBAFunctions.h" />
-    <ClInclude Include="inc\BalBaseBAFunctionsProc.h" />
-    <ClInclude Include="inc\BalBaseBootstrapperApplication.h" />
-    <ClInclude Include="inc\BalBaseBootstrapperApplicationProc.h" />
-    <ClInclude Include="inc\BalBootstrapperEngine.h" />
-    <ClInclude Include="inc\balcondition.h" />
-    <ClInclude Include="inc\balinfo.h" />
-    <ClInclude Include="inc\balretry.h" />
-    <ClInclude Include="inc\balutil.h" />
-    <ClInclude Include="inc\IBAFunctions.h" />
-    <ClInclude Include="inc\IBootstrapperApplication.h" />
-    <ClInclude Include="inc\IBootstrapperApplicationFactory.h" />
-    <ClInclude Include="inc\IBootstrapperEngine.h" />
     <ClInclude Include="precomp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mbanative.def" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
 
-  <Target Name="Pack"
-          DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack balutil.nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=WixToolset.BalUtil;Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\balutil\balutil.vcxproj" />
+  </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

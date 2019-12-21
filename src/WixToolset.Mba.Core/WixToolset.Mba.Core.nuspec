@@ -7,7 +7,7 @@
     <owners>WiX Toolset Team</owners>
     <!-- <license type="expression">MS-RL</license> -->
     <licenseUrl>https://licenses.nuget.org/MS-RL</licenseUrl>
-    <projectUrl>https://github.com/wixtoolset/BootstrapperCore</projectUrl>
+    <projectUrl>https://github.com/wixtoolset/balutil</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
@@ -15,6 +15,8 @@
 
   <files>
     <file src="..\..\build\$configuration$\$id$.config" target="samples" />
+    <file src="build\net20\$id$.props" target="build\net20" />
+    <file src="..\..\build\$configuration$\v141_xp\x86\mbanative.dll" target="build\net20\x86" />
     <file src="..\..\build\$configuration$\$id$.h" target="build\native\include" />
     <file src="..\..\build\$configuration$\$id$.dll" target="lib\net20" />
   </files>

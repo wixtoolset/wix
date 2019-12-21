@@ -8,7 +8,7 @@ namespace WixToolset.Mba.Core
     using System.Runtime.InteropServices;
 
     /// <summary>
-    /// Entry point for the MBA host to create and return the IBootstrapperApplication implementation to the engine.
+    /// Entry point for the MBA host to create and return the BA to the engine.
     /// </summary>
     [ClassInterface(ClassInterfaceType.None)]
     public sealed class BootstrapperApplicationFactory : MarshalByRefObject, IBootstrapperApplicationFactory
@@ -21,14 +21,13 @@ namespace WixToolset.Mba.Core
         }
 
         /// <summary>
-        /// Loads the bootstrapper application assembly and creates an instance of the IBootstrapperApplication.
+        /// Loads the bootstrapper application assembly and calls its IBootstrapperApplicationFactory.Create method.
         /// </summary>
-        /// <param name="pEngine">IBootstrapperEngine provided for the bootstrapper application.</param>
-        /// <param name="command">Command line for the bootstrapper application.</param>
-        /// <returns>Bootstrapper application via <see cref="IBootstrapperApplication"/> interface.</returns>
+        /// <param name="pArgs">Pointer to BOOTSTRAPPER_CREATE_ARGS struct.</param>
+        /// <param name="pResults">Pointer to BOOTSTRAPPER_CREATE_RESULTS struct.</param>
         /// <exception cref="MissingAttributeException">The bootstrapper application assembly
         /// does not define the <see cref="BootstrapperApplicationFactoryAttribute"/>.</exception>
-        public IBootstrapperApplication Create(IBootstrapperEngine pEngine, ref Command command)
+        public void Create(IntPtr pArgs, IntPtr pResults)
         {
             // Get the wix.boostrapper section group to get the name of the bootstrapper application assembly to host.
             var section = ConfigurationManager.GetSection("wix.bootstrapper/host") as HostSection;
@@ -45,8 +44,7 @@ namespace WixToolset.Mba.Core
                 throw new InvalidBootstrapperApplicationFactoryException();
             }
 
-            var ba = baFactory.Create(pEngine, ref command);
-            return ba;
+            baFactory.Create(pArgs, pResults);
         }
 
         /// <summary>

@@ -23,6 +23,7 @@
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BalUtil.cs" />
     <Compile Include="BaseBootstrapperApplicationFactory.cs" />
     <Compile Include="BootstrapperApplication.cs" />
     <Compile Include="BootstrapperApplicationData.cs" />

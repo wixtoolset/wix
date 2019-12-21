@@ -12,9 +12,9 @@ namespace WixToolset.Mba.Core
     [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
     public interface IBootstrapperApplicationFactory
     {
-        IBootstrapperApplication Create(
-            [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
-            ref Command command
+        void Create(
+            IntPtr pArgs,
+            IntPtr pResults
             );
     }
 
@@ -23,6 +23,7 @@ namespace WixToolset.Mba.Core
     [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
     public struct Command
     {
+        [MarshalAs(UnmanagedType.I4)] internal int cbSize;
         [MarshalAs(UnmanagedType.U4)] private readonly LaunchAction action;
         [MarshalAs(UnmanagedType.U4)] private readonly Display display;
         [MarshalAs(UnmanagedType.U4)] private readonly Restart restart;
@@ -47,6 +48,27 @@ namespace WixToolset.Mba.Core
                 this.relation,
                 this.passthrough,
                 this.wzLayoutDirectory);
+        }
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
+    public struct BootstrapperCreateArgs
+    {
+        [MarshalAs(UnmanagedType.I4)] public readonly int cbSize;
+        [MarshalAs(UnmanagedType.I8)] public readonly long qwEngineAPIVersion;
+        public readonly IntPtr pfnBootstrapperEngineProc;
+        public readonly IntPtr pvBootstrapperEngineProcContext;
+        public readonly IntPtr pCommand;
+
+        public BootstrapperCreateArgs(long version, IntPtr pEngineProc, IntPtr pEngineContext, IntPtr pCommand)
+        {
+            this.cbSize = Marshal.SizeOf(typeof(BootstrapperCreateArgs));
+            this.qwEngineAPIVersion = version;
+            this.pfnBootstrapperEngineProc = pEngineProc;
+            this.pvBootstrapperEngineProcContext = pEngineContext;
+            this.pCommand = pCommand;
         }
     }
 }
