@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\..\packages\WixToolset.Mba.Core.4.0.12\build\net20\WixToolset.Mba.Core.props" Condition="Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.12\build\net20\WixToolset.Mba.Core.props')" />
+  <PropertyGroup>
+    <ProjectGuid>{CC4236FC-226E-4232-AB50-24CBEC4D314D}</ProjectGuid>
+    <AssemblyName>Example.FullFramework2MBA</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Example.FullFramework2MBA</RootNamespace>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <CreateDocumentation>false</CreateDocumentation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="FullFramework2BA.cs" />
+    <Compile Include="FullFramework2BAFactory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BootstrapperApplicationData.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WixToolset.Mba.Core">
+      <HintPath>..\..\..\..\packages\WixToolset.Mba.Core.4.0.12\lib\net20\WixToolset.Mba.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\mbahost\mbahost.vcxproj">
+      <Project>{12c87c77-3547-44f8-8134-29bc915cb19d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj">
+      <Project>{F2BA1935-70FA-4156-B161-FD03850B4FAA}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <MbaHostDependency Include="$(BaseOutputPath)$(Configuration)\Win32\mbahost.dll" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+
+  <Import Project="..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.12\build\net20\WixToolset.Mba.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.Mba.Core.4.0.12\build\net20\WixToolset.Mba.Core.props'))" />
+    <Error Condition="!Exists('..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+  </Target>
+
+  <Target Name="CopyMbaHostDependencies" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(MbaHostDependency)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

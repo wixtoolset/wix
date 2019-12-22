@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\..\packages\WixToolset.BalUtil.4.0.12\build\WixToolset.BalUtil.props" Condition="Exists('..\..\..\..\packages\WixToolset.BalUtil.4.0.12\build\WixToolset.BalUtil.props')" />
+  <Import Project="..\..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.10\build\WixToolset.BootstrapperCore.Native.props" Condition="Exists('..\..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.10\build\WixToolset.BootstrapperCore.Native.props')" />
+  <Import Project="..\..\..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props" Condition="Exists('..\..\..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3D44B67D-A475-49BA-8310-E39F6C117CC9}</ProjectGuid>
+    <ConfigurationType>Application</ConfigurationType>
+    <ProjectSubSystem>Console</ProjectSubSystem>
+    <TargetName>Example.TestEngine</TargetName>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+    <Import Project="..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  </ImportGroup>
+  <PropertyGroup>
+    <ProjectAdditionalLinkLibraries>
+    </ProjectAdditionalLinkLibraries>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ShutdownEngine.cpp" />
+    <ClCompile Include="ExampleTestEngine.cpp" />
+    <ClCompile Include="TestEngine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="TestEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\..\..\packages\WixToolset.BalUtil.4.0.12\build\WixToolset.BalUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.BalUtil.4.0.12\build\WixToolset.BalUtil.props'))" />
+    <Error Condition="!Exists('..\..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.10\build\WixToolset.BootstrapperCore.Native.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.BootstrapperCore.Native.4.0.10\build\WixToolset.BootstrapperCore.Native.props'))" />
+    <Error Condition="!Exists('..\..\..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props'))" />
+  </Target>
+</Project>

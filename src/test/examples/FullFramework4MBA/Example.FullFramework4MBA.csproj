@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Description>Full Framework v4 MBA</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.*" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="BootstrapperApplicationData.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\mbahost\mbahost.vcxproj">
+      <Project>{12c87c77-3547-44f8-8134-29bc915cb19d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj">
+      <Project>{F2BA1935-70FA-4156-B161-FD03850B4FAA}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <MbaHostDependency Include="$(BaseOutputPath)$(Configuration)\Win32\mbahost.dll" />
+  </ItemGroup>
+
+  <Target Name="CopyMbaHostDependencies" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(MbaHostDependency)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
