@@ -63,7 +63,7 @@
   The following properties are 'macros' that are available via IDE for pre and post build steps.
   All of them should be added to WixBuildMacroCollection to ensure that they are shown in the UI.
   -->
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetExt)' == '' ">
     <TargetExt Condition=" '$(OutputType)' == 'Package' ">.msi</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Module' ">.msm</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'PatchCreation' ">.pcp</TargetExt>
