@@ -5297,7 +5297,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ErrorTuple(sourceLineNumbers)
+                var tuple = new ErrorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
                 {
                     Error = id,
                     Message = Common.GetInnerText(node)

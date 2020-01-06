@@ -280,6 +280,12 @@ namespace WixToolsetTest.CoreIntegration
                 var errors = section.Tuples.OfType<ErrorTuple>().ToDictionary(t => t.Error);
                 Assert.Equal("Category 55 Emergency Doomsday Crisis", errors[1234].Message.Trim());
                 Assert.Equal(" ", errors[5678].Message);
+
+                var customAction1 = section.Tuples.OfType<CustomActionTuple>().Where(t => t.Id.Id == "CanWeReferenceAnError_YesWeCan").Single();
+                Assert.Equal("1234", customAction1.Target);
+
+                var customAction2 = section.Tuples.OfType<CustomActionTuple>().Where(t => t.Id.Id == "TextErrorsWorkOKToo").Single();
+                Assert.Equal("If you see this, something went wrong.", customAction2.Target);
             }
         }
 
