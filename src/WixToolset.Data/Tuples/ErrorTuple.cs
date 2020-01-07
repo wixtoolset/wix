@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.Error,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ErrorTupleFields.Error), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ErrorTupleFields.Message), IntermediateFieldType.String),
             },
             typeof(ErrorTuple));
@@ -21,7 +20,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ErrorTupleFields
     {
-        Error,
         Message,
     }
 
@@ -36,12 +34,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ErrorTupleFields index] => this.Fields[(int)index];
-
-        public int Error
-        {
-            get => (int)this.Fields[(int)ErrorTupleFields.Error];
-            set => this.Set((int)ErrorTupleFields.Error, value);
-        }
 
         public string Message
         {
