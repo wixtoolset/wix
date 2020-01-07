@@ -100,6 +100,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddEnvironmentTuple((EnvironmentTuple)tuple, output);
                     break;
 
+                case TupleDefinitionType.Error:
+                    this.AddErrorTuple((ErrorTuple)tuple, output);
+                    break;
+
                 case TupleDefinitionType.Feature:
                     this.AddFeatureTuple((FeatureTuple)tuple, output);
                     break;
@@ -486,6 +490,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[1] = String.Concat(action, uninstall, system, tuple.Name);
             row[2] = value;
             row[3] = tuple.ComponentRef;
+        }
+
+        private void AddErrorTuple(ErrorTuple tuple, WindowsInstallerData output)
+        {
+            var table = output.EnsureTable(this.TableDefinitions["Error"]);
+            var row = table.CreateRow(tuple.SourceLineNumbers);
+            row[0] = Convert.ToInt32(tuple.Id.Id);
+            row[1] = tuple.Message;
         }
 
         private void AddFeatureTuple(FeatureTuple tuple, WindowsInstallerData output)
