@@ -35,9 +35,9 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[BinaryTupleFields index] => this.Fields[(int)index];
 
-        public string Data
+        public IntermediateFieldPathValue Data
         {
-            get => (string)this.Fields[(int)BinaryTupleFields.Data];
+            get => this.Fields[(int)BinaryTupleFields.Data].AsPath();
             set => this.Set((int)BinaryTupleFields.Data, value);
         }
     }
