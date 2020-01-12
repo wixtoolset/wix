@@ -739,7 +739,7 @@ namespace WixToolset.Core
             {
                 var tuple = new BinaryTuple(sourceLineNumbers, id)
                 {
-                    Data = sourceFile
+                    Data = new IntermediateFieldPathValue { Path = sourceFile }
                 };
 
                 this.Core.AddTuple(tuple);
