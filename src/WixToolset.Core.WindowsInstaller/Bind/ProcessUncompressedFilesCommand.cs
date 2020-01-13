@@ -57,25 +57,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var mediaRows = this.Section.Tuples.OfType<MediaTuple>().ToDictionary(t => t.DiskId);
 
-            using (Database db = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
+            using (var db = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
             {
-                using (View directoryView = db.OpenExecuteView("SELECT `Directory`, `Directory_Parent`, `DefaultDir` FROM `Directory`"))
+                using (var directoryView = db.OpenExecuteView("SELECT `Directory`, `Directory_Parent`, `DefaultDir` FROM `Directory`"))
                 {
-                    while (true)
+                    foreach (var directoryRecord in directoryView.Records)
                     {
-                        using (Record directoryRecord = directoryView.Fetch())
-                        {
-                            if (null == directoryRecord)
-                            {
-                                break;
-                            }
+                        var sourceName = Common.GetName(directoryRecord.GetString(3), true, this.LongNamesInImage);
 
-                            string sourceName = Common.GetName(directoryRecord.GetString(3), true, this.LongNamesInImage);
+                        var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(directoryRecord.GetString(2), sourceName);
 
-                            var resolvedDirectory = this.BackendHelper.CreateResolvedDirectory(directoryRecord.GetString(2), sourceName);
-
-                            directories.Add(directoryRecord.GetString(1), resolvedDirectory);
-                        }
+                        directories.Add(directoryRecord.GetString(1), resolvedDirectory);
                     }
                 }
 

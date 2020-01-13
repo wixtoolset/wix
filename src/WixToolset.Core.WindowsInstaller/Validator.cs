@@ -201,21 +201,13 @@ namespace WixToolset.Core.WindowsInstaller
                     List<string> actions = new List<string>();
                     using (View view = database.OpenExecuteView("SELECT `Action` FROM `_ICESequence` ORDER BY `Sequence`"))
                     {
-                        while (true)
+                        foreach (Record record in view.Records)
                         {
-                            using (Record record = view.Fetch())
+                            string action = record.GetString(1);
+
+                            if ((this.SuppressedICEs == null || !this.SuppressedICEs.Contains(action)) && (this.ICEs == null || this.ICEs.Contains(action)))
                             {
-                                if (null == record)
-                                {
-                                    break;
-                                }
-
-                                string action = record.GetString(1);
-
-                                if ((this.SuppressedICEs == null || !this.SuppressedICEs.Contains(action)) && (this.ICEs == null || this.ICEs.Contains(action)))
-                                {
-                                    actions.Add(action);
-                                }
+                                actions.Add(action);
                             }
                         }
                     }

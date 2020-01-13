@@ -220,14 +220,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             string query = String.Format(CultureInfo.InvariantCulture, "SELECT * FROM {0} WHERE `Action` = '{1}'", row[0].ToString(), (string)row[1]);
 
                             using (View view = db.OpenExecuteView(query))
+                            using (Record record = view.Fetch())
                             {
-                                using (Record record = view.Fetch())
+                                if (null != record)
                                 {
-                                    if (null != record)
-                                    {
-                                        this.Messaging.Write(WarningMessages.SuppressMergedAction((string)row[1], row[0].ToString()));
-                                        view.Modify(ModifyView.Delete, record);
-                                    }
+                                    this.Messaging.Write(WarningMessages.SuppressMergedAction((string)row[1], row[0].ToString()));
+                                    view.Modify(ModifyView.Delete, record);
                                 }
                             }
                         }
@@ -244,17 +242,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     using (View view = db.OpenExecuteView(String.Concat("SELECT `Action` FROM ", tableName)))
                     {
-                        while (true)
+                        foreach (Record resultRecord in view.Records)
                         {
-                            using (Record resultRecord = view.Fetch())
-                            {
-                                if (null == resultRecord)
-                                {
-                                    break;
-                                }
-
-                                this.Messaging.Write(WarningMessages.SuppressMergedAction(resultRecord.GetString(1), tableName));
-                            }
+                            this.Messaging.Write(WarningMessages.SuppressMergedAction(resultRecord.GetString(1), tableName));
                         }
                     }
 

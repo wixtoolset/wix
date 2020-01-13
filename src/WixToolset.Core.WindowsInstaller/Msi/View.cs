@@ -3,6 +3,8 @@
 namespace WixToolset.Core.WindowsInstaller.Msi
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Globalization;
 
     /// <summary>
@@ -110,6 +112,11 @@ namespace WixToolset.Core.WindowsInstaller.Msi
         }
 
         /// <summary>
+        /// Enumerator that automatically disposes of the retrieved Records.
+        /// </summary>
+        public IEnumerable<Record> Records => new ViewEnumerable(this);
+
+        /// <summary>
         /// Executes a view with no customizable parameters.
         /// </summary>
         public void Execute()
@@ -124,7 +131,7 @@ namespace WixToolset.Core.WindowsInstaller.Msi
         /// <param name="record">Record containing parameters to be substituded into the view.</param>
         public void Execute(Record record)
         {
-            int error = MsiInterop.MsiViewExecute(this.Handle, null == record ? 0 : record.Handle);
+            var error = MsiInterop.MsiViewExecute(this.Handle, null == record ? 0 : record.Handle);
             if (0 != error)
             {
                 throw new MsiException(error);
@@ -137,9 +144,7 @@ namespace WixToolset.Core.WindowsInstaller.Msi
         /// <returns>Returns the fetched record; otherwise null.</returns>
         public Record Fetch()
         {
-            uint recordHandle;
-
-            int error = MsiInterop.MsiViewFetch(this.Handle, out recordHandle);
+            var error = MsiInterop.MsiViewFetch(this.Handle, out var recordHandle);
             if (259 == error)
             {
                 return null;
@@ -182,6 +187,76 @@ namespace WixToolset.Core.WindowsInstaller.Msi
             }
 
             return new Record(recordHandle);
+        }
+
+        private class ViewEnumerable : IEnumerable<Record>
+        {
+            private readonly View view;
+
+            public ViewEnumerable(View view) => this.view = view;
+
+            public IEnumerator<Record> GetEnumerator() => new ViewEnumerator(this.view);
+
+            IEnumerator IEnumerable.GetEnumerator() => new ViewEnumerator(this.view);
+        }
+
+        private class ViewEnumerator : IEnumerator<Record>
+        {
+            private readonly View view;
+            private readonly List<Record> records = new List<Record>();
+            private int position = -1;
+            private bool disposed;
+
+            public ViewEnumerator(View view) => this.view = view;
+
+            public Record Current => this.records[this.position];
+
+            object IEnumerator.Current => this.records[this.position];
+
+            public bool MoveNext()
+            {
+                if (this.position + 1 >= this.records.Count)
+                {
+                    var record = this.view.Fetch();
+
+                    if (record == null)
+                    {
+                        return false;
+                    }
+
+                    this.records.Add(record);
+                    this.position = this.records.Count - 1;
+                }
+                else
+                {
+                    ++this.position;
+                }
+
+                return true;
+            }
+
+            public void Reset() => this.position = -1;
+
+            public void Dispose()
+            {
+                this.Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!this.disposed)
+                {
+                    if (disposing)
+                    {
+                        foreach (var record in this.records)
+                        {
+                            record.Dispose();
+                        }
+                    }
+
+                    this.disposed = true;
+                }
+            }
         }
     }
 }

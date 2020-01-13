@@ -26,7 +26,6 @@ namespace WixToolset.Core.TestPackage
                 var filename = message.SourceLineNumbers?.FileName ?? "TEST";
                 var line = message.SourceLineNumbers?.LineNumber ?? -1;
                 var type = message.Level.ToString().ToLowerInvariant();
-                var output = message.Level >= MessageLevel.Warning ? Console.Out : Console.Error;
 
                 if (line > 0)
                 {

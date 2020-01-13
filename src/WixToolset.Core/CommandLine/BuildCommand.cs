@@ -591,7 +591,7 @@ namespace WixToolset.Core.CommandLine
                     this.OutputType = Path.GetExtension(this.OutputFile);
                 }
 
-                switch (this.OutputType.ToLowerInvariant())
+                switch (this.OutputType?.ToLowerInvariant())
                 {
                     case "bundle":
                     case ".exe":
