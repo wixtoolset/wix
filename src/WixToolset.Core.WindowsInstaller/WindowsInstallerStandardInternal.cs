@@ -2,10 +2,8 @@
 
 namespace WixToolset.Core.WindowsInstaller
 {
-    using System;
     using System.Reflection;
     using System.Xml;
-    using WixToolset.Core.WindowsInstaller.Rows;
     using WixToolset.Data.WindowsInstaller;
 
     /// <summary>
@@ -16,9 +14,6 @@ namespace WixToolset.Core.WindowsInstaller
         private static readonly object lockObject = new object();
 
         private static TableDefinitionCollection tableDefinitions;
-#if REVISIT_FOR_PATCHING
-        private static WixActionRowCollection standardActions;
-#endif
 
         /// <summary>
         /// Gets the table definitions stored in this assembly.
@@ -26,6 +21,8 @@ namespace WixToolset.Core.WindowsInstaller
         /// <returns>Table definition collection for tables stored in this assembly.</returns>
         public static TableDefinitionCollection GetTableDefinitions()
         {
+            // TODO: make the data static data structures instead of parsing an XML file and consider
+            //       moving it all to WixToolset.Data.WindowsInstallerStandard class.
             lock (lockObject)
             {
                 if (null == WindowsInstallerStandardInternal.tableDefinitions)
@@ -38,29 +35,6 @@ namespace WixToolset.Core.WindowsInstaller
             }
 
             return WindowsInstallerStandardInternal.tableDefinitions;
-        }
-
-        /// <summary>
-        /// Gets the standard actions stored in this assembly.
-        /// </summary>
-        /// <returns>Collection of standard actions in this assembly.</returns>
-        public static WixActionRowCollection GetStandardActionRows()
-        {
-#if REVISIT_FOR_PATCHING
-            lock (lockObject)
-            {
-                if (null == WindowsInstallerStandardInternal.standardActions)
-                {
-                    using (XmlReader reader = XmlReader.Create(Assembly.GetExecutingAssembly().GetManifestResourceStream("WixToolset.Core.WindowsInstaller.Data.actions.xml")))
-                    {
-                        WindowsInstallerStandardInternal.standardActions = WixActionRowCollection.Load(reader);
-                    }
-                }
-            }
-
-            return WindowsInstallerStandardInternal.standardActions;
-#endif
-            throw new NotImplementedException();
         }
     }
 }

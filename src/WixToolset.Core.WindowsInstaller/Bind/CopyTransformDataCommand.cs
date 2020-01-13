@@ -433,59 +433,63 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="mainFileRow">The file row that contains information about the patched file.</param>
         private void AddPatchFilesActionToSequenceTable(SequenceTable table, WindowsInstallerData mainTransform, WindowsInstallerData pairedTransform, Row mainFileRow)
         {
+            var tableName = table.ToString();
+
             // Find/add PatchFiles action (also determine sequence for it).
             // Search mainTransform first, then pairedTransform (pairedTransform overrides).
-            bool hasPatchFilesAction = false;
-            int seqInstallFiles = 0;
-            int seqDuplicateFiles = 0;
-            string tableName = table.ToString();
+            var hasPatchFilesAction = false;
+            var installFilesSequence = 0;
+            var duplicateFilesSequence = 0;
 
             TestSequenceTableForPatchFilesAction(
                     mainTransform.Tables[tableName],
                     ref hasPatchFilesAction,
-                    ref seqInstallFiles,
-                    ref seqDuplicateFiles);
+                    ref installFilesSequence,
+                    ref duplicateFilesSequence);
             TestSequenceTableForPatchFilesAction(
                     pairedTransform.Tables[tableName],
                     ref hasPatchFilesAction,
-                    ref seqInstallFiles,
-                    ref seqDuplicateFiles);
+                    ref installFilesSequence,
+                    ref duplicateFilesSequence);
             if (!hasPatchFilesAction)
             {
-                Table iesTable = pairedTransform.EnsureTable(this.TableDefinitions[tableName]);
-                if (0 == iesTable.Rows.Count)
-                {
-                    iesTable.Operation = TableOperation.Add;
-                }
+                WindowsInstallerStandard.TryGetStandardAction(tableName, "PatchFiles", out var patchFilesActionTuple);
 
-                Row patchAction = iesTable.CreateRow(null);
-                WixActionRow wixPatchAction = WindowsInstallerStandardInternal.GetStandardActionRows()[table, "PatchFiles"];
-                int sequence = wixPatchAction.Sequence;
+                var sequence = patchFilesActionTuple.Sequence;
+
                 // Test for default sequence value's appropriateness
-                if (seqInstallFiles >= sequence || (0 != seqDuplicateFiles && seqDuplicateFiles <= sequence))
+                if (installFilesSequence >= sequence || (0 != duplicateFilesSequence && duplicateFilesSequence <= sequence))
                 {
-                    if (0 != seqDuplicateFiles)
+                    if (0 != duplicateFilesSequence)
                     {
-                        if (seqDuplicateFiles < seqInstallFiles)
+                        if (duplicateFilesSequence < installFilesSequence)
                         {
-                            throw new WixException(ErrorMessages.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, iesTable.Name, "InstallFiles", "DuplicateFiles", wixPatchAction.Action));
+                            throw new WixException(ErrorMessages.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionTuple.Action));
                         }
                         else
                         {
-                            sequence = (seqDuplicateFiles + seqInstallFiles) / 2;
-                            if (seqInstallFiles == sequence || seqDuplicateFiles == sequence)
+                            sequence = (duplicateFilesSequence + installFilesSequence) / 2;
+                            if (installFilesSequence == sequence || duplicateFilesSequence == sequence)
                             {
-                                throw new WixException(ErrorMessages.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, iesTable.Name, "InstallFiles", "DuplicateFiles", wixPatchAction.Action));
+                                throw new WixException(ErrorMessages.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionTuple.Action));
                             }
                         }
                     }
                     else
                     {
-                        sequence = seqInstallFiles + 1;
+                        sequence = installFilesSequence + 1;
                     }
                 }
-                patchAction[0] = wixPatchAction.Action;
-                patchAction[1] = wixPatchAction.Condition;
+
+                var sequenceTable = pairedTransform.EnsureTable(this.TableDefinitions[tableName]);
+                if (0 == sequenceTable.Rows.Count)
+                {
+                    sequenceTable.Operation = TableOperation.Add;
+                }
+
+                var patchAction = sequenceTable.CreateRow(null);
+                patchAction[0] = patchFilesActionTuple.Action;
+                patchAction[1] = patchFilesActionTuple.Condition;
                 patchAction[2] = sequence;
                 patchAction.Operation = RowOperation.Add;
             }
@@ -494,27 +498,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Tests sequence table for PatchFiles and associated actions
         /// </summary>
-        /// <param name="iesTable">The table to test.</param>
+        /// <param name="sequenceTable">The table to test.</param>
         /// <param name="hasPatchFilesAction">Set to true if PatchFiles action is found. Left unchanged otherwise.</param>
-        /// <param name="seqInstallFiles">Set to sequence value of InstallFiles action if found. Left unchanged otherwise.</param>
-        /// <param name="seqDuplicateFiles">Set to sequence value of DuplicateFiles action if found. Left unchanged otherwise.</param>
-        private static void TestSequenceTableForPatchFilesAction(Table iesTable, ref bool hasPatchFilesAction, ref int seqInstallFiles, ref int seqDuplicateFiles)
+        /// <param name="installFilesSequence">Set to sequence value of InstallFiles action if found. Left unchanged otherwise.</param>
+        /// <param name="duplicateFilesSequence">Set to sequence value of DuplicateFiles action if found. Left unchanged otherwise.</param>
+        private static void TestSequenceTableForPatchFilesAction(Table sequenceTable, ref bool hasPatchFilesAction, ref int installFilesSequence, ref int duplicateFilesSequence)
         {
-            if (null != iesTable)
+            if (null != sequenceTable)
             {
-                foreach (Row iesRow in iesTable.Rows)
+                foreach (var row in sequenceTable.Rows)
                 {
-                    if (String.Equals("PatchFiles", (string)iesRow[0], StringComparison.Ordinal))
+                    var actionName = row.FieldAsString(0);
+                    if (String.Equals("PatchFiles", actionName, StringComparison.Ordinal))
                     {
                         hasPatchFilesAction = true;
                     }
-                    if (String.Equals("InstallFiles", (string)iesRow[0], StringComparison.Ordinal))
+                    else if (String.Equals("InstallFiles", actionName, StringComparison.Ordinal))
                     {
-                        seqInstallFiles = (int)iesRow.Fields[2].Data;
+                        installFilesSequence = row.FieldAsInteger(2);
                     }
-                    if (String.Equals("DuplicateFiles", (string)iesRow[0], StringComparison.Ordinal))
+                    else if (String.Equals("DuplicateFiles", actionName, StringComparison.Ordinal))
                     {
-                        seqDuplicateFiles = (int)iesRow.Fields[2].Data;
+                        duplicateFilesSequence = row.FieldAsInteger(2);
                     }
                 }
             }

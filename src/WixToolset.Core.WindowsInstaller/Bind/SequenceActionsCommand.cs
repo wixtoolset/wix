@@ -18,15 +18,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Section = section;
 
             this.RelativeActionsForActions = new Dictionary<string, RelativeActions>();
-
-            this.StandardActionsById = WindowsInstallerStandard.StandardActions().ToDictionary(a => a.Id.Id);
         }
 
         private IntermediateSection Section { get; }
 
         private Dictionary<string, RelativeActions> RelativeActionsForActions { get; }
-
-        private Dictionary<string, WixActionTuple> StandardActionsById { get; }
 
         public IMessaging Messaging { private get; set; }
 
@@ -63,7 +59,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // Unsequenced action (allowed for certain standard actions).
                     if (null == actionTuple.Before && null == actionTuple.After && !actionTuple.Sequence.HasValue)
                     {
-                        if (this.StandardActionsById.TryGetValue(actionTuple.Id.Id, out var standardAction))
+                        if (WindowsInstallerStandard.TryGetStandardAction(actionTuple.Id.Id, out var standardAction))
                         {
                             // Populate the sequence from the standard action
                             actionTuple.Sequence = standardAction.Sequence;
@@ -154,7 +150,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // on the presence of a particular table.
             if (requiredActionTuples.ContainsKey("InstallExecuteSequence/DuplicateFiles") && !requiredActionTuples.ContainsKey("InstallExecuteSequence/InstallFiles"))
             {
-                var standardAction = this.StandardActionsById["InstallExecuteSequence/InstallFiles"];
+                WindowsInstallerStandard.TryGetStandardAction("InstallExecuteSequence/InstallFiles", out var standardAction);
                 requiredActionTuples.Add(standardAction.Id.Id, standardAction);
             }
 
@@ -201,8 +197,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var actionId in requiredActionIds)
             {
-                var standardAction = this.StandardActionsById[actionId];
-
+                WindowsInstallerStandard.TryGetStandardAction(actionId, out var standardAction);
                 overridableActionTuples.Add(standardAction.Id.Id, standardAction);
             }
 
@@ -597,7 +592,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (!requiredActionTuples.TryGetValue(parentActionKey, out var parentActionTuple))
             {
                 // If the missing parent action is a standard action (with a suggested sequence number), add it.
-                if (this.StandardActionsById.TryGetValue(parentActionKey, out parentActionTuple))
+                if (WindowsInstallerStandard.TryGetStandardAction(parentActionKey, out parentActionTuple))
                 {
                     // Create a clone to avoid modifying the static copy of the object.
                     // TODO: consider this: parentActionTuple = parentActionTuple.Clone();

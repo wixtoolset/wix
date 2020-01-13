@@ -13,7 +13,6 @@ namespace WixToolset.Core.WindowsInstaller
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Core;
-    using WixToolset.Core.WindowsInstaller.Rows;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
@@ -104,7 +103,7 @@ namespace WixToolset.Core.WindowsInstaller
         {
             if (null == output)
             {
-                throw new ArgumentNullException("output");
+                throw new ArgumentNullException(nameof(output));
             }
 
             this.OutputType = output.Type;
@@ -1534,9 +1533,7 @@ namespace WixToolset.Core.WindowsInstaller
 
                     foreach (Wix.ISchemaElement element in component.Children)
                     {
-                        var file = element as Wix.File;
-
-                        if (null != file && Wix.YesNoType.yes == file.KeyPath)
+                        if (element is Wix.File file && Wix.YesNoType.yes == file.KeyPath)
                         {
                             file.AddChild(typeLib);
                         }
@@ -2511,10 +2508,10 @@ namespace WixToolset.Core.WindowsInstaller
 
                     if (null != table)
                     {
-                        var actionRows = new ArrayList();
+                        var actionRows = new List<WixActionRow>();
                         var needAbsoluteScheduling = this.SuppressRelativeActionSequencing;
-                        var nonSequencedActionRows = new WixActionRowCollection();
-                        var suppressedRelativeActionRows = new WixActionRowCollection();
+                        var nonSequencedActionRows = new Dictionary<string, WixActionRow>();
+                        var suppressedRelativeActionRows = new Dictionary<string, WixActionRow>();
 
                         // create a sorted array of actions in this table
                         foreach (var row in table.Rows)
@@ -2538,7 +2535,7 @@ namespace WixToolset.Core.WindowsInstaller
 
                         for (var i = 0; i < actionRows.Count && !needAbsoluteScheduling; i++)
                         {
-                            var actionRow = (WixActionRow)actionRows[i];
+                            var actionRow = actionRows[i];
                             this.StandardActions.TryGetValue(actionRow.GetPrimaryKey(), out var standardActionRow);
 
                             // create actions for custom actions, dialogs, AppSearch when its moved, and standard actions with non-standard conditions
@@ -2550,13 +2547,13 @@ namespace WixToolset.Core.WindowsInstaller
                                 // find the previous action row if there is one
                                 if (0 <= i - 1)
                                 {
-                                    previousActionRow = (WixActionRow)actionRows[i - 1];
+                                    previousActionRow = actionRows[i - 1];
                                 }
 
                                 // find the next action row if there is one
                                 if (actionRows.Count > i + 1)
                                 {
-                                    nextActionRow = (WixActionRow)actionRows[i + 1];
+                                    nextActionRow = actionRows[i + 1];
                                 }
 
                                 // the logic for setting the before or after attribute for an action:
@@ -2594,7 +2591,7 @@ namespace WixToolset.Core.WindowsInstaller
                                 }
                                 else if (null != standardActionRow && actionRow.Condition != standardActionRow.Condition) // standard actions get their standard sequence numbers
                                 {
-                                    nonSequencedActionRows.Add(actionRow);
+                                    nonSequencedActionRows.Add(actionRow.GetPrimaryKey(), actionRow);
                                 }
                                 else if (0 < actionRow.Sequence)
                                 {
@@ -2603,25 +2600,27 @@ namespace WixToolset.Core.WindowsInstaller
                             }
                             else
                             {
-                                suppressedRelativeActionRows.Add(actionRow);
+                                suppressedRelativeActionRows.Add(actionRow.GetPrimaryKey(), actionRow);
                             }
                         }
 
                         // create the actions now that we know if they must be absolutely or relatively scheduled
-                        foreach (WixActionRow actionRow in actionRows)
+                        foreach (var actionRow in actionRows)
                         {
+                            var key = actionRow.GetPrimaryKey();
+
                             if (needAbsoluteScheduling)
                             {
                                 // remove any before/after information to ensure this is absolutely sequenced
                                 actionRow.Before = null;
                                 actionRow.After = null;
                             }
-                            else if (nonSequencedActionRows.Contains(actionRow.SequenceTable, actionRow.Action))
+                            else if (nonSequencedActionRows.ContainsKey(key))
                             {
                                 // clear the sequence attribute to ensure this action is scheduled without a sequence number (or before/after)
                                 actionRow.Sequence = 0;
                             }
-                            else if (suppressedRelativeActionRows.Contains(actionRow.SequenceTable, actionRow.Action))
+                            else if (suppressedRelativeActionRows.ContainsKey(key))
                             {
                                 // skip the suppressed relatively scheduled action rows
                                 continue;
