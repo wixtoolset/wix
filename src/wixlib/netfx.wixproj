@@ -11,6 +11,8 @@
     <Pedantic>true</Pedantic>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NetFx472.wxs" />
+    <Compile Include="NetFx48.wxs" />
     <Compile Include="NetFxExtension.wxs" />
     <Compile Include="NetFx1.wxs" />
     <Compile Include="NetFx1.1.wxs" />
