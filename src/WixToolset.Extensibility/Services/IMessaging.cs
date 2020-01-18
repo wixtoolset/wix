@@ -58,13 +58,6 @@ namespace WixToolset.Extensibility.Services
         void SuppressWarningMessage(int warningNumber);
 
         /// <summary>
-        /// Formats a message to standard message.
-        /// </summary>
-        /// <param name="message">Message to format.</param>
-        /// <returns>Formatted message</returns>
-        string FormatMessage(Message message);
-
-        /// <summary>
         /// Sends a message with the given arguments.
         /// </summary>
         /// <param name="message">Message to write.</param>
