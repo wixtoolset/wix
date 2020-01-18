@@ -41,94 +41,9 @@ namespace WixToolset.Core.ExtensibilityServices
             this.suppressedWarnings.Add(warningNumber);
         }
 
-        public string FormatMessage(Message message)
-        {
-            var level = CalculateMessageLevel(message);
-
-            if (level == MessageLevel.Nothing)
-            {
-                return String.Empty;
-            }
-
-            var shortAppName = String.IsNullOrEmpty(this.listener?.ShortAppName) ? "WIX" : this.listener.ShortAppName;
-            var longAppName = String.IsNullOrEmpty(this.listener?.LongAppName) ? "WIX" : this.listener.LongAppName;
-
-            var fileNames = new List<string>();
-            var errorFileName = longAppName;
-            for (var sln = message.SourceLineNumbers; null != sln; sln = sln.Parent)
-            {
-                if (String.IsNullOrEmpty(sln.FileName))
-                {
-                    continue;
-                }
-                else if (sln.LineNumber.HasValue)
-                {
-                    if (fileNames.Count == 0)
-                    {
-                        errorFileName = String.Format(CultureInfo.CurrentUICulture, "{0}({1})", sln.FileName, sln.LineNumber);
-                    }
-
-                    fileNames.Add(String.Format(CultureInfo.CurrentUICulture, "{0}: line {1}", sln.FileName, sln.LineNumber));
-                }
-                else
-                {
-                    if (fileNames.Count == 0)
-                    {
-                        errorFileName = sln.FileName;
-                    }
-
-                    fileNames.Add(sln.FileName);
-                }
-            }
-
-            var levelString = String.Empty;
-            if (MessageLevel.Warning == level)
-            {
-                levelString = "warning";
-            }
-            else if (MessageLevel.Error == level)
-            {
-                levelString = "error";
-            }
-
-            string formatted;
-            if (message.ResourceManager == null)
-            {
-                formatted = String.Format(CultureInfo.InvariantCulture, message.ResourceNameOrFormat, message.MessageArgs);
-            }
-            else
-            {
-                formatted = String.Format(CultureInfo.InvariantCulture, message.ResourceManager.GetString(message.ResourceNameOrFormat), message.MessageArgs);
-            }
-
-            var builder = new StringBuilder();
-            if (level == MessageLevel.Information || level == MessageLevel.Verbose)
-            {
-                builder.Append(formatted);
-            }
-            else
-            {
-                builder.AppendFormat("{0} : {1} {2}{3:0000} : {4}", errorFileName, levelString, shortAppName, message.Id, formatted);
-            }
-
-            if (fileNames.Count > 1)
-            {
-                builder.AppendFormat("Source trace:{0}", Environment.NewLine);
-
-                foreach (var fileName in fileNames)
-                {
-                    builder.AppendFormat("Source trace:{0}", fileName, Environment.NewLine);
-                }
-
-                builder.AppendLine();
-            }
-
-            return builder.ToString();
-        }
-
         public void Write(Message message)
         {
-            var level = CalculateMessageLevel(message);
+            var level = this.CalculateMessageLevel(message);
 
             if (level == MessageLevel.Nothing)
             {
@@ -187,6 +102,8 @@ namespace WixToolset.Core.ExtensibilityServices
                     level = MessageLevel.Error;
                 }
             }
+
+            level = this.listener?.CalculateMessageLevel(this, message, level) ?? level;
 
             return level;
         }

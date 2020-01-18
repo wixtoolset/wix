@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using WixToolset.Data;
 using WixToolset.Extensibility;
+using WixToolset.Extensibility.Services;
 
 namespace WixToolset.Core.TestPackage
 {
@@ -21,5 +22,7 @@ namespace WixToolset.Core.TestPackage
         {
             this.Messages.Add(new Message(null, MessageLevel.Information, 0, message));
         }
+
+        public MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel) => defaultMessageLevel;
     }
 }
