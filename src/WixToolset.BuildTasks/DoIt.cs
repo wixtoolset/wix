@@ -278,6 +278,8 @@ namespace WixToolset.BuildTasks
             {
                 this.Logger.LogMessage(MessageImportance.Low, message);
             }
+
+            public MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel) => defaultMessageLevel;
         }
     }
 }
