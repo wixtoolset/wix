@@ -82,19 +82,6 @@ namespace WixToolset.Data
         /// <value>The arguments for the format string.</value>
         public object[] MessageArgs { get; }
 
-        /// <summary>
-        /// Makes a warning an error.
-        /// </summary>
-        public void ElevateWarningToError()
-        {
-            if (this.Level != MessageLevel.Warning)
-            {
-                throw new InvalidOperationException($"Cannot elevate {this.Level.ToString()} Message to an Error. Only Warning Messages can be elevated to an Error.");
-            }
-
-            this.Level = MessageLevel.Error;
-        }
-
         public override string ToString()
         {
             if (this.ResourceManager == null)
