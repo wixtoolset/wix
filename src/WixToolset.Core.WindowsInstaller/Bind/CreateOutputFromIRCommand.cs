@@ -803,7 +803,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[1] = tuple.Name;
             row[2] = events;
             row[3] = tuple.Arguments;
-            row[4] = tuple.Wait;
+            if (tuple.Wait.HasValue)
+            {
+                row[4] =  tuple.Wait.Value ? 1 : 0;
+            }
             row[5] = tuple.ComponentRef;
         }
 

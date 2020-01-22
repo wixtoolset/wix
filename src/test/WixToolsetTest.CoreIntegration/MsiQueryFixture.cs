@@ -817,7 +817,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void PopulatesServiceInstallTable()
+        public void PopulatesServiceTables()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -841,9 +841,10 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "ServiceInstall" });
+                var results = Query.QueryDatabase(msiPath, new[] { "ServiceInstall", "ServiceControl" });
                 Assert.Equal(new[]
                 {
+                    "ServiceControl:SampleService\tSampleService\t161\t\t1\ttest.txt",
                     "ServiceInstall:SampleService\tSampleService\t\t16\t4\t0\t\t\t\t\t\ttest.txt\t",
                 }, results);
             }
