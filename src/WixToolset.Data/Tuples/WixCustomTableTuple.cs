@@ -22,7 +22,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Sets), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Descriptions), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Modularizations), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Unreal), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Unreal), IntermediateFieldType.Bool),
             },
             typeof(WixCustomTableTuple));
     }
