@@ -32,19 +32,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return this.TableDefinitions;
         }
 
-        private TableDefinition CreateCustomTable(WixCustomTableTuple row)
+        private TableDefinition CreateCustomTable(WixCustomTableTuple tuple)
         {
-            var columnNames = row.ColumnNames.Split('\t');
-            var columnTypes = row.ColumnTypes.Split('\t');
-            var primaryKeys = row.PrimaryKeys.Split('\t');
-            var minValues = row.MinValues?.Split('\t');
-            var maxValues = row.MaxValues?.Split('\t');
-            var keyTables = row.KeyTables?.Split('\t');
-            var keyColumns = row.KeyColumns?.Split('\t');
-            var categories = row.Categories?.Split('\t');
-            var sets = row.Sets?.Split('\t');
-            var descriptions = row.Descriptions?.Split('\t');
-            var modularizations = row.Modularizations?.Split('\t');
+            var columnNames = tuple.ColumnNames.Split('\t');
+            var columnTypes = tuple.ColumnTypes.Split('\t');
+            var primaryKeys = tuple.PrimaryKeys.Split('\t');
+            var minValues = tuple.MinValues?.Split('\t');
+            var maxValues = tuple.MaxValues?.Split('\t');
+            var keyTables = tuple.KeyTables?.Split('\t');
+            var keyColumns = tuple.KeyColumns?.Split('\t');
+            var categories = tuple.Categories?.Split('\t');
+            var sets = tuple.Sets?.Split('\t');
+            var descriptions = tuple.Descriptions?.Split('\t');
+            var modularizations = tuple.Modularizations?.Split('\t');
 
             var currentPrimaryKey = 0;
 
@@ -206,7 +206,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 columns.Add(columnDefinition);
             }
 
-            var customTable = new TableDefinition(row.Id.Id, columns/*, unreal: bootstrapperApplicationData, bootstrapperApplicationData*/);
+            var customTable = new TableDefinition(tuple.Id.Id, columns, tuple.Unreal);
             return customTable;
         }
     }
