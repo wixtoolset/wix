@@ -109,12 +109,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // If there are any fields to resolve later, create the cache to populate during bind.
             var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
 
+            // Load standard tables, authored custom tables, and extension custom tables.
             TableDefinitionCollection tableDefinitions;
             {
                 var command = new LoadTableDefinitionsCommand(section);
                 command.Execute();
 
                 tableDefinitions = command.TableDefinitions;
+
+                foreach (var backendExtension in this.BackendExtensions)
+                {
+                    foreach (var tableDefinition in backendExtension.TableDefinitions)
+                    {
+                        tableDefinitions.Add(tableDefinition);
+                    }
+                }
             }
 
             // Process the summary information table before the other tables.
