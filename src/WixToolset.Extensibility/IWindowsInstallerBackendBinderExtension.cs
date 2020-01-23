@@ -13,6 +13,8 @@ namespace WixToolset.Extensibility
     /// </summary>
     public interface IWindowsInstallerBackendBinderExtension
     {
+        IEnumerable<TableDefinition> TableDefinitions { get; }
+
         /// <summary>
         /// Called before binding occurs.
         /// </summary>

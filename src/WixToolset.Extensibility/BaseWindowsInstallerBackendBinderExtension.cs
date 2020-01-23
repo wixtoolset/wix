@@ -3,6 +3,7 @@
 namespace WixToolset.Extensibility
 {
     using System.Collections.Generic;
+    using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
@@ -30,9 +31,9 @@ namespace WixToolset.Extensibility
         protected IWindowsInstallerBackendHelper BackendHelper { get; private set; }
 
         /// <summary>
-        /// Optional table definitions to automatically map to tuples.
+        /// Optional table definitions.
         /// </summary>
-        protected virtual TableDefinition[] TableDefinitionsForTuples { get; }
+        public virtual IEnumerable<TableDefinition> TableDefinitions => Enumerable.Empty<TableDefinition>();
 
         /// <summary>
         /// Creates a resolved cabinet result.
@@ -48,21 +49,15 @@ namespace WixToolset.Extensibility
             this.BackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
         }
 
-        public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files)
-        {
-            return null;
-        }
+        public virtual IResolvedCabinet ResolveCabinet(string cabinetPath, IEnumerable<IBindFileWithPath> files) => null;
 
-        public virtual string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory)
-        {
-            return null;
-        }
+        public virtual string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
 
         public virtual bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
         {
-            if (this.TableDefinitionsForTuples != null)
+            if (this.TableDefinitions.Any())
             {
-                return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitionsForTuples);
+                return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitions);
             }
 
             return false;
