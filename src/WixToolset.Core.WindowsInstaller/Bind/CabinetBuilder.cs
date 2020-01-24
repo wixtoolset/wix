@@ -152,7 +152,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     foreach (FileFacade facade in cabinetWorkItem.FileFacades) // No other easy way than looping to get the only row
                     {
-                        if ((ulong)facade.File.FileSize >= maxPreCompressedSizeInBytes)
+                        if ((ulong)facade.FileSize >= maxPreCompressedSizeInBytes)
                         {
                             // If file is larger than MaximumUncompressedFileSize set Maximum Cabinet Size for Cabinet Splitting
                             maxCabinetSize = this.MaximumCabinetSizeForLargeFileSplitting;
@@ -166,8 +166,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var files = cabinetWorkItem.FileFacades
                 .Select(facade => facade.Hash == null ?
-                    new CabinetCompressFile(facade.File.Source.Path, facade.File.Id.Id) :
-                    new CabinetCompressFile(facade.File.Source.Path, facade.File.Id.Id, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
+                    new CabinetCompressFile(facade.SourcePath, facade.Id) :
+                    new CabinetCompressFile(facade.SourcePath, facade.Id, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
                 .ToList();
 
             var cab = new Cabinet(cabinetPath);

@@ -1,8 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-#if DELETE
-
-namespace WixToolset
+namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections;
@@ -10,48 +8,27 @@ namespace WixToolset
     using System.Text;
     using System.Text.RegularExpressions;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
-    public class PatchTransform
+    internal class PatchTransform
     {
-        private string baseline;
-        private Intermediate transform;
-        private string transformPath;
-
-        public string Baseline
+        public PatchTransform(string baseline, WindowsInstallerData transform)
         {
-            get { return this.baseline; }
+            this.Baseline = baseline;
+            this.Transform = transform;
         }
 
-        public Intermediate Transform
-        {
-            get
-            {
-                if (null == this.transform)
-                {
-                    this.transform = Intermediate.Load(this.transformPath, false);
-                }
+        public string Baseline { get; }
 
-                return this.transform;
-            }
-        }
-
-        public string TransformPath
-        {
-            get { return this.transformPath; }
-        }
-
-        public PatchTransform(string transformPath, string baseline)
-        {
-            this.transformPath = transformPath;
-            this.baseline = baseline;
-        }
+        public WindowsInstallerData Transform { get; }
 
         /// <summary>
         /// Validates that the differences in the transform are valid for patch transforms.
         /// </summary>
         public void Validate()
         {
+#if TODO_PATCHING
             // Changing the ProdocutCode in a patch transform is not recommended.
             Table propertyTable = this.Transform.Tables["Property"];
             if (null != propertyTable)
@@ -262,10 +239,8 @@ namespace WixToolset
                     }
                 }
             }
-
+#endif
             throw new NotImplementedException();
         }
     }
 }
-
-#endif

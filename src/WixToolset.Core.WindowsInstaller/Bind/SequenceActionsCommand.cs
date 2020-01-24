@@ -11,24 +11,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
+    /// <summary>
+    /// Set sequence numbers for all the actions and create tuples in the output object.
+    /// </summary>
     internal class SequenceActionsCommand
     {
-        public SequenceActionsCommand(IntermediateSection section)
+        public SequenceActionsCommand(IMessaging messaging, IntermediateSection section)
         {
+            this.Messaging = messaging;
             this.Section = section;
 
             this.RelativeActionsForActions = new Dictionary<string, RelativeActions>();
         }
 
+        private IMessaging Messaging { get; }
+
         private IntermediateSection Section { get; }
 
         private Dictionary<string, RelativeActions> RelativeActionsForActions { get; }
 
-        public IMessaging Messaging { private get; set; }
-
-        /// <summary>
-        /// Set sequence numbers for all the actions and create tuples in the output object.
-        /// </summary>
         public void Execute()
         {
             var requiredActionTuples = new Dictionary<string, WixActionTuple>();

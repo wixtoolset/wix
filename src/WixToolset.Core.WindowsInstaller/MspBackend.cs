@@ -3,36 +3,74 @@
 namespace WixToolset.Core.WindowsInstaller
 {
     using System;
-    using System.ComponentModel;
+    using System.Collections.Generic;
     using System.IO;
-    using WixToolset.Core.Native;
+    using System.Linq;
+    using WixToolset.Core.WindowsInstaller.Bind;
+    using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Core.WindowsInstaller.Unbind;
     using WixToolset.Data;
-    using WixToolset.Data.Bind;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
-    using WixToolset.Ole32;
+    using WixToolset.Extensibility.Services;
 
     internal class MspBackend : IBackend
     {
         public IBindResult Bind(IBindContext context)
         {
-            throw new NotImplementedException();
+            var messaging = context.ServiceProvider.GetService<IMessaging>();
+
+            var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
+
+            var backendExtensions = extensionManager.GetServices<IWindowsInstallerBackendBinderExtension>();
+
+            foreach (var extension in backendExtensions)
+            {
+                extension.PreBackendBind(context);
+            }
+
+            // Create transforms named in patch transforms.
+            IEnumerable<PatchTransform> patchTransforms;
+            {
+                var command = new CreatePatchTransformsCommand(messaging, context.IntermediateRepresentation, context.IntermediateFolder);
+                patchTransforms = command.Execute();
+            }
+
+            // Enhance the intermediate by attaching the created patch transforms.
+            IEnumerable<SubStorage> subStorages;
+            {
+                var command = new AttachPatchTransformsCommand(messaging, context.IntermediateRepresentation, patchTransforms);
+                subStorages = command.Execute();
+            }
+
+            // Create WindowsInstallerData with patch metdata and transforms as sub-storages
+            // Create MSP from WindowsInstallerData
+            using (var command = new BindDatabaseCommand(context, backendExtensions, subStorages, null))
+            {
+                command.Execute();
+
+                var result = context.ServiceProvider.GetService<IBindResult>();
+                result.FileTransfers = command.FileTransfers;
+                result.TrackedFiles = command.TrackedFiles;
+
+                foreach (var extension in backendExtensions)
+                {
+                    extension.PostBackendBind(result, command.Wixout);
+                }
+
+                return result;
+            }
         }
 
-        public IDecompileResult Decompile(IDecompileContext context)
-        {
-            throw new NotImplementedException();
-        }
+        public IDecompileResult Decompile(IDecompileContext context) => throw new NotImplementedException();
 
-        public bool Inscribe(IInscribeContext context)
-        {
-            throw new NotImplementedException();
-        }
+        public bool Inscribe(IInscribeContext context) => throw new NotImplementedException();
 
         public Intermediate Unbind(IUnbindContext context)
         {
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
             Output patch;
 
             // patch files are essentially database files (use a special flag to let the API know its a patch file)

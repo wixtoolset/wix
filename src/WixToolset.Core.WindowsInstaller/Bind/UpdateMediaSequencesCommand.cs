@@ -33,7 +33,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 // Order by Component to group the files by directory.
                 var optimized = this.OptimizedFileFacades();
-                foreach (var fileId in optimized.Select(f => f.File.Id.Id))
+                foreach (var fileId in optimized.Select(f => f.Id))
                 {
                     var fileRow = fileRows.Get(fileId);
                     fileRow.Sequence = ++lastSequence;
@@ -41,13 +41,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
-                int lastSequence = 0;
+                var lastSequence = 0;
                 MediaRow mediaRow = null;
-                Dictionary<int, List<FileFacade>> patchGroups = new Dictionary<int, List<FileFacade>>();
+                var patchGroups = new Dictionary<int, List<FileFacade>>();
 
                 // sequence the non-patch-added files
                 var optimized = this.OptimizedFileFacades();
-                foreach (FileFacade facade in optimized)
+                foreach (var facade in optimized)
                 {
                     if (null == mediaRow)
                     {
@@ -64,19 +64,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         mediaRow = mediaRows.Get(facade.DiskId);
                     }
 
-                    if (facade.File.PatchGroup.HasValue)
+                    if (facade.PatchGroup.HasValue)
                     {
-                        if (patchGroups.TryGetValue(facade.File.PatchGroup.Value, out var patchGroup))
+                        if (patchGroups.TryGetValue(facade.PatchGroup.Value, out var patchGroup))
                         {
                             patchGroup = new List<FileFacade>();
-                            patchGroups.Add(facade.File.PatchGroup.Value, patchGroup);
+                            patchGroups.Add(facade.PatchGroup.Value, patchGroup);
                         }
 
                         patchGroup.Add(facade);
                     }
                     else
                     {
-                        var fileRow = fileRows.Get(facade.File.Id.Id);
+                        var fileRow = fileRows.Get(facade.Id);
                         fileRow.Sequence = ++lastSequence;
                     }
                 }
@@ -102,7 +102,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             mediaRow = mediaRows.Get(facade.DiskId);
                         }
 
-                        var fileRow = fileRows.Get(facade.File.Id.Id);
+                        var fileRow = fileRows.Get(facade.Id);
                         fileRow.Sequence = ++lastSequence;
                     }
                 }
@@ -119,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // TODO: Sort these facades even smarter by directory path and component id 
             //       and maybe file size or file extension and other creative ideas to
             //       get optimal install speed out of MSI.
-            return this.FileFacades.OrderBy(f => f.File.ComponentRef);
+            return this.FileFacades.OrderBy(f => f.ComponentRef);
         }
     }
 }

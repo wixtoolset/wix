@@ -1,0 +1,31 @@
+<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>
+  <Product Id='7d326855-e790-4a94-8611-5351f8321fca' Name='~Test Package'
+            Version='$(var.V)' Manufacturer='Example Corporation' Language='1033'
+            UpgradeCode='7d326855-e790-4a94-8611-5351f8321fca'>
+    <Package InstallScope='perMachine' Compressed='yes' />
+
+    <MajorUpgrade DowngradeErrorMessage='Newer version already installed.' />
+    <MediaTemplate EmbedCab='yes' />
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder'>
+        <Directory Id='INSTALLFOLDER' Name='~Test App' />
+      </Directory>
+    </Directory>
+
+    <Feature Id='Main'>
+      <ComponentGroupRef Id='Components' />
+    </Feature>
+  </Product>
+
+  <Fragment>
+    <ComponentGroup Id="Components" Directory='INSTALLFOLDER'>
+      <Component>
+        <File Id='a.txt' Name='a.txt' Source='Av$(var.A).txt' />
+      </Component>
+      <Component>
+        <File Id='b.txt' Name='b.txt' Source='Bv$(var.B).txt' />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -89,7 +89,7 @@ namespace WixToolset.Core.Bind
                         {
                             var objectField = field.AsPath();
 
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
                             // Skip file resolution if the file is to be deleted.
                             if (RowOperation.Delete == tuple.Operation)
                             {
@@ -111,7 +111,7 @@ namespace WixToolset.Core.Bind
                                 {
                                     if (!this.BuildingPatch) // Normal binding for non-Patch scenario such as link (light.exe)
                                     {
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
                                         // keep a copy of the un-resolved data for future replay. This will be saved into wixpdb file
                                         if (null == objectField.UnresolvedData)
                                         {
@@ -129,7 +129,7 @@ namespace WixToolset.Core.Bind
                                         var value = fileResolver.ResolveFile(objectField.Path, tuple.Definition, tuple.SourceLineNumbers, BindStage.Normal);
                                         field.Set(value);
                                     }
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
                                     else // Re-base binding path scenario caused by pyro.exe -bt -bu
                                     {
                                         // by default, use the resolved Data for file lookup
@@ -158,7 +158,7 @@ namespace WixToolset.Core.Bind
                                 }
                             }
 
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
                             if (null != objectField.PreviousData)
                             {
                                 objectField.PreviousData = this.BindVariableResolver.ResolveVariables(tuple.SourceLineNumbers, objectField.PreviousData, false, out isDefault);

@@ -63,8 +63,8 @@ namespace WixToolset.Ole32
     /// </summary>
     internal sealed class Storage : IDisposable
     {
+        private readonly IStorage storage;
         private bool disposed;
-        private IStorage storage;
 
         /// <summary>
         /// Instantiate a new Storage.

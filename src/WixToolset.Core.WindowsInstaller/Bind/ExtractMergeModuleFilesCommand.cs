@@ -48,7 +48,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var mergeModulesFileFacades = new List<FileFacade>();
 
-            IMsmMerge2 merge = MsmInterop.GetMsmMerge();
+            var merge = MsmInterop.GetMsmMerge();
 
             // Index all of the file rows to be able to detect collisions with files in the Merge Modules.
             // It may seem a bit expensive to build up this index solely for the purpose of checking collisions
@@ -57,11 +57,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Now since Merge Modules are already slow and generally less desirable than .wixlibs we'll let
             // this case be slightly more expensive because the cost of maintaining an indexed file row collection
             // is a lot more costly for the common cases.
-            var indexedFileFacades = this.FileFacades.ToDictionary(f => f.File.Id.Id, StringComparer.Ordinal);
+            var indexedFileFacades = this.FileFacades.ToDictionary(f => f.Id, StringComparer.Ordinal);
 
             foreach (var wixMergeRow in this.WixMergeTuples)
             {
-                bool containsFiles = this.CreateFacadesForMergeModuleFiles(wixMergeRow, mergeModulesFileFacades, indexedFileFacades);
+                var containsFiles = this.CreateFacadesForMergeModuleFiles(wixMergeRow, mergeModulesFileFacades, indexedFileFacades);
 
                 // If the module has files and creating layout
                 if (containsFiles && !this.SuppressLayout)
@@ -75,21 +75,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private bool CreateFacadesForMergeModuleFiles(WixMergeTuple wixMergeRow, List<FileFacade> mergeModulesFileFacades, Dictionary<string, FileFacade> indexedFileFacades)
         {
-            bool containsFiles = false;
+            var containsFiles = false;
 
             try
             {
                 // read the module's File table to get its FileMediaInformation entries and gather any other information needed from the module.
-                using (Database db = new Database(wixMergeRow.SourceFile, OpenDatabase.ReadOnly))
+                using (var db = new Database(wixMergeRow.SourceFile, OpenDatabase.ReadOnly))
                 {
                     if (db.TableExists("File") && db.TableExists("Component"))
                     {
-                        Dictionary<string, FileFacade> uniqueModuleFileIdentifiers = new Dictionary<string, FileFacade>(StringComparer.OrdinalIgnoreCase);
+                        var uniqueModuleFileIdentifiers = new Dictionary<string, FileFacade>(StringComparer.OrdinalIgnoreCase);
 
-                        using (View view = db.OpenExecuteView("SELECT `File`, `Directory_` FROM `File`, `Component` WHERE `Component_`=`Component`"))
+                        using (var view = db.OpenExecuteView("SELECT `File`, `Directory_` FROM `File`, `Component` WHERE `Component_`=`Component`"))
                         {
                             // add each file row from the merge module into the file row collection (check for errors along the way)
-                            foreach (Record record in view.Records)
+                            foreach (var record in view.Records)
                             {
                                 // NOTE: this is very tricky - the merge module file rows are not added to the
                                 // file table because they should not be created via idt import.  Instead, these
@@ -103,21 +103,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 var mergeModuleFileFacade = new FileFacade(true, fileTuple);
 
                                 // If case-sensitive collision with another merge module or a user-authored file identifier.
-                                if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.File.Id.Id, out var collidingFacade))
+                                if (indexedFileFacades.TryGetValue(mergeModuleFileFacade.Id, out var collidingFacade))
                                 {
-                                    this.Messaging.Write(ErrorMessages.DuplicateModuleFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, collidingFacade.File.Id.Id));
+                                    this.Messaging.Write(ErrorMessages.DuplicateModuleFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, collidingFacade.Id));
                                 }
-                                else if (uniqueModuleFileIdentifiers.TryGetValue(mergeModuleFileFacade.File.Id.Id, out collidingFacade)) // case-insensitive collision with another file identifier in the same merge module
+                                else if (uniqueModuleFileIdentifiers.TryGetValue(mergeModuleFileFacade.Id, out collidingFacade)) // case-insensitive collision with another file identifier in the same merge module
                                 {
-                                    this.Messaging.Write(ErrorMessages.DuplicateModuleCaseInsensitiveFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, mergeModuleFileFacade.File.Id.Id, collidingFacade.File.Id.Id));
+                                    this.Messaging.Write(ErrorMessages.DuplicateModuleCaseInsensitiveFileIdentifier(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, mergeModuleFileFacade.Id, collidingFacade.Id));
                                 }
                                 else // no collision
                                 {
                                     mergeModulesFileFacades.Add(mergeModuleFileFacade);
 
                                     // Keep updating the indexes as new rows are added.
-                                    indexedFileFacades.Add(mergeModuleFileFacade.File.Id.Id, mergeModuleFileFacade);
-                                    uniqueModuleFileIdentifiers.Add(mergeModuleFileFacade.File.Id.Id, mergeModuleFileFacade);
+                                    indexedFileFacades.Add(mergeModuleFileFacade.Id, mergeModuleFileFacade);
+                                    uniqueModuleFileIdentifiers.Add(mergeModuleFileFacade.Id, mergeModuleFileFacade);
                                 }
 
                                 containsFiles = true;
@@ -126,13 +126,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
 
                     // Get the summary information to detect the Schema
-                    using (SummaryInformation summaryInformation = new SummaryInformation(db))
+                    using (var summaryInformation = new SummaryInformation(db))
                     {
-                        string moduleInstallerVersionString = summaryInformation.GetProperty(14);
+                        var moduleInstallerVersionString = summaryInformation.GetProperty(14);
 
                         try
                         {
-                            int moduleInstallerVersion = Convert.ToInt32(moduleInstallerVersionString, CultureInfo.InvariantCulture);
+                            var moduleInstallerVersion = Convert.ToInt32(moduleInstallerVersionString, CultureInfo.InvariantCulture);
                             if (moduleInstallerVersion > this.OutputInstallerVersion)
                             {
                                 this.Messaging.Write(WarningMessages.InvalidHigherInstallerVersionInModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleInstallerVersion, this.OutputInstallerVersion));
@@ -159,7 +159,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void ExtractFilesFromMergeModule(IMsmMerge2 merge, WixMergeTuple wixMergeRow)
         {
-            bool moduleOpen = false;
+            var moduleOpen = false;
             short mergeLanguage;
 
             var mergeId = wixMergeRow.Id.Id;
@@ -180,10 +180,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 moduleOpen = true;
 
                 // extract the module cabinet, then explode all of the files to a temp directory
-                string moduleCabPath = Path.Combine(this.IntermediateFolder, mergeId + ".cab");
+                var moduleCabPath = Path.Combine(this.IntermediateFolder, mergeId + ".cab");
                 merge.ExtractCAB(moduleCabPath);
 
-                string mergeIdPath = Path.Combine(this.IntermediateFolder, mergeId);
+                var mergeIdPath = Path.Combine(this.IntermediateFolder, mergeId);
                 Directory.CreateDirectory(mergeIdPath);
 
                 try

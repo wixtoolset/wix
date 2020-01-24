@@ -19,7 +19,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         public Intermediate Execute()
         {
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
             Output output;
 
             try

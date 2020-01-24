@@ -57,7 +57,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var mediaRows = new Dictionary<int, MediaTuple>();
 
-            List<FileFacade> uncompressedFiles = new List<FileFacade>();
+            var uncompressedFiles = new List<FileFacade>();
 
             var mediaTable = this.Section.Tuples.OfType<MediaTuple>().ToList();
             var mediaTemplateTable = this.Section.Tuples.OfType<WixMediaTemplateTuple>().ToList();
@@ -109,8 +109,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             ulong currentPreCabSize = 0;
             ulong maxPreCabSizeInBytes;
-            int maxPreCabSizeInMB = 0;
-            int currentCabIndex = 0;
+            var maxPreCabSizeInMB = 0;
+            var currentCabIndex = 0;
 
             MediaTuple currentMediaRow = null;
 
@@ -131,7 +131,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.CabinetNameTemplate = mediaTemplateRow.CabinetTemplate;
             }
 
-            string mumsString = Environment.GetEnvironmentVariable("WIX_MUMS");
+            var mumsString = Environment.GetEnvironmentVariable("WIX_MUMS");
 
             try
             {
@@ -170,13 +170,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     // Associate current file with last cab (irrespective of the size) and cab index is not incremented anymore.
                     var cabinetFiles = filesByCabinetMedia[currentMediaRow];
-                    facade.File.DiskId = currentCabIndex;
+                    facade.DiskId = currentCabIndex;
                     cabinetFiles.Add(facade);
                     continue;
                 }
 
                 // Update current cab size.
-                currentPreCabSize += (ulong)facade.File.FileSize;
+                currentPreCabSize += (ulong)facade.FileSize;
 
                 if (currentPreCabSize > maxPreCabSizeInBytes)
                 {
@@ -186,10 +186,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     filesByCabinetMedia.Add(currentMediaRow, new List<FileFacade>());
 
                     var cabinetFileRows = filesByCabinetMedia[currentMediaRow];
-                    facade.File.DiskId = currentCabIndex;
+                    facade.DiskId = currentCabIndex;
                     cabinetFileRows.Add(facade);
                     // Now files larger than MaxUncompressedMediaSize will be the only file in its cabinet so as to respect MaxUncompressedMediaSize
-                    currentPreCabSize = (ulong)facade.File.FileSize;
+                    currentPreCabSize = (ulong)facade.FileSize;
                 }
                 else
                 {
@@ -204,7 +204,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     // Associate current file with current cab.
                     var cabinetFiles = filesByCabinetMedia[currentMediaRow];
-                    facade.File.DiskId = currentCabIndex;
+                    facade.DiskId = currentCabIndex;
                     cabinetFiles.Add(facade);
                 }
             }
@@ -260,18 +260,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            foreach (FileFacade facade in fileFacades)
+            foreach (var facade in fileFacades)
             {
                 if (!mediaRows.TryGetValue(facade.DiskId, out var mediaRow))
                 {
-                    this.Messaging.Write(ErrorMessages.MissingMedia(facade.File.SourceLineNumbers, facade.DiskId));
+                    this.Messaging.Write(ErrorMessages.MissingMedia(facade.SourceLineNumber, facade.DiskId));
                     continue;
                 }
 
                 // When building a product, if the current file is to be uncompressed or if
                 // the package set not to be compressed, don't cab it.
-                var compressed = (facade.File.Attributes & FileTupleAttributes.Compressed) == FileTupleAttributes.Compressed;
-                var uncompressed = (facade.File.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed;
+                var compressed = facade.Compressed;
+                var uncompressed = facade.Uncompressed;
                 if (SectionType.Product == this.Section.Type && (uncompressed || (!compressed && !this.FilesCompressed)))
                 {
                     uncompressedFiles.Add(facade);
@@ -284,7 +284,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.ExpectedMediaCabinet(facade.File.SourceLineNumbers, facade.File.Id.Id, facade.DiskId));
+                        this.Messaging.Write(ErrorMessages.ExpectedMediaCabinet(facade.SourceLineNumber, facade.Id, facade.DiskId));
                     }
                 }
             }

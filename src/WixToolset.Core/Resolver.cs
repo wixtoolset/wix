@@ -92,7 +92,7 @@ namespace WixToolset.Core
                 delayedFields = command.DelayedFields;
             }
 
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
             if (context.IntermediateRepresentation.SubStorages != null)
             {
                 foreach (SubStorage transform in context.IntermediateRepresentation.SubStorages)

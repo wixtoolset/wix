@@ -112,8 +112,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IBindFileWithPath CreateBindFileWithPath(FileFacade facade)
         {
             var result = this.ServiceProvider.GetService<IBindFileWithPath>();
-            result.Id = facade.File.Id.Id;
-            result.Path = facade.File.Source.Path;
+            result.Id = facade.Id;
+            result.Path = facade.SourcePath;
 
             return result;
         }

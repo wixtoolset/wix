@@ -12,7 +12,7 @@ namespace WixToolset.Core.WindowsInstaller
     {
         public IBindResult Bind(IBindContext context)
         {
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
             var command = new BindTransformCommand();
             command.Extensions = context.Extensions;
             command.TempFilesLocation = context.IntermediateFolder;

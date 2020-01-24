@@ -197,9 +197,8 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixPatchIdTuple(sourceLineNumbers)
+                var tuple = new WixPatchIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, patchId))
                 {
-                    ProductCode = patchId,
                     ClientPatchId = clientPatchId,
                     OptimizePatchSizeForLargeFiles = optimizePatchSizeForLargeFiles,
                     ApiPatchingSymbolFlags = apiPatchingSymbolFlags

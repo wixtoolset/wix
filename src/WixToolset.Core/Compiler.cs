@@ -7878,7 +7878,7 @@ namespace WixToolset.Core
             if (patch)
             {
                 // /Patch/PatchProperty goes directly into MsiPatchMetadata table
-                this.Core.AddTuple(new MsiPatchMetadataTuple(sourceLineNumbers)
+                this.Core.AddTuple(new MsiPatchMetadataTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, company, name))
                 {
                     Company = company,
                     Property = name,
@@ -8130,12 +8130,15 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="node">The element to parse.</param>
         /// <param name="diskId">Media index from parent element.</param>
-        private void ParsePatchBaselineElement(XElement node, int diskId)
+        private void ParsePatchBaselineElement(XElement node, int? diskId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
             var parsedValidate = false;
             var validationFlags = TransformFlags.PatchTransformDefault;
+            string baselineFile = null;
+            string updateFile = null;
+            string transformFile = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -8145,6 +8148,18 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
+                    case "DiskId":
+                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                        break;
+                    case "BaselineFile":
+                        baselineFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "UpdateFile":
+                        updateFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "TransformFile":
+                        transformFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -8165,6 +8180,28 @@ namespace WixToolset.Core
             else if (27 < id.Id.Length)
             {
                 this.Core.Write(ErrorMessages.IdentifierTooLongError(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, 27));
+            }
+
+            if (!String.IsNullOrEmpty(baselineFile) || !String.IsNullOrEmpty(updateFile))
+            {
+                if (String.IsNullOrEmpty(baselineFile))
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BaselineFile", "UpdateFile"));
+                }
+
+                if (String.IsNullOrEmpty(updateFile))
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpdateFile", "BaselineFile"));
+                }
+
+                if (!String.IsNullOrEmpty(transformFile))
+                {
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "TransformFile", !String.IsNullOrEmpty(baselineFile) ? "BaselineFile" : "UpdateFile"));
+                }
+            }
+            else if (String.IsNullOrEmpty(transformFile))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BaselineFile", "TransformFile", true));
             }
 
             foreach (var child in node.Elements())
@@ -8200,8 +8237,11 @@ namespace WixToolset.Core
             {
                 var tuple = new WixPatchBaselineTuple(sourceLineNumbers, id)
                 {
-                    DiskId = diskId,
-                    ValidationFlags = validationFlags
+                    DiskId = diskId ?? 1,
+                    ValidationFlags = validationFlags,
+                    BaselineFile = new IntermediateFieldPathValue { Path = baselineFile },
+                    UpdateFile = new IntermediateFieldPathValue { Path = updateFile },
+                    TransformFile = new IntermediateFieldPathValue { Path = transformFile }
                 };
 
                 this.Core.AddTuple(tuple);

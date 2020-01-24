@@ -113,7 +113,7 @@ namespace WixToolset.Core.Burn.Bundles
                         ++attachedContainerIndex;
                     }
 
-                    this.CreateContainer(container, containerPayloads, null);
+                    this.CreateContainer(container, containerPayloads);
                 }
             }
 
@@ -122,7 +122,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.FileTransfers = fileTransfers;
         }
 
-        private void CreateContainer(WixBundleContainerTuple container, IEnumerable<WixBundlePayloadTuple> containerPayloads, string manifestFile)
+        private void CreateContainer(WixBundleContainerTuple container, IEnumerable<WixBundlePayloadTuple> containerPayloads)
         {
             var command = new CreateContainerCommand(containerPayloads, container.WorkingPath, this.DefaultCompressionLevel);
             command.Execute();

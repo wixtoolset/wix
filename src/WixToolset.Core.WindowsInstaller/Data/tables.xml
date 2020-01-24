@@ -156,6 +156,10 @@
                 minValue="0" maxValue="32767" description="Integer containing bit flags representing file attributes (with the decimal value of each bit position in parentheses)"/>
         <columnDefinition name="Sequence" type="number" length="4"
                 minValue="1" maxValue="2147483647" description="Sequence with respect to the media images; order must track cabinet order."/>
+        <columnDefinition name="DiskId" type="number" length="4" unreal="yes"
+                minValue="1" maxValue="32767" description="Disk identifier for the file."/>
+        <columnDefinition name="Source" type="object" length="0" unreal="yes"
+                category="binary" description="Path to source of file."/>
     </tableDefinition>
     <tableDefinition name="CCPSearch">
         <columnDefinition name="Signature_" type="string" length="72" primaryKey="yes"

@@ -1,12 +1,15 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#if DELETE
+
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
     using WixToolset.Core.Bind;
-    using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
@@ -16,15 +19,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CopyTransformDataCommand
     {
-        public bool CopyOutFileRows { private get; set; }
+        public CopyTransformDataCommand(IMessaging messaging, WindowsInstallerData output, TableDefinitionCollection tableDefinitions, bool copyOutFileRows)
+        {
+            this.Messaging = messaging;
+            this.Output = output;
+            this.TableDefinitions = tableDefinitions;
+            this.CopyOutFileRows = copyOutFileRows;
+        }
 
-        public IEnumerable<IFileSystemExtension> Extensions { private get; set; }
+        private bool CopyOutFileRows { get; }
 
-        public IMessaging Messaging { private get; set; }
+        public IEnumerable<IFileSystemExtension> Extensions { get; }
 
-        public WindowsInstallerData Output { private get; set; }
+        private IMessaging Messaging { get; }
 
-        public TableDefinitionCollection TableDefinitions { private get; set; }
+        private WindowsInstallerData Output { get; }
+
+        private TableDefinitionCollection TableDefinitions { get; }
 
         public IEnumerable<FileFacade> FileFacades { get; private set; }
 
@@ -32,18 +43,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             Debug.Assert(OutputType.Patch != this.Output.Type);
 
-            List<FileFacade> allFileRows = this.CopyOutFileRows ? new List<FileFacade>() : null;
+            var allFileRows = this.CopyOutFileRows ? new List<FileFacade>() : null;
 
-#if REVISIT_FOR_PATCHING // TODO: Fix this patching related code to work correctly with FileFacades.
-            bool copyToPatch = (allFileRows != null);
-            bool copyFromPatch = !copyToPatch;
+            var copyToPatch = (allFileRows != null);
+            var copyFromPatch = !copyToPatch;
 
-            RowDictionary<MediaRow> patchMediaRows = new RowDictionary<MediaRow>();
+            var patchMediaRows = new RowDictionary<MediaRow>();
 
-            Dictionary<int, RowDictionary<WixFileRow>> patchMediaFileRows = new Dictionary<int, RowDictionary<WixFileRow>>();
+            var patchMediaFileRows = new Dictionary<int, RowDictionary<WixFileRow>>();
 
-            Table patchActualFileTable = this.Output.EnsureTable(this.TableDefinitions["File"]);
-            Table patchFileTable = this.Output.EnsureTable(this.TableDefinitions["WixFile"]);
+            var patchActualFileTable = this.Output.EnsureTable(this.TableDefinitions["File"]);
+            var patchFileTable = this.Output.EnsureTable(this.TableDefinitions["WixFile"]);
 
             if (copyFromPatch)
             {
@@ -51,8 +61,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 foreach (WixFileRow patchFileRow in patchFileTable.Rows)
                 {
                     int diskId = patchFileRow.DiskId;
-                    RowDictionary<WixFileRow> mediaFileRows;
-                    if (!patchMediaFileRows.TryGetValue(diskId, out mediaFileRows))
+                    if (!patchMediaFileRows.TryGetValue(diskId, out var mediaFileRows))
                     {
                         mediaFileRows = new RowDictionary<WixFileRow>();
                         patchMediaFileRows.Add(diskId, mediaFileRows);
@@ -61,24 +70,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     mediaFileRows.Add(patchFileRow);
                 }
 
-                Table patchMediaTable = this.Output.EnsureTable(this.TableDefinitions["Media"]);
+                var patchMediaTable = this.Output.EnsureTable(this.TableDefinitions["Media"]);
                 patchMediaRows = new RowDictionary<MediaRow>(patchMediaTable);
             }
 
-            // index paired transforms
-            Dictionary<string, Output> pairedTransforms = new Dictionary<string, Output>();
-            foreach (SubStorage substorage in this.Output.SubStorages)
-            {
-                if (substorage.Name.StartsWith("#"))
-                {
-                    pairedTransforms.Add(substorage.Name.Substring(1), substorage.Data);
-                }
-            }
+            // Index paired transforms by name without the "#" prefix.
+            var pairedTransforms = this.Output.SubStorages.Where(s => s.Name.StartsWith("#")).ToDictionary(s => s.Name.Substring(1), s => s.Data);
+            //Dictionary<string, Output> pairedTransforms = new Dictionary<string, Output>();
+            //foreach (SubStorage substorage in this.Output.SubStorages)
+            //{
+            //    if (substorage.Name.StartsWith("#"))
+            //    {
+            //        pairedTransforms.Add(substorage.Name.Substring(1), substorage.Data);
+            //    }
+            //}
 
             try
             {
-                // copy File bind data into substorages
-                foreach (SubStorage substorage in this.Output.SubStorages)
+                // Copy File bind data into substorages
+                foreach (var substorage in this.Output.SubStorages)
                 {
                     if (substorage.Name.StartsWith("#"))
                     {
@@ -86,25 +96,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         continue;
                     }
 
-                    Output mainTransform = substorage.Data;
-                    Table mainWixFileTable = mainTransform.Tables["WixFile"];
-                    Table mainMsiFileHashTable = mainTransform.Tables["MsiFileHash"];
+                    var mainTransform = substorage.Data;
+                    var mainWixFileTable = mainTransform.Tables["WixFile"];
+                    var mainMsiFileHashTable = mainTransform.Tables["MsiFileHash"];
 
                     this.FileManagerCore.ActiveSubStorage = substorage;
 
-                    RowDictionary<WixFileRow> mainWixFiles = new RowDictionary<WixFileRow>(mainWixFileTable);
-                    RowDictionary<Row> mainMsiFileHashIndex = new RowDictionary<Row>();
+                    var mainWixFiles = new RowDictionary<WixFileRow>(mainWixFileTable);
+                    var mainMsiFileHashIndex = new RowDictionary<Row>();
 
-                    Table mainFileTable = mainTransform.Tables["File"];
-                    Output pairedTransform = (Output)pairedTransforms[substorage.Name];
+                    var mainFileTable = mainTransform.Tables["File"];
+                    var pairedTransform = pairedTransforms[substorage.Name];
 
                     // copy Media.LastSequence and index the MsiFileHash table if it exists.
                     if (copyFromPatch)
                     {
-                        Table pairedMediaTable = pairedTransform.Tables["Media"];
+                        var pairedMediaTable = pairedTransform.Tables["Media"];
                         foreach (MediaRow pairedMediaRow in pairedMediaTable.Rows)
                         {
-                            MediaRow patchMediaRow = patchMediaRows.Get(pairedMediaRow.DiskId);
+                            var patchMediaRow = patchMediaRows.Get(pairedMediaRow.DiskId);
                             pairedMediaRow.Fields[1] = patchMediaRow.Fields[1];
                         }
 
@@ -118,8 +128,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
 
                     // Index File table of pairedTransform
-                    Table pairedFileTable = pairedTransform.Tables["File"];
-                    RowDictionary<FileRow> pairedFileRows = new RowDictionary<FileRow>(pairedFileTable);
+                    var pairedFileTable = pairedTransform.Tables["File"];
+                    var pairedFileRows = new RowDictionary<FileRow>(pairedFileTable);
 
                     if (null != mainFileTable)
                     {
@@ -140,12 +150,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 continue;
                             }
 
-                            WixFileRow mainWixFileRow = mainWixFiles.Get(mainFileRow.File);
+                            var mainWixFileRow = mainWixFiles.Get(mainFileRow.File);
 
                             if (copyToPatch) // when copying to the patch, we need compare the underlying files and include all file changes.
                             {
-                                ObjectField objectField = (ObjectField)mainWixFileRow.Fields[6];
-                                FileRow pairedFileRow = pairedFileRows.Get(mainFileRow.File);
+                                var objectField = (ObjectField)mainWixFileRow.Fields[6];
+                                var pairedFileRow = pairedFileRows.Get(mainFileRow.File);
 
                                 // If the file is new, we always need to add it to the patch.
                                 if (mainFileRow.Operation != RowOperation.Add)
@@ -169,8 +179,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                             if (null != pairedFileRow)
                                             {
                                                 // Always patch-added, but never non-compressed.
-                                                pairedFileRow.Attributes |= MsiInterop.MsidbFileAttributesPatchAdded;
-                                                pairedFileRow.Attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                                                pairedFileRow.Attributes |= WindowsInstallerConstants.MsidbFileAttributesPatchAdded;
+                                                pairedFileRow.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                                                 pairedFileRow.Fields[6].Modified = true;
                                                 pairedFileRow.Operation = RowOperation.Modify;
                                             }
@@ -179,14 +189,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                         {
                                             // The File is same. We need mark all the attributes as unchanged.
                                             mainFileRow.Operation = RowOperation.None;
-                                            foreach (Field field in mainFileRow.Fields)
+                                            foreach (var field in mainFileRow.Fields)
                                             {
                                                 field.Modified = false;
                                             }
 
                                             if (null != pairedFileRow)
                                             {
-                                                pairedFileRow.Attributes &= ~MsiInterop.MsidbFileAttributesPatchAdded;
+                                                pairedFileRow.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesPatchAdded;
                                                 pairedFileRow.Fields[6].Modified = false;
                                                 pairedFileRow.Operation = RowOperation.None;
                                             }
@@ -197,8 +207,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 else if (null != pairedFileRow) // RowOperation.Add
                                 {
                                     // Always patch-added, but never non-compressed.
-                                    pairedFileRow.Attributes |= MsiInterop.MsidbFileAttributesPatchAdded;
-                                    pairedFileRow.Attributes &= ~MsiInterop.MsidbFileAttributesNoncompressed;
+                                    pairedFileRow.Attributes |= WindowsInstallerConstants.MsidbFileAttributesPatchAdded;
+                                    pairedFileRow.Attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                                     pairedFileRow.Fields[6].Modified = true;
                                     pairedFileRow.Operation = RowOperation.Add;
                                 }
@@ -207,20 +217,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             // index patch files by diskId+fileId
                             int diskId = mainWixFileRow.DiskId;
 
-                            RowDictionary<WixFileRow> mediaFileRows;
-                            if (!patchMediaFileRows.TryGetValue(diskId, out mediaFileRows))
+                            if (!patchMediaFileRows.TryGetValue(diskId, out var mediaFileRows))
                             {
                                 mediaFileRows = new RowDictionary<WixFileRow>();
                                 patchMediaFileRows.Add(diskId, mediaFileRows);
                             }
 
-                            string fileId = mainFileRow.File;
-                            WixFileRow patchFileRow = mediaFileRows.Get(fileId);
+                            var fileId = mainFileRow.File;
+                            var patchFileRow = mediaFileRows.Get(fileId);
                             if (copyToPatch)
                             {
                                 if (null == patchFileRow)
                                 {
-                                    FileRow patchActualFileRow = (FileRow)patchFileTable.CreateRow(mainFileRow.SourceLineNumbers);
+                                    var patchActualFileRow = (FileRow)patchFileTable.CreateRow(mainFileRow.SourceLineNumbers);
                                     patchActualFileRow.CopyFrom(mainFileRow);
 
                                     patchFileRow = (WixFileRow)patchFileTable.CreateRow(mainFileRow.SourceLineNumbers);
@@ -237,7 +246,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     // make sure Source is same. Otherwise we are silently ignoring a file.
                                     if (0 != String.Compare(patchFileRow.Source, mainWixFileRow.Source, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        Messaging.Instance.OnMessage(WixErrors.SameFileIdDifferentSource(mainFileRow.SourceLineNumbers, fileId, patchFileRow.Source, mainWixFileRow.Source));
+                                        this.Messaging.Write(ErrorMessages.SameFileIdDifferentSource(mainFileRow.SourceLineNumbers, fileId, patchFileRow.Source, mainWixFileRow.Source));
                                     }
 
                                     // capture the previous file versions (and associated data) from this targeted instance of the baseline into the current filerow.
@@ -249,11 +258,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 // copy data from the patch back to the transform
                                 if (null != patchFileRow)
                                 {
-                                    FileRow pairedFileRow = (FileRow)pairedFileRows.Get(fileId);
-                                    for (int i = 0; i < patchFileRow.Fields.Length; i++)
+                                    var pairedFileRow = pairedFileRows.Get(fileId);
+                                    for (var i = 0; i < patchFileRow.Fields.Length; i++)
                                     {
-                                        string patchValue = patchFileRow[i] == null ? "" : patchFileRow[i].ToString();
-                                        string mainValue = mainFileRow[i] == null ? "" : mainFileRow[i].ToString();
+                                        var patchValue = patchFileRow[i] == null ? String.Empty : patchFileRow.FieldAsString(i);
+                                        var mainValue = mainFileRow[i] == null ? String.Empty : mainFileRow.FieldAsString(i);
 
                                         if (1 == i)
                                         {
@@ -298,17 +307,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     }
 
                                     // copy MsiFileHash row for this File
-                                    Row patchHashRow;
-                                    if (!mainMsiFileHashIndex.TryGetValue(patchFileRow.File, out patchHashRow))
+                                    if (!mainMsiFileHashIndex.TryGetValue(patchFileRow.File, out var patchHashRow))
                                     {
                                         patchHashRow = patchFileRow.Hash;
                                     }
 
                                     if (null != patchHashRow)
                                     {
-                                        Table mainHashTable = mainTransform.EnsureTable(this.TableDefinitions["MsiFileHash"]);
-                                        Row mainHashRow = mainHashTable.CreateRow(mainFileRow.SourceLineNumbers);
-                                        for (int i = 0; i < patchHashRow.Fields.Length; i++)
+                                        var mainHashTable = mainTransform.EnsureTable(this.TableDefinitions["MsiFileHash"]);
+                                        var mainHashRow = mainHashTable.CreateRow(mainFileRow.SourceLineNumbers);
+                                        for (var i = 0; i < patchHashRow.Fields.Length; i++)
                                         {
                                             mainHashRow[i] = patchHashRow[i];
                                             if (i > 1)
@@ -326,12 +334,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     List<Row> patchAssemblyNameRows = patchFileRow.AssemblyNames;
                                     if (null != patchAssemblyNameRows)
                                     {
-                                        Table mainAssemblyNameTable = mainTransform.EnsureTable(this.TableDefinitions["MsiAssemblyName"]);
-                                        foreach (Row patchAssemblyNameRow in patchAssemblyNameRows)
+                                        var mainAssemblyNameTable = mainTransform.EnsureTable(this.TableDefinitions["MsiAssemblyName"]);
+                                        foreach (var patchAssemblyNameRow in patchAssemblyNameRows)
                                         {
                                             // Copy if there isn't an identical modified/added row already in the transform.
-                                            bool foundMatchingModifiedRow = false;
-                                            foreach (Row mainAssemblyNameRow in mainAssemblyNameTable.Rows)
+                                            var foundMatchingModifiedRow = false;
+                                            foreach (var mainAssemblyNameRow in mainAssemblyNameTable.Rows)
                                             {
                                                 if (RowOperation.None != mainAssemblyNameRow.Operation && mainAssemblyNameRow.GetPrimaryKey('/').Equals(patchAssemblyNameRow.GetPrimaryKey('/')))
                                                 {
@@ -342,8 +350,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                                             if (!foundMatchingModifiedRow)
                                             {
-                                                Row mainAssemblyNameRow = mainAssemblyNameTable.CreateRow(mainFileRow.SourceLineNumbers);
-                                                for (int i = 0; i < patchAssemblyNameRow.Fields.Length; i++)
+                                                var mainAssemblyNameRow = mainAssemblyNameTable.CreateRow(mainFileRow.SourceLineNumbers);
+                                                for (var i = 0; i < patchAssemblyNameRow.Fields.Length; i++)
                                                 {
                                                     mainAssemblyNameRow[i] = patchAssemblyNameRow[i];
                                                 }
@@ -359,34 +367,36 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     if (null != patchFileRow.Patch)
                                     {
                                         // Add the PatchFiles action automatically to the AdminExecuteSequence and InstallExecuteSequence tables.
-                                        AddPatchFilesActionToSequenceTable(SequenceTable.AdminExecuteSequence, mainTransform, pairedTransform, mainFileRow);
-                                        AddPatchFilesActionToSequenceTable(SequenceTable.InstallExecuteSequence, mainTransform, pairedTransform, mainFileRow);
+                                        this.AddPatchFilesActionToSequenceTable(SequenceTable.AdminExecuteSequence, mainTransform, pairedTransform, mainFileRow);
+                                        this.AddPatchFilesActionToSequenceTable(SequenceTable.InstallExecuteSequence, mainTransform, pairedTransform, mainFileRow);
 
                                         // Add to Patch table
-                                        Table patchTable = pairedTransform.EnsureTable(this.TableDefinitions["Patch"]);
+                                        var patchTable = pairedTransform.EnsureTable(this.TableDefinitions["Patch"]);
                                         if (0 == patchTable.Rows.Count)
                                         {
                                             patchTable.Operation = TableOperation.Add;
                                         }
 
-                                        Row patchRow = patchTable.CreateRow(mainFileRow.SourceLineNumbers);
+                                        var patchRow = patchTable.CreateRow(mainFileRow.SourceLineNumbers);
                                         patchRow[0] = patchFileRow.File;
                                         patchRow[1] = patchFileRow.Sequence;
 
-                                        FileInfo patchFile = new FileInfo(patchFileRow.Source);
+                                        var patchFile = new FileInfo(patchFileRow.Source);
                                         patchRow[2] = (int)patchFile.Length;
                                         patchRow[3] = 0 == (PatchAttributeType.AllowIgnoreOnError & patchFileRow.PatchAttributes) ? 0 : 1;
 
-                                        string streamName = patchTable.Name + "." + patchRow[0] + "." + patchRow[1];
-                                        if (MsiInterop.MsiMaxStreamNameLength < streamName.Length)
+                                        var streamName = patchTable.Name + "." + patchRow[0] + "." + patchRow[1];
+                                        if (Msi.MsiInterop.MsiMaxStreamNameLength < streamName.Length)
                                         {
                                             streamName = "_" + Guid.NewGuid().ToString("D").ToUpperInvariant().Replace('-', '_');
-                                            Table patchHeadersTable = pairedTransform.EnsureTable(this.TableDefinitions["MsiPatchHeaders"]);
+
+                                            var patchHeadersTable = pairedTransform.EnsureTable(this.TableDefinitions["MsiPatchHeaders"]);
                                             if (0 == patchHeadersTable.Rows.Count)
                                             {
                                                 patchHeadersTable.Operation = TableOperation.Add;
                                             }
-                                            Row patchHeadersRow = patchHeadersTable.CreateRow(mainFileRow.SourceLineNumbers);
+
+                                            var patchHeadersRow = patchHeadersTable.CreateRow(mainFileRow.SourceLineNumbers);
                                             patchHeadersRow[0] = streamName;
                                             patchHeadersRow[1] = patchFileRow.Patch;
                                             patchRow[5] = streamName;
@@ -420,7 +430,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.FileManagerCore.ActiveSubStorage = null;
             }
-#endif
+
             this.FileFacades = allFileRows;
         }
 
@@ -509,17 +519,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 foreach (var row in sequenceTable.Rows)
                 {
                     var actionName = row.FieldAsString(0);
-                    if (String.Equals("PatchFiles", actionName, StringComparison.Ordinal))
+                    switch (actionName)
                     {
-                        hasPatchFilesAction = true;
-                    }
-                    else if (String.Equals("InstallFiles", actionName, StringComparison.Ordinal))
-                    {
-                        installFilesSequence = row.FieldAsInteger(2);
-                    }
-                    else if (String.Equals("DuplicateFiles", actionName, StringComparison.Ordinal))
-                    {
-                        duplicateFilesSequence = row.FieldAsInteger(2);
+                        case "PatchFiles":
+                            hasPatchFilesAction = true;
+                            break;
+
+                        case "InstallFiles":
+                            installFilesSequence = row.FieldAsInteger(2);
+                            break;
+
+                        case "DuplicateFiles":
+                            duplicateFilesSequence = row.FieldAsInteger(2);
+                            break;
                     }
                 }
             }
@@ -531,8 +543,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="output">The output to validate.</param>
         private void ValidateFileRowChanges(WindowsInstallerData transform)
         {
-            Table componentTable = transform.Tables["Component"];
-            Table fileTable = transform.Tables["File"];
+            var componentTable = transform.Tables["Component"];
+            var fileTable = transform.Tables["File"];
 
             // There's no sense validating keypaths if the transform has no component or file table
             if (componentTable == null || fileTable == null)
@@ -540,30 +552,30 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            Dictionary<string, string> componentKeyPath = new Dictionary<string, string>(componentTable.Rows.Count);
+            var componentKeyPath = new Dictionary<string, string>(componentTable.Rows.Count);
 
             // Index the Component table for non-directory & non-registry key paths.
-            foreach (Row row in componentTable.Rows)
+            foreach (var row in componentTable.Rows)
             {
-                if (null != row.Fields[5].Data &&
-                    0 != ((int)row.Fields[3].Data & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath))
+                var keyPath = row.FieldAsString(5);
+                if (keyPath != null && 0 != (row.FieldAsInteger(3) & WindowsInstallerConstants.MsidbComponentAttributesRegistryKeyPath))
                 {
-                    componentKeyPath.Add(row.Fields[0].Data.ToString(), row.Fields[5].Data.ToString());
+                    componentKeyPath.Add(row.FieldAsString(0), keyPath);
                 }
             }
 
-            Dictionary<string, string> componentWithChangedKeyPath = new Dictionary<string, string>();
-            Dictionary<string, string> componentWithNonKeyPathChanged = new Dictionary<string, string>();
+            var componentWithChangedKeyPath = new Dictionary<string, string>();
+            var componentWithNonKeyPathChanged = new Dictionary<string, string>();
             // Verify changes in the file table, now that file diffing has occurred
             foreach (FileRow row in fileTable.Rows)
             {
-                string fileId = row.Fields[0].Data.ToString();
-                string componentId = row.Fields[1].Data.ToString();
-
                 if (RowOperation.Modify != row.Operation)
                 {
                     continue;
                 }
+
+                var fileId = row.FieldAsString(0);
+                var componentId = row.FieldAsString(1);
 
                 // If this file is the keypath of a component
                 if (componentKeyPath.ContainsValue(fileId))
@@ -582,12 +594,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            foreach (KeyValuePair<string, string> componentFile in componentWithNonKeyPathChanged)
+            foreach (var componentFile in componentWithNonKeyPathChanged)
             {
                 // Make sure all changes to non keypath files also had a change in the keypath.
-                if (!componentWithChangedKeyPath.ContainsKey(componentFile.Key) && componentKeyPath.ContainsKey(componentFile.Key))
+                if (!componentWithChangedKeyPath.ContainsKey(componentFile.Key) && componentKeyPath.TryGetValue(componentFile.Key, out var keyPath))
                 {
-                    this.Messaging.Write(WarningMessages.UpdateOfNonKeyPathFile((string)componentFile.Value, (string)componentFile.Key, (string)componentKeyPath[componentFile.Key]));
+                    this.Messaging.Write(WarningMessages.UpdateOfNonKeyPathFile(componentFile.Value, componentFile.Key, keyPath));
                 }
             }
         }
@@ -614,3 +626,5 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         }
     }
 }
+
+#endif

@@ -470,7 +470,7 @@ namespace WixToolset.Core
                         string defaultControl = null;
                         string cancelControl = null;
 
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.BBControl, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl, false);
+                        this.ParseControlElement(child, id.Id, TupleDefinitionType.BBControl, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -966,7 +966,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "Control":
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.Control, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl, trackDiskSpace);
+                        this.ParseControlElement(child, id.Id, TupleDefinitionType.Control, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -1032,7 +1032,7 @@ namespace WixToolset.Core
         /// <param name="defaultControl">Name of the default control.</param>
         /// <param name="cancelControl">Name of the candle control.</param>
         /// <param name="trackDiskSpace">True if the containing dialog tracks disk space.</param>
-        private void ParseControlElement(XElement node, string dialog, TupleDefinitionType tupleType, ref IntermediateTuple lastTabTuple, ref string firstControl, ref string defaultControl, ref string cancelControl, bool trackDiskSpace)
+        private void ParseControlElement(XElement node, string dialog, TupleDefinitionType tupleType, ref IntermediateTuple lastTabTuple, ref string firstControl, ref string defaultControl, ref string cancelControl)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier controlId = null;

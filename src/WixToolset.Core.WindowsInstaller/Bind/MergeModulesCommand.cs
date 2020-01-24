@@ -277,7 +277,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         using (Record record = new Record(1))
                         {
-                            record.SetString(1, file.File.Id.Id);
+                            record.SetString(1, file.Id);
                             view.Execute(record);
                         }
 
@@ -288,7 +288,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 throw new InvalidOperationException("Failed to fetch a File row from the database that was merged in from a module.");
                             }
 
-                            recordUpdate.SetInteger(1, file.File.Sequence);
+                            recordUpdate.SetInteger(1, file.Sequence);
 
                             // Update the file attributes to match the compression specified
                             // on the Merge element or on the Package element.
@@ -300,12 +300,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 attributes = recordUpdate.GetInteger(2);
                             }
 
-                            if ((file.File.Attributes & FileTupleAttributes.Compressed) == FileTupleAttributes.Compressed)
+                            if (file.Compressed)
                             {
                                 attributes |= WindowsInstallerConstants.MsidbFileAttributesCompressed;
                                 attributes &= ~WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                             }
-                            else if ((file.File.Attributes & FileTupleAttributes.Uncompressed) == FileTupleAttributes.Uncompressed)
+                            else if (file.Uncompressed)
                             {
                                 attributes |= WindowsInstallerConstants.MsidbFileAttributesNoncompressed;
                                 attributes &= ~WindowsInstallerConstants.MsidbFileAttributesCompressed;

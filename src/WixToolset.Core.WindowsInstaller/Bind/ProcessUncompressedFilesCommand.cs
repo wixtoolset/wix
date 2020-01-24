@@ -86,14 +86,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             // setup up the query record and find the appropriate file in the
                             // previously executed file view
-                            fileQueryRecord[1] = facade.File.Id.Id;
+                            fileQueryRecord[1] = facade.Id;
                             fileView.Execute(fileQueryRecord);
 
                             using (Record fileRecord = fileView.Fetch())
                             {
                                 if (null == fileRecord)
                                 {
-                                    throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.File.SourceLineNumbers, facade.File.Id.Id));
+                                    throw new WixException(ErrorMessages.FileIdentifierNotFound(facade.SourceLineNumber, facade.Id));
                                 }
 
                                 relativeFileLayoutPath = this.PathResolver.GetFileSourcePath(directories, fileRecord[1], fileRecord[2], this.Compressed, this.LongNamesInImage);
@@ -102,7 +102,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             // finally put together the base media layout path and the relative file layout path
                             var fileLayoutPath = Path.Combine(mediaLayoutDirectory, relativeFileLayoutPath);
 
-                            var transfer = this.BackendHelper.CreateFileTransfer(facade.File.Source.Path, fileLayoutPath, false, facade.File.SourceLineNumbers);
+                            var transfer = this.BackendHelper.CreateFileTransfer(facade.SourcePath, fileLayoutPath, false, facade.SourceLineNumber);
                             fileTransfers.Add(transfer);
 
                             // Track the location where the cabinet will be placed. If the transfer is
@@ -110,7 +110,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             // because if the source and destination of the transfer is the same, we
                             // don't want to clean the file because we'd be deleting the original
                             // (and that would be bad).
-                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.Final, facade.File.SourceLineNumbers);
+                            var tracked = this.BackendHelper.TrackFile(transfer.Destination, TrackedFileType.Final, facade.SourceLineNumber);
                             tracked.Clean = !transfer.Redundant;
 
                             trackedFiles.Add(tracked);

@@ -1030,12 +1030,6 @@ namespace WixToolset.Core
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.WindowsInstallerVersion,
-                    Value = msiVersion.ToString(CultureInfo.InvariantCulture)
-                });
-
-                this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
-                {
                     PropertyId = SumaryInformationType.Security,
                     Value = YesNoDefaultType.No == security ? "0" : YesNoDefaultType.Yes == security ? "4" : "2"
                 });

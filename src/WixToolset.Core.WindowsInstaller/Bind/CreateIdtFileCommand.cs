@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
@@ -122,11 +122,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             tableString.Append(definition.Name);
             foreach (var column in definition.Columns)
             {
-                // conditionally keep columns added in a transform; otherwise,
-                // break because columns can only be added at the end
+                // Conditionally keep columns added in a transform; otherwise,
+                // break because columns can only be added at the end.
                 if (column.Added && !keepAddedColumns)
                 {
                     break;
+                }
+
+                if (column.Unreal)
+                {
+                    continue;
                 }
 
                 if (!first)
@@ -166,6 +171,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (field.Column.Added && !keepAddedColumns)
                 {
                     break;
+                }
+
+                if (field.Column.Unreal)
+                {
+                    continue;
                 }
 
                 if (first)

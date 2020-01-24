@@ -132,7 +132,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 file.SymbolPaths = String.Concat(file.SymbolPaths, ";", row.SymbolPaths);
             }
 
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
             Field field = row.Fields[2];
             if (null != field.PreviousData)
             {

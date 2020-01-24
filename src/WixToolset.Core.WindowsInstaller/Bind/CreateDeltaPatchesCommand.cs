@@ -33,7 +33,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var optimizePatchSizeForLargeFiles = this.WixPatchId?.OptimizePatchSizeForLargeFiles ?? false;
             var apiPatchingSymbolFlags = (PatchSymbolFlagsType)(this.WixPatchId?.ApiPatchingSymbolFlags ?? 0);
 
-#if REVISIT_FOR_PATCHING
+#if TODO_PATCHING
             foreach (FileFacade facade in this.FileFacades)
             {
                 if (RowOperation.Modify == facade.File.Operation &&

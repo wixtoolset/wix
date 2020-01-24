@@ -208,7 +208,6 @@ namespace WixToolset.Core.Burn
                             variableCache.Add(String.Concat("packageManufacturer.", facade.PackageId), msiPackage.Manufacturer);
                         }
                     }
-
                 }
                 break;
 
