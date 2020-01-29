@@ -6,16 +6,6 @@ namespace WixToolset.Extensibility.Services
 
     public interface IVariableResolver
     {
-        /// <summary>
-        /// Gets the codepage.
-        /// </summary>
-        int Codepage { get; }
-
-        /// <summary>
-        /// Gets the count of variables added to the resolver.
-        /// </summary>
-        int VariableCount { get; }
-
         void AddLocalization(Localization localization);
 
         /// <summary>

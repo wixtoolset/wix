@@ -24,7 +24,5 @@ namespace WixToolset.Extensibility.Data
         Intermediate IntermediateRepresentation { get; set; }
 
         IEnumerable<Localization> Localizations { get; set; }
-
-        IVariableResolver VariableResolver { get; set; }
     }
 }
