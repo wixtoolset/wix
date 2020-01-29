@@ -29,24 +29,16 @@ namespace WixToolset.Core
             this.locVariables = new Dictionary<string, BindVariable>();
             this.wixVariables = new Dictionary<string, BindVariable>();
             this.localizedControls = new Dictionary<string, LocalizedControl>();
-            this.Codepage = -1;
         }
 
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
-        public int Codepage { get; private set; }
-
         public int VariableCount  => this.wixVariables.Count;
 
         public void AddLocalization(Localization localization)
         {
-            if (-1 == this.Codepage)
-            {
-                this.Codepage = localization.Codepage;
-            }
-
             foreach (var variable in localization.Variables)
             {
                 if (!TryAddWixVariable(this.locVariables, variable))

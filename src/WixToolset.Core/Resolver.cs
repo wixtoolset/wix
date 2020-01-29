@@ -22,11 +22,15 @@ namespace WixToolset.Core
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
+
+            this.VariableResolver = serviceProvider.GetService<IVariableResolver>();
         }
 
         private IServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
+
+        private IVariableResolver VariableResolver { get; set; }
 
         public IEnumerable<IBindPath> BindPaths { get; set; }
 
@@ -40,7 +44,6 @@ namespace WixToolset.Core
 
         public IResolveResult Resolve(IResolveContext context)
         {
-
             foreach (var extension in context.Extensions)
             {
                 extension.PreResolve(context);
@@ -49,11 +52,11 @@ namespace WixToolset.Core
             ResolveResult resolveResult = null;
             try
             {
-                PopulateVariableResolver(context);
+                var codepage = this.PopulateVariableResolver(context);
 
                 this.LocalizeUI(context);
 
-                resolveResult = this.DoResolve(context);
+                resolveResult = this.DoResolve(context, codepage);
             }
             finally
             {
@@ -66,7 +69,7 @@ namespace WixToolset.Core
             return resolveResult;
         }
 
-        private ResolveResult DoResolve(IResolveContext context)
+        private ResolveResult DoResolve(IResolveContext context, int? codepage)
         {
             var buildingPatch = context.IntermediateRepresentation.Sections.Any(s => s.Type == SectionType.Patch);
 
@@ -77,7 +80,7 @@ namespace WixToolset.Core
                 var command = new ResolveFieldsCommand();
                 command.Messaging = this.Messaging;
                 command.BuildingPatch = buildingPatch;
-                command.VariableResolver = context.VariableResolver;
+                command.VariableResolver = this.VariableResolver;
                 command.BindPaths = context.BindPaths;
                 command.Extensions = context.Extensions;
                 command.FilesWithEmbeddedFiles = filesWithEmbeddedFiles;
@@ -112,7 +115,7 @@ namespace WixToolset.Core
 
             return new ResolveResult
             {
-                Codepage = context.VariableResolver.Codepage,
+                Codepage = codepage.HasValue ? codepage.Value : -1,
                 ExpectedEmbeddedFiles = expectedEmbeddedFiles,
                 DelayedFields = delayedFields,
                 IntermediateRepresentation = context.IntermediateRepresentation
@@ -128,7 +131,7 @@ namespace WixToolset.Core
             {
                 foreach (var tuple in section.Tuples.OfType<DialogTuple>())
                 {
-                    if (context.VariableResolver.TryGetLocalizedControl(tuple.Id.Id, null, out var localizedControl))
+                    if (this.VariableResolver.TryGetLocalizedControl(tuple.Id.Id, null, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
@@ -163,7 +166,7 @@ namespace WixToolset.Core
 
                 foreach (var tuple in section.Tuples.OfType<ControlTuple>())
                 {
-                    if (context.VariableResolver.TryGetLocalizedControl(tuple.DialogRef, tuple.Control, out var localizedControl))
+                    if (this.VariableResolver.TryGetLocalizedControl(tuple.DialogRef, tuple.Control, out var localizedControl))
                     {
                         if (CompilerConstants.IntegerNotSet != localizedControl.X)
                         {
@@ -198,23 +201,24 @@ namespace WixToolset.Core
             }
         }
 
-        private static void PopulateVariableResolver(IResolveContext context)
+        private int? PopulateVariableResolver(IResolveContext context)
         {
-            var creator = context.ServiceProvider.GetService<ITupleDefinitionCreator>();
-
             var localizations = FilterLocalizations(context);
+            var codepage = localizations.FirstOrDefault()?.Codepage;
 
             foreach (var localization in localizations)
             {
-                context.VariableResolver.AddLocalization(localization);
+                this.VariableResolver.AddLocalization(localization);
             }
 
             // Gather all the wix variables.
             var wixVariableTuples = context.IntermediateRepresentation.Sections.SelectMany(s => s.Tuples).OfType<WixVariableTuple>();
             foreach (var tuple in wixVariableTuples)
             {
-                context.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.Id.Id, tuple.Value, tuple.Overridable);
+                this.VariableResolver.AddVariable(tuple.SourceLineNumbers, tuple.Id.Id, tuple.Value, tuple.Overridable);
             }
+
+            return codepage;
         }
 
         private static IEnumerable<Localization> FilterLocalizations(IResolveContext context)

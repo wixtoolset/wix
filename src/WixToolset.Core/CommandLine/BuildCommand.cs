@@ -284,7 +284,6 @@ namespace WixToolset.Core.CommandLine
                 context.IntermediateFolder = intermediateFolder;
                 context.IntermediateRepresentation = output;
                 context.Localizations = localizations;
-                context.VariableResolver = this.ServiceProvider.GetService<IVariableResolver>();
 
                 var resolver = this.ServiceProvider.GetService<IResolver>();
                 resolveResult = resolver.Resolve(context);
