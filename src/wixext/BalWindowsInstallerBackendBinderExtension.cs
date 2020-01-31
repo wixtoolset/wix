@@ -3,6 +3,7 @@
 namespace WixToolset.Bal
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
     using WixToolset.Data;
@@ -16,7 +17,7 @@ namespace WixToolset.Bal
     {
         private static readonly TableDefinition[] Tables = LoadTables();
 
-        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
+        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
 
         private static TableDefinition[] LoadTables()
         {
