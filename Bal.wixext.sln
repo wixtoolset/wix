@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.ManagedHost"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.FullFramework4MBA", "src\test\examples\FullFramework4MBA\Example.FullFramework4MBA.csproj", "{44297646-706D-4508-8E96-1B35B109694C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Bal", "src\test\WixToolsetTest.Bal\WixToolsetTest.Bal.csproj", "{89D479FC-20DA-44D8-AE38-48F063223498}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,18 @@ Global
 		{44297646-706D-4508-8E96-1B35B109694C}.Release|x64.Build.0 = Release|Any CPU
 		{44297646-706D-4508-8E96-1B35B109694C}.Release|x86.ActiveCfg = Release|Any CPU
 		{44297646-706D-4508-8E96-1B35B109694C}.Release|x86.Build.0 = Release|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Debug|x64.Build.0 = Debug|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Debug|x86.Build.0 = Debug|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Release|x64.ActiveCfg = Release|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Release|x64.Build.0 = Release|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Release|x86.ActiveCfg = Release|Any CPU
+		{89D479FC-20DA-44D8-AE38-48F063223498}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
