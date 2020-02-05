@@ -7,10 +7,10 @@ namespace WixToolset.Extensibility
 
     public interface IMessageListener
     {
+        MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel);
+
         void Write(Message message);
 
         void Write(string message);
-
-        MessageLevel CalculateMessageLevel(IMessaging messaging, Message message, MessageLevel defaultMessageLevel);
     }
 }
