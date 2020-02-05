@@ -88,6 +88,12 @@ namespace WixToolset.Data.WindowsInstaller
                     var thisColumnDef = this.Columns[i];
                     var updatedColumnDef = updated.Columns[i];
 
+                    // Igmore unreal columns when comparing table definitions.
+                    if (thisColumnDef.Unreal || updatedColumnDef.Unreal)
+                    {
+                        continue;
+                    }
+
                     ret = thisColumnDef.CompareTo(updatedColumnDef);
                 }
             }

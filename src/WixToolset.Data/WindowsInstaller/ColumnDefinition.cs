@@ -29,7 +29,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="modularizeType">Type of modularization for column</param>
         /// <param name="forceLocalizable">If the column is localizable.</param>
         /// <param name="useCData">If whitespace should be preserved in a CDATA node.</param>
-        public ColumnDefinition(string name, ColumnType type, int length, bool primaryKey, bool nullable, ColumnCategory category, long? minValue = null, long? maxValue = null, string keyTable = null, int? keyColumn = null, string possibilities = null, string description = null, ColumnModularizeType? modularizeType = null, bool forceLocalizable = false, bool useCData = false)
+        public ColumnDefinition(string name, ColumnType type, int length, bool primaryKey, bool nullable, ColumnCategory category, long? minValue = null, long? maxValue = null, string keyTable = null, int? keyColumn = null, string possibilities = null, string description = null, ColumnModularizeType? modularizeType = null, bool forceLocalizable = false, bool useCData = false, bool unreal = false)
         {
             this.Name = name;
             this.Type = type;
@@ -46,6 +46,7 @@ namespace WixToolset.Data.WindowsInstaller
             this.Possibilities = possibilities;
             this.Description = description;
             this.UseCData = useCData;
+            this.Unreal = unreal;
         }
 
         /// <summary>
@@ -146,6 +147,12 @@ namespace WixToolset.Data.WindowsInstaller
         public bool UseCData { get; }
 
         /// <summary>
+        /// Gets if column is Unreal.
+        /// </summary>
+        /// <value>true if column should not be included in idts.</value>
+        public bool Unreal { get; }
+
+        /// <summary>
         /// Parses a column definition in a table definition.
         /// </summary>
         /// <param name="reader">Reader to get data from.</param>
@@ -174,6 +181,7 @@ namespace WixToolset.Data.WindowsInstaller
             bool primaryKey = false;
             var type = ColumnType.Unknown;
             bool useCData = false;
+            bool unreal = false;
 
             // parse the attributes
             while (reader.MoveToNextAttribute())
@@ -370,6 +378,9 @@ namespace WixToolset.Data.WindowsInstaller
                     case "useCData":
                         useCData = reader.Value.Equals("yes");
                         break;
+                    case "unreal":
+                        unreal = reader.Value.Equals("yes");
+                        break;
                 }
             }
 
@@ -396,7 +407,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            ColumnDefinition columnDefinition = new ColumnDefinition(name, type, length, primaryKey, nullable, category, minValue, maxValue, keyTable, keyColumn, possibilities, description, modularize, localizable, useCData);
+            ColumnDefinition columnDefinition = new ColumnDefinition(name, type, length, primaryKey, nullable, category, minValue, maxValue, keyTable, keyColumn, possibilities, description, modularize, localizable, useCData, unreal);
             columnDefinition.Added = added;
 
             return columnDefinition;
@@ -599,6 +610,11 @@ namespace WixToolset.Data.WindowsInstaller
             if (this.UseCData)
             {
                 writer.WriteAttributeString("useCData", "yes");
+            }
+
+            if (this.Unreal)
+            {
+                writer.WriteAttributeString("unreal", "yes");
             }
 
             writer.WriteEndElement();
