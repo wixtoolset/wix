@@ -203,6 +203,11 @@ namespace WixToolset.Data
             return Message(null, Ids.CorruptFileFormat, "Attempted to load corrupt file from path: {0}. The file with format {1} contained unexpected content. Ensure the correct path was provided and that the file has not been incorrectly modified.", path, format.ToLowerInvariant());
         }
 
+        public static Message CouldNotDetermineProductCodeFromTransformSummaryInfo()
+        {
+            return Message(null, Ids.CouldNotDetermineProductCodeFromTransformSummaryInfo, "Could not determine ProductCode from transform summary information.");
+        }
+        
         public static Message CreateCabAddFileFailed()
         {
             return Message(null, Ids.CreateCabAddFileFailed, "An error (E_FAIL) was returned while adding files to a CAB file. This most commonly happens when creating a CAB file 2 GB or larger. Either reduce the size of your installation package, raise Media/@CompressionLevel to a higher compression level, or split your installation package's files into more than one CAB file.");
@@ -2640,6 +2645,7 @@ namespace WixToolset.Data
             NoSourceFiles = 391,
             WixiplSourceFileIsExclusive = 392,
             UnableToConvertFieldToNumber = 393,
+            CouldNotDetermineProductCodeFromTransformSummaryInfo = 394,
         }
     }
 }

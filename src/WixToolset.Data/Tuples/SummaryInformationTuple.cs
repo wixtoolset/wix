@@ -30,18 +30,49 @@ namespace WixToolset.Data.Tuples
         Codepage = 1,
         Title,
         Subject,
+        PatchPackageName = 3, //used by patches
         Author,
         Keywords,
         Comments,
         PlatformAndLanguage,
+        PatchProductCodes = 7, // used by patches
         TransformPlatformAndLanguageOrStorageNames,
+        TransformNames = 8, // used by patches
         PackageCode,
-        Created = 12,
+        PatchCode = 9, // used by patches
+        TransformProductCodes = 9, // used by transforms
+        Reserved11 = 11, // reserved by patches
+        Created,
         LastSaved,
         WindowsInstallerVersion,
+        Reserved14 = 14, // reserved by patches
         WordCount,
+        PatchInstallerRequirement = 15, // used by patches
+        Reserved16, // reserved by patches
+        TransformValidationFlags = 16, // used by transforms
         CreatingApplication = 18,
         Security
+    }
+
+    /// <summary>
+    /// Summary information values for the PachInstallerRequirement property.
+    /// </summary>
+    public enum PatchInstallerRequirement
+    {
+        /// <summary>Any version of the installer will do</summary>
+        Version10 = 1,
+
+        /// <summary>At least 1.2</summary>
+        Version12 = 2,
+
+        /// <summary>At least 2.0</summary>
+        Version20 = 3,
+
+        /// <summary>At least 3.0</summary>
+        Version30 = 4,
+
+        /// <summary>At least 3.1</summary>
+        Version31 = 5,
     }
 
     public class SummaryInformationTuple : IntermediateTuple

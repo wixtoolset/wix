@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixPatchId,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ProductCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ClientPatchId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixPatchIdTupleFields.ApiPatchingSymbolFlags), IntermediateFieldType.Number),
@@ -23,7 +22,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixPatchIdTupleFields
     {
-        ProductCode,
         ClientPatchId,
         OptimizePatchSizeForLargeFiles,
         ApiPatchingSymbolFlags,
@@ -40,12 +38,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixPatchIdTupleFields index] => this.Fields[(int)index];
-
-        public string ProductCode
-        {
-            get => (string)this.Fields[(int)WixPatchIdTupleFields.ProductCode];
-            set => this.Set((int)WixPatchIdTupleFields.ProductCode, value);
-        }
 
         public string ClientPatchId
         {

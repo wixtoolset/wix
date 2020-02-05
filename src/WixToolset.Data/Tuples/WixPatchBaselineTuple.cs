@@ -12,6 +12,9 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.DiskId), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.ValidationFlags), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.BaselineFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.UpdateFile), IntermediateFieldType.Path),
+                new IntermediateFieldDefinition(nameof(WixPatchBaselineTupleFields.TransformFile), IntermediateFieldType.Path),
             },
             typeof(WixPatchBaselineTuple));
     }
@@ -23,6 +26,9 @@ namespace WixToolset.Data.Tuples
     {
         DiskId,
         ValidationFlags,
+        BaselineFile,
+        UpdateFile,
+        TransformFile,
     }
 
     public class WixPatchBaselineTuple : IntermediateTuple
@@ -47,6 +53,24 @@ namespace WixToolset.Data.Tuples
         {
             get => (TransformFlags)this.Fields[(int)WixPatchBaselineTupleFields.ValidationFlags].AsNumber();
             set => this.Set((int)WixPatchBaselineTupleFields.ValidationFlags, (int)value);
+        }
+
+        public IntermediateFieldPathValue BaselineFile
+        {
+            get => this.Fields[(int)WixPatchBaselineTupleFields.BaselineFile].AsPath();
+            set => this.Set((int)WixPatchBaselineTupleFields.BaselineFile, value);
+        }
+
+        public IntermediateFieldPathValue UpdateFile
+        {
+            get => this.Fields[(int)WixPatchBaselineTupleFields.UpdateFile].AsPath();
+            set => this.Set((int)WixPatchBaselineTupleFields.UpdateFile, value);
+        }
+
+        public IntermediateFieldPathValue TransformFile
+        {
+            get => this.Fields[(int)WixPatchBaselineTupleFields.TransformFile].AsPath();
+            set => this.Set((int)WixPatchBaselineTupleFields.TransformFile, value);
         }
     }
 }
