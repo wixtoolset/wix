@@ -4,7 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -13,6 +13,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" />
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" NoWarn="NU1701" />
+    <PackageReference Include="WixToolset.Dtf.Compression" Version="4.0.*" NoWarn="NU1701" />
+    <PackageReference Include="WixToolset.Dtf.Compression.Cab" Version="4.0.*" NoWarn="NU1701" />
   </ItemGroup>
 
   <ItemGroup>
