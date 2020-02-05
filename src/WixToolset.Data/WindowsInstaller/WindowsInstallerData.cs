@@ -61,6 +61,42 @@ namespace WixToolset.Data.WindowsInstaller
         public TableIndexedCollection Tables { get; private set; }
 
         /// <summary>
+        /// Ensure this output contains a particular table.
+        /// </summary>
+        /// <param name="tableDefinition">Definition of the table that should exist.</param>
+        /// <param name="section">Optional section to use for the table. If one is not provided, the entry section will be used.</param>
+        /// <returns>The table in this output.</returns>
+        public Table EnsureTable(TableDefinition tableDefinition)
+        {
+            if (!this.Tables.TryGetTable(tableDefinition.Name, out var table))
+            {
+                table = new Table(tableDefinition);
+                this.Tables.Add(table);
+            }
+
+            return table;
+        }
+
+        /// <summary>
+        /// Saves an output to a <c>WixOutput</c> container.
+        /// </summary>
+        /// <param name="wixout">Container to save to.</param>
+        public void Save(WixOutput wixout)
+        {
+            using (var writer = XmlWriter.Create(wixout.CreateDataStream(WixOutputStreamName)))
+            {
+                writer.WriteStartDocument();
+                this.Write(writer);
+                writer.WriteEndDocument();
+            }
+        }
+
+        /// <summary>
+        /// Gets table by name.
+        /// </summary>
+        public bool TryGetTable(string tableName, out Table table) => this.Tables.TryGetTable(tableName, out table);
+
+        /// <summary>
         /// Loads an output from a path on disk.
         /// </summary>
         /// <param name="path">Path to output file saved on disk.</param>
@@ -81,20 +117,6 @@ namespace WixToolset.Data.WindowsInstaller
                 {
                     throw new WixCorruptFileException(path, "wixout", xe);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Saves an output to a <c>WixOutput</c> container.
-        /// </summary>
-        /// <param name="wixout">Container to save to.</param>
-        public void Save(WixOutput wixout)
-        {
-            using (var writer = XmlWriter.Create(wixout.CreateDataStream(WixOutputStreamName)))
-            {
-                writer.WriteStartDocument();
-                this.Write(writer);
-                writer.WriteEndDocument();
             }
         }
 
@@ -204,23 +226,6 @@ namespace WixToolset.Data.WindowsInstaller
 
             output.Tables = new TableIndexedCollection(tables);
             return output;
-        }
-
-        /// <summary>
-        /// Ensure this output contains a particular table.
-        /// </summary>
-        /// <param name="tableDefinition">Definition of the table that should exist.</param>
-        /// <param name="section">Optional section to use for the table. If one is not provided, the entry section will be used.</param>
-        /// <returns>The table in this output.</returns>
-        public Table EnsureTable(TableDefinition tableDefinition)
-        {
-            if (!this.Tables.TryGetTable(tableDefinition.Name, out var table))
-            {
-                table = new Table(tableDefinition);
-                this.Tables.Add(table);
-            }
-
-            return table;
         }
 
         /// <summary>

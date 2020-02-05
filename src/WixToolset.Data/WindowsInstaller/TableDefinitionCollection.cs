@@ -36,18 +36,12 @@ namespace WixToolset.Data.WindowsInstaller
         /// Gets the number of items in the collection.
         /// </summary>
         /// <value>Number of items in collection.</value>
-        public int Count
-        {
-            get { return this.collection.Count; }
-        }
+        public int Count => this.collection.Count;
 
         /// <summary>
         /// Table definition collections are never read-only.
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Gets a table definition by name.
@@ -72,10 +66,7 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="tableName">Name of table to locate.</param>
         /// <param name="table">Table definition if found.</param>
         /// <returns>True if table definition was found otherwise false.</returns>
-        public bool TryGet(string tableName, out TableDefinition table)
-        {
-            return this.collection.TryGetValue(tableName, out table);
-        }
+        public bool TryGet(string tableName, out TableDefinition table) => this.collection.TryGetValue(tableName, out table);
 
         /// <summary>
         /// Load a table definition collection from an XmlReader.
@@ -95,76 +86,52 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         /// <param name="tableDefinition">Table definition to add to the collection.</param>
         /// <value>Indexes by table definition name.</value>
-        public void Add(TableDefinition tableDefinition)
-        {
-            this.collection.Add(tableDefinition.Name, tableDefinition);
-        }
+        public void Add(TableDefinition tableDefinition) => this.collection.Add(tableDefinition.Name, tableDefinition);
 
         /// <summary>
         /// Removes all table definitions from the collection.
         /// </summary>
-        public void Clear()
-        {
-            this.collection.Clear();
-        }
+        public void Clear() => this.collection.Clear();
 
         /// <summary>
         /// Checks if the collection contains a table name.
         /// </summary>
         /// <param name="tableName">The table to check in the collection.</param>
         /// <returns>True if collection contains the table.</returns>
-        public bool Contains(string tableName)
-        {
-            return this.collection.ContainsKey(tableName);
-        }
+        public bool Contains(string tableName) => this.collection.ContainsKey(tableName);
 
         /// <summary>
         /// Checks if the collection contains a table.
         /// </summary>
         /// <param name="table">The table to check in the collection.</param>
         /// <returns>True if collection contains the table.</returns>
-        public bool Contains(TableDefinition table)
-        {
-            return this.collection.ContainsKey(table.Name);
-        }
+        public bool Contains(TableDefinition table) => this.collection.ContainsKey(table.Name);
 
         /// <summary>
         /// Copies table definitions to an arry.
         /// </summary>
         /// <param name="array">Array to copy the table definitions to.</param>
         /// <param name="index">Index in the array to start copying at.</param>
-        public void CopyTo(TableDefinition[] array, int index)
-        {
-            this.collection.Values.CopyTo(array, index);
-        }
+        public void CopyTo(TableDefinition[] array, int index) => this.collection.Values.CopyTo(array, index);
 
         /// <summary>
         /// Removes a table definition from the collection.
         /// </summary>
         /// <param name="table">Table to remove from the collection.</param>
         /// <returns>True if the table definition existed in the collection and was removed.</returns>
-        public bool Remove(TableDefinition table)
-        {
-            return this.collection.Remove(table.Name);
-        }
+        public bool Remove(TableDefinition table) => this.collection.Remove(table.Name);
 
         /// <summary>
         /// Gets enumerator for the collection.
         /// </summary>
         /// <returns>Enumerator for the collection.</returns>
-        public IEnumerator<TableDefinition> GetEnumerator()
-        {
-            return this.collection.Values.GetEnumerator();
-        }
+        public IEnumerator<TableDefinition> GetEnumerator() => this.collection.Values.GetEnumerator();
 
         /// <summary>
         /// Gets the untyped enumerator for the collection.
         /// </summary>
         /// <returns>Untyped enumerator for the collection.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.collection.Values.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => this.collection.Values.GetEnumerator();
 
         /// <summary>
         /// Loads a collection of table definitions from a XmlReader in memory.
@@ -178,8 +145,8 @@ namespace WixToolset.Data.WindowsInstaller
                 throw new XmlException();
             }
 
-            bool empty = reader.IsEmptyElement;
-            TableDefinitionCollection tableDefinitionCollection = new TableDefinitionCollection();
+            var empty = reader.IsEmptyElement;
+            var tableDefinitionCollection = new TableDefinitionCollection();
 
             while (reader.MoveToNextAttribute())
             {
@@ -188,7 +155,7 @@ namespace WixToolset.Data.WindowsInstaller
             // parse the child elements
             if (!empty)
             {
-                bool done = false;
+                var done = false;
 
                 while (!done && reader.Read())
                 {

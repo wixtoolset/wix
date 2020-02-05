@@ -39,14 +39,15 @@ namespace WixToolset.Data.WindowsInstaller
         /// <returns>New SubStorage object.</returns>
         internal static SubStorage Read(XmlReader reader)
         {
-            if (!reader.LocalName.Equals("subStorage" == reader.LocalName))
+            if (reader.LocalName != "subStorage")
             {
                 throw new XmlException();
             }
 
             WindowsInstallerData data = null;
-            bool empty = reader.IsEmptyElement;
             string name = null;
+
+            var empty = reader.IsEmptyElement;
 
             while (reader.MoveToNextAttribute())
             {
@@ -60,7 +61,7 @@ namespace WixToolset.Data.WindowsInstaller
 
             if (!empty)
             {
-                bool done = false;
+                var done = false;
 
                 while (!done && reader.Read())
                 {
@@ -76,6 +77,7 @@ namespace WixToolset.Data.WindowsInstaller
                                     throw new XmlException();
                             }
                             break;
+
                         case XmlNodeType.EndElement:
                             done = true;
                             break;

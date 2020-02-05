@@ -15,19 +15,13 @@ namespace WixToolset.Data.WindowsInstaller
         /// <summary>
         /// Instantiate a new empty collection.
         /// </summary>
-        public TableIndexedCollection()
-        {
-            this.collection = new Dictionary<string, Table>();
-        }
+        public TableIndexedCollection() => this.collection = new Dictionary<string, Table>();
 
         /// <summary>
         /// Instantiate a new collection populated with a set of tables.
         /// </summary>
         /// <param name="tables">Set of tables.</param>
-        public TableIndexedCollection(IEnumerable<Table> tables)
-        {
-            this.collection = tables.ToDictionary(t => t.Name);
-        }
+        public TableIndexedCollection(IEnumerable<Table> tables) => this.collection = tables.ToDictionary(t => t.Name);
 
         /// <summary>
         /// Gets the number of items in the collection.
@@ -45,18 +39,12 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         /// <param name="table">Table to add to the collection.</param>
         /// <remarks>Indexes the table by name.</remarks>
-        public void Add(Table table)
-        {
-            this.collection.Add(table.Name, table);
-        }
+        public void Add(Table table) => this.collection.Add(table.Name, table);
 
         /// <summary>
         /// Clear the tables from the collection.
         /// </summary>
-        public void Clear()
-        {
-            this.collection.Clear();
-        }
+        public void Clear() => this.collection.Clear();
 
         /// <summary>
         /// Determines if a table is in the collection.
@@ -70,46 +58,31 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         /// <param name="array">Array to copy the collection into.</param>
         /// <param name="arrayIndex">Index to start copying from.</param>
-        public void CopyTo(Table[] array, int arrayIndex)
-        {
-            this.collection.Values.CopyTo(array, arrayIndex);
-        }
+        public void CopyTo(Table[] array, int arrayIndex) => this.collection.Values.CopyTo(array, arrayIndex);
 
         /// <summary>
         /// Remove a table from the collection by name.
         /// </summary>
         /// <param name="tableName">Table name to remove from the collection.</param>
-        public void Remove(string tableName)
-        {
-            this.collection.Remove(tableName);
-        }
+        public void Remove(string tableName) => _ = this.collection.Remove(tableName);
 
         /// <summary>
         /// Remove a table from the collection.
         /// </summary>
         /// <param name="table">Table with matching name to remove from the collection.</param>
-        public bool Remove(Table table)
-        {
-            return this.collection.Remove(table.Name);
-        }
+        public bool Remove(Table table) => this.collection.Remove(table.Name);
 
         /// <summary>
         /// Gets an enumerator over the whole collection.
         /// </summary>
         /// <returns>Collection enumerator.</returns>
-        public IEnumerator<Table> GetEnumerator()
-        {
-            return this.collection.Values.GetEnumerator();
-        }
+        public IEnumerator<Table> GetEnumerator() => this.collection.Values.GetEnumerator();
 
         /// <summary>
         /// Gets an untyped enumerator over the whole collection.
         /// </summary>
         /// <returns>Untyped collection enumerator.</returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return this.collection.Values.GetEnumerator();
-        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => this.collection.Values.GetEnumerator();
 
         /// <summary>
         /// Gets a table by name.
@@ -117,16 +90,8 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="tableName">Name of table to locate.</param>
         public Table this[string tableName]
         {
-            get
-            {
-                Table table;
-                return this.collection.TryGetValue(tableName, out table) ? table : null;
-            }
-
-            set
-            {
-                this.collection[tableName] = value;
-            }
+            get => this.collection.TryGetValue(tableName, out var table) ? table : null;
+            set => this.collection[tableName] = value;
         }
 
         /// <summary>
@@ -135,9 +100,6 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="tableName">Table name to locate.</param>
         /// <param name="table">Found table.</param>
         /// <returns>True if table with table name was found, otherwise false.</returns>
-        public bool TryGetTable(string tableName, out Table table)
-        {
-            return this.collection.TryGetValue(tableName, out table);
-        }
+        public bool TryGetTable(string tableName, out Table table) => this.collection.TryGetValue(tableName, out table);
     }
 }
