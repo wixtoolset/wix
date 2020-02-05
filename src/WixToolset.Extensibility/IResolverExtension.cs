@@ -15,6 +15,9 @@ namespace WixToolset.Extensibility
         /// </summary>
         void PreResolve(IResolveContext context);
 
+        /// <summary>
+        /// Called to attempt to resolve source to a file.
+        /// </summary>
         IResolveFileResult ResolveFile(string source, IntermediateTupleDefinition tupleDefinition, SourceLineNumber sourceLineNumbers, BindStage bindStage);
 
         /// <summary>

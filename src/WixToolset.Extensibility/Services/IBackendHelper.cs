@@ -15,7 +15,7 @@ namespace WixToolset.Extensibility.Services
         /// Creates a file transfer and marks it redundant if the source and destination are identical.
         /// </summary>
         /// <param name="source">Source for the file transfer.</param>
-        /// <param name="destination">Destiation for the file transfer.</param>
+        /// <param name="destination">Destination for the file transfer.</param>
         /// <param name="move">Indicates whether to move or copy the source file.</param>
         IFileTransfer CreateFileTransfer(string source, string destination, bool move, SourceLineNumber sourceLineNumbers = null);
 
