@@ -85,7 +85,7 @@ namespace WixToolset.Data
 
         public static IntermediateField Set(this IntermediateTuple tuple, int index, IntermediateFieldPathValue value)
         {
-            if (value == null && NoFieldMetadata(tuple, index))
+            if (value?.Path == null && value?.BaseUri == null && NoFieldMetadata(tuple, index))
             {
                 return tuple.Fields[index] = null;
             }
