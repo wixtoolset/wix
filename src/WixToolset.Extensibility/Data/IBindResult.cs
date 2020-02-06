@@ -2,6 +2,7 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    using WixToolset.Data;
     using System.Collections.Generic;
 
     public interface IBindResult
@@ -9,5 +10,7 @@ namespace WixToolset.Extensibility.Data
         IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
         IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+
+        WixOutput Wixout { get; set; }
     }
 }
