@@ -32,6 +32,7 @@ namespace WixToolset.Core.WindowsInstaller
                 var result = context.ServiceProvider.GetService<IBindResult>();
                 result.FileTransfers = command.FileTransfers;
                 result.TrackedFiles = command.TrackedFiles;
+                result.Wixout = command.Wixout;
 
                 foreach (var extension in backendExtensions)
                 {

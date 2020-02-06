@@ -3,6 +3,7 @@
 namespace WixToolset.Core
 {
     using System.Collections.Generic;
+    using WixToolset.Data;
     using WixToolset.Extensibility.Data;
 
     internal class BindResult : IBindResult
@@ -10,5 +11,7 @@ namespace WixToolset.Core
         public IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; set; }
+
+        public WixOutput Wixout { get; set; }
     }
 }
