@@ -253,6 +253,39 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void PopulatesCreateFolderTableForNullKeypathComponents()
+        {
+            var folder = TestData.Get(@"TestData\Components");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "CreateFolder" });
+                Assert.Equal(new[]
+                {
+                    "CreateFolder:INSTALLFOLDER\tNullKeypathComponent",
+                }, results);
+            }
+        }
+
+        [Fact]
         public void PopulatesCustomActionTable()
         {
             var folder = TestData.Get(@"TestData");

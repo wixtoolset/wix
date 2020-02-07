@@ -156,6 +156,10 @@
     <Content Include="TestData\ProgId\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProgId\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProgId\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Components\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Components\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Components\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Components\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

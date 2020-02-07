@@ -338,6 +338,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     command.Execute();
                 }
 
+                // Add missing CreateFolder tuples to null-keypath components.
+                {
+                    var command = new AddCreateFoldersCommand(section);
+                    command.Execute();
+                }
+
                 // stop processing if an error previously occurred
                 if (this.Messaging.EncounteredError)
                 {

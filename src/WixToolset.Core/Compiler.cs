@@ -2126,7 +2126,6 @@ namespace WixToolset.Core
             var id = new Identifier(AccessModifier.Private, componentIdPlaceholderWixVariable);
             var keyFound = false;
             string keyPath = null;
-            var shouldAddCreateFolder = false;
 
             var keyPathType = ComponentKeyPathType.Directory;
             var location = ComponentLocation.LocalOnly;
@@ -2181,7 +2180,6 @@ namespace WixToolset.Core
                         {
                             keyFound = true;
                             keyPath = null;
-                            shouldAddCreateFolder = true;
                         }
                         break;
                     case "Location":
@@ -2343,10 +2341,6 @@ namespace WixToolset.Core
                         break;
                     case "CreateFolder":
                         var createdFolder = this.ParseCreateFolderElement(child, id.Id, directoryId, win64);
-                        if (directoryId == createdFolder)
-                        {
-                            shouldAddCreateFolder = false;
-                        }
                         break;
                     case "Environment":
                         this.ParseEnvironmentElement(child, id.Id);
@@ -2477,17 +2471,6 @@ namespace WixToolset.Core
                     keyPath = keyPossible;
                     keyPathType = keyBit.Value;
                 }
-            }
-
-            if (shouldAddCreateFolder)
-            {
-                var tuple = new CreateFolderTuple(sourceLineNumbers)
-                {
-                    DirectoryRef = directoryId,
-                    ComponentRef = id.Id
-                };
-
-                this.Core.AddTuple(tuple);
             }
 
             // check for conditions that exclude this component from using generated guids
