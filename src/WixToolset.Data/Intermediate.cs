@@ -108,6 +108,31 @@ namespace WixToolset.Data
         }
 
         /// <summary>
+        /// Loads an intermediate from a WixOutput object.
+        /// </summary>
+        /// <param name="wixOutput">WixOutput object.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediate.</returns>
+        public static Intermediate Load(WixOutput wixOutput, bool suppressVersionCheck = false)
+        {
+            var creator = new SimpleTupleDefinitionCreator();
+            return Intermediate.LoadIntermediate(wixOutput, creator, suppressVersionCheck);
+        }
+
+        /// <summary>
+        /// Loads an intermediate from a WixOutput object.
+        /// </summary>
+        /// <param name="wixOutput">WixOutput object.</param>
+        /// <param name="creator">ITupleDefinitionCreator to use when reconstituting the intermediate.</param>
+        /// <param name="suppressVersionCheck">Suppress checking for wix.dll version mismatches.</param>
+        /// <returns>Returns the loaded intermediate.</returns>
+        public static Intermediate Load(WixOutput wixOutput, ITupleDefinitionCreator creator, bool suppressVersionCheck = false)
+        {
+            return Intermediate.LoadIntermediate(wixOutput, creator, suppressVersionCheck);
+        }
+
+        /// <summary>
         /// Loads several intermediates from paths on disk using the same definitions.
         /// </summary>
         /// <param name="intermediateFiles">Paths to intermediate files saved on disk.</param>

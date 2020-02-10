@@ -102,11 +102,24 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="path">Path to output file saved on disk.</param>
         /// <param name="suppressVersionCheck">Suppresses wix.dll version mismatch check.</param>
         /// <returns>Output object.</returns>
-        public static WindowsInstallerData Load(string path, bool suppressVersionCheck)
+        public static WindowsInstallerData Load(string path, bool suppressVersionCheck = false)
         {
-            using (var wixout = WixOutput.Read(path))
-            using (var stream = wixout.GetDataStream(WixOutputStreamName))
-            using (var reader = XmlReader.Create(stream, null, wixout.Uri.AbsoluteUri))
+            using (var wixOutput = WixOutput.Read(path))
+            {
+                return WindowsInstallerData.Load(wixOutput, suppressVersionCheck);
+            }
+        }
+
+        /// <summary>
+        /// Loads an output from a WixOutput object.
+        /// </summary>
+        /// <param name="wixOutput">WixOutput object.</param>
+        /// <param name="suppressVersionCheck">Suppresses wix.dll version mismatch check.</param>
+        /// <returns>Output object.</returns>
+        public static WindowsInstallerData Load(WixOutput wixOutput, bool suppressVersionCheck = false)
+        {
+            using (var stream = wixOutput.GetDataStream(WixOutputStreamName))
+            using (var reader = XmlReader.Create(stream, null, wixOutput.Uri.AbsoluteUri))
             {
                 try
                 {
@@ -115,7 +128,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
                 catch (XmlException xe)
                 {
-                    throw new WixCorruptFileException(path, "wixout", xe);
+                    throw new WixCorruptFileException(wixOutput.Uri.AbsoluteUri, "wixout", xe);
                 }
             }
         }
