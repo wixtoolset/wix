@@ -324,6 +324,41 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanLoadPdbGeneratedByBuildViaWixOutput()
+        {
+            var folder = TestData.Get(@"TestData\MultiFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-d", "MediaTemplateCompressionLevel",
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
+
+                var pdbPath = Path.Combine(intermediateFolder, @"bin\test.wixpdb");
+                Assert.True(File.Exists(pdbPath));
+
+                var wixOutput = WixOutput.Read(pdbPath);
+                var output = WindowsInstallerData.Load(wixOutput, suppressVersionCheck: true);
+                Assert.NotNull(output);
+            }
+        }
+
+        [Fact]
         public void CanBuildSimpleModule()
         {
             var folder = TestData.Get(@"TestData\SimpleModule");
