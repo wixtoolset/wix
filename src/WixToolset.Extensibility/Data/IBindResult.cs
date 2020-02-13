@@ -2,10 +2,11 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using WixToolset.Data;
+    using System;
     using System.Collections.Generic;
+    using WixToolset.Data;
 
-    public interface IBindResult
+    public interface IBindResult : IDisposable
     {
         IEnumerable<IFileTransfer> FileTransfers { get; set; }
 
