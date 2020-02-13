@@ -17,12 +17,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// <summary>
     /// Binds a databse.
     /// </summary>
-    internal class BindDatabaseCommand : IDisposable
+    internal class BindDatabaseCommand
     {
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
-
-        private bool disposed;
 
         public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator):this(context, backendExtension, null, validator)
         {
@@ -97,13 +95,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Validator Validator { get; }
 
-        public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
-
-        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
-
-        public WixOutput Wixout { get; private set; }
-
-        public void Execute()
+        public IBindResult Execute()
         {
             var section = this.Intermediate.Sections.Single();
 
@@ -218,7 +210,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (this.Messaging.EncounteredError)
             {
-                return;
+                return null;
             }
 
             // Call extension
@@ -290,7 +282,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // stop processing if an error previously occurred
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
                 // Gather information about files that do not come from merge modules.
@@ -322,7 +314,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // stop processing if an error previously occurred
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
                 // Now that the variable cache is populated, resolve any delayed fields.
@@ -347,7 +339,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // stop processing if an error previously occurred
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
                 // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
@@ -425,7 +417,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Stop processing if an error previously occurred.
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
                 // Ensure the intermediate folder is created since delta patches will be
@@ -479,7 +471,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // stop processing if an error previously occurred
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
                 // Generate database file.
@@ -496,7 +488,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Stop processing if an error previously occurred.
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
                 // Merge modules.
@@ -533,7 +525,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (this.Messaging.EncounteredError)
                 {
-                    return;
+                    return null;
                 }
 
 #if TODO_FINISH_VALIDATION
@@ -580,10 +572,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.SourcePath, TrackedFileType.Input, f.SourceLineNumber)));
             }
 
-            this.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, output);
+            var result = this.ServiceProvider.GetService<IBindResult>();
+            result.FileTransfers = fileTransfers;
+            result.TrackedFiles = trackedFiles;
+            result.Wixout = this.CreateWixout(trackedFiles, this.Intermediate, output);
 
-            this.FileTransfers = fileTransfers;
-            this.TrackedFiles = trackedFiles;
+            return result;
         }
 
         private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, WindowsInstallerData output)
@@ -984,24 +978,5 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             return command.GeneratedTemporaryFiles;
         }
-
-#region IDisposable Support
-
-        public void Dispose() => this.Dispose(true);
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    this.Wixout?.Dispose();
-                }
-
-                this.disposed = true;
-            }
-        }
-
-#endregion
     }
 }

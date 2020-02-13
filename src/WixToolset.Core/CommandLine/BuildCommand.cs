@@ -294,47 +294,54 @@ namespace WixToolset.Core.CommandLine
                 return;
             }
 
-            IBindResult bindResult;
+            IBindResult bindResult = null;
+            try
             {
-                var context = this.ServiceProvider.GetService<IBindContext>();
-                //context.CabbingThreadCount = this.CabbingThreadCount;
-                context.BurnStubPath = burnStubPath;
-                context.CabCachePath = cabCachePath;
-                context.Codepage = resolveResult.Codepage;
-                //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
-                context.DelayedFields = resolveResult.DelayedFields;
-                context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
-                context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
-                context.Ices = Array.Empty<string>(); // TODO: set this correctly
-                context.IntermediateFolder = intermediateFolder;
-                context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
-                context.OutputPath = this.OutputFile;
-                context.OutputPdbPath = Path.ChangeExtension(this.OutputFile, ".wixpdb");
-                context.SuppressIces = Array.Empty<string>(); // TODO: set this correctly
-                context.SuppressValidation = true; // TODO: set this correctly
+                {
+                    var context = this.ServiceProvider.GetService<IBindContext>();
+                    //context.CabbingThreadCount = this.CabbingThreadCount;
+                    context.BurnStubPath = burnStubPath;
+                    context.CabCachePath = cabCachePath;
+                    context.Codepage = resolveResult.Codepage;
+                    //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
+                    context.DelayedFields = resolveResult.DelayedFields;
+                    context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
+                    context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
+                    context.Ices = Array.Empty<string>(); // TODO: set this correctly
+                    context.IntermediateFolder = intermediateFolder;
+                    context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
+                    context.OutputPath = this.OutputFile;
+                    context.OutputPdbPath = Path.ChangeExtension(this.OutputFile, ".wixpdb");
+                    context.SuppressIces = Array.Empty<string>(); // TODO: set this correctly
+                    context.SuppressValidation = true; // TODO: set this correctly
 
-                var binder = this.ServiceProvider.GetService<IBinder>();
-                bindResult = binder.Bind(context);
+                    var binder = this.ServiceProvider.GetService<IBinder>();
+                    bindResult = binder.Bind(context);
+                }
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
+                {
+                    var context = this.ServiceProvider.GetService<ILayoutContext>();
+                    context.Extensions = this.ExtensionManager.GetServices<ILayoutExtension>();
+                    context.TrackedFiles = bindResult.TrackedFiles;
+                    context.FileTransfers = bindResult.FileTransfers;
+                    context.IntermediateFolder = intermediateFolder;
+                    context.ContentsFile = this.ContentsFile;
+                    context.OutputsFile = this.OutputsFile;
+                    context.BuiltOutputsFile = this.BuiltOutputsFile;
+                    context.SuppressAclReset = false; // TODO: correctly set SuppressAclReset
+
+                    var layout = this.ServiceProvider.GetService<ILayoutCreator>();
+                    layout.Layout(context);
+                }
             }
-
-            if (this.Messaging.EncounteredError)
+            finally
             {
-                return;
-            }
-
-            {
-                var context = this.ServiceProvider.GetService<ILayoutContext>();
-                context.Extensions = this.ExtensionManager.GetServices<ILayoutExtension>();
-                context.TrackedFiles = bindResult.TrackedFiles;
-                context.FileTransfers = bindResult.FileTransfers;
-                context.IntermediateFolder = intermediateFolder;
-                context.ContentsFile = this.ContentsFile;
-                context.OutputsFile = this.OutputsFile;
-                context.BuiltOutputsFile = this.BuiltOutputsFile;
-                context.SuppressAclReset = false; // TODO: correctly set SuppressAclReset
-
-                var layout = this.ServiceProvider.GetService<ILayoutCreator>();
-                layout.Layout(context);
+                bindResult?.Dispose();
             }
         }
 

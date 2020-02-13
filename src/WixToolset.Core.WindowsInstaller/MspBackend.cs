@@ -47,20 +47,23 @@ namespace WixToolset.Core.WindowsInstaller
 
             // Create WindowsInstallerData with patch metdata and transforms as sub-storages
             // Create MSP from WindowsInstallerData
-            using (var command = new BindDatabaseCommand(context, backendExtensions, subStorages, null))
+            IBindResult result = null;
+            try
             {
-                command.Execute();
-
-                var result = context.ServiceProvider.GetService<IBindResult>();
-                result.FileTransfers = command.FileTransfers;
-                result.TrackedFiles = command.TrackedFiles;
+                var command = new BindDatabaseCommand(context, backendExtensions, subStorages, null);
+                result = command.Execute();
 
                 foreach (var extension in backendExtensions)
                 {
-                    extension.PostBackendBind(result, command.Wixout);
+                    extension.PostBackendBind(result);
                 }
 
                 return result;
+            }
+            catch
+            {
+                result?.Dispose();
+                throw;
             }
         }
 

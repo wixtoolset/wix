@@ -25,21 +25,23 @@ namespace WixToolset.Core.WindowsInstaller
 
             var validator = Validator.CreateFromContext(context, "darice.cub");
 
-            using (var command = new BindDatabaseCommand(context, backendExtensions, validator))
+            IBindResult result = null;
+            try
             {
-                command.Execute();
-
-                var result = context.ServiceProvider.GetService<IBindResult>();
-                result.FileTransfers = command.FileTransfers;
-                result.TrackedFiles = command.TrackedFiles;
-                result.Wixout = command.Wixout;
+                var command = new BindDatabaseCommand(context, backendExtensions, validator);
+                result = command.Execute();
 
                 foreach (var extension in backendExtensions)
                 {
-                    extension.PostBackendBind(result, command.Wixout);
+                    extension.PostBackendBind(result);
                 }
 
                 return result;
+            }
+            catch
+            {
+                result?.Dispose();
+                throw;
             }
         }
 
