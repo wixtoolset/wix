@@ -600,6 +600,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             output.Save(wixout);
 
+            wixout.Reopen(System.IO.Compression.ZipArchiveMode.Read);
+
             return wixout;
         }
 
