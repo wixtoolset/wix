@@ -13,13 +13,15 @@ namespace WixToolset.Data
     /// </summary>
     public class WixOutput : IDisposable
     {
-        private readonly ZipArchive archive;
+        private ZipArchive archive;
+        private Stream stream;
         private bool disposed;
 
-        private WixOutput(Uri uri, ZipArchive archive)
+        private WixOutput(Uri uri, ZipArchive archive, Stream stream)
         {
             this.Uri = uri;
             this.archive = archive;
+            this.stream = stream;
         }
 
         public Uri Uri { get; }
@@ -59,9 +61,9 @@ namespace WixToolset.Data
         /// <returns>Newly created <c>WixOutput</c>.</returns>
         public static WixOutput Create(Uri uri, Stream stream)
         {
-            var archive = new ZipArchive(stream, ZipArchiveMode.Update);
+            var archive = new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen: true);
 
-            return new WixOutput(uri, archive);
+            return new WixOutput(uri, archive, stream);
         }
 
         /// <summary>
@@ -124,18 +126,24 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="stream">Stream to read from.</param>
         /// <returns>Loaded created <c>WixOutput</c>.</returns>
-        public static WixOutput Read(Uri uri, Stream stream, bool leaveOpen = false)
+        public static WixOutput Read(Uri uri, Stream stream)
         {
             try
             {
-                var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen);
+                var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
 
-                return new WixOutput(uri, archive);
+                return new WixOutput(uri, archive, stream);
             }
             catch (InvalidDataException)
             {
                 throw new WixException(ErrorMessages.CorruptFileFormat(uri.AbsoluteUri, "wixout"));
             }
+        }
+
+        public void Reopen(ZipArchiveMode mode)
+        {
+            this.archive?.Dispose();
+            this.archive = new ZipArchive(this.stream, mode, leaveOpen: true);
         }
 
         /// <summary>
@@ -224,6 +232,7 @@ namespace WixToolset.Data
                 if (disposing)
                 {
                     this.archive?.Dispose();
+                    this.stream?.Dispose();
                 }
             }
 
