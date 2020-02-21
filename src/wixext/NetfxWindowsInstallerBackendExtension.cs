@@ -2,6 +2,7 @@
 
 namespace WixToolset.Netfx
 {
+    using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
@@ -23,8 +24,6 @@ namespace WixToolset.Netfx
             ),
         };
 
-        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
-
-        public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output) => this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitionsForTuples, true);
+        public override IEnumerable<TableDefinition> TableDefinitions { get => Tables; }
     }
 }
