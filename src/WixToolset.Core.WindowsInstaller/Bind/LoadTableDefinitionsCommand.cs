@@ -10,14 +10,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     internal class LoadTableDefinitionsCommand
     {
-        public LoadTableDefinitionsCommand(IntermediateSection section, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
+        public LoadTableDefinitionsCommand(IMessaging messaging, IntermediateSection section, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
         {
+            this.Messaging = messaging;
             this.Section = section;
             this.BackendExtensions = backendExtensions;
         }
+
+        public IMessaging Messaging { get; }
 
         private IntermediateSection Section { get; }
 
@@ -39,6 +43,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 foreach (var tableDefinition in backendExtension.TableDefinitions)
                 {
+                    if (tableDefinitions.Contains(tableDefinition.Name))
+                    {
+                        this.Messaging.Write(ErrorMessages.DuplicateExtensionTable(backendExtension.GetType().Assembly.Location, tableDefinition.Name));
+                    }
+
                     tableDefinitions.Add(tableDefinition);
                 }
             }

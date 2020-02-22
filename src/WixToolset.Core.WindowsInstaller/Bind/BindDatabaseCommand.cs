@@ -111,7 +111,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Load standard tables, authored custom tables, and extension custom tables.
             TableDefinitionCollection tableDefinitions;
             {
-                var command = new LoadTableDefinitionsCommand(section, this.BackendExtensions);
+                var command = new LoadTableDefinitionsCommand(this.Messaging, section, this.BackendExtensions);
                 command.Execute();
 
                 tableDefinitions = command.TableDefinitions;
