@@ -3,7 +3,7 @@
     <Fragment>
         <ComponentGroup Id="ProductComponents">
             <Component Id="TrueTypeFontComp" Directory="INSTALLFOLDER" Guid="C8116E5E-F731-427C-AF43-6FF8B8D7DA64">
-                <File Source="test.txt" Name="TrueTypeFontComp.ttf" TrueType="yes" />
+                <File Id="TrueTypeFontFile" Source="test.txt" Name="TrueTypeFontComp.ttf" TrueType="yes" />
             </Component>
         </ComponentGroup>
     </Fragment>

@@ -531,7 +531,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             attributes |= (tuple.Attributes & FileTupleAttributes.Vital) == FileTupleAttributes.Vital ? WindowsInstallerConstants.MsidbFileAttributesVital : 0;
             row.Attributes = attributes;
 
-            if (!String.IsNullOrEmpty(tuple.FontTitle))
+            if (tuple.FontTitle != null)
             {
                 var fontRow = this.CreateRow(tuple, "Font");
                 fontRow[0] = tuple.Id.Id;

@@ -594,7 +594,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void PopulatesFontTableFromTrueType()
         {
             var folder = TestData.Get(@"TestData");
@@ -622,7 +622,7 @@ namespace WixToolsetTest.CoreIntegration
                 var results = Query.QueryDatabase(msiPath, new[] { "Font" });
                 Assert.Equal(new[]
                 {
-                    "Font:TrueTypeFontComp.ttf\t",
+                    "Font:TrueTypeFontFile\t",
                 }, results);
             }
         }
