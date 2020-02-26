@@ -13,8 +13,8 @@ namespace WixToolset.Data
     /// </summary>
     public class WixOutput : IDisposable
     {
+        private readonly Stream stream;
         private ZipArchive archive;
-        private Stream stream;
         private bool disposed;
 
         private WixOutput(Uri uri, ZipArchive archive, Stream stream)
@@ -140,10 +140,16 @@ namespace WixToolset.Data
             }
         }
 
-        public void Reopen(ZipArchiveMode mode)
+        /// <summary>
+        /// Reopen the underlying archive for read-only or read-write access.
+        /// </summary>
+        /// <param name="writable">Indicates whether the output can be modified. Defaults to false.</param>
+        public void Reopen(bool writable = false)
         {
             this.archive?.Dispose();
-            this.archive = new ZipArchive(this.stream, mode, leaveOpen: true);
+            this.archive = null;
+
+            this.archive = new ZipArchive(this.stream, writable ? ZipArchiveMode.Update : ZipArchiveMode.Read, leaveOpen: true);
         }
 
         /// <summary>
@@ -178,6 +184,11 @@ namespace WixToolset.Data
             return entry.Open();
         }
 
+        /// <summary>
+        /// Imports a file from disk into the output.
+        /// </summary>
+        /// <param name="name">Name of the stream in the output.</param>
+        /// <param name="path">Path to file on disk to include in the output.</param>
         public void ImportDataStream(string name, string path)
         {
             this.archive.CreateEntryFromFile(path, name, System.IO.Compression.CompressionLevel.Optimal);
