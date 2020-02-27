@@ -123,7 +123,7 @@ namespace WixToolset.BuildTasks
             }
             catch (Exception e)
             {
-                this.Log.LogErrorFromException(e);
+                this.Log.LogErrorFromException(e, showStackTrace: true, showDetail: true, null);
 
                 if (e is NullReferenceException || e is SEHException)
                 {
