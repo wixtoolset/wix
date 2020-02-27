@@ -99,7 +99,7 @@ namespace WixToolset.Core
                 var sb = new StringBuilder(value);
 
                 // notice how this code walks backward through the list
-                // because it modifies the string as we through it
+                // because it modifies the string as we move through it
                 for (int i = matches.Count - 1; 0 <= i; i--)
                 {
                     var variableNamespace = matches[i].Groups["namespace"].Value;

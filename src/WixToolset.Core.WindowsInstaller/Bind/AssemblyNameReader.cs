@@ -29,7 +29,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     var name = ReadString(reader, assembly.Name);
                     var culture = ReadString(reader, assembly.Culture);
-                    var architecture = headers.PEHeader.Magic == PEMagic.PE32Plus ? "x64" : (headers.CorHeader.Flags & CorFlags.Requires32Bit) == CorFlags.Requires32Bit ? "x86" : null;
+                    var architecture = headers.PEHeader.Magic == PEMagic.PE32Plus ? "x64" : (headers.CorHeader.Flags & CorFlags.Requires32Bit) == CorFlags.Requires32Bit ? "x86" : (headers.CorHeader.Flags & CorFlags.ILOnly) == CorFlags.ILOnly ? "MSIL" : null;
                     var version = assembly.Version.ToString();
                     var publicKeyToken = ReadPublicKeyToken(reader, assembly.PublicKey);
 
