@@ -126,6 +126,17 @@ namespace WixToolset.Extensibility.Services
         void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys);
 
         /// <summary>
+        /// Create a reference in the specified section for a custom action specialized for specific platforms,
+        /// given standard prefixes for naming and suffixes for platforms.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information.</param>
+        /// <param name="section">Section to create the reference in.</param>
+        /// <param name="customAction">The custom action base name.</param>
+        /// <param name="currentPlatform">The platform being compiled.</param>
+        /// <param name="supportedPlatforms">The platforms for which there are specialized custom actions.</param>
+        void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform platform, CustomActionPlatforms supportedPlatforms);
+
+        /// <summary>
         /// Creates WixComplexReference and WixGroup rows in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information.</param>
