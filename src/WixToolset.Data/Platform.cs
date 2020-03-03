@@ -17,6 +17,9 @@ namespace WixToolset.Data
         IA64,
 
         /// <summary>arm.</summary>
-        ARM
+        ARM,
+
+        /// <summary>arm64.</summary>
+        ARM64,
     }
 }
