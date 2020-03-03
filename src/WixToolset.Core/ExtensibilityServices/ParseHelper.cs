@@ -892,20 +892,13 @@ namespace WixToolset.Core.ExtensibilityServices
             return actionTuple;
         }
 
-        /// <summary>
-        /// Create a reference in the specified section for a custom action specialized for specific platforms,
-        /// given standard prefixes for naming and suffixes for platforms.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line information.</param>
-        /// <param name="customAction">The custom action base name.</param>
-        /// <param name="supportedPlatforms">The platforms for which there are specialized custom actions.</param>
-        public void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform platform, CustomActionPlatforms supportedPlatforms)
+        public void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform currentPlatform, CustomActionPlatforms supportedPlatforms)
         {
             if (!this.Messaging.EncounteredError)
             {
                 var name = String.Concat("Wix4", customAction);
 
-                switch (platform)
+                switch (currentPlatform)
                 {
                     case Platform.X86:
                         if ((supportedPlatforms & CustomActionPlatforms.X86) == CustomActionPlatforms.X86)
