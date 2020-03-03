@@ -892,6 +892,54 @@ namespace WixToolset.Core.ExtensibilityServices
             return actionTuple;
         }
 
+        /// <summary>
+        /// Create a reference in the specified section for a custom action specialized for specific platforms,
+        /// given standard prefixes for naming and suffixes for platforms.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information.</param>
+        /// <param name="customAction">The custom action base name.</param>
+        /// <param name="supportedPlatforms">The platforms for which there are specialized custom actions.</param>
+        public void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform platform, CustomActionPlatforms supportedPlatforms)
+        {
+            if (!this.Messaging.EncounteredError)
+            {
+                var name = String.Concat("Wix4", customAction);
+
+                switch (platform)
+                {
+                    case Platform.X86:
+                        if ((supportedPlatforms & CustomActionPlatforms.X86) == CustomActionPlatforms.X86)
+                        {
+                            name = String.Concat(customAction, "_X86");
+                        }
+                        break;
+                    case Platform.X64:
+                        if ((supportedPlatforms & CustomActionPlatforms.X64) == CustomActionPlatforms.X64)
+                        {
+                            name = String.Concat(customAction, "_X64");
+                        }
+                        break;
+                    case Platform.ARM:
+                        if ((supportedPlatforms & CustomActionPlatforms.ARM) == CustomActionPlatforms.ARM)
+                        {
+                            name = String.Concat(customAction, "_A32");
+                        }
+                        break;
+                    case Platform.ARM64:
+                        if ((supportedPlatforms & CustomActionPlatforms.ARM64) == CustomActionPlatforms.ARM64)
+                        {
+                            name = String.Concat(customAction, "_A64");
+                        }
+                        break;
+                    case Platform.IA64:
+                        // yeah, no
+                        break;
+                }
+
+                this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), name);
+            }
+        }
+
         public void UnexpectedAttribute(XElement element, XAttribute attribute)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
