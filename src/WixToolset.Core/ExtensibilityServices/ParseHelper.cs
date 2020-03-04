@@ -903,25 +903,25 @@ namespace WixToolset.Core.ExtensibilityServices
                     case Platform.X86:
                         if ((supportedPlatforms & CustomActionPlatforms.X86) == CustomActionPlatforms.X86)
                         {
-                            name = String.Concat(customAction, "_X86");
+                            name = String.Concat(name, "_X86");
                         }
                         break;
                     case Platform.X64:
                         if ((supportedPlatforms & CustomActionPlatforms.X64) == CustomActionPlatforms.X64)
                         {
-                            name = String.Concat(customAction, "_X64");
+                            name = String.Concat(name, "_X64");
                         }
                         break;
                     case Platform.ARM:
                         if ((supportedPlatforms & CustomActionPlatforms.ARM) == CustomActionPlatforms.ARM)
                         {
-                            name = String.Concat(customAction, "_A32");
+                            name = String.Concat(name, "_A32");
                         }
                         break;
                     case Platform.ARM64:
                         if ((supportedPlatforms & CustomActionPlatforms.ARM64) == CustomActionPlatforms.ARM64)
                         {
-                            name = String.Concat(customAction, "_A64");
+                            name = String.Concat(name, "_A64");
                         }
                         break;
                     case Platform.IA64:
