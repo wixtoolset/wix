@@ -27,9 +27,21 @@ namespace WixToolset.Data.WindowsInstaller
         public TableDefinition(string name, IEnumerable<ColumnDefinition> columns, bool unreal = false)
         {
             this.Name = name;
+            this.TupleDefinitionName = name;
             this.Unreal = unreal;
-
             this.Columns = columns.ToArray();
+        }
+
+        /// <summary>
+        /// Creates a table definition.
+        /// </summary>
+        /// <param name="name">Name of table to create.</param>
+        /// <param name="tupleDefinitionName">Optional name of tuple definition for this table.</param>
+        /// <param name="columns">Column definitions for the table.</param>
+        /// <param name="unreal">Flag if table is unreal.</param>
+        public TableDefinition(string name, string tupleDefinitionName, IEnumerable<ColumnDefinition> columns, bool unreal = false) : this(name, columns, unreal)
+        {
+            this.TupleDefinitionName = tupleDefinitionName ?? name;
         }
 
         /// <summary>
@@ -37,6 +49,12 @@ namespace WixToolset.Data.WindowsInstaller
         /// </summary>
         /// <value>Name of the table.</value>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets the name of the tuple definition associated with this table.
+        /// </summary>
+        /// <value>Name of the tuple definition.</value>
+        public string TupleDefinitionName { get; private set; }
 
         /// <summary>
         /// Gets if the table is unreal.
@@ -110,6 +128,7 @@ namespace WixToolset.Data.WindowsInstaller
         {
             var empty = reader.IsEmptyElement;
             string name = null;
+            string tupleDefinitionName = null;
             var unreal = false;
             var bootstrapperApplicationData = false;
 
@@ -119,6 +138,9 @@ namespace WixToolset.Data.WindowsInstaller
                 {
                     case "name":
                         name = reader.Value;
+                        break;
+                    case "tupleDefinitionName":
+                        tupleDefinitionName = reader.Value;
                         break;
                     case "unreal":
                         unreal = reader.Value.Equals("yes");
@@ -176,7 +198,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            return new TableDefinition(name, columns.ToArray(), unreal);
+            return new TableDefinition(name, tupleDefinitionName, columns.ToArray(), unreal);
         }
 
         /// <summary>
