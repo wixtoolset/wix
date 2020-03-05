@@ -14,7 +14,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, IEnumerable<TableDefinition> tableDefinitions, bool columnZeroIsId)
         {
-            var tableDefinition = tableDefinitions.FirstOrDefault(t => t.Name == tuple.Definition.Name);
+            var tableDefinition = tableDefinitions.FirstOrDefault(t => t.TupleDefinitionName == tuple.Definition.Name);
 
             if (tableDefinition == null)
             {
