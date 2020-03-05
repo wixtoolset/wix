@@ -897,35 +897,31 @@ namespace WixToolset.Core.ExtensibilityServices
             if (!this.Messaging.EncounteredError)
             {
                 var name = String.Concat("Wix4", customAction);
+                var suffix = "_X86";
 
                 switch (currentPlatform)
                 {
                     case Platform.X64:
                         if ((supportedPlatforms & CustomActionPlatforms.X64) == CustomActionPlatforms.X64)
                         {
-                            name = String.Concat(name, "_X64");
+                            suffix = "_X64";
                         }
                         break;
                     case Platform.ARM:
                         if ((supportedPlatforms & CustomActionPlatforms.ARM) == CustomActionPlatforms.ARM)
                         {
-                            name = String.Concat(name, "_A32");
+                            suffix = "_A32";
                         }
                         break;
                     case Platform.ARM64:
                         if ((supportedPlatforms & CustomActionPlatforms.ARM64) == CustomActionPlatforms.ARM64)
                         {
-                            name = String.Concat(name, "_A64");
+                            suffix = "_A64";
                         }
-                        break;
-                    // Fall back to x86.
-                    case Platform.X86:
-                    default:
-                        name = String.Concat(name, "_X86");
                         break;
                 }
 
-                this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), name);
+                this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), name + suffix);
             }
         }
 
