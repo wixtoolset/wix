@@ -900,12 +900,6 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 switch (currentPlatform)
                 {
-                    case Platform.X86:
-                        if ((supportedPlatforms & CustomActionPlatforms.X86) == CustomActionPlatforms.X86)
-                        {
-                            name = String.Concat(name, "_X86");
-                        }
-                        break;
                     case Platform.X64:
                         if ((supportedPlatforms & CustomActionPlatforms.X64) == CustomActionPlatforms.X64)
                         {
@@ -924,8 +918,10 @@ namespace WixToolset.Core.ExtensibilityServices
                             name = String.Concat(name, "_A64");
                         }
                         break;
-                    case Platform.IA64:
-                        // yeah, no
+                    // Fall back to x86.
+                    case Platform.X86:
+                    default:
+                        name = String.Concat(name, "_X86");
                         break;
                 }
 
