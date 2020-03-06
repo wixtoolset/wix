@@ -11,7 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.EventManifest.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(EventManifestTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(EventManifestTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(EventManifestTupleFields.File), IntermediateFieldType.String),
             },
             typeof(EventManifestTuple));
@@ -24,7 +24,7 @@ namespace WixToolset.Util.Tuples
 
     public enum EventManifestTupleFields
     {
-        Component_,
+        ComponentRef,
         File,
     }
 
@@ -40,10 +40,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[EventManifestTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)EventManifestTupleFields.Component_].AsString();
-            set => this.Set((int)EventManifestTupleFields.Component_, value);
+            get => this.Fields[(int)EventManifestTupleFields.ComponentRef].AsString();
+            set => this.Set((int)EventManifestTupleFields.ComponentRef, value);
         }
 
         public string File

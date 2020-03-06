@@ -11,8 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.WixRemoveFolderEx.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.WixRemoveFolderEx), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.Property), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRemoveFolderExTupleFields.InstallMode), IntermediateFieldType.Number),
             },
@@ -26,8 +25,7 @@ namespace WixToolset.Util.Tuples
 
     public enum WixRemoveFolderExTupleFields
     {
-        WixRemoveFolderEx,
-        Component_,
+        ComponentRef,
         Property,
         InstallMode,
     }
@@ -44,16 +42,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[WixRemoveFolderExTupleFields index] => this.Fields[(int)index];
 
-        public string WixRemoveFolderEx
+        public string ComponentRef
         {
-            get => this.Fields[(int)WixRemoveFolderExTupleFields.WixRemoveFolderEx].AsString();
-            set => this.Set((int)WixRemoveFolderExTupleFields.WixRemoveFolderEx, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)WixRemoveFolderExTupleFields.Component_].AsString();
-            set => this.Set((int)WixRemoveFolderExTupleFields.Component_, value);
+            get => this.Fields[(int)WixRemoveFolderExTupleFields.ComponentRef].AsString();
+            set => this.Set((int)WixRemoveFolderExTupleFields.ComponentRef, value);
         }
 
         public string Property

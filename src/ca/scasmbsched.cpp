@@ -92,8 +92,8 @@ void ScaExUserPermsSmbFreeList(SCA_SMB_EX_USER_PERMS* pExUserPermsList)
 }
 
 // sql query constants
-LPCWSTR vcsSmbQuery = L"SELECT `FileShare`, `ShareName`, `Description`, `Directory_`, "
-    L"`Component_`, `User_`, `Permissions` FROM `FileShare`";
+LPCWSTR vcsSmbQuery = L"SELECT `Wix4FileShare`, `ShareName`, `Description`, `Directory_`, "
+    L"`Component_`, `User_`, `Permissions` FROM `Wix4FileShare`";
 
 enum eSmbQuery {
     ssqFileShare = 1,
@@ -122,26 +122,26 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
     SCA_SMB* pss = NULL;
     BOOL bUserPermissionsTableExists = FALSE;
 
-    if (S_OK != WcaTableExists(L"FileShare"))
+    if (S_OK != WcaTableExists(L"Wix4FileShare"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ScaSmbCreateShare() - FileShare table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ScaSmbCreateShare() - Wix4FileShare table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
-    if (S_OK == WcaTableExists(L"FileSharePermissions"))
+    if (S_OK == WcaTableExists(L"Wix4FileSharePermissions"))
     {
         bUserPermissionsTableExists = TRUE;
     }
     else
     {
-        WcaLog(LOGMSG_VERBOSE, "No Additional Permissions - FileSharePermissions table not present");
+        WcaLog(LOGMSG_VERBOSE, "No Additional Permissions - Wix4FileSharePermissions table not present");
     }
 
     WcaLog(LOGMSG_VERBOSE, "Reading File Share Tables");
 
     // loop through all the fileshares
     hr = WcaOpenExecuteView(vcsSmbQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on FileShare table");
+    ExitOnFailure(hr, "Failed to open view on Wix4FileShare table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         pss = NewSmb();
@@ -154,33 +154,33 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
         ::ZeroMemory(pss, sizeof(*pss));
 
         hr = WcaGetRecordString(hRec, ssqFileShare, &pwzData);
-        ExitOnFailure(hr, "Failed to get FileShare.FileShare");
+        ExitOnFailure(hr, "Failed to get Wix4FileShare.Wix4FileShare");
         hr = ::StringCchCopyW(pss->wzId, countof(pss->wzId), pwzData);
         ExitOnFailure(hr, "Failed to copy ID string to smb object");
 
         hr = WcaGetRecordFormattedString(hRec, ssqShareName, &pwzData);
-        ExitOnFailure(hr, "Failed to get FileShare.ShareName");
+        ExitOnFailure(hr, "Failed to get Wix4FileShare.ShareName");
         hr = ::StringCchCopyW(pss->wzShareName, countof(pss->wzShareName), pwzData);
         ExitOnFailure(hr, "Failed to copy share name string to smb object");
 
         hr = WcaGetRecordString(hRec, ssqComponent, &pwzData);
-        ExitOnFailure(hr, "Failed to get Component for FileShare: '%ls'", pss->wzShareName);
+        ExitOnFailure(hr, "Failed to get Component for Wix4FileShare: '%ls'", pss->wzShareName);
         hr = ::StringCchCopyW(pss->wzComponent, countof(pss->wzComponent), pwzData);
         ExitOnFailure(hr, "Failed to copy component string to smb object");
 
         hr = WcaGetRecordFormattedString(hRec, ssqDescription, &pwzData);
-        ExitOnFailure(hr, "Failed to get Share Description for FileShare: '%ls'", pss->wzShareName);
+        ExitOnFailure(hr, "Failed to get Share Description for Wix4FileShare: '%ls'", pss->wzShareName);
         hr = ::StringCchCopyW(pss->wzDescription, countof(pss->wzDescription), pwzData);
         ExitOnFailure(hr, "Failed to copy description string to smb object");
 
         // get user info from the user table
         hr = WcaGetRecordFormattedString(hRec, ssqUser, &pwzData);
-        ExitOnFailure(hr, "Failed to get User record for FileShare: '%ls'", pss->wzShareName);
+        ExitOnFailure(hr, "Failed to get Wix4User record for Wix4FileShare: '%ls'", pss->wzShareName);
 
         // get component install state
         er = ::MsiGetComponentStateW(WcaGetInstallHandle(), pss->wzComponent, &pss->isInstalled, &pss->isAction);
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "Failed to get Component state for FileShare");
+        ExitOnFailure(hr, "Failed to get Component state for Wix4FileShare");
 
         // if a user was specified
         if (*pwzData)
@@ -200,7 +200,7 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
 
         // get the share's directory
         hr = WcaGetRecordString(hRec, ssqDirectory, &pwzData);
-        ExitOnFailure(hr, "Failed to get directory for FileShare: '%ls'", pss->wzShareName);
+        ExitOnFailure(hr, "Failed to get directory for Wix4FileShare: '%ls'", pss->wzShareName);
 
         WCHAR wzPath[MAX_PATH];
         DWORD dwLen;
@@ -236,7 +236,7 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
         ExitOnFailure(hr, "Failed to copy directory string to smb object");
 
         hr = WcaGetRecordInteger(hRec, ssqPermissions, &pss->nPermissions);
-        ExitOnFailure(hr, "Failed to get FileShare.Permissions");
+        ExitOnFailure(hr, "Failed to get Wix4FileShare.Permissions");
 
         // Check to see if additional user & permissions are specified for this share
         if (bUserPermissionsTableExists)
@@ -253,7 +253,7 @@ HRESULT ScaSmbRead(SCA_SMB** ppssList)
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while processing FileShare table");
+    ExitOnFailure(hr, "Failure occured while processing Wix4FileShare table");
 
 LExit:
     // if anything was left over after an error clean it all up
@@ -420,10 +420,10 @@ HRESULT SchedCreateSmb(SCA_SMB* pss)
     }
 
     // Schedule the rollback first
-    hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"CreateSmbRollback"), pwzRollbackCustomActionData, COST_SMB_DROPSMB);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateSmbRollback"), pwzRollbackCustomActionData, COST_SMB_DROPSMB);
     ExitOnFailure(hr, "Failed to schedule DropSmb action");
 
-    hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"CreateSmb"), pwzCustomActionData, COST_SMB_CREATESMB);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateSmb"), pwzCustomActionData, COST_SMB_CREATESMB);
     ExitOnFailure(hr, "Failed to schedule CreateSmb action");
 
 LExit:
@@ -511,14 +511,14 @@ HRESULT SchedDropSmb(SCA_SMB* pss)
         ExitOnFailure(hr, "Failed to add permissions to CustomActionData");
     }
 
-    hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"DropSmbRollback"), pwzRollbackCustomActionData, COST_SMB_CREATESMB);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"DropSmbRollback"), pwzRollbackCustomActionData, COST_SMB_CREATESMB);
     ExitOnFailure(hr, "Failed to schedule DropSmbRollback action");
 
     // DropSMB
     hr = WcaWriteStringToCaData(pss->wzShareName, &pwzCustomActionData);
     ExitOnFailure(hr, "failed to add ShareName to CustomActionData");
 
-    hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"DropSmb"), pwzCustomActionData, COST_SMB_DROPSMB);
+    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"DropSmb"), pwzCustomActionData, COST_SMB_DROPSMB);
     ExitOnFailure(hr, "Failed to schedule DropSmb action");
 
 LExit:
@@ -558,7 +558,7 @@ LExit:
 }
 
 LPCWSTR vcsSmbExUserPermsQuery = L"SELECT `FileShare_`,`User_`,`Permissions` "
-    L"FROM `FileSharePermissions` WHERE `FileShare_`=?";
+    L"FROM `Wix4FileSharePermissions` WHERE `FileShare_`=?";
 
 enum  eSmbUserPermsQuery {
     ssupqFileShare = 1,
@@ -588,9 +588,9 @@ HRESULT ScaSmbExPermsRead(SCA_SMB* pss)
     ExitOnFailure(hr, "Failed to look up FileShare");
 
     hr = WcaOpenView(vcsSmbExUserPermsQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on FileSharePermissions table");
+    ExitOnFailure(hr, "Failed to open view on Wix4FileSharePermissions table");
     hr = WcaExecuteView(hView, hRec);
-    ExitOnFailure(hr, "Failed to execute view on FileSharePermissions table");
+    ExitOnFailure(hr, "Failed to execute view on Wix4FileSharePermissions table");
 
     // loop through all User/Permissions paris returned
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
@@ -605,12 +605,12 @@ HRESULT ScaSmbExPermsRead(SCA_SMB* pss)
         ::ZeroMemory(pExUserPerms, sizeof(*pExUserPerms));
 
         hr = WcaGetRecordString(hRec, ssupqUser, &pwzData);
-        ExitOnFailure(hr, "Failed to get FileSharePermissions.User");
+        ExitOnFailure(hr, "Failed to get Wix4FileSharePermissions.User");
         hr = ScaGetUser(pwzData, &pExUserPerms->scau);
         ExitOnFailure(hr, "Failed to get user information for fileshare: '%ls'", pss->wzShareName);
 
         hr = WcaGetRecordInteger(hRec, ssupqPermissions, &pExUserPerms->nPermissions);
-        ExitOnFailure(hr, "Failed to get FileSharePermissions.Permissions");
+        ExitOnFailure(hr, "Failed to get Wix4FileSharePermissions.Permissions");
         pExUserPerms->accessMode = SET_ACCESS;  // we only support SET_ACCESS here
 
         pExUserPermsList = AddExUserPermsSmbToList(pExUserPermsList, pExUserPerms);

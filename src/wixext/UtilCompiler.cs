@@ -14,6 +14,7 @@ namespace WixToolset.Util
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Util.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset Utility Extension.
@@ -790,38 +791,32 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            // Reference CustomAction since nothing will happen without it
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixCloseApplications_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixCloseApplications");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "CloseApplications", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixCloseApplication", id);
-                row.Set(1, target);
-                row.Set(2, description);
-                row.Set(3, condition);
-                row.Set(4, attributes);
+                var tuple = new WixCloseApplicationTuple(sourceLineNumbers, id)
+                {
+                    Target = target,
+                    Description = description,
+                    Condition = condition,
+                    Attributes = attributes,
+                    Property = property,
+                };
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row.Set(5, sequence);
+                    tuple.Sequence = sequence;
                 }
-                row.Set(6, property);
                 if (CompilerConstants.IntegerNotSet != terminateExitCode)
                 {
-                    row.Set(7, terminateExitCode);
+                    tuple.TerminateExitCode = terminateExitCode;
                 }
                 if (CompilerConstants.IntegerNotSet != timeout)
                 {
-                    row.Set(8, timeout * 1000); // make the timeout milliseconds in the table.
+                    tuple.Timeout = timeout * 1000; // make the timeout milliseconds in the table.
                 }
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -1096,7 +1091,7 @@ namespace WixToolset.Util
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string description = null;
             string name = null;
-            string id = null;
+            Identifier id = null;
 
             foreach (XAttribute attrib in element.Attributes())
             {
@@ -1105,7 +1100,7 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Name":
                             name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1159,28 +1154,20 @@ namespace WixToolset.Util
                 }
             }
 
-            // Reference ConfigureSmbInstall and ConfigureSmbUninstall since nothing will happen without it
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureSmbInstall_ARM");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureSmbUninstall_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureSmbInstall");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureSmbUninstall");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureSmbInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureSmbUninstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "FileShare");
-                row.Set(0, id);
-                row.Set(1, name);
-                row.Set(2, componentId);
-                row.Set(3, description);
-                row.Set(4, directoryId);
+                var tuple = new FileShareTuple(sourceLineNumbers, id)
+                {
+                    ShareName = name,
+                    ComponentRef = componentId,
+                    Description = description,
+                    DirectoryRef = directoryId,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -1189,7 +1176,7 @@ namespace WixToolset.Util
         /// </summary>
         /// <param name="element">Element to parse.</param>
         /// <param name="fileShareId">The identifier of the parent FileShare element.</param>
-        private void ParseFileSharePermissionElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileShareId)
+        private void ParseFileSharePermissionElement(Intermediate intermediate, IntermediateSection section, XElement element, Identifier fileShareId)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             BitArray bits = new BitArray(32);
@@ -1244,10 +1231,14 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "FileSharePermissions");
-                row.Set(0, fileShareId);
-                row.Set(1, user);
-                row.Set(2, permission);
+                var tuple = new FileSharePermissionsTuple(sourceLineNumbers)
+                {
+                    FileShareRef = fileShareId.Id,
+                    UserRef = user,
+                    Permissions = permission,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -1259,7 +1250,7 @@ namespace WixToolset.Util
         private void ParseGroupElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string id = null;
+            Identifier id = null;
             string domain = null;
             string name = null;
 
@@ -1270,7 +1261,7 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Name":
                             name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1298,11 +1289,14 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Group");
-                row.Set(0, id);
-                row.Set(1, componentId);
-                row.Set(2, name);
-                row.Set(3, domain);
+                var tuple = new GroupTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Name = name,
+                    Domain = domain,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -1341,9 +1335,13 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "UserGroup");
-                row.Set(0, userId);
-                row.Set(1, groupId);
+                var tuple = new UserGroupTuple(sourceLineNumbers)
+                {
+                    UserRef = userId,
+                    GroupRef = groupId,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -1356,7 +1354,7 @@ namespace WixToolset.Util
         private void ParseInternetShortcutElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string defaultTarget)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string id = null;
+            Identifier id = null;
             string name = null;
             string target = null;
             string directoryId = null;
@@ -1374,7 +1372,7 @@ namespace WixToolset.Util
                             directoryId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             break;
                         case "Id":
-                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Name":
                             name = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1457,43 +1455,40 @@ namespace WixToolset.Util
         /// <param name="id">Identifier of shortcut.</param>
         /// <param name="name">Name of shortcut without extension.</param>
         /// <param name="target">Target URL of shortcut.</param>
-        private void CreateWixInternetShortcut(IntermediateSection section, SourceLineNumber sourceLineNumbers, string componentId, string directoryId, string shortcutId, string name, string target, InternetShortcutType type, string iconFile, int iconIndex)
+        private void CreateWixInternetShortcut(IntermediateSection section, SourceLineNumber sourceLineNumbers, string componentId, string directoryId, Identifier shortcutId, string name, string target, InternetShortcutType type, string iconFile, int iconIndex)
         {
             // add the appropriate extension based on type of shortcut
             name = String.Concat(name, InternetShortcutType.Url == type ? ".url" : ".lnk");
 
-            var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixInternetShortcut");
-            row.Set(0, shortcutId);
-            row.Set(1, componentId);
-            row.Set(2, directoryId);
-            row.Set(3, name);
-            row.Set(4, target);
-            row.Set(5, (int)type);
-            row.Set(6, iconFile);
-            row.Set(7, iconIndex);
+            var tuple = new WixInternetShortcutTuple(sourceLineNumbers, shortcutId)
+            {
+                ComponentRef = componentId,
+                DirectoryRef = directoryId,
+                Name = name,
+                Target = target,
+                Attributes = (int)type,
+                IconFile = iconFile,
+                IconIndex = iconIndex,
+            };
 
-            // Reference custom action because nothing will happen without it
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedInternetShortcuts_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedInternetShortcuts");
-            }
+            section.Tuples.Add(tuple);
+
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedInternetShortcuts", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
             // make sure we have a CreateFolder table so that the immediate CA can add temporary rows to handle installation and uninstallation
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CreateFolder");
 
             // use built-in MSI functionality to remove the shortcuts rather than doing so via CA
-            row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "RemoveFile");
-            row.Set(0, shortcutId);
-            row.Set(1, componentId);
-            row.Set(2, this.ParseHelper.IsValidShortFilename(name, false) ? name : String.Concat(this.ParseHelper.CreateShortName(name, true, false, directoryId, name), "|", name));
-            row.Set(3, directoryId);
-            row.Set(4, 2); // msidbRemoveFileInstallModeOnRemove
+            var removeFileTuple = new RemoveFileTuple(sourceLineNumbers, shortcutId)
+            {
+                ComponentRef = componentId,
+                DirProperty = directoryId,
+                OnUninstall = true,
+                // TODO: A better way?
+                FileName = this.ParseHelper.IsValidShortFilename(name, false) ? name : String.Concat(this.ParseHelper.CreateShortName(name, true, false, directoryId, name), "|", name),
+            };
+
+            section.Tuples.Add(removeFileTuple);
         }
 
         /// <summary>
@@ -1504,7 +1499,7 @@ namespace WixToolset.Util
         private void ParsePerformanceCategoryElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string id = null;
+            Identifier id = null;
             string name = null;
             string help = null;
             YesNoType multiInstance = YesNoType.No;
@@ -1537,7 +1532,7 @@ namespace WixToolset.Util
                             help = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Id":
-                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Library":
                             library = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1569,7 +1564,7 @@ namespace WixToolset.Util
 
             if (null == name)
             {
-                name = id;
+                name = id?.Id;
             }
 
             // Process the child counter elements.
@@ -1641,12 +1636,15 @@ namespace WixToolset.Util
                 sbSymbolicConstants.AppendFormat("#define LAST_{0}_COUNTER_OFFSET    {1}\r\n", objectName, symbolConstantsCounter);
 
                 // Add the calculated INI and H strings to the PerformanceCategory table.
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "PerformanceCategory");
-                row.Set(0, id);
-                row.Set(1, componentId);
-                row.Set(2, name);
-                row.Set(3, sbIniData.ToString());
-                row.Set(4, sbSymbolicConstants.ToString());
+                var tuple = new PerformanceCategoryTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Name = name,
+                    IniData = sbIniData.ToString(),
+                    ConstantData = sbSymbolicConstants.ToString(),
+                };
+
+                section.Tuples.Add(tuple);
 
                 // Set up the application's performance key.
                 string escapedName = UtilCompiler.FindPropertyBrackets.Replace(name, this.EscapeProperties);
@@ -1664,19 +1662,8 @@ namespace WixToolset.Util
                 this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
             }
 
-            // Reference InstallPerfCounterData and UninstallPerfCounterData since nothing will happen without them
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CAs are referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallPerfCounterData_ARM");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallPerfCounterData_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallPerfCounterData");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallPerfCounterData");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "InstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "UninstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
         }
 
         /// <summary>
@@ -2146,25 +2133,18 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Perfmon");
-                row.Set(0, componentId);
-                row.Set(1, $"[#{fileId}]");
-                row.Set(2, name);
+                var tuple = new PerfmonTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    File = $"[#{fileId}]",
+                    Name = name,
+                };
+
+                section.Tuples.Add(tuple);
             }
 
-            // Reference ConfigurePerfmonInstall and ConfigurePerfmonUninstall since nothing will happen without them
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CAs are referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonInstall_ARM");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonUninstall_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonInstall");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonUninstall");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonUninstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
         }
 
 
@@ -2203,24 +2183,18 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "PerfmonManifest");
-                row.Set(0, componentId);
-                row.Set(1, $"[#{fileId}]");
-                row.Set(2, resourceFileDirectory);
+                var tuple = new PerfmonManifestTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    File = $"[#{fileId}]",
+                    ResourceFileDirectory = resourceFileDirectory,
+                };
+
+                section.Tuples.Add(tuple);
             }
 
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CAs are referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonManifestRegister_ARM");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonManifestUnregister_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonManifestRegister");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigurePerfmonManifestUnregister");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestRegister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestUnregister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
         }
 
         /// <summary>
@@ -2263,23 +2237,15 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                switch (this.Context.Platform)
-                {
-                    case Platform.X86:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedFormatFiles");
-                        break;
-                    case Platform.X64:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedFormatFiles_x64");
-                        break;
-                    case Platform.IA64:
-                    case Platform.ARM:
-                        this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
-                        break;
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFormatFiles", this.Context.Platform, CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
 
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixFormatFiles");
-                row.Set(0, binaryId);
-                row.Set(1, fileId);
+                var tuple = new WixFormatFilesTuple(sourceLineNumbers)
+                {
+                    BinaryRef = binaryId,
+                    FileRef = fileId,
+                };
+
+                section.Tuples.Add(tuple);
 
                 this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Binary", binaryId);
             }
@@ -2328,71 +2294,62 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "EventManifest");
-                row.Set(0, componentId);
-                row.Set(1, $"[#{fileId}]");
+                var tuple = new EventManifestTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    File = $"[#{fileId}]",
+                };
+
+                section.Tuples.Add(tuple);
 
                 if (null != messageFile)
                 {
-                    var messageRow = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
-                    messageRow.Set(0, String.Concat("Config_", fileId, "MessageFile"));
-                    messageRow.Set(1, $"[#{fileId}]");
-                    messageRow.Set(2, "/*/*/*/*[\\[]@messageFileName[\\]]");
-                    messageRow.Set(3, "messageFileName");
-                    messageRow.Set(4, messageFile);
-                    messageRow.Set(5, 4 | 0x00001000);  //bulk write | preserve modified date
-                    messageRow.Set(6, componentId);
+                    var xmlTuple = new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}MessageFile"))
+                    {
+                        File = $"[#{fileId}]",
+                        ElementPath = "/*/*/*/*[\\[]@messageFileName[\\]]",
+                        Name = "messageFileName",
+                        Value = messageFile,
+                        Flags = 4 | 0x00001000,  //bulk write | preserve modified date
+                        ComponentRef = componentId,
+                    };
+                    section.Tuples.Add(xmlTuple);
                 }
                 if (null != parameterFile)
                 {
-                    var resourceRow = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
-                    resourceRow.Set(0, String.Concat("Config_", fileId, "ParameterFile"));
-                    resourceRow.Set(1, $"[#{fileId}]");
-                    resourceRow.Set(2, "/*/*/*/*[\\[]@parameterFileName[\\]]");
-                    resourceRow.Set(3, "parameterFileName");
-                    resourceRow.Set(4, parameterFile);
-                    resourceRow.Set(5, 4 | 0x00001000);  //bulk write | preserve modified date
-                    resourceRow.Set(6, componentId);
+                    var xmlTuple = new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ParameterFile"))
+                    {
+                        File = $"[#{fileId}]",
+                        ElementPath = "/*/*/*/*[\\[]@parameterFileName[\\]]",
+                        Name = "parameterFileName",
+                        Value = parameterFile,
+                        Flags = 4 | 0x00001000,  //bulk write | preserve modified date
+                        ComponentRef = componentId,
+                    };
+                    section.Tuples.Add(xmlTuple);
                 }
                 if (null != resourceFile)
                 {
-                    var resourceRow = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
-                    resourceRow.Set(0, String.Concat("Config_", fileId, "ResourceFile"));
-                    resourceRow.Set(1, $"[#{fileId}]");
-                    resourceRow.Set(2, "/*/*/*/*[\\[]@resourceFileName[\\]]");
-                    resourceRow.Set(3, "resourceFileName");
-                    resourceRow.Set(4, resourceFile);
-                    resourceRow.Set(5, 4 | 0x00001000);  //bulk write | preserve modified date
-                    resourceRow.Set(6, componentId);
+                    var xmlTuple = new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ResourceFile"))
+                    {
+                        File = $"[#{fileId}]",
+                        ElementPath = "/*/*/*/*[\\[]@resourceFileName[\\]]",
+                        Name = "resourceFileName",
+                        Value = resourceFile,
+                        Flags = 4 | 0x00001000,  //bulk write | preserve modified date
+                        ComponentRef = componentId,
+                    };
+                    section.Tuples.Add(xmlTuple);
                 }
 
             }
 
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureEventManifestRegister_ARM");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureEventManifestUnregister_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureEventManifestRegister");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureEventManifestUnregister");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureEventManifestRegister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureEventManifestUnregister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
             if (null != messageFile || null != parameterFile || null != resourceFile)
             {
-                if (this.Context.Platform == Platform.ARM)
-                {
-                    // Ensure ARM version of the CA is referenced
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedXmlFile_ARM");
-                }
-                else
-                {
-                    // All other supported platforms use x86
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedXmlFile");
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
             }
         }
 
@@ -2493,36 +2450,18 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                if (win64)
-                {
-                    if (this.Context.Platform == Platform.IA64)
-                    {
-                        this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, "ia64", element.Name.LocalName));
-                    }
-                    else
-                    {
-                        // Ensure SchedSecureObjects (x64) is referenced
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedSecureObjects_x64");
-                    }
-                }
-                else if (this.Context.Platform == Platform.ARM)
-                {
-                    // Ensure SchedSecureObjects (arm) is referenced
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedSecureObjects_ARM");
-                }
-                else
-                {
-                    // Ensure SchedSecureObjects (x86) is referenced, to handle this x86 component member
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedSecureObjects");
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedSecureObjects", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
 
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "SecureObjects");
-                row.Set(0, objectId);
-                row.Set(1, tableName);
-                row.Set(2, domain);
-                row.Set(3, user);
-                row.Set(4, permission);
-                row.Set(5, componentId);
+                var tuple = new SecureObjectsTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, objectId))
+                {
+                    Table = tableName,
+                    Domain = domain,
+                    User = user,
+                    Permission = permission,
+                    ComponentRef = componentId,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -2881,13 +2820,18 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixRemoveFolderEx", id);
-                row.Set(1, componentId);
-                row.Set(2, property);
-                row.Set(3, on);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RemoveFoldersEx", this.Context.Platform, CustomActionPlatforms.X86);
+
+                var tuple = new WixRemoveFolderExTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    Property = property,
+                    InstallMode = (int)on,
+                };
+
+                section.Tuples.Add(tuple);
 
                 this.ParseHelper.EnsureTable(section, sourceLineNumbers, "RemoveFile");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixRemoveFoldersEx");
             }
         }
 
@@ -2954,22 +2898,16 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                // Add a reference to the WixRegisterRestartResources custom action since nothing will happen without it.
-                if (this.Context.Platform == Platform.ARM)
-                {
-                    // Ensure ARM version of the CA is referenced
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixRegisterRestartResources_ARM");
-                }
-                else
-                {
-                    // All other supported platforms use x86
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixRegisterRestartResources");
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RegisterRestartResources", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixRestartResource", id);
-                row.Set(1, componentId);
-                row.Set(2, resource);
-                row.Set(3, attributes);
+                var tuple = new WixRestartResourceTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    Resource = resource,
+                    Attributes = attributes,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -3052,38 +2990,25 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            // Reference SchedServiceConfig since nothing will happen without it
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedServiceConfig_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedServiceConfig");
-            }
-
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "ServiceConfig");
-                row.Set(0, serviceName);
-                row.Set(1, componentId);
-                row.Set(2, (newService ? 1 : 0));
-                row.Set(3, firstFailureActionType);
-                row.Set(4, secondFailureActionType);
-                row.Set(5, thirdFailureActionType);
-                if (CompilerConstants.IntegerNotSet != resetPeriod)
-                {
-                    row.Set(6, resetPeriod);
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedServiceConfig", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
-                if (CompilerConstants.IntegerNotSet != restartServiceDelay)
+                var tuple = new ServiceConfigTuple(sourceLineNumbers)
                 {
-                    row.Set(7, restartServiceDelay);
-                }
-                row.Set(8, programCommandLine);
-                row.Set(9, rebootMessage);
+                    ServiceName = serviceName,
+                    ComponentRef = componentId,
+                    NewService = newService ? 1 : 0,
+                    FirstFailureActionType = firstFailureActionType,
+                    SecondFailureActionType = secondFailureActionType,
+                    ThirdFailureActionType = thirdFailureActionType,
+                    ResetPeriodInDays = resetPeriod,
+                    RestartServiceDelayInSeconds = restartServiceDelay,
+                    ProgramCommandLine = programCommandLine,
+                    RebootMessage = rebootMessage,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -3166,12 +3091,16 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "WixTouchFile", id);
-                row.Set(1, componentId);
-                row.Set(2, path);
-                row.Set(3, attributes);
+                var tuple = new WixTouchFileTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    Path = path,
+                    Attributes = attributes,
+                };
 
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixTouchFileDuringInstall");
+                section.Tuples.Add(tuple);
+
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "TouchFileDuringInstall", this.Context.Platform, CustomActionPlatforms.X86);
             }
         }
 
@@ -3375,27 +3304,21 @@ namespace WixToolset.Util
 
             if (null != componentId)
             {
-                // Reference ConfigureIIs since nothing will happen without it
-                if (this.Context.Platform == Platform.ARM)
-                {
-                    // Ensure ARM version of the CA is referenced
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureUsers_ARM");
-                }
-                else
-                {
-                    // All other supported platforms use x86
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureUsers");
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureUsers", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "User", id);
-                row.Set(1, componentId);
-                row.Set(2, name);
-                row.Set(3, domain);
-                row.Set(4, password);
-                row.Set(5, attributes);
+                var tuple = new UserTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Name = name,
+                    Domain = domain,
+                    Password = password,
+                    Attributes = attributes,
+                };
+
+                section.Tuples.Add(tuple);
             }
         }
 
@@ -3407,7 +3330,7 @@ namespace WixToolset.Util
         private void ParseXmlFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string id = null;
+            Identifier id = null;
             string file = null;
             string elementPath = null;
             string name = null;
@@ -3458,7 +3381,7 @@ namespace WixToolset.Util
                             }
                             break;
                         case "Id":
-                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "File":
                             file = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3522,31 +3445,23 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlFile");
-                row.Set(0, id);
-                row.Set(1, file);
-                row.Set(2, elementPath);
-                row.Set(3, name);
-                row.Set(4, value);
-                row.Set(5, flags);
-                row.Set(6, componentId);
+                var tuple = new XmlFileTuple(sourceLineNumbers, id)
+                {
+                    File = file,
+                    ElementPath = elementPath,
+                    Name = name,
+                    Value = value,
+                    Flags = flags,
+                    ComponentRef = componentId,
+                };
                 if (-1 != sequence)
                 {
-                    row.Set(7, sequence);
+                    tuple.Sequence = sequence;
                 }
+                section.Tuples.Add(tuple);
             }
 
-            // Reference SchedXmlFile since nothing will happen without it
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedXmlFile_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedXmlFile");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
         }
 
         /// <summary>
@@ -3558,7 +3473,7 @@ namespace WixToolset.Util
         private void ParseXmlConfigElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, bool nested)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string id = null;
+            Identifier id = null;
             string elementId = null;
             string elementPath = null;
             int flags = 0;
@@ -3575,7 +3490,7 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Action":
                             if (nested)
@@ -3760,32 +3675,24 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "XmlConfig");
-                row.Set(0, id);
-                row.Set(1, file);
-                row.Set(2, elementId ?? elementPath);
-                row.Set(3, verifyPath);
-                row.Set(4, name);
-                row.Set(5, value);
-                row.Set(6, flags);
-                row.Set(7, componentId);
+                var tuple = new XmlConfigTuple(sourceLineNumbers, id)
+                {
+                    File=file,
+                    ElementPath=elementId ??elementPath,
+                    VerifyPath=verifyPath,
+                    Name=name,
+                    Value=value,
+                    Flags=flags,
+                    ComponentRef=componentId,
+                };
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row.Set(8, sequence);
+                    tuple.Sequence = sequence;
                 }
+                section.Tuples.Add(tuple);
             }
 
-            // Reference SchedXmlConfig since nothing will happen without it
-            if (this.Context.Platform == Platform.ARM)
-            {
-                // Ensure ARM version of the CA is referenced
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedXmlConfig_ARM");
-            }
-            else
-            {
-                // All other supported platforms use x86
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "SchedXmlConfig");
-            }
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlConfig", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
         }
 
         /// <summary>

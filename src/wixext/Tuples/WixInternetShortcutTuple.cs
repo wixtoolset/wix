@@ -11,9 +11,8 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.WixInternetShortcut.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.WixInternetShortcut), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Target), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixInternetShortcutTupleFields.Attributes), IntermediateFieldType.Number),
@@ -30,9 +29,8 @@ namespace WixToolset.Util.Tuples
 
     public enum WixInternetShortcutTupleFields
     {
-        WixInternetShortcut,
-        Component_,
-        Directory_,
+        ComponentRef,
+        DirectoryRef,
         Name,
         Target,
         Attributes,
@@ -52,22 +50,16 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[WixInternetShortcutTupleFields index] => this.Fields[(int)index];
 
-        public string WixInternetShortcut
+        public string ComponentRef
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.WixInternetShortcut].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.WixInternetShortcut, value);
+            get => this.Fields[(int)WixInternetShortcutTupleFields.ComponentRef].AsString();
+            set => this.Set((int)WixInternetShortcutTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string DirectoryRef
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.Component_].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.Component_, value);
-        }
-
-        public string Directory_
-        {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.Directory_].AsString();
-            set => this.Set((int)WixInternetShortcutTupleFields.Directory_, value);
+            get => this.Fields[(int)WixInternetShortcutTupleFields.DirectoryRef].AsString();
+            set => this.Set((int)WixInternetShortcutTupleFields.DirectoryRef, value);
         }
 
         public string Name

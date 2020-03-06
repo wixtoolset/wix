@@ -18,8 +18,8 @@ enum eRmuResourceType
 };
 
 LPCWSTR vcsRestartResourceQuery =
-    L"SELECT `WixRestartResource`.`WixRestartResource`, `WixRestartResource`.`Component_`, `WixRestartResource`.`Resource`, `WixRestartResource`.`Attributes` "
-    L"FROM `WixRestartResource`";
+    L"SELECT `Wix4RestartResource`.`Wix4RestartResource`, `Wix4RestartResource`.`Component_`, `Wix4RestartResource`.`Resource`, `Wix4RestartResource`.`Attributes` "
+    L"FROM `Wix4RestartResource`";
 enum eRestartResourceQuery { rrqRestartResource = 1, rrqComponent, rrqResource, rrqAttributes };
 
 /********************************************************************
@@ -58,9 +58,9 @@ extern "C" UINT __stdcall WixRegisterRestartResources(
     ExitOnFailure(hr, "Failed to initialize.");
 
     // Skip if the table doesn't exist.
-    if (S_OK != WcaTableExists(L"WixRestartResource"))
+    if (S_OK != WcaTableExists(L"Wix4RestartResource"))
     {
-        WcaLog(LOGMSG_STANDARD, "The RestartResource table does not exist; there are no resources to register with Restart Manager.");
+        WcaLog(LOGMSG_STANDARD, "The Wix4RestartResource table does not exist; there are no resources to register with Restart Manager.");
         ExitFunction();
     }
 

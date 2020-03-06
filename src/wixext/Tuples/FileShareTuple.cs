@@ -11,13 +11,10 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.FileShare.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.FileShare), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileShareTupleFields.ShareName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileShareTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileShareTupleFields.Description), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.Directory_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.User_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileShareTupleFields.Permissions), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(FileShareTupleFields.DirectoryRef), IntermediateFieldType.String),
             },
             typeof(FileShareTuple));
     }
@@ -29,13 +26,10 @@ namespace WixToolset.Util.Tuples
 
     public enum FileShareTupleFields
     {
-        FileShare,
         ShareName,
-        Component_,
+        ComponentRef,
         Description,
-        Directory_,
-        User_,
-        Permissions,
+        DirectoryRef,
     }
 
     public class FileShareTuple : IntermediateTuple
@@ -50,22 +44,16 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[FileShareTupleFields index] => this.Fields[(int)index];
 
-        public string FileShare
-        {
-            get => this.Fields[(int)FileShareTupleFields.FileShare].AsString();
-            set => this.Set((int)FileShareTupleFields.FileShare, value);
-        }
-
         public string ShareName
         {
             get => this.Fields[(int)FileShareTupleFields.ShareName].AsString();
             set => this.Set((int)FileShareTupleFields.ShareName, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)FileShareTupleFields.Component_].AsString();
-            set => this.Set((int)FileShareTupleFields.Component_, value);
+            get => this.Fields[(int)FileShareTupleFields.ComponentRef].AsString();
+            set => this.Set((int)FileShareTupleFields.ComponentRef, value);
         }
 
         public string Description
@@ -74,22 +62,10 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)FileShareTupleFields.Description, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => this.Fields[(int)FileShareTupleFields.Directory_].AsString();
-            set => this.Set((int)FileShareTupleFields.Directory_, value);
-        }
-
-        public string User_
-        {
-            get => this.Fields[(int)FileShareTupleFields.User_].AsString();
-            set => this.Set((int)FileShareTupleFields.User_, value);
-        }
-
-        public int? Permissions
-        {
-            get => this.Fields[(int)FileShareTupleFields.Permissions].AsNullableNumber();
-            set => this.Set((int)FileShareTupleFields.Permissions, value);
+            get => this.Fields[(int)FileShareTupleFields.DirectoryRef].AsString();
+            set => this.Set((int)FileShareTupleFields.DirectoryRef, value);
         }
     }
 }

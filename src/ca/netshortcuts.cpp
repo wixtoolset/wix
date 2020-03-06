@@ -4,7 +4,7 @@
 
 LPCWSTR vcsShortcutsQuery =
     L"SELECT `Component_`, `Directory_`, `Name`, `Target`, `Attributes`, `IconFile`, `IconIndex` "
-    L"FROM `WixInternetShortcut`";
+    L"FROM `Wix4InternetShortcut`";
 enum eShortcutsQuery { esqComponent = 1, esqDirectory, esqFilename, esqTarget, esqAttributes, esqIconFile, esqIconIndex };
 enum eShortcutsAttributes { esaLink = 0, esaURL = 1 };
 
@@ -44,9 +44,9 @@ extern "C" UINT __stdcall WixSchedInternetShortcuts(
     ExitOnFailure(hr, "failed to initialize WixSchedInternetShortcuts.");
 
     // anything to do?
-    if (S_OK != WcaTableExists(L"WixInternetShortcut"))
+    if (S_OK != WcaTableExists(L"Wix4InternetShortcut"))
     {
-        WcaLog(LOGMSG_STANDARD, "WixInternetShortcut table doesn't exist, so there are no Internet shortcuts to process");
+        WcaLog(LOGMSG_STANDARD, "Wix4InternetShortcut table doesn't exist, so there are no Internet shortcuts to process");
         goto LExit;
     }
 
@@ -71,7 +71,7 @@ extern "C" UINT __stdcall WixSchedInternetShortcuts(
 
     // query and loop through all the shortcuts
     hr = WcaOpenExecuteView(vcsShortcutsQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on WixInternetShortcut table");
+    ExitOnFailure(hr, "failed to open view on Wix4InternetShortcut table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -91,7 +91,7 @@ extern "C" UINT __stdcall WixSchedInternetShortcuts(
         hr = WcaGetRecordInteger(hRec, esqIconIndex, &iIconIndex);
         ExitOnFailure(hr, "failed to get shortcut icon index");
 
-        // skip processing this WixInternetShortcut row if the component isn't being configured
+        // skip processing this Wix4InternetShortcut row if the component isn't being configured
         WCA_TODO todo = WcaGetComponentToDo(pwzComponent);
         if (WCA_TODO_UNKNOWN == todo)
         {
@@ -144,7 +144,7 @@ extern "C" UINT __stdcall WixSchedInternetShortcuts(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while processing WixInternetShortcut table");
+    ExitOnFailure(hr, "Failure occured while processing Wix4InternetShortcut table");
 
     // if we have any shortcuts to install
     if (pwzCustomActionData && *pwzCustomActionData)
@@ -154,9 +154,9 @@ extern "C" UINT __stdcall WixSchedInternetShortcuts(
         ExitOnFailure(hr, "failed to extend progress bar for InternetShortcuts");
 
         // provide custom action data to deferred and rollback CAs
-        hr = WcaSetProperty(PLATFORM_DECORATION(L"WixRollbackInternetShortcuts"), pwzCustomActionData);
+        hr = WcaSetProperty(CUSTOM_ACTION_DECORATION(L"RollbackInternetShortcuts"), pwzCustomActionData);
         ExitOnFailure(hr, "failed to set WixRollbackInternetShortcuts rollback custom action data");
-        hr = WcaSetProperty(PLATFORM_DECORATION(L"WixCreateInternetShortcuts"), pwzCustomActionData);
+        hr = WcaSetProperty(CUSTOM_ACTION_DECORATION(L"CreateInternetShortcuts"), pwzCustomActionData);
         ExitOnFailure(hr, "failed to set WixCreateInternetShortcuts custom action data");
     }
 

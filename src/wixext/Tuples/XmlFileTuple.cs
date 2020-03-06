@@ -11,13 +11,12 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.XmlFile.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.XmlFile), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlFileTupleFields.File), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlFileTupleFields.ElementPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Flags), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlFileTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlFileTupleFields.Sequence), IntermediateFieldType.Number),
             },
             typeof(XmlFileTuple));
@@ -30,13 +29,12 @@ namespace WixToolset.Util.Tuples
 
     public enum XmlFileTupleFields
     {
-        XmlFile,
         File,
         ElementPath,
         Name,
         Value,
         Flags,
-        Component_,
+        ComponentRef,
         Sequence,
     }
 
@@ -51,12 +49,6 @@ namespace WixToolset.Util.Tuples
         }
 
         public IntermediateField this[XmlFileTupleFields index] => this.Fields[(int)index];
-
-        public string XmlFile
-        {
-            get => this.Fields[(int)XmlFileTupleFields.XmlFile].AsString();
-            set => this.Set((int)XmlFileTupleFields.XmlFile, value);
-        }
 
         public string File
         {
@@ -88,10 +80,10 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)XmlFileTupleFields.Flags, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)XmlFileTupleFields.Component_].AsString();
-            set => this.Set((int)XmlFileTupleFields.Component_, value);
+            get => this.Fields[(int)XmlFileTupleFields.ComponentRef].AsString();
+            set => this.Set((int)XmlFileTupleFields.ComponentRef, value);
         }
 
         public int Sequence

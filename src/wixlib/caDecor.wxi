@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?ifdef Prefix ?>
+        <?undef Prefix ?>
+    <?endif ?>
+
+    <?define Prefix="Wix4" ?>
+
+    <?ifndef platform ?>
+        <?define platform="x86" ?>
+    <?endif ?>
+
+    <?if $(var.platform)="" ?>
+        <?undef platform ?>
+        <?define platform="x86" ?>
+    <?endif ?>
+
+    <?ifdef Suffix ?>
+        <?undef Suffix ?>
+    <?endif ?>
+
+    <?if $(var.platform)~="x86" ?>
+        <?define Suffix="_X86" ?>
+    <?endif ?>
+
+    <?if $(var.platform)~="x64" ?>
+        <?define Suffix="_X64" ?>
+    <?endif ?>
+
+    <?if $(var.platform)~="arm" ?>
+        <?define Suffix="_A32" ?>
+    <?endif ?>
+
+    <?if $(var.platform)~="arm64" ?>
+        <?define Suffix="_A64" ?>
+    <?endif ?>
+</Include>

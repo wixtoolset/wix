@@ -51,4 +51,4 @@
 #include "scasmb.h"
 #include "scasmbexec.h"
 
-#include "caSuffix.h"
+#include "caDecor.h"

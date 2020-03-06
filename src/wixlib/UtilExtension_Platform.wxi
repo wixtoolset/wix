@@ -3,8 +3,7 @@
 
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-
-  <?include caSuffix.wxi ?>
+  <?include caDecor.wxi ?>
 
   <!--
   The following actions do not support X64.
@@ -12,178 +11,178 @@
   <?if $(var.platform)!=x64 ?>
   
   <Fragment>
-    <CustomAction Id="WixCheckRebootRequired$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixCheckRebootRequired" Execute="immediate" Return="ignore" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CheckRebootRequired$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixCheckRebootRequired" Execute="immediate" Return="ignore" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
       <!-- Condition this so it runs on install and MMode, but not uninstall -->
-      <Custom Action="WixCheckRebootRequired$(var.Suffix)" After="InstallFinalize" Overridable="yes">NOT REMOVE~="ALL" AND VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)CheckRebootRequired$(var.Suffix)" After="InstallFinalize" Overridable="yes">NOT REMOVE~="ALL" AND VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="WixCloseApplications$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixCloseApplications" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixCloseApplicationsDeferred$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixCloseApplicationsDeferred" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
-    <CustomActionRef Id="WixCheckRebootRequired$(var.Suffix)" />
+    <CustomAction Id="$(var.Prefix)CloseApplications$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixCloseApplications" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CloseApplicationsDeferred$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixCloseApplicationsDeferred" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
+    <CustomActionRef Id="$(var.Prefix)CheckRebootRequired$(var.Suffix)" />
 
     <InstallExecuteSequence>
-      <Custom Action="WixCloseApplications$(var.Suffix)" Before="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)CloseApplications$(var.Suffix)" Before="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="WixRegisterRestartResources$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixRegisterRestartResources$(var.Suffix)" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RegisterRestartResources$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixRegisterRestartResources$(var.Suffix)" Execute="immediate" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="WixRegisterRestartResources$(var.Suffix)" Before="InstallValidate" Overridable="yes" />
+      <Custom Action="$(var.Prefix)RegisterRestartResources$(var.Suffix)" Before="InstallValidate" Overridable="yes" />
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
     <UIRef Id="ConfigureUsersErrorText" />
 
-    <CustomAction Id="ConfigureUsers$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigureUsers" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="CreateUser$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CreateUser" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="CreateUserRollback$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigureUsers$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigureUsers" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CreateUser$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CreateUser" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CreateUserRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
     <!-- RemoveUser is a type commit action because it is not possible to rollback the removal of a user -->
-    <CustomAction Id="RemoveUser$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="commit" Return="ignore" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RemoveUser$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="commit" Return="ignore" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="ConfigureUsers$(var.Suffix)" Before="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigureUsers$(var.Suffix)" Before="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
     <UIRef Id="ConfigureSmbErrorsText" />
 
-    <CustomAction Id="ConfigureSmbInstall$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigureSmbInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigureSmbUninstall$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigureSmbUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="CreateSmb$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CreateSmb" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="CreateSmbRollback$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="DropSmb" Impersonate="no" Execute="rollback" Return="ignore" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="DropSmb$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="DropSmb" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="DropSmbRollback$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CreateSmb" Impersonate="no" Execute="rollback" Return="ignore" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigureSmbInstall$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigureSmbInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigureSmbUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigureSmbUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CreateSmb$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CreateSmb" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CreateSmbRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="DropSmb" Impersonate="no" Execute="rollback" Return="ignore" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)DropSmb$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="DropSmb" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)DropSmbRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CreateSmb" Impersonate="no" Execute="rollback" Return="ignore" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="ConfigureSmbInstall$(var.Suffix)" After="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="ConfigureSmbUninstall$(var.Suffix)" After="RemoveFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigureSmbInstall$(var.Suffix)" After="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigureSmbUninstall$(var.Suffix)" After="RemoveFiles" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
     <UIRef Id="PerCounterDataErrorsText" />
 
-    <CustomAction Id="InstallPerfCounterData$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="InstallPerfCounterData" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="UninstallPerfCounterData$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="UninstallPerfCounterData" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RegisterPerfCounterData$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RegisterPerfCounterData" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="UnregisterPerfCounterData$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="UnregisterPerfCounterData" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="RollbackRegisterPerfCounterData$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="UnregisterPerfCounterData" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="RollbackUnregisterPerfCounterData$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RegisterPerfCounterData" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)InstallPerfCounterData$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="InstallPerfCounterData" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)UninstallPerfCounterData$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="UninstallPerfCounterData" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RegisterPerfCounterData$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RegisterPerfCounterData" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)UnregisterPerfCounterData$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="UnregisterPerfCounterData" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackRegisterPerfCounterData$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="UnregisterPerfCounterData" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackUnregisterPerfCounterData$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RegisterPerfCounterData" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="InstallPerfCounterData$(var.Suffix)" After="WriteRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="UninstallPerfCounterData$(var.Suffix)" Before="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)InstallPerfCounterData$(var.Suffix)" After="WriteRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)UninstallPerfCounterData$(var.Suffix)" Before="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
     <UIRef Id="ConfigurePerfmonErrorsText" />
 
-    <CustomAction Id="ConfigurePerfmonInstall$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigurePerfmonUninstall$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RegisterPerfmon$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RegisterPerfmon" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="UnregisterPerfmon$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="UnregisterPerfmon" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RollbackRegisterPerfmon$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="UnregisterPerfmon" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RollbackUnregisterPerfmon$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RegisterPerfmon" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigurePerfmonInstall$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigurePerfmonUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RegisterPerfmon$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RegisterPerfmon" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)UnregisterPerfmon$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="UnregisterPerfmon" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackRegisterPerfmon$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="UnregisterPerfmon" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackUnregisterPerfmon$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RegisterPerfmon" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="ConfigurePerfmonInstall$(var.Suffix)" After="WriteRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="ConfigurePerfmonUninstall$(var.Suffix)" Before="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigurePerfmonInstall$(var.Suffix)" After="WriteRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigurePerfmonUninstall$(var.Suffix)" Before="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="ConfigurePerfmonManifestRegister$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonManifestRegister" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigurePerfmonManifestUnregister$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonManifestUnregister" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RegisterPerfmonManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="UnregisterPerfmonManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="RollbackRegisterPerfmonManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="RollbackUnregisterPerfmonManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigurePerfmonManifestRegister$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonManifestRegister" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigurePerfmonManifestUnregister$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigurePerfmonManifestUnregister" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RegisterPerfmonManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)UnregisterPerfmonManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="ignore" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackRegisterPerfmonManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="ignore" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackUnregisterPerfmonManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="ConfigurePerfmonManifestRegister$(var.Suffix)" After="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="ConfigurePerfmonManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigurePerfmonManifestRegister$(var.Suffix)" After="InstallFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigurePerfmonManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="ConfigureEventManifestRegister$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigureEventManifestRegister" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ConfigureEventManifestUnregister$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ConfigureEventManifestUnregister" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RegisterEventManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="UnregisterEventManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="RollbackRegisterEventManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="ignore" SuppressModularization="yes" />
-    <CustomAction Id="RollbackUnregisterEventManifest$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigureEventManifestRegister$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigureEventManifestRegister" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ConfigureEventManifestUnregister$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ConfigureEventManifestUnregister" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RegisterEventManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)UnregisterEventManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="deferred" Return="ignore" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackRegisterEventManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="ignore" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackUnregisterEventManifest$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="CAQuietExec" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="ConfigureEventManifestRegister$(var.Suffix)" After="SchedXmlFile" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="ConfigureEventManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigureEventManifestRegister$(var.Suffix)" After="$(var.Prefix)SchedXmlFile$(var.Suffix)" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)ConfigureEventManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="SchedServiceConfig$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="SchedServiceConfig" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ExecServiceConfig$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecServiceConfig" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="RollbackServiceConfig$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="RollbackServiceConfig" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedServiceConfig$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="SchedServiceConfig" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecServiceConfig$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecServiceConfig" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackServiceConfig$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="RollbackServiceConfig" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
       <!-- Condition this so it runs on install and MMode, but not uninstall -->
-      <Custom Action="SchedServiceConfig$(var.Suffix)" After="InstallServices" Overridable="yes">NOT REMOVE~="ALL" AND VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)SchedServiceConfig$(var.Suffix)" After="InstallServices" Overridable="yes">NOT REMOVE~="ALL" AND VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="WixTouchFileDuringInstall" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixTouchFileDuringInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixTouchFileDuringUninstall" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixTouchFileDuringUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixExecuteTouchFile" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixExecuteTouchFile" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixRollbackTouchFile" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixExecuteTouchFile" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)TouchFileDuringInstall$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixTouchFileDuringInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)TouchFileDuringUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixTouchFileDuringUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecuteTouchFile$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixExecuteTouchFile" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackTouchFile$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixExecuteTouchFile" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="WixTouchFileDuringUninstall" Before="RemoveFiles" Overridable="yes" />
-      <Custom Action="WixTouchFileDuringInstall" After="InstallFiles" Overridable="yes" />
+      <Custom Action="$(var.Prefix)TouchFileDuringUninstall" Before="RemoveFiles" Overridable="yes" />
+      <Custom Action="$(var.Prefix)TouchFileDuringInstall" After="InstallFiles" Overridable="yes" />
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
     <UIRef Id="XmlFileErrorsText" />
 
-    <CustomAction Id="SchedXmlFile$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="SchedXmlFile" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ExecXmlFile$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecXmlFile" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ExecXmlFileRollback$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecXmlFileRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedXmlFile$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="SchedXmlFile" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecXmlFile$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecXmlFile" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecXmlFileRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecXmlFileRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="SchedXmlFile$(var.Suffix)" After="DuplicateFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)SchedXmlFile$(var.Suffix)" After="DuplicateFiles" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
     <UIRef Id="XmlConfigErrorsText" />
 
-    <CustomAction Id="SchedXmlConfig$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="SchedXmlConfig" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ExecXmlConfig$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecXmlConfig" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ExecXmlConfigRollback$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecXmlConfigRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedXmlConfig$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="SchedXmlConfig" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecXmlConfig$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecXmlConfig" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecXmlConfigRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecXmlConfigRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="SchedXmlConfig$(var.Suffix)" After="DuplicateFiles" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)SchedXmlConfig$(var.Suffix)" After="DuplicateFiles" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="WixSchedInternetShortcuts$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixSchedInternetShortcuts" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixRollbackInternetShortcuts$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixRollbackInternetShortcuts" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixCreateInternetShortcuts$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixCreateInternetShortcuts" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedInternetShortcuts$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixSchedInternetShortcuts" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackInternetShortcuts$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixRollbackInternetShortcuts" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixCreateInternetShortcuts" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="WixSchedInternetShortcuts$(var.Suffix)" Before="RemoveFolders" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="WixRollbackInternetShortcuts$(var.DeferredSuffix)" Before="WixCreateInternetShortcuts$(var.DeferredSuffix)" Overridable="yes">VersionNT &gt; 400</Custom>
-      <Custom Action="WixCreateInternetShortcuts$(var.DeferredSuffix)" After="CreateShortcuts" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)SchedInternetShortcuts$(var.Suffix)" Before="RemoveFolders" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)RollbackInternetShortcuts$(var.Suffix)" Before="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" After="CreateShortcuts" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
@@ -196,29 +195,29 @@
   <Fragment>
     <UIRef Id="SecureObjectsErrors" />
 
-    <CustomAction Id="SchedSecureObjects$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="SchedSecureObjects" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="SchedSecureObjectsRollback$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="SchedSecureObjectsRollback" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="ExecSecureObjects$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecSecureObjects" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
-    <CustomAction Id="ExecSecureObjectsRollback$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="ExecSecureObjectsRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedSecureObjects$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="SchedSecureObjects" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedSecureObjectsRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="SchedSecureObjectsRollback" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecSecureObjects$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecSecureObjects" Execute="deferred" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecSecureObjectsRollback$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="ExecSecureObjectsRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
       <!-- Condition this so it runs on install and MMode, but not uninstall -->
-      <Custom Action="SchedSecureObjects$(var.Suffix)" After="InstallServices" Overridable="yes">NOT REMOVE~="ALL" AND VersionNT &gt; 400</Custom>
-      <Custom Action="SchedSecureObjectsRollback$(var.Suffix)" After="UnpublishFeatures" Overridable="yes">VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)SchedSecureObjects$(var.Suffix)" After="InstallServices" Overridable="yes">NOT REMOVE~="ALL" AND VersionNT &gt; 400</Custom>
+      <Custom Action="$(var.Prefix)SchedSecureObjectsRollback$(var.Suffix)" After="UnpublishFeatures" Overridable="yes">VersionNT &gt; 400</Custom>
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <CustomAction Id="WixSchedFormatFiles$(var.Suffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixSchedFormatFiles" Execute="immediate" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixExecFormatFiles$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixExecFormatFiles" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
-    <CustomAction Id="WixRollbackFormatFiles$(var.DeferredSuffix)" BinaryKey="UtilCA$(var.Suffix)" DllEntry="WixExecFormatFiles" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)SchedFormatFiles$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixSchedFormatFiles" Execute="immediate" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)ExecFormatFiles$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixExecFormatFiles" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+    <CustomAction Id="$(var.Prefix)RollbackFormatFiles$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixExecFormatFiles" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
 
     <InstallExecuteSequence>
-      <Custom Action="WixSchedFormatFiles$(var.Suffix)" After="InstallFiles" />
+      <Custom Action="$(var.Prefix)SchedFormatFiles$(var.Suffix)" After="InstallFiles" />
     </InstallExecuteSequence>
   </Fragment>
 
   <Fragment>
-    <Binary Id="UtilCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))utilca.dll" />
+    <Binary Id="$(var.Prefix)UtilCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))utilca.dll" />
   </Fragment>
 </Include>

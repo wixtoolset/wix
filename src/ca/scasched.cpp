@@ -21,14 +21,14 @@ extern "C" UINT __stdcall ConfigureSmbInstall(
     ExitOnFailure(hr, "Failed to initialize");
 
     // check to see if necessary tables are specified
-    if (WcaTableExists(L"FileShare") != S_OK)
+    if (WcaTableExists(L"Wix4FileShare") != S_OK)
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping SMB CustomAction, no FileShare table");
+        WcaLog(LOGMSG_VERBOSE, "Skipping SMB CustomAction, no Wix4FileShare table");
         ExitFunction1(hr = S_FALSE);
     }
 
     hr = ScaSmbRead(&pssList);
-    ExitOnFailure(hr, "failed to read FileShare table");
+    ExitOnFailure(hr, "failed to read Wix4FileShare table");
 
     hr = ScaSmbInstall(pssList);
     ExitOnFailure(hr, "failed to install FileShares");
@@ -43,7 +43,7 @@ LExit:
 
 
 /********************************************************************
-ConfigureSmb - CUSTOM ACTION ENTRY POINT for installing fileshare settings
+ConfigureSmb - CUSTOM ACTION ENTRY POINT for uninstalling fileshare settings
 
 ********************************************************************/
 extern "C" UINT __stdcall ConfigureSmbUninstall(
@@ -60,14 +60,14 @@ extern "C" UINT __stdcall ConfigureSmbUninstall(
     ExitOnFailure(hr, "Failed to initialize");
 
     // check to see if necessary tables are specified
-    if (WcaTableExists(L"FileShare") != S_OK)
+    if (WcaTableExists(L"Wix4FileShare") != S_OK)
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping SMB CustomAction, no FileShare table");
+        WcaLog(LOGMSG_VERBOSE, "Skipping SMB CustomAction, no Wix4FileShare table");
         ExitFunction1(hr = S_FALSE);
     }
 
     hr = ScaSmbRead(&pssList);
-    ExitOnFailure(hr, "failed to read FileShare table");
+    ExitOnFailure(hr, "failed to read Wix4FileShare table");
 
     hr = ScaSmbUninstall(pssList);
     ExitOnFailure(hr, "failed to uninstall FileShares");
@@ -106,7 +106,7 @@ extern "C" UINT __stdcall ConfigureUsers(
     fInitializedCom = TRUE;
 
     hr = ScaUserRead(&psuList);
-    ExitOnFailure(hr, "failed to read User table");
+    ExitOnFailure(hr, "failed to read Wix4User table");
 
     hr = ScaUserExecute(psuList);
     ExitOnFailure(hr, "failed to add/remove User actions");

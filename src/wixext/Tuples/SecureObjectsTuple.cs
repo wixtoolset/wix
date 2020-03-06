@@ -11,12 +11,11 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.SecureObjects.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.SecureObject), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Table), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Domain), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.User), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Permission), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(SecureObjectsTuple));
     }
@@ -28,12 +27,11 @@ namespace WixToolset.Util.Tuples
 
     public enum SecureObjectsTupleFields
     {
-        SecureObject,
         Table,
         Domain,
         User,
         Permission,
-        Component_,
+        ComponentRef,
     }
 
     public class SecureObjectsTuple : IntermediateTuple
@@ -47,12 +45,6 @@ namespace WixToolset.Util.Tuples
         }
 
         public IntermediateField this[SecureObjectsTupleFields index] => this.Fields[(int)index];
-
-        public string SecureObject
-        {
-            get => this.Fields[(int)SecureObjectsTupleFields.SecureObject].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.SecureObject, value);
-        }
 
         public string Table
         {
@@ -78,10 +70,10 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)SecureObjectsTupleFields.Permission, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.Component_].AsString();
-            set => this.Set((int)SecureObjectsTupleFields.Component_, value);
+            get => this.Fields[(int)SecureObjectsTupleFields.ComponentRef].AsString();
+            set => this.Set((int)SecureObjectsTupleFields.ComponentRef, value);
         }
     }
 }

@@ -36,9 +36,9 @@ enum eXmlSelectionLanguage
 };
 
 LPCWSTR vcsXmlFileQuery =
-    L"SELECT `XmlFile`.`XmlFile`, `XmlFile`.`File`, `XmlFile`.`ElementPath`, `XmlFile`.`Name`, `XmlFile`.`Value`, "
-    L"`XmlFile`.`Flags`, `XmlFile`.`Component_`, `Component`.`Attributes` "
-    L"FROM `XmlFile`,`Component` WHERE `XmlFile`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
+    L"SELECT `Wix4XmlFile`.`Wix4XmlFile`, `Wix4XmlFile`.`File`, `Wix4XmlFile`.`ElementPath`, `Wix4XmlFile`.`Name`, `Wix4XmlFile`.`Value`, "
+    L"`Wix4XmlFile`.`Flags`, `Wix4XmlFile`.`Component_`, `Component`.`Attributes` "
+    L"FROM `Wix4XmlFile`,`Component` WHERE `Wix4XmlFile`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
 enum eXmlFileQuery { xfqXmlFile = 1, xfqFile, xfqXPath, xfqName, xfqValue, xfqXmlFlags, xfqComponent, xfqCompAttributes  };
 
 struct XML_FILE_CHANGE
@@ -130,12 +130,14 @@ static HRESULT ReadXmlFileTable(
     LPWSTR pwzData = NULL;
 
     // check to see if necessary tables are specified
-    if (S_FALSE == WcaTableExists(L"XmlFile"))
+    if (S_FALSE == WcaTableExists(L"Wix4XmlFile"))
+    {
         ExitFunction1(hr = S_FALSE);
+    }
 
     // loop through all the xml configurations
     hr = WcaOpenExecuteView(vcsXmlFileQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on XmlFile table");
+    ExitOnFailure(hr, "failed to open view on Wix4XmlFile table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -144,13 +146,13 @@ static HRESULT ReadXmlFileTable(
 
         // Get record Id
         hr = WcaGetRecordString(hRec, xfqXmlFile, &pwzData);
-        ExitOnFailure(hr, "failed to get XmlFile record Id");
+        ExitOnFailure(hr, "failed to get Wix4XmlFile record Id");
         hr = StringCchCopyW((*ppxfcTail)->wzId, countof((*ppxfcTail)->wzId), pwzData);
-        ExitOnFailure(hr, "failed to copy XmlFile record Id");
+        ExitOnFailure(hr, "failed to copy Wix4XmlFile record Id");
 
         // Get component name
         hr = WcaGetRecordString(hRec, xfqComponent, &pwzData);
-        ExitOnFailure(hr, "failed to get component name for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get component name for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
 
         // Get the component's state
         er = ::MsiGetComponentStateW(WcaGetInstallHandle(), pwzData, &(*ppxfcTail)->isInstalled, &(*ppxfcTail)->isAction);
@@ -158,33 +160,33 @@ static HRESULT ReadXmlFileTable(
 
         // Get the xml file
         hr = WcaGetRecordFormattedString(hRec, xfqFile, &pwzData);
-        ExitOnFailure(hr, "failed to get xml file for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get xml file for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
         hr = StringCchCopyW((*ppxfcTail)->wzFile, countof((*ppxfcTail)->wzFile), pwzData);
         ExitOnFailure(hr, "failed to copy xml file path");
 
-        // Get the XmlFile table flags
+        // Get the Wix4XmlFile table flags
         hr = WcaGetRecordInteger(hRec, xfqXmlFlags, &(*ppxfcTail)->iXmlFlags);
-        ExitOnFailure(hr, "failed to get XmlFile flags for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Wix4XmlFile flags for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
 
         // Get the XPath
         hr = WcaGetRecordFormattedString(hRec, xfqXPath, &(*ppxfcTail)->pwzElementPath);
-        ExitOnFailure(hr, "failed to get XPath for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get XPath for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
 
         // Get the name
         hr = WcaGetRecordFormattedString(hRec, xfqName, &pwzData);
-        ExitOnFailure(hr, "failed to get Name for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Name for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
         hr = StringCchCopyW((*ppxfcTail)->wzName, countof((*ppxfcTail)->wzName), pwzData);
         ExitOnFailure(hr, "failed to copy name of element");
 
         // Get the value
         hr = WcaGetRecordFormattedString(hRec, xfqValue, &pwzData);
-        ExitOnFailure(hr, "failed to get Value for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Value for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
         hr = StrAllocString(&(*ppxfcTail)->pwzValue, pwzData, 0);
         ExitOnFailure(hr, "failed to allocate buffer for value");
 
         // Get the component attributes
         hr = WcaGetRecordInteger(hRec, xfqCompAttributes, &(*ppxfcTail)->iCompAttributes);
-        ExitOnFailure(hr, "failed to get component attributes for XmlFile: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get component attributes for Wix4XmlFile: %ls", (*ppxfcTail)->wzId);
     }
 
     // if we looped through all records all is well
@@ -254,7 +256,7 @@ static HRESULT BeginChangeFile(
         hr = WcaWriteStreamToCaData(pbData, cbData, &pwzRollbackCustomActionData);
         ExitOnFailure(hr, "failed to write file contents to rollback custom action data.");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecXmlFileRollback"), pwzRollbackCustomActionData, COST_XMLFILE);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecXmlFileRollback"), pwzRollbackCustomActionData, COST_XMLFILE);
         ExitOnFailure(hr, "failed to schedule ExecXmlFileRollback for file: %ls", pwzFile);
 
         ReleaseStr(pwzRollbackCustomActionData);
@@ -325,11 +327,11 @@ extern "C" UINT __stdcall SchedXmlFile(
     hr = ReadXmlFileTable(&pxfcHead, &pxfcTail);
     if (S_FALSE == hr)
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping SchedXmlFile because XmlFile table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping SchedXmlFile because Wix4XmlFile table not present");
         ExitFunction1(hr = S_OK);
     }
 
-    MessageExitOnFailure(hr, msierrXmlFileFailedRead, "failed to read XmlFile table");
+    MessageExitOnFailure(hr, msierrXmlFileFailedRead, "failed to read Wix4XmlFile table");
 
     // loop through all the xml configurations
     for (pxfc = pxfcHead; pxfc; pxfc = pxfc->pxfcNext)
@@ -454,7 +456,7 @@ extern "C" UINT __stdcall SchedXmlFile(
     {
         Assert(0 < cFiles);
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecXmlFile"), pwzCustomActionData, cFiles * COST_XMLFILE);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecXmlFile"), pwzCustomActionData, cFiles * COST_XMLFILE);
         ExitOnFailure(hr, "failed to schedule ExecXmlFile action");
     }
 

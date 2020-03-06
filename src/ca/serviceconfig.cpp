@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 // structs
-LPCWSTR wzQUERY_SERVICECONFIG = L"SELECT `ServiceName`, `Component_`, `NewService`, `FirstFailureActionType`, `SecondFailureActionType`, `ThirdFailureActionType`, `ResetPeriodInDays`, `RestartServiceDelayInSeconds`, `ProgramCommandLine`, `RebootMessage` FROM `ServiceConfig`";
+LPCWSTR wzQUERY_SERVICECONFIG = L"SELECT `ServiceName`, `Component_`, `NewService`, `FirstFailureActionType`, `SecondFailureActionType`, `ThirdFailureActionType`, `ResetPeriodInDays`, `RestartServiceDelayInSeconds`, `ProgramCommandLine`, `RebootMessage` FROM `Wix4ServiceConfig`";
 enum eQUERY_SERVICECONFIG { QSC_SERVICENAME = 1, QSC_COMPONENT, QSC_NEWSERVICE, QSC_FIRSTFAILUREACTIONTYPE, QSC_SECONDFAILUREACTIONTYPE, QSC_THIRDFAILUREACTIONTYPE, QSC_RESETPERIODINDAYS, QSC_RESTARTSERVICEDELAYINSECONDS, QSC_PROGRAMCOMMANDLINE, QSC_REBOOTMESSAGE };
 
 // consts
@@ -81,7 +81,7 @@ extern "C" UINT __stdcall SchedServiceConfig(
 
     // Loop through all the services to be configured.
     hr = WcaOpenExecuteView(wzQUERY_SERVICECONFIG, &hView);
-    ExitOnFailure(hr, "Failed to open view on ServiceConfig table.");
+    ExitOnFailure(hr, "Failed to open view on Wix4ServiceConfig table.");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -106,7 +106,7 @@ extern "C" UINT __stdcall SchedServiceConfig(
             ExitOnFailure(hr, "Failed to add name to CustomActionData.");
 
             hr = WcaGetRecordInteger(hRec, QSC_NEWSERVICE, &iData);
-            ExitOnFailure(hr, "Failed to get ServiceConfig.NewService.");
+            ExitOnFailure(hr, "Failed to get Wix4ServiceConfig.NewService.");
             hr = WcaWriteIntegerToCaData(0 != iData, &pwzCustomActionData);
             ExitOnFailure(hr, "Failed to add NewService data to CustomActionData");
 
@@ -167,10 +167,10 @@ extern "C" UINT __stdcall SchedServiceConfig(
     // setup CustomActionData and add to progress bar for download
     if (0 < cServices)
     {
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackServiceConfig"), pwzScriptKey, cServices * COST_SERVICECONFIG);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackServiceConfig"), pwzScriptKey, cServices * COST_SERVICECONFIG);
         ExitOnFailure(hr, "failed to schedule RollbackServiceConfig action");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecServiceConfig"), pwzCustomActionData, cServices * COST_SERVICECONFIG);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecServiceConfig"), pwzCustomActionData, cServices * COST_SERVICECONFIG);
         ExitOnFailure(hr, "failed to schedule ExecServiceConfig action");
     }
 

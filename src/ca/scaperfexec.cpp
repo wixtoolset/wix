@@ -35,7 +35,7 @@ extern "C" UINT __stdcall RegisterPerfCounterData(
     ExitOnFailure(hr, "Failed to initialize RegisterPerfCounterData.");
 
     hr = ExecutePerfCounterData(hInstall, TRUE);
-    MessageExitOnFailure(hr, msierrInstallPerfCounterData, "Failed to execute PerformanceCategory table.");
+    MessageExitOnFailure(hr, msierrInstallPerfCounterData, "Failed to execute Wix4PerformanceCategory table.");
 
 LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
@@ -61,7 +61,7 @@ extern "C" UINT __stdcall UnregisterPerfCounterData(
     ExitOnFailure(hr, "Failed to initialize UnregisterPerfCounterData.");
 
     hr = ExecutePerfCounterData(hInstall, FALSE);
-    MessageExitOnFailure(hr, msierrUninstallPerfCounterData, "Failed to execute PerformanceCategory table.");
+    MessageExitOnFailure(hr, msierrUninstallPerfCounterData, "Failed to execute Wix4PerformanceCategory table.");
 
 LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;

@@ -11,14 +11,13 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.XmlConfig.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.XmlConfig), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.File), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.ElementPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.VerifyPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.Value), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.Flags), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(XmlConfigTupleFields.Sequence), IntermediateFieldType.Number),
             },
             typeof(XmlConfigTuple));
@@ -31,14 +30,13 @@ namespace WixToolset.Util.Tuples
 
     public enum XmlConfigTupleFields
     {
-        XmlConfig,
         File,
         ElementPath,
         VerifyPath,
         Name,
         Value,
         Flags,
-        Component_,
+        ComponentRef,
         Sequence,
     }
 
@@ -53,12 +51,6 @@ namespace WixToolset.Util.Tuples
         }
 
         public IntermediateField this[XmlConfigTupleFields index] => this.Fields[(int)index];
-
-        public string XmlConfig
-        {
-            get => this.Fields[(int)XmlConfigTupleFields.XmlConfig].AsString();
-            set => this.Set((int)XmlConfigTupleFields.XmlConfig, value);
-        }
 
         public string File
         {
@@ -96,10 +88,10 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)XmlConfigTupleFields.Flags, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)XmlConfigTupleFields.Component_].AsString();
-            set => this.Set((int)XmlConfigTupleFields.Component_, value);
+            get => this.Fields[(int)XmlConfigTupleFields.ComponentRef].AsString();
+            set => this.Set((int)XmlConfigTupleFields.ComponentRef, value);
         }
 
         public int Sequence

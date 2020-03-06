@@ -11,8 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.WixTouchFile.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.WixTouchFile), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.Path), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixTouchFileTupleFields.Attributes), IntermediateFieldType.Number),
             },
@@ -26,8 +25,7 @@ namespace WixToolset.Util.Tuples
 
     public enum WixTouchFileTupleFields
     {
-        WixTouchFile,
-        Component_,
+        ComponentRef,
         Path,
         Attributes,
     }
@@ -44,16 +42,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[WixTouchFileTupleFields index] => this.Fields[(int)index];
 
-        public string WixTouchFile
+        public string ComponentRef
         {
-            get => this.Fields[(int)WixTouchFileTupleFields.WixTouchFile].AsString();
-            set => this.Set((int)WixTouchFileTupleFields.WixTouchFile, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)WixTouchFileTupleFields.Component_].AsString();
-            set => this.Set((int)WixTouchFileTupleFields.Component_, value);
+            get => this.Fields[(int)WixTouchFileTupleFields.ComponentRef].AsString();
+            set => this.Set((int)WixTouchFileTupleFields.ComponentRef, value);
         }
 
         public string Path

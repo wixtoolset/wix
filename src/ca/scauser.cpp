@@ -2,16 +2,16 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Password` FROM `User` WHERE `User`=?";
+LPCWSTR vcsUserQuery = L"SELECT `Wix4User`, `Component_`, `Name`, `Domain`, `Password` FROM `Wix4User` WHERE `Wix4User`=?";
 enum eUserQuery { vuqUser = 1, vuqComponent, vuqName, vuqDomain, vuqPassword };
 
-LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Group` WHERE `Group`=?";
+LPCWSTR vcsGroupQuery = L"SELECT `Wix4Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Wix4Group`=?";
 enum eGroupQuery { vgqGroup = 1, vgqComponent, vgqName, vgqDomain };
 
-LPCWSTR vcsUserGroupQuery = L"SELECT `User_`, `Group_` FROM `UserGroup` WHERE `User_`=?";
+LPCWSTR vcsUserGroupQuery = L"SELECT `Wix4User_`, `Wix4Group_` FROM `Wix4UserGroup` WHERE `Wix4User_`=?";
 enum eUserGroupQuery { vugqUser = 1, vugqGroup };
 
-LPCWSTR vActionableQuery = L"SELECT `User`,`Component_`,`Name`,`Domain`,`Password`,`Attributes` FROM `User` WHERE `Component_` IS NOT NULL";
+LPCWSTR vActionableQuery = L"SELECT `Wix4User`,`Component_`,`Name`,`Domain`,`Password`,`Attributes` FROM `Wix4User` WHERE `Component_` IS NOT NULL";
 enum eActionableQuery { vaqUser = 1, vaqComponent, vaqName, vaqDomain, vaqPassword, vaqAttributes };
 
 
@@ -51,46 +51,46 @@ HRESULT __stdcall ScaGetUser(
     ExitOnFailure(hr, "Failed to look up User");
 
     hr = WcaOpenView(vcsUserQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on User table");
+    ExitOnFailure(hr, "Failed to open view on Wix4User table");
     hr = WcaExecuteView(hView, hRec);
-    ExitOnFailure(hr, "Failed to execute view on User table");
+    ExitOnFailure(hr, "Failed to execute view on Wix4User table");
 
     hr = WcaFetchSingleRecord(hView, &hRec);
     if (S_OK == hr)
     {
         hr = WcaGetRecordString(hRec, vuqUser, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.User");
+        ExitOnFailure(hr, "Failed to get Wix4User.User");
         hr = ::StringCchCopyW(pscau->wzKey, countof(pscau->wzKey), pwzData);
         ExitOnFailure(hr, "Failed to copy key string to user object");
 
         hr = WcaGetRecordString(hRec, vuqComponent, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Component_");
+        ExitOnFailure(hr, "Failed to get Wix4User.Component_");
         hr = ::StringCchCopyW(pscau->wzComponent, countof(pscau->wzComponent), pwzData);
         ExitOnFailure(hr, "Failed to copy component string to user object");
 
         hr = WcaGetRecordFormattedString(hRec, vuqName, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Name");
+        ExitOnFailure(hr, "Failed to get Wix4User.Name");
         hr = ::StringCchCopyW(pscau->wzName, countof(pscau->wzName), pwzData);
         ExitOnFailure(hr, "Failed to copy name string to user object");
 
         hr = WcaGetRecordFormattedString(hRec, vuqDomain, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Domain");
+        ExitOnFailure(hr, "Failed to get Wix4User.Domain");
         hr = ::StringCchCopyW(pscau->wzDomain, countof(pscau->wzDomain), pwzData);
         ExitOnFailure(hr, "Failed to copy domain string to user object");
 
         hr = WcaGetRecordFormattedString(hRec, vuqPassword, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Password");
+        ExitOnFailure(hr, "Failed to get Wix4User.Password");
         hr = ::StringCchCopyW(pscau->wzPassword, countof(pscau->wzPassword), pwzData);
         ExitOnFailure(hr, "Failed to copy password string to user object");
     }
     else if (E_NOMOREITEMS == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate User.User='%ls'", wzUser);
+        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4User.User='%ls'", wzUser);
         hr = E_FAIL;
     }
     else
     {
-        ExitOnFailure(hr, "Error or found multiple matching User rows");
+        ExitOnFailure(hr, "Error or found multiple matching Wix4User rows");
     }
 
 LExit:
@@ -131,42 +131,42 @@ HRESULT __stdcall ScaGetUserDeferred(
         hr = WcaFetchWrappedRecordWhereString(hUserQuery, vuqUser, wzUser, &hRecTest);
         if (S_OK == hr)
         {
-            AssertSz(FALSE, "Found multiple matching User rows");
+            AssertSz(FALSE, "Found multiple matching Wix4User rows");
         }
 
         hr = WcaGetRecordString(hRec, vuqUser, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.User");
+        ExitOnFailure(hr, "Failed to get Wix4User.User");
         hr = ::StringCchCopyW(pscau->wzKey, countof(pscau->wzKey), pwzData);
         ExitOnFailure(hr, "Failed to copy key string to user object (in deferred CA)");
 
         hr = WcaGetRecordString(hRec, vuqComponent, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Component_");
+        ExitOnFailure(hr, "Failed to get Wix4User.Component_");
         hr = ::StringCchCopyW(pscau->wzComponent, countof(pscau->wzComponent), pwzData);
         ExitOnFailure(hr, "Failed to copy component string to user object (in deferred CA)");
 
         hr = WcaGetRecordString(hRec, vuqName, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Name");
+        ExitOnFailure(hr, "Failed to get Wix4User.Name");
         hr = ::StringCchCopyW(pscau->wzName, countof(pscau->wzName), pwzData);
         ExitOnFailure(hr, "Failed to copy name string to user object (in deferred CA)");
 
         hr = WcaGetRecordString(hRec, vuqDomain, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Domain");
+        ExitOnFailure(hr, "Failed to get Wix4User.Domain");
         hr = ::StringCchCopyW(pscau->wzDomain, countof(pscau->wzDomain), pwzData);
         ExitOnFailure(hr, "Failed to copy domain string to user object (in deferred CA)");
 
         hr = WcaGetRecordString(hRec, vuqPassword, &pwzData);
-        ExitOnFailure(hr, "Failed to get User.Password");
+        ExitOnFailure(hr, "Failed to get Wix4User.Password");
         hr = ::StringCchCopyW(pscau->wzPassword, countof(pscau->wzPassword), pwzData);
         ExitOnFailure(hr, "Failed to copy password string to user object (in deferred CA)");
     }
     else if (E_NOMOREITEMS == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate User.User='%ls'", wzUser);
+        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4User.User='%ls'", wzUser);
         hr = E_FAIL;
     }
     else
     {
-        ExitOnFailure(hr, "Error fetching single User row");
+        ExitOnFailure(hr, "Error fetching single Wix4User row");
     }
 
 LExit:
@@ -196,41 +196,41 @@ HRESULT __stdcall ScaGetGroup(
     ExitOnFailure(hr, "Failed to look up Group");
 
     hr = WcaOpenView(vcsGroupQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on Group table");
+    ExitOnFailure(hr, "Failed to open view on Wix4Group table");
     hr = WcaExecuteView(hView, hRec);
-    ExitOnFailure(hr, "Failed to execute view on Group table");
+    ExitOnFailure(hr, "Failed to execute view on Wix4Group table");
 
     hr = WcaFetchSingleRecord(hView, &hRec);
     if (S_OK == hr)
     {
         hr = WcaGetRecordString(hRec, vgqGroup, &pwzData);
-        ExitOnFailure(hr, "Failed to get Group.Group");
+        ExitOnFailure(hr, "Failed to get Wix4Group.Wix4Group.");
         hr = ::StringCchCopyW(pscag->wzKey, countof(pscag->wzKey), pwzData);
-        ExitOnFailure(hr, "Failed to copy Group.Group.");
+        ExitOnFailure(hr, "Failed to copy Wix4Group.Wix4Group.");
 
         hr = WcaGetRecordString(hRec, vgqComponent, &pwzData);
-        ExitOnFailure(hr, "Failed to get Group.Component_");
+        ExitOnFailure(hr, "Failed to get Wix4Group.Component_");
         hr = ::StringCchCopyW(pscag->wzComponent, countof(pscag->wzComponent), pwzData);
-        ExitOnFailure(hr, "Failed to copy Group.Component_.");
+        ExitOnFailure(hr, "Failed to copy Wix4Group.Component_.");
 
         hr = WcaGetRecordFormattedString(hRec, vgqName, &pwzData);
-        ExitOnFailure(hr, "Failed to get Group.Name");
+        ExitOnFailure(hr, "Failed to get Wix4Group.Name");
         hr = ::StringCchCopyW(pscag->wzName, countof(pscag->wzName), pwzData);
-        ExitOnFailure(hr, "Failed to copy Group.Name.");
+        ExitOnFailure(hr, "Failed to copy Wix4Group.Name.");
 
         hr = WcaGetRecordFormattedString(hRec, vgqDomain, &pwzData);
-        ExitOnFailure(hr, "Failed to get Group.Domain");
+        ExitOnFailure(hr, "Failed to get Wix4Group.Domain");
         hr = ::StringCchCopyW(pscag->wzDomain, countof(pscag->wzDomain), pwzData);
-        ExitOnFailure(hr, "Failed to copy Group.Domain.");
+        ExitOnFailure(hr, "Failed to copy Wix4Group.Domain.");
     }
     else if (E_NOMOREITEMS == hr)
     {
-        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Group.Group='%ls'", wzGroup);
+        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4Group.Wix4Group='%ls'", wzGroup);
         hr = E_FAIL;
     }
     else
     {
-        ExitOnFailure(hr, "Error or found multiple matching Group rows");
+        ExitOnFailure(hr, "Error or found multiple matching Wix4Group rows");
     }
 
 LExit:
@@ -284,19 +284,19 @@ HRESULT ScaUserRead(
 
     LPWSTR pwzData = NULL;
 
-    BOOL fUserGroupExists  = FALSE;
+    BOOL fUserGroupExists = FALSE;
 
     SCA_USER *psu = NULL;
 
     INSTALLSTATE isInstalled, isAction;
 
-    if (S_OK != WcaTableExists(L"User"))
+    if (S_OK != WcaTableExists(L"Wix4User"))
     {
-        WcaLog(LOGMSG_VERBOSE, "User Table does not exist, exiting");
+        WcaLog(LOGMSG_VERBOSE, "Wix4User Table does not exist, exiting");
         ExitFunction1(hr = S_FALSE);
     }
 
-    if (S_OK == WcaTableExists(L"UserGroup"))
+    if (S_OK == WcaTableExists(L"Wix4UserGroup"))
     {
         fUserGroupExists = TRUE;
     }
@@ -305,15 +305,15 @@ HRESULT ScaUserRead(
     // loop through all the users
     //
     hr = WcaOpenExecuteView(vActionableQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on User table");
+    ExitOnFailure(hr, "failed to open view on Wix4User table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, vaqComponent, &pwzData);
-        ExitOnFailure(hr, "failed to get User.Component");
+        ExitOnFailure(hr, "failed to get Wix4User.Component");
 
         er = ::MsiGetComponentStateW(WcaGetInstallHandle(), pwzData, &isInstalled, &isAction);
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "failed to get Component state for User");
+        ExitOnFailure(hr, "failed to get Component state for Wix4User");
 
         // don't bother if we aren't installing or uninstalling this component
         if (WcaIsInstalling(isInstalled,  isAction) || WcaIsUninstalling(isInstalled, isAction))
@@ -332,44 +332,44 @@ HRESULT ScaUserRead(
             ExitOnFailure(hr, "failed to copy component name: %ls", pwzData);
 
             hr = WcaGetRecordString(hRec, vaqUser, &pwzData);
-            ExitOnFailure(hr, "failed to get User.User");
+            ExitOnFailure(hr, "failed to get Wix4User.User");
             hr = ::StringCchCopyW(psu->wzKey, countof(psu->wzKey), pwzData);
             ExitOnFailure(hr, "failed to copy user key: %ls", pwzData);
 
             hr = WcaGetRecordFormattedString(hRec, vaqName, &pwzData);
-            ExitOnFailure(hr, "failed to get User.Name");
+            ExitOnFailure(hr, "failed to get Wix4User.Name");
             hr = ::StringCchCopyW(psu->wzName, countof(psu->wzName), pwzData);
             ExitOnFailure(hr, "failed to copy user name: %ls", pwzData);
 
             hr = WcaGetRecordFormattedString(hRec, vaqDomain, &pwzData);
-            ExitOnFailure(hr, "failed to get User.Domain");
+            ExitOnFailure(hr, "failed to get Wix4User.Domain");
             hr = ::StringCchCopyW(psu->wzDomain, countof(psu->wzDomain), pwzData);
             ExitOnFailure(hr, "failed to copy user domain: %ls", pwzData);
 
             hr = WcaGetRecordFormattedString(hRec, vaqPassword, &pwzData);
-            ExitOnFailure(hr, "failed to get User.Password");
+            ExitOnFailure(hr, "failed to get Wix4User.Password");
             hr = ::StringCchCopyW(psu->wzPassword, countof(psu->wzPassword), pwzData);
             ExitOnFailure(hr, "failed to copy user password");
 
             hr = WcaGetRecordInteger(hRec, vaqAttributes, &psu->iAttributes);
-            ExitOnFailure(hr, "failed to get User.Attributes");
+            ExitOnFailure(hr, "failed to get Wix4User.Attributes");
 
             // Check if this user is to be added to any groups
             if (fUserGroupExists)
             {
                 hUserRec = ::MsiCreateRecord(1);
                 hr = WcaSetRecordString(hUserRec, 1, psu->wzKey);
-                ExitOnFailure(hr, "Failed to create user record for querying UserGroup table");
+                ExitOnFailure(hr, "Failed to create user record for querying Wix4UserGroup table");
 
                 hr = WcaOpenView(vcsUserGroupQuery, &hUserGroupView);
-                ExitOnFailure(hr, "Failed to open view on UserGroup table for user %ls", psu->wzKey);
+                ExitOnFailure(hr, "Failed to open view on Wix4UserGroup table for user %ls", psu->wzKey);
                 hr = WcaExecuteView(hUserGroupView, hUserRec);
-                ExitOnFailure(hr, "Failed to execute view on UserGroup table for user: %ls", psu->wzKey);
+                ExitOnFailure(hr, "Failed to execute view on Wix4UserGroup table for user: %ls", psu->wzKey);
 
                 while (S_OK == (hr = WcaFetchRecord(hUserGroupView, &hRec)))
                 {
                     hr = WcaGetRecordString(hRec, vugqGroup, &pwzData);
-                    ExitOnFailure(hr, "failed to get UserGroup.Group");
+                    ExitOnFailure(hr, "failed to get Wix4UserGroup.Group");
 
                     hr = AddGroupToList(&(psu->psgGroups));
                     ExitOnFailure(hr, "failed to add group to list");
@@ -382,7 +382,7 @@ HRESULT ScaUserRead(
                 {
                     hr = S_OK;
                 }
-                ExitOnFailure(hr, "failed to enumerate selected rows from UserGroup table");
+                ExitOnFailure(hr, "failed to enumerate selected rows from Wix4UserGroup table");
             }
         }
     }
@@ -391,7 +391,7 @@ HRESULT ScaUserRead(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "failed to enumerate selected rows from User table");
+    ExitOnFailure(hr, "failed to enumerate selected rows from Wix4User table");
 
 LExit:
     ReleaseStr(pwzData);
@@ -581,7 +581,7 @@ HRESULT ScaUserExecute(
                     ExitOnFailure(hr, "failed to add group information to rollback custom action data");
                 }
 
-                hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"CreateUserRollback"), pwzRollbackData, COST_USER_DELETE);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateUserRollback"), pwzRollbackData, COST_USER_DELETE);
                 ExitOnFailure(hr, "failed to schedule CreateUserRollback");
             }
 
@@ -595,7 +595,7 @@ HRESULT ScaUserExecute(
             hr = WriteGroupInfo(psu->psgGroups, &pwzActionData);
             ExitOnFailure(hr, "failed to add group information to custom action data");
 
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"CreateUser"), pwzActionData, COST_USER_ADD);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateUser"), pwzActionData, COST_USER_ADD);
             ExitOnFailure(hr, "failed to schedule CreateUser");
         }
         else if (((USER_EXISTS_YES == ueUserExists) || (USER_EXISTS_INDETERMINATE == ueUserExists)) && WcaIsUninstalling(psu->isInstalled, psu->isAction) && !(psu->iAttributes & SCAU_DONT_REMOVE_ON_UNINSTALL))
@@ -610,7 +610,7 @@ HRESULT ScaUserExecute(
             //
             // Note: We can't rollback the removal of a user which is why RemoveUser is a commit
             // CustomAction.
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RemoveUser"), pwzActionData, COST_USER_DELETE);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RemoveUser"), pwzActionData, COST_USER_DELETE);
             ExitOnFailure(hr, "failed to schedule RemoveUser");
         }
 

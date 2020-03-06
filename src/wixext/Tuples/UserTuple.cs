@@ -11,8 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.User.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UserTupleFields.User), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UserTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UserTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UserTupleFields.Domain), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(UserTupleFields.Password), IntermediateFieldType.String),
@@ -28,8 +27,7 @@ namespace WixToolset.Util.Tuples
 
     public enum UserTupleFields
     {
-        User,
-        Component_,
+        ComponentRef,
         Name,
         Domain,
         Password,
@@ -48,16 +46,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[UserTupleFields index] => this.Fields[(int)index];
 
-        public string User
+        public string ComponentRef
         {
-            get => this.Fields[(int)UserTupleFields.User].AsString();
-            set => this.Set((int)UserTupleFields.User, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)UserTupleFields.Component_].AsString();
-            set => this.Set((int)UserTupleFields.Component_, value);
+            get => this.Fields[(int)UserTupleFields.ComponentRef].AsString();
+            set => this.Set((int)UserTupleFields.ComponentRef, value);
         }
 
         public string Name

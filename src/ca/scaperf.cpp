@@ -2,10 +2,10 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsPerfCounterDataQuery = L"SELECT `PerformanceCategory`, `Component_`, `Name`, `IniData`, `ConstantData` FROM `PerformanceCategory`";
+LPCWSTR vcsPerfCounterDataQuery = L"SELECT `Wix4PerformanceCategory`, `Component_`, `Name`, `IniData`, `ConstantData` FROM `Wix4PerformanceCategory`";
 enum ePerfCounterDataQuery { pcdqId = 1, pcdqComponent, pcdqName, pcdqIniData, pcdqConstantData };
 
-LPCWSTR vcsPerfMonQuery = L"SELECT `Component_`, `File`, `Name` FROM `Perfmon`";
+LPCWSTR vcsPerfMonQuery = L"SELECT `Component_`, `File`, `Name` FROM `Wix4Perfmon`";
 enum ePerfMonQuery { pmqComponent = 1, pmqFile, pmqName };
 
 
@@ -32,7 +32,7 @@ extern "C" UINT __stdcall InstallPerfCounterData(
     ExitOnFailure(hr, "Failed to initialize InstallPerfCounterData.");
 
     hr = ProcessPerformanceCategory(hInstall, TRUE);
-    MessageExitOnFailure(hr, msierrInstallPerfCounterData, "Failed to process PerformanceCategory table.");
+    MessageExitOnFailure(hr, msierrInstallPerfCounterData, "Failed to process Wix4PerformanceCategory table.");
 
 LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
@@ -57,7 +57,7 @@ extern "C" UINT __stdcall UninstallPerfCounterData(
     ExitOnFailure(hr, "Failed to initialize UninstallPerfCounterData.");
 
     hr = ProcessPerformanceCategory(hInstall, FALSE);
-    MessageExitOnFailure(hr, msierrUninstallPerfCounterData, "Failed to process PerformanceCategory table.");
+    MessageExitOnFailure(hr, msierrUninstallPerfCounterData, "Failed to process Wix4PerformanceCategory table.");
 
 LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
@@ -85,9 +85,9 @@ extern "C" UINT __stdcall ConfigurePerfmonInstall(
     ExitOnFailure(hr, "Failed to initialize");
 
     // check to see if necessary tables are specified
-    if (S_OK != WcaTableExists(L"Perfmon"))
+    if (S_OK != WcaTableExists(L"Wix4Perfmon"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping RegisterPerfmon() because Perfmon table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping RegisterPerfmon() because Wix4Perfmon table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
@@ -113,9 +113,9 @@ extern "C" UINT __stdcall ConfigurePerfmonInstall(
         ExitOnFailure(hr, "failed to get File for PerfMon");
 
         WcaLog(LOGMSG_VERBOSE, "ConfigurePerfmonInstall's CustomActionData: '%ls', '%ls'", pwzName, pwzFile);
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RegisterPerfmon"), pwzFile, COST_PERFMON_REGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RegisterPerfmon"), pwzFile, COST_PERFMON_REGISTER);
         ExitOnFailure(hr, "failed to schedule RegisterPerfmon action");
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackRegisterPerfmon"), pwzName, COST_PERFMON_UNREGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackRegisterPerfmon"), pwzName, COST_PERFMON_UNREGISTER);
         ExitOnFailure(hr, "failed to schedule RollbackRegisterPerfmon action");
     }
 
@@ -158,9 +158,9 @@ extern "C" UINT __stdcall ConfigurePerfmonUninstall(
     ExitOnFailure(hr, "Failed to initialize");
 
     // check to see if necessary tables are specified
-    if (WcaTableExists(L"Perfmon") != S_OK)
+    if (WcaTableExists(L"Wix4Perfmon") != S_OK)
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping UnregisterPerfmon() because Perfmon table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping UnregisterPerfmon() because Wix4Perfmon table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
@@ -186,9 +186,9 @@ extern "C" UINT __stdcall ConfigurePerfmonUninstall(
         ExitOnFailure(hr, "failed to get File for PerfMon");
 
         WcaLog(LOGMSG_VERBOSE, "ConfigurePerfmonUninstall's CustomActionData: '%ls', '%ls'", pwzName, pwzFile);
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"UnregisterPerfmon"), pwzName, COST_PERFMON_UNREGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"UnregisterPerfmon"), pwzName, COST_PERFMON_UNREGISTER);
         ExitOnFailure(hr, "failed to schedule UnregisterPerfmon action");
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackUnregisterPerfmon"), pwzFile, COST_PERFMON_REGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackUnregisterPerfmon"), pwzFile, COST_PERFMON_REGISTER);
         ExitOnFailure(hr, "failed to schedule RollbackUnregisterPerfmon action");
     }
 
@@ -229,26 +229,26 @@ static HRESULT ProcessPerformanceCategory(
     LPWSTR pwzCustomActionData = NULL;
 
     // check to see if necessary tables are specified
-    if (S_OK != WcaTableExists(L"PerformanceCategory"))
+    if (S_OK != WcaTableExists(L"Wix4PerformanceCategory"))
     {
         ExitFunction1(hr = S_FALSE);
     }
 
     hr = WcaOpenExecuteView(vcsPerfCounterDataQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on PerformanceCategory table");
+    ExitOnFailure(hr, "failed to open view on Wix4PerformanceCategory table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, pcdqId, &pwzId);
-        ExitOnFailure(hr, "Failed to get id for PerformanceCategory.");
+        ExitOnFailure(hr, "Failed to get id for Wix4PerformanceCategory.");
 
         // Check to see if the Component is being installed or uninstalled
         // when we are processing the same.
         hr = WcaGetRecordString(hRec, pcdqComponent, &pwzComponent);
-        ExitOnFailure(hr, "Failed to get Component for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to get Component for Wix4PerformanceCategory: %ls", pwzId);
 
         er = ::MsiGetComponentStateW(hInstall, pwzComponent, &isInstalled, &isAction);
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "Failed to get Component state for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to get Component state for Wix4PerformanceCategory: %ls", pwzId);
 
         if ((fInstall && !WcaIsInstalling(isInstalled, isAction)) ||
             (!fInstall && !WcaIsUninstalling(isInstalled, isAction)))
@@ -257,45 +257,45 @@ static HRESULT ProcessPerformanceCategory(
         }
 
         hr = WcaGetRecordString(hRec, pcdqName, &pwzName);
-        ExitOnFailure(hr, "Failed to get Name for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to get Name for Wix4PerformanceCategory: %ls", pwzId);
         hr = WcaWriteStringToCaData(pwzName, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add Name to CustomActionData for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to add Name to CustomActionData for Wix4PerformanceCategory: %ls", pwzId);
 
         hr = WcaGetRecordString(hRec, pcdqIniData, &pwzData);
-        ExitOnFailure(hr, "Failed to get IniData for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to get IniData for Wix4PerformanceCategory: %ls", pwzId);
         hr = WcaWriteStringToCaData(pwzData, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add IniData to CustomActionData for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to add IniData to CustomActionData for Wix4PerformanceCategory: %ls", pwzId);
 
         hr = WcaGetRecordString(hRec, pcdqConstantData, &pwzData);
-        ExitOnFailure(hr, "Failed to get ConstantData for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to get ConstantData for Wix4PerformanceCategory: %ls", pwzId);
         hr = WcaWriteStringToCaData(pwzData, &pwzCustomActionData);
-        ExitOnFailure(hr, "Failed to add ConstantData to CustomActionData for PerformanceCategory: %ls", pwzId);
+        ExitOnFailure(hr, "Failed to add ConstantData to CustomActionData for Wix4PerformanceCategory: %ls", pwzId);
     }
 
     if (hr == E_NOMOREITEMS)
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure while processing PerformanceCategory table.");
+    ExitOnFailure(hr, "Failure while processing Wix4PerformanceCategory table.");
 
     // If there was any data built up, schedule it for execution.
     if (pwzCustomActionData)
     {
         if (fInstall)
         {
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackRegisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_UNREGISTER);
-            ExitOnFailure(hr, "Failed to schedule RollbackRegisterPerfCounterData action for PerformanceCategory: %ls", pwzId);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackRegisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_UNREGISTER);
+            ExitOnFailure(hr, "Failed to schedule RollbackRegisterPerfCounterData action for Wix4PerformanceCategory: %ls", pwzId);
 
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RegisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_REGISTER);
-            ExitOnFailure(hr, "Failed to schedule RegisterPerfCounterData action for PerformanceCategory: %ls", pwzId);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RegisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_REGISTER);
+            ExitOnFailure(hr, "Failed to schedule RegisterPerfCounterData action for Wix4PerformanceCategory: %ls", pwzId);
         }
         else
         {
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackUnregisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_REGISTER);
-            ExitOnFailure(hr, "Failed to schedule RollbackUnregisterPerfCounterData action for PerformanceCategory: %ls", pwzId);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackUnregisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_REGISTER);
+            ExitOnFailure(hr, "Failed to schedule RollbackUnregisterPerfCounterData action for Wix4PerformanceCategory: %ls", pwzId);
 
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"UnregisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_UNREGISTER);
-            ExitOnFailure(hr, "Failed to schedule UnregisterPerfCounterData action for PerformanceCategory: %ls", pwzId);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"UnregisterPerfCounterData"), pwzCustomActionData, COST_PERFMON_UNREGISTER);
+            ExitOnFailure(hr, "Failed to schedule UnregisterPerfCounterData action for Wix4PerformanceCategory: %ls", pwzId);
         }
     }
 

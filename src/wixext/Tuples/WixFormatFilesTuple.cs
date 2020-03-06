@@ -11,8 +11,8 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.WixFormatFiles.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixFormatFilesTupleFields.Binary_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFormatFilesTupleFields.File_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFormatFilesTupleFields.BinaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixFormatFilesTupleFields.FileRef), IntermediateFieldType.String),
             },
             typeof(WixFormatFilesTuple));
     }
@@ -24,8 +24,8 @@ namespace WixToolset.Util.Tuples
 
     public enum WixFormatFilesTupleFields
     {
-        Binary_,
-        File_,
+        BinaryRef,
+        FileRef,
     }
 
     public class WixFormatFilesTuple : IntermediateTuple
@@ -40,16 +40,16 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[WixFormatFilesTupleFields index] => this.Fields[(int)index];
 
-        public string Binary_
+        public string BinaryRef
         {
-            get => this.Fields[(int)WixFormatFilesTupleFields.Binary_].AsString();
-            set => this.Set((int)WixFormatFilesTupleFields.Binary_, value);
+            get => this.Fields[(int)WixFormatFilesTupleFields.BinaryRef].AsString();
+            set => this.Set((int)WixFormatFilesTupleFields.BinaryRef, value);
         }
 
-        public string File_
+        public string FileRef
         {
-            get => this.Fields[(int)WixFormatFilesTupleFields.File_].AsString();
-            set => this.Set((int)WixFormatFilesTupleFields.File_, value);
+            get => this.Fields[(int)WixFormatFilesTupleFields.FileRef].AsString();
+            set => this.Set((int)WixFormatFilesTupleFields.FileRef, value);
         }
     }
 }

@@ -30,9 +30,9 @@ enum eXmlPreserveDate
 };
 
 LPCWSTR vcsXmlConfigQuery =
-    L"SELECT `XmlConfig`.`XmlConfig`, `XmlConfig`.`File`, `XmlConfig`.`ElementPath`, `XmlConfig`.`VerifyPath`, `XmlConfig`.`Name`, "
-    L"`XmlConfig`.`Value`, `XmlConfig`.`Flags`, `XmlConfig`.`Component_`, `Component`.`Attributes` "
-    L"FROM `XmlConfig`,`Component` WHERE `XmlConfig`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
+    L"SELECT `Wix4XmlConfig`.`Wix4XmlConfig`, `Wix4XmlConfig`.`File`, `Wix4XmlConfig`.`ElementPath`, `Wix4XmlConfig`.`VerifyPath`, `Wix4XmlConfig`.`Name`, "
+    L"`Wix4XmlConfig`.`Value`, `Wix4XmlConfig`.`Flags`, `Wix4XmlConfig`.`Component_`, `Component`.`Attributes` "
+    L"FROM `Wix4XmlConfig`,`Component` WHERE `Wix4XmlConfig`.`Component_`=`Component`.`Component` ORDER BY `File`, `Sequence`";
 enum eXmlConfigQuery { xfqXmlConfig = 1, xfqFile, xfqElementPath, xfqVerifyPath, xfqName, xfqValue, xfqXmlFlags, xfqComponent, xfqCompAttributes  };
 
 struct XML_CONFIG_CHANGE
@@ -146,7 +146,7 @@ static HRESULT ReadXmlConfigTable(
 
     // loop through all the xml configurations
     hr = WcaOpenExecuteView(vcsXmlConfigQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on XmlConfig table");
+    ExitOnFailure(hr, "failed to open view on Wix4XmlConfig table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -155,13 +155,13 @@ static HRESULT ReadXmlConfigTable(
 
         // Get record Id
         hr = WcaGetRecordString(hRec, xfqXmlConfig, &pwzData);
-        ExitOnFailure(hr, "failed to get XmlConfig record Id");
+        ExitOnFailure(hr, "failed to get Wix4XmlConfig record Id");
         hr = StringCchCopyW((*ppxfcTail)->wzId, countof((*ppxfcTail)->wzId), pwzData);
-        ExitOnFailure(hr, "failed to copy XmlConfig record Id");
+        ExitOnFailure(hr, "failed to copy Wix4XmlConfig record Id");
 
         // Get component name
         hr = WcaGetRecordString(hRec, xfqComponent, &pwzData);
-        ExitOnFailure(hr, "failed to get component name for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get component name for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
 
         // Get the component's state
         if (0 < lstrlenW(pwzData))
@@ -175,45 +175,45 @@ static HRESULT ReadXmlConfigTable(
 
         // Get the xml file
         hr = WcaGetRecordFormattedString(hRec, xfqFile, &pwzData);
-        ExitOnFailure(hr, "failed to get xml file for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get xml file for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
         hr = StringCchCopyW((*ppxfcTail)->wzFile, countof((*ppxfcTail)->wzFile), pwzData);
         ExitOnFailure(hr, "failed to copy xml file path");
 
         // Figure out if the file is already on the machine or if it's being installed
         hr = WcaGetRecordString(hRec, xfqFile, &pwzData);
-        ExitOnFailure(hr, "failed to get xml file for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get xml file for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
         if (NULL != wcsstr(pwzData, L"[!") || NULL != wcsstr(pwzData, L"[#"))
         {
             (*ppxfcTail)->fInstalledFile = TRUE;
         }
 
-        // Get the XmlConfig table flags
+        // Get the Wix4XmlConfig table flags
         hr = WcaGetRecordInteger(hRec, xfqXmlFlags, &(*ppxfcTail)->iXmlFlags);
-        ExitOnFailure(hr, "failed to get XmlConfig flags for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Wix4XmlConfig flags for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
 
         // Get the Element Path
         hr = WcaGetRecordFormattedString(hRec, xfqElementPath, &(*ppxfcTail)->pwzElementPath);
-        ExitOnFailure(hr, "failed to get Element Path for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Element Path for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
 
         // Get the Verify Path
         hr = WcaGetRecordFormattedString(hRec, xfqVerifyPath, &(*ppxfcTail)->pwzVerifyPath);
-        ExitOnFailure(hr, "failed to get Verify Path for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Verify Path for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
 
         // Get the name
         hr = WcaGetRecordFormattedString(hRec, xfqName, &pwzData);
-        ExitOnFailure(hr, "failed to get Name for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Name for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
         hr = StringCchCopyW((*ppxfcTail)->wzName, countof((*ppxfcTail)->wzName), pwzData);
         ExitOnFailure(hr, "failed to copy name of element");
 
         // Get the value
         hr = WcaGetRecordFormattedString(hRec, xfqValue, &pwzData);
-        ExitOnFailure(hr, "failed to get Value for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get Value for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
         hr = StrAllocString(&(*ppxfcTail)->pwzValue, pwzData, 0);
         ExitOnFailure(hr, "failed to allocate buffer for value");
 
         // Get the component attributes
         hr = WcaGetRecordInteger(hRec, xfqCompAttributes, &(*ppxfcTail)->iCompAttributes);
-        ExitOnFailure(hr, "failed to get component attributes for XmlConfig: %ls", (*ppxfcTail)->wzId);
+        ExitOnFailure(hr, "failed to get component attributes for Wix4XmlConfig: %ls", (*ppxfcTail)->wzId);
     }
 
     // if we looped through all records all is well
@@ -359,7 +359,7 @@ static HRESULT BeginChangeFile(
         hr = WcaWriteStreamToCaData(pbData, cbData, &pwzRollbackCustomActionData);
         ExitOnFailure(hr, "failed to write file contents to rollback custom action data.");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecXmlConfigRollback"), pwzRollbackCustomActionData, COST_XMLFILE);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecXmlConfigRollback"), pwzRollbackCustomActionData, COST_XMLFILE);
         ExitOnFailure(hr, "failed to schedule ExecXmlConfigRollback for file: %ls", pwzFile);
 
         ReleaseStr(pwzRollbackCustomActionData);
@@ -459,10 +459,10 @@ extern "C" UINT __stdcall SchedXmlConfig(
     ExitOnFailure(hr, "failed to initialize");
 
     hr = ReadXmlConfigTable(&pxfcHead, &pxfcTail);
-    MessageExitOnFailure(hr, msierrXmlConfigFailedRead, "failed to read XmlConfig table");
+    MessageExitOnFailure(hr, msierrXmlConfigFailedRead, "failed to read Wix4XmlConfig table");
 
     hr = ProcessChanges(&pxfcHead);
-    ExitOnFailure(hr, "failed to process XmlConfig changes");
+    ExitOnFailure(hr, "failed to process Wix4XmlConfig changes");
 
     // loop through all the xml configurations
     for (pxfc = pxfcHead; pxfc; pxfc = pxfc->pxfcNext)
@@ -557,7 +557,7 @@ extern "C" UINT __stdcall SchedXmlConfig(
     {
         Assert(0 < cFiles);
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecXmlConfig"), pwzCustomActionData, cFiles * COST_XMLFILE);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecXmlConfig"), pwzCustomActionData, cFiles * COST_XMLFILE);
         ExitOnFailure(hr, "failed to schedule ExecXmlConfig action");
     }
 

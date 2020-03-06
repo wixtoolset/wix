@@ -3,9 +3,9 @@
 #include "precomp.h"
 
 // structs
-LPCWSTR wzQUERY_SECUREOBJECTS = L"SELECT `SecureObjects`.`SecureObject`, `SecureObjects`.`Table`, `SecureObjects`.`Domain`, `SecureObjects`.`User`, "
-                                L"`SecureObjects`.`Permission`, `SecureObjects`.`Component_`, `Component`.`Attributes` FROM `SecureObjects`,`Component` WHERE "
-                                L"`SecureObjects`.`Component_`=`Component`.`Component`";
+LPCWSTR wzQUERY_SECUREOBJECTS = L"SELECT `Wix4SecureObject`.`Wix4SecureObject`, `Wix4SecureObject`.`Table`, `Wix4SecureObject`.`Domain`, `Wix4SecureObject`.`User`, "
+                                L"`Wix4SecureObject`.`Permission`, `Wix4SecureObject`.`Component_`, `Component`.`Attributes` FROM `Wix4SecureObject`,`Component` WHERE "
+                                L"`Wix4SecureObject`.`Component_`=`Component`.`Component`";
 enum eQUERY_SECUREOBJECTS { QSO_SECUREOBJECT = 1, QSO_TABLE, QSO_DOMAIN, QSO_USER, QSO_PERMISSION, QSO_COMPONENT, QSO_COMPATTRIBUTES };
 
 LPCWSTR wzQUERY_REGISTRY = L"SELECT `Registry`.`Registry`, `Registry`.`Root`, `Registry`.`Key` FROM `Registry` WHERE `Registry`.`Registry`=?";
@@ -142,7 +142,7 @@ static HRESULT StoreACLRollbackInfo(
             ExitOnFailure(hr, "failed to add data to rollback CustomActionData");
         }
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecSecureObjectsRollback"), pwzCustomActionData, COST_SECUREOBJECT);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecSecureObjectsRollback"), pwzCustomActionData, COST_SECUREOBJECT);
         ExitOnFailure(hr, "failed to schedule ExecSecureObjectsRollback for item: %ls of type: %ls", pwzObject, pwzTable);
 
         ReleaseStr(pwzCustomActionData);
@@ -343,9 +343,9 @@ extern "C" UINT __stdcall SchedSecureObjects(
     ExitOnFailure(hr, "failed to initialize");
 
     // anything to do?
-    if (S_OK != WcaTableExists(L"SecureObjects"))
+    if (S_OK != WcaTableExists(L"Wix4SecureObject"))
     {
-        WcaLog(LOGMSG_STANDARD, "SecureObjects table doesn't exist, so there are no objects to secure.");
+        WcaLog(LOGMSG_STANDARD, "Wix4SecureObject table doesn't exist, so there are no objects to secure.");
         ExitFunction();
     }
 
@@ -353,7 +353,7 @@ extern "C" UINT __stdcall SchedSecureObjects(
     // loop through all the objects to be secured
     //
     hr = WcaOpenExecuteView(wzQUERY_SECUREOBJECTS, &hView);
-    ExitOnFailure(hr, "failed to open view on SecureObjects table");
+    ExitOnFailure(hr, "failed to open view on Wix4SecureObject table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, QSO_TABLE, &pwzTable);
@@ -372,7 +372,7 @@ extern "C" UINT __stdcall SchedSecureObjects(
 
         BOOL fIs64Bit = iCompAttributes & msidbComponentAttributes64bit;
 
-        // Only process entries in the SecureObjects table whose components match the bitness of this CA
+        // Only process entries in the Wix4SecureObject table whose components match the bitness of this CA
 #ifdef _WIN64
         if (!fIs64Bit)
         {
@@ -444,7 +444,7 @@ extern "C" UINT __stdcall SchedSecureObjects(
     {
         Assert(0 < cObjects);
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"ExecSecureObjects"), pwzCustomActionData, cObjects * COST_SECUREOBJECT);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecSecureObjects"), pwzCustomActionData, cObjects * COST_SECUREOBJECT);
         ExitOnFailure(hr, "failed to schedule ExecSecureObjects action");
     }
 
@@ -497,7 +497,7 @@ extern "C" UINT __stdcall SchedSecureObjectsRollback(
     // loop through all the objects to be secured
     //
     hr = WcaOpenExecuteView(wzQUERY_SECUREOBJECTS, &hView);
-    ExitOnFailure(hr, "failed to open view on SecureObjects table");
+    ExitOnFailure(hr, "failed to open view on Wix4SecureObject table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, QSO_TABLE, &pwzTable);
@@ -516,7 +516,7 @@ extern "C" UINT __stdcall SchedSecureObjectsRollback(
 
         BOOL fIs64Bit = iCompAttributes & msidbComponentAttributes64bit;
 
-        // Only process entries in the SecureObjects table whose components match the bitness of this CA
+        // Only process entries in the Wix4SecureObject table whose components match the bitness of this CA
 #ifdef _WIN64
         if (!fIs64Bit)
         {

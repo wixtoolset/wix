@@ -11,8 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.WixRestartResource.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.WixRestartResource), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.Resource), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRestartResourceTupleFields.Attributes), IntermediateFieldType.Number),
             },
@@ -26,8 +25,7 @@ namespace WixToolset.Util.Tuples
 
     public enum WixRestartResourceTupleFields
     {
-        WixRestartResource,
-        Component_,
+        ComponentRef,
         Resource,
         Attributes,
     }
@@ -44,16 +42,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[WixRestartResourceTupleFields index] => this.Fields[(int)index];
 
-        public string WixRestartResource
+        public string ComponentRef
         {
-            get => this.Fields[(int)WixRestartResourceTupleFields.WixRestartResource].AsString();
-            set => this.Set((int)WixRestartResourceTupleFields.WixRestartResource, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)WixRestartResourceTupleFields.Component_].AsString();
-            set => this.Set((int)WixRestartResourceTupleFields.Component_, value);
+            get => this.Fields[(int)WixRestartResourceTupleFields.ComponentRef].AsString();
+            set => this.Set((int)WixRestartResourceTupleFields.ComponentRef, value);
         }
 
         public string Resource

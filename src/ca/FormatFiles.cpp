@@ -27,9 +27,9 @@ extern "C" UINT __stdcall WixSchedFormatFiles(
     PSCZ sczRollbackCustomActionData;
 
     LPCWSTR wzQuery =
-        L"SELECT `WixFormatFiles`.`Binary_`, `WixFormatFiles`.`File_`, `File`.`Component_` "
-        L"FROM `WixFormatFiles`, `File` "
-        L"WHERE `WixFormatFiles`.`File_` = `File`.`File`";
+        L"SELECT `Wix4FormatFile`.`Binary_`, `Wix4FormatFile`.`File_`, `File`.`Component_` "
+        L"FROM `Wix4FormatFile`, `File` "
+        L"WHERE `Wix4FormatFile`.`File_` = `File`.`File`";
     enum eQuery { eqBinaryKey = 1, eqFileKey, eqComponentKey };
 
     // initialize
@@ -38,7 +38,7 @@ extern "C" UINT __stdcall WixSchedFormatFiles(
 
     // query and loop through all the files
     hr = WcaOpenExecuteView(wzQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on WixFormatFiles table");
+    ExitOnFailure(hr, "Failed to open view on Wix4FormatFile table");
 
     DWORD cFiles = 0;
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
@@ -100,19 +100,19 @@ extern "C" UINT __stdcall WixSchedFormatFiles(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occurred while processing WixFormatFiles table");
+    ExitOnFailure(hr, "Failure occurred while processing Wix4FormatFile table");
 
     // schedule deferred CAs if there's anything to do
     if (sczRollbackCustomActionData && *sczRollbackCustomActionData)
     {
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"WixRollbackFormatFiles"), sczRollbackCustomActionData, cFiles * COST_FILEFORMATTING);
-        ExitOnFailure(hr, "Failed to schedule WixRollbackFormatFiles");
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackFormatFiles"), sczRollbackCustomActionData, cFiles * COST_FILEFORMATTING);
+        ExitOnFailure(hr, "Failed to schedule RollbackFormatFiles");
     }
 
     if (sczExecCustomActionData && *sczExecCustomActionData)
     {
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"WixExecFormatFiles"), sczExecCustomActionData, cFiles * COST_FILEFORMATTING);
-        ExitOnFailure(hr, "Failed to schedule WixExecFormatFiles");
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecFormatFiles"), sczExecCustomActionData, cFiles * COST_FILEFORMATTING);
+        ExitOnFailure(hr, "Failed to schedule ExecFormatFiles");
     }
 
 LExit:

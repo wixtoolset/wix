@@ -3,8 +3,8 @@
 
 
 <tableDefinitions xmlns="http://wixtoolset.org/schemas/v4/wi/tables">
-    <tableDefinition name="WixCloseApplication">
-        <columnDefinition name="WixCloseApplication" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4CloseApplication" tupleDefinitionName="WixCloseApplication">
+        <columnDefinition name="Wix4CloseApplication" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token in table."/>
         <columnDefinition name="Target" type="localized" length="0" modularize="property"
                 category="formatted" description="Name of executable to ensure is closed."/>
@@ -23,8 +23,8 @@
         <columnDefinition name="Timeout" type="number" length="4" nullable="yes"
                 minValue="1" maxValue="2147483647" description="Timeout in milliseconds before scheduling restart or terminating application."/>
     </tableDefinition>
-    <tableDefinition name="WixRemoveFolderEx" createSymbols="yes">
-        <columnDefinition name="WixRemoveFolderEx" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4RemoveFolderEx" tupleDefinitionName="WixRemoveFolderEx" createSymbols="yes">
+        <columnDefinition name="Wix4RemoveFolderEx" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Identifier for the WixRemoveFolderEx row in the package."/>
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table used to determine install state"/>
@@ -33,8 +33,8 @@
         <columnDefinition name="InstallMode" type="number" length="2"
                 minValue="1" maxValue="3" description="1 == Remove only when the associated component is being installed (msiInstallStateLocal or msiInstallStateSource), 2 == Remove only when the associated component is being removed (msiInstallStateAbsent), 3 = Remove in either of the above cases."/>
     </tableDefinition>
-    <tableDefinition name="WixRestartResource">
-        <columnDefinition name="WixRestartResource" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4RestartResource" tupleDefinitionName="WixRestartResource">
+        <columnDefinition name="Wix4RestartResource" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized identifier."/>
         <columnDefinition name="Component_" type="string" length="72" nullable="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table used to determine install state."/>
@@ -43,8 +43,8 @@
         <columnDefinition name="Attributes" type="number" length="4"
                 minValue="0" maxValue="2147483647" description="A 32-bit word that specifies the type of resource and flags used for processing."/>
     </tableDefinition>
-    <tableDefinition name="FileShare" createSymbols="yes">
-        <columnDefinition name="FileShare" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4FileShare" tupleDefinitionName="FileShare" createSymbols="yes">
+        <columnDefinition name="Wix4FileShare" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized identifier"/>
         <columnDefinition name="ShareName" type="string" length="255"
                 category="formatted" description="The actual share name used"/>
@@ -54,21 +54,17 @@
                 category="text" description="Description string displayed for the file share"/>
         <columnDefinition name="Directory_" type="string" length="72" modularize="column"
                 keyTable="Directory" keyColumn="1" category="identifier" description="Foreign key referencing directory that the share is created on"/>
-        <columnDefinition name="User_" type="string" length="72" modularize="column" nullable="yes"
-                keyTable="User" keyColumn="1" category="identifier" description="Foreign key, User to give access permissions to"/>
-        <columnDefinition name="Permissions" type="number" length="4" nullable="yes"
-                description="Permissions int, as in EXPLICIT_ACCESS.grfAccessPermissions in MSDN"/>
     </tableDefinition>
-    <tableDefinition name="FileSharePermissions">
-        <columnDefinition name="FileShare_" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4FileSharePermissions" tupleDefinitionName="FileSharePermissions">
+        <columnDefinition name="Wix4FileShare_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="FileShare" keyColumn="1" category="identifier" description="FileShare that these premissions are to be applied to."/>
-        <columnDefinition name="User_" type="string" length="72" primaryKey="yes" modularize="column"
-                category="identifier" description="User that these premissions are to apply to."/>
+        <columnDefinition name="Wix4User_" type="string" length="72" primaryKey="yes" modularize="column"
+                keyTable="Wix4User" category="identifier" description="User that these premissions are to apply to."/>
         <columnDefinition name="Permissions" type="number" length="4"
                 description="Permissions int, as in EXPLICIT_ACCESS.grfAccessPermissions in MSDN"/>
     </tableDefinition>
-    <tableDefinition name="Group" createSymbols="yes">
-        <columnDefinition name="Group" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4Group" tupleDefinitionName="Group" createSymbols="yes">
+        <columnDefinition name="Wix4Group" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token"/>
         <columnDefinition name="Component_" type="string" length="72" nullable="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="text" description="Foreign key, Component used to determine install state"/>
@@ -77,8 +73,8 @@
         <columnDefinition name="Domain" type="string" length="255" nullable="yes" modularize="property"
                 category="formatted" description="Group domain"/>
     </tableDefinition>
-    <tableDefinition name="WixInternetShortcut" createSymbols="yes">
-        <columnDefinition name="WixInternetShortcut" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4InternetShortcut" tupleDefinitionName="WixInternetShortcut" createSymbols="yes">
+        <columnDefinition name="Wix4InternetShortcut" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token in table."/>
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="text" description="Foreign key, Component used to determine install state"/>
@@ -95,8 +91,8 @@
         <columnDefinition name="IconIndex" type="number" length="4"
                 nullable="yes" description="Index of the icon being referenced."/>
     </tableDefinition>
-    <tableDefinition name="PerformanceCategory">
-        <columnDefinition name="PerformanceCategory" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4PerformanceCategory" tupleDefinitionName="PerformanceCategory">
+        <columnDefinition name="Wix4PerformanceCategory" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token in table."/>
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Component used to determine install state"/>
@@ -107,7 +103,7 @@
         <columnDefinition name="ConstantData" type="localized" length="0" escapeIdtCharacters="yes"
                 category="text" description="Data that goes into the performance counter .h file."/>
     </tableDefinition>
-    <tableDefinition name="Perfmon">
+    <tableDefinition name="Wix4Perfmon" tupleDefinitionName="Perfmon">
         <columnDefinition name="Component_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Component used to determine install state"/>
         <columnDefinition name="File" type="string" length="72" primaryKey="yes" modularize="property"
@@ -115,7 +111,7 @@
         <columnDefinition name="Name" type="string" length="72" primaryKey="yes"
                 category="text" description="Service name in registry"/>
     </tableDefinition>
-    <tableDefinition name="PerfmonManifest">
+    <tableDefinition name="Wix4PerfmonManifest" tupleDefinitionName="PerfmonManifest">
         <columnDefinition name="Component_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Component used to determine install state"/>
         <columnDefinition name="File" type="string" length="72" primaryKey="yes" modularize="property"
@@ -123,27 +119,27 @@
         <columnDefinition name="ResourceFileDirectory" type="string" length="255" primaryKey="yes"
                 category="formatted" description="The path of the Resource File Directory"/>
     </tableDefinition>
-    <tableDefinition name="EventManifest">
+    <tableDefinition name="Wix4EventManifest" tupleDefinitionName="EventManifest">
         <columnDefinition name="Component_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Component used to determine install state"/>
         <columnDefinition name="File" type="string" length="72" primaryKey="yes" modularize="property"
                 category="formatted" description="Name of event manifest file"/>
     </tableDefinition>
-    <tableDefinition name="SecureObjects">
-        <columnDefinition name="SecureObject" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4SecureObject" tupleDefinitionName="SecureObjects">
+        <columnDefinition name="Wix4SecureObject" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token in Table"/>
         <columnDefinition name="Table" type="string" length="32" primaryKey="yes"
                 category="text" description="Table SecureObject should be securing"/>
         <columnDefinition name="Domain" type="string" length="255" primaryKey="yes" nullable="yes" modularize="property"
                 category="text" description="Domain half of user account to secure"/>
         <columnDefinition name="User" type="string" length="255" primaryKey="yes" modularize="property"
-                category="text" description="Username half of user account to secure"/>
+                category="text" description="User name half of user account to secure"/>
         <columnDefinition name="Permission" type="number" length="4" nullable="yes"
                 minValue="-2147483647" maxValue="2147483647" description="Permissions to grant to User"/>
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table used to determine install state"/>
     </tableDefinition>
-    <tableDefinition name="ServiceConfig">
+    <tableDefinition name="Wix4ServiceConfig" tupleDefinitionName="ServiceConfig">
         <columnDefinition name="ServiceName" type="string" length="72" primaryKey="yes"
                 category="formatted" description="Primary key, non-localized token"/>
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
@@ -165,9 +161,9 @@
         <columnDefinition name="RebootMessage" type="string" length="255" nullable="yes"
                 category="text" description="Message to show to users when rebooting if failure action is REBOOT."/>
     </tableDefinition>
-    <tableDefinition name="WixTouchFile" createSymbols="yes">
-        <columnDefinition name="WixTouchFile" type="string" length="72" primaryKey="yes" modularize="column"
-                category="identifier" description="Identifier for the WixTouchFile row in the package."/>
+    <tableDefinition name="Wix4TouchFile" tupleDefinitionName="WixTouchFile" createSymbols="yes">
+        <columnDefinition name="Wix4TouchFile" type="string" length="72" primaryKey="yes" modularize="column"
+                category="identifier" description="Identifier for the Wix4TouchFile row in the package."/>
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table used to determine install state"/>
         <columnDefinition name="Path" type="string" length="255" modularize="property"
@@ -175,8 +171,8 @@
         <columnDefinition name="Attributes" type="number" length="2"
                 minValue="1" maxValue="63" description="1 == Touch only when the associated component is being installed, 2 == Touch only when the associated component is being repaired , 4 == Touch only when the associated component is being removed, 16 = path is in 64-bit location, 32 = touching the file is vital."/>
     </tableDefinition>
-    <tableDefinition name="User" createSymbols="yes">
-        <columnDefinition name="User" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4User" tupleDefinitionName="User" createSymbols="yes">
+        <columnDefinition name="Wix4User" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token"/>
         <columnDefinition name="Component_" type="string" length="72" nullable="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="text" description="Foreign key, Component used to determine install state"/>
@@ -189,14 +185,14 @@
         <columnDefinition name="Attributes" type="number" length="4" nullable="yes"
                 minValue="0" maxValue="65535" description="Attributes describing how to create the user"/>
     </tableDefinition>
-    <tableDefinition name="UserGroup">
-        <columnDefinition name="User_" type="string" length="72" primaryKey="yes" modularize="column"
-                keyTable="User" keyColumn="1" category="identifier" description="User to be joined to a Group."/>
-        <columnDefinition name="Group_" type="string" length="72" primaryKey="yes" modularize="column"
-                keyTable="Group" keyColumn="1" category="identifier" description="User to be joined to a Group."/>
+    <tableDefinition name="Wix4UserGroup" tupleDefinitionName="UserGroup">
+        <columnDefinition name="Wix4User_" type="string" length="72" primaryKey="yes" modularize="column"
+                keyTable="Wix4User" keyColumn="1" category="identifier" description="User to be joined to a Group."/>
+        <columnDefinition name="Wix4Group_" type="string" length="72" primaryKey="yes" modularize="column"
+                keyTable="Wix4Group" keyColumn="1" category="identifier" description="Group to join User to."/>
     </tableDefinition>
-    <tableDefinition name="XmlFile">
-        <columnDefinition name="XmlFile" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4XmlFile" tupleDefinitionName="XmlFile">
+        <columnDefinition name="Wix4XmlFile" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token."/>
         <columnDefinition name="File" type="localized" length="255" modularize="property"
                 category="formatted" description="The .XML file in which to write the information"/>
@@ -213,13 +209,13 @@
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
                 description="Order to execute the XML modifications."/>
     </tableDefinition>
-    <tableDefinition name="XmlConfig" createSymbols="yes">
-        <columnDefinition name="XmlConfig" type="string" length="72" primaryKey="yes" modularize="column"
+    <tableDefinition name="Wix4XmlConfig" tupleDefinitionName="XmlConfig" createSymbols="yes">
+        <columnDefinition name="Wix4XmlConfig" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token."/>
         <columnDefinition name="File" type="localized" length="255" modularize="property"
                 category="formatted" description="The .XML file in which to write the information"/>
         <columnDefinition name="ElementPath" type="localized" length="0" modularize="property"
-                category="formatted" description="The XPATH query for an element to modify or add children to.  Can also be a foreign key reference to another XmlConfig row if no attributes are set and the row referenced is a create element row."/>
+                category="formatted" description="The XPATH query for an element to modify or add children to.  Can also be a foreign key reference to another Wix4XmlConfig row if no attributes are set and the row referenced is a create element row."/>
         <columnDefinition name="VerifyPath" type="localized" length="0" modularize="property" nullable="yes"
                 category="formatted" description="The XPATH query run from ElementPath to verify whether a repair is necessary.  Also used to uninstall."/>
         <columnDefinition name="Name" type="localized" length="255" modularize="property" nullable="yes"
@@ -233,7 +229,7 @@
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
                 description="Order to execute the XML modifications."/>
     </tableDefinition>
-    <tableDefinition name="WixFormatFiles">
+    <tableDefinition name="Wix4FormatFile" tupleDefinitionName="WixFormatFile">
         <columnDefinition name="Binary_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="Binary" keyColumn="1" category="identifier" description="Binary data to be formatted."/>
         <columnDefinition name="File_" type="string" length="72" primaryKey="yes" modularize="column"

@@ -4,10 +4,8 @@
 
 #define DEFAULT_PROCESS_EXIT_WAIT_TIME 5000
 
-// WixCloseApplication     Target      Description     Condition       Attributes      Sequence
-
 // structs
-LPCWSTR wzQUERY_CLOSEAPPS = L"SELECT `WixCloseApplication`, `Target`, `Description`, `Condition`, `Attributes`, `Property`, `TerminateExitCode`, `Timeout` FROM `WixCloseApplication` ORDER BY `Sequence`";
+LPCWSTR wzQUERY_CLOSEAPPS = L"SELECT `Wix4CloseApplication`, `Target`, `Description`, `Condition`, `Attributes`, `Property`, `TerminateExitCode`, `Timeout` FROM `Wix4CloseApplication` ORDER BY `Sequence`";
 enum eQUERY_CLOSEAPPS { QCA_ID = 1, QCA_TARGET, QCA_DESCRIPTION, QCA_CONDITION, QCA_ATTRIBUTES, QCA_PROPERTY, QCA_TERMINATEEXITCODE, QCA_TIMEOUT };
 
 // CloseApplication.Attributes
@@ -294,14 +292,14 @@ extern "C" UINT __stdcall WixCloseApplications(
     // loop through all the objects to be secured
     //
     hr = WcaOpenExecuteView(wzQUERY_CLOSEAPPS, &hView);
-    ExitOnFailure(hr, "failed to open view on WixCloseApplication table");
+    ExitOnFailure(hr, "failed to open view on Wix4CloseApplication table");
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
         hr = WcaGetRecordString(hRec, QCA_ID, &pwzId);
-        ExitOnFailure(hr, "failed to get id from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get id from Wix4CloseApplication table");
 
         hr = WcaGetRecordString(hRec, QCA_CONDITION, &pwzCondition);
-        ExitOnFailure(hr, "failed to get condition from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get condition from Wix4CloseApplication table");
 
         if (pwzCondition && *pwzCondition)
         {
@@ -309,7 +307,7 @@ extern "C" UINT __stdcall WixCloseApplications(
             if (MSICONDITION_ERROR == condition)
             {
                 hr = E_INVALIDARG;
-                ExitOnFailure(hr, "failed to process condition for WixCloseApplication '%ls'", pwzId);
+                ExitOnFailure(hr, "failed to process condition for Wix4CloseApplication '%ls'", pwzId);
             }
             else if (MSICONDITION_FALSE == condition)
             {
@@ -318,16 +316,16 @@ extern "C" UINT __stdcall WixCloseApplications(
         }
 
         hr = WcaGetRecordFormattedString(hRec, QCA_TARGET, &pwzTarget);
-        ExitOnFailure(hr, "failed to get target from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get target from Wix4CloseApplication table");
 
         hr = WcaGetRecordFormattedString(hRec, QCA_DESCRIPTION, &pwzDescription);
-        ExitOnFailure(hr, "failed to get description from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get description from Wix4CloseApplication table");
 
         hr = WcaGetRecordInteger(hRec, QCA_ATTRIBUTES, reinterpret_cast<int*>(&dwAttributes));
-        ExitOnFailure(hr, "failed to get attributes from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get attributes from Wix4CloseApplication table");
 
         hr = WcaGetRecordFormattedString(hRec, QCA_PROPERTY, &pwzProperty);
-        ExitOnFailure(hr, "failed to get property from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get property from Wix4CloseApplication table");
 
         hr = WcaGetRecordInteger(hRec, QCA_TERMINATEEXITCODE, reinterpret_cast<int*>(&dwTerminateExitCode));
         if (S_FALSE == hr)
@@ -335,7 +333,7 @@ extern "C" UINT __stdcall WixCloseApplications(
             dwTerminateExitCode = 0;
             hr = S_OK;
         }
-        ExitOnFailure(hr, "failed to get timeout from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get timeout from Wix4CloseApplication table");
 
         hr = WcaGetRecordInteger(hRec, QCA_TIMEOUT, reinterpret_cast<int*>(&dwTimeout));
         if (S_FALSE == hr)
@@ -343,7 +341,7 @@ extern "C" UINT __stdcall WixCloseApplications(
             dwTimeout = DEFAULT_PROCESS_EXIT_WAIT_TIME;
             hr = S_OK;
         }
-        ExitOnFailure(hr, "failed to get timeout from WixCloseApplication table");
+        ExitOnFailure(hr, "failed to get timeout from Wix4CloseApplication table");
 
         // Before trying any changes to the machine, prompt if requested.
         if (dwAttributes & CLOSEAPP_ATTRIBUTE_PROMPTTOCONTINUE)
@@ -433,8 +431,8 @@ extern "C" UINT __stdcall WixCloseApplications(
     {
         Assert(0 < cCloseApps);
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"WixCloseApplicationsDeferred"), pwzCustomActionData, cCloseApps * COST_CLOSEAPP);
-        ExitOnFailure(hr, "failed to schedule WixCloseApplicationsDeferred action");
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CloseApplicationsDeferred"), pwzCustomActionData, cCloseApps * COST_CLOSEAPP);
+        ExitOnFailure(hr, "failed to schedule CloseApplicationsDeferred action");
     }
 
 LExit:

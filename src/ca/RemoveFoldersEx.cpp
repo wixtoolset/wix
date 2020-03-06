@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsRemoveFolderExQuery = L"SELECT `WixRemoveFolderEx`, `Component_`, `Property`, `InstallMode` FROM `WixRemoveFolderEx`";
+LPCWSTR vcsRemoveFolderExQuery = L"SELECT `Wix4RemoveFolderEx`, `Component_`, `Property`, `InstallMode` FROM `Wix4RemoveFolderEx`";
 enum eRemoveFolderExQuery { rfqId = 1, rfqComponent, rfqProperty, feqMode };
 
 static HRESULT RecursePath(
@@ -81,10 +81,10 @@ static HRESULT RecursePath(
 
     // Add the row to remove any files and another row to remove the folder.
     hr = WcaAddTempRecord(phTable, phColumns, L"RemoveFile", NULL, 1, 5, L"RfxFiles", wzComponent, L"*.*", sczProperty, iMode);
-    ExitOnFailure(hr, "Failed to add row to remove all files for WixRemoveFolderEx row: %S under path:", wzId, wzPath);
+    ExitOnFailure(hr, "Failed to add row to remove all files for Wix4RemoveFolderEx row: %S under path:", wzId, wzPath);
 
     hr = WcaAddTempRecord(phTable, phColumns, L"RemoveFile", NULL, 1, 5, L"RfxFolder", wzComponent, NULL, sczProperty, iMode);
-    ExitOnFailure(hr, "Failed to add row to remove folder for WixRemoveFolderEx row: %S under path: %S", wzId, wzPath);
+    ExitOnFailure(hr, "Failed to add row to remove folder for Wix4RemoveFolderEx row: %S under path: %S", wzId, wzPath);
 
 LExit:
     if (INVALID_HANDLE_VALUE != hFind)
@@ -122,15 +122,15 @@ extern "C" UINT WINAPI WixRemoveFoldersEx(
     ExitOnFailure(hr, "Failed to initialize WixRemoveFoldersEx.");
 
     // anything to do?
-    if (S_OK != WcaTableExists(L"WixRemoveFolderEx"))
+    if (S_OK != WcaTableExists(L"Wix4RemoveFolderEx"))
     {
-        WcaLog(LOGMSG_STANDARD, "WixRemoveFolderEx table doesn't exist, so there are no folders to remove.");
+        WcaLog(LOGMSG_STANDARD, "Wix4RemoveFolderEx table doesn't exist, so there are no folders to remove.");
         ExitFunction();
     }
 
     // query and loop through all the remove folders exceptions
     hr = WcaOpenExecuteView(vcsRemoveFolderExQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on WixRemoveFolderEx table");
+    ExitOnFailure(hr, "Failed to open view on Wix4RemoveFolderEx table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -173,7 +173,7 @@ extern "C" UINT WINAPI WixRemoveFoldersEx(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while processing WixRemoveFolderEx table");
+    ExitOnFailure(hr, "Failure occured while processing Wix4RemoveFolderEx table");
 
 LExit:
     if (hColumns)

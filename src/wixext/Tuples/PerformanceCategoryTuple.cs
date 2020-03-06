@@ -11,8 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.PerformanceCategory.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.PerformanceCategory), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.IniData), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PerformanceCategoryTupleFields.ConstantData), IntermediateFieldType.String),
@@ -27,8 +26,7 @@ namespace WixToolset.Util.Tuples
 
     public enum PerformanceCategoryTupleFields
     {
-        PerformanceCategory,
-        Component_,
+        ComponentRef,
         Name,
         IniData,
         ConstantData,
@@ -46,16 +44,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[PerformanceCategoryTupleFields index] => this.Fields[(int)index];
 
-        public string PerformanceCategory
+        public string ComponentRef
         {
-            get => this.Fields[(int)PerformanceCategoryTupleFields.PerformanceCategory].AsString();
-            set => this.Set((int)PerformanceCategoryTupleFields.PerformanceCategory, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)PerformanceCategoryTupleFields.Component_].AsString();
-            set => this.Set((int)PerformanceCategoryTupleFields.Component_, value);
+            get => this.Fields[(int)PerformanceCategoryTupleFields.ComponentRef].AsString();
+            set => this.Set((int)PerformanceCategoryTupleFields.ComponentRef, value);
         }
 
         public string Name

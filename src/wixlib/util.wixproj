@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="caerr.wxi" />
-    <None Include="caSuffix.wxi" />
+    <None Include="caDecor.wxi" />
     <None Include="UtilExtension_Platform.wxi" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />

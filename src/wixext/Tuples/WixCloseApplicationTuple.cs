@@ -11,7 +11,6 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.WixCloseApplication.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixCloseApplicationTupleFields.WixCloseApplication), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCloseApplicationTupleFields.Target), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCloseApplicationTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixCloseApplicationTupleFields.Condition), IntermediateFieldType.String),
@@ -31,7 +30,6 @@ namespace WixToolset.Util.Tuples
 
     public enum WixCloseApplicationTupleFields
     {
-        WixCloseApplication,
         Target,
         Description,
         Condition,
@@ -53,12 +51,6 @@ namespace WixToolset.Util.Tuples
         }
 
         public IntermediateField this[WixCloseApplicationTupleFields index] => this.Fields[(int)index];
-
-        public string WixCloseApplication
-        {
-            get => this.Fields[(int)WixCloseApplicationTupleFields.WixCloseApplication].AsString();
-            set => this.Set((int)WixCloseApplicationTupleFields.WixCloseApplication, value);
-        }
 
         public string Target
         {

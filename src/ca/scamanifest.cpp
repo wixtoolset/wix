@@ -2,8 +2,8 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsPerfmonManifestQuery = L"SELECT `Component_`, `File`, `ResourceFileDirectory` FROM `PerfmonManifest`";
-LPCWSTR vcsEventManifestQuery = L"SELECT `Component_`, `File` FROM `EventManifest`";
+LPCWSTR vcsPerfmonManifestQuery = L"SELECT `Component_`, `File`, `ResourceFileDirectory` FROM `Wix4PerfmonManifest`";
+LPCWSTR vcsEventManifestQuery = L"SELECT `Component_`, `File` FROM `Wix4EventManifest`";
 enum ePerfMonManifestQuery { pfmComponent = 1, pfmFile, pfmResourceFileDir };
 enum eEventManifestQuery { emComponent = 1, emFile};
 
@@ -46,9 +46,9 @@ extern "C" UINT __stdcall ConfigurePerfmonManifestRegister(
         ExitFunction1(hr = S_FALSE);
     }
     // check to see if necessary tables are specified
-    if (S_OK != WcaTableExists(L"PerfmonManifest"))
+    if (S_OK != WcaTableExists(L"Wix4PerfmonManifest"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigurePerfmonManifestRegister() because PerfmonManifest table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigurePerfmonManifestRegister() because Wix4PerfmonManifest table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
@@ -79,7 +79,7 @@ extern "C" UINT __stdcall ConfigurePerfmonManifestRegister(
         hr = StrAllocFormatted(&pwzCommand, L"\"unlodctr.exe\" /m:\"%s\"", pwzFile);
         ExitOnFailure(hr, "failed to copy string in PerfMonManifest");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackRegisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackRegisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
         ExitOnFailure(hr, "failed to schedule RollbackRegisterPerfmonManifest action");
 
         if ( *pwzResourceFilePath )
@@ -95,7 +95,7 @@ extern "C" UINT __stdcall ConfigurePerfmonManifestRegister(
         
         WcaLog(LOGMSG_VERBOSE, "RegisterPerfmonManifest's CustomActionData: '%ls'", pwzCommand);
         
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RegisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_REGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RegisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_REGISTER);
         ExitOnFailure(hr, "failed to schedule RegisterPerfmonManifest action");
     }
 
@@ -143,40 +143,40 @@ extern "C" UINT __stdcall ConfigurePerfmonManifestUnregister(
         ExitFunction1(hr = S_FALSE);
     }
     // check to see if necessary tables are specified
-    if (WcaTableExists(L"PerfmonManifest") != S_OK)
+    if (WcaTableExists(L"Wix4PerfmonManifest") != S_OK)
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigurePerfmonManifestUnregister() because PerfmonManifest table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigurePerfmonManifestUnregister() because Wix4PerfmonManifest table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
     hr = WcaOpenExecuteView(vcsPerfmonManifestQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on PerfMonManifest table");
+    ExitOnFailure(hr, "failed to open view on Wix4PerfmonManifest table");
     while ((hr = WcaFetchRecord(hView, &hRec)) == S_OK)
     {
         // get component install state
         hr = WcaGetRecordString(hRec, pfmComponent, &pwzData);
-        ExitOnFailure(hr, "failed to get Component for PerfMonManifest");
+        ExitOnFailure(hr, "failed to get Component for Wix4PerfmonManifest");
         er = ::MsiGetComponentStateW(hInstall, pwzData, &isInstalled, &isAction);
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "failed to get Component state for PerfMonManifest");
+        ExitOnFailure(hr, "failed to get Component state for Wix4PerfmonManifest");
         if (!WcaIsUninstalling(isInstalled, isAction))
         {
             continue;
         }
 
         hr = WcaGetRecordFormattedString(hRec, pfmFile, &pwzFile);
-        ExitOnFailure(hr, "failed to get File for PerfMonManifest");
+        ExitOnFailure(hr, "failed to get File for Wix4PerfmonManifest");
 
         hr = WcaGetRecordFormattedString(hRec, pfmResourceFileDir, &pwzResourceFilePath);
-        ExitOnFailure(hr, "failed to get ApplicationIdentity for PerfMonManifest");
+        ExitOnFailure(hr, "failed to get ApplicationIdentity for Wix4PerfmonManifest");
         size_t iResourcePath = lstrlenW(pwzResourceFilePath);
         if ( iResourcePath > 0 && *(pwzResourceFilePath + iResourcePath -1) == L'\\') 
             *(pwzResourceFilePath + iResourcePath -1) = 0;  //remove the trailing '\'
 
         hr = StrAllocFormatted(&pwzCommand, L"\"lodctr.exe\" /m:\"%s\" \"%s\"", pwzFile, pwzResourceFilePath);
-        ExitOnFailure(hr, "failed to copy string in PerfMonManifest");
+        ExitOnFailure(hr, "failed to copy string in Wix4PerfmonManifest");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackUnregisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_REGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackUnregisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_REGISTER);
         ExitOnFailure(hr, "failed to schedule RollbackUnregisterPerfmonManifest action");
 
         hr = StrAllocFormatted(&pwzCommand, L"\"unlodctr.exe\" /m:\"%s\"", pwzFile);
@@ -184,7 +184,7 @@ extern "C" UINT __stdcall ConfigurePerfmonManifestUnregister(
 
         WcaLog(LOGMSG_VERBOSE, "UnRegisterPerfmonManifest's CustomActionData: '%ls'", pwzCommand);
         
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"UnregisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"UnregisterPerfmonManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
         ExitOnFailure(hr, "failed to schedule UnregisterPerfmonManifest action");
     }
 
@@ -231,41 +231,41 @@ extern "C" UINT __stdcall ConfigureEventManifestRegister(
         ExitFunction1(hr = S_FALSE);
     }
     // check to see if necessary tables are specified
-    if (S_OK != WcaTableExists(L"EventManifest"))
+    if (S_OK != WcaTableExists(L"Wix4EventManifest"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigureEventManifestRegister() because EventManifest table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigureEventManifestRegister() because Wix4EventManifest table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
     hr = WcaOpenExecuteView(vcsEventManifestQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on EventManifest table");
+    ExitOnFailure(hr, "failed to open view on Wix4EventManifest table");
     while ((hr = WcaFetchRecord(hView, &hRec)) == S_OK)
     {
         // get component install state
         hr = WcaGetRecordString(hRec, emComponent, &pwzData);
-        ExitOnFailure(hr, "failed to get Component for EventManifest");
+        ExitOnFailure(hr, "failed to get Component for Wix4EventManifest");
         er = ::MsiGetComponentStateW(hInstall, pwzData, &isInstalled, &isAction);
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "failed to get Component state for EventManifest");
+        ExitOnFailure(hr, "failed to get Component state for Wix4EventManifest");
         if (!WcaIsInstalling(isInstalled, isAction))
         {
             continue;
         }
 
         hr = WcaGetRecordFormattedString(hRec, emFile, &pwzFile);
-        ExitOnFailure(hr, "failed to get File for EventManifest");
+        ExitOnFailure(hr, "failed to get File for Wix4EventManifest");
 
         hr = StrAllocFormatted(&pwzCommand, L"\"wevtutil.exe\" um \"%s\"", pwzFile);
-        ExitOnFailure(hr, "failed to copy string in EventManifest");
+        ExitOnFailure(hr, "failed to copy string in Wix4EventManifest");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackRegisterEventManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackRegisterEventManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
         ExitOnFailure(hr, "failed to schedule RollbackRegisterEventManifest action");
 
         hr = StrAllocFormatted(&pwzCommand, L"\"wevtutil.exe\" im \"%s\"", pwzFile);
-        ExitOnFailure(hr, "failed to copy string in EventManifest");
+        ExitOnFailure(hr, "failed to copy string in Wix4EventManifest");
         WcaLog(LOGMSG_VERBOSE, "RegisterEventManifest's CustomActionData: '%ls'", pwzCommand);
         
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RegisterEventManifest"), pwzCommand, COST_EVENTMANIFEST_REGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RegisterEventManifest"), pwzCommand, COST_EVENTMANIFEST_REGISTER);
         ExitOnFailure(hr, "failed to schedule RegisterEventManifest action");
     }
 
@@ -273,7 +273,7 @@ extern "C" UINT __stdcall ConfigureEventManifestRegister(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure while processing EventManifest");
+    ExitOnFailure(hr, "Failure while processing Wix4EventManifest");
 
     hr = S_OK;
 
@@ -313,22 +313,22 @@ extern "C" UINT __stdcall ConfigureEventManifestUnregister(
         ExitFunction1(hr = S_FALSE);
     }
     // check to see if necessary tables are specified
-    if (S_OK != WcaTableExists(L"EventManifest"))
+    if (S_OK != WcaTableExists(L"Wix4EventManifest"))
     {
-        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigureEventManifestUnregister() because EventManifest table not present");
+        WcaLog(LOGMSG_VERBOSE, "Skipping ConfigureEventManifestUnregister() because Wix4EventManifest table not present");
         ExitFunction1(hr = S_FALSE);
     }
 
     hr = WcaOpenExecuteView(vcsEventManifestQuery, &hView);
-    ExitOnFailure(hr, "failed to open view on EventManifest table");
+    ExitOnFailure(hr, "failed to open view on Wix4EventManifest table");
     while ((hr = WcaFetchRecord(hView, &hRec)) == S_OK)
     {
         // get component install state
         hr = WcaGetRecordString(hRec, emComponent, &pwzData);
-        ExitOnFailure(hr, "failed to get Component for EventManifest");
+        ExitOnFailure(hr, "failed to get Component for Wix4EventManifest");
         er = ::MsiGetComponentStateW(hInstall, pwzData, &isInstalled, &isAction);
         hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "failed to get Component state for EventManifest");
+        ExitOnFailure(hr, "failed to get Component state for Wix4EventManifest");
 
         // nothing to do on an install
         // schedule the rollback action when reinstalling to re-register pre-patch manifest
@@ -338,22 +338,22 @@ extern "C" UINT __stdcall ConfigureEventManifestUnregister(
         }
 
         hr = WcaGetRecordFormattedString(hRec, emFile, &pwzFile);
-        ExitOnFailure(hr, "failed to get File for EventManifest");
+        ExitOnFailure(hr, "failed to get File for Wix4EventManifest");
 
         hr = StrAllocFormatted(&pwzCommand, L"\"wevtutil.exe\" im \"%s\"", pwzFile);
-        ExitOnFailure(hr, "failed to copy string in EventManifest");
+        ExitOnFailure(hr, "failed to copy string in Wix4EventManifest");
 
-        hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"RollbackUnregisterEventManifest"), pwzCommand, COST_PERFMONMANIFEST_REGISTER);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackUnregisterEventManifest"), pwzCommand, COST_PERFMONMANIFEST_REGISTER);
         ExitOnFailure(hr, "failed to schedule RollbackUnregisterEventManifest action");
 
         // no need to uninstall on a repair/patch.  Register action will re-register and update the manifest.
         if (!WcaIsReInstalling(isInstalled, isAction))
         {
             hr = StrAllocFormatted(&pwzCommand, L"\"wevtutil.exe\" um \"%s\"", pwzFile);
-            ExitOnFailure(hr, "failed to copy string in EventManifest");
+            ExitOnFailure(hr, "failed to copy string in Wix4EventManifest");
             WcaLog(LOGMSG_VERBOSE, "UnregisterEventManifest's CustomActionData: '%ls'", pwzCommand);
             
-            hr = WcaDoDeferredAction(PLATFORM_DECORATION(L"UnregisterEventManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"UnregisterEventManifest"), pwzCommand, COST_PERFMONMANIFEST_UNREGISTER);
             ExitOnFailure(hr, "failed to schedule UnregisterEventManifest action");
         }
     }
@@ -362,7 +362,7 @@ extern "C" UINT __stdcall ConfigureEventManifestUnregister(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure while processing EventManifest");
+    ExitOnFailure(hr, "Failure while processing Wix4EventManifest");
 
     hr = S_OK;
 

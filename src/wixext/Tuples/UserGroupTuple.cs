@@ -11,8 +11,8 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.UserGroup.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(UserGroupTupleFields.User_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(UserGroupTupleFields.Group_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserGroupTupleFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(UserGroupTupleFields.GroupRef), IntermediateFieldType.String),
             },
             typeof(UserGroupTuple));
     }
@@ -24,8 +24,8 @@ namespace WixToolset.Util.Tuples
 
     public enum UserGroupTupleFields
     {
-        User_,
-        Group_,
+        UserRef,
+        GroupRef,
     }
 
     public class UserGroupTuple : IntermediateTuple
@@ -40,16 +40,16 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[UserGroupTupleFields index] => this.Fields[(int)index];
 
-        public string User_
+        public string UserRef
         {
-            get => this.Fields[(int)UserGroupTupleFields.User_].AsString();
-            set => this.Set((int)UserGroupTupleFields.User_, value);
+            get => this.Fields[(int)UserGroupTupleFields.UserRef].AsString();
+            set => this.Set((int)UserGroupTupleFields.UserRef, value);
         }
 
-        public string Group_
+        public string GroupRef
         {
-            get => this.Fields[(int)UserGroupTupleFields.Group_].AsString();
-            set => this.Set((int)UserGroupTupleFields.Group_, value);
+            get => this.Fields[(int)UserGroupTupleFields.GroupRef].AsString();
+            set => this.Set((int)UserGroupTupleFields.GroupRef, value);
         }
     }
 }

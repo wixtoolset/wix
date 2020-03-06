@@ -5,6 +5,7 @@ namespace WixToolset.Util
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
+    using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
@@ -13,6 +14,12 @@ namespace WixToolset.Util
         private static readonly TableDefinition[] Tables = LoadTables();
 
         public override IEnumerable<TableDefinition> TableDefinitions { get => Tables; }
+
+        public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
+        {
+            var columnZeroIsId = tuple.Id != null;
+            return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitions, columnZeroIsId);
+        }
 
         private static TableDefinition[] LoadTables()
         {

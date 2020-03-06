@@ -12,7 +12,7 @@ namespace WixToolset.Util
             new[]
             {
                 new IntermediateFieldDefinition(nameof(GroupTupleFields.Group), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(GroupTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(GroupTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(GroupTupleFields.Domain), IntermediateFieldType.String),
             },
@@ -27,7 +27,7 @@ namespace WixToolset.Util.Tuples
     public enum GroupTupleFields
     {
         Group,
-        Component_,
+        ComponentRef,
         Name,
         Domain,
     }
@@ -50,10 +50,10 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)GroupTupleFields.Group, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)GroupTupleFields.Component_].AsString();
-            set => this.Set((int)GroupTupleFields.Component_, value);
+            get => this.Fields[(int)GroupTupleFields.ComponentRef].AsString();
+            set => this.Set((int)GroupTupleFields.ComponentRef, value);
         }
 
         public string Name

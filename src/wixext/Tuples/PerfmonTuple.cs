@@ -11,7 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.Perfmon.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(PerfmonTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(PerfmonTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PerfmonTupleFields.File), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(PerfmonTupleFields.Name), IntermediateFieldType.String),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.Util.Tuples
 
     public enum PerfmonTupleFields
     {
-        Component_,
+        ComponentRef,
         File,
         Name,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[PerfmonTupleFields index] => this.Fields[(int)index];
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)PerfmonTupleFields.Component_].AsString();
-            set => this.Set((int)PerfmonTupleFields.Component_, value);
+            get => this.Fields[(int)PerfmonTupleFields.ComponentRef].AsString();
+            set => this.Set((int)PerfmonTupleFields.ComponentRef, value);
         }
 
         public string File

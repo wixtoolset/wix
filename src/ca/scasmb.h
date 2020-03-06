@@ -5,7 +5,7 @@
 #include "scauser.h"
 
 // structs
-// Structure used to hold and extra user/permission pairs from the FileSharePermissions Table
+// Structure used to hold and extra user/permission pairs from the Wix4FileSharePermissions Table
 struct SCA_SMB_EX_USER_PERMS
 {
 	int nPermissions;

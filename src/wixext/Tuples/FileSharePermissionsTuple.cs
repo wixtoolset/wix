@@ -11,8 +11,8 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.FileSharePermissions.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.FileShare_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.User_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.FileShareRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.UserRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(FileSharePermissionsTupleFields.Permissions), IntermediateFieldType.Number),
             },
             typeof(FileSharePermissionsTuple));
@@ -25,8 +25,8 @@ namespace WixToolset.Util.Tuples
 
     public enum FileSharePermissionsTupleFields
     {
-        FileShare_,
-        User_,
+        FileShareRef,
+        UserRef,
         Permissions,
     }
 
@@ -42,16 +42,16 @@ namespace WixToolset.Util.Tuples
 
         public IntermediateField this[FileSharePermissionsTupleFields index] => this.Fields[(int)index];
 
-        public string FileShare_
+        public string FileShareRef
         {
-            get => this.Fields[(int)FileSharePermissionsTupleFields.FileShare_].AsString();
-            set => this.Set((int)FileSharePermissionsTupleFields.FileShare_, value);
+            get => this.Fields[(int)FileSharePermissionsTupleFields.FileShareRef].AsString();
+            set => this.Set((int)FileSharePermissionsTupleFields.FileShareRef, value);
         }
 
-        public string User_
+        public string UserRef
         {
-            get => this.Fields[(int)FileSharePermissionsTupleFields.User_].AsString();
-            set => this.Set((int)FileSharePermissionsTupleFields.User_, value);
+            get => this.Fields[(int)FileSharePermissionsTupleFields.UserRef].AsString();
+            set => this.Set((int)FileSharePermissionsTupleFields.UserRef, value);
         }
 
         public int Permissions

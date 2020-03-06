@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-LPCWSTR vcsTouchFileQuery = L"SELECT `WixTouchFile`, `Component_`, `Path`, `Attributes` FROM `WixTouchFile`";
+LPCWSTR vcsTouchFileQuery = L"SELECT `Wix4TouchFile`, `Component_`, `Path`, `Attributes` FROM `Wix4TouchFile`";
 enum TOUCH_FILE_QUERY { tfqId = 1, tfqComponent, tfqPath, tfqTouchFileAttributes };
 
 enum TOUCH_FILE_ATTRIBUTE
@@ -134,7 +134,7 @@ static HRESULT ProcessTouchFileTable(
     LPWSTR sczRollbackData = NULL;
     LPWSTR sczExecuteData = NULL;
 
-    if (S_OK != WcaTableExists(L"WixTouchFile"))
+    if (S_OK != WcaTableExists(L"Wix4TouchFile"))
     {
         ExitFunction();
     }
@@ -142,7 +142,7 @@ static HRESULT ProcessTouchFileTable(
     ::GetSystemTimeAsFileTime(&ftModified);
 
     hr = WcaOpenExecuteView(vcsTouchFileQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on WixTouchFile table");
+    ExitOnFailure(hr, "Failed to open view on Wix4TouchFile table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -181,18 +181,18 @@ static HRESULT ProcessTouchFileTable(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while processing WixTouchFile table");
+    ExitOnFailure(hr, "Failure occured while processing Wix4TouchFile table");
 
     if (sczRollbackData)
     {
-        hr = WcaDoDeferredAction(L"WixRollbackTouchFile", sczRollbackData, 0);
-        ExitOnFailure(hr, "Failed to schedule WixRollbackTouchFile");
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RollbackTouchFile"), sczRollbackData, 0);
+        ExitOnFailure(hr, "Failed to schedule RollbackTouchFile");
     }
 
     if (sczExecuteData)
     {
-        hr = WcaDoDeferredAction(L"WixExecuteTouchFile", sczExecuteData, 0);
-        ExitOnFailure(hr, "Failed to schedule WixExecuteTouchFile");
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"ExecuteTouchFile"), sczExecuteData, 0);
+        ExitOnFailure(hr, "Failed to schedule ExecuteTouchFile");
     }
 
 LExit:

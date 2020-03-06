@@ -12,7 +12,7 @@ namespace WixToolset.Util
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ServiceConfigTupleFields.ServiceName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ServiceConfigTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceConfigTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceConfigTupleFields.NewService), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ServiceConfigTupleFields.FirstFailureActionType), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceConfigTupleFields.SecondFailureActionType), IntermediateFieldType.String),
@@ -33,7 +33,7 @@ namespace WixToolset.Util.Tuples
     public enum ServiceConfigTupleFields
     {
         ServiceName,
-        Component_,
+        ComponentRef,
         NewService,
         FirstFailureActionType,
         SecondFailureActionType,
@@ -62,10 +62,10 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)ServiceConfigTupleFields.ServiceName, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ServiceConfigTupleFields.Component_].AsString();
-            set => this.Set((int)ServiceConfigTupleFields.Component_, value);
+            get => this.Fields[(int)ServiceConfigTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ServiceConfigTupleFields.ComponentRef, value);
         }
 
         public int NewService
