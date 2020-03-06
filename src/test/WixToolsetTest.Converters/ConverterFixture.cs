@@ -590,6 +590,40 @@ namespace WixToolsetTest.Converters
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        public void CanConvertCustomAction()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <CustomAction Id='Foo' BinaryKey='WixCA' DllEntry='CAQuietExec' />",
+                "  <CustomAction Id='Foo' BinaryKey='WixCA_x64' DllEntry='CAQuietExec64' />",
+                "  <CustomAction Id='Foo' BinaryKey='UtilCA' DllEntry='WixQuietExec' />",
+                "  <CustomAction Id='Foo' BinaryKey='UtilCA_x64' DllEntry='WixQuietExec64' />",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
+                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
+                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
+                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
+                "</Wix>");
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new DummyMessaging();
+            var converter = new Wix3Converter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actual = UnformattedDocumentString(document);
+
+            Assert.Equal(6, errors);
+            Assert.Equal(expected, actual);
+        }
+
         private static string UnformattedDocumentString(XDocument document)
         {
             var sb = new StringBuilder();
