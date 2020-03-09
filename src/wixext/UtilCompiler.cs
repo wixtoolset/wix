@@ -2452,7 +2452,8 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedSecureObjects", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
 
-                var tuple = new SecureObjectsTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, objectId))
+                var id = this.ParseHelper.CreateIdentifier("sec", objectId, tableName, domain, user);
+                var tuple = new SecureObjectsTuple(sourceLineNumbers, id)
                 {
                     Table = tableName,
                     Domain = domain,
