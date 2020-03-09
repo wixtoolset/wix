@@ -7,6 +7,7 @@ namespace WixToolset.Netfx
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Netfx.Tuples;
 
     /// <summary>
@@ -144,7 +145,7 @@ namespace WixToolset.Netfx
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "NetFxScheduleNativeImage");
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "NetFxScheduleNativeImage", this.Context.Platform, CustomActionPlatforms.X86);
 
             if (!this.Messaging.EncounteredError)
             {

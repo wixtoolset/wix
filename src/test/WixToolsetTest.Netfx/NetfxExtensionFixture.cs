@@ -16,10 +16,10 @@ namespace WixToolsetTest.Netfx
             var folder = TestData.Get(@"TestData\UsingNativeImage");
             var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "NetFxNativeImage");
+            var results = build.BuildAndQuery(Build, "Wix4NetFxNativeImage");
             Assert.Equal(new[]
             {
-                "NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
+                "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
             }, results.OrderBy(s => s).ToArray());
         }
 

@@ -10,4 +10,5 @@
 #include "strutil.h"
 #include "pathutil.h"
 
+#include "caDecor.h"
 #include "cost.h"
