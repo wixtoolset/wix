@@ -35,7 +35,7 @@ namespace WixToolset.Core
 
         private IMessaging Messaging { get; }
 
-        public int VariableCount  => this.wixVariables.Count;
+        public int VariableCount => this.wixVariables.Count;
 
         public void AddLocalization(Localization localization)
         {
@@ -94,7 +94,7 @@ namespace WixToolset.Core
             result.IsDefault = true;
             result.Value = value;
 
-            if (0 < matches.Count)
+            while (!result.DelayedResolve && matches.Count > 0)
             {
                 var sb = new StringBuilder(value);
 
@@ -203,6 +203,8 @@ namespace WixToolset.Core
                 }
 
                 result.Value = sb.ToString();
+                value = result.Value;
+                matches = Common.WixVariableRegex.Matches(value);
             }
 
             return result;
