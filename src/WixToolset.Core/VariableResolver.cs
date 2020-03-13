@@ -94,7 +94,7 @@ namespace WixToolset.Core
             result.IsDefault = true;
             result.Value = value;
 
-            while (!result.DelayedResolve && matches.Count > 0)
+            while (!this.Messaging.EncounteredError && !result.DelayedResolve && matches.Count > 0)
             {
                 var sb = new StringBuilder(value);
 

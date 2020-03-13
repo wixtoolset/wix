@@ -32,6 +32,7 @@ namespace WixToolsetTest.CoreIntegration
             Assert.Equal("Welcome to Localized Product Name", variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductName)", false).Value);
             Assert.Equal("Welcome to Localized Product Name Enterprise Edition", variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEdition)", false).Value);
             Assert.Equal("Welcome to Localized Product Name Enterprise Edition v1.2.3", variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion)", false).Value);
+            Assert.Throws<WixException>(() => variableResolver.ResolveVariables(null, "Welcome to !(loc.UnknownLocalizationVariable)", false));
         }
     }
 }
