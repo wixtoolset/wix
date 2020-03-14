@@ -251,7 +251,7 @@ namespace WixToolset.Core
                                 var data = field.AsString();
                                 if (!String.IsNullOrEmpty(data))
                                 {
-                                    var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(tuple.SourceLineNumbers, data, false, false);
+                                    var resolved = this.componentIdPlaceholdersResolver.ResolveVariables(tuple.SourceLineNumbers, data, errorOnUnknown: false);
                                     if (resolved.UpdatedValue)
                                     {
                                         field.Set(resolved.Value);

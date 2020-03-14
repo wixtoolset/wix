@@ -66,9 +66,9 @@ namespace WixToolset.Core
             }
         }
 
-        public IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly)
+        public IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value)
         {
-            return this.ResolveVariables(sourceLineNumbers, value, localizationOnly, true);
+            return this.ResolveVariables(sourceLineNumbers, value, errorOnUnknown: true);
         }
 
         public bool TryGetLocalizedControl(string dialog, string control, out LocalizedControl localizedControl)
@@ -82,25 +82,27 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="sourceLineNumbers">The source line information for the value.</param>
         /// <param name="value">The value to resolve.</param>
-        /// <param name="localizationOnly">true to only resolve localization variables; false otherwise.</param>
         /// <param name="errorOnUnknown">true if unknown variables should throw errors.</param>
         /// <returns>The resolved value.</returns>
-        internal IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool localizationOnly, bool errorOnUnknown)
+        internal IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool errorOnUnknown)
         {
             var matches = Common.WixVariableRegex.Matches(value);
 
-            // the value is the default unless its substituted further down
+            // the value is the default unless it's substituted further down
             var result = this.ServiceProvider.GetService<IVariableResolution>();
             result.IsDefault = true;
             result.Value = value;
 
-            while (!this.Messaging.EncounteredError && !result.DelayedResolve && matches.Count > 0)
+            var finalizeEscapes = false;
+
+            while (matches.Count > 0)
             {
+                var updatedResultThisPass = false;
                 var sb = new StringBuilder(value);
 
                 // notice how this code walks backward through the list
                 // because it modifies the string as we move through it
-                for (int i = matches.Count - 1; 0 <= i; i--)
+                for (var i = matches.Count - 1; 0 <= i; i--)
                 {
                     var variableNamespace = matches[i].Groups["namespace"].Value;
                     var variableId = matches[i].Groups["fullname"].Value;
@@ -130,11 +132,15 @@ namespace WixToolset.Core
                     // check for an escape sequence of !! indicating the match is not a variable expression
                     if (0 < matches[i].Index && '!' == sb[matches[i].Index - 1])
                     {
-                        if (!localizationOnly)
+                        if (finalizeEscapes)
                         {
                             sb.Remove(matches[i].Index - 1, 1);
 
                             result.UpdatedValue = true;
+                        }
+                        else
+                        {
+                            continue;
                         }
                     }
                     else
@@ -154,7 +160,7 @@ namespace WixToolset.Core
                                 resolvedValue = bindVariable.Value;
                             }
                         }
-                        else if (!localizationOnly && "wix" == variableNamespace)
+                        else if ("wix" == variableNamespace)
                         {
                             // illegal syntax of $(wix.var)
                             if ('$' == sb[matches[i].Index])
@@ -189,12 +195,13 @@ namespace WixToolset.Core
                                 sb.Insert(matches[i].Index, resolvedValue);
 
                                 result.UpdatedValue = true;
+                                updatedResultThisPass = true;
                             }
                             else if ("loc" == variableNamespace && errorOnUnknown) // unresolved loc variable
                             {
                                 this.Messaging.Write(ErrorMessages.LocalizationVariableUnknown(sourceLineNumbers, variableId));
                             }
-                            else if (!localizationOnly && "wix" == variableNamespace && errorOnUnknown) // unresolved wix variable
+                            else if ("wix" == variableNamespace && errorOnUnknown) // unresolved wix variable
                             {
                                 this.Messaging.Write(ErrorMessages.WixVariableUnknown(sourceLineNumbers, variableId));
                             }
@@ -204,7 +211,22 @@ namespace WixToolset.Core
 
                 result.Value = sb.ToString();
                 value = result.Value;
-                matches = Common.WixVariableRegex.Matches(value);
+
+                if (finalizeEscapes)
+                {
+                    // escaped references have been un-escaped, so we're done
+                    break;
+                }
+                else if (updatedResultThisPass)
+                {
+                    // we substituted loc strings, so make another pass to see if that brought in more loc strings
+                    matches = Common.WixVariableRegex.Matches(value);
+                }
+                else
+                {
+                    // make one final pass to un-escape any escaped references
+                    finalizeEscapes = true;
+                }
             }
 
             return result;

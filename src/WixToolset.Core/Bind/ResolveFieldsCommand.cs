@@ -62,7 +62,7 @@ namespace WixToolset.Core.Bind
                                 var original = field.AsString();
                                 if (!String.IsNullOrEmpty(original))
                                 {
-                                    var resolution = this.VariableResolver.ResolveVariables(tuple.SourceLineNumbers, original, false);
+                                    var resolution = this.VariableResolver.ResolveVariables(tuple.SourceLineNumbers, original);
                                     if (resolution.UpdatedValue)
                                     {
                                         field.Set(resolution.Value);

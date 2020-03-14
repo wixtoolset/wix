@@ -29,10 +29,42 @@ namespace WixToolsetTest.CoreIntegration
 
             variableResolver.AddLocalization(localization);
 
-            Assert.Equal("Welcome to Localized Product Name", variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductName)", false).Value);
-            Assert.Equal("Welcome to Localized Product Name Enterprise Edition", variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEdition)", false).Value);
-            Assert.Equal("Welcome to Localized Product Name Enterprise Edition v1.2.3", variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion)", false).Value);
-            Assert.Throws<WixException>(() => variableResolver.ResolveVariables(null, "Welcome to !(loc.UnknownLocalizationVariable)", false));
+            var result = variableResolver.ResolveVariables(null, "These are not the loc strings you're looking for.");
+            Assert.Equal("These are not the loc strings you're looking for.", result.Value);
+            Assert.False(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductName)");
+            Assert.Equal("Welcome to Localized Product Name", result.Value);
+            Assert.True(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEdition)");
+            Assert.Equal("Welcome to Localized Product Name Enterprise Edition", result.Value);
+            Assert.True(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion)");
+            Assert.Equal("Welcome to Localized Product Name Enterprise Edition v1.2.3", result.Value);
+            Assert.True(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !(bind.property.ProductVersion)");
+            Assert.Equal("Welcome to !(bind.property.ProductVersion)", result.Value);
+            Assert.False(result.UpdatedValue);
+            Assert.True(result.DelayedResolve);
+
+            Assert.Throws<WixException>(() => variableResolver.ResolveVariables(null, "Welcome to !(loc.UnknownLocalizationVariable)"));
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !!(loc.UnknownLocalizationVariable)");
+            Assert.Equal("Welcome to !(loc.UnknownLocalizationVariable)", result.Value);
+            Assert.True(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !!(loc.UnknownLocalizationVariable) v!(bind.property.ProductVersion)");
+            Assert.Equal("Welcome to !(loc.UnknownLocalizationVariable) v!(bind.property.ProductVersion)", result.Value);
+            Assert.True(result.UpdatedValue);
+            Assert.True(result.DelayedResolve);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion) !!(loc.UnknownLocalizationVariable) v!(bind.property.ProductVersion)");
+            Assert.Equal("Welcome to Localized Product Name Enterprise Edition v1.2.3 !(loc.UnknownLocalizationVariable) v!(bind.property.ProductVersion)", result.Value);
+            Assert.True(result.UpdatedValue);
+            Assert.True(result.DelayedResolve);
         }
     }
 }

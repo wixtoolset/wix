@@ -95,7 +95,7 @@ namespace WixToolset.Core
 
                         if (pathField != null && !String.IsNullOrEmpty(pathField.Path))
                         {
-                            var resolution = variableResolver.ResolveVariables(tuple.SourceLineNumbers, pathField.Path, false);
+                            var resolution = variableResolver.ResolveVariables(tuple.SourceLineNumbers, pathField.Path);
 
                             var file = fileResolver.Resolve(tuple.SourceLineNumbers, tuple.Definition, resolution.Value);
 
