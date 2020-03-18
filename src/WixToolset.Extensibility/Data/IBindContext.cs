@@ -36,7 +36,9 @@ namespace WixToolset.Extensibility.Data
 
         string OutputPath { get; set; }
 
-        string OutputPdbPath { get; set; }
+        PdbType PdbType { get; set; }
+
+        string PdbPath { get; set; }
 
         IEnumerable<string> SuppressIces { get; set; }
 
