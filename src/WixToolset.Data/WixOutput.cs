@@ -46,7 +46,11 @@ namespace WixToolset.Data
         /// <returns>Newly created <c>WixOutput</c>.</returns>
         public static WixOutput Create(string path)
         {
-            var uri = new Uri(Path.GetFullPath(path));
+            var fullPath = Path.GetFullPath(path);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+
+            var uri = new Uri(fullPath);
 
             var stream = File.Create(path);
 
