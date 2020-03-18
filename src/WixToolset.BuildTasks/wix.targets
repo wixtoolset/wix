@@ -54,8 +54,11 @@
     <OutputName Condition=" '$(OutputName)'=='' ">$(MSBuildProjectName)</OutputName>
     <AssemblyName>$(OutputName)</AssemblyName>
 
-    <!-- Default the OutputType to a known WiX Toolset type.  -->
+    <!-- Default OutputType to a known WiX Toolset type.  -->
     <OutputType Condition=" '$(OutputType)' == '' ">Package</OutputType>
+
+    <!-- Default WixPdbType to a known WiX Toolset type.  -->
+    <WixPdbType Condition=" '$(WixPdbType)' == '' ">full</WixPdbType>
   </PropertyGroup>
 
   <!--
@@ -227,6 +230,11 @@
       Code="WIX102"
       Condition=" '$(MSBuildToolsVersion)' == '' OR '$(MSBuildToolsVersion)' &lt; '4.0' "
       Text="MSBuild v$(MSBuildToolsVersion) is not supported by the project &quot;$(MSBuildProjectFile)&quot;. You must use MSBuild v4.0 or later." />
+
+    <Error
+      Code="WIX103"
+      Condition=" '$(WixPdbType)' != 'none' and '$(WixPdbType)' != 'full' and '$(WixPdbType)' != 'partial' "
+      Text="The WixPdbType property '$(WixPdbType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. Supported values are: 'full', 'none', 'partial'" />
 
   </Target>
 
@@ -636,7 +644,8 @@
 
         OutputFile="$(OutputFile)"
         OutputType="$(OutputType)"
-        PdbOutputFile="$(PdbOutputFile)"
+        PdbFile="$(PdbOutputFile)"
+        PdbType="$(WixPdbType)"
 
         AdditionalOptions="$(CompilerAdditionalOptions) $(LinkerAdditionalOptions)"
         DefineConstants="$(DefineConstants);$(SolutionDefineConstants);$(ProjectDefineConstants);$(ProjectReferenceDefineConstants)"

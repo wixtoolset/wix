@@ -22,7 +22,7 @@ namespace WixToolsetTest.BuildTasks
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-
+                var pdbPath = Path.Combine(baseFolder, @"bin\testpackage.wixpdb");
                 var engine = new FakeBuildEngine();
 
                 var task = new DoIt
@@ -43,16 +43,18 @@ namespace WixToolsetTest.BuildTasks
                     },
                     IntermediateDirectory = new TaskItem(intermediateFolder),
                     OutputFile = new TaskItem(Path.Combine(baseFolder, @"bin\test.msi")),
+                    PdbType = "Full",
+                    PdbFile = new TaskItem(pdbPath),
                 };
 
                 var result = task.Execute();
                 Assert.True(result, $"MSBuild task failed unexpectedly. Output:\r\n{engine.Output}");
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(pdbPath));
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\cab1.cab")));
 
-                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();

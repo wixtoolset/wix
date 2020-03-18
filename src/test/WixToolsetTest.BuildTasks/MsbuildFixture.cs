@@ -52,6 +52,66 @@ namespace WixToolsetTest.BuildTasks
         }
 
         [Fact]
+        public void CanBuildWithDefaultAndExplicitlyFullWixpdbs()
+        {
+            var expectedOutputs = new[]
+                {
+                    @"bin\en-US\cab1.cab",
+                    @"bin\en-US\MsiPackage.msi",
+                    @"bin\en-US\MsiPackage.wixpdb",
+                };
+
+            this.AssertWixpdb(null, expectedOutputs);
+            this.AssertWixpdb("Full", expectedOutputs);
+        }
+
+        [Fact]
+        public void CanBuildWithPartialWixpdb()
+        {
+            this.AssertWixpdb("partial", new[]
+                {
+                    @"bin\en-US\MsiPackage.wixpdb",
+                });
+        }
+
+        [Fact]
+        public void CanBuildWithNoWixpdb()
+        {
+            this.AssertWixpdb("NONE", new[]
+                {
+                    @"bin\en-US\cab1.cab",
+                    @"bin\en-US\MsiPackage.msi",
+                });
+        }
+
+        private void AssertWixpdb(string wixpdbType, string[] expectedOutputFiles)
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+
+                var result = MsbuildRunner.Execute(projectPath, new[]
+                {
+                    wixpdbType == null ? String.Empty : $"-p:WixPdbType={wixpdbType}",
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}",
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.Equal(expectedOutputFiles, paths);
+            }
+        }
+
+        [Fact]
         public void CanBuild64BitMsiPackage()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");

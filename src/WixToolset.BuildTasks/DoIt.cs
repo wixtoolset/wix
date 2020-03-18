@@ -47,7 +47,9 @@ namespace WixToolset.BuildTasks
 
         public string OutputType { get; set; }
 
-        public string PdbOutputFile { get; set; }
+        public ITaskItem PdbFile { get; set; }
+
+        public string PdbType { get; set; }
 
         public bool Pedantic { get; set; }
 
@@ -162,6 +164,8 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-platform ", this.InstallerPlatform);
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-outputType ", this.OutputType);
+            commandLineBuilder.AppendSwitchIfNotNull("-pdb ", this.PdbFile);
+            commandLineBuilder.AppendSwitchIfNotNull("-pdbType ", this.PdbType);
             commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
             commandLineBuilder.AppendArrayIfNotNull("-culture ", this.Cultures);
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
