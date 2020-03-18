@@ -45,7 +45,9 @@ namespace WixToolset.Core
 
         public string OutputPath { get; set; }
 
-        public string OutputPdbPath { get; set; }
+        public PdbType PdbType { get; set; }
+
+        public string PdbPath { get; set; }
 
         public IEnumerable<string> SuppressIces { get; set; }
 

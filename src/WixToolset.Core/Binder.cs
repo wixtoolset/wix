@@ -35,7 +35,7 @@ namespace WixToolset.Core
 
             // Bind.
             //
-            this.WriteBuildInfoTuple(context.IntermediateRepresentation, context.OutputPath, context.OutputPdbPath);
+            this.WriteBuildInfoTuple(context.IntermediateRepresentation, context.OutputPath, context.PdbPath);
 
             var bindResult = this.BackendBind(context);
 

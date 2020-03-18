@@ -45,7 +45,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.FileSystemExtensions = context.FileSystemExtensions;
             this.Intermediate = context.IntermediateRepresentation;
             this.OutputPath = context.OutputPath;
-            this.OutputPdbPath = context.OutputPdbPath;
+            this.OutputPdbPath = context.PdbPath;
+            this.PdbType = context.PdbType;
             this.IntermediateFolder = context.IntermediateFolder;
             this.SubStorages = subStorages;
             this.Validator = validator;
@@ -84,6 +85,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private Intermediate Intermediate { get; }
 
         private string OutputPath { get; }
+
+        public PdbType PdbType { get; set; }
 
         private string OutputPdbPath { get; }
 
@@ -213,11 +216,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return null;
             }
 
-            // Call extension
-            var ExtensionSaidSkip = false;
-
             WindowsInstallerData output;
-            if (ExtensionSaidSkip)
+            if (this.PdbType == PdbType.Partial)
             {
                 // Time to create the output object, since we're bypassing everything that touches files.
                 var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);

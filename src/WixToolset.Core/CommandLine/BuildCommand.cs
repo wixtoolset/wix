@@ -40,6 +40,10 @@ namespace WixToolset.Core.CommandLine
 
         private List<string> IncludeSearchPaths { get; set; }
 
+        public string PdbFile { get; set; }
+
+        public PdbType PdbType { get; set; }
+
         private Platform Platform { get; set; }
 
         private string OutputFile { get; set; }
@@ -63,6 +67,10 @@ namespace WixToolset.Core.CommandLine
             this.OutputType = this.commandLine.CalculateOutputType();
 
             this.IncludeSearchPaths = this.commandLine.IncludeSearchPaths;
+
+            this.PdbFile = this.commandLine.PdbFile;
+
+            this.PdbType = this.commandLine.PdbType;
 
             this.Platform = this.commandLine.Platform;
 
@@ -311,7 +319,8 @@ namespace WixToolset.Core.CommandLine
                     context.IntermediateFolder = intermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;
                     context.OutputPath = this.OutputFile;
-                    context.OutputPdbPath = Path.ChangeExtension(this.OutputFile, ".wixpdb");
+                    context.PdbType = this.PdbType;
+                    context.PdbPath = this.PdbType == PdbType.None ? null : this.PdbFile ?? Path.ChangeExtension(this.OutputFile, ".wixpdb");
                     context.SuppressIces = Array.Empty<string>(); // TODO: set this correctly
                     context.SuppressValidation = true; // TODO: set this correctly
 
@@ -433,6 +442,10 @@ namespace WixToolset.Core.CommandLine
 
             public Platform Platform { get; private set; }
 
+            public string PdbFile { get; private set; }
+
+            public PdbType PdbType { get; private set; }
+
             public bool ShowLogo { get; private set; }
 
             public bool ShowHelp { get; private set; }
@@ -514,9 +527,11 @@ namespace WixToolset.Core.CommandLine
                         case "contentsfile":
                             this.ContentsFile = parser.GetNextArgumentAsFilePathOrError(arg);
                             return true;
+
                         case "outputsfile":
                             this.OutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
                             return true;
+
                         case "builtoutputsfile":
                             this.BuiltOutputsFile = parser.GetNextArgumentAsFilePathOrError(arg);
                             return true;
@@ -551,6 +566,21 @@ namespace WixToolset.Core.CommandLine
                         case "outputtype":
                             this.OutputType = parser.GetNextArgumentOrError(arg);
                             return true;
+
+                        case "pdb":
+                            this.PdbFile = parser.GetNextArgumentAsFilePathOrError(arg);
+                            return true;
+
+                        case "pdbtype":
+                            {
+                                var value = parser.GetNextArgumentOrError(arg);
+                                if (Enum.TryParse(value, true, out PdbType pdbType))
+                                {
+                                    this.PdbType = pdbType;
+                                    return true;
+                                }
+                                break;
+                            }
 
                         case "nologo":
                             this.ShowLogo = false;

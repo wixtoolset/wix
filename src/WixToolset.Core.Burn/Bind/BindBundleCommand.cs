@@ -38,7 +38,7 @@ namespace WixToolset.Core.Burn
             this.IntermediateFolder = context.IntermediateFolder;
             this.Output = context.IntermediateRepresentation;
             this.OutputPath = context.OutputPath;
-            this.OutputPdbPath = context.OutputPdbPath;
+            this.OutputPdbPath = context.PdbPath;
             //this.VariableResolver = context.VariableResolver;
 
             this.BackendExtensions = backedExtensions;
