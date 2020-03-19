@@ -50,7 +50,12 @@ namespace WixToolsetTest.CoreIntegration
             Assert.False(result.UpdatedValue);
             Assert.True(result.DelayedResolve);
 
-            Assert.Throws<WixException>(() => variableResolver.ResolveVariables(null, "Welcome to !(loc.UnknownLocalizationVariable)"));
+            var withUnknownLocString = "Welcome to !(loc.UnknownLocalizationVariable)";
+            Assert.Throws<WixException>(() => variableResolver.ResolveVariables(null, withUnknownLocString));
+
+            result = variableResolver.ResolveVariables(null, withUnknownLocString, errorOnUnknown: false);
+            Assert.Equal(withUnknownLocString, result.Value);
+            Assert.False(result.UpdatedValue);
 
             result = variableResolver.ResolveVariables(null, "Welcome to !!(loc.UnknownLocalizationVariable)");
             Assert.Equal("Welcome to !(loc.UnknownLocalizationVariable)", result.Value);

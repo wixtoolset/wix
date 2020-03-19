@@ -32,6 +32,8 @@ namespace WixToolset.Core.Bind
 
         public bool SupportDelayedResolution { private get; set; }
 
+        public bool AllowUnresolvedVariables { private get; set; }
+
         public IEnumerable<DelayedField> DelayedFields { get; private set; }
 
         public void Execute()
@@ -62,7 +64,7 @@ namespace WixToolset.Core.Bind
                                 var original = field.AsString();
                                 if (!String.IsNullOrEmpty(original))
                                 {
-                                    var resolution = this.VariableResolver.ResolveVariables(tuple.SourceLineNumbers, original);
+                                    var resolution = this.VariableResolver.ResolveVariables(tuple.SourceLineNumbers, original, !this.AllowUnresolvedVariables);
                                     if (resolution.UpdatedValue)
                                     {
                                         field.Set(resolution.Value);

@@ -77,14 +77,7 @@ namespace WixToolset.Core
             return this.localizedControls.TryGetValue(key, out localizedControl);
         }
 
-        /// <summary>
-        /// Resolve the wix variables in a value.
-        /// </summary>
-        /// <param name="sourceLineNumbers">The source line information for the value.</param>
-        /// <param name="value">The value to resolve.</param>
-        /// <param name="errorOnUnknown">true if unknown variables should throw errors.</param>
-        /// <returns>The resolved value.</returns>
-        internal IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool errorOnUnknown)
+        public IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool errorOnUnknown)
         {
             var matches = Common.WixVariableRegex.Matches(value);
 

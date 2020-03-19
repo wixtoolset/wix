@@ -87,6 +87,7 @@ namespace WixToolset.Core
                 command.IntermediateFolder = context.IntermediateFolder;
                 command.Intermediate = context.IntermediateRepresentation;
                 command.SupportDelayedResolution = true;
+                command.AllowUnresolvedVariables = context.AllowUnresolvedVariables;
                 command.Execute();
 
                 delayedFields = command.DelayedFields;

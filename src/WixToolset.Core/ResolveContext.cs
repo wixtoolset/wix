@@ -33,5 +33,7 @@ namespace WixToolset.Core
         public IEnumerable<Localization> Localizations { get; set; }
 
         public IVariableResolver VariableResolver { get; set; }
+
+        public bool AllowUnresolvedVariables { get; set; }
     }
 }
