@@ -25,6 +25,15 @@ namespace WixToolset.Extensibility.Services
         IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value);
 
         /// <summary>
+        /// Resolve the wix variables in a value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">The source line information for the value.</param>
+        /// <param name="value">The value to resolve.</param>
+        /// <param name="errorOnUnknown">true if unknown variables should throw errors.</param>
+        /// <returns>The resolved value.</returns>
+        IVariableResolution ResolveVariables(SourceLineNumber sourceLineNumbers, string value, bool errorOnUnknown);
+
+        /// <summary>
         /// Try to find localization information for dialog and (optional) control.
         /// </summary>
         /// <param name="dialog">Dialog identifier.</param>

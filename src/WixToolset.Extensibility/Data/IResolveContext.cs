@@ -5,7 +5,6 @@ namespace WixToolset.Extensibility.Data
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
-    using WixToolset.Extensibility.Services;
 
     public interface IResolveContext
     {
@@ -24,5 +23,7 @@ namespace WixToolset.Extensibility.Data
         Intermediate IntermediateRepresentation { get; set; }
 
         IEnumerable<Localization> Localizations { get; set; }
+
+        bool AllowUnresolvedVariables { get; set; }
     }
 }
