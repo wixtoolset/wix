@@ -15,6 +15,60 @@ namespace WixToolsetTest.CoreIntegration
     public class WixlibFixture
     {
         [Fact]
+        public void CanBuildSimpleBundleUsingWixlib()
+        {
+            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
+            var folder = TestData.Get(@"TestData\SimpleBundle");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "MultiFileBootstrapperApplication.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"test.wixlib")
+                });
+
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "MultiFileBundle.wxs"),
+                    "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
+                    "-lib", Path.Combine(intermediateFolder, @"test.wixlib"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-burnStub", burnStubPath,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
+#if TODO
+                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+#endif
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
+                var section = intermediate.Sections.Single();
+
+                var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
+                Assert.Equal("1.0.0.0", bundleTuple.Version);
+
+                var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
+                Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
+
+                var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
+                Assert.Equal("test.msi", msiTuple.Id.Id);
+            }
+        }
+
+        [Fact]
         public void CanBuildSingleFileUsingWixlib()
         {
             var folder = TestData.Get(@"TestData\SingleFile");

@@ -9,11 +9,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Data\Example.wir" />
+    <ExtensionWxs Include="Data\example.wxs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CompileCoreTestExtensionWixlib\CompileCoreTestExtensionWixlib.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Target Name="SetExtensionWixlib">
+    <PropertyGroup>
+      <CompileWixlibExePath>$(OutputPath)..\net461\CompileCoreTestExtensionWixlib.exe</CompileWixlibExePath>
+      <WixlibPath>$(IntermediateOutputPath)Example.wixlib</WixlibPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="$(WixlibPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="BuildExtensionWixlib" AfterTargets="ResolveProjectReferences" DependsOnTargets="SetExtensionWixlib" Inputs="@(ExtensionWxs)" Outputs="$(WixlibPath)">
+    <Exec Command='$(CompileWixlibExePath) "$(IntermediateOutputPath)\" "$(WixlibPath)" "@(ExtensionWxs)"' />
+  </Target>
 </Project>

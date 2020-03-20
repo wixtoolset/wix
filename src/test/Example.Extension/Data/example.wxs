@@ -5,4 +5,7 @@
 
     <Binary Id="BinFromWir" SourceFile="example.txt" />
   </Fragment>
+  <Fragment>
+    <BootstrapperApplication Id="fakeba" SourceFile="example.txt" />
+  </Fragment>
 </Wix>

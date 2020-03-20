@@ -11,7 +11,7 @@ namespace Example.Extension
 
         public Intermediate GetLibrary(ITupleDefinitionCreator tupleDefinitions)
         {
-            return Intermediate.Load(typeof(ExampleExtensionData).Assembly, "Example.Extension.Data.Example.wir", tupleDefinitions);
+            return Intermediate.Load(typeof(ExampleExtensionData).Assembly, "Example.Extension.Example.wixlib", tupleDefinitions);
         }
 
         public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
