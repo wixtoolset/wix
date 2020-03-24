@@ -3,12 +3,12 @@
 namespace WixToolset.Data.WindowsInstaller.Rows
 {
     /// <summary>
-    /// Specialization of a row for the upgrade table.
+    /// Specialization of a row for the Property table.
     /// </summary>
     public sealed class PropertyRow : Row
     {
         /// <summary>
-        /// Creates an Upgrade row that belongs to a table.
+        /// Creates an Property row that belongs to a table.
         /// </summary>
         /// <param name="sourceLineNumbers">Original source lines for this row.</param>
         /// <param name="table">Table this Upgrade row belongs to and should get its column definitions from.</param>
@@ -18,7 +18,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         }
 
         /// <summary>
-        /// Gets and sets the upgrade code for the row.
+        /// Gets and sets the property name for the row.
         /// </summary>
         /// <value>Property identifier for the row.</value>
         public string Property
@@ -28,7 +28,7 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         }
 
         /// <summary>
-        /// Gets and sets the value for the row.
+        /// Gets and sets the property value for the row.
         /// </summary>
         /// <value>Property value for the row.</value>
         public string Value

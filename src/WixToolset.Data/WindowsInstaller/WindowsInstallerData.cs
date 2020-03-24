@@ -85,10 +85,19 @@ namespace WixToolset.Data.WindowsInstaller
         {
             using (var writer = XmlWriter.Create(wixout.CreateDataStream(WixOutputStreamName)))
             {
-                writer.WriteStartDocument();
-                this.Write(writer);
-                writer.WriteEndDocument();
+                this.Save(writer);
             }
+        }
+
+        /// <summary>
+        /// Saves an output to an <c>XmlWriter</c>.
+        /// </summary>
+        /// <param name="wixout">XmlWriter to save to.</param>
+        public void Save(XmlWriter writer)
+        {
+            writer.WriteStartDocument();
+            this.Write(writer);
+            writer.WriteEndDocument();
         }
 
         /// <summary>
