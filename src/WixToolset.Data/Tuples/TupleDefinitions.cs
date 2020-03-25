@@ -133,6 +133,7 @@ namespace WixToolset.Data
         WixBundleCatalog,
         WixBundleContainer,
         WixBundleExePackage,
+        WixBundleExtension,
         WixBundleMsiFeature,
         WixBundleMsiPackage,
         WixBundleMsiProperty,
@@ -585,6 +586,9 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixBundleContainer:
                     return TupleDefinitions.WixBundleContainer;
+
+                case TupleDefinitionType.WixBundleExtension:
+                    return TupleDefinitions.WixBundleExtension;
 
                 case TupleDefinitionType.WixBundleExePackage:
                     return TupleDefinitions.WixBundleExePackage;
