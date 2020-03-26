@@ -114,6 +114,8 @@ namespace WixToolset.Core
 
             var expectedEmbeddedFiles = filesWithEmbeddedFiles.GetExpectedEmbeddedFiles();
 
+            context.IntermediateRepresentation.UpdateLevel(IntermediateLevels.Resolved);
+
             return new ResolveResult
             {
                 Codepage = codepage.HasValue ? codepage.Value : -1,

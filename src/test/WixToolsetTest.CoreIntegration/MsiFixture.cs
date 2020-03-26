@@ -41,6 +41,12 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\MsiPackage\test.txt")));
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+
+                Assert.False(intermediate.HasLevel(WixToolset.Data.IntermediateLevels.Compiled));
+                Assert.True(intermediate.HasLevel(WixToolset.Data.IntermediateLevels.Linked));
+                Assert.True(intermediate.HasLevel(WixToolset.Data.IntermediateLevels.Resolved));
+                Assert.True(intermediate.HasLevel(WixToolset.Data.WindowsInstaller.IntermediateLevels.FullyBound));
+
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().First();
@@ -464,6 +470,50 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal(new[]{
                     "test.wixipl"
+                }, builtFiles.Select(Path.GetFileName).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanBuildWithPartialWixpdbInput()
+        {
+            var folder = TestData.Get(@"TestData\SingleFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixpdbPath = Path.Combine(baseFolder, @"partial\test.wixpdb");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    //"-o", Path.Combine(baseFolder, @"partial\test.msi"),
+                    "-pdb", wixpdbPath,
+                    "-pdbtype", "Partial",
+                }, out var messages);
+                Assert.Equal(0, result);
+
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    wixpdbPath,
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi"),
+                }, out messages);
+                Assert.Equal(0, result);
+
+                var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
+                Assert.Equal(new[]{
+                    "test.msi",
+                    "test.wixpdb",
                 }, builtFiles.Select(Path.GetFileName).ToArray());
             }
         }

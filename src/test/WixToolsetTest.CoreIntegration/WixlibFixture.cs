@@ -77,16 +77,24 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
 
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(folder, "PackageComponents.wxs"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(intermediateFolder, @"test.wixlib")
+                    "-o", wixlibPath,
                 });
 
                 result.AssertSuccess();
+
+                var wixlib = Intermediate.Load(wixlibPath);
+
+                Assert.True(wixlib.HasLevel(IntermediateLevels.Compiled));
+                Assert.True(wixlib.HasLevel(IntermediateLevels.Combined));
+                Assert.False(wixlib.HasLevel(IntermediateLevels.Linked));
+                Assert.False(wixlib.HasLevel(IntermediateLevels.Resolved));
 
                 result = WixRunner.Execute(new[]
                 {
@@ -102,6 +110,12 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+
+                Assert.False(intermediate.HasLevel(IntermediateLevels.Compiled));
+                Assert.False(intermediate.HasLevel(IntermediateLevels.Combined));
+                Assert.True(intermediate.HasLevel(IntermediateLevels.Linked));
+                Assert.True(intermediate.HasLevel(IntermediateLevels.Resolved));
+
                 var section = intermediate.Sections.Single();
 
                 var wixFile = section.Tuples.OfType<FileTuple>().First();

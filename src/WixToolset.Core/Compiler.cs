@@ -163,6 +163,8 @@ namespace WixToolset.Core
                 this.Core = null;
             }
 
+            target.UpdateLevel(IntermediateLevels.Compiled);
+
             return this.Messaging.EncounteredError ? null : target;
         }
 

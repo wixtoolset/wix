@@ -70,6 +70,12 @@ namespace WixToolset.Core
                 extension.PreLink(this.Context);
             }
 
+            var invalidIntermediates = this.Context.Intermediates.Where(i => !i.HasLevel(Data.IntermediateLevels.Compiled));
+            if (invalidIntermediates.Any())
+            {
+                this.Messaging.Write(ErrorMessages.IntermediatesMustBeCompiled(String.Join(", ", invalidIntermediates.Select(i => i.Id))));
+            }
+
             Intermediate intermediate = null;
             try
             {
@@ -564,7 +570,7 @@ namespace WixToolset.Core
                 var collate = new CollateLocalizationsCommand(this.Messaging, localizations);
                 var localizationsByCulture = collate.Execute();
 
-                intermediate = new Intermediate(resolvedSection.Id, new[] { resolvedSection }, localizationsByCulture);
+                intermediate = new Intermediate(resolvedSection.Id, Data.IntermediateLevels.Linked, new[] { resolvedSection }, localizationsByCulture);
 
 #if MOVE_TO_BACKEND
                 this.CheckOutputConsistency(output);

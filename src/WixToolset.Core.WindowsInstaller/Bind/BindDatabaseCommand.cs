@@ -100,6 +100,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IBindResult Execute()
         {
+            if (!this.Intermediate.HasLevel(Data.IntermediateLevels.Linked) && !this.Intermediate.HasLevel(Data.IntermediateLevels.Resolved))
+            {
+                this.Messaging.Write(ErrorMessages.IntermediatesMustBeResolved(this.Intermediate.Id));
+            }
+
             var section = this.Intermediate.Sections.Single();
 
             var fileTransfers = new List<IFileTransfer>();
@@ -178,15 +183,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            // Sequence all the actions.
+            if (!this.Intermediate.HasLevel(Data.WindowsInstaller.IntermediateLevels.PartiallyBound))
             {
-                var command = new SequenceActionsCommand(this.Messaging, section);
-                command.Execute();
-            }
+                // Sequence all the actions.
+                {
+                    var command = new SequenceActionsCommand(this.Messaging, section);
+                    command.Execute();
+                }
 
-            {
-                var command = new CreateSpecialPropertiesCommand(section);
-                command.Execute();
+                {
+                    var command = new CreateSpecialPropertiesCommand(section);
+                    command.Execute();
+                }
             }
 
 #if TODO_PATCHING
@@ -220,6 +228,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (this.PdbType == PdbType.Partial)
             {
                 // Time to create the output object, since we're bypassing everything that touches files.
+                this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.PartiallyBound);
+
                 var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);
                 command.Execute();
 
@@ -227,6 +237,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else
             {
+                this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
                 this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
 
                 // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).

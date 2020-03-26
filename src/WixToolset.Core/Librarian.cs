@@ -63,7 +63,9 @@ namespace WixToolset.Core
                     section.LibraryId = context.LibraryId;
                 }
 
-                library = new Intermediate(context.LibraryId, sections, localizationsByCulture);
+                library = new Intermediate(context.LibraryId, IntermediateLevels.Compiled, sections, localizationsByCulture);
+
+                library.UpdateLevel(IntermediateLevels.Combined);
 
                 this.Validate(library);
             }
