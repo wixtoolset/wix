@@ -278,6 +278,12 @@ namespace WixToolset.Core
                     case "BootstrapperApplicationRef":
                         this.ParseBootstrapperApplicationRefElement(child);
                         break;
+                    case "BundleExtension":
+                        this.ParseBundleExtensionElement(child);
+                        break;
+                    case "BundleExtensionRef":
+                        this.ParseSimpleRefElement(child, "WixBundleExtension");
+                        break;
                     case "OptionalUpdateRegistration":
                         this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
                         break;
@@ -756,6 +762,73 @@ namespace WixToolset.Core
             else
             {
                 this.Core.CreateSimpleReference(sourceLineNumbers, "WixBootstrapperApplication", id);
+            }
+        }
+
+        /// <summary>
+        /// Parse the BundleExtension element.
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseBundleExtensionElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier previousId = null;
+            var previousType = ComplexReferenceChildType.Unknown;
+
+            // The BundleExtension element acts like a Payload element so delegate to the "Payload" attribute parsing code to parse and create a Payload entry.
+            var id = this.ParsePayloadElementContent(node, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId, false);
+            if (null != id)
+            {
+                previousId = id;
+                previousType = ComplexReferenceChildType.Payload;
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "Payload":
+                            previousId = this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.Payload;
+                            break;
+                        case "PayloadGroupRef":
+                            previousId = this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, previousType, previousId);
+                            previousType = ComplexReferenceChildType.PayloadGroup;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+            if (null == previousId)
+            {
+                // We need *either* <Payload> or <PayloadGroupRef> or even just @SourceFile on the BundleExtension...
+                // but we just say there's a missing <Payload>.
+                // TODO: Is there a better message for this?
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "Payload"));
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            // Add the BundleExtension.
+            if (!this.Core.EncounteredError)
+            {
+                var tuple = new WixBundleExtensionTuple(sourceLineNumbers, id)
+                {
+                    PayloadRef = id.Id,
+                };
+                this.Core.AddTuple(tuple);
             }
         }
 

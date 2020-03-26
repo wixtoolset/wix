@@ -21,6 +21,10 @@
     <Content Include="TestData\AppSearch\FileSearch.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\NestedDirSearchUnderRegSearch.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\AppSearch\RegistrySearch.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleExtension\BundleExtension.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleExtension\SimpleBundleExtension.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithPackageGroupRef\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\BundleWithPackageGroupRef\MinimalPackageGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\DecompiledOldClassTableDef.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\OldClassTableDef.msi" CopyToOutputDirectory="PreserveNewest" />

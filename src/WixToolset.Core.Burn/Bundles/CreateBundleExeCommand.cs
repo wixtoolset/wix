@@ -125,7 +125,7 @@ namespace WixToolset.Core.Burn.Bundles
             version.FileVersion = fourPartVersion;
             version.ProductVersion = fourPartVersion;
 
-            var strings = version[1033];
+            var strings = version[1033] ?? version.Add(1033);
             strings["LegalCopyright"] = bundleInfo.Copyright;
             strings["OriginalFilename"] = Path.GetFileName(outputPath);
             strings["FileVersion"] = bundleInfo.Version;    // string versions do not have to be four parts.

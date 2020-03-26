@@ -621,6 +621,18 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteEndElement();
                 }
 
+                // Write the BundleExtension elements.
+                var bundleExtensions = this.Section.Tuples.OfType<WixBundleExtensionTuple>();
+
+                foreach (var bundleExtension in bundleExtensions)
+                {
+                    writer.WriteStartElement("BundleExtension");
+                    writer.WriteAttributeString("Id", bundleExtension.Id.Id);
+                    writer.WriteAttributeString("EntryPayloadId", bundleExtension.PayloadRef);
+
+                    writer.WriteEndElement();
+                }
+
                 writer.WriteEndDocument(); // </BurnManifest>
             }
         }

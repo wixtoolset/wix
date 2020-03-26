@@ -6121,6 +6121,12 @@ namespace WixToolset.Core
                     case "BootstrapperApplicationRef":
                         this.ParseBootstrapperApplicationRefElement(child);
                         break;
+                    case "BundleExtension":
+                        this.ParseBundleExtensionElement(child);
+                        break;
+                    case "BundleExtensionRef":
+                        this.ParseSimpleRefElement(child, "WixBundleExtension");
+                        break;
                     case "ComplianceCheck":
                         this.ParseComplianceCheckElement(child);
                         break;
