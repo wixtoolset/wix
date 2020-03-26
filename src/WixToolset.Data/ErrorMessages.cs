@@ -1469,6 +1469,11 @@ namespace WixToolset.Data
             return Message(null, Ids.MissingBundleInformation, "The Bundle is missing '{0}' data, and cannot continue.", data);
         }
 
+        public static Message MissingBundleSearch(SourceLineNumber sourceLineNumbers, string searchId)
+        {
+            return Message(sourceLineNumbers, Ids.MissingBundleSearch, "Bundle Search with id '{0}' has no corresponding implementation tuple.", searchId);
+        }
+
         public static Message MissingDependencyVersion(string packageId)
         {
             return Message(null, Ids.MissingDependencyVersion, "The provider dependency version was not authored for the package with Id '{0}'. Please author the Provides/@Version attribute for this package.", packageId);
@@ -2658,6 +2663,7 @@ namespace WixToolset.Data
             CouldNotDetermineProductCodeFromTransformSummaryInfo = 394,
             IntermediatesMustBeCompiled = 395,
             IntermediatesMustBeResolved = 396,
+            MissingBundleSearch = 397,
         }
     }
 }

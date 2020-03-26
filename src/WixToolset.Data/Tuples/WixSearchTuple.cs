@@ -12,6 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixSearchTupleFields.Variable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchTupleFields.Condition), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSearchTupleFields.BundleExtensionRef), IntermediateFieldType.String),
             },
             typeof(WixSearchTuple));
     }
@@ -23,6 +24,7 @@ namespace WixToolset.Data.Tuples
     {
         Variable,
         Condition,
+        BundleExtensionRef,
     }
 
     public class WixSearchTuple : IntermediateTuple
@@ -47,6 +49,12 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)WixSearchTupleFields.Condition];
             set => this.Set((int)WixSearchTupleFields.Condition, value);
+        }
+
+        public string BundleExtensionRef
+        {
+            get => (string)this.Fields[(int)WixSearchTupleFields.BundleExtensionRef];
+            set => this.Set((int)WixSearchTupleFields.BundleExtensionRef, value);
         }
     }
 }

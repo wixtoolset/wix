@@ -9,6 +9,7 @@ namespace WixToolset.Data.Burn
         public const string BundleLayoutOnlyPayloadsName = "BundleLayoutOnlyPayloads";
 
         public const string BootstrapperApplicationDataTupleDefinitionTag = "WixBootstrapperApplicationData";
+        public const string BundleExtensionSearchTupleDefinitionTag = "WixBundleExtensionSearch";
 
         // The following constants must stay in sync with src\burn\engine\core.h
         public const string BURN_BUNDLE_NAME = "WixBundleName";
