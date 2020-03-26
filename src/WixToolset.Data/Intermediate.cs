@@ -29,9 +29,14 @@ namespace WixToolset.Data
             this.Sections = new List<IntermediateSection>();
         }
 
-        public Intermediate(string id, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture)
+        public Intermediate(string id, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture) : this(id, level: null, sections, localizationsByCulture)
+        {
+        }
+
+        public Intermediate(string id, string level, IEnumerable<IntermediateSection> sections, IDictionary<string, Localization> localizationsByCulture)
         {
             this.Id = id;
+            this.Level = level;
             this.localizationsByCulture = (localizationsByCulture != null) ? new Dictionary<string, Localization>(localizationsByCulture, StringComparer.OrdinalIgnoreCase) : new Dictionary<string, Localization>(StringComparer.OrdinalIgnoreCase);
             this.Sections = (sections != null) ? new List<IntermediateSection>(sections) : new List<IntermediateSection>();
         }
@@ -40,6 +45,11 @@ namespace WixToolset.Data
         /// Get the id for the intermediate.
         /// </summary>
         public string Id { get; }
+
+        /// <summary>
+        /// Get the id for the intermediate.
+        /// </summary>
+        public string Level { get; private set; }
 
         /// <summary>
         /// Get the localizations contained in this intermediate.
@@ -182,6 +192,25 @@ namespace WixToolset.Data
         }
 
         /// <summary>
+        /// Updates the intermediate level to the specified level.
+        /// </summary>
+        /// <param name="level">Intermediate level.</param>
+        public void UpdateLevel(string level)
+        {
+            this.Level = String.IsNullOrEmpty(this.Level) ? level : String.Concat(this.Level, ";", level);
+        }
+
+        /// <summary>
+        /// Returns whether a specifed intermediate level has been set for this intermediate.
+        /// </summary>
+        /// <param name="level">Intermediate level.</param>
+        /// <returns>True if the specifed intermediate level has been set for this intermediate.</returns>
+        public bool HasLevel(string level)
+        {
+            return this.Level?.Contains(level) == true;
+        }
+
+        /// <summary>
         /// Saves an intermediate to a path on disk.
         /// </summary>
         /// <param name="path">Path to save intermediate file to disk.</param>
@@ -277,6 +306,7 @@ namespace WixToolset.Data
         private static Intermediate FinalizeLoad(JsonObject json, Uri baseUri, ITupleDefinitionCreator creator)
         {
             var id = json.GetValueOrDefault<string>("id");
+            var level = json.GetValueOrDefault<string>("level");
 
             var sections = new List<IntermediateSection>();
 
@@ -296,7 +326,7 @@ namespace WixToolset.Data
                 localizations.Add(localization.Culture, localization);
             }
 
-            return new Intermediate(id, sections, localizations);
+            return new Intermediate(id, level, sections, localizations);
         }
 
         private void SaveEmbedFiles(WixOutput wixout)
@@ -351,6 +381,7 @@ namespace WixToolset.Data
                 var jsonObject = new JsonObject
                 {
                     { "id", this.Id },
+                    { "level", this.Level },
                     { "version", Intermediate.CurrentVersion.ToString() }
                 };
 

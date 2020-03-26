@@ -2249,6 +2249,21 @@ namespace WixToolset.Data
             return Message(null, Ids.WixiplSourceFileIsExclusive, "When an intermediate post link source file is specified, it must be the only source file provided.");
         }
 
+        public static Message IntermediatesMustBeCompiled(string invalidIntermediates)
+        {
+            return Message(null, Ids.IntermediatesMustBeCompiled, "Intermediates being linked must have been compiled. Intermediates with these ids were not compiled: {0}", invalidIntermediates);
+        }
+
+        public static Message IntermediatesMustBeLinked(string invalidIntermediate)
+        {
+            return Message(null, Ids.IntermediatesMustBeLinked, "Intermediates being resolved must have been linked. This intermediate was not linked: {0}", invalidIntermediate);
+        }
+
+        public static Message IntermediatesMustBeResolved(string invalidIntermediate)
+        {
+            return Message(null, Ids.IntermediatesMustBeResolved, "Intermediates being bound must have been resolved. This intermediate was not resolved: {0}", invalidIntermediate);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2646,6 +2661,9 @@ namespace WixToolset.Data
             WixiplSourceFileIsExclusive = 392,
             UnableToConvertFieldToNumber = 393,
             CouldNotDetermineProductCodeFromTransformSummaryInfo = 394,
+            IntermediatesMustBeCompiled = 395,
+            IntermediatesMustBeLinked = 396,
+            IntermediatesMustBeResolved = 397,
         }
     }
 }
