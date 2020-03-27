@@ -16,14 +16,18 @@ namespace CompileCoreTestExtensionWixlib
 
             var buildArgs = new List<string>();
             buildArgs.Add("build");
-            foreach (var path in args[2].Split(';'))
-            {
-                buildArgs.Add(path);
-            }
+            buildArgs.Add("-bindfiles");
+            buildArgs.Add("-bindpath");
+            buildArgs.Add("Data");
             buildArgs.Add("-intermediateFolder");
             buildArgs.Add(intermediateFolder);
             buildArgs.Add("-o");
             buildArgs.Add(wixlibPath);
+
+            foreach (var path in args[2].Split(';'))
+            {
+                buildArgs.Add(path);
+            }
 
             var result = WixRunner.Execute(buildArgs.ToArray());
 

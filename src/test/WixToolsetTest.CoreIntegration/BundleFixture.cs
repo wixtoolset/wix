@@ -101,7 +101,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildSimpleBundleUsingExtensionBA()
         {
             var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
@@ -112,14 +112,6 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-
-                var libResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(@"C:\src\mynewwix4\Core\src\test\Example.Extension\Data", "example.wxs"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(intermediateFolder, @"test.wixlib")
-                });
 
                 var result = WixRunner.Execute(new[]
                 {

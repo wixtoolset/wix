@@ -24,7 +24,7 @@
 
   <Target Name="SetExtensionWixlib">
     <PropertyGroup>
-      <CompileWixlibExePath>$(OutputPath)..\net461\CompileCoreTestExtensionWixlib.exe</CompileWixlibExePath>
+      <CompileWixlibExePath>$(OutputPath)..\net472\CompileCoreTestExtensionWixlib.exe</CompileWixlibExePath>
       <WixlibPath>$(IntermediateOutputPath)Example.wixlib</WixlibPath>
     </PropertyGroup>
 

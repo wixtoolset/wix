@@ -122,14 +122,11 @@ namespace WixToolset.Core.Burn
             // of this in the 4.0 timeframe.
             var orderedSearches = this.OrderSearches(section);
 
-#if THIS_SHOULD_BE_DELETED_SINCE_RESOLVE_DOES_THIS_NOW
-            // Extract files that come from cabinet files (this does not extract files from merge modules).
+            // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
-                var extractEmbeddedFilesCommand = new ExtractEmbeddedFilesCommand();
-                extractEmbeddedFilesCommand.FilesWithEmbeddedFiles = ExpectedEmbeddedFiles;
-                extractEmbeddedFilesCommand.Execute();
+                var command = new ExtractEmbeddedFilesCommand(this.ExpectedEmbeddedFiles);
+                command.Execute();
             }
-#endif
 
             // Get the explicit payloads.
             var payloadTuples = section.Tuples.OfType<WixBundlePayloadTuple>().ToDictionary(t => t.Id.Id);

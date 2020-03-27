@@ -103,7 +103,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildMsiUsingExtensionLibrary()
         {
             var folder = TestData.Get(@"TestData\Wixipl");
@@ -147,7 +147,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildWixiplUsingExtensionLibrary()
         {
             var folder = TestData.Get(@"TestData\Wixipl");
