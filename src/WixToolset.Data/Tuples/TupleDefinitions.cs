@@ -185,6 +185,7 @@ namespace WixToolset.Data
         WixRelatedBundle,
         WixSearch,
         WixSearchRelation,
+        WixSetVariable,
         WixSimpleReference,
         WixSuppressAction,
         WixSuppressModularization,
@@ -736,6 +737,9 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixSearchRelation:
                     return TupleDefinitions.WixSearchRelation;
+
+                case TupleDefinitionType.WixSetVariable:
+                    return TupleDefinitions.WixSetVariable;
 
                 case TupleDefinitionType.WixSimpleReference:
                     return TupleDefinitions.WixSimpleReference;
