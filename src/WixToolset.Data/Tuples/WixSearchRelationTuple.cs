@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.WixSearchRelation,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.WixSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.ParentSearchRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchRelationTupleFields.Attributes), IntermediateFieldType.Number),
             },
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum WixSearchRelationTupleFields
     {
-        WixSearchRef,
         ParentSearchRef,
         Attributes,
     }
@@ -38,12 +36,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixSearchRelationTupleFields index] => this.Fields[(int)index];
-
-        public string WixSearchRef
-        {
-            get => (string)this.Fields[(int)WixSearchRelationTupleFields.WixSearchRef];
-            set => this.Set((int)WixSearchRelationTupleFields.WixSearchRef, value);
-        }
 
         public string ParentSearchRef
         {

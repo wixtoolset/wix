@@ -173,6 +173,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.CheckBoxValueOnlyValidWithCheckBox, "A {0} element was specified with Type='{1}' and a CheckBoxValue. Check box values can only be specified with Type='CheckBox'.", elementName, controlType);
         }
 
+        public static Message CircularSearchReference(string chain)
+        {
+            return Message(null, Ids.CircularSearchReference, "A circular reference of search ordering constraints was detected: {0}. Search ordering references must form a directed acyclic graph.", chain);
+        }
+
         public static Message CollidingModularizationTypes(string tableName, string columnName, string foreignTableName, int foreignColumnNumber, string modularizationType, string foreignModularizationType)
         {
             return Message(null, Ids.CollidingModularizationTypes, "The definition for the '{0}' table's '{1}' column is a foreign key relationship to the '{2}' table's column number {3}.  The modularization types of the two column definitions differ: one is {4} and the other is {5}.  Change one of the modularization types so that they match.", tableName, columnName, foreignTableName, foreignColumnNumber, modularizationType, foreignModularizationType);
@@ -2664,6 +2669,7 @@ namespace WixToolset.Data
             IntermediatesMustBeCompiled = 395,
             IntermediatesMustBeResolved = 396,
             MissingBundleSearch = 397,
+            CircularSearchReference = 398,
         }
     }
 }
