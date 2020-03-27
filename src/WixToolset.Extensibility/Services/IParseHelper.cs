@@ -139,6 +139,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// Creates WixComplexReference and WixGroup rows in the active section.
         /// </summary>
+        /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
         /// <param name="parentType">The parent type.</param>
         /// <param name="parentId">The parent id.</param>
@@ -151,6 +152,7 @@ namespace WixToolset.Extensibility.Services
         /// <summary>
         /// A row in the WixGroup table is added for this child node and its parent node.
         /// </summary>
+        /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
         /// <param name="parentType">Type of child's complex reference parent.</param>
         /// <param name="parentId">Id of the parenet node.</param>
@@ -160,6 +162,29 @@ namespace WixToolset.Extensibility.Services
 
         [Obsolete]
         void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
+
+        /// <summary>
+        /// Creates a row in the WixSearch table.
+        /// </summary>
+        /// <param name="section">Section to create the reference in.</param>
+        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
+        /// <param name="elementName">Name of search element.</param>
+        /// <param name="id">Identifier of the search.</param>
+        /// <param name="variable">The Burn variable to store the result into.</param>
+        /// <param name="condition">A condition to test before evaluating the search.</param>
+        /// <param name="after">The search that this one will execute after.</param>
+        /// <param name="bundleExtensionId">The id of the bundle extension that handles this search.</param>
+        void CreateWixSearchTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="section">Section to create the reference in.</param>
+        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
+        /// <param name="id">Identifier of the search (key into the WixSearch table)</param>
+        /// <param name="parentId">Identifier of the search that comes before (key into the WixSearch table)</param>
+        /// <param name="attributes">Further details about the relation between id and parentId.</param>
+        void CreateWixSearchRelationTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes);
 
         /// <summary>
         /// Checks if the string contains a property (i.e. "foo[Property]bar")
