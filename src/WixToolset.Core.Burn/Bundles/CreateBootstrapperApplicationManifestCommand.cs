@@ -57,7 +57,7 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 writer.Formatting = Formatting.Indented;
                 writer.WriteStartDocument();
-                writer.WriteStartElement("BootstrapperApplicationData", "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData");
+                writer.WriteStartElement("BootstrapperApplicationData", BurnCommon.BADataNamespace);
 
                 this.WriteBundleInfo(writer);
 
@@ -247,11 +247,11 @@ namespace WixToolset.Core.Burn.Bundles
 
         private WixBundlePayloadTuple CreateBootstrapperApplicationManifestPayloadRow(string baManifestPath)
         {
-            var generatedId = Common.GenerateIdentifier("ux", "BootstrapperApplicationData.xml");
+            var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BADataFileName);
 
             var tuple = new WixBundlePayloadTuple(this.BundleTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
             {
-                Name = "BootstrapperApplicationData.xml",
+                Name = BurnCommon.BADataFileName,
                 SourceFile = new IntermediateFieldPathValue { Path = baManifestPath },
                 Compressed = true,
                 UnresolvedSourceFile = baManifestPath,

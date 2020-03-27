@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ex="http://www.example.com/scheams/v1/wxs">
+    <Fragment>
+        <ex:ExampleSearch Id="ExampleSearchBar" Variable="SearchBar" Condition="WixBundleInstalled" SearchFor="Bar" />
+        <ex:ExampleSearch Id="ExampleSearchFoo" Variable="SearchFoo" SearchFor="Foo" />
+    </Fragment>
+</Wix>

@@ -7,15 +7,13 @@ namespace WixToolset.Core.Burn
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
 
-    internal class SearchFacade
+    internal class LegacySearchFacade : BaseSearchFacade
     {
-        public SearchFacade(WixSearchTuple searchTuple, IntermediateTuple searchSpecificTuple)
+        public LegacySearchFacade(WixSearchTuple searchTuple, IntermediateTuple searchSpecificTuple)
         {
             this.SearchTuple = searchTuple;
             this.SearchSpecificTuple = searchSpecificTuple;
         }
-
-        public WixSearchTuple SearchTuple { get; }
 
         public IntermediateTuple SearchSpecificTuple { get; }
 
@@ -23,32 +21,22 @@ namespace WixToolset.Core.Burn
         /// Generates Burn manifest and ParameterInfo-style markup a search.
         /// </summary>
         /// <param name="writer"></param>
-        public void WriteXml(XmlTextWriter writer)
+        public override void WriteXml(XmlTextWriter writer)
         {
             switch (this.SearchSpecificTuple)
             {
-            case WixComponentSearchTuple tuple:
-                this.WriteComponentSearchXml(writer, tuple);
-                break;
-            case WixFileSearchTuple tuple:
-                this.WriteFileSearchXml(writer, tuple);
-                break;
-            case WixProductSearchTuple tuple:
-                this.WriteProductSearchXml(writer, tuple);
-                break;
-            case WixRegistrySearchTuple tuple:
-                this.WriteRegistrySearchXml(writer, tuple);
-                break;
-            }
-        }
-
-        private void WriteCommonAttributes(XmlTextWriter writer)
-        {
-            writer.WriteAttributeString("Id", this.SearchTuple.Id.Id);
-            writer.WriteAttributeString("Variable", this.SearchTuple.Variable);
-            if (!String.IsNullOrEmpty(this.SearchTuple.Condition))
-            {
-                writer.WriteAttributeString("Condition", this.SearchTuple.Condition);
+                case WixComponentSearchTuple tuple:
+                    this.WriteComponentSearchXml(writer, tuple);
+                    break;
+                case WixFileSearchTuple tuple:
+                    this.WriteFileSearchXml(writer, tuple);
+                    break;
+                case WixProductSearchTuple tuple:
+                    this.WriteProductSearchXml(writer, tuple);
+                    break;
+                case WixRegistrySearchTuple tuple:
+                    this.WriteRegistrySearchXml(writer, tuple);
+                    break;
             }
         }
 
@@ -56,7 +44,7 @@ namespace WixToolset.Core.Burn
         {
             writer.WriteStartElement("MsiComponentSearch");
 
-            this.WriteCommonAttributes(writer);
+            base.WriteXml(writer);
 
             writer.WriteAttributeString("ComponentId", searchTuple.Guid);
 
@@ -85,7 +73,7 @@ namespace WixToolset.Core.Burn
         {
             writer.WriteStartElement((0 == (searchTuple.Attributes & WixFileSearchAttributes.IsDirectory)) ? "FileSearch" : "DirectorySearch");
 
-            this.WriteCommonAttributes(writer);
+            base.WriteXml(writer);
 
             writer.WriteAttributeString("Path", searchTuple.Path);
             if (WixFileSearchAttributes.WantExists == (searchTuple.Attributes & WixFileSearchAttributes.WantExists))
@@ -108,7 +96,7 @@ namespace WixToolset.Core.Burn
         {
             writer.WriteStartElement("MsiProductSearch");
 
-            this.WriteCommonAttributes(writer);
+            base.WriteXml(writer);
 
             if (0 != (tuple.Attributes & WixProductSearchAttributes.UpgradeCode))
             {
@@ -143,22 +131,22 @@ namespace WixToolset.Core.Burn
         {
             writer.WriteStartElement("RegistrySearch");
 
-            this.WriteCommonAttributes(writer);
+            base.WriteXml(writer);
 
             switch (tuple.Root)
             {
-            case RegistryRootType.ClassesRoot:
-                writer.WriteAttributeString("Root", "HKCR");
-                break;
-            case RegistryRootType.CurrentUser:
-                writer.WriteAttributeString("Root", "HKCU");
-                break;
-            case RegistryRootType.LocalMachine:
-                writer.WriteAttributeString("Root", "HKLM");
-                break;
-            case RegistryRootType.Users:
-                writer.WriteAttributeString("Root", "HKU");
-                break;
+                case RegistryRootType.ClassesRoot:
+                    writer.WriteAttributeString("Root", "HKCR");
+                    break;
+                case RegistryRootType.CurrentUser:
+                    writer.WriteAttributeString("Root", "HKCU");
+                    break;
+                case RegistryRootType.LocalMachine:
+                    writer.WriteAttributeString("Root", "HKLM");
+                    break;
+                case RegistryRootType.Users:
+                    writer.WriteAttributeString("Root", "HKU");
+                    break;
             }
 
             writer.WriteAttributeString("Key", tuple.Key);

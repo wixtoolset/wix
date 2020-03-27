@@ -18,7 +18,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<WixBundleContainerTuple> containers, WixChainTuple chainTuple, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundaryTuple> boundaries, IEnumerable<WixBundlePayloadTuple> uxPayloads, Dictionary<string, WixBundlePayloadTuple> allPayloadsById, IEnumerable<SearchFacade> orderedSearches, IEnumerable<WixBundleCatalogTuple> catalogs, string intermediateFolder)
+        public CreateBurnManifestCommand(IMessaging messaging, IEnumerable<IBurnBackendExtension> backendExtensions, string executableName, IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<WixBundleContainerTuple> containers, WixChainTuple chainTuple, IEnumerable<PackageFacade> orderedPackages, IEnumerable<WixBundleRollbackBoundaryTuple> boundaries, IEnumerable<WixBundlePayloadTuple> uxPayloads, Dictionary<string, WixBundlePayloadTuple> allPayloadsById, IEnumerable<ISearchFacade> orderedSearches, IEnumerable<WixBundleCatalogTuple> catalogs, string intermediateFolder)
         {
             this.Messaging = messaging;
             this.BackendExtensions = backendExtensions;
@@ -54,7 +54,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IEnumerable<PackageFacade> OrderedPackages { get; }
 
-        private IEnumerable<SearchFacade> OrderedSearches { get; }
+        private IEnumerable<ISearchFacade> OrderedSearches { get; }
 
         private Dictionary<string, WixBundlePayloadTuple> Payloads { get; }
 

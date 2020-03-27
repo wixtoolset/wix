@@ -1026,6 +1026,11 @@ namespace WixToolset.Core
             return this.parseHelper.CreateDirectoryTuple(this.ActiveSection, sourceLineNumbers, id, parentId, name, this.activeSectionInlinedDirectoryIds, shortName, sourceName, shortSourceName);
         }
 
+        public void CreateWixSearchTuple(SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after)
+        {
+            this.parseHelper.CreateWixSearchTuple(this.ActiveSection, sourceLineNumbers, elementName, id, variable, condition, after, null);
+        }
+
         /// <summary>
         /// Gets the attribute value as inline directory syntax.
         /// </summary>

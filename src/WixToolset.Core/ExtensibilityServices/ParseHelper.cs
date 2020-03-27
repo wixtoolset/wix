@@ -260,6 +260,43 @@ namespace WixToolset.Core.ExtensibilityServices
             section.Tuples.Add(tuple);
         }
 
+        public void CreateWixSearchTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId)
+        {
+            // TODO: verify variable is not a standard bundle variable
+            if (variable == null)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, elementName, "Variable"));
+            }
+
+            section.Tuples.Add(new WixSearchTuple(sourceLineNumbers, id)
+            {
+                Variable = variable,
+                Condition = condition,
+                BundleExtensionRef = bundleExtensionId,
+            });
+
+            if (after != null)
+            {
+                this.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
+                // TODO: We're currently defaulting to "always run after", which we will need to change...
+                this.CreateWixSearchRelationTuple(section, sourceLineNumbers, id, after, 2);
+            }
+
+            if (!String.IsNullOrEmpty(bundleExtensionId))
+            {
+                this.CreateSimpleReference(section, sourceLineNumbers, "WixBundleExtension", bundleExtensionId);
+            }
+        }
+
+        public void CreateWixSearchRelationTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
+        {
+            section.Tuples.Add(new WixSearchRelationTuple(sourceLineNumbers, id)
+            {
+                ParentSearchRef = parentId,
+                Attributes = attributes,
+            });
+        }
+
         [Obsolete]
         public IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
         {

@@ -117,10 +117,10 @@ namespace WixToolset.Core.Burn
             // If there are any fields to resolve later, create the cache to populate during bind.
             var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
 
-            // TODO: Although the WixSearch tables are defined in the Util extension,
-            // the Bundle Binder has to know all about them. We hope to revisit all
-            // of this in the 4.0 timeframe.
-            var orderedSearches = this.OrderSearches(section);
+            var orderSearchesCommand = new OrderSearchesCommand(this.Messaging, section);
+            orderSearchesCommand.Execute();
+            var orderedSearches = orderSearchesCommand.OrderedSearchFacades;
+            var extensionSearchTuplesById = orderSearchesCommand.ExtensionSearchTuplesByExtensionId;
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
@@ -387,6 +387,17 @@ namespace WixToolset.Core.Burn
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;
                 payloadTuples.Add(baManifestPayload.Id.Id, baManifestPayload);
+                ++uxPayloadIndex;
+            }
+
+            // Generate the bundle extension manifest...
+            {
+                var command = new CreateBundleExtensionManifestCommand(section, bundleTuple, extensionSearchTuplesById, uxPayloadIndex, this.IntermediateFolder);
+                command.Execute();
+
+                var bextManifestPayload = command.BundleExtensionManifestPayloadRow;
+                payloadTuples.Add(bextManifestPayload.Id.Id, bextManifestPayload);
+                ++uxPayloadIndex;
             }
 
 #if TODO
@@ -462,28 +473,6 @@ namespace WixToolset.Core.Burn
             var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
             intermediate.Save(trackIntermediate.Path);
             trackedFiles.Add(trackIntermediate);
-        }
-
-        private IEnumerable<SearchFacade> OrderSearches(IntermediateSection section)
-        {
-            var searchesById = section.Tuples
-                .Where(t => t.Definition.Type == TupleDefinitionType.WixComponentSearch ||
-                       t.Definition.Type == TupleDefinitionType.WixFileSearch ||
-                       t.Definition.Type == TupleDefinitionType.WixProductSearch ||
-                       t.Definition.Type == TupleDefinitionType.WixRegistrySearch)
-                .ToDictionary(t => t.Id.Id);
-
-            var orderedSearches = new List<SearchFacade>(searchesById.Keys.Count);
-
-            foreach (var searchTuple in section.Tuples.OfType<WixSearchTuple>())
-            {
-                if (searchesById.TryGetValue(searchTuple.Id.Id, out var specificSearchTuple))
-                {
-                    orderedSearches.Add(new SearchFacade(searchTuple, specificSearchTuple));
-                }
-            }
-
-            return orderedSearches;
         }
 
         /// <summary>

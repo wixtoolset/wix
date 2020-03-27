@@ -8,4 +8,7 @@
   <Fragment>
     <BootstrapperApplication Id="fakeba" SourceFile="example.txt" />
   </Fragment>
+  <Fragment>
+    <BundleExtension Id="ExampleBundleExtension" SourceFile="example.txt" />
+  </Fragment>
 </Wix>

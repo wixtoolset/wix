@@ -22,6 +22,12 @@ namespace WixToolset.Core.Burn.Bundles
         public const string BurnUXContainerPayloadIdFormat = "p{0}";
         public const string BurnAttachedContainerEmbeddedIdFormat = "a{0}";
 
+        public const string BADataFileName = "BootstrapperApplicationData.xml";
+        public const string BADataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
+
+        public const string BundleExtensionDataFileName = "BundleExtensionData.xml";
+        public const string BundleExtensionDataNamespace = "http://wixtoolset.org/schemas/v4/BundleExtensionData";
+
         // See WinNT.h for details about the PE format, including the
         // structure and offsets for IMAGE_DOS_HEADER, IMAGE_NT_HEADERS32,
         // IMAGE_FILE_HEADER, etc.
@@ -167,7 +173,7 @@ namespace WixToolset.Core.Burn.Bundles
         /// <returns>True if initialized.</returns>
         protected bool Initialize(BinaryReader reader)
         {
-            if (!GetWixburnSectionInfo(reader))
+            if (!this.GetWixburnSectionInfo(reader))
             {
                 return false;
             }
