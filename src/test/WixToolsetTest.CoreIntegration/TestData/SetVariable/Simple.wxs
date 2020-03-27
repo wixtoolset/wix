@@ -9,7 +9,7 @@
         <SetVariable Id="SetCoercedString" Variable="CoercedString" Value="Bar" />
         <SetVariable Id="SetCoercedVersion" Variable="CoercedVersion" Value="v2.0" />
         <SetVariable Id="SetNeedsFormatting" Variable="NeedsFormatting" Value="[One] [Two] [Three]" />
+        <SetVariable Id="SetUnset" Variable="Unset" Condition="VersionString = v2.0" After="SetVersionString" />
         <SetVariable Id="SetVersionString" Variable="VersionString" Value="v1.0" Type="string" />
-        <SetVariable Id="SetUnset" Variable="Unset" Condition="VersionString = v2.0" />
     </Fragment>
 </Wix>
