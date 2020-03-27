@@ -36,19 +36,26 @@ namespace WixToolset.Core.Burn.Bundles
                        t.Definition.Type == TupleDefinitionType.WixProductSearch ||
                        t.Definition.Type == TupleDefinitionType.WixRegistrySearch)
                 .ToDictionary(t => t.Id.Id);
+            var setVariablesById = this.Section.Tuples
+                .OfType<WixSetVariableTuple>()
+                .ToDictionary(t => t.Id.Id);
             var extensionSearchesById = this.Section.Tuples
                 .Where(t => t.Definition.HasTag(BurnConstants.BundleExtensionSearchTupleDefinitionTag))
                 .ToDictionary(t => t.Id.Id);
             var searchTuples = this.Section.Tuples.OfType<WixSearchTuple>().ToList();
 
             this.ExtensionSearchTuplesByExtensionId = new Dictionary<string, IList<IntermediateTuple>>();
-            this.OrderedSearchFacades = new List<ISearchFacade>(legacySearchesById.Keys.Count + extensionSearchesById.Keys.Count);
+            this.OrderedSearchFacades = new List<ISearchFacade>(legacySearchesById.Keys.Count + setVariablesById.Keys.Count + extensionSearchesById.Keys.Count);
 
             foreach (var searchTuple in searchTuples)
             {
                 if (legacySearchesById.TryGetValue(searchTuple.Id.Id, out var specificSearchTuple))
                 {
                     this.OrderedSearchFacades.Add(new LegacySearchFacade(searchTuple, specificSearchTuple));
+                }
+                else if (setVariablesById.TryGetValue(searchTuple.Id.Id, out var setVariableTuple))
+                {
+                    this.OrderedSearchFacades.Add(new SetVariableSearchFacade(searchTuple, setVariableTuple));
                 }
                 else if (extensionSearchesById.TryGetValue(searchTuple.Id.Id, out var extensionSearchTuple))
                 {

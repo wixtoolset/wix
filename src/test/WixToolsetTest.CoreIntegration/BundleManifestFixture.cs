@@ -113,5 +113,49 @@ namespace WixToolsetTest.CoreIntegration
                     "</BundleExtension>", bundleExtensionDatas[0].GetTestXml());
             }
         }
+
+        [Fact]
+        public void PopulatesManifestWithSetVariables()
+        {
+            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SetVariable", "Simple.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-burnStub", burnStubPath,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var setVariables = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:SetVariable");
+                Assert.Equal(6, setVariables.Count);
+                Assert.Equal("<SetVariable Id='SetCoercedNumber' Variable='CoercedNumber' Value='2' Type='numeric' />", setVariables[0].GetTestXml());
+                Assert.Equal("<SetVariable Id='SetCoercedString' Variable='CoercedString' Value='Bar' Type='string' />", setVariables[1].GetTestXml());
+                Assert.Equal("<SetVariable Id='SetCoercedVersion' Variable='CoercedVersion' Value='v2.0' Type='version' />", setVariables[2].GetTestXml());
+                Assert.Equal("<SetVariable Id='SetNeedsFormatting' Variable='NeedsFormatting' Value='[One] [Two] [Three]' Type='string' />", setVariables[3].GetTestXml());
+                Assert.Equal("<SetVariable Id='SetVersionString' Variable='VersionString' Value='v1.0' Type='string' />", setVariables[4].GetTestXml());
+                Assert.Equal("<SetVariable Id='SetUnset' Variable='Unset' Condition='VersionString = v2.0' />", setVariables[5].GetTestXml());
+            }
+        }
     }
 }

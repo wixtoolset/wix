@@ -323,6 +323,12 @@ namespace WixToolset.Core
                     case "RelatedBundle":
                         this.ParseRelatedBundleElement(child);
                         break;
+                    case "SetVariable":
+                        this.ParseSetVariableElement(child);
+                        break;
+                    case "SetVariableRef":
+                        this.ParseSimpleRefElement(child, "WixSetVariable");
+                        break;
                     case "Update":
                         this.ParseUpdateElement(child);
                         break;
@@ -2705,6 +2711,78 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Parse SetVariable element
+        /// </summary>
+        /// <param name="node">Element to parse</param>
+        private void ParseSetVariableElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
+            string variable = null;
+            string condition = null;
+            string after = null;
+            string value = null;
+            string type = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Variable":
+                            variable = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "After":
+                            after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Type":
+                            type = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib, null);
+                }
+            }
+
+            type = this.ValidateVariableTypeWithValue(sourceLineNumbers, type, value);
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (id == null)
+            {
+                id = this.Core.CreateIdentifier("sbv", variable, condition, after, value, type);
+            }
+
+            this.Core.CreateWixSearchTuple(sourceLineNumbers, node.Name.LocalName, id, variable, condition, after);
+
+            if (!this.Messaging.EncounteredError)
+            {
+                var tuple = new WixSetVariableTuple(sourceLineNumbers, id)
+                {
+                    Value = value,
+                    Type = type,
+                };
+                this.Core.AddTuple(tuple);
+            }
+        }
+
+        /// <summary>
         /// Parse Variable element
         /// </summary>
         /// <param name="node">Element to parse</param>
@@ -2764,49 +2842,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ReservedNamespaceViolation(sourceLineNumbers, node.Name.LocalName, "Name", "Wix"));
             }
 
-            if (null == type && null != value)
-            {
-                // Infer the type from the current value... 
-                if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Version constructor does not support simple "v#" syntax so check to see if the value is
-                    // non-negative real quick.
-                    if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var number))
-                    {
-                        type = "version";
-                    }
-                    else
-                    {
-                        // Sadly, Version doesn't have a TryParse() method until .NET 4, so we have to try/catch to see if it parses.
-                        try
-                        {
-                            var version = new Version(value.Substring(1));
-                            type = "version";
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
-
-                // Not a version, check for numeric.
-                if (null == type)
-                {
-                    if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var number))
-                    {
-                        type = "numeric";
-                    }
-                    else
-                    {
-                        type = "string";
-                    }
-                }
-            }
-
-            if (null == value && null != type)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
-            }
+            type = this.ValidateVariableTypeWithValue(sourceLineNumbers, type, value);
 
             this.Core.ParseForExtensionElements(node);
 
@@ -2822,6 +2858,48 @@ namespace WixToolset.Core
 
                 this.Core.AddTuple(tuple);
             }
+        }
+
+        private string ValidateVariableTypeWithValue(SourceLineNumber sourceLineNumbers, string type, string value)
+        {
+            var newType = type;
+            if (newType == null && value != null)
+            {
+                // Infer the type from the current value... 
+                if (value.StartsWith("v", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Version constructor does not support simple "v#" syntax so check to see if the value is
+                    // non-negative real quick.
+                    if (Int32.TryParse(value.Substring(1), NumberStyles.None, CultureInfo.InvariantCulture.NumberFormat, out var _))
+                    {
+                        newType = "version";
+                    }
+                    else if (Version.TryParse(value.Substring(1), out var _))
+                    {
+                        newType = "version";
+                    }
+                }
+
+                // Not a version, check for numeric.
+                if (newType == null)
+                {
+                    if (Int64.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture.NumberFormat, out var _))
+                    {
+                        newType = "numeric";
+                    }
+                    else
+                    {
+                        newType = "string";
+                    }
+                }
+            }
+
+            if (value == null && newType != null)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, "Variable", "Value", "Type"));
+            }
+
+            return newType;
         }
 
         private class RemotePayload

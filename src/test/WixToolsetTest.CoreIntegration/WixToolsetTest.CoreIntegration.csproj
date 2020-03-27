@@ -112,6 +112,7 @@
     <Content Include="TestData\SetProperty\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SetProperty\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SetProperty\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SetVariable\Simple.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\data\test.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\Bundle.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />

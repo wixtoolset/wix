@@ -6221,6 +6221,12 @@ namespace WixToolset.Core
                     case "SetProperty":
                         this.ParseSetPropertyElement(child);
                         break;
+                    case "SetVariable":
+                        this.ParseSetVariableElement(child);
+                        break;
+                    case "SetVariableRef":
+                        this.ParseSimpleRefElement(child, "WixSetVariable");
+                        break;
                     case "SFPCatalog":
                         string parentName = null;
                         this.ParseSFPCatalogElement(child, ref parentName);
