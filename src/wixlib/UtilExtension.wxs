@@ -418,4 +418,8 @@
         <PropertyRef Id="WixSilentExec64CmdLine" />
         <CustomAction Id="$(var.Prefix)SilentExec64$(var.Suffix)" BinaryKey="$(var.Prefix)UtilCA$(var.Suffix)" DllEntry="WixSilentExec64" Execute="immediate" Return="check" Impersonate="yes" />
     </Fragment>
+
+    <Fragment>
+        <BundleExtension Id="WixUtilBundleExtension" SourceFile="utilbe.dll" Name="WixUtilBundleExtension\utilbe.dll" />
+    </Fragment>
 </Wix>

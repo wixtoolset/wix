@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 15.0.26124.0
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilbe", "src\be\utilbe.vcxproj", "{630C1EE7-2517-4A8C-83E3-DA1150308B58}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilca", "src\ca\utilca.vcxproj", "{076018F7-19BD-423A-ABBF-229273DA08D8}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "util", "src\wixlib\util.wixproj", "{1ACFFEFD-505A-41A5-ACBF-A02B7B473AA2}"
@@ -21,6 +23,15 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Debug|Any CPU.Build.0 = Debug|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Debug|x64.ActiveCfg = Debug|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Debug|x86.ActiveCfg = Debug|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Debug|x86.Build.0 = Debug|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Release|Any CPU.ActiveCfg = Release|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Release|x64.ActiveCfg = Release|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Release|x86.ActiveCfg = Release|Win32
+		{630C1EE7-2517-4A8C-83E3-DA1150308B58}.Release|x86.Build.0 = Release|Win32
 		{076018F7-19BD-423A-ABBF-229273DA08D8}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{076018F7-19BD-423A-ABBF-229273DA08D8}.Debug|Any CPU.Build.0 = Debug|Win32
 		{076018F7-19BD-423A-ABBF-229273DA08D8}.Debug|x64.ActiveCfg = Debug|Win32
