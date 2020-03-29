@@ -103,7 +103,7 @@ extern "C" HRESULT UserExperienceLoad(
 
     // Load BA DLL.
     pUserExperience->hUXModule = ::LoadLibraryExW(pUserExperience->payloads.rgPayloads[0].sczLocalFilePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    ExitOnNullWithLastError(pUserExperience->hUXModule, hr, "Failed to load UX DLL.");
+    ExitOnNullWithLastError(pUserExperience->hUXModule, hr, "Failed to load BA DLL.");
 
     // Get BootstrapperApplicationCreate entry-point.
     PFN_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = (PFN_BOOTSTRAPPER_APPLICATION_CREATE)::GetProcAddress(pUserExperience->hUXModule, "BootstrapperApplicationCreate");

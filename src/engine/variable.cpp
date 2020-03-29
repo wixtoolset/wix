@@ -309,7 +309,7 @@ extern "C" HRESULT VariablesParseFromXml(
     hr = pixnNodes->get_length((long*)&cNodes);
     ExitOnFailure(hr, "Failed to get variable node count.");
 
-    // parse package elements
+    // parse variable elements
     for (DWORD i = 0; i < cNodes; ++i)
     {
         hr = XmlNextElement(pixnNodes, &pixnNode, NULL);

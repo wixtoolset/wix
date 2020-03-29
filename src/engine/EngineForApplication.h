@@ -24,11 +24,11 @@ enum WM_BURN
 
 // structs
 
-struct BOOTSTRAPPER_ENGINE_CONTEXT
+typedef struct _BOOTSTRAPPER_ENGINE_CONTEXT
 {
     BURN_ENGINE_STATE* pEngineState;
     DWORD dwThreadId;
-};
+} BOOTSTRAPPER_ENGINE_CONTEXT;
 
 // function declarations
 

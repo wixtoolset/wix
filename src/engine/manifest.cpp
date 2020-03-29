@@ -116,6 +116,10 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
     hr = ApprovedExesParseFromXml(&pEngineState->approvedExes, pixeBundle);
     ExitOnFailure(hr, "Failed to parse approved exes.");
 
+    // parse extensions
+    hr = BurnExtensionParseFromXml(&pEngineState->extensions, &pEngineState->userExperience.payloads, pixeBundle);
+    ExitOnFailure(hr, "Failed to parse extensions.");
+
 LExit:
     ReleaseObject(pixnChain);
     ReleaseObject(pixnLog);

@@ -61,6 +61,8 @@
 
 #include "BootstrapperEngine.h"
 #include "BootstrapperApplication.h"
+#include "BundleExtensionEngine.h"
+#include "BundleExtension.h"
 
 #include "platform.h"
 #include "variant.h"
@@ -73,6 +75,7 @@
 #include "catalog.h"
 #include "payload.h"
 #include "cabextract.h"
+#include "burnextension.h"
 #include "userexperience.h"
 #include "package.h"
 #include "update.h"
@@ -100,4 +103,5 @@
 #include "netfxchainer.h"
 
 #include "EngineForApplication.h"
+#include "EngineForExtension.h"
 #include "engine.messages.h"

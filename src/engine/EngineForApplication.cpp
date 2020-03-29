@@ -593,7 +593,7 @@ static HRESULT BAEngineSetVariableString(
     if (wzVariable && *wzVariable)
     {
         hr = VariableSetString(&pContext->pEngineState->variables, wzVariable, wzValue, FALSE);
-        ExitOnFailure(hr, "Failed to set numeric variable.");
+        ExitOnFailure(hr, "Failed to set string variable.");
     }
     else
     {

@@ -103,6 +103,7 @@ typedef struct _BURN_ENGINE_STATE
     BURN_PACKAGES packages;
     BURN_UPDATE update;
     BURN_APPROVED_EXES approvedExes;
+    BURN_EXTENSIONS extensions;
 
     HWND hMessageWindow;
     HANDLE hMessageWindowThread;

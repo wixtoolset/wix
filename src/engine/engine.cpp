@@ -352,6 +352,8 @@ static void UninitializeEngineState(
 
     ReleaseHandle(pEngineState->hMessageWindowThread);
 
+    BurnExtensionUninitialize(&pEngineState->extensions);
+
     ::DeleteCriticalSection(&pEngineState->userExperience.csEngineActive);
     UserExperienceUninitialize(&pEngineState->userExperience);
 
@@ -493,6 +495,7 @@ static HRESULT RunNormal(
     HANDLE hPipesCreatedEvent = NULL;
     BOOL fContinueExecution = TRUE;
     BOOL fReloadApp = FALSE;
+    BURN_EXTENSION_ENGINE_CONTEXT extensionEngineContext = { };
 
     // Initialize logging.
     hr = LoggingOpen(&pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->registration.sczDisplayName);
@@ -537,6 +540,13 @@ static HRESULT RunNormal(
         ExitOnFailure(hr, "Failed to set layout directory variable to value provided from command-line.");
     }
 
+    // Setup the extension engine.
+    extensionEngineContext.pEngineState = pEngineState;
+
+    // Load the extensions.
+    hr = BurnExtensionLoad(&pEngineState->extensions, &extensionEngineContext);
+    ExitOnFailure(hr, "Failed to load BundleExtensions.");
+
     do
     {
         fReloadApp = FALSE;
@@ -546,6 +556,8 @@ static HRESULT RunNormal(
     } while (fReloadApp);
 
 LExit:
+    BurnExtensionUnload(&pEngineState->extensions);
+
     // If the message window is still around, close it.
     UiCloseMessageWindow(pEngineState);
 
