@@ -104,6 +104,7 @@ EXTERN_C HRESULT BurnExtensionLoad(
     )
 {
     HRESULT hr = S_OK;
+    LPWSTR sczBundleExtensionDataPath = NULL;
     BUNDLE_EXTENSION_CREATE_ARGS args = { };
     BUNDLE_EXTENSION_CREATE_RESULTS results = { };
 
@@ -111,6 +112,9 @@ EXTERN_C HRESULT BurnExtensionLoad(
     {
         ExitFunction();
     }
+
+    hr = PathConcat(pEngineContext->pEngineState->userExperience.sczTempDirectory, L"BundleExtensionData.xml", &sczBundleExtensionDataPath);
+    ExitOnFailure(hr, "Failed to get BundleExtensionDataPath.");
 
     for (DWORD i = 0; i < pBurnExtensions->cExtensions; ++i)
     {
@@ -123,6 +127,8 @@ EXTERN_C HRESULT BurnExtensionLoad(
         args.pfnBundleExtensionEngineProc = EngineForExtensionProc;
         args.pvBundleExtensionEngineProcContext = pEngineContext;
         args.qwEngineAPIVersion = MAKEQWORDVERSION(0, 0, 0, 1); // TODO: need to decide whether to keep this, and if so when to update it.
+        args.wzBootstrapperWorkingFolder = pEngineContext->pEngineState->userExperience.sczTempDirectory;
+        args.wzBundleExtensionDataPath = sczBundleExtensionDataPath;
 
         results.cbSize = sizeof(BUNDLE_EXTENSION_CREATE_RESULTS);
 
@@ -143,6 +149,8 @@ EXTERN_C HRESULT BurnExtensionLoad(
     }
 
 LExit:
+    ReleaseStr(sczBundleExtensionDataPath);
+
     return hr;
 }
 

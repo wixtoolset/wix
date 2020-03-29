@@ -368,6 +368,8 @@ static void UninitializeEngineState(
     SectionUninitialize(&pEngineState->section);
     ContainersUninitialize(&pEngineState->containers);
 
+    ReleaseStr(pEngineState->command.wzBootstrapperApplicationDataPath);
+    ReleaseStr(pEngineState->command.wzBootstrapperWorkingFolder);
     ReleaseStr(pEngineState->command.wzLayoutDirectory);
     ReleaseStr(pEngineState->command.wzCommandLine);
 
