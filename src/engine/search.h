@@ -18,6 +18,7 @@ enum BURN_SEARCH_TYPE
     BURN_SEARCH_TYPE_MSI_COMPONENT,
     BURN_SEARCH_TYPE_MSI_PRODUCT,
     BURN_SEARCH_TYPE_MSI_FEATURE,
+    BURN_SEARCH_TYPE_EXTENSION,
 };
 
 enum BURN_DIRECTORY_SEARCH_TYPE
@@ -122,6 +123,10 @@ typedef struct _BURN_SEARCH
             LPWSTR sczProductCode;
             LPWSTR sczFeatureId;
         } MsiFeatureSearch;
+        struct
+        {
+            BURN_EXTENSION* pExtension;
+        } ExtensionSearch;
     };
 } BURN_SEARCH;
 
@@ -136,6 +141,7 @@ typedef struct _BURN_SEARCHES
 
 HRESULT SearchesParseFromXml(
     __in BURN_SEARCHES* pSearches,
+    __in BURN_EXTENSIONS* pBurnExtensions,
     __in IXMLDOMNode* pixnBundle
     );
 HRESULT SearchesExecute(

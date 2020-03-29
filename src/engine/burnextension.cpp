@@ -182,3 +182,52 @@ EXTERN_C void BurnExtensionUnload(
         }
     }
 }
+
+EXTERN_C HRESULT BurnExtensionFindById(
+    __in BURN_EXTENSIONS* pBurnExtensions,
+    __in_z LPCWSTR wzId,
+    __out BURN_EXTENSION** ppExtension
+    )
+{
+    HRESULT hr = S_OK;
+    BURN_EXTENSION* pExtension = NULL;
+
+    for (DWORD i = 0; i < pBurnExtensions->cExtensions; ++i)
+    {
+        pExtension = &pBurnExtensions->rgExtensions[i];
+
+        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pExtension->sczId, -1, wzId, -1))
+        {
+            *ppExtension = pExtension;
+            ExitFunction1(hr = S_OK);
+        }
+    }
+
+    hr = E_NOTFOUND;
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BEEAPI BurnExtensionPerformSearch(
+    __in BURN_EXTENSION* pExtension,
+    __in LPWSTR wzSearchId,
+    __in LPWSTR wzVariable
+    )
+{
+    HRESULT hr = S_OK;
+    BUNDLE_EXTENSION_SEARCH_ARGS args = { };
+    BUNDLE_EXTENSION_SEARCH_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzId = wzSearchId;
+    args.wzVariable = wzVariable;
+
+    results.cbSize = sizeof(results);
+
+    hr = pExtension->pfnBurnExtensionProc(BUNDLE_EXTENSION_MESSAGE_SEARCH, &args, &results, pExtension->pvBurnExtensionProcContext);
+    ExitOnFailure(hr, "BundleExtension '%ls' Search '%ls' failed.", pExtension->sczId, wzSearchId);
+
+LExit:
+    return hr;
+}

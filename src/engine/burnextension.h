@@ -46,6 +46,16 @@ HRESULT BurnExtensionLoad(
 void BurnExtensionUnload(
     __in BURN_EXTENSIONS* pBurnExtensions
     );
+HRESULT BurnExtensionFindById(
+    __in BURN_EXTENSIONS* pBurnExtensions,
+    __in_z LPCWSTR wzId,
+    __out BURN_EXTENSION** ppExtension
+    );
+BEEAPI BurnExtensionPerformSearch(
+    __in BURN_EXTENSION* pExtension,
+    __in LPWSTR wzSearchId,
+    __in LPWSTR wzVariable
+    );
 #if defined(__cplusplus)
 }
 #endif

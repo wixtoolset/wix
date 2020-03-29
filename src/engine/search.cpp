@@ -45,12 +45,16 @@ static HRESULT MsiFeatureSearch(
     __in BURN_SEARCH* pSearch,
     __in BURN_VARIABLES* pVariables
     );
+static HRESULT PerformExtensionSearch(
+    __in BURN_SEARCH* pSearch
+    );
 
 
 // function definitions
 
 extern "C" HRESULT SearchesParseFromXml(
     __in BURN_SEARCHES* pSearches,
+    __in BURN_EXTENSIONS* pBurnExtensions,
     __in IXMLDOMNode* pixnBundle
     )
 {
@@ -62,7 +66,7 @@ extern "C" HRESULT SearchesParseFromXml(
     LPWSTR scz = NULL;
 
     // select search nodes
-    hr = XmlSelectNodes(pixnBundle, L"DirectorySearch|FileSearch|RegistrySearch|MsiComponentSearch|MsiProductSearch|MsiFeatureSearch", &pixnNodes);
+    hr = XmlSelectNodes(pixnBundle, L"DirectorySearch|FileSearch|RegistrySearch|MsiComponentSearch|MsiProductSearch|MsiFeatureSearch|ExtensionSearch", &pixnNodes);
     ExitOnFailure(hr, "Failed to select search nodes.");
 
     // get search node count
@@ -373,6 +377,17 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
             }
         }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"ExtensionSearch", -1))
+        {
+            pSearch->Type = BURN_SEARCH_TYPE_EXTENSION;
+
+            // @ExtensionId
+            hr = XmlGetAttributeEx(pixnNode, L"ExtensionId", &scz);
+            ExitOnFailure(hr, "Failed to get @ExtensionId.");
+
+            hr = BurnExtensionFindById(pBurnExtensions, scz, &pSearch->ExtensionSearch.pExtension);
+            ExitOnFailure(hr, "Failed to find extension '%ls' for search '%ls'", scz, pSearch->sczKey);
+        }
         else
         {
             hr = E_UNEXPECTED;
@@ -476,6 +491,9 @@ extern "C" HRESULT SearchesExecute(
             break;
         case BURN_SEARCH_TYPE_MSI_FEATURE:
             hr = MsiFeatureSearch(pSearch, pVariables);
+            break;
+        case BURN_SEARCH_TYPE_EXTENSION:
+            hr = PerformExtensionSearch(pSearch);
             break;
         default:
             hr = E_UNEXPECTED;
@@ -1190,6 +1208,17 @@ static HRESULT MsiFeatureSearch(
     {
         LogStringLine(REPORT_STANDARD, "MsiFeatureSearch failed: ID '%ls', HRESULT 0x%x", pSearch->sczKey, hr);
     }
+
+    return hr;
+}
+
+static HRESULT PerformExtensionSearch(
+    __in BURN_SEARCH* pSearch
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = BurnExtensionPerformSearch(pSearch->ExtensionSearch.pExtension, pSearch->sczKey, pSearch->sczVariable);
 
     return hr;
 }

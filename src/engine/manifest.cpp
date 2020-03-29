@@ -80,13 +80,17 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
     hr = VariablesParseFromXml(&pEngineState->variables, pixeBundle);
     ExitOnFailure(hr, "Failed to parse variables.");
 
-    // parse searches
-    hr = SearchesParseFromXml(&pEngineState->searches, pixeBundle); // TODO: Modularization
-    ExitOnFailure(hr, "Failed to parse searches.");
-
     // parse user experience
     hr = UserExperienceParseFromXml(&pEngineState->userExperience, pixeBundle);
     ExitOnFailure(hr, "Failed to parse user experience.");
+
+    // parse extensions
+    hr = BurnExtensionParseFromXml(&pEngineState->extensions, &pEngineState->userExperience.payloads, pixeBundle);
+    ExitOnFailure(hr, "Failed to parse extensions.");
+
+    // parse searches
+    hr = SearchesParseFromXml(&pEngineState->searches, &pEngineState->extensions, pixeBundle);
+    ExitOnFailure(hr, "Failed to parse searches.");
 
     // parse catalog files
     hr = CatalogsParseFromXml(&pEngineState->catalogs, pixeBundle);
@@ -115,10 +119,6 @@ extern "C" HRESULT ManifestLoadXmlFromBuffer(
     // parse approved exes for elevation
     hr = ApprovedExesParseFromXml(&pEngineState->approvedExes, pixeBundle);
     ExitOnFailure(hr, "Failed to parse approved exes.");
-
-    // parse extensions
-    hr = BurnExtensionParseFromXml(&pEngineState->extensions, &pEngineState->userExperience.payloads, pixeBundle);
-    ExitOnFailure(hr, "Failed to parse extensions.");
 
 LExit:
     ReleaseObject(pixnChain);
