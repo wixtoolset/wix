@@ -59,5 +59,15 @@ namespace WixToolset.Mba.Core
         /// Gets layout directory.
         /// </summary>
         string LayoutDirectory { get; }
+
+        /// <summary>
+        /// Gets bootstrapper working folder.
+        /// </summary>
+        string BootstrapperWorkingFolder { get; }
+
+        /// <summary>
+        /// Gets path to BootstrapperApplicationData.xml.
+        /// </summary>
+        string BootstrapperApplicationDataPath { get; }
     }
 }

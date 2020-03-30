@@ -20,7 +20,9 @@ namespace WixToolset.Mba.Core
             IntPtr splashScreen,
             RelationType relation,
             bool passthrough,
-            string layoutDirectory)
+            string layoutDirectory,
+            string bootstrapperWorkingFolder,
+            string bootstrapperApplicationDataPath)
         {
             this.Action = action;
             this.Display = display;
@@ -32,6 +34,8 @@ namespace WixToolset.Mba.Core
             this.Relation = relation;
             this.Passthrough = passthrough;
             this.LayoutDirectory = layoutDirectory;
+            this.BootstrapperWorkingFolder = bootstrapperWorkingFolder;
+            this.BootstrapperApplicationDataPath = bootstrapperApplicationDataPath;
         }
 
         public LaunchAction Action { get; }
@@ -53,6 +57,10 @@ namespace WixToolset.Mba.Core
         public bool Passthrough { get; }
 
         public string LayoutDirectory { get; }
+
+        public string BootstrapperWorkingFolder { get; }
+
+        public string BootstrapperApplicationDataPath { get; }
 
         /// <summary>
         /// Gets the command line arguments as a string array.

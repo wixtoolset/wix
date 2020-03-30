@@ -9,7 +9,7 @@ namespace WixToolset.Mba.Core
     public class BootstrapperApplicationData : IBootstrapperApplicationData
     {
         public const string DefaultFileName = "BootstrapperApplicationData.xml";
-        public const string XMLNamespace = "http://wixtoolset.org/schemas/v4/2010/BootstrapperApplicationData";
+        public const string XMLNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
 
         public static readonly DirectoryInfo DefaultFolder;
         public static readonly FileInfo DefaultFile;

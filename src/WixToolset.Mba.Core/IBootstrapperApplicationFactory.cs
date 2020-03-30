@@ -34,6 +34,8 @@ namespace WixToolset.Mba.Core
         [MarshalAs(UnmanagedType.I4)] private readonly RelationType relation;
         [MarshalAs(UnmanagedType.Bool)] private readonly bool passthrough;
         [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzLayoutDirectory;
+        [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzBootstrapperWorkingFolder;
+        [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzBootstrapperApplicationDataPath;
 
         public IBootstrapperCommand GetBootstrapperCommand()
         {
@@ -47,7 +49,9 @@ namespace WixToolset.Mba.Core
                 this.hwndSplashScreen,
                 this.relation,
                 this.passthrough,
-                this.wzLayoutDirectory);
+                this.wzLayoutDirectory,
+                this.wzBootstrapperWorkingFolder,
+                this.wzBootstrapperApplicationDataPath);
         }
     }
 
