@@ -29,11 +29,11 @@ namespace WixToolset.Bal
             }
         }
 
-        public override void PostBackendBind(IBindResult result, WixOutput wixout)
+        public override void PostBackendBind(IBindResult result)
         {
-            base.PostBackendBind(result, wixout);
+            base.PostBackendBind(result);
 
-            var output = WindowsInstallerData.Load(wixout.Uri.AbsoluteUri, false);
+            var output = WindowsInstallerData.Load(result.Wixout, false);
 
             // Only process Bundles.
             if (OutputType.Bundle != output.Type)

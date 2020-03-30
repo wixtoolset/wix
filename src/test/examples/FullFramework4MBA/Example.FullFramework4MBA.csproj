@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.13" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.16" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@
 #include "precomp.h"
 
 static HINSTANCE vhInstance = NULL;
+static IBootstrapperApplication* vpApplication = NULL;
 
 extern "C" BOOL WINAPI DllMain(
     IN HINSTANCE hInstance,
@@ -37,7 +38,7 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     hr = BalInitializeFromCreateArgs(pArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
 
-    hr = CreateBootstrapperApplication(vhInstance, FALSE, S_OK, pEngine, pArgs, pResults);
+    hr = CreateBootstrapperApplication(vhInstance, FALSE, S_OK, pEngine, pArgs, pResults, &vpApplication);
     BalExitOnFailure(hr, "Failed to create bootstrapper application interface.");
 
 LExit:
@@ -49,6 +50,7 @@ LExit:
 
 extern "C" void WINAPI BootstrapperApplicationDestroy()
 {
+    ReleaseNullObject(vpApplication);
     BalUninitialize();
 }
 
@@ -64,7 +66,7 @@ extern "C" HRESULT WINAPI MbaPrereqBootstrapperApplicationCreate(
 
     BalInitialize(pEngine);
 
-    hr = CreateBootstrapperApplication(vhInstance, TRUE, hrHostInitialization, pEngine, pArgs, pResults);
+    hr = CreateBootstrapperApplication(vhInstance, TRUE, hrHostInitialization, pEngine, pArgs, pResults, &vpApplication);
     BalExitOnFailure(hr, "Failed to create managed prerequisite bootstrapper application interface.");
 
 LExit:
@@ -74,5 +76,6 @@ LExit:
 
 extern "C" void WINAPI MbaPrereqBootstrapperApplicationDestroy()
 {
+    ReleaseNullObject(vpApplication);
     BalUninitialize();
 }

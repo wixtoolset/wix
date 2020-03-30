@@ -52,5 +52,6 @@ HRESULT CreateBootstrapperApplication(
     __in HRESULT hrHostInitialization,
     __in IBootstrapperEngine* pEngine,
     __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults,
+    __out IBootstrapperApplication** ppApplication
     );

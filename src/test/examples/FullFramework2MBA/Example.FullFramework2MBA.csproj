@@ -3,7 +3,7 @@
 
 
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props" Condition="Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props')" />
+  <Import Project="..\..\..\..\packages\WixToolset.Mba.Core.4.0.16\build\net20\WixToolset.Mba.Core.props" Condition="Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.16\build\net20\WixToolset.Mba.Core.props')" />
   <PropertyGroup>
     <ProjectGuid>{CC4236FC-226E-4232-AB50-24CBEC4D314D}</ProjectGuid>
     <AssemblyName>Example.FullFramework2MBA</AssemblyName>
@@ -40,7 +40,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WixToolset.Mba.Core">
-      <HintPath>..\..\..\..\packages\WixToolset.Mba.Core.4.0.13\lib\net20\WixToolset.Mba.Core.dll</HintPath>
+      <HintPath>..\..\..\..\packages\WixToolset.Mba.Core.4.0.16\lib\net20\WixToolset.Mba.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -67,7 +67,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.Mba.Core.4.0.13\build\net20\WixToolset.Mba.Core.props'))" />
+    <Error Condition="!Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.16\build\net20\WixToolset.Mba.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.Mba.Core.4.0.16\build\net20\WixToolset.Mba.Core.props'))" />
     <Error Condition="!Exists('..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
 

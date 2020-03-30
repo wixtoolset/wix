@@ -9,7 +9,7 @@ namespace WixToolsetTest.Bal
 
     public class BalExtensionFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void CanBuildUsingWixStdBa()
         {
             using (var fs = new DisposableFileSystem())
@@ -17,12 +17,14 @@ namespace WixToolsetTest.Bal
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
                 var bundleSourceFolder = TestData.Get(@"TestData\WixStdBa");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
 
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "Bundle.wxs"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
                     "-burnStub", TestData.Get(@"runtimes\win-x86\native\burn.x86.exe"),
                     "-o", bundleFile,
                 });
