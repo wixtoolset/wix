@@ -48,6 +48,10 @@ static HRESULT MsiFeatureSearch(
 static HRESULT PerformExtensionSearch(
     __in BURN_SEARCH* pSearch
     );
+static HRESULT PerformSetVariable(
+    __in BURN_SEARCH* pSearch,
+    __in BURN_VARIABLES* pVariables
+);
 
 
 // function definitions
@@ -64,9 +68,10 @@ extern "C" HRESULT SearchesParseFromXml(
     DWORD cNodes = 0;
     BSTR bstrNodeName = NULL;
     LPWSTR scz = NULL;
+    BURN_VARIANT_TYPE valueType = BURN_VARIANT_TYPE_NONE;
 
     // select search nodes
-    hr = XmlSelectNodes(pixnBundle, L"DirectorySearch|FileSearch|RegistrySearch|MsiComponentSearch|MsiProductSearch|MsiFeatureSearch|ExtensionSearch", &pixnNodes);
+    hr = XmlSelectNodes(pixnBundle, L"DirectorySearch|FileSearch|RegistrySearch|MsiComponentSearch|MsiProductSearch|MsiFeatureSearch|ExtensionSearch|SetVariable", &pixnNodes);
     ExitOnFailure(hr, "Failed to select search nodes.");
 
     // get search node count
@@ -388,6 +393,50 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = BurnExtensionFindById(pBurnExtensions, scz, &pSearch->ExtensionSearch.pExtension);
             ExitOnFailure(hr, "Failed to find extension '%ls' for search '%ls'", scz, pSearch->sczKey);
         }
+        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"SetVariable", -1))
+        {
+            pSearch->Type = BURN_SEARCH_TYPE_SET_VARIABLE;
+
+            // @Value
+            hr = XmlGetAttributeEx(pixnNode, L"Value", &scz);
+            if (E_NOTFOUND != hr)
+            {
+                ExitOnFailure(hr, "Failed to get @Value.");
+
+                hr = BVariantSetString(&pSearch->SetVariable.value, scz, 0);
+                ExitOnFailure(hr, "Failed to set variant value.");
+
+                // @Type
+                hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
+                ExitOnFailure(hr, "Failed to get @Type.");
+
+                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+                {
+                    valueType = BURN_VARIANT_TYPE_NUMERIC;
+                }
+                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"string", -1))
+                {
+                    valueType = BURN_VARIANT_TYPE_STRING;
+                }
+                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
+                {
+                    valueType = BURN_VARIANT_TYPE_VERSION;
+                }
+                else
+                {
+                    hr = E_INVALIDARG;
+                    ExitOnFailure(hr, "Invalid value for @Type: %ls", scz);
+                }
+            }
+            else
+            {
+                valueType = BURN_VARIANT_TYPE_NONE;
+            }
+
+            // change value variant to correct type
+            hr = BVariantChangeType(&pSearch->SetVariable.value, valueType);
+            ExitOnFailure(hr, "Failed to change variant type.");
+        }
         else
         {
             hr = E_UNEXPECTED;
@@ -495,6 +544,9 @@ extern "C" HRESULT SearchesExecute(
         case BURN_SEARCH_TYPE_EXTENSION:
             hr = PerformExtensionSearch(pSearch);
             break;
+        case BURN_SEARCH_TYPE_SET_VARIABLE:
+            hr = PerformSetVariable(pSearch, pVariables);
+            break;
         default:
             hr = E_UNEXPECTED;
         }
@@ -548,6 +600,9 @@ extern "C" void SearchesUninitialize(
             case BURN_SEARCH_TYPE_MSI_FEATURE:
                 ReleaseStr(pSearch->MsiFeatureSearch.sczProductCode);
                 ReleaseStr(pSearch->MsiFeatureSearch.sczFeatureId);
+                break;
+            case BURN_SEARCH_TYPE_SET_VARIABLE:
+                BVariantUninitialize(&pSearch->SetVariable.value);
                 break;
             }
         }
@@ -1220,5 +1275,19 @@ static HRESULT PerformExtensionSearch(
 
     hr = BurnExtensionPerformSearch(pSearch->ExtensionSearch.pExtension, pSearch->sczKey, pSearch->sczVariable);
 
+    return hr;
+}
+
+static HRESULT PerformSetVariable(
+    __in BURN_SEARCH* pSearch,
+    __in BURN_VARIABLES* pVariables
+    )
+{
+    HRESULT hr = S_OK;
+
+    hr = VariableSetVariant(pVariables, pSearch->sczVariable, &pSearch->SetVariable.value);
+    ExitOnFailure(hr, "Failed to set variable: %ls", pSearch->sczVariable);
+
+LExit:
     return hr;
 }

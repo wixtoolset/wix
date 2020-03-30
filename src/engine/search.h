@@ -19,6 +19,7 @@ enum BURN_SEARCH_TYPE
     BURN_SEARCH_TYPE_MSI_PRODUCT,
     BURN_SEARCH_TYPE_MSI_FEATURE,
     BURN_SEARCH_TYPE_EXTENSION,
+    BURN_SEARCH_TYPE_SET_VARIABLE,
 };
 
 enum BURN_DIRECTORY_SEARCH_TYPE
@@ -127,6 +128,10 @@ typedef struct _BURN_SEARCH
         {
             BURN_EXTENSION* pExtension;
         } ExtensionSearch;
+        struct
+        {
+            BURN_VARIANT value;
+        } SetVariable;
     };
 } BURN_SEARCH;
 

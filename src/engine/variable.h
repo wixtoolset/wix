@@ -127,6 +127,11 @@ HRESULT VariableSetLiteralVariant(
     __in_z LPCWSTR wzVariable,
     __in BURN_VARIANT* pVariant
     );
+HRESULT VariableSetVariant(
+    __in BURN_VARIABLES* pVariables,
+    __in_z LPCWSTR wzVariable,
+    __in BURN_VARIANT* pVariant
+    );
 HRESULT VariableFormatString(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzIn,

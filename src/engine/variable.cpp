@@ -732,6 +732,15 @@ extern "C" HRESULT VariableSetLiteralVariant(
     return SetVariableValue(pVariables, wzVariable, pVariant, TRUE, SET_VARIABLE_NOT_BUILTIN, TRUE);
 }
 
+extern "C" HRESULT VariableSetVariant(
+    __in BURN_VARIABLES * pVariables,
+    __in_z LPCWSTR wzVariable,
+    __in BURN_VARIANT * pVariant
+    )
+{
+    return SetVariableValue(pVariables, wzVariable, pVariant, FALSE, SET_VARIABLE_NOT_BUILTIN, TRUE);
+}
+
 // The contents of psczOut may be sensitive, should keep encrypted and SecureZeroFree
 extern "C" HRESULT VariableFormatString(
     __in BURN_VARIABLES* pVariables,
