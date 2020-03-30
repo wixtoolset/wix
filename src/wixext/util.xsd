@@ -172,6 +172,30 @@
       <xs:attribute name="Id" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
+  <xs:element name="DetectSHA2Support">
+    <xs:annotation>
+      <xs:documentation>Detects support for SHA2.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="SearchCommonAttributes" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DetectSHA2SupportRef">
+    <xs:annotation>
+      <xs:documentation>References a DetectSHA2Support.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="Id" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="DirectorySearch">
     <xs:annotation>
       <xs:documentation>Describes a directory search.</xs:documentation>

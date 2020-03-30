@@ -17,9 +17,20 @@
 
 #define MAXUINT USHRT_MAX
 
-#include "dutil.h"
-#include "memutil.h"
+#include <dutil.h>
+#include <memutil.h>
+#include <strutil.h>
+#include <pathutil.h>
+#include <xmlutil.h>
 
-#include "BootstrapperEngine.h"
-#include "BundleExtensionEngine.h"
-#include "BundleExtension.h"
+#include <BundleExtensionEngine.h>
+#include <BundleExtension.h>
+
+#include <IBundleExtensionEngine.h>
+#include <IBundleExtension.h>
+#include <bextutil.h>
+#include <BextBundleExtensionEngine.h>
+
+#include "utilsearch.h"
+#include "detectsha2support.h"
+#include "UtilBundleExtension.h"

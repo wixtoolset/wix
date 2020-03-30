@@ -4,6 +4,7 @@ namespace WixToolset.Util
 {
     using System;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
 
     public enum UtilTupleDefinitionType
     {
@@ -19,6 +20,7 @@ namespace WixToolset.Util
         User,
         UserGroup,
         WixCloseApplication,
+        WixDetectSHA2Support,
         WixFormatFiles,
         WixInternetShortcut,
         WixRemoveFolderEx,
@@ -82,6 +84,9 @@ namespace WixToolset.Util
                 case UtilTupleDefinitionType.WixCloseApplication:
                     return UtilTupleDefinitions.WixCloseApplication;
 
+                case UtilTupleDefinitionType.WixDetectSHA2Support:
+                    return UtilTupleDefinitions.WixDetectSHA2Support;
+
                 case UtilTupleDefinitionType.WixFormatFiles:
                     return UtilTupleDefinitions.WixFormatFiles;
 
@@ -106,6 +111,11 @@ namespace WixToolset.Util
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
+        }
+
+        static UtilTupleDefinitions()
+        {
+            WixDetectSHA2Support.AddTag(BurnConstants.BundleExtensionSearchTupleDefinitionTag);
         }
     }
 }

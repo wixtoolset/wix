@@ -13,11 +13,6 @@ namespace WixToolset.Util
             return Message(null, Ids.ArgumentRequiresValue, "The argument '{0}' does not have a value specified and it is required.", argument);
         }
 
-        public static Message CircularSearchReference(string chain)
-        {
-            return Message(null, Ids.CircularSearchReference, "A circular reference of search ordering constraints was detected: {0}. Search ordering references must form a directed acyclic graph.", chain);
-        }
-
         public static Message DirectoryNotFound(string directory)
         {
             return Message(null, Ids.DirectoryNotFound, "The directory '{0}' could not be found.", directory);
@@ -102,7 +97,6 @@ namespace WixToolset.Util
             FileNotFound = 5059,
             PerformanceCategoryNotFound = 5060,
             UnsupportedPerformanceCounterType = 5061,
-            CircularSearchReference = 5062,
             InvalidRegistryObject = 5063,
         }
     }

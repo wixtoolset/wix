@@ -230,6 +230,8 @@ namespace WixToolset.Util
                             break;
                         case "ComponentSearch":
                         case "ComponentSearchRef":
+                        case "DetectSHA2Support":
+                        case "DetectSHA2SupportRef":
                         case "DirectorySearch":
                         case "DirectorySearchRef":
                         case "FileSearch":
@@ -250,6 +252,12 @@ namespace WixToolset.Util
                                         break;
                                     case "ComponentSearchRef":
                                         this.ParseComponentSearchRefElement(intermediate, section, element);
+                                        break;
+                                    case "DetectSHA2Support":
+                                        this.ParseDetectSHA2SupportElement(intermediate, section, element);
+                                        break;
+                                    case "DetectSHA2SupportRef":
+                                        this.ParseDetectSHA2SupportRefElement(intermediate, section, element);
                                         break;
                                     case "DirectorySearch":
                                         this.ParseDirectorySearchElement(intermediate, section, element);
@@ -422,11 +430,6 @@ namespace WixToolset.Util
                 }
             }
 
-            if (null == variable)
-            {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Variable"));
-            }
-
             if (null == guid)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Guid"));
@@ -439,16 +442,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
+            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixSearchRow(section, sourceLineNumbers, id, variable, condition);
-                if (after != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
-                    // TODO: We're currently defaulting to "always run after", which we will need to change...
-                    this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
-                }
-
                 WixComponentSearchAttributes attributes = WixComponentSearchAttributes.KeyPath;
                 switch (result)
                 {
@@ -490,6 +487,89 @@ namespace WixToolset.Util
                         case "Id":
                             refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixComponentSearch", refId);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+        }
+
+        /// <summary>
+        /// Parses a DetectSHA2Support element.
+        /// </summary>
+        /// <param name="element">Element to parse.</param>
+        private void ParseDetectSHA2SupportElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            Identifier id = null;
+            string variable = null;
+            string condition = null;
+            string after = null;
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                        case "Variable":
+                        case "Condition":
+                        case "After":
+                            this.ParseCommonSearchAttributes(sourceLineNumbers, attrib, ref id, ref variable, ref condition, ref after);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(element, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, element, attrib);
+                }
+            }
+
+            if (id == null)
+            {
+                id = this.ParseHelper.CreateIdentifier("wds2s", variable, condition, after);
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+
+            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, UtilConstants.UtilBundleExtensionId);
+
+            if (!this.Messaging.EncounteredError)
+            {
+                section.Tuples.Add(new WixDetectSHA2SupportTuple(sourceLineNumbers, id));
+            }
+        }
+
+        /// <summary>
+        /// Parses a DetectSHA2SupportRef element
+        /// </summary>
+        /// <param name="element">Element to parse.</param>
+        private void ParseDetectSHA2SupportRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            string refId = null;
+
+            foreach (var attrib in element.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixDetectSHA2Support", refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -868,11 +948,6 @@ namespace WixToolset.Util
                 }
             }
 
-            if (null == variable)
-            {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Variable"));
-            }
-
             if (null == path)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Path"));
@@ -885,16 +960,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
+            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixSearchRow(section, sourceLineNumbers, id, variable, condition);
-                if (after != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
-                    // TODO: We're currently defaulting to "always run after", which we will need to change...
-                    this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
-                }
-
                 WixFileSearchAttributes attributes = WixFileSearchAttributes.IsDirectory;
                 switch (result)
                 {
@@ -990,11 +1059,6 @@ namespace WixToolset.Util
                 }
             }
 
-            if (null == variable)
-            {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Variable"));
-            }
-
             if (null == path)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Path"));
@@ -1007,16 +1071,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
+            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, node.Name.LocalName, id, variable, condition, after, null);
+
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixSearchRow(section, sourceLineNumbers, id, variable, condition);
-                if (after != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
-                    // TODO: We're currently defaulting to "always run after", which we will need to change...
-                    this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
-                }
-
                 WixFileSearchAttributes attributes = WixFileSearchAttributes.Default;
                 switch (result)
                 {
@@ -1044,38 +1102,6 @@ namespace WixToolset.Util
             section.Tuples.Add(new WixFileSearchTuple(sourceLineNumbers, id)
             {
                 Path = path,
-                Attributes = attributes,
-            });
-        }
-
-        /// <summary>
-        /// Creates a row in the WixSearch table.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
-        /// <param name="id">Identifier of the search.</param>
-        /// <param name="variable">The Burn variable to store the result into.</param>
-        /// <param name="condition">A condition to test before evaluating the search.</param>
-        private void CreateWixSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string variable, string condition)
-        {
-            section.Tuples.Add(new WixSearchTuple(sourceLineNumbers, id)
-            {
-                Variable = variable,
-                Condition = condition,
-            });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
-        /// <param name="id">Identifier of the search (key into the WixSearch table)</param>
-        /// <param name="parentId">Identifier of the search that comes before (key into the WixSearch table)</param>
-        /// <param name="attributes">Further details about the relation between id and parentId.</param>
-        private void CreateWixSearchRelationRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
-        {
-            section.Tuples.Add(new WixSearchRelationTuple(sourceLineNumbers, id)
-            {
-                ParentSearchRef = parentId,
                 Attributes = attributes,
             });
         }
@@ -2523,11 +2549,6 @@ namespace WixToolset.Util
                 }
             }
 
-            if (null == variable)
-            {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Variable"));
-            }
-
             if (null == upgradeCode && null == productCode)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "ProductCode", "UpgradeCode", true));
@@ -2545,16 +2566,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
+            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixSearchRow(section, sourceLineNumbers, id, variable, condition);
-                if (after != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
-                    // TODO: We're currently defaulting to "always run after", which we will need to change...
-                    this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
-                }
-
                 WixProductSearchAttributes attributes = WixProductSearchAttributes.Version;
                 switch (result)
                 {
@@ -2662,11 +2677,6 @@ namespace WixToolset.Util
                 }
             }
 
-            if (null == variable)
-            {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Variable"));
-            }
-
             if (!root.HasValue)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Root"));
@@ -2726,16 +2736,10 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
+            this.ParseHelper.CreateWixSearchTuple(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, null);
+
             if (!this.Messaging.EncounteredError)
             {
-                this.CreateWixSearchRow(section, sourceLineNumbers, id, variable, condition);
-                if (after != null)
-                {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
-                    // TODO: We're currently defaulting to "always run after", which we will need to change...
-                    this.CreateWixSearchRelationRow(section, sourceLineNumbers, id, after, 2);
-                }
-
                 section.Tuples.Add(new WixRegistrySearchTuple(sourceLineNumbers, id)
                 {
                     Root = (RegistryRootType)root,

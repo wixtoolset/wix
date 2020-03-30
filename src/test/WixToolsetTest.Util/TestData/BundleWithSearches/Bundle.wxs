@@ -7,6 +7,7 @@
         <util:RegistrySearchRef Id="RegistrySearchId" />
         <util:ProductSearchRef Id="ProductSearchId" />
         <util:FileSearchRef Id="FileSearchId" />
+        <util:DetectSHA2SupportRef Id="DetectSHA2SupportId" />
 
         <Chain>
             <MsiPackage SourceFile="test.msi">
@@ -31,5 +32,9 @@
 
     <Fragment>
         <util:FileSearch Id="FileSearchId" Variable="FileSearchVariable" Path="%windir%\System32\mscoree.dll" Result="exists" />
+    </Fragment>
+
+    <Fragment>
+        <util:DetectSHA2Support Id="DetectSHA2SupportId" Variable="IsSHA2Supported" />
     </Fragment>
 </Wix>
