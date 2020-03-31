@@ -206,6 +206,11 @@ namespace WixToolset.Data
         {
             var entry = this.archive.GetEntry(name);
 
+            if (entry == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(name));
+            }
+
             return entry.Open();
         }
 

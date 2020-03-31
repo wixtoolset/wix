@@ -20,6 +20,7 @@ namespace WixToolset.Data
 namespace WixToolset.Data.Tuples
 {
     using System;
+    using System.Diagnostics;
 
     public enum WixSimpleReferenceTupleFields
     {
@@ -27,6 +28,7 @@ namespace WixToolset.Data.Tuples
         PrimaryKeys,
     }
 
+    [DebuggerDisplay("{SymbolicName}")]
     public class WixSimpleReferenceTuple : IntermediateTuple
     {
         public WixSimpleReferenceTuple() : base(TupleDefinitions.WixSimpleReference, null, null)
