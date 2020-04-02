@@ -5,10 +5,11 @@ namespace WixToolset.Extensibility.Data
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface ILibraryContext
     {
-        IServiceProvider ServiceProvider { get; }
+        IWixToolsetServiceProvider ServiceProvider { get; }
 
         bool BindFiles { get; set; }
 

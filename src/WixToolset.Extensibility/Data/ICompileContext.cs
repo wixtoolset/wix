@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Extensibility.Data
 {
@@ -6,10 +6,11 @@ namespace WixToolset.Extensibility.Data
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface ICompileContext
     {
-        IServiceProvider ServiceProvider { get; }
+        IWixToolsetServiceProvider ServiceProvider { get; }
 
         string CompilationId { get; set; }
 

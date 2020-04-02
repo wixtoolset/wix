@@ -5,10 +5,11 @@ namespace WixToolset.Extensibility.Data
     using System;
     using System.Collections.Generic;
     using WixToolset.Data;
+    using WixToolset.Extensibility.Services;
 
     public interface IDecompileContext
     {
-        IServiceProvider ServiceProvider { get; }
+        IWixToolsetServiceProvider ServiceProvider { get; }
 
         string DecompilePath { get; set; }
 

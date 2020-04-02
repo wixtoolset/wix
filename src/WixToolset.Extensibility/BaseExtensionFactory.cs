@@ -7,6 +7,8 @@ namespace WixToolset.Extensibility
 
     /// <summary>
     /// Base class for extension factories.
+    ///
+    /// Implementations may request an IWixToolsetCoreServiceProvider at instantiation by having a single parameter constructor for it.
     /// </summary>
     public abstract class BaseExtensionFactory : IExtensionFactory
     {
