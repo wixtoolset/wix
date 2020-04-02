@@ -12,13 +12,13 @@ namespace WixToolset.Core.TestPackage
     {
         public static int Execute(string[] args, out List<Message> messages)
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             return Execute(args, serviceProvider, out messages);
         }
 
         public static WixRunnerResult Execute(params string[] args)
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var exitCode = Execute(args, serviceProvider, out var messages);
             return new WixRunnerResult { ExitCode = exitCode, Messages = messages.ToArray() };
         }

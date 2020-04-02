@@ -21,7 +21,7 @@ namespace WixToolsetTest.CoreIntegration
         {
             var intermediate1 = new Intermediate("TestIntermediate1", new[] { new IntermediateSection("test1", SectionType.Product, 65001) }, null);
             var intermediate2 = new Intermediate("TestIntermediate2", new[] { new IntermediateSection("test2", SectionType.Fragment, 65001) }, null);
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
 
             var listener = new TestMessageListener();
             var messaging = serviceProvider.GetService<IMessaging>();

@@ -10,7 +10,7 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public sealed class WixToolsetServiceProvider : IWixToolsetCoreServiceProvider
+    internal class WixToolsetServiceProvider : IWixToolsetCoreServiceProvider
     {
         public WixToolsetServiceProvider()
         {

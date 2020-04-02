@@ -15,7 +15,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void GeneratesCorrectCustomActionIdentifiers()
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var section = new IntermediateSection("section", SectionType.Fragment, 0);
             var parseHelper = serviceProvider.GetService<IParseHelper>();
 

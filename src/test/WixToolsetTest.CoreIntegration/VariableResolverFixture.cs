@@ -15,7 +15,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanRecursivelyResolveVariables()
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var variableResolver = serviceProvider.GetService<IVariableResolver>();
 
             var variables = new Dictionary<string, BindVariable>()

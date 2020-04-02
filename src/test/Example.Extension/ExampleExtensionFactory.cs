@@ -4,12 +4,13 @@ namespace Example.Extension
 {
     using System;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
 
     public class ExampleExtensionFactory : IExtensionFactory
     {
         private ExamplePreprocessorExtensionAndCommandLine preprocessorExtension;
 
-        public ExampleExtensionFactory(IServiceProvider serviceProvider)
+        public ExampleExtensionFactory(IWixToolsetCoreServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
@@ -17,7 +18,7 @@ namespace Example.Extension
         /// <summary>
         /// This exists just to show it is possible to get a service provider to the extension factory.
         /// </summary>
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetCoreServiceProvider ServiceProvider { get; }
 
         public bool TryCreateExtension(Type extensionType, out object extension)
         {

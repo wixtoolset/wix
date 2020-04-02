@@ -21,7 +21,7 @@ namespace WixToolsetTest.CoreIntegration
             var includeFolder = Path.Combine(folder, "data");
             var includeFile = Path.Combine(includeFolder, "Package.wxi");
 
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
 
             var context = serviceProvider.GetService<IPreprocessContext>();
             context.SourcePath = sourcePath;

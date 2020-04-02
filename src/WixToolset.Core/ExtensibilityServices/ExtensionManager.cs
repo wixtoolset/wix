@@ -16,12 +16,12 @@ namespace WixToolset.Core.ExtensibilityServices
         private List<IExtensionFactory> extensionFactories = new List<IExtensionFactory>();
         private Dictionary<Type, List<object>> loadedExtensionsByType = new Dictionary<Type, List<object>>();
 
-        public ExtensionManager(IServiceProvider serviceProvider)
+        public ExtensionManager(IWixToolsetCoreServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetCoreServiceProvider ServiceProvider { get; }
 
         public void Add(Assembly extensionAssembly)
         {
@@ -33,7 +33,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IExtensionFactory CreateExtensionFactory(Type type)
         {
-            var constructor = type.GetConstructor(new[] { typeof(IServiceProvider) });
+            var constructor = type.GetConstructor(new[] { typeof(IWixToolsetCoreServiceProvider) });
             if (constructor != null)
             {
                 return (IExtensionFactory)constructor.Invoke(new[] { this.ServiceProvider });
