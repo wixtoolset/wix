@@ -63,7 +63,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"example.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
 
                 var example = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
-                Assert.Equal("Foo", example.Id.Id);
+                Assert.Null(example.Id?.Id);
                 Assert.Equal("Foo", example[0].AsString());
                 Assert.Equal("Bar", example[1].AsString());
             }

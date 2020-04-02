@@ -6,7 +6,6 @@ namespace Example.Extension
 
     public enum ExampleSearchTupleFields
     {
-        Example,
         SearchFor,
     }
 

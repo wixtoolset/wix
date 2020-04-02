@@ -22,7 +22,6 @@ namespace Example.Extension
             nameof(ExampleSearch),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ExampleTupleFields.Example), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ExampleSearchTupleFields.SearchFor), IntermediateFieldType.String),
             },
             typeof(ExampleSearchTuple));

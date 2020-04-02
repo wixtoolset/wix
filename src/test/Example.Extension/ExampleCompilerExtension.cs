@@ -88,7 +88,8 @@ namespace Example.Extension
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Example", id);
+                var tuple = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Example");
+                tuple.Set(0, id.Id);
                 tuple.Set(1, value);
             }
         }
