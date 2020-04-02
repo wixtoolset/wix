@@ -111,7 +111,7 @@ namespace WixToolset.BuildTasks
 
         public override bool Execute()
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
 
             var listener = new MsbuildMessageListener(this.Log, "WIX", this.BuildEngine.ProjectFileOfTaskNode);
 
@@ -136,7 +136,7 @@ namespace WixToolset.BuildTasks
             return !this.Log.HasLoggedErrors;
         }
 
-        private void ExecuteCore(IServiceProvider serviceProvider, IMessageListener listener)
+        private void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener)
         {
             var commandLineString = this.BuildCommandLine();
 
@@ -191,7 +191,7 @@ namespace WixToolset.BuildTasks
             return commandLineBuilder.ToString();
         }
 
-        private IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
+        private IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 

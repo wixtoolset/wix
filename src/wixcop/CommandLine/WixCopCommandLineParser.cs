@@ -14,14 +14,14 @@ namespace WixToolset.Tools.WixCop.CommandLine
         private bool fixErrors;
         private int indentationAmount;
         private readonly List<string> searchPatterns;
-        private readonly IServiceProvider serviceProvider;
+        private readonly IWixToolsetServiceProvider serviceProvider;
         private string settingsFile1;
         private string settingsFile2;
         private bool showHelp;
         private bool showLogo;
         private bool subDirectories;
 
-        public WixCopCommandLineParser(IServiceProvider serviceProvider)
+        public WixCopCommandLineParser(IWixToolsetServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
 

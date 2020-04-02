@@ -24,7 +24,7 @@ namespace WixToolset.Tools
         [MTAThread]
         public static int Main(string[] args)
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
 
             var listener = new ConsoleMessageListener("WIX", "wix.exe");
 
@@ -58,7 +58,7 @@ namespace WixToolset.Tools
         /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
         /// <param name="args">Command-line arguments to execute.</param>
         /// <returns>Returns the application error code.</returns>
-        public int Run(IServiceProvider serviceProvider, IMessageListener listener, string[] args)
+        public int Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args)
         {
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
@@ -73,7 +73,7 @@ namespace WixToolset.Tools
             return command?.Execute() ?? 1;
         }
 
-        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
+        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 

@@ -14,7 +14,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
     {
         private const string SettingsFileDefault = "wixcop.settings.xml";
 
-        public ConvertCommand(IServiceProvider serviceProvider, bool fixErrors, int indentationAmount, List<string> searchPatterns, bool subDirectories, string settingsFile1, string settingsFile2)
+        public ConvertCommand(IWixToolsetServiceProvider serviceProvider, bool fixErrors, int indentationAmount, List<string> searchPatterns, bool subDirectories, string settingsFile1, string settingsFile2)
         {
             this.ErrorsAsWarnings = new HashSet<string>();
             this.ExemptFiles = new HashSet<string>();
@@ -43,7 +43,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
 
         private List<string> SearchPatterns { get; }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private string SettingsFile1 { get; }
 

@@ -24,7 +24,7 @@ namespace WixToolset.Tools.WixCop
         [STAThread]
         public static int Main(string[] args)
         {
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var listener = new ConsoleMessageListener("WXCP", "wixcop.exe");
 
             serviceProvider.AddService<IMessageListener>((x, y) => listener);
@@ -40,7 +40,7 @@ namespace WixToolset.Tools.WixCop
         /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
         /// <param name="args">The commandline arguments.</param>
         /// <returns>The number of errors that were found.</returns>
-        public int Run(IServiceProvider serviceProvider, string[] args)
+        public int Run(IWixToolsetServiceProvider serviceProvider, string[] args)
         {
             try
             {

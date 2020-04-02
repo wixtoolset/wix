@@ -7,6 +7,7 @@ namespace WixToolsetTest.WixCop
     using WixToolset.Core;
     using WixToolset.Core.TestPackage;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Services;
     using WixToolset.Tools.WixCop;
     using WixToolset.Tools.WixCop.CommandLine;
     using WixToolset.Tools.WixCop.Interfaces;
@@ -45,7 +46,7 @@ namespace WixToolsetTest.WixCop
         {
             var listener = new TestMessageListener();
 
-            var serviceProvider = new WixToolsetServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             serviceProvider.AddService<IMessageListener>((x, y) => listener);
             serviceProvider.AddService<IWixCopCommandLineParser>((x, y) => new WixCopCommandLineParser(x));
 
@@ -58,7 +59,7 @@ namespace WixToolsetTest.WixCop
             };
         }
 
-        public static int Execute(IServiceProvider serviceProvider, string[] args)
+        public static int Execute(IWixToolsetServiceProvider serviceProvider, string[] args)
         {
             var wixcop = new Program();
             return wixcop.Run(serviceProvider, args);
