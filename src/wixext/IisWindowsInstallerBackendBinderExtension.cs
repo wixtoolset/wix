@@ -2,8 +2,10 @@
 
 namespace WixToolset.Iis
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
+    using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
@@ -11,7 +13,13 @@ namespace WixToolset.Iis
     {
         private static readonly TableDefinition[] Tables = LoadTables();
 
-        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
+        public override IEnumerable<TableDefinition> TableDefinitions { get => Tables; }
+
+        public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
+        {
+            var columnZeroIsId = tuple.Id != null;
+            return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitions, columnZeroIsId);
+        }
 
         private static TableDefinition[] LoadTables()
         {
