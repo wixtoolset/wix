@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.CommandLine
 {
@@ -20,9 +20,9 @@ namespace WixToolset.Core.CommandLine
 
         public string ErrorArgument { get; set; }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
-        public CommandLineArguments(IServiceProvider serviceProvider)
+        public CommandLineArguments(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
@@ -43,7 +43,7 @@ namespace WixToolset.Core.CommandLine
 
         public ICommandLineParser Parse()
         {
-            var messaging = (IMessaging)this.ServiceProvider.GetService(typeof(IMessaging));
+            var messaging = this.ServiceProvider.GetService<IMessaging>();
 
             return new CommandLineParser(messaging, this.Arguments, this.ErrorArgument);
         }

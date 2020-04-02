@@ -17,7 +17,7 @@ namespace WixToolset.Core
     /// </summary>
     internal class Resolver : IResolver
     {
-        internal Resolver(IServiceProvider serviceProvider)
+        internal Resolver(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
@@ -26,7 +26,7 @@ namespace WixToolset.Core
             this.VariableResolver = serviceProvider.GetService<IVariableResolver>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

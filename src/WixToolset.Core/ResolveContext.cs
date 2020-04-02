@@ -11,12 +11,12 @@ namespace WixToolset.Core
 
     internal class ResolveContext : IResolveContext
     {
-        internal ResolveContext(IServiceProvider serviceProvider)
+        internal ResolveContext(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IServiceProvider ServiceProvider { get; }
+        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         public IEnumerable<IBindPath> BindPaths { get; set; }
 

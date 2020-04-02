@@ -15,7 +15,7 @@ namespace WixToolset.Core
         public static readonly XNamespace WxlNamespace = "http://wixtoolset.org/schemas/v4/wxl";
         private const string XmlElementName = "WixLocalization";
 
-        internal LocalizationParser(IServiceProvider serviceProvider)
+        internal LocalizationParser(IWixToolsetServiceProvider serviceProvider)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }

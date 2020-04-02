@@ -7,15 +7,16 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class BindContext : IBindContext
     {
-        internal BindContext(IServiceProvider serviceProvider)
+        internal BindContext(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IServiceProvider ServiceProvider { get; }
+        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         public IEnumerable<BindPath> BindPaths { get; set; }
 

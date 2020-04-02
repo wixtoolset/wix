@@ -44,7 +44,7 @@ namespace WixToolset.Core.Burn
             this.BackendExtensions = backedExtensions;
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

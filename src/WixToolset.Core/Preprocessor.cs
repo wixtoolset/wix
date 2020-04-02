@@ -37,14 +37,14 @@ namespace WixToolset.Core
             XmlResolver = null,
         };
 
-        internal Preprocessor(IServiceProvider serviceProvider)
+        internal Preprocessor(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -1469,7 +1469,7 @@ namespace WixToolset.Core
 
         private class ProcessingState
         {
-            public ProcessingState(IServiceProvider serviceProvider, IPreprocessContext context)
+            public ProcessingState(IWixToolsetServiceProvider serviceProvider, IPreprocessContext context)
             {
                 var path = Path.GetFullPath(context.SourcePath);
 

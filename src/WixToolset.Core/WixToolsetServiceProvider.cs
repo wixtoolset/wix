@@ -10,11 +10,11 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public sealed class WixToolsetServiceProvider : IServiceProvider
+    public sealed class WixToolsetServiceProvider : IWixToolsetCoreServiceProvider
     {
         public WixToolsetServiceProvider()
         {
-            this.CreationFunctions = new Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>>();
+            this.CreationFunctions = new Dictionary<Type, Func<IWixToolsetCoreServiceProvider, Dictionary<Type, object>, object>>();
             this.Singletons = new Dictionary<Type, object>();
 
             // Singletons.
@@ -67,7 +67,7 @@ namespace WixToolset.Core
             this.AddService<IVariableResolver>((provider, singletons) => new VariableResolver(provider));
         }
 
-        private Dictionary<Type, Func<IServiceProvider, Dictionary<Type, object>, object>> CreationFunctions { get; }
+        private Dictionary<Type, Func<IWixToolsetCoreServiceProvider, Dictionary<Type, object>, object>> CreationFunctions { get; }
 
         private Dictionary<Type, object> Singletons { get; }
 
@@ -96,17 +96,31 @@ namespace WixToolset.Core
             return service != null;
         }
 
+        public bool TryGetService<T>(out T service)
+            where T : class
+        {
+            var success = this.TryGetService(typeof(T), out var untypedService);
+            service = (T)untypedService;
+            return success;
+        }
+
         public object GetService(Type serviceType)
         {
             return this.TryGetService(serviceType, out var service) ? service : throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));
         }
 
-        public void AddService(Type serviceType, Func<IServiceProvider, Dictionary<Type, object>, object> creationFunction)
+        public T GetService<T>()
+            where T : class
+        {
+            return (T)this.GetService(typeof(T));
+        }
+
+        public void AddService(Type serviceType, Func<IWixToolsetCoreServiceProvider, Dictionary<Type, object>, object> creationFunction)
         {
             this.CreationFunctions[serviceType] = creationFunction;
         }
 
-        public void AddService<T>(Func<IServiceProvider, Dictionary<Type, object>, T> creationFunction)
+        public void AddService<T>(Func<IWixToolsetCoreServiceProvider, Dictionary<Type, object>, T> creationFunction)
             where T : class
         {
             this.AddService(typeof(T), creationFunction);

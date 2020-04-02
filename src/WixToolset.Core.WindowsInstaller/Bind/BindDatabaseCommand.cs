@@ -54,7 +54,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.BackendExtensions = backendExtension;
         }
 
-        public IServiceProvider ServiceProvider { get; }
+        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 

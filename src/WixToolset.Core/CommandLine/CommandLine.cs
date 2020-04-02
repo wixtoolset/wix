@@ -23,14 +23,14 @@ namespace WixToolset.Core.CommandLine
     {
         private static readonly char[] BindPathSplit = { '=' };
 
-        public CommandLine(IServiceProvider serviceProvider)
+        public CommandLine(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; set; }
 

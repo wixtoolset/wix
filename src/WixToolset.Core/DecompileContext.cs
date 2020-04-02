@@ -7,15 +7,16 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     internal class DecompileContext : IDecompileContext
     {
-        internal DecompileContext(IServiceProvider serviceProvider)
+        internal DecompileContext(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IServiceProvider ServiceProvider { get; }
+        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         public string DecompilePath { get; set; }
 

@@ -2,11 +2,11 @@
 
 namespace WixToolset.Core
 {
-    using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using System.Collections.Generic;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// Unbinder core of the WiX toolset.
@@ -20,6 +20,8 @@ namespace WixToolset.Core
         /// </summary>
         /// <value>Set to true if the input msi is part of an admin image.</value>
         public bool IsAdminImage { get; set; }
+
+        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         /// <summary>
         /// Gets or sets the option to suppress demodularizing values.
@@ -64,7 +66,7 @@ namespace WixToolset.Core
             // if we don't have the temporary files object yet, get one
             Directory.CreateDirectory(this.TempFilesLocation); // ensure the base path is there
 
-            var context = new UnbindContext();
+            var context = new UnbindContext(this.ServiceProvider);
             context.InputFilePath = file;
             context.ExportBasePath = exportBasePath;
             context.IntermediateFolder = this.TempFilesLocation;

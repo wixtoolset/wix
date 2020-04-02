@@ -11,12 +11,12 @@ namespace WixToolset.Core
 
     internal class LibraryContext : ILibraryContext
     {
-        internal LibraryContext(IServiceProvider serviceProvider)
+        internal LibraryContext(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        public IServiceProvider ServiceProvider { get; }
+        public IWixToolsetServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; set; }
 

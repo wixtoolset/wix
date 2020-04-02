@@ -14,7 +14,7 @@ namespace WixToolset.Core.CommandLine
     {
         private readonly CommandLine commandLine;
 
-        public DecompileCommand(IServiceProvider serviceProvider)
+        public DecompileCommand(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -25,7 +25,7 @@ namespace WixToolset.Core.CommandLine
 
         public bool StopParsing => this.commandLine.ShowHelp;
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; }
 

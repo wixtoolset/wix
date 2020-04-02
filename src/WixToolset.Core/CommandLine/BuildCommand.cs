@@ -16,7 +16,7 @@ namespace WixToolset.Core.CommandLine
     {
         private readonly CommandLine commandLine;
 
-        public BuildCommand(IServiceProvider serviceProvider)
+        public BuildCommand(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
@@ -28,7 +28,7 @@ namespace WixToolset.Core.CommandLine
 
         public bool StopParsing => this.commandLine.ShowHelp;
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -462,13 +462,13 @@ namespace WixToolset.Core.CommandLine
 
             public string BuiltOutputsFile { get; private set; }
 
-            public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
+            public CommandLine(IWixToolsetServiceProvider serviceProvider, IMessaging messaging)
             {
                 this.ServiceProvider = serviceProvider;
                 this.Messaging = messaging;
             }
 
-            private IServiceProvider ServiceProvider { get; }
+            private IWixToolsetServiceProvider ServiceProvider { get; }
 
             private IMessaging Messaging { get; }
 

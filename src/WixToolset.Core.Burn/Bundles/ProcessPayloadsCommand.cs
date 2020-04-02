@@ -19,7 +19,7 @@ namespace WixToolset.Core.Burn.Bundles
     {
         private static readonly Version EmptyVersion = new Version(0, 0, 0, 0);
 
-        public ProcessPayloadsCommand(IServiceProvider serviceProvider, IBackendHelper backendHelper, IEnumerable<WixBundlePayloadTuple> payloads, PackagingType defaultPackaging, string layoutDirectory)
+        public ProcessPayloadsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, IEnumerable<WixBundlePayloadTuple> payloads, PackagingType defaultPackaging, string layoutDirectory)
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
 

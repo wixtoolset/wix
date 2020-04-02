@@ -56,14 +56,14 @@ namespace WixToolset.Core
             Icon,
         }
 
-        internal Compiler(IServiceProvider serviceProvider)
+        internal Compiler(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         public IMessaging Messaging { get; }
 

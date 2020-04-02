@@ -33,14 +33,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private static readonly Regex PutGuidHere = new Regex(@"PUT\-GUID\-(?:\d+\-)?HERE", RegexOptions.Singleline);
 
-        public ParseHelper(IServiceProvider serviceProvider)
+        public ParseHelper(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = serviceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
@@ -976,7 +976,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private void CreateTupleDefinitionCreator()
         {
-            this.Creator = (ITupleDefinitionCreator)this.ServiceProvider.GetService(typeof(ITupleDefinitionCreator));
+            this.Creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
         }
 
         private static IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier)

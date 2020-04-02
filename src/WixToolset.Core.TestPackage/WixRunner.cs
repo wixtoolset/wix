@@ -23,7 +23,7 @@ namespace WixToolset.Core.TestPackage
             return new WixRunnerResult { ExitCode = exitCode, Messages = messages.ToArray() };
         }
 
-        public static int Execute(string[] args, IServiceProvider serviceProvider, out List<Message> messages)
+        public static int Execute(string[] args, IWixToolsetServiceProvider serviceProvider, out List<Message> messages)
         {
             var listener = new TestMessageListener();
 
@@ -42,7 +42,7 @@ namespace WixToolset.Core.TestPackage
             return command?.Execute() ?? 1;
         }
 
-        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IServiceProvider serviceProvider, string[] extensions)
+        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, string[] extensions)
         {
             var extensionManager = serviceProvider.GetService<IExtensionManager>();
 

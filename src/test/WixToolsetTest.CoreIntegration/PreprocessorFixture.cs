@@ -23,11 +23,11 @@ namespace WixToolsetTest.CoreIntegration
 
             var serviceProvider = new WixToolsetServiceProvider();
 
-            var context = (IPreprocessContext)serviceProvider.GetService(typeof(IPreprocessContext));
+            var context = serviceProvider.GetService<IPreprocessContext>();
             context.SourcePath = sourcePath;
             context.IncludeSearchPaths = new[] { includeFolder };
 
-            var preprocessor = (IPreprocessor)serviceProvider.GetService(typeof(IPreprocessor));
+            var preprocessor = serviceProvider.GetService<IPreprocessor>();
             var result = preprocessor.Preprocess(context);
 
             var includedFile = result.IncludedFiles.Single();

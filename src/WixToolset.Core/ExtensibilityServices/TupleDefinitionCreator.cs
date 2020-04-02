@@ -10,12 +10,12 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class TupleDefinitionCreator : ITupleDefinitionCreator
     {
-        public TupleDefinitionCreator(IServiceProvider serviceProvider)
+        public TupleDefinitionCreator(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IEnumerable<IExtensionData> ExtensionData { get; set; }
 
@@ -62,7 +62,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private void LoadExtensionData()
         {
-            var extensionManager = (IExtensionManager)this.ServiceProvider.GetService(typeof(IExtensionManager));
+            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
 
             this.ExtensionData = extensionManager.GetServices<IExtensionData>();
         }

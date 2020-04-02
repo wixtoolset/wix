@@ -17,14 +17,14 @@ namespace WixToolset.Core.ExtensibilityServices
         private static readonly char[] VariableSplitter = new char[] { '.' };
         private static readonly char[] ArgumentSplitter = new char[] { ',' };
 
-        public PreprocessHelper(IServiceProvider serviceProvider)
+        public PreprocessHelper(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;
 
             this.Messaging = this.ServiceProvider.GetService<IMessaging>();
         }
 
-        private IServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
         private IMessaging Messaging { get; }
 
