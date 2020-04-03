@@ -15,6 +15,27 @@ namespace WixBuildTools.TestSupport
         public static string[] QueryDatabase(string path, string[] tables)
         {
             var results = new List<string>();
+            var resultsByTable = QueryDatabaseByTable(path, tables);
+            var sortedTables = tables.ToList();
+            sortedTables.Sort();
+            foreach (var tableName in sortedTables)
+            {
+                var rows = resultsByTable[tableName];
+                rows?.ForEach(r => results.Add($"{tableName}:{r}"));
+            }
+            return results.ToArray();
+        }
+
+        /// <summary>
+        /// Returns rows from requested tables formatted to facilitate testing.
+        /// If the table did not exist in the database, its list will be null.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="tables"></param>
+        /// <returns></returns>
+        public static Dictionary<string, List<string>> QueryDatabaseByTable(string path, string[] tables)
+        {
+            var results = new Dictionary<string, List<string>>();
 
             if (tables?.Length > 0)
             {
@@ -25,9 +46,12 @@ namespace WixBuildTools.TestSupport
                     {
                         if (!db.IsTablePersistent(table))
                         {
+                            results.Add(table, null);
                             continue;
                         }
 
+                        var rows = new List<string>();
+                        results.Add(table, rows);
                         using (var view = db.OpenView("SELECT * FROM `{0}`", table))
                         {
                             view.Execute();
@@ -36,7 +60,6 @@ namespace WixBuildTools.TestSupport
                             while ((record = view.Fetch()) != null)
                             {
                                 sb.Clear();
-                                sb.AppendFormat("{0}:", table);
 
                                 using (record)
                                 {
@@ -51,15 +74,15 @@ namespace WixBuildTools.TestSupport
                                     }
                                 }
 
-                                results.Add(sb.ToString());
+                                rows.Add(sb.ToString());
                             }
                         }
+                        rows.Sort();
                     }
                 }
             }
 
-            results.Sort();
-            return results.ToArray();
+            return results;
         }
 
         public static CabFileInfo[] GetCabinetFiles(string path)
