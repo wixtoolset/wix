@@ -168,9 +168,8 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"example.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
 
                 var example = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).Single();
-                Assert.Null(example.Id?.Id);
-                Assert.Equal("Foo", example[0].AsString());
-                Assert.Equal("Bar", example[1].AsString());
+                Assert.Equal("Foo", example.Id?.Id);
+                Assert.Equal("Bar", example[0].AsString());
             }
         }
 
@@ -232,9 +231,8 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(@"other.txt", fileTuples[1][FileTupleFields.Source].PreviousValue.AsPath().Path);
 
                 var examples = section.Tuples.Where(t => t.Definition.Type == TupleDefinitionType.MustBeFromAnExtension).ToArray();
-                Assert.Equal(new string[] { null, null }, examples.Select(t => t.Id?.Id).ToArray());
-                Assert.Equal(new[] { "Foo", "Other" }, examples.Select(t => t.AsString(0)).ToArray());
-                Assert.Equal(new[] { "Bar", "Value" }, examples.Select(t => t[1].AsString()).ToArray());
+                Assert.Equal(new string[] { "Foo", "Other" }, examples.Select(t => t.Id?.Id).ToArray());
+                Assert.Equal(new[] { "Bar", "Value" }, examples.Select(t => t[0].AsString()).ToArray());
             }
         }
     }

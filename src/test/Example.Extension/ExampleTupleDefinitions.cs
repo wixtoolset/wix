@@ -13,7 +13,6 @@ namespace Example.Extension
             ExampleName,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ExampleTupleFields.Example), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ExampleTupleFields.Value), IntermediateFieldType.String),
             },
             typeof(ExampleTuple));

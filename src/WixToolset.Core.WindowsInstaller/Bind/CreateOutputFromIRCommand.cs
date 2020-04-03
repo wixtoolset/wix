@@ -64,10 +64,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddAssemblyTuple((AssemblyTuple)tuple);
                     break;
 
-                case TupleDefinitionType.Binary:
-                    this.AddTupleDefaultly(tuple, idIsPrimaryKey: true);
-                    break;
-
                 case TupleDefinitionType.BBControl:
                     this.AddBBControlTuple((BBControlTuple)tuple);
                     break;
@@ -112,10 +108,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddFileTuple((FileTuple)tuple);
                     break;
 
-                case TupleDefinitionType.Icon:
-                    this.AddTupleDefaultly(tuple, idIsPrimaryKey: true);
-                    break;
-
                 case TupleDefinitionType.IniFile:
                     this.AddIniFileTuple((IniFileTuple)tuple);
                     break;
@@ -142,10 +134,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 case TupleDefinitionType.MsiServiceConfigFailureActions:
                     this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.MsiShortcutProperty:
-                    this.AddTupleDefaultly(tuple, idIsPrimaryKey: true);
                     break;
 
                 case TupleDefinitionType.MoveFile:
@@ -177,10 +165,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddRemoveRegistryTuple((RemoveRegistryTuple)tuple);
                     break;
 
-                case TupleDefinitionType.ReserveCost:
-                    this.AddTupleDefaultly(tuple, idIsPrimaryKey: true);
-                    break;
-
                 case TupleDefinitionType.ServiceControl:
                     this.AddServiceControlTuple((ServiceControlTuple)tuple);
                     break;
@@ -191,10 +175,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 case TupleDefinitionType.Shortcut:
                     this.AddShortcutTuple((ShortcutTuple)tuple);
-                    break;
-                        
-                case TupleDefinitionType.Signature:
-                    this.AddTupleDefaultly(tuple, idIsPrimaryKey: true);
                     break;
 
                 case TupleDefinitionType.SummaryInformation:
@@ -1070,7 +1050,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddTupleDefaultly(IntermediateTuple tuple, bool idIsPrimaryKey = false, string tableName = null)
+        private void AddTupleDefaultly(IntermediateTuple tuple, string tableName = null)
         {
             if (!this.TableDefinitions.TryGet(tableName ?? tuple.Definition.Name, out var tableDefinition))
             {
@@ -1080,7 +1060,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var row = this.CreateRow(tuple, tableDefinition);
             var rowOffset = 0;
 
-            if (idIsPrimaryKey)
+            if (tableDefinition.TupleIdIsPrimaryKey)
             {
                 row[0] = tuple.Id.Id;
                 rowOffset = 1;

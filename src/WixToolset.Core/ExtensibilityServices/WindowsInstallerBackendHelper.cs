@@ -10,9 +10,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
     internal class WindowsInstallerBackendHelper : IWindowsInstallerBackendHelper
     {
-        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, IEnumerable<TableDefinition> tableDefinitions) => this.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, tableDefinitions, false);
-
-        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, IEnumerable<TableDefinition> tableDefinitions, bool columnZeroIsId)
+        public bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, IEnumerable<TableDefinition> tableDefinitions)
         {
             var tableDefinition = tableDefinitions.FirstOrDefault(t => t.TupleDefinitionName == tuple.Definition.Name);
 
@@ -25,7 +23,7 @@ namespace WixToolset.Core.ExtensibilityServices
             var row = table.CreateRow(tuple.SourceLineNumbers);
             var rowOffset = 0;
 
-            if (columnZeroIsId)
+            if (tableDefinition.TupleIdIsPrimaryKey)
             {
                 row[0] = tuple.Id.Id;
                 rowOffset = 1;
