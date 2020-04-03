@@ -2481,6 +2481,7 @@ namespace WixToolset.Util
                 var id = this.ParseHelper.CreateIdentifier("sec", objectId, tableName, domain, user);
                 var tuple = new SecureObjectsTuple(sourceLineNumbers, id)
                 {
+                    SecureObject = objectId,
                     Table = tableName,
                     Domain = domain,
                     User = user,

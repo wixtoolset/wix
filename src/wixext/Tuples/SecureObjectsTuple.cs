@@ -11,6 +11,7 @@ namespace WixToolset.Util
             UtilTupleDefinitionType.SecureObjects.ToString(),
             new[]
             {
+                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.SecureObject), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Table), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Domain), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.User), IntermediateFieldType.String),
@@ -27,6 +28,7 @@ namespace WixToolset.Util.Tuples
 
     public enum SecureObjectsTupleFields
     {
+        SecureObject,
         Table,
         Domain,
         User,
@@ -45,6 +47,12 @@ namespace WixToolset.Util.Tuples
         }
 
         public IntermediateField this[SecureObjectsTupleFields index] => this.Fields[(int)index];
+
+        public string SecureObject
+        {
+            get => this.Fields[(int)SecureObjectsTupleFields.SecureObject].AsString();
+            set => this.Set((int)SecureObjectsTupleFields.SecureObject, value);
+        }
 
         public string Table
         {
