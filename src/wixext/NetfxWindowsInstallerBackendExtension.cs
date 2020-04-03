@@ -3,7 +3,6 @@
 namespace WixToolset.Netfx
 {
     using System.Collections.Generic;
-    using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
@@ -26,11 +25,5 @@ namespace WixToolset.Netfx
         };
 
         public override IEnumerable<TableDefinition> TableDefinitions { get => Tables; }
-
-        public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
-        {
-            var columnZeroIsId = tuple.Id != null;
-            return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitions, columnZeroIsId);
-        }
     }
 }
