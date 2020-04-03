@@ -26,6 +26,7 @@ namespace WixToolset.Core.WindowsInstaller
             var validator = Validator.CreateFromContext(context, "darice.cub");
 
             IBindResult result = null;
+            var dispose = true;
             try
             {
                 var command = new BindDatabaseCommand(context, backendExtensions, validator);
@@ -36,12 +37,15 @@ namespace WixToolset.Core.WindowsInstaller
                     extension.PostBackendBind(result);
                 }
 
+                dispose = false;
                 return result;
             }
-            catch
+            finally
             {
-                result?.Dispose();
-                throw;
+                if (dispose)
+                {
+                    result?.Dispose();
+                }
             }
         }
 
