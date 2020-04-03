@@ -2,8 +2,10 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
+    using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
@@ -523,6 +525,38 @@ namespace WixToolsetTest.CoreIntegration
                     "Environment:WixEnvironmentTest3\t!-WixEnvTest1\t\tWixEnvironmentTest",
                     "Environment:WixEnvironmentTest4\t=-*WIX\t[INSTALLFOLDER]\tWixEnvironmentTest",
                 }, results);
+            }
+        }
+
+        [Fact]
+        public void PopulatesExampleTableBecauseOfEnsureTable()
+        {
+            var folder = TestData.Get(@"TestData");
+            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "EnsureTable", "EnsureTable.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-ext", extensionPath,
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabaseByTable(msiPath, new[] { "Wix4Example" });
+                Assert.Empty(results["Wix4Example"]);
             }
         }
 

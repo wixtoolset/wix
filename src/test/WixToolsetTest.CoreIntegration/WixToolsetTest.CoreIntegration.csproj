@@ -37,6 +37,7 @@
     <Content Include="TestData\DialogsInInstallUISequence\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\EnsureTable\EnsureTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Environment\Environment.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ErrorsInUI\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ErrorsInUI\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />

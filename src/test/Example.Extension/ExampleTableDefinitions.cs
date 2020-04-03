@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace Example.Extension
 {
@@ -7,7 +7,8 @@ namespace Example.Extension
     public static class ExampleTableDefinitions
     {
         public static readonly TableDefinition ExampleTable = new TableDefinition(
-            "Example",
+            "Wix4Example",
+            ExampleTupleDefinitions.Example.Name,
             new[]
             {
                 new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier),
