@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using SimpleJson;
 
@@ -27,9 +28,23 @@ namespace TablesAndTuples
                 if (args.Length < 2)
                 {
                     Console.WriteLine("Need to specify output json file as well.");
+                    return;
+                }
+                if (Path.GetExtension(args[1]) != ".json")
+                {
+                    Console.WriteLine("Output needs to be .json");
+                    return;
                 }
 
-                ReadXmlWriteJson(Path.GetFullPath(args[0]), Path.GetFullPath(args[1]));
+                string prefix = null;
+                if (args.Length > 2)
+                {
+                    prefix = args[2];
+                }
+
+                var csFile = Path.Combine(Path.GetDirectoryName(args[1]), String.Concat(prefix ?? "WindowsInstaller", "TableDefinitions.cs"));
+
+                ReadXmlWriteJson(Path.GetFullPath(args[0]), Path.GetFullPath(args[1]), Path.GetFullPath(csFile), prefix);
             }
             else if (Path.GetExtension(args[0]) == ".json")
             {
@@ -37,6 +52,7 @@ namespace TablesAndTuples
                 if (args.Length < 2)
                 {
                     Console.WriteLine("Need to specify output folder.");
+                    return;
                 }
                 else if (args.Length > 2)
                 {
@@ -47,8 +63,10 @@ namespace TablesAndTuples
             }
         }
 
-        private static void ReadXmlWriteJson(string inputPath, string outputPath)
+        private static void ReadXmlWriteJson(string inputPath, string outputPath, string csOutputPath, string prefix)
         {
+            ReadXmlWriteCs(inputPath, csOutputPath, prefix);
+
             var doc = XDocument.Load(inputPath);
 
             var array = new JsonArray();
@@ -97,6 +115,14 @@ namespace TablesAndTuples
             File.WriteAllText(outputPath, json);
         }
 
+        private static void ReadXmlWriteCs(string inputPath, string outputPath, string prefix)
+        {
+            var tableDefinitions = WixTableDefinition.LoadCollection(inputPath);
+            var text = GenerateCsTableDefinitionsFileText(prefix, tableDefinitions);
+            Console.WriteLine("Writing: {0}", outputPath);
+            File.WriteAllText(outputPath, text);
+        }
+
         private static void ReadJsonWriteCs(string inputPath, string outputFolder, string prefix)
         {
             var json = File.ReadAllText(inputPath);
@@ -140,6 +166,116 @@ namespace TablesAndTuples
 
                 yield return (Name: fieldName, Type: fieldType, ClrType: clrType, AsFunction: asFunction);
             }
+        }
+
+        private static string GenerateCsTableDefinitionsFileText(string prefix, List<WixTableDefinition> tableDefinitions)
+        {
+            var ns = prefix ?? "Data";
+
+            var startClassDef = String.Join(Environment.NewLine,
+                "// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.",
+                "",
+                "namespace WixToolset.{1}",
+                "{",
+                "    using WixToolset.Data.WindowsInstaller;",
+                "",
+                "    public static class {2}TableDefinitions",
+                "    {");
+            var startTableDef = String.Join(Environment.NewLine,
+                "        public static readonly TableDefinition {1} = new TableDefinition(",
+                "            \"{1}\",",
+                "            new[]",
+                "            {");
+            var columnDef =
+                "                new ColumnDefinition(\"{1}\", ColumnType.{2}, {3}, primaryKey: {4}, nullable: {5}, ColumnCategory.{6}";
+            var endColumnsDef = String.Join(Environment.NewLine,
+                "            },");
+            var unrealDef =
+                "            unreal: true,";
+            var endTableDef = String.Join(Environment.NewLine,
+                "            tupleDefinitionName: \"{1}\",",
+                "            tupleIdIsPrimaryKey: {2}",
+                "        );",
+                "");
+            var startAllTablesDef = String.Join(Environment.NewLine,
+                "        public static readonly TableDefinition[] All = new[]",
+                "        {");
+            var allTableDef =
+                "            {1},";
+            var endAllTablesDef =
+                "        };";
+            var endClassDef = String.Join(Environment.NewLine,
+                "    }",
+                "}");
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine(startClassDef.Replace("{1}", ns).Replace("{2}", prefix));
+            foreach (var tableDefinition in tableDefinitions)
+            {
+                sb.AppendLine(startTableDef.Replace("{1}", tableDefinition.Name));
+                foreach (var columnDefinition in tableDefinition.Columns)
+                {
+                    sb.Append(columnDef.Replace("{1}", columnDefinition.Name).Replace("{2}", columnDefinition.Type.ToString()).Replace("{3}", columnDefinition.Length.ToString())
+                        .Replace("{4}", columnDefinition.PrimaryKey.ToString().ToLower()).Replace("{5}", columnDefinition.Nullable.ToString().ToLower()).Replace("{6}", columnDefinition.Category.ToString()));
+                    if (columnDefinition.MinValue.HasValue)
+                    {
+                        sb.AppendFormat(", minValue: {0}", columnDefinition.MinValue.Value);
+                    }
+                    if (columnDefinition.MaxValue.HasValue)
+                    {
+                        sb.AppendFormat(", maxValue: {0}", columnDefinition.MaxValue.Value);
+                    }
+                    if (!String.IsNullOrEmpty(columnDefinition.KeyTable))
+                    {
+                        sb.AppendFormat(", keyTable: \"{0}\"", columnDefinition.KeyTable);
+                    }
+                    if (columnDefinition.KeyColumn.HasValue)
+                    {
+                        sb.AppendFormat(", keyColumn: {0}", columnDefinition.KeyColumn.Value);
+                    }
+                    if (!String.IsNullOrEmpty(columnDefinition.Possibilities))
+                    {
+                        sb.AppendFormat(", possibilities: \"{0}\"", columnDefinition.Possibilities);
+                    }
+                    if (!String.IsNullOrEmpty(columnDefinition.Description))
+                    {
+                        sb.AppendFormat(", description: \"{0}\"", columnDefinition.Description);
+                    }
+                    if (columnDefinition.ModularizeType.HasValue && columnDefinition.ModularizeType.Value != ColumnModularizeType.None)
+                    {
+                        sb.AppendFormat(", modularizeType: ColumnModularizeType.{0}", columnDefinition.ModularizeType.ToString());
+                    }
+                    if (columnDefinition.ForceLocalizable)
+                    {
+                        sb.Append(", forceLocalizable: true");
+                    }
+                    if (columnDefinition.UseCData)
+                    {
+                        sb.Append(", useCData: true");
+                    }
+                    if (columnDefinition.Unreal)
+                    {
+                        sb.Append(", unreal: true");
+                    }
+                    sb.AppendLine("),");
+                }
+                sb.AppendLine(endColumnsDef);
+                if (tableDefinition.Unreal)
+                {
+                    sb.AppendLine(unrealDef);
+                }
+                sb.AppendLine(endTableDef.Replace("{1}", tableDefinition.TupleDefinitionName).Replace("{2}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
+            }
+            sb.AppendLine(startAllTablesDef);
+            foreach (var tableDefinition in tableDefinitions)
+            {
+                sb.AppendLine(allTableDef.Replace("{1}", tableDefinition.Name));
+            }
+            sb.AppendLine(endAllTablesDef);
+            sb.AppendLine(endClassDef);
+
+            return sb.ToString();
         }
 
         private static string GenerateTupleFileText(string prefix, string tupleName, List<(string Name, string Type, string ClrType, string AsFunction)> tupleFields)
