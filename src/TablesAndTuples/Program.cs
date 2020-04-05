@@ -11,12 +11,6 @@ namespace TablesAndTuples
 {
     class Program
     {
-        static readonly XNamespace ns = "http://wixtoolset.org/schemas/v4/wi/tables";
-        static readonly XName TableDefinition = ns + "tableDefinition";
-        static readonly XName ColumnDefinition = ns + "columnDefinition";
-        static readonly XName Name = "name";
-        static readonly XName Type = "type";
-
         static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -65,22 +59,34 @@ namespace TablesAndTuples
 
         private static void ReadXmlWriteJson(string inputPath, string outputPath, string csOutputPath, string prefix)
         {
-            ReadXmlWriteCs(inputPath, csOutputPath, prefix);
-
-            var doc = XDocument.Load(inputPath);
+            var tableDefinitions = ReadXmlWriteCs(inputPath, csOutputPath, prefix);
 
             var array = new JsonArray();
 
-            foreach (var tableDefinition in doc.Descendants(TableDefinition))
+            foreach (var tableDefinition in tableDefinitions)
             {
-                var tupleType = tableDefinition.Attribute(Name).Value;
+                var tupleType = tableDefinition.Name;
 
                 var fields = new JsonArray();
+                var firstField = true;
 
-                foreach (var columnDefinition in tableDefinition.Elements(ColumnDefinition))
+                foreach (var columnDefinition in tableDefinition.Columns)
                 {
-                    var fieldName = columnDefinition.Attribute(Name).Value;
-                    var type = columnDefinition.Attribute(Type).Value;
+                    if (firstField)
+                    {
+                        firstField = false;
+                        if (tableDefinition.TupleIdIsPrimaryKey)
+                        {
+                            continue;
+                        }
+                    }
+
+                    var fieldName = columnDefinition.Name;
+                    fieldName = Regex.Replace(fieldName, "^([^_]+)_([^_]*)$", x =>
+                    {
+                        return $"{x.Groups[2].Value}{x.Groups[1].Value}Ref";
+                    });
+                    var type = columnDefinition.Type.ToString().ToLower();
 
                     if (type == "localized")
                     {
@@ -115,12 +121,13 @@ namespace TablesAndTuples
             File.WriteAllText(outputPath, json);
         }
 
-        private static void ReadXmlWriteCs(string inputPath, string outputPath, string prefix)
+        private static List<WixTableDefinition> ReadXmlWriteCs(string inputPath, string outputPath, string prefix)
         {
             var tableDefinitions = WixTableDefinition.LoadCollection(inputPath);
             var text = GenerateCsTableDefinitionsFileText(prefix, tableDefinitions);
             Console.WriteLine("Writing: {0}", outputPath);
             File.WriteAllText(outputPath, text);
+            return tableDefinitions;
         }
 
         private static void ReadJsonWriteCs(string inputPath, string outputFolder, string prefix)
