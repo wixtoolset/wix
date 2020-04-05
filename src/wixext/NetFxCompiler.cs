@@ -53,14 +53,14 @@ namespace WixToolset.Netfx
         /// <param name="fileId">The file identifier of the parent element.</param>
         private void ParseNativeImageElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string appBaseDirectory = null;
             string assemblyApplication = null;
             int attributes = 0x8; // 32bit is on by default
             int priority = 3;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -75,7 +75,7 @@ namespace WixToolset.Netfx
                             // See if a formatted value is specified.
                             if (-1 == appBaseDirectory.IndexOf("[", StringComparison.Ordinal))
                             {
-                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Directory", appBaseDirectory);
+                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, appBaseDirectory);
                             }
                             break;
                         case "AssemblyApplication":
@@ -84,7 +84,7 @@ namespace WixToolset.Netfx
                             // See if a formatted value is specified.
                             if (-1 == assemblyApplication.IndexOf("[", StringComparison.Ordinal))
                             {
-                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", assemblyApplication);
+                                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, assemblyApplication);
                             }
                             break;
                         case "Debug":
@@ -140,7 +140,7 @@ namespace WixToolset.Netfx
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("nni", fileId);
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -149,7 +149,7 @@ namespace WixToolset.Netfx
 
             if (!this.Messaging.EncounteredError)
             {
-                section.Tuples.Add(new NetFxNativeImageTuple(sourceLineNumbers, id)
+                section.AddTuple(new NetFxNativeImageTuple(sourceLineNumbers, id)
                 {
                     FileRef = fileId,
                     Priority = priority,
