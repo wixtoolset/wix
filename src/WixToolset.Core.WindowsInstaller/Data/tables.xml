@@ -3,7 +3,7 @@
 
 
 <tableDefinitions xmlns="http://wixtoolset.org/schemas/v4/wi/tables">
-    <tableDefinition name="ActionText">
+    <tableDefinition name="ActionText" tupleIdIsPrimaryKey="no">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Name of action to be described."/>
         <columnDefinition name="Description" type="localized" length="0" nullable="yes" escapeIdtCharacters="yes"

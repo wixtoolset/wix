@@ -8,13 +8,14 @@ namespace Example.Extension
     {
         public static readonly TableDefinition ExampleTable = new TableDefinition(
             "Wix4Example",
-            ExampleTupleDefinitions.Example.Name,
             new[]
             {
                 new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier),
                 new ColumnDefinition("Value", ColumnType.String, 0, false, false, ColumnCategory.Formatted),
-            }
-            );
+            },
+            tupleDefinitionName: ExampleTupleDefinitions.Example.Name,
+            tupleIdIsPrimaryKey: true
+        );
 
         public static readonly TableDefinition[] All = new[] { ExampleTable };
     }

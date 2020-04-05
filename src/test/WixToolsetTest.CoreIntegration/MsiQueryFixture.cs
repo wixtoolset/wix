@@ -313,6 +313,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] {
+                    "ActionText",
                     "AdminExecuteSequence",
                     "AdminUISequence",
                     "AdvtExecuteSequence",
@@ -324,6 +325,7 @@ namespace WixToolsetTest.CoreIntegration
                 }).Where(x => !x.StartsWith("Property:") || x.StartsWith("Property:MsiHiddenProperties\t")).ToArray();
                 Assert.Equal(new[]
                 {
+                    "ActionText:CustomAction2\tProgess2Text\t",
                     "AdminExecuteSequence:CostFinalize\t\t1000",
                     "AdminExecuteSequence:CostInitialize\t\t800",
                     "AdminExecuteSequence:CustomAction2\t\t801",

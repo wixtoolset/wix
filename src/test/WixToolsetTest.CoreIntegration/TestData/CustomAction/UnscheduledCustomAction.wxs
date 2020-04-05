@@ -2,10 +2,10 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <ComponentGroup Id="ProductComponents">
-            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+            <ComponentGroupRef Id="MinimalComponentGroup" />
         </ComponentGroup>
 
-        <Binary Id="Binary1" SourceFile="test.txt"></Binary>
+        <Binary Id="Binary1" SourceFile="test.txt" />
         <CustomAction Id="CustomAction1" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" />
         <CustomAction Id="DiscardOptimismAllBeingsWhoProceed" Error="Abandon hope all ye who enter here." />
         <CustomAction Id="CustomActionWithHiddenTarget" BinaryKey="Binary1" DllEntry="InvalidEntryPoint" Execute="deferred" HideTarget="yes" />
@@ -25,5 +25,9 @@
         <InstallUISequence>
             <Custom Action="CustomAction2" After="CostInitialize" />
         </InstallUISequence>
+
+        <UI>
+            <ProgressText Action="CustomAction2">Progess2Text</ProgressText>
+        </UI>
     </Fragment>
 </Wix>
