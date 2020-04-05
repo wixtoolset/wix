@@ -20,10 +20,10 @@ namespace WixToolsetTest.CoreIntegration
             var folder = TestData.Get(@"TestData\ExampleExtension");
             var build = new Builder(folder, typeof(ExampleExtensionFactory), new[] { Path.Combine(folder, "data") });
 
-            var results = build.BuildAndQuery(Build, "Example");
+            var results = build.BuildAndQuery(Build, "Wix4Example");
             Assert.Equal(new[]
             {
-                "Example:Foo\tBar"
+                "Wix4Example:Foo\tBar"
             }, results);
         }
 

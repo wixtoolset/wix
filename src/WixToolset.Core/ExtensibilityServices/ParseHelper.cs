@@ -220,15 +220,20 @@ namespace WixToolset.Core.ExtensibilityServices
             return id;
         }
 
-        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys)
+        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys)
         {
             var tuple = new WixSimpleReferenceTuple(sourceLineNumbers)
             {
-                Table = tableName,
+                Table = tupleName,
                 PrimaryKeys = String.Join("/", primaryKeys)
             };
 
             section.Tuples.Add(tuple);
+        }
+
+        public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys)
+        {
+            this.CreateSimpleReference(section, sourceLineNumbers, tupleDefinition.Name, primaryKeys);
         }
 
         [Obsolete]
@@ -309,26 +314,32 @@ namespace WixToolset.Core.ExtensibilityServices
             return this.CreateTuple(section, sourceLineNumbers, tupleType, identifier);
         }
 
-        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null)
+        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, Identifier identifier = null)
         {
             if (this.Creator == null)
             {
                 this.CreateTupleDefinitionCreator();
             }
 
-            if (!this.Creator.TryGetTupleDefinitionByName(tableName, out var tupleDefinition))
+            if (!this.Creator.TryGetTupleDefinitionByName(tupleName, out var tupleDefinition))
             {
-                throw new ArgumentException(nameof(tableName));
+                throw new ArgumentException(nameof(tupleName));
             }
 
-            return CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
+            return this.CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
         }
 
+        [Obsolete]
         public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
         {
             var tupleDefinition = TupleDefinitions.ByType(tupleType);
 
-            return CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
+            return this.CreateTuple(section, sourceLineNumbers, tupleDefinition, identifier);
+        }
+
+        public IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier = null)
+        {
+            return section.AddTuple(tupleDefinition.CreateTuple(sourceLineNumbers, identifier));
         }
 
         public string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args)
@@ -381,6 +392,17 @@ namespace WixToolset.Core.ExtensibilityServices
             return shortName.ToString().ToLowerInvariant();
         }
 
+        public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
+        {
+            section.AddTuple(new WixEnsureTableTuple(sourceLineNumbers)
+            {
+                Table = tableDefinition.Name,
+            });
+
+            // TODO: Check if the given table definition is a custom table. For now we have to assume that it isn't.
+            //this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixCustomTable, tableDefinition.Name);
+        }
+
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName)
         {
             section.Tuples.Add(new WixEnsureTableTuple(sourceLineNumbers)
@@ -393,12 +415,13 @@ namespace WixToolset.Core.ExtensibilityServices
                 this.CreateTupleDefinitionCreator();
             }
 
+            // TODO: The tableName may not be the same as the tupleName. For now, we have to assume that it is.
             // We don't add custom table definitions to the tableDefinitions collection,
             // so if it's not in there, it better be a custom table. If the Id is just wrong,
             // instead of a custom table, we get an unresolved reference at link time.
             if (!this.Creator.TryGetTupleDefinitionByName(tableName, out var ignored))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.WixCustomTable), tableName);
+                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixCustomTable, tableName);
             }
         }
 
@@ -977,11 +1000,6 @@ namespace WixToolset.Core.ExtensibilityServices
         private void CreateTupleDefinitionCreator()
         {
             this.Creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
-        }
-
-        private static IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier)
-        {
-            return section.AddTuple(tupleDefinition.CreateTuple(sourceLineNumbers, identifier));
         }
 
         private static bool TryFindExtension(IEnumerable<ICompilerExtension> extensions, XNamespace ns, out ICompilerExtension extension)
