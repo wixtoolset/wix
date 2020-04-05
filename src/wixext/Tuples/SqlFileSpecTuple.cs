@@ -11,7 +11,6 @@ namespace WixToolset.Sql
             SqlTupleDefinitionType.SqlFileSpec.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.FileSpec), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.Filename), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlFileSpecTupleFields.Size), IntermediateFieldType.String),
@@ -28,7 +27,6 @@ namespace WixToolset.Sql.Tuples
 
     public enum SqlFileSpecTupleFields
     {
-        FileSpec,
         Name,
         Filename,
         Size,
@@ -47,12 +45,6 @@ namespace WixToolset.Sql.Tuples
         }
 
         public IntermediateField this[SqlFileSpecTupleFields index] => this.Fields[(int)index];
-
-        public string FileSpec
-        {
-            get => this.Fields[(int)SqlFileSpecTupleFields.FileSpec].AsString();
-            set => this.Set((int)SqlFileSpecTupleFields.FileSpec, value);
-        }
 
         public string Name
         {

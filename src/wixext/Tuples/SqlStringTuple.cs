@@ -11,11 +11,10 @@ namespace WixToolset.Sql
             SqlTupleDefinitionType.SqlString.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.String), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.SqlDb_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.SqlDbRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlStringTupleFields.SQL), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.User_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlStringTupleFields.UserRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlStringTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(SqlStringTupleFields.Sequence), IntermediateFieldType.Number),
             },
@@ -29,11 +28,10 @@ namespace WixToolset.Sql.Tuples
 
     public enum SqlStringTupleFields
     {
-        String,
-        SqlDb_,
-        Component_,
+        SqlDbRef,
+        ComponentRef,
         SQL,
-        User_,
+        UserRef,
         Attributes,
         Sequence,
     }
@@ -50,22 +48,16 @@ namespace WixToolset.Sql.Tuples
 
         public IntermediateField this[SqlStringTupleFields index] => this.Fields[(int)index];
 
-        public string String
+        public string SqlDbRef
         {
-            get => this.Fields[(int)SqlStringTupleFields.String].AsString();
-            set => this.Set((int)SqlStringTupleFields.String, value);
+            get => this.Fields[(int)SqlStringTupleFields.SqlDbRef].AsString();
+            set => this.Set((int)SqlStringTupleFields.SqlDbRef, value);
         }
 
-        public string SqlDb_
+        public string ComponentRef
         {
-            get => this.Fields[(int)SqlStringTupleFields.SqlDb_].AsString();
-            set => this.Set((int)SqlStringTupleFields.SqlDb_, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)SqlStringTupleFields.Component_].AsString();
-            set => this.Set((int)SqlStringTupleFields.Component_, value);
+            get => this.Fields[(int)SqlStringTupleFields.ComponentRef].AsString();
+            set => this.Set((int)SqlStringTupleFields.ComponentRef, value);
         }
 
         public string SQL
@@ -74,10 +66,10 @@ namespace WixToolset.Sql.Tuples
             set => this.Set((int)SqlStringTupleFields.SQL, value);
         }
 
-        public string User_
+        public string UserRef
         {
-            get => this.Fields[(int)SqlStringTupleFields.User_].AsString();
-            set => this.Set((int)SqlStringTupleFields.User_, value);
+            get => this.Fields[(int)SqlStringTupleFields.UserRef].AsString();
+            set => this.Set((int)SqlStringTupleFields.UserRef, value);
         }
 
         public int Attributes

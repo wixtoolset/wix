@@ -11,11 +11,10 @@ namespace WixToolset.Sql
             SqlTupleDefinitionType.SqlScript.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.Script), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.SqlDb_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.ScriptBinary_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.User_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.SqlDbRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.ScriptBinaryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.UserRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(SqlScriptTupleFields.Sequence), IntermediateFieldType.Number),
             },
@@ -29,11 +28,10 @@ namespace WixToolset.Sql.Tuples
 
     public enum SqlScriptTupleFields
     {
-        Script,
-        SqlDb_,
-        Component_,
-        ScriptBinary_,
-        User_,
+        SqlDbRef,
+        ComponentRef,
+        ScriptBinaryRef,
+        UserRef,
         Attributes,
         Sequence,
     }
@@ -50,34 +48,28 @@ namespace WixToolset.Sql.Tuples
 
         public IntermediateField this[SqlScriptTupleFields index] => this.Fields[(int)index];
 
-        public string Script
+        public string SqlDbRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.Script].AsString();
-            set => this.Set((int)SqlScriptTupleFields.Script, value);
+            get => this.Fields[(int)SqlScriptTupleFields.SqlDbRef].AsString();
+            set => this.Set((int)SqlScriptTupleFields.SqlDbRef, value);
         }
 
-        public string SqlDb_
+        public string ComponentRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.SqlDb_].AsString();
-            set => this.Set((int)SqlScriptTupleFields.SqlDb_, value);
+            get => this.Fields[(int)SqlScriptTupleFields.ComponentRef].AsString();
+            set => this.Set((int)SqlScriptTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string ScriptBinaryRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.Component_].AsString();
-            set => this.Set((int)SqlScriptTupleFields.Component_, value);
+            get => this.Fields[(int)SqlScriptTupleFields.ScriptBinaryRef].AsString();
+            set => this.Set((int)SqlScriptTupleFields.ScriptBinaryRef, value);
         }
 
-        public string ScriptBinary_
+        public string UserRef
         {
-            get => this.Fields[(int)SqlScriptTupleFields.ScriptBinary_].AsString();
-            set => this.Set((int)SqlScriptTupleFields.ScriptBinary_, value);
-        }
-
-        public string User_
-        {
-            get => this.Fields[(int)SqlScriptTupleFields.User_].AsString();
-            set => this.Set((int)SqlScriptTupleFields.User_, value);
+            get => this.Fields[(int)SqlScriptTupleFields.UserRef].AsString();
+            set => this.Set((int)SqlScriptTupleFields.UserRef, value);
         }
 
         public int Attributes

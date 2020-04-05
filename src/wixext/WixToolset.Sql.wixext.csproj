@@ -14,7 +14,6 @@
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
     <Content Include="sql.xsd" PackagePath="tools" />
-    <EmbeddedResource Include="tables.xml" />
     <EmbeddedResource Include="$(OutputPath)..\sql.wixlib" />
   </ItemGroup>
 

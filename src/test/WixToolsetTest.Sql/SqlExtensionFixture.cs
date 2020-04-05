@@ -19,8 +19,8 @@ namespace WixToolsetTest.Sql
             var results = build.BuildAndQuery(Build, "SqlString");
             Assert.Equal(new[]
             {
-                "SqlString:TestString\tTestDB\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tCREATE TABLE TestTable1(name varchar(20), value varchar(20))\t\t1\t0",
-            }, results.OrderBy(s => s).ToArray());
+                "SqlString:TestString\tTestDB\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tCREATE TABLE TestTable1(name varchar(20), value varchar(20))\t\t1\t",
+            }, results.ToArray());
         }
 
         private static void Build(string[] args)

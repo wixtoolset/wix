@@ -11,14 +11,13 @@ namespace WixToolset.Sql
             SqlTupleDefinitionType.SqlDatabase.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.SqlDb), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Server), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Instance), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Database), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.User_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.FileSpec_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.FileSpec_Log), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.UserRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.FileSpecRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.LogFileSpecRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SqlDatabaseTupleFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(SqlDatabaseTuple));
@@ -31,14 +30,13 @@ namespace WixToolset.Sql.Tuples
 
     public enum SqlDatabaseTupleFields
     {
-        SqlDb,
         Server,
         Instance,
         Database,
-        Component_,
-        User_,
-        FileSpec_,
-        FileSpec_Log,
+        ComponentRef,
+        UserRef,
+        FileSpecRef,
+        LogFileSpecRef,
         Attributes,
     }
 
@@ -53,12 +51,6 @@ namespace WixToolset.Sql.Tuples
         }
 
         public IntermediateField this[SqlDatabaseTupleFields index] => this.Fields[(int)index];
-
-        public string SqlDb
-        {
-            get => this.Fields[(int)SqlDatabaseTupleFields.SqlDb].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.SqlDb, value);
-        }
 
         public string Server
         {
@@ -78,28 +70,28 @@ namespace WixToolset.Sql.Tuples
             set => this.Set((int)SqlDatabaseTupleFields.Database, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.Component_].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.Component_, value);
+            get => this.Fields[(int)SqlDatabaseTupleFields.ComponentRef].AsString();
+            set => this.Set((int)SqlDatabaseTupleFields.ComponentRef, value);
         }
 
-        public string User_
+        public string UserRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.User_].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.User_, value);
+            get => this.Fields[(int)SqlDatabaseTupleFields.UserRef].AsString();
+            set => this.Set((int)SqlDatabaseTupleFields.UserRef, value);
         }
 
-        public string FileSpec_
+        public string FileSpecRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.FileSpec_].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.FileSpec_, value);
+            get => this.Fields[(int)SqlDatabaseTupleFields.FileSpecRef].AsString();
+            set => this.Set((int)SqlDatabaseTupleFields.FileSpecRef, value);
         }
 
-        public string FileSpec_Log
+        public string LogFileSpecRef
         {
-            get => this.Fields[(int)SqlDatabaseTupleFields.FileSpec_Log].AsString();
-            set => this.Set((int)SqlDatabaseTupleFields.FileSpec_Log, value);
+            get => this.Fields[(int)SqlDatabaseTupleFields.LogFileSpecRef].AsString();
+            set => this.Set((int)SqlDatabaseTupleFields.LogFileSpecRef, value);
         }
 
         public int Attributes

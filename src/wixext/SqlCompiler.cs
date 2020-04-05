@@ -7,6 +7,7 @@ namespace WixToolset.Sql
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Sql.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset SQL Server Extension.
@@ -45,8 +46,8 @@ namespace WixToolset.Sql
             switch (parentElement.Name.LocalName)
             {
                 case "Component":
-                    string componentId = context["ComponentId"];
-                    string directoryId = context["DirectoryId"];
+                    var componentId = context["ComponentId"];
+                    var directoryId = context["DirectoryId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -92,7 +93,7 @@ namespace WixToolset.Sql
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseSqlDatabaseElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
             string database = null;
@@ -102,7 +103,7 @@ namespace WixToolset.Sql
             string server = null;
             string user = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -230,7 +231,7 @@ namespace WixToolset.Sql
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("sdb", componentId, server, database);
             }
 
             if (null == database)
@@ -252,11 +253,11 @@ namespace WixToolset.Sql
                 this.Messaging.Write(SqlErrors.OneOfAttributesRequiredUnderComponent(sourceLineNumbers, element.Name.LocalName, "CreateOnInstall", "CreateOnUninstall", "DropOnInstall", "DropOnUninstall"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                    var childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "SqlScript":
@@ -285,7 +286,7 @@ namespace WixToolset.Sql
                                 this.Messaging.Write(ErrorMessages.TooManyElements(sourceLineNumbers, element.Name.LocalName, child.Name.LocalName, 1));
                             }
 
-                            fileSpec = this.ParseSqlFileSpecElement(intermediate, section, child);
+                            fileSpec = this.ParseSqlFileSpecElement(intermediate, section, child, id?.Id);
                             break;
                         case "SqlLogFileSpec":
                             if (null == componentId)
@@ -297,7 +298,7 @@ namespace WixToolset.Sql
                                 this.Messaging.Write(ErrorMessages.TooManyElements(sourceLineNumbers, element.Name.LocalName, child.Name.LocalName, 1));
                             }
 
-                            logFileSpec = this.ParseSqlFileSpecElement(intermediate, section, child);
+                            logFileSpec = this.ParseSqlFileSpecElement(intermediate, section, child, id?.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(element, child);
@@ -313,23 +314,25 @@ namespace WixToolset.Sql
             if (null != componentId)
             {
                 // Reference InstallSqlData and UninstallSqlData since nothing will happen without it
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallSqlData");
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallSqlData");
+                this.AddReferenceToInstallSqlData(section, sourceLineNumbers);
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlDatabase", id);
-                row.Set(1, server);
-                row.Set(2, instance);
-                row.Set(3, database);
-                row.Set(4, componentId);
-                row.Set(5, user);
-                row.Set(6, fileSpec?.Id);
-                row.Set(7, logFileSpec?.Id);
+                var tuple = section.AddTuple(new SqlDatabaseTuple(sourceLineNumbers, id)
+                {
+                    Server = server,
+                    Instance = instance,
+                    Database = database,
+                    ComponentRef = componentId,
+                    UserRef = user,
+                    FileSpecRef = fileSpec?.Id,
+                    LogFileSpecRef = logFileSpec?.Id,
+                });
+
                 if (0 != attributes)
                 {
-                    row.Set(8, attributes);
+                    tuple.Attributes = attributes;
                 }
             }
         }
@@ -341,9 +344,9 @@ namespace WixToolset.Sql
         /// <param name="section"></param>
         /// <param name="element">Element to parse.</param>
         /// <returns>Identifier of sql file specification.</returns>
-        private Identifier ParseSqlFileSpecElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        private Identifier ParseSqlFileSpecElement(Intermediate intermediate, IntermediateSection section, XElement element, string parentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string fileName = null;
             string growthSize = null;
@@ -351,7 +354,7 @@ namespace WixToolset.Sql
             string name = null;
             string size = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -388,7 +391,7 @@ namespace WixToolset.Sql
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("sfs", parentId, name, fileName);
             }
 
             if (null == name)
@@ -405,22 +408,25 @@ namespace WixToolset.Sql
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlFileSpec", id);
-                row.Set(1, name);
-                row.Set(2, fileName);
+                var tuple = section.AddTuple(new SqlFileSpecTuple(sourceLineNumbers, id)
+                {
+                    Name = name,
+                    Filename = fileName,
+                });
+
                 if (null != size)
                 {
-                    row.Set(3, size);
+                    tuple.Size = size;
                 }
 
                 if (null != maxSize)
                 {
-                    row.Set(4, maxSize);
+                    tuple.MaxSize = maxSize;
                 }
 
                 if (null != growthSize)
                 {
-                    row.Set(5, growthSize);
+                    tuple.GrowthSize = growthSize;
                 }
             }
 
@@ -435,16 +441,16 @@ namespace WixToolset.Sql
         /// <param name="sqlDb">Optional database to execute script against.</param>
         private void ParseSqlScriptElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string sqlDb)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
-            bool rollbackAttribute = false;
-            bool nonRollbackAttribute = false;
+            var rollbackAttribute = false;
+            var nonRollbackAttribute = false;
             string binary = null;
-            int sequence = CompilerConstants.IntegerNotSet;
+            var sequence = CompilerConstants.IntegerNotSet;
             string user = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -455,7 +461,7 @@ namespace WixToolset.Sql
                             break;
                         case "BinaryKey":
                             binary = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Binary", binary);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Binary, binary);
                             break;
                         case "Sequence":
                             sequence = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, short.MaxValue);
@@ -466,7 +472,7 @@ namespace WixToolset.Sql
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName, element.Parent.Name.LocalName));
                             }
                             sqlDb = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "SqlDatabase", sqlDb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SqlTupleDefinitions.SqlDatabase, sqlDb);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -568,7 +574,7 @@ namespace WixToolset.Sql
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("ssc", componentId, binary, sqlDb);
             }
 
             if (null == binary)
@@ -589,20 +595,22 @@ namespace WixToolset.Sql
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallSqlData and UninstallSqlData since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallSqlData");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallSqlData");
+            this.AddReferenceToInstallSqlData(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlScript", id);
-                row.Set(1, sqlDb);
-                row.Set(2, componentId);
-                row.Set(3, binary);
-                row.Set(4, user);
-                row.Set(5, attributes);
+                var tuple = section.AddTuple(new SqlScriptTuple(sourceLineNumbers, id)
+                {
+                    SqlDbRef = sqlDb,
+                    ComponentRef = componentId,
+                    ScriptBinaryRef = binary,
+                    UserRef = user,
+                    Attributes = attributes,
+                });
+
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row.Set(6, sequence);
+                    tuple.Sequence = sequence;
                 }
             }
         }
@@ -615,16 +623,16 @@ namespace WixToolset.Sql
         /// <param name="sqlDb">Optional database to execute string against.</param>
         private void ParseSqlStringElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string sqlDb)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
-            bool rollbackAttribute = false;
-            bool nonRollbackAttribute = false;
-            int sequence = CompilerConstants.IntegerNotSet;
+            var rollbackAttribute = false;
+            var nonRollbackAttribute = false;
+            var sequence = CompilerConstants.IntegerNotSet;
             string sql = null;
             string user = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -727,7 +735,7 @@ namespace WixToolset.Sql
                             }
 
                             sqlDb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "SqlDatabase", sqlDb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SqlTupleDefinitions.SqlDatabase, sqlDb);
                             break;
                         case "User":
                             user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -746,7 +754,7 @@ namespace WixToolset.Sql
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("sst", componentId, sql, sqlDb);
             }
 
             if (null == sql)
@@ -767,22 +775,30 @@ namespace WixToolset.Sql
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallSqlData and UninstallSqlData since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallSqlData");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallSqlData");
+            this.AddReferenceToInstallSqlData(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "SqlString", id);
-                row.Set(1, sqlDb);
-                row.Set(2, componentId);
-                row.Set(3, sql);
-                row.Set(4, user);
-                row.Set(5, attributes);
+                var tuple = section.AddTuple(new SqlStringTuple(sourceLineNumbers, id)
+                {
+                    SqlDbRef = sqlDb,
+                    ComponentRef = componentId,
+                    SQL = sql,
+                    UserRef = user,
+                    Attributes = attributes,
+                });
+
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row.Set(6, sequence);
+                    tuple.Sequence = sequence;
                 }
             }
+        }
+
+        private void AddReferenceToInstallSqlData(IntermediateSection section, SourceLineNumber sourceLineNumbers)
+        {
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "InstallSqlData");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "UninstallSqlData");
         }
     }
 }
