@@ -11,7 +11,6 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebLog.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebLogTupleFields.Log), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebLogTupleFields.Format), IntermediateFieldType.String),
             },
             typeof(IIsWebLogTuple));
@@ -24,7 +23,6 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebLogTupleFields
     {
-        Log,
         Format,
     }
 
@@ -39,12 +37,6 @@ namespace WixToolset.Iis.Tuples
         }
 
         public IntermediateField this[IIsWebLogTupleFields index] => this.Fields[(int)index];
-
-        public string Log
-        {
-            get => this.Fields[(int)IIsWebLogTupleFields.Log].AsString();
-            set => this.Set((int)IIsWebLogTupleFields.Log, value);
-        }
 
         public string Format
         {

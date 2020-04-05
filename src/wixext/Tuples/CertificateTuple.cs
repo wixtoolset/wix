@@ -11,13 +11,12 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.Certificate.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.Certificate), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CertificateTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CertificateTupleFields.StoreLocation), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(CertificateTupleFields.StoreName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CertificateTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(CertificateTupleFields.Binary_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateTupleFields.BinaryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CertificateTupleFields.CertificatePath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CertificateTupleFields.PFXPassword), IntermediateFieldType.String),
             },
@@ -31,13 +30,12 @@ namespace WixToolset.Iis.Tuples
 
     public enum CertificateTupleFields
     {
-        Certificate,
-        Component_,
+        ComponentRef,
         Name,
         StoreLocation,
         StoreName,
         Attributes,
-        Binary_,
+        BinaryRef,
         CertificatePath,
         PFXPassword,
     }
@@ -54,16 +52,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[CertificateTupleFields index] => this.Fields[(int)index];
 
-        public string Certificate
+        public string ComponentRef
         {
-            get => this.Fields[(int)CertificateTupleFields.Certificate].AsString();
-            set => this.Set((int)CertificateTupleFields.Certificate, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)CertificateTupleFields.Component_].AsString();
-            set => this.Set((int)CertificateTupleFields.Component_, value);
+            get => this.Fields[(int)CertificateTupleFields.ComponentRef].AsString();
+            set => this.Set((int)CertificateTupleFields.ComponentRef, value);
         }
 
         public string Name
@@ -90,10 +82,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)CertificateTupleFields.Attributes, value);
         }
 
-        public string Binary_
+        public string BinaryRef
         {
-            get => this.Fields[(int)CertificateTupleFields.Binary_].AsString();
-            set => this.Set((int)CertificateTupleFields.Binary_, value);
+            get => this.Fields[(int)CertificateTupleFields.BinaryRef].AsString();
+            set => this.Set((int)CertificateTupleFields.BinaryRef, value);
         }
 
         public string CertificatePath

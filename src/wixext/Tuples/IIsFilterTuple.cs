@@ -11,11 +11,10 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsFilter.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Filter), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Path), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Web_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.WebRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.Flags), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsFilterTupleFields.LoadOrder), IntermediateFieldType.Number),
@@ -30,11 +29,10 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsFilterTupleFields
     {
-        Filter,
         Name,
-        Component_,
+        ComponentRef,
         Path,
-        Web_,
+        WebRef,
         Description,
         Flags,
         LoadOrder,
@@ -52,22 +50,16 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsFilterTupleFields index] => this.Fields[(int)index];
 
-        public string Filter
-        {
-            get => this.Fields[(int)IIsFilterTupleFields.Filter].AsString();
-            set => this.Set((int)IIsFilterTupleFields.Filter, value);
-        }
-
         public string Name
         {
             get => this.Fields[(int)IIsFilterTupleFields.Name].AsString();
             set => this.Set((int)IIsFilterTupleFields.Name, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsFilterTupleFields.Component_].AsString();
-            set => this.Set((int)IIsFilterTupleFields.Component_, value);
+            get => this.Fields[(int)IIsFilterTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsFilterTupleFields.ComponentRef, value);
         }
 
         public string Path
@@ -76,10 +68,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsFilterTupleFields.Path, value);
         }
 
-        public string Web_
+        public string WebRef
         {
-            get => this.Fields[(int)IIsFilterTupleFields.Web_].AsString();
-            set => this.Set((int)IIsFilterTupleFields.Web_, value);
+            get => this.Fields[(int)IIsFilterTupleFields.WebRef].AsString();
+            set => this.Set((int)IIsFilterTupleFields.WebRef, value);
         }
 
         public string Description

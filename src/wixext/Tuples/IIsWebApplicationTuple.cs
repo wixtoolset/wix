@@ -11,7 +11,6 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebApplication.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.Application), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.Isolation), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.AllowSessions), IntermediateFieldType.Number),
@@ -22,7 +21,7 @@ namespace WixToolset.Iis
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.ScriptTimeout), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.ServerDebugging), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.ClientDebugging), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.AppPool_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebApplicationTupleFields.AppPoolRef), IntermediateFieldType.String),
             },
             typeof(IIsWebApplicationTuple));
     }
@@ -34,7 +33,6 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebApplicationTupleFields
     {
-        Application,
         Name,
         Isolation,
         AllowSessions,
@@ -45,7 +43,7 @@ namespace WixToolset.Iis.Tuples
         ScriptTimeout,
         ServerDebugging,
         ClientDebugging,
-        AppPool_,
+        AppPoolRef,
     }
 
     public class IIsWebApplicationTuple : IntermediateTuple
@@ -59,12 +57,6 @@ namespace WixToolset.Iis.Tuples
         }
 
         public IntermediateField this[IIsWebApplicationTupleFields index] => this.Fields[(int)index];
-
-        public string Application
-        {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.Application].AsString();
-            set => this.Set((int)IIsWebApplicationTupleFields.Application, value);
-        }
 
         public string Name
         {
@@ -126,10 +118,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebApplicationTupleFields.ClientDebugging, value);
         }
 
-        public string AppPool_
+        public string AppPoolRef
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.AppPool_].AsString();
-            set => this.Set((int)IIsWebApplicationTupleFields.AppPool_, value);
+            get => this.Fields[(int)IIsWebApplicationTupleFields.AppPoolRef].AsString();
+            set => this.Set((int)IIsWebApplicationTupleFields.AppPoolRef, value);
         }
     }
 }

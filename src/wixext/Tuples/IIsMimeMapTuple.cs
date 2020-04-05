@@ -11,7 +11,6 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsMimeMap.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.MimeMap), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.ParentType), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.ParentValue), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsMimeMapTupleFields.MimeType), IntermediateFieldType.String),
@@ -27,7 +26,6 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsMimeMapTupleFields
     {
-        MimeMap,
         ParentType,
         ParentValue,
         MimeType,
@@ -45,12 +43,6 @@ namespace WixToolset.Iis.Tuples
         }
 
         public IntermediateField this[IIsMimeMapTupleFields index] => this.Fields[(int)index];
-
-        public string MimeMap
-        {
-            get => this.Fields[(int)IIsMimeMapTupleFields.MimeMap].AsString();
-            set => this.Set((int)IIsMimeMapTupleFields.MimeMap, value);
-        }
 
         public int ParentType
         {

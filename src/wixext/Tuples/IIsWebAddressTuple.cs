@@ -11,8 +11,7 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebAddress.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Address), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Web_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.WebRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.IP), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Port), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebAddressTupleFields.Header), IntermediateFieldType.String),
@@ -28,8 +27,7 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebAddressTupleFields
     {
-        Address,
-        Web_,
+        WebRef,
         IP,
         Port,
         Header,
@@ -48,16 +46,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebAddressTupleFields index] => this.Fields[(int)index];
 
-        public string Address
+        public string WebRef
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.Address].AsString();
-            set => this.Set((int)IIsWebAddressTupleFields.Address, value);
-        }
-
-        public string Web_
-        {
-            get => this.Fields[(int)IIsWebAddressTupleFields.Web_].AsString();
-            set => this.Set((int)IIsWebAddressTupleFields.Web_, value);
+            get => this.Fields[(int)IIsWebAddressTupleFields.WebRef].AsString();
+            set => this.Set((int)IIsWebAddressTupleFields.WebRef, value);
         }
 
         public string IP

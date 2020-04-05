@@ -11,18 +11,17 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebSite.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Web), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.ConnectionTimeout), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Directory_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.DirectoryRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.State), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.KeyAddress_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.DirProperties_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Application_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.KeyAddressRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.DirPropertiesRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.ApplicationRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Sequence), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.Log_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.LogRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebSiteTupleFields.WebsiteId), IntermediateFieldType.String),
             },
             typeof(IIsWebSiteTuple));
@@ -35,18 +34,17 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebSiteTupleFields
     {
-        Web,
-        Component_,
+        ComponentRef,
         Description,
         ConnectionTimeout,
-        Directory_,
+        DirectoryRef,
         State,
         Attributes,
-        KeyAddress_,
-        DirProperties_,
-        Application_,
+        KeyAddressRef,
+        DirPropertiesRef,
+        ApplicationRef,
         Sequence,
-        Log_,
+        LogRef,
         WebsiteId,
     }
 
@@ -62,16 +60,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebSiteTupleFields index] => this.Fields[(int)index];
 
-        public string Web
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.Web].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.Web, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)IIsWebSiteTupleFields.Component_].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.Component_, value);
+            get => this.Fields[(int)IIsWebSiteTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsWebSiteTupleFields.ComponentRef, value);
         }
 
         public string Description
@@ -86,10 +78,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebSiteTupleFields.ConnectionTimeout, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.Directory_].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.Directory_, value);
+            get => this.Fields[(int)IIsWebSiteTupleFields.DirectoryRef].AsString();
+            set => this.Set((int)IIsWebSiteTupleFields.DirectoryRef, value);
         }
 
         public int State
@@ -104,22 +96,22 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebSiteTupleFields.Attributes, value);
         }
 
-        public string KeyAddress_
+        public string KeyAddressRef
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.KeyAddress_].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.KeyAddress_, value);
+            get => this.Fields[(int)IIsWebSiteTupleFields.KeyAddressRef].AsString();
+            set => this.Set((int)IIsWebSiteTupleFields.KeyAddressRef, value);
         }
 
-        public string DirProperties_
+        public string DirPropertiesRef
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.DirProperties_].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.DirProperties_, value);
+            get => this.Fields[(int)IIsWebSiteTupleFields.DirPropertiesRef].AsString();
+            set => this.Set((int)IIsWebSiteTupleFields.DirPropertiesRef, value);
         }
 
-        public string Application_
+        public string ApplicationRef
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.Application_].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.Application_, value);
+            get => this.Fields[(int)IIsWebSiteTupleFields.ApplicationRef].AsString();
+            set => this.Set((int)IIsWebSiteTupleFields.ApplicationRef, value);
         }
 
         public int Sequence
@@ -128,10 +120,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebSiteTupleFields.Sequence, value);
         }
 
-        public string Log_
+        public string LogRef
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.Log_].AsString();
-            set => this.Set((int)IIsWebSiteTupleFields.Log_, value);
+            get => this.Fields[(int)IIsWebSiteTupleFields.LogRef].AsString();
+            set => this.Set((int)IIsWebSiteTupleFields.LogRef, value);
         }
 
         public string WebsiteId

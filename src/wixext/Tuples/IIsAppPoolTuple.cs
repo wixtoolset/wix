@@ -11,11 +11,10 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsAppPool.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.AppPool), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.User_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.UserRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.RecycleMinutes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.RecycleRequests), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsAppPoolTupleFields.RecycleTimes), IntermediateFieldType.String),
@@ -38,11 +37,10 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsAppPoolTupleFields
     {
-        AppPool,
         Name,
-        Component_,
+        ComponentRef,
         Attributes,
-        User_,
+        UserRef,
         RecycleMinutes,
         RecycleRequests,
         RecycleTimes,
@@ -68,22 +66,16 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsAppPoolTupleFields index] => this.Fields[(int)index];
 
-        public string AppPool
-        {
-            get => this.Fields[(int)IIsAppPoolTupleFields.AppPool].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.AppPool, value);
-        }
-
         public string Name
         {
             get => this.Fields[(int)IIsAppPoolTupleFields.Name].AsString();
             set => this.Set((int)IIsAppPoolTupleFields.Name, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.Component_].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.Component_, value);
+            get => this.Fields[(int)IIsAppPoolTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsAppPoolTupleFields.ComponentRef, value);
         }
 
         public int Attributes
@@ -92,10 +84,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsAppPoolTupleFields.Attributes, value);
         }
 
-        public string User_
+        public string UserRef
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.User_].AsString();
-            set => this.Set((int)IIsAppPoolTupleFields.User_, value);
+            get => this.Fields[(int)IIsAppPoolTupleFields.UserRef].AsString();
+            set => this.Set((int)IIsAppPoolTupleFields.UserRef, value);
         }
 
         public int RecycleMinutes

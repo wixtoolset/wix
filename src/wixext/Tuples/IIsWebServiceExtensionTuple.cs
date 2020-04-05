@@ -11,8 +11,7 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebServiceExtension.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.WebServiceExtension), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.File), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.Description), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebServiceExtensionTupleFields.Group), IntermediateFieldType.String),
@@ -28,8 +27,7 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebServiceExtensionTupleFields
     {
-        WebServiceExtension,
-        Component_,
+        ComponentRef,
         File,
         Description,
         Group,
@@ -48,16 +46,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebServiceExtensionTupleFields index] => this.Fields[(int)index];
 
-        public string WebServiceExtension
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.WebServiceExtension].AsString();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.WebServiceExtension, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.Component_].AsString();
-            set => this.Set((int)IIsWebServiceExtensionTupleFields.Component_, value);
+            get => this.Fields[(int)IIsWebServiceExtensionTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsWebServiceExtensionTupleFields.ComponentRef, value);
         }
 
         public string File

@@ -8,6 +8,7 @@ namespace WixToolset.Iis
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Iis.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset Internet Information Services Extension.
@@ -64,8 +65,8 @@ namespace WixToolset.Iis
             switch (parentElement.Name.LocalName)
             {
                 case "Component":
-                    string componentId = context["ComponentId"];
-                    string directoryId = context["DirectoryId"];
+                    var componentId = context["ComponentId"];
+                    var directoryId = context["DirectoryId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -110,7 +111,7 @@ namespace WixToolset.Iis
                             this.ParseWebAppPoolElement(intermediate, section, element, null);
                             break;
                         case "WebDirProperties":
-                            this.ParseWebDirPropertiesElement(intermediate, section, element);
+                            this.ParseWebDirPropertiesElement(intermediate, section, element, null);
                             break;
                         case "WebLog":
                             this.ParseWebLogElement(intermediate, section, element);
@@ -136,7 +137,7 @@ namespace WixToolset.Iis
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseCertificateElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
             string binaryKey = null;
@@ -146,7 +147,7 @@ namespace WixToolset.Iis
             int storeLocation = 0;
             string storeName = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -158,7 +159,7 @@ namespace WixToolset.Iis
                         case "BinaryKey":
                             attributes |= 2; // SCA_CERT_ATTRIBUTE_BINARYDATA
                             binaryKey = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Binary", binaryKey);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Binary, binaryKey);
                             break;
                         case "CertificatePath":
                             certificatePath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -190,7 +191,7 @@ namespace WixToolset.Iis
                             }
                             break;
                         case "StoreLocation":
-                            string storeLocationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var storeLocationValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < storeLocationValue.Length)
                             {
                                 switch (storeLocationValue)
@@ -209,7 +210,7 @@ namespace WixToolset.Iis
                             }
                             break;
                         case "StoreName":
-                            string storeNameValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var storeNameValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < storeNameValue.Length)
                             {
                                 switch (storeNameValue)
@@ -256,7 +257,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("crt", componentId, binaryKey, certificatePath);
             }
 
             if (null == name)
@@ -286,21 +287,23 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference InstallCertificates and UninstallCertificates since nothing will happen without them
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "InstallCertificates");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "UninstallCertificates");
-            this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CertificateHash"); // Certificate CustomActions require the CertificateHash table
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "InstallCertificates");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "UninstallCertificates");
+            this.ParseHelper.EnsureTable(section, sourceLineNumbers, IisTableDefinitions.CertificateHash); // Certificate CustomActions require the CertificateHash table
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Certificate", id);
-                row.Set(1, componentId);
-                row.Set(2, name);
-                row.Set(3, storeLocation);
-                row.Set(4, storeName);
-                row.Set(5, attributes);
-                row.Set(6, binaryKey);
-                row.Set(7, certificatePath);
-                row.Set(8, pfxPassword);
+                section.AddTuple(new CertificateTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Name = name,
+                    StoreLocation = storeLocation,
+                    StoreName = storeName,
+                    Attributes = attributes,
+                    BinaryRef = binaryKey,
+                    CertificatePath = certificatePath,
+                    PFXPassword = pfxPassword,
+                });
             }
         }
 
@@ -311,10 +314,10 @@ namespace WixToolset.Iis
         /// <param name="webId">Identifier for parent web site.</param>
         private void ParseCertificateRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string webId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -322,7 +325,7 @@ namespace WixToolset.Iis
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Certificate", id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.Certificate, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -337,18 +340,20 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("wsc", webId);
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Certificate", id.Id);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.Certificate, id.Id);
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebSiteCertificates");
-                row.Set(0, webId);
-                row.Set(1, id.Id);
+                section.AddTuple(new IIsWebSiteCertificatesTuple(sourceLineNumbers)
+                {
+                    WebRef = webId,
+                    CertificateRef = id.Id,
+                });
             }
         }
 
@@ -360,12 +365,12 @@ namespace WixToolset.Iis
         /// <param name="parentType">Type that parentId refers to.</param>
         private void ParseMimeMapElement(Intermediate intermediate, IntermediateSection section, XElement element, string parentId, MimeMapParentType parentType)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string extension = null;
             string type = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -393,7 +398,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("imm", parentId, type, extension);
             }
 
             if (null == extension)
@@ -417,11 +422,13 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsMimeMap", id);
-                row.Set(1, (int)parentType);
-                row.Set(2, parentId);
-                row.Set(3, type);
-                row.Set(4, extension);
+                section.AddTuple(new IIsMimeMapTuple(sourceLineNumbers, id)
+                {
+                    ParentType = (int)parentType,
+                    ParentValue = parentId,
+                    MimeType = type,
+                    Extension = extension,
+                });
             }
         }
 
@@ -432,10 +439,10 @@ namespace WixToolset.Iis
         /// <returns>Recycle time value.</returns>
         private string ParseRecycleTimeElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string value = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -473,14 +480,14 @@ namespace WixToolset.Iis
         /// <returns>Identifier for web address.</returns>
         private string ParseWebAddressElement(Intermediate intermediate, IntermediateSection section, XElement element, string parentWeb)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string header = null;
             string ip = null;
             string port = null;
-            bool secure = false;
+            var secure = false;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -514,7 +521,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("iwa", parentWeb, ip, port);
             }
 
             if (null == port)
@@ -526,12 +533,14 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebAddress", id);
-                row.Set(1, parentWeb);
-                row.Set(2, ip);
-                row.Set(3, port);
-                row.Set(4, header);
-                row.Set(5, secure ? 1 : 0);
+                section.AddTuple(new IIsWebAddressTuple(sourceLineNumbers, id)
+                {
+                    WebRef = parentWeb,
+                    IP = ip,
+                    Port = port,
+                    Header = header,
+                    Secure = secure ? 1 : 0,
+                });
             }
 
             return id?.Id;
@@ -544,21 +553,21 @@ namespace WixToolset.Iis
         /// <returns>Identifier for web application.</returns>
         private string ParseWebApplicationElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
-            YesNoDefaultType allowSessions = YesNoDefaultType.Default;
+            var allowSessions = YesNoDefaultType.Default;
             string appPool = null;
-            YesNoDefaultType buffer = YesNoDefaultType.Default;
-            YesNoDefaultType clientDebugging = YesNoDefaultType.Default;
+            var buffer = YesNoDefaultType.Default;
+            var clientDebugging = YesNoDefaultType.Default;
             string defaultScript = null;
             int isolation = 0;
             string name = null;
-            YesNoDefaultType parentPaths = YesNoDefaultType.Default;
-            int scriptTimeout = CompilerConstants.IntegerNotSet;
-            int sessionTimeout = CompilerConstants.IntegerNotSet;
-            YesNoDefaultType serverDebugging = YesNoDefaultType.Default;
+            var parentPaths = YesNoDefaultType.Default;
+            var scriptTimeout = CompilerConstants.IntegerNotSet;
+            var sessionTimeout = CompilerConstants.IntegerNotSet;
+            var serverDebugging = YesNoDefaultType.Default;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -630,7 +639,7 @@ namespace WixToolset.Iis
                             break;
                         case "WebAppPool":
                             appPool = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsAppPool", appPool);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsAppPool, appPool);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -645,7 +654,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("wap", name, appPool);
             }
 
             if (null == name)
@@ -657,11 +666,10 @@ namespace WixToolset.Iis
                 this.Messaging.Write(IIsErrors.IllegalCharacterInAttributeValue(sourceLineNumbers, element.Name.LocalName, "Name", name, '\\'));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "WebApplicationExtension":
@@ -680,44 +688,48 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebApplication", id);
-                row.Set(1, name);
-                row.Set(2, isolation);
+                var tuple = section.AddTuple(new IIsWebApplicationTuple(sourceLineNumbers, id)
+                {
+                    Name = name,
+                    Isolation = isolation,
+                    DefaultScript = defaultScript,
+                    AppPoolRef = appPool,
+                });
+
                 if (YesNoDefaultType.Default != allowSessions)
                 {
-                    row.Set(3, YesNoDefaultType.Yes == allowSessions ? 1 : 0);
+                    tuple.AllowSessions = YesNoDefaultType.Yes == allowSessions ? 1 : 0;
                 }
 
                 if (CompilerConstants.IntegerNotSet != sessionTimeout)
                 {
-                    row.Set(4, sessionTimeout);
+                    tuple.SessionTimeout = sessionTimeout;
                 }
 
                 if (YesNoDefaultType.Default != buffer)
                 {
-                    row.Set(5, YesNoDefaultType.Yes == buffer ? 1 : 0);
+                    tuple.Buffer = YesNoDefaultType.Yes == buffer ? 1 : 0;
                 }
 
                 if (YesNoDefaultType.Default != parentPaths)
                 {
-                    row.Set(6, YesNoDefaultType.Yes == parentPaths ? 1 : 0);
+                    tuple.ParentPaths = YesNoDefaultType.Yes == parentPaths ? 1 : 0;
                 }
-                row.Set(7, defaultScript);
+
                 if (CompilerConstants.IntegerNotSet != scriptTimeout)
                 {
-                    row.Set(8, scriptTimeout);
+                    tuple.ScriptTimeout = scriptTimeout;
                 }
 
                 if (YesNoDefaultType.Default != serverDebugging)
                 {
-                    row.Set(9, YesNoDefaultType.Yes == serverDebugging ? 1 : 0);
+                    tuple.ServerDebugging = YesNoDefaultType.Yes == serverDebugging ? 1 : 0;
                 }
 
                 if (YesNoDefaultType.Default != clientDebugging)
                 {
-                    row.Set(10, YesNoDefaultType.Yes == clientDebugging ? 1 : 0);
+                    tuple.ClientDebugging = YesNoDefaultType.Yes == clientDebugging ? 1 : 0;
                 }
-                row.Set(11, appPool);
             }
 
             return id?.Id;
@@ -730,13 +742,13 @@ namespace WixToolset.Iis
         /// <param name="application">Identifier for parent web application.</param>
         private void ParseWebApplicationExtensionElement(Intermediate intermediate, IntermediateSection section, XElement element, string application)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             int attributes = 0;
             string executable = null;
             string extension = null;
             string verbs = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -786,14 +798,17 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebApplicationExtension");
-                row.Set(0, application);
-                row.Set(1, extension);
-                row.Set(2, verbs);
-                row.Set(3, executable);
+                var tuple = section.AddTuple(new IIsWebApplicationExtensionTuple(sourceLineNumbers)
+                {
+                    ApplicationRef = application,
+                    Extension = extension,
+                    Verbs = verbs,
+                    Executable = executable,
+                });
+
                 if (0 < attributes)
                 {
-                    row.Set(4, attributes);
+                    tuple.Attributes = attributes;
                 }
             }
         }
@@ -805,27 +820,27 @@ namespace WixToolset.Iis
         /// <param name="componentId">Optional identifier of parent component.</param>
         private void ParseWebAppPoolElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
-            int cpuAction = CompilerConstants.IntegerNotSet;
+            var cpuAction = CompilerConstants.IntegerNotSet;
             string cpuMon = null;
-            int idleTimeout = CompilerConstants.IntegerNotSet;
+            var idleTimeout = CompilerConstants.IntegerNotSet;
             int maxCpuUsage = 0;
-            int maxWorkerProcs = CompilerConstants.IntegerNotSet;
+            var maxWorkerProcs = CompilerConstants.IntegerNotSet;
             string managedRuntimeVersion = null;
             string managedPipelineMode = null;
             string name = null;
-            int privateMemory = CompilerConstants.IntegerNotSet;
-            int queueLimit = CompilerConstants.IntegerNotSet;
-            int recycleMinutes = CompilerConstants.IntegerNotSet;
-            int recycleRequests = CompilerConstants.IntegerNotSet;
+            var privateMemory = CompilerConstants.IntegerNotSet;
+            var queueLimit = CompilerConstants.IntegerNotSet;
+            var recycleMinutes = CompilerConstants.IntegerNotSet;
+            var recycleRequests = CompilerConstants.IntegerNotSet;
             string recycleTimes = null;
-            int refreshCpu = CompilerConstants.IntegerNotSet;
+            var refreshCpu = CompilerConstants.IntegerNotSet;
             string user = null;
-            int virtualMemory = CompilerConstants.IntegerNotSet;
+            var virtualMemory = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -840,7 +855,7 @@ namespace WixToolset.Iis
                                 this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            string cpuActionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var cpuActionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < cpuActionValue.Length)
                             {
                                 switch (cpuActionValue)
@@ -863,7 +878,7 @@ namespace WixToolset.Iis
                                 this.Messaging.Write(IIsErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
                             }
 
-                            string identityValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var identityValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < identityValue.Length)
                             {
                                 switch (identityValue)
@@ -1029,7 +1044,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("iap", name, componentId, user);
             }
 
             if (null == name)
@@ -1057,7 +1072,7 @@ namespace WixToolset.Iis
                 }
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -1066,7 +1081,7 @@ namespace WixToolset.Iis
                         case "RecycleTime":
                             if (null == componentId)
                             {
-                                SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                                var childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                                 this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, element.Name.LocalName));
                             }
 
@@ -1093,52 +1108,57 @@ namespace WixToolset.Iis
             if (null != componentId)
             {
                 // Reference ConfigureIIs since nothing will happen without it
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+                this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsAppPool", id);
-                row.Set(1, name);
-                row.Set(2, componentId);
-                row.Set(3, attributes);
-                row.Set(4, user);
+                var tuple = section.AddTuple(new IIsAppPoolTuple(sourceLineNumbers, id)
+                {
+                    Name = name,
+                    ComponentRef = componentId,
+                    Attributes = attributes,
+                    UserRef = user,
+                    RecycleTimes = recycleTimes,
+                    CPUMon = cpuMon,
+                    ManagedRuntimeVersion = managedRuntimeVersion,
+                    ManagedPipelineMode = managedPipelineMode,
+                });
+
                 if (CompilerConstants.IntegerNotSet != recycleMinutes)
                 {
-                    row.Set(5, recycleMinutes);
+                    tuple.RecycleMinutes = recycleMinutes;
                 }
 
                 if (CompilerConstants.IntegerNotSet != recycleRequests)
                 {
-                    row.Set(6, recycleRequests);
+                    tuple.RecycleRequests = recycleRequests;
                 }
-                row.Set(7, recycleTimes);
+
                 if (CompilerConstants.IntegerNotSet != idleTimeout)
                 {
-                    row.Set(8, idleTimeout);
+                    tuple.IdleTimeout = idleTimeout;
                 }
 
                 if (CompilerConstants.IntegerNotSet != queueLimit)
                 {
-                    row.Set(9, queueLimit);
+                    tuple.QueueLimit = queueLimit;
                 }
-                row.Set(10, cpuMon);
+
                 if (CompilerConstants.IntegerNotSet != maxWorkerProcs)
                 {
-                    row.Set(11, maxWorkerProcs);
+                    tuple.MaxProc = maxWorkerProcs;
                 }
 
                 if (CompilerConstants.IntegerNotSet != virtualMemory)
                 {
-                    row.Set(12, virtualMemory);
+                    tuple.VirtualMemory = virtualMemory;
                 }
 
                 if (CompilerConstants.IntegerNotSet != privateMemory)
                 {
-                    row.Set(13, privateMemory);
+                    tuple.PrivateMemory = privateMemory;
                 }
-                row.Set(14, managedRuntimeVersion);
-                row.Set(15, managedPipelineMode);
             }
         }
 
@@ -1150,13 +1170,13 @@ namespace WixToolset.Iis
         /// <param name="parentWeb">Optional identifier for parent web site.</param>
         private void ParseWebDirElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentWeb)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string dirProperties = null;
             string path = null;
             string application = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1181,7 +1201,7 @@ namespace WixToolset.Iis
                             }
 
                             parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebSite", parentWeb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebSite, parentWeb);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1196,7 +1216,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("iwd", componentId, parentWeb, dirProperties, application);
             }
 
             if (null == path)
@@ -1209,11 +1229,11 @@ namespace WixToolset.Iis
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "WebSite"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                    var childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "WebApplication":
@@ -1230,7 +1250,7 @@ namespace WixToolset.Iis
                                 this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child);
+                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child, componentId);
                             if (null == dirProperties)
                             {
                                 dirProperties = childWebDirProperties;
@@ -1258,22 +1278,24 @@ namespace WixToolset.Iis
 
             if (null != application)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebApplication", application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebApplication, application);
             }
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebDirProperties", dirProperties);
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebDirProperties, dirProperties);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebDir", id);
-                row.Set(1, componentId);
-                row.Set(2, parentWeb);
-                row.Set(3, path);
-                row.Set(4, dirProperties);
-                row.Set(5, application);
+                section.AddTuple(new IIsWebDirTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    WebRef = parentWeb,
+                    Path = path,
+                    DirPropertiesRef = dirProperties,
+                    ApplicationRef = application,
+                });
             }
         }
 
@@ -1282,29 +1304,29 @@ namespace WixToolset.Iis
         /// </summary>
         /// <param name="element">Element to parse.</param>
         /// <returns>The identifier for this WebDirProperties.</returns>
-        private string ParseWebDirPropertiesElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        private string ParseWebDirPropertiesElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int access = 0;
-            bool accessSet = false;
+            var accessSet = false;
             int accessSSLFlags = 0;
-            bool accessSSLFlagsSet = false;
+            var accessSSLFlagsSet = false;
             string anonymousUser = null;
-            YesNoType aspDetailedError = YesNoType.NotSet;
+            var aspDetailedError = YesNoType.NotSet;
             string authenticationProviders = null;
             int authorization = 0;
-            bool authorizationSet = false;
+            var authorizationSet = false;
             string cacheControlCustom = null;
-            long cacheControlMaxAge = CompilerConstants.LongNotSet;
+            var cacheControlMaxAge = CompilerConstants.LongNotSet;
             string defaultDocuments = null;
             string httpExpires = null;
-            bool iisControlledPassword = false;
-            YesNoType index = YesNoType.NotSet;
-            YesNoType logVisits = YesNoType.NotSet;
-            YesNoType notCustomError = YesNoType.NotSet;
+            var iisControlledPassword = false;
+            var index = YesNoType.NotSet;
+            var logVisits = YesNoType.NotSet;
+            var notCustomError = YesNoType.NotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1520,58 +1542,73 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                if (null == componentId)
+                {
+                    this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                    id = Identifier.Invalid;
+                }
+                else
+                {
+                    id = this.ParseHelper.CreateIdentifier("wdp", componentId);
+                }
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebDirProperties", id);
+                var tuple = section.AddTuple(new IIsWebDirPropertiesTuple(sourceLineNumbers, id)
+                {
+                    AnonymousUserRef = anonymousUser,
+                    IIsControlledPassword = iisControlledPassword ? 1 : 0,
+                    DefaultDoc = defaultDocuments,
+                    HttpExpires = httpExpires,
+                    CacheControlCustom = cacheControlCustom,
+                });
+
                 if (accessSet)
                 {
-                    row.Set(1, access);
+                    tuple.Access = access;
                 }
 
                 if (authorizationSet)
                 {
-                    row.Set(2, authorization);
+                    tuple.Authorization = authorization;
                 }
-                row.Set(3, anonymousUser);
-                row.Set(4, iisControlledPassword ? 1 : 0);
+
                 if (YesNoType.NotSet != logVisits)
                 {
-                    row.Set(5, YesNoType.Yes == logVisits ? 1 : 0);
+                    tuple.LogVisits = YesNoType.Yes == logVisits ? 1 : 0;
                 }
 
                 if (YesNoType.NotSet != index)
                 {
-                    row.Set(6, YesNoType.Yes == index ? 1 : 0);
+                    tuple.Index = YesNoType.Yes == index ? 1 : 0;
                 }
-                row.Set(7, defaultDocuments);
+
                 if (YesNoType.NotSet != aspDetailedError)
                 {
-                    row.Set(8, YesNoType.Yes == aspDetailedError ? 1 : 0);
+                    tuple.AspDetailedError = YesNoType.Yes == aspDetailedError ? 1 : 0;
                 }
-                row.Set(9, httpExpires);
+
                 if (CompilerConstants.LongNotSet != cacheControlMaxAge)
                 {
-                    row.Set(10, unchecked((int)cacheControlMaxAge));
+                    tuple.CacheControlMaxAge = unchecked((int)cacheControlMaxAge);
                 }
-                row.Set(11, cacheControlCustom);
+
                 if (YesNoType.NotSet != notCustomError)
                 {
-                    row.Set(12, YesNoType.Yes == notCustomError ? 1 : 0);
+                    tuple.NoCustomError = YesNoType.Yes == notCustomError ? 1 : 0;
                 }
 
                 if (accessSSLFlagsSet)
                 {
-                    row.Set(13, accessSSLFlags);
+                    tuple.AccessSSLFlags = accessSSLFlags;
                 }
 
                 if (null != authenticationProviders)
                 {
-                    row.Set(14, authenticationProviders);
+                    tuple.AuthenticationProviders = authenticationProviders;
                 }
             }
 
@@ -1586,13 +1623,13 @@ namespace WixToolset.Iis
         /// <param name="parent">Id of the parent.</param>
         private void ParseWebErrorElement(Intermediate intermediate, IntermediateSection section, XElement element, WebErrorParentType parentType, string parent)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            int errorCode = CompilerConstants.IntegerNotSet;
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var errorCode = CompilerConstants.IntegerNotSet;
             string file = null;
             string url = null;
-            int subCode = CompilerConstants.IntegerNotSet;
+            var subCode = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1641,17 +1678,19 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebError");
-                row.Set(0, errorCode);
-                row.Set(1, subCode);
-                row.Set(2, (int)parentType);
-                row.Set(3, parent);
-                row.Set(4, file);
-                row.Set(5, url);
+                section.AddTuple(new IIsWebErrorTuple(sourceLineNumbers)
+                {
+                    ErrorCode = errorCode,
+                    SubCode = subCode,
+                    ParentType = (int)parentType,
+                    ParentValue = parent,
+                    File = file,
+                    URL = url,
+                });
             }
         }
 
@@ -1663,15 +1702,15 @@ namespace WixToolset.Iis
         /// <param name="parentWeb">Optional identifier of parent web site.</param>
         private void ParseWebFilterElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentWeb)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string description = null;
             int flags = 0;
-            int loadOrder = CompilerConstants.IntegerNotSet;
+            var loadOrder = CompilerConstants.IntegerNotSet;
             string name = null;
             string path = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1717,7 +1756,7 @@ namespace WixToolset.Iis
                             }
 
                             parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebSite", parentWeb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebSite, parentWeb);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1732,7 +1771,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("ifl", name, componentId, path, parentWeb);
             }
 
             if (null == name)
@@ -1748,20 +1787,23 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsFilter", id);
-                row.Set(1, name);
-                row.Set(2, componentId);
-                row.Set(3, path);
-                row.Set(4, parentWeb);
-                row.Set(5, description);
-                row.Set(6, flags);
+                var tuple = section.AddTuple(new IIsFilterTuple(sourceLineNumbers, id)
+                {
+                    Name = name,
+                    ComponentRef = componentId,
+                    Path = path,
+                    WebRef = parentWeb,
+                    Description = description,
+                    Flags = flags,
+                });
+
                 if (CompilerConstants.IntegerNotSet != loadOrder)
                 {
-                    row.Set(7, loadOrder);
+                    tuple.LoadOrder = loadOrder;
                 }
             }
         }
@@ -1772,11 +1814,11 @@ namespace WixToolset.Iis
         /// <param name="element">Node to be parsed.</param>
         private void ParseWebLogElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string type = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1786,7 +1828,7 @@ namespace WixToolset.Iis
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "Type":
-                            string typeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var typeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (0 < typeValue.Length)
                             {
                                 switch (typeValue)
@@ -1837,8 +1879,10 @@ namespace WixToolset.Iis
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebLog", id);
-                row.Set(1, type);
+                section.AddTuple(new IIsWebLogTuple(sourceLineNumbers, id)
+                {
+                    Format = type,
+                });
             }
         }
 
@@ -1849,11 +1893,11 @@ namespace WixToolset.Iis
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseWebPropertyElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string value = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1902,14 +1946,16 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsProperty", id);
-                row.Set(1, componentId);
-                row.Set(2, 0);
-                row.Set(3, value);
+                section.AddTuple(new IIsPropertyTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Attributes = 0,
+                    Value = value,
+                });
             }
         }
 
@@ -1920,7 +1966,7 @@ namespace WixToolset.Iis
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseWebServiceExtensionElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
             string description = null;
@@ -1978,7 +2024,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("iwe", componentId, file);
             }
 
             if (null == file)
@@ -1989,16 +2035,18 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebServiceExtension", id);
-                row.Set(1, componentId);
-                row.Set(2, file);
-                row.Set(3, description);
-                row.Set(4, group);
-                row.Set(5, attributes);
+                section.AddTuple(new IIsWebServiceExtensionTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    File = file,
+                    Description = description,
+                    Group = group,
+                    Attributes = attributes,
+                });
             }
         }
 
@@ -2009,21 +2057,21 @@ namespace WixToolset.Iis
         /// <param name="componentId">Optional identifier of parent component.</param>
         private void ParseWebSiteElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string application = null;
             int attributes = 0;
-            int connectionTimeout = CompilerConstants.IntegerNotSet;
+            var connectionTimeout = CompilerConstants.IntegerNotSet;
             string description = null;
             string directory = null;
             string dirProperties = null;
             string keyAddress = null;
             string log = null;
             string siteId = null;
-            int sequence = CompilerConstants.IntegerNotSet;
-            int state = CompilerConstants.IntegerNotSet;
+            var sequence = CompilerConstants.IntegerNotSet;
+            var state = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2070,7 +2118,7 @@ namespace WixToolset.Iis
                             break;
                         case "Directory":
                             directory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Directory", directory);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, directory);
                             break;
                         case "DirProperties":
                             if (null == componentId)
@@ -2121,7 +2169,7 @@ namespace WixToolset.Iis
                             }
 
                             log = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebLog", log);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebLog, log);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -2136,7 +2184,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("iws", description, componentId, siteId, application);
             }
 
             if (null == description)
@@ -2149,11 +2197,11 @@ namespace WixToolset.Iis
                 this.Messaging.Write(IIsErrors.RequiredAttributeUnderComponent(sourceLineNumbers, element.Name.LocalName, "Directory"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                    var childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "CertificateRef":
@@ -2206,7 +2254,7 @@ namespace WixToolset.Iis
                                 this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child);
+                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child, componentId);
                             if (null == dirProperties)
                             {
                                 dirProperties = childWebDirProperties;
@@ -2262,48 +2310,53 @@ namespace WixToolset.Iis
 
             if (null != application)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebApplication", application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebApplication, application);
             }
 
             if (null != dirProperties)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebDirProperties", dirProperties);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebDirProperties, dirProperties);
             }
 
             if (null != componentId)
             {
                 // Reference ConfigureIIs since nothing will happen without it
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+                this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebSite", id);
-                row.Set(1, componentId);
-                row.Set(2, description);
+                var tuple = section.AddTuple(new IIsWebSiteTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    Description = description,
+                    DirectoryRef = directory,
+                    KeyAddressRef = keyAddress,
+                    DirPropertiesRef = dirProperties,
+                    ApplicationRef = application,
+                    LogRef = log,
+                    WebsiteId = siteId,
+                });
+
                 if (CompilerConstants.IntegerNotSet != connectionTimeout)
                 {
-                    row.Set(3, connectionTimeout);
+                    tuple.ConnectionTimeout = connectionTimeout;
                 }
-                row.Set(4, directory);
+
                 if (CompilerConstants.IntegerNotSet != state)
                 {
-                    row.Set(5, state);
+                    tuple.State = state;
                 }
 
                 if (0 != attributes)
                 {
-                    row.Set(6, attributes);
+                    tuple.Attributes = attributes;
                 }
-                row.Set(7, keyAddress);
-                row.Set(8, dirProperties);
-                row.Set(9, application);
+
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row.Set(10, sequence);
+                    tuple.Sequence = sequence;
                 }
-                row.Set(11, log);
-                row.Set(12, siteId);
             }
         }
 
@@ -2315,12 +2368,12 @@ namespace WixToolset.Iis
         /// <param name="parent">Id of the parent.</param>
         private void ParseHttpHeaderElement(Intermediate intermediate, IntermediateSection section, XElement element, HttpHeaderParentType parentType, string parent)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string headerName = null;
             string headerValue = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2358,15 +2411,20 @@ namespace WixToolset.Iis
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
-            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsHttpHeader", id);
-            row.Set(1, (int)parentType);
-            row.Set(2, parent);
-            row.Set(3, headerName);
-            row.Set(4, headerValue);
-            row.Set(5, 0);
-            //row.Set(6, null);
+            if (!this.Messaging.EncounteredError)
+            {
+                section.AddTuple(new IIsHttpHeaderTuple(sourceLineNumbers, id)
+                {
+                    HttpHeader = id.Id,
+                    ParentType = (int)parentType,
+                    ParentValue = parent,
+                    Name = headerName,
+                    Value = headerValue,
+                    Attributes = 0,
+                });
+            }
         }
 
         /// <summary>
@@ -2378,14 +2436,14 @@ namespace WixToolset.Iis
         /// <param name="parentAlias">Alias of the parent web site.</param>
         private void ParseWebVirtualDirElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentWeb, string parentAlias)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string alias = null;
             string application = null;
             string directory = null;
             string dirProperties = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2399,7 +2457,7 @@ namespace WixToolset.Iis
                             break;
                         case "Directory":
                             directory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Directory", directory);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, directory);
                             break;
                         case "DirProperties":
                             dirProperties = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2414,7 +2472,7 @@ namespace WixToolset.Iis
                             }
 
                             parentWeb = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebSite", parentWeb);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebSite, parentWeb);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -2429,7 +2487,7 @@ namespace WixToolset.Iis
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("wvd", alias, directory, dirProperties, application, parentWeb);
             }
 
             if (null == alias)
@@ -2461,11 +2519,11 @@ namespace WixToolset.Iis
                 alias = String.Concat(parentAlias, "/", alias);
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                    var childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "WebApplication":
@@ -2482,7 +2540,7 @@ namespace WixToolset.Iis
                                 this.Messaging.Write(IIsErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child);
+                            string childWebDirProperties = this.ParseWebDirPropertiesElement(intermediate, section, child, componentId);
                             if (null == dirProperties)
                             {
                                 dirProperties = childWebDirProperties;
@@ -2518,27 +2576,34 @@ namespace WixToolset.Iis
 
             if (null != dirProperties)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebDirProperties", dirProperties);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebDirProperties, dirProperties);
             }
 
             if (null != application)
             {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "IIsWebApplication", application);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, IisTupleDefinitions.IIsWebApplication, application);
             }
 
             // Reference ConfigureIIs since nothing will happen without it
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "ConfigureIIs");
+            this.AddReferenceToConfigureIIs(section, sourceLineNumbers);
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "IIsWebVirtualDir", id);
-                row.Set(1, componentId);
-                row.Set(2, parentWeb);
-                row.Set(3, alias);
-                row.Set(4, directory);
-                row.Set(5, dirProperties);
-                row.Set(6, application);
+                section.AddTuple(new IIsWebVirtualDirTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    WebRef = parentWeb,
+                    Alias = alias,
+                    DirectoryRef = directory,
+                    DirPropertiesRef = dirProperties,
+                    ApplicationRef = application,
+                });
             }
+        }
+
+        private void AddReferenceToConfigureIIs(IntermediateSection section, SourceLineNumber sourceLineNumbers)
+        {
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "ConfigureIIs");
         }
     }
 }

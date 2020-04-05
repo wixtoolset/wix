@@ -11,7 +11,7 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebApplicationExtension.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebApplicationExtensionTupleFields.Application_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebApplicationExtensionTupleFields.ApplicationRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationExtensionTupleFields.Extension), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationExtensionTupleFields.Verbs), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebApplicationExtensionTupleFields.Executable), IntermediateFieldType.String),
@@ -27,7 +27,7 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebApplicationExtensionTupleFields
     {
-        Application_,
+        ApplicationRef,
         Extension,
         Verbs,
         Executable,
@@ -46,10 +46,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebApplicationExtensionTupleFields index] => this.Fields[(int)index];
 
-        public string Application_
+        public string ApplicationRef
         {
-            get => this.Fields[(int)IIsWebApplicationExtensionTupleFields.Application_].AsString();
-            set => this.Set((int)IIsWebApplicationExtensionTupleFields.Application_, value);
+            get => this.Fields[(int)IIsWebApplicationExtensionTupleFields.ApplicationRef].AsString();
+            set => this.Set((int)IIsWebApplicationExtensionTupleFields.ApplicationRef, value);
         }
 
         public string Extension

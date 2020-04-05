@@ -11,8 +11,8 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebSiteCertificates.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesTupleFields.Web_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesTupleFields.Certificate_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesTupleFields.WebRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebSiteCertificatesTupleFields.CertificateRef), IntermediateFieldType.String),
             },
             typeof(IIsWebSiteCertificatesTuple));
     }
@@ -24,8 +24,8 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebSiteCertificatesTupleFields
     {
-        Web_,
-        Certificate_,
+        WebRef,
+        CertificateRef,
     }
 
     public class IIsWebSiteCertificatesTuple : IntermediateTuple
@@ -40,16 +40,16 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebSiteCertificatesTupleFields index] => this.Fields[(int)index];
 
-        public string Web_
+        public string WebRef
         {
-            get => this.Fields[(int)IIsWebSiteCertificatesTupleFields.Web_].AsString();
-            set => this.Set((int)IIsWebSiteCertificatesTupleFields.Web_, value);
+            get => this.Fields[(int)IIsWebSiteCertificatesTupleFields.WebRef].AsString();
+            set => this.Set((int)IIsWebSiteCertificatesTupleFields.WebRef, value);
         }
 
-        public string Certificate_
+        public string CertificateRef
         {
-            get => this.Fields[(int)IIsWebSiteCertificatesTupleFields.Certificate_].AsString();
-            set => this.Set((int)IIsWebSiteCertificatesTupleFields.Certificate_, value);
+            get => this.Fields[(int)IIsWebSiteCertificatesTupleFields.CertificateRef].AsString();
+            set => this.Set((int)IIsWebSiteCertificatesTupleFields.CertificateRef, value);
         }
     }
 }

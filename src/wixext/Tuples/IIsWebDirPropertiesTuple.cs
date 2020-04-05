@@ -11,10 +11,9 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebDirProperties.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.DirProperties), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.Access), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.Authorization), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.AnonymousUser_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.AnonymousUserRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.IIsControlledPassword), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.LogVisits), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesTupleFields.Index), IntermediateFieldType.Number),
@@ -37,10 +36,9 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebDirPropertiesTupleFields
     {
-        DirProperties,
         Access,
         Authorization,
-        AnonymousUser_,
+        AnonymousUserRef,
         IIsControlledPassword,
         LogVisits,
         Index,
@@ -66,12 +64,6 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebDirPropertiesTupleFields index] => this.Fields[(int)index];
 
-        public string DirProperties
-        {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.DirProperties].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.DirProperties, value);
-        }
-
         public int Access
         {
             get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Access].AsNumber();
@@ -84,10 +76,10 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebDirPropertiesTupleFields.Authorization, value);
         }
 
-        public string AnonymousUser_
+        public string AnonymousUserRef
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AnonymousUser_].AsString();
-            set => this.Set((int)IIsWebDirPropertiesTupleFields.AnonymousUser_, value);
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AnonymousUserRef].AsString();
+            set => this.Set((int)IIsWebDirPropertiesTupleFields.AnonymousUserRef, value);
         }
 
         public int IIsControlledPassword

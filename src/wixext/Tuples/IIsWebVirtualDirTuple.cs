@@ -11,13 +11,12 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebVirtualDir.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.VirtualDir), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.Web_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.WebRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.Alias), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.Directory_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.DirProperties_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.Application_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.DirectoryRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.DirPropertiesRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebVirtualDirTupleFields.ApplicationRef), IntermediateFieldType.String),
             },
             typeof(IIsWebVirtualDirTuple));
     }
@@ -29,13 +28,12 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebVirtualDirTupleFields
     {
-        VirtualDir,
-        Component_,
-        Web_,
+        ComponentRef,
+        WebRef,
         Alias,
-        Directory_,
-        DirProperties_,
-        Application_,
+        DirectoryRef,
+        DirPropertiesRef,
+        ApplicationRef,
     }
 
     public class IIsWebVirtualDirTuple : IntermediateTuple
@@ -50,22 +48,16 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebVirtualDirTupleFields index] => this.Fields[(int)index];
 
-        public string VirtualDir
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsWebVirtualDirTupleFields.VirtualDir].AsString();
-            set => this.Set((int)IIsWebVirtualDirTupleFields.VirtualDir, value);
+            get => this.Fields[(int)IIsWebVirtualDirTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsWebVirtualDirTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string WebRef
         {
-            get => this.Fields[(int)IIsWebVirtualDirTupleFields.Component_].AsString();
-            set => this.Set((int)IIsWebVirtualDirTupleFields.Component_, value);
-        }
-
-        public string Web_
-        {
-            get => this.Fields[(int)IIsWebVirtualDirTupleFields.Web_].AsString();
-            set => this.Set((int)IIsWebVirtualDirTupleFields.Web_, value);
+            get => this.Fields[(int)IIsWebVirtualDirTupleFields.WebRef].AsString();
+            set => this.Set((int)IIsWebVirtualDirTupleFields.WebRef, value);
         }
 
         public string Alias
@@ -74,22 +66,22 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebVirtualDirTupleFields.Alias, value);
         }
 
-        public string Directory_
+        public string DirectoryRef
         {
-            get => this.Fields[(int)IIsWebVirtualDirTupleFields.Directory_].AsString();
-            set => this.Set((int)IIsWebVirtualDirTupleFields.Directory_, value);
+            get => this.Fields[(int)IIsWebVirtualDirTupleFields.DirectoryRef].AsString();
+            set => this.Set((int)IIsWebVirtualDirTupleFields.DirectoryRef, value);
         }
 
-        public string DirProperties_
+        public string DirPropertiesRef
         {
-            get => this.Fields[(int)IIsWebVirtualDirTupleFields.DirProperties_].AsString();
-            set => this.Set((int)IIsWebVirtualDirTupleFields.DirProperties_, value);
+            get => this.Fields[(int)IIsWebVirtualDirTupleFields.DirPropertiesRef].AsString();
+            set => this.Set((int)IIsWebVirtualDirTupleFields.DirPropertiesRef, value);
         }
 
-        public string Application_
+        public string ApplicationRef
         {
-            get => this.Fields[(int)IIsWebVirtualDirTupleFields.Application_].AsString();
-            set => this.Set((int)IIsWebVirtualDirTupleFields.Application_, value);
+            get => this.Fields[(int)IIsWebVirtualDirTupleFields.ApplicationRef].AsString();
+            set => this.Set((int)IIsWebVirtualDirTupleFields.ApplicationRef, value);
         }
     }
 }

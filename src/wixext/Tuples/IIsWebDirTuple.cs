@@ -11,12 +11,11 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsWebDir.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.WebDir), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.Web_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.WebRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.Path), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.DirProperties_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.Application_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.DirPropertiesRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirTupleFields.ApplicationRef), IntermediateFieldType.String),
             },
             typeof(IIsWebDirTuple));
     }
@@ -28,12 +27,11 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsWebDirTupleFields
     {
-        WebDir,
-        Component_,
-        Web_,
+        ComponentRef,
+        WebRef,
         Path,
-        DirProperties_,
-        Application_,
+        DirPropertiesRef,
+        ApplicationRef,
     }
 
     public class IIsWebDirTuple : IntermediateTuple
@@ -48,22 +46,16 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebDirTupleFields index] => this.Fields[(int)index];
 
-        public string WebDir
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsWebDirTupleFields.WebDir].AsString();
-            set => this.Set((int)IIsWebDirTupleFields.WebDir, value);
+            get => this.Fields[(int)IIsWebDirTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsWebDirTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string WebRef
         {
-            get => this.Fields[(int)IIsWebDirTupleFields.Component_].AsString();
-            set => this.Set((int)IIsWebDirTupleFields.Component_, value);
-        }
-
-        public string Web_
-        {
-            get => this.Fields[(int)IIsWebDirTupleFields.Web_].AsString();
-            set => this.Set((int)IIsWebDirTupleFields.Web_, value);
+            get => this.Fields[(int)IIsWebDirTupleFields.WebRef].AsString();
+            set => this.Set((int)IIsWebDirTupleFields.WebRef, value);
         }
 
         public string Path
@@ -72,16 +64,16 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebDirTupleFields.Path, value);
         }
 
-        public string DirProperties_
+        public string DirPropertiesRef
         {
-            get => this.Fields[(int)IIsWebDirTupleFields.DirProperties_].AsString();
-            set => this.Set((int)IIsWebDirTupleFields.DirProperties_, value);
+            get => this.Fields[(int)IIsWebDirTupleFields.DirPropertiesRef].AsString();
+            set => this.Set((int)IIsWebDirTupleFields.DirPropertiesRef, value);
         }
 
-        public string Application_
+        public string ApplicationRef
         {
-            get => this.Fields[(int)IIsWebDirTupleFields.Application_].AsString();
-            set => this.Set((int)IIsWebDirTupleFields.Application_, value);
+            get => this.Fields[(int)IIsWebDirTupleFields.ApplicationRef].AsString();
+            set => this.Set((int)IIsWebDirTupleFields.ApplicationRef, value);
         }
     }
 }

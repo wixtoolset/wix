@@ -11,8 +11,7 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.IIsProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.Property), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsPropertyTupleFields.Value), IntermediateFieldType.String),
             },
@@ -26,8 +25,7 @@ namespace WixToolset.Iis.Tuples
 
     public enum IIsPropertyTupleFields
     {
-        Property,
-        Component_,
+        ComponentRef,
         Attributes,
         Value,
     }
@@ -44,16 +42,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsPropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Property
+        public string ComponentRef
         {
-            get => this.Fields[(int)IIsPropertyTupleFields.Property].AsString();
-            set => this.Set((int)IIsPropertyTupleFields.Property, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)IIsPropertyTupleFields.Component_].AsString();
-            set => this.Set((int)IIsPropertyTupleFields.Component_, value);
+            get => this.Fields[(int)IIsPropertyTupleFields.ComponentRef].AsString();
+            set => this.Set((int)IIsPropertyTupleFields.ComponentRef, value);
         }
 
         public int Attributes

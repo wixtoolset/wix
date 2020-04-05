@@ -11,7 +11,7 @@ namespace WixToolset.Iis
             IisTupleDefinitionType.CertificateHash.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(CertificateHashTupleFields.Certificate_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(CertificateHashTupleFields.CertificateRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(CertificateHashTupleFields.Hash), IntermediateFieldType.String),
             },
             typeof(CertificateHashTuple));
@@ -24,7 +24,7 @@ namespace WixToolset.Iis.Tuples
 
     public enum CertificateHashTupleFields
     {
-        Certificate_,
+        CertificateRef,
         Hash,
     }
 
@@ -40,10 +40,10 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[CertificateHashTupleFields index] => this.Fields[(int)index];
 
-        public string Certificate_
+        public string CertificateRef
         {
-            get => this.Fields[(int)CertificateHashTupleFields.Certificate_].AsString();
-            set => this.Set((int)CertificateHashTupleFields.Certificate_, value);
+            get => this.Fields[(int)CertificateHashTupleFields.CertificateRef].AsString();
+            set => this.Set((int)CertificateHashTupleFields.CertificateRef, value);
         }
 
         public string Hash
