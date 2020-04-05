@@ -7,6 +7,7 @@ namespace WixToolset.Extensibility.Services
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
 
     /// <summary>
@@ -38,26 +39,29 @@ namespace WixToolset.Extensibility.Services
         Identifier CreateIdentifierFromFilename(string filename);
 
         /// <summary>
-        /// Creates a row in the section.
+        /// Creates a tuple in the section.
         /// </summary>
         /// <param name="section">Section to add the new tuple to.</param>
-        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tableName">Name of table to create row in.</param>
-        /// <param name="identifier">Optional identifier for the row.</param>
-        /// <returns>New row.</returns>
-        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
+        /// <param name="sourceLineNumbers">Source and line number of current tuple.</param>
+        /// <param name="tupleName">Name of tuple definition.</param>
+        /// <param name="identifier">Optional identifier for the tuple.</param>
+        /// <returns>New tuple.</returns>
+        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, Identifier identifier = null);
+
+        /// <summary>
+        /// Creates a tuple in the section.
+        /// </summary>
+        /// <param name="section">Section to add the new tuple to.</param>
+        /// <param name="sourceLineNumbers">Source and line number of current tuple.</param>
+        /// <param name="tupleDefinition">Tuple definition to create from.</param>
+        /// <param name="identifier">Optional identifier for the tuple.</param>
+        /// <returns>New tuple.</returns>
+        IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, Identifier identifier = null);
 
         [Obsolete]
         IntermediateTuple CreateRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, Identifier identifier = null);
 
-        /// <summary>
-        /// Creates a row in the section.
-        /// </summary>
-        /// <param name="section">Section to add the new tuple to.</param>
-        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tupleType">Type of tuple to create.</param>
-        /// <param name="identifier">Optional identifier for the row.</param>
-        /// <returns>New row.</returns>
+        [Obsolete]
         IntermediateTuple CreateTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null);
 
         [Obsolete]
@@ -93,9 +97,9 @@ namespace WixToolset.Extensibility.Services
         string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds);
 
         /// <summary>
-        /// Creates a Registry row in the active section.
+        /// Creates a Registry tuple in the active section.
         /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of the current row.</param>
+        /// <param name="sourceLineNumbers">Source and line number of the current tuple.</param>
         /// <param name="root">The registry entry root.</param>
         /// <param name="key">The registry entry key.</param>
         /// <param name="name">The registry entry name.</param>
@@ -118,12 +122,20 @@ namespace WixToolset.Extensibility.Services
         string CreateShortName(string longName, bool keepExtension, bool allowWildcards, params string[] args);
 
         /// <summary>
-        /// Create a WixSimpleReference row in the active section.
+        /// Create a WixSimpleReference tuple in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
-        /// <param name="tableName">The table name of the simple reference.</param>
+        /// <param name="tupleName">The tuple name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys);
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys);
+
+        /// <summary>
+        /// Create a WixSimpleReference tuple in the active section.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="tupleDefinition">The tuple definition of the simple reference.</param>
+        /// <param name="primaryKeys">The primary keys of the simple reference.</param>
+        void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys);
 
         /// <summary>
         /// Create a reference in the specified section for a custom action specialized for specific platforms,
@@ -137,7 +149,7 @@ namespace WixToolset.Extensibility.Services
         void CreateCustomActionReference(SourceLineNumber sourceLineNumbers, IntermediateSection section, string customAction, Platform platform, CustomActionPlatforms supportedPlatforms);
 
         /// <summary>
-        /// Creates WixComplexReference and WixGroup rows in the active section.
+        /// Creates WixComplexReference and WixGroup tuples in the active section.
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line information.</param>
@@ -150,7 +162,7 @@ namespace WixToolset.Extensibility.Services
         void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary);
 
         /// <summary>
-        /// A row in the WixGroup table is added for this child node and its parent node.
+        /// A tuple in the WixGroup table is added for this child node and its parent node.
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
@@ -164,10 +176,10 @@ namespace WixToolset.Extensibility.Services
         void CreateWixGroupRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, ComplexReferenceChildType childType, string childId);
 
         /// <summary>
-        /// Creates a row in the WixSearch table.
+        /// Creates a tuple in the WixSearch table.
         /// </summary>
         /// <param name="section">Section to create the reference in.</param>
-        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
+        /// <param name="sourceLineNumbers">Source line number for the search element.</param>
         /// <param name="elementName">Name of search element.</param>
         /// <param name="id">Identifier of the search.</param>
         /// <param name="variable">The Burn variable to store the result into.</param>
@@ -194,11 +206,18 @@ namespace WixToolset.Extensibility.Services
         bool ContainsProperty(string possibleProperty);
 
         /// <summary>
-        /// Add the appropriate rows to make sure that the given table shows up in the resulting output.
+        /// Add the appropriate tuples to make sure that the given table shows up in the resulting output.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
         /// <param name="tableName">Name of the table to ensure existance of.</param>
         void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName);
+
+        /// <summary>
+        /// Add the appropriate tuples to make sure that the given table shows up in the resulting output.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers.</param>
+        /// <param name="tableDefinition">Definition of the table to ensure existance of.</param>
+        void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition);
 
         /// <summary>
         /// Get an attribute value and displays an error if the value is empty by default.
