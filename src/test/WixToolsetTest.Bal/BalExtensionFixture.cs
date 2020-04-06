@@ -3,6 +3,7 @@
 namespace WixToolsetTest.Bal
 {
     using System.IO;
+    using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
@@ -29,6 +30,10 @@ namespace WixToolsetTest.Bal
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
+                Assert.Equal(new[]
+                {
+                    "BurnBackend didn't provide Wixout so skipping BalExtension PostBind verification."
+                }, compileResult.Messages.Select(x => x.ToString()).ToArray());
 
                 Assert.True(File.Exists(bundleFile));
             }

@@ -4,10 +4,10 @@ namespace WixToolset.Bal
 {
     using System;
     using System.Linq;
+    using WixToolset.Bal.Tuples;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
-    using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
@@ -17,17 +17,17 @@ namespace WixToolset.Bal
         {
             base.PostBackendBind(result);
 
-            var output = WindowsInstallerData.Load(result.Wixout, false);
-
-            // Only process Bundles.
-            if (OutputType.Bundle != output.Type)
+            if (result.Wixout == null)
             {
+                this.Messaging.Write(new Message(null, MessageLevel.Warning, 1, "BurnBackend didn't provide Wixout so skipping BalExtension PostBind verification."));
                 return;
             }
 
-            var baTable = output.Tables["WixBootstrapperApplication"];
-            var baRow = baTable.Rows[0];
-            var baId = (string)baRow[0];
+            var intermediate = Intermediate.Load(result.Wixout);
+            var section = intermediate.Sections.Single();
+
+            var baTuple = section.Tuples.OfType<WixBootstrapperApplicationTuple>().SingleOrDefault();
+            var baId = baTuple?.Id?.Id;
             if (null == baId)
             {
                 return;
@@ -38,60 +38,57 @@ namespace WixToolset.Bal
 
             if (isStdBA || isMBA)
             {
-                this.VerifyBAFunctions(output);
+                this.VerifyBAFunctions(section);
             }
 
             if (isMBA)
             {
-                this.VerifyPrereqPackages(output);
+                this.VerifyPrereqPackages(section);
             }
         }
 
-        private void VerifyBAFunctions(WindowsInstallerData output)
+        private void VerifyBAFunctions(IntermediateSection section)
         {
-            Row baFunctionsRow = null;
-            var baFunctionsTable = output.Tables["WixBalBAFunctions"];
-            foreach (var row in baFunctionsTable.Rows)
+            WixBalBAFunctionsTuple baFunctionsTuple = null;
+            foreach (var tuple in section.Tuples.OfType<WixBalBAFunctionsTuple>())
             {
-                if (null == baFunctionsRow)
+                if (null == baFunctionsTuple)
                 {
-                    baFunctionsRow = row;
+                    baFunctionsTuple = tuple;
                 }
                 else
                 {
-                    this.Messaging.Write(BalErrors.MultipleBAFunctions(row.SourceLineNumbers));
+                    this.Messaging.Write(BalErrors.MultipleBAFunctions(tuple.SourceLineNumbers));
                 }
             }
 
-            var payloadPropertiesTable = output.Tables["WixPayloadProperties"];
-            var payloadPropertiesRows = payloadPropertiesTable.Rows.Cast<WixPayloadPropertiesRow>();
-            if (null == baFunctionsRow)
+            var payloadPropertiesTuples = section.Tuples.OfType<WixBundlePayloadTuple>().ToList();
+            if (null == baFunctionsTuple)
             {
-                foreach (var payloadPropertiesRow in payloadPropertiesRows)
+                foreach (var payloadPropertiesTuple in payloadPropertiesTuples)
                 {
                     // TODO: Make core WiX canonicalize Name (this won't catch '.\bafunctions.dll').
-                    if (string.Equals(payloadPropertiesRow.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(payloadPropertiesTuple.Name, "bafunctions.dll", StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Messaging.Write(BalWarnings.UnmarkedBAFunctionsDLL(payloadPropertiesRow.SourceLineNumbers));
+                        this.Messaging.Write(BalWarnings.UnmarkedBAFunctionsDLL(payloadPropertiesTuple.SourceLineNumbers));
                     }
                 }
             }
             else
             {
-                // TODO: May need to revisit this depending on the outcome of #5273.
-                var payloadId = (string)baFunctionsRow[0];
-                var bundlePayloadRow = payloadPropertiesRows.Single(x => payloadId == x.Id);
-                if (BurnConstants.BurnUXContainerName != bundlePayloadRow.Container)
+                var payloadId = baFunctionsTuple.Id;
+                var bundlePayloadTuple = payloadPropertiesTuples.Single(x => payloadId == x.Id);
+                if (BurnConstants.BurnUXContainerName != bundlePayloadTuple.ContainerRef)
                 {
-                    this.Messaging.Write(BalErrors.BAFunctionsPayloadRequiredInUXContainer(baFunctionsRow.SourceLineNumbers));
+                    this.Messaging.Write(BalErrors.BAFunctionsPayloadRequiredInUXContainer(baFunctionsTuple.SourceLineNumbers));
                 }
             }
         }
 
-        private void VerifyPrereqPackages(WindowsInstallerData output)
+        private void VerifyPrereqPackages(IntermediateSection section)
         {
-            var prereqInfoTable = output.Tables["WixMbaPrereqInformation"];
-            if (null == prereqInfoTable || prereqInfoTable.Rows.Count == 0)
+            var prereqInfoTuples = section.Tuples.OfType<WixMbaPrereqInformationTuple>().ToList();
+            if (prereqInfoTuples.Count == 0)
             {
                 this.Messaging.Write(BalErrors.MissingPrereq());
                 return;
@@ -100,24 +97,24 @@ namespace WixToolset.Bal
             var foundLicenseFile = false;
             var foundLicenseUrl = false;
 
-            foreach (Row prereqInfoRow in prereqInfoTable.Rows)
+            foreach (var prereqInfoTuple in prereqInfoTuples)
             {
-                if (null != prereqInfoRow[1])
+                if (null != prereqInfoTuple.LicenseFile)
                 {
                     if (foundLicenseFile || foundLicenseUrl)
                     {
-                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoRow.SourceLineNumbers));
+                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoTuple.SourceLineNumbers));
                         return;
                     }
 
                     foundLicenseFile = true;
                 }
 
-                if (null != prereqInfoRow[2])
+                if (null != prereqInfoTuple.LicenseUrl)
                 {
                     if (foundLicenseFile || foundLicenseUrl)
                     {
-                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoRow.SourceLineNumbers));
+                        this.Messaging.Write(BalErrors.MultiplePrereqLicenses(prereqInfoTuple.SourceLineNumbers));
                         return;
                     }
 
