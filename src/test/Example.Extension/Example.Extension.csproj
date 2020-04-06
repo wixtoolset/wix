@@ -33,7 +33,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="BuildExtensionWixlib" AfterTargets="ResolveProjectReferences" DependsOnTargets="SetExtensionWixlib" Inputs="@(ExtensionWxs);$(CompileWixlibExePath)" Outputs="$(WixlibPath)">
+  <Target Name="BuildExtensionWixlib" AfterTargets="ResolveProjectReferences" DependsOnTargets="ResolveProjectReferences;SetExtensionWixlib" Inputs="@(ExtensionWxs);$(CompileWixlibExePath)" Outputs="$(WixlibPath)">
     <Exec Command='$(CompileWixlibExePath) "$(IntermediateOutputPath)\" "$(WixlibPath)" "@(ExtensionWxs)"' />
   </Target>
 </Project>

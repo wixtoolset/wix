@@ -23,6 +23,10 @@ namespace Example.Extension
                 case "Fragment":
                     switch (element.Name.LocalName)
                     {
+                        case "ExampleEnsureTable":
+                            this.ParseExampleEnsureTableElement(intermediate, section, element);
+                            processed = true;
+                            break;
                         case "ExampleSearch":
                             this.ParseExampleSearchElement(intermediate, section, element);
                             processed = true;
@@ -91,6 +95,12 @@ namespace Example.Extension
                 var tuple = this.ParseHelper.CreateTuple(section, sourceLineNumbers, "Example", id);
                 tuple.Set(0, value);
             }
+        }
+
+        private void ParseExampleEnsureTableElement(Intermediate intermediate, IntermediateSection section, XElement element)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            this.ParseHelper.EnsureTable(section, sourceLineNumbers, ExampleTableDefinitions.NotInAll);
         }
 
         private void ParseExampleSearchElement(Intermediate intermediate, IntermediateSection section, XElement element)

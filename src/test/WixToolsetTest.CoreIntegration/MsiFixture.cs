@@ -2,8 +2,10 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
+    using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
@@ -880,6 +882,40 @@ namespace WixToolsetTest.CoreIntegration
 
                 var output = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
                 Assert.NotEmpty(output.SubStorages);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void FailsBuildAtLinkTimeForMissingEnsureTable()
+        {
+            var folder = TestData.Get(@"TestData");
+            var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BadEnsureTable", "BadEnsureTable.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-ext", extensionPath,
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+                Assert.Collection(result.Messages,
+                    first =>
+                    {
+                        Assert.Equal(MessageLevel.Error, first.Level);
+                        Assert.Equal("The identifier 'WixCustomTable:TableDefinitionNotExposedByExtension' could not be found. Ensure you have typed the reference correctly and that all the necessary inputs are provided to the linker.", first.ToString());
+                    });
+
+                Assert.False(File.Exists(msiPath));
             }
         }
     }
