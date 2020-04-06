@@ -3,9 +3,7 @@
 namespace WixToolset.Bal
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Xml;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.WindowsInstaller;
@@ -13,22 +11,8 @@ namespace WixToolset.Bal
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
-    public class BalWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
+    public class BalBurnBackendExtension : BaseBurnBackendExtension
     {
-        private static readonly TableDefinition[] Tables = LoadTables();
-
-        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
-
-        private static TableDefinition[] LoadTables()
-        {
-            using (var resourceStream = typeof(BalWindowsInstallerBackendBinderExtension).Assembly.GetManifestResourceStream("WixToolset.Bal.tables.xml"))
-            using (var reader = XmlReader.Create(resourceStream))
-            {
-                var tables = TableDefinitionCollection.Load(reader);
-                return tables.ToArray();
-            }
-        }
-
         public override void PostBackendBind(IBindResult result)
         {
             base.PostBackendBind(result);

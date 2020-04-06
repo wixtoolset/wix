@@ -12,7 +12,7 @@ namespace WixToolset.Bal
         {
             typeof(BalCompiler),
             typeof(BalExtensionData),
-            typeof(BalWindowsInstallerBackendBinderExtension),
+            typeof(BalBurnBackendExtension),
         };
     }
 }
