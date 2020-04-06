@@ -4,15 +4,28 @@ namespace WixToolset.Extensibility
 {
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     public class BaseBurnBackendExtension : IBurnBackendExtension
     {
+        /// <summary>
+        /// Context for use by the extension.
+        /// </summary>
+        protected IBindContext Context { get; private set; }
+
+        /// <summary>
+        /// Messaging for use by the extension.
+        /// </summary>
+        protected IMessaging Messaging { get; private set; }
+
         public virtual void PostBackendBind(IBindResult result)
         {
         }
 
         public virtual void PreBackendBind(IBindContext context)
         {
+            this.Context = context;
+            this.Messaging = context.ServiceProvider.GetService<IMessaging>();
         }
 
         public virtual IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage)
