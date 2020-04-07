@@ -6295,7 +6295,7 @@ namespace WixToolset.Core
                             case "default":
                                 action = "Default";
                                 break;
-                            case "disnable":
+                            case "disable":
                                 action = "Disable";
                                 break;
                             case "enable":

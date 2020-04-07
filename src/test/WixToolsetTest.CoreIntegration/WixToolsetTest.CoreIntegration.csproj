@@ -34,9 +34,6 @@
     <Content Include="TestData\CustomAction\UnscheduledCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\DialogsInInstallUISequence\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\DialogsInInstallUISequence\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\DialogsInInstallUISequence\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\EnsureTable\EnsureTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Environment\Environment.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -157,6 +154,8 @@
     <Content Include="TestData\OverridableActions\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\OverridableActions\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\TextStyle\ColorNull.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\TextStyle\SizeLocalized.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\TextStyle\SizeLocalized.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\TypeLib\Language0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Wixipl\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Wixipl\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />

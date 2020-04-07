@@ -465,12 +465,12 @@ namespace WixToolset.Core
                     {
                     case "Control":
                         // These are all thrown away.
-                        IntermediateTuple lastTabRow = null;
+                        ControlTuple lastTabTuple = null;
                         string firstControl = null;
                         string defaultControl = null;
                         string cancelControl = null;
 
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.BBControl, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl);
+                        this.ParseControlElement(child, id.Id, TupleDefinitionType.BBControl, ref lastTabTuple, ref firstControl, ref defaultControl, ref cancelControl);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -954,7 +954,7 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            IntermediateTuple lastTabRow = null;
+            ControlTuple lastTabTuple = null;
             string cancelControl = null;
             string defaultControl = null;
             string firstControl = null;
@@ -966,7 +966,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "Control":
-                        this.ParseControlElement(child, id.Id, TupleDefinitionType.Control, ref lastTabRow, ref firstControl, ref defaultControl, ref cancelControl);
+                        this.ParseControlElement(child, id.Id, TupleDefinitionType.Control, ref lastTabTuple, ref firstControl, ref defaultControl, ref cancelControl);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -979,11 +979,11 @@ namespace WixToolset.Core
                 }
             }
 
-            if (null != lastTabRow && null != lastTabRow[1])
+            if (null != lastTabTuple && null != lastTabTuple.Control)
             {
-                if (firstControl != lastTabRow[1].ToString())
+                if (firstControl != lastTabTuple.Control)
                 {
-                    lastTabRow.Set(10, firstControl);
+                    lastTabTuple.NextControlRef = firstControl;
                 }
             }
 
@@ -1027,12 +1027,12 @@ namespace WixToolset.Core
         /// <param name="node">Element to parse.</param>
         /// <param name="dialog">Identifier for parent dialog.</param>
         /// <param name="table">Table control belongs in.</param>
-        /// <param name="lastTabTuple">Last row in the tab order.</param>
+        /// <param name="lastTabTuple">Last control in the tab order.</param>
         /// <param name="firstControl">Name of the first control in the tab order.</param>
         /// <param name="defaultControl">Name of the default control.</param>
         /// <param name="cancelControl">Name of the candle control.</param>
         /// <param name="trackDiskSpace">True if the containing dialog tracks disk space.</param>
-        private void ParseControlElement(XElement node, string dialog, TupleDefinitionType tupleType, ref IntermediateTuple lastTabTuple, ref string firstControl, ref string defaultControl, ref string cancelControl)
+        private void ParseControlElement(XElement node, string dialog, TupleDefinitionType tupleType, ref ControlTuple lastTabTuple, ref string firstControl, ref string defaultControl, ref string cancelControl)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier controlId = null;
@@ -1529,7 +1529,15 @@ namespace WixToolset.Core
 
             if (!notTabbable)
             {
-                if (TupleDefinitionType.BBControl == tupleType)
+                if (tuple is ControlTuple controlTuple)
+                {
+                    if (null != lastTabTuple)
+                    {
+                        lastTabTuple.NextControlRef = controlTuple.Control;
+                    }
+                    lastTabTuple = controlTuple;
+                }
+                else if (tuple != null)
                 {
                     this.Core.Write(ErrorMessages.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
                 }
@@ -1538,12 +1546,6 @@ namespace WixToolset.Core
                 {
                     firstControl = controlId.Id;
                 }
-
-                if (null != lastTabTuple)
-                {
-                    lastTabTuple.Set(10, controlId.Id);
-                }
-                lastTabTuple = tuple;
             }
 
             // bitmap and icon controls contain a foreign key into the binary table in the text column;

@@ -255,6 +255,54 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void PopulatesControlTables()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "DialogsInInstallUISequence", "PackageComponents.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+
+                var results = Query.QueryDatabase(msiPath, new[] { "CheckBox", "Control", "InstallUISequence" });
+                Assert.Equal(new[]
+                {
+                    "CheckBox:WIXUI_EXITDIALOGOPTIONALCHECKBOX\t1",
+                    "Control:FirstDialog\tHeader\tText\t0\t13\t90\t13\t3\tFirstDialogHeader\tTitle\t\t",
+                    "Control:FirstDialog\tTitle\tText\t0\t0\t90\t13\t3\tFirstDialogTitle\tHeader\t\t",
+                    "Control:SecondDialog\tOptionalCheckBox\tCheckBox\t0\t13\t100\t40\t2\t[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]\tTitle\t\t",
+                    "Control:SecondDialog\tTitle\tText\t0\t0\t90\t13\t3\tSecondDialogTitle\tOptionalCheckBox\t\t",
+                    "InstallUISequence:CostFinalize\t\t1000",
+                    "InstallUISequence:CostInitialize\t\t800",
+                    "InstallUISequence:ExecuteAction\t\t1300",
+                    "InstallUISequence:FileCost\t\t900",
+                    "InstallUISequence:FindRelatedProducts\t\t25",
+                    "InstallUISequence:FirstDialog\tInstalled AND PATCH\t1298",
+                    "InstallUISequence:LaunchConditions\t\t100",
+                    "InstallUISequence:MigrateFeatureStates\t\t1200",
+                    "InstallUISequence:SecondDialog\tNOT Installed\t1299",
+                    "InstallUISequence:ValidateProductID\t\t700",
+                }, results);
+            }
+        }
+
+        [Fact]
         public void PopulatesCreateFolderTableForNullKeypathComponents()
         {
             var folder = TestData.Get(@"TestData\Components");
@@ -978,6 +1026,40 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(new[]
                 {
                     "TextStyle:FirstTextStyle\tArial\t2\t\t",
+                }, results);
+            }
+        }
+
+        [Fact(Skip = "Test demonstrates failure")]
+        public void PopulatesTextStyleTableWhenSizeIsLocalized()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "TextStyle", "SizeLocalized.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-loc", Path.Combine(folder, "TextStyle", "SizeLocalized.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "TextStyle" });
+                Assert.Equal(new[]
+                {
+                    "TextStyle:CustomFont\tTahoma\t8\t\t",
                 }, results);
             }
         }

@@ -165,7 +165,7 @@
         <columnDefinition name="Signature_" type="string" length="72" primaryKey="yes"
                 keyTable="Signature;RegLocator;IniLocator;DrLocator;CompLocator" keyColumn="1" category="identifier" description="The Signature_ represents a unique file signature and is also the foreign key in the Signature,  RegLocator, IniLocator, CompLocator and the DrLocator tables."/>
     </tableDefinition>
-    <tableDefinition name="CheckBox" createSymbols="yes">
+    <tableDefinition name="CheckBox" createSymbols="yes" tupleIdIsPrimaryKey="no">
         <columnDefinition name="Property" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="A named property to be tied to the item."/>
         <columnDefinition name="Value" type="string" length="64" nullable="yes" modularize="property"

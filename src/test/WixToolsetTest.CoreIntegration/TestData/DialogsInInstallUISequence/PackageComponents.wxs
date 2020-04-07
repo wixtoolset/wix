@@ -2,17 +2,21 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <UI Id="CustomDialog">
-            <!-- TODO: compiler can't handle loc strings for number fields -->
-            <TextStyle Id="CustomFont" FaceName="!(loc.CustomFontName)" Size="!(loc.CustomFontSize)" />
             <Dialog Id="FirstDialog" Width="100" Height="100">
                 <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="FirstDialogTitle" />
+                <Control Id="Header" Type="Text" X="0" Y="13" Width="90" Height="13" TabSkip="no" Text="FirstDialogHeader">
+                    <Condition Action="hide">Installed</Condition>
+                    <Condition Action="disable">Installed</Condition>
+                </Control>
             </Dialog>
             <Dialog Id="SecondDialog" Width="100" Height="100">
                 <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="SecondDialogTitle" />
+                <Control Id="OptionalCheckBox" Type="CheckBox" X="0" Y="13" Width="100" Height="40" Hidden="yes" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" CheckBoxValue="1" Text="[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]">
+                    <Condition Action="show">WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed</Condition>
+                </Control>
             </Dialog>
 
             <InstallUISequence>
-                <!-- TODO: overriding this currently causes a duplicate symbol error -->
                 <Show Dialog="SecondDialog" Before="FirstDialog" Overridable="yes">NOT Installed</Show>
             </InstallUISequence>
         </UI>
