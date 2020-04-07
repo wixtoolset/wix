@@ -2,13 +2,11 @@
 
 namespace WixToolset.VisualStudio
 {
-    using System.Collections.Generic;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility;
 
-    public class VSWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
+    public static class VSTableDefinitions
     {
-        private static readonly TableDefinition[] Tables = new[] {
+        public static readonly TableDefinition[] Tables = new[] {
             new TableDefinition(
                 "HelpFile",
                 new[]
@@ -70,7 +68,5 @@ namespace WixToolset.VisualStudio
                 }
             ),
         };
-
-        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
     }
 }
