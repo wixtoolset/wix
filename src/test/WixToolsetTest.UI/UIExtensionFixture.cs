@@ -10,17 +10,74 @@ namespace WixToolsetTest.UI
 
     public class UIExtensionFixture
     {
-        [Fact(Skip = "Currently fails")]
-        public void CanBuildUsingWixUIMinimal()
+        [Fact(Skip = "WixUI_Advanced is missing because it can't currently compile in v4")]
+        public void CanBuildUsingWixUIAdvanced()
         {
-            var folder = TestData.Get(@"TestData\WixUI_Minimal");
-            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { folder });
+            var folder = TestData.Get(@"TestData\WixUI_Advanced");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Property");
             Assert.Equal(new[]
             {
-                "Property:",
-            }, results.OrderBy(s => s).ToArray());
+                "Property:WixUI_Mode\tAdvanced",
+            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIFeatureTree()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_FeatureTree");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(Build, "Property");
+            Assert.Equal(new[]
+            {
+                "Property:WixUI_Mode\tFeatureTree",
+            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIInstallDir()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_InstallDir");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(Build, "Property");
+            Assert.Equal(new[]
+            {
+                "Property:WixUI_Mode\tInstallDir",
+            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIMinimal()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Minimal");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(Build, "Property");
+            Assert.Equal(new[]
+            {
+                "Property:WixUI_Mode\tMinimal",
+            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingWixUIMondo()
+        {
+            var folder = TestData.Get(@"TestData\WixUI_Mondo");
+            var bindFolder = TestData.Get(@"TestData\data");
+            var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
+
+            var results = build.BuildAndQuery(Build, "Property");
+            Assert.Equal(new[]
+            {
+                "Property:WixUI_Mode\tMondo",
+            }, results.Where(s => s.StartsWith("Property:WixUI_Mode")).ToArray());
         }
 
         private static void Build(string[] args)

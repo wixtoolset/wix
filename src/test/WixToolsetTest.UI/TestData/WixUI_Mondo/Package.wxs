@@ -16,7 +16,7 @@
        </Component>
     </ComponentGroup>
 
-    <UIRef Id="WixUI_Minimal" />
+    <UIRef Id="WixUI_Mondo" />
   </Product>
 
   <Fragment>

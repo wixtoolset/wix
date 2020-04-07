@@ -12,10 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\WixUI_Minimal\example.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\WixUI_Minimal\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\data\example.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixUI_Advanced\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixUI_FeatureTree\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixUI_InstallDir\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\WixUI_Minimal\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\WixUI_Minimal\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixUI_Mondo\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
