@@ -4,10 +4,13 @@ namespace WixToolset.VisualStudio
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
+    using WixToolset.VisualStudio.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset Visual Studio Extension.
@@ -79,10 +82,10 @@ namespace WixToolset.VisualStudio
 
         private void ParseHelpCollectionRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -90,7 +93,7 @@ namespace WixToolset.VisualStudio
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "HelpNamespace", id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpNamespace, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -108,11 +111,10 @@ namespace WixToolset.VisualStudio
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "HelpFileRef":
@@ -132,13 +134,13 @@ namespace WixToolset.VisualStudio
 
         private void ParseHelpCollectionElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string description = null;
             string name = null;
-            YesNoType suppressCAs = YesNoType.No;
+            var suppressCAs = YesNoType.No;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -169,7 +171,7 @@ namespace WixToolset.VisualStudio
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("vshc", fileId, description, name);
             }
 
             if (null == description)
@@ -182,7 +184,7 @@ namespace WixToolset.VisualStudio
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -210,31 +212,33 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpNamespace", id);
-                row.Set(1, name);
-                row.Set(2, fileId);
-                row.Set(3, description);
+                section.AddTuple(new HelpNamespaceTuple(sourceLineNumbers, id)
+                {
+                    NamespaceName = name,
+                    CollectionFileRef = fileId,
+                    Description = description,
+                });
 
                 if (YesNoType.No == suppressCAs)
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8");
+                    this.AddReferenceToRegisterMicrosoftHelp(section, sourceLineNumbers);
                 }
             }
         }
 
         private void ParseHelpFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string name = null;
-            int language = CompilerConstants.IntegerNotSet;
+            var language = CompilerConstants.IntegerNotSet;
             string hxi = null;
             string hxq = null;
             string hxr = null;
             string samples = null;
-            YesNoType suppressCAs = YesNoType.No;
+            var suppressCAs = YesNoType.No;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -245,11 +249,11 @@ namespace WixToolset.VisualStudio
                             break;
                         case "AttributeIndex":
                             hxr = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", hxr);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, hxr);
                             break;
                         case "Index":
                             hxi = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", hxi);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, hxi);
                             break;
                         case "Language":
                             language = this.ParseHelper.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, short.MaxValue);
@@ -259,11 +263,11 @@ namespace WixToolset.VisualStudio
                             break;
                         case "SampleLocation":
                             samples = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", samples);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, samples);
                             break;
                         case "Search":
                             hxq = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", hxq);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, hxq);
                             break;
                         case "SuppressCustomActions":
                             suppressCAs = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -281,7 +285,7 @@ namespace WixToolset.VisualStudio
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("vshf", fileId, name, language.ToString(CultureInfo.InvariantCulture.NumberFormat));
             }
 
             if (null == name)
@@ -299,28 +303,30 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpFile", id);
-                row.Set(1, name);
-                row.Set(2, language);
-                row.Set(3, fileId);
-                row.Set(4, hxi);
-                row.Set(5, hxq);
-                row.Set(6, hxr);
-                row.Set(7, samples);
+                section.AddTuple(new HelpFileTuple(sourceLineNumbers, id)
+                {
+                    HelpFileName = name,
+                    LangID = language,
+                    HxSFileRef = fileId,
+                    HxIFileRef = hxi,
+                    HxQFileRef = hxq,
+                    HxRFileRef = hxr,
+                    SamplesFileRef = samples,
+                });
 
                 if (YesNoType.No == suppressCAs)
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8");
+                    this.AddReferenceToRegisterMicrosoftHelp(section, sourceLineNumbers);
                 }
             }
         }
 
         private void ParseHelpFileRefElement(Intermediate intermediate, IntermediateSection section, XElement element, Identifier collectionId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -328,7 +334,7 @@ namespace WixToolset.VisualStudio
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "HelpFile", id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpFile, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -350,20 +356,23 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpFileToNamespace", id);
-                row.Set(1, collectionId.Id);
+                section.AddTuple(new HelpFileToNamespaceTuple(sourceLineNumbers, id)
+                {
+                    HelpFileRef = id.Id,
+                    HelpNamespaceRef = collectionId.Id,
+                });
             }
         }
 
         private void ParseHelpFilterElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string filterDefinition = null;
             string name = null;
-            YesNoType suppressCAs = YesNoType.No;
+            var suppressCAs = YesNoType.No;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -394,7 +403,7 @@ namespace WixToolset.VisualStudio
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("hfl", name, filterDefinition);
             }
 
             if (null == name)
@@ -406,23 +415,25 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpFilter", id);
-                row.Set(1, name);
-                row.Set(2, filterDefinition);
+                section.AddTuple(new HelpFilterTuple(sourceLineNumbers, id)
+                {
+                    Description = name,
+                    QueryString = filterDefinition,
+                });
 
                 if (YesNoType.No == suppressCAs)
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8");
+                    this.AddReferenceToRegisterMicrosoftHelp(section, sourceLineNumbers);
                 }
             }
         }
 
         private void ParseHelpFilterRefElement(Intermediate intermediate, IntermediateSection section, XElement element, Identifier collectionId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -430,7 +441,7 @@ namespace WixToolset.VisualStudio
                     {
                         case "Id":
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "HelpFilter", id.Id);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpFilter, id.Id);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -452,24 +463,25 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpFilterToNamespace", id);
-                row.Set(1, collectionId.Id);
+                section.AddTuple(new HelpFilterToNamespaceTuple(sourceLineNumbers, id)
+                {
+                    HelpFilterRef = id.Id,
+                    HelpNamespaceRef = collectionId.Id,
+                });
             }
         }
 
         private void ParsePlugCollectionIntoElement(Intermediate intermediate, IntermediateSection section, XElement element, Identifier parentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string hxa = null;
             string hxt = null;
             string hxtParent = null;
             string namespaceParent = null;
             string feature = null;
-            YesNoType suppressExternalNamespaces = YesNoType.No;
-            bool pluginVS05 = false;
-            bool pluginVS08 = false;
+            var suppressExternalNamespaces = YesNoType.No;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -504,8 +516,8 @@ namespace WixToolset.VisualStudio
                 }
             }
 
-            pluginVS05 = namespaceParent.Equals("MS_VSIPCC_v80", StringComparison.Ordinal);
-            pluginVS08 = namespaceParent.Equals("MS.VSIPCC.v90", StringComparison.Ordinal);
+            var pluginVS05 = namespaceParent.Equals("MS_VSIPCC_v80", StringComparison.Ordinal);
+            var pluginVS08 = namespaceParent.Equals("MS.VSIPCC.v90", StringComparison.Ordinal);
 
             if (null == namespaceParent)
             {
@@ -521,11 +533,14 @@ namespace WixToolset.VisualStudio
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "HelpPlugin", parentId);
-                row.Set(1, namespaceParent);
-                row.Set(2, hxt);
-                row.Set(3, hxa);
-                row.Set(4, hxtParent);
+                section.AddTuple(new HelpPluginTuple(sourceLineNumbers, parentId)
+                {
+                    HelpNamespaceRef = parentId.Id,
+                    ParentHelpNamespaceRef = namespaceParent,
+                    HxTFileRef = hxt,
+                    HxAFileRef = hxa,
+                    ParentHxTFileRef = hxtParent,
+                });
 
                 if (pluginVS05)
                 {
@@ -535,7 +550,7 @@ namespace WixToolset.VisualStudio
                         this.ParseHelper.CreateComplexReference(section, sourceLineNumbers, ComplexReferenceParentType.Feature, feature, String.Empty,
                             ComplexReferenceChildType.ComponentGroup, "Help2_VS2005_Namespace_Components", false);
                         // Reference CustomAction since nothing will happen without it
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "CA_HxMerge_VSIPCC_VSCC");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "CA_HxMerge_VSIPCC_VSCC");
                     }
                 }
                 else if (pluginVS08)
@@ -546,28 +561,28 @@ namespace WixToolset.VisualStudio
                         this.ParseHelper.CreateComplexReference(section, sourceLineNumbers, ComplexReferenceParentType.Feature, feature, String.Empty,
                             ComplexReferenceChildType.ComponentGroup, "Help2_VS2008_Namespace_Components", false);
                         // Reference CustomAction since nothing will happen without it
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "CA_ScheduleExtHelpPlugin_VSCC_VSIPCC");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "CA_ScheduleExtHelpPlugin_VSCC_VSIPCC");
                     }
                 }
                 else
                 {
                     // Reference the parent namespace to enforce the foreign key relationship
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "HelpNamespace", namespaceParent);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, VSTupleDefinitions.HelpNamespace, namespaceParent);
                 }
             }
         }
 
         private void ParseVsixPackageElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string propertyId = "VS_VSIX_INSTALLER_PATH";
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var propertyId = "VS_VSIX_INSTALLER_PATH";
             string packageId = null;
-            YesNoType permanent = YesNoType.NotSet;
+            var permanent = YesNoType.NotSet;
             string target = null;
             string targetVersion = null;
-            YesNoType vital = YesNoType.NotSet;
+            var vital = YesNoType.NotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -664,98 +679,131 @@ namespace WixToolset.VisualStudio
             if (!this.Messaging.EncounteredError)
             {
                 // Ensure there is a reference to the AppSearch Property that will find the VsixInstaller.exe.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Property", propertyId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Property, propertyId);
 
                 // Ensure there is a reference to the package file (even if we are a child under it).
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", fileId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, fileId);
 
-                string cmdlinePrefix = "/q ";
+                var cmdlinePrefix = "/q ";
 
                 if (!String.IsNullOrEmpty(target))
                 {
                     cmdlinePrefix = String.Format("{0} /skuName:{1} /skuVersion:{2}", cmdlinePrefix, target, targetVersion);
                 }
 
-                string installAfter = "WriteRegistryValues"; // by default, come after the registry key registration.
-                int installExtraBits = VSCompiler.MsidbCustomActionTypeInScript;
+                var installAfter = "WriteRegistryValues"; // by default, come after the registry key registration.
+
+                var installNamePerUser = this.ParseHelper.CreateIdentifier("viu", componentId, fileId, "per-user", target, targetVersion);
+                var installNamePerMachine = this.ParseHelper.CreateIdentifier("vim", componentId, fileId, "per-machine", target, targetVersion);
+                var installCmdLinePerUser = String.Format("{0} \"[#{1}]\"", cmdlinePrefix, fileId);
+                var installCmdLinePerMachine = String.Concat(installCmdLinePerUser, " /admin");
+                var installConditionPerUser = String.Format("NOT ALLUSERS AND ${0}=3", componentId); // only execute if the Component being installed.
+                var installConditionPerMachine = String.Format("ALLUSERS AND ${0}=3", componentId); // only execute if the Component being installed.
+                var installPerUserCA = new CustomActionTuple(sourceLineNumbers, installNamePerUser)
+                {
+                    ExecutionType = CustomActionExecutionType.Deferred,
+                    Impersonate = true,
+                };
+                var installPerMachineCA = new CustomActionTuple(sourceLineNumbers, installNamePerMachine)
+                {
+                    ExecutionType = CustomActionExecutionType.Deferred,
+                    Impersonate = false,
+                };
 
                 // If the package is not vital, mark the install action as continue.
                 if (vital == YesNoType.No)
                 {
-                    installExtraBits |= VSCompiler.MsidbCustomActionTypeContinue;
+                    installPerUserCA.IgnoreResult = true;
+                    installPerMachineCA.IgnoreResult = true;
                 }
                 else // the package is vital so ensure there is a rollback action scheduled.
                 {
-                    Identifier rollbackNamePerUser = this.ParseHelper.CreateIdentifier("vru", componentId, fileId, "per-user", target ?? String.Empty, targetVersion ?? String.Empty);
-                    Identifier rollbackNamePerMachine = this.ParseHelper.CreateIdentifier("vrm", componentId, fileId, "per-machine", target ?? String.Empty, targetVersion ?? String.Empty);
-                    string rollbackCmdLinePerUser = String.Concat(cmdlinePrefix, " /u:\"", packageId, "\"");
-                    string rollbackCmdLinePerMachine = String.Concat(rollbackCmdLinePerUser, " /admin");
-                    int rollbackExtraBitsPerUser = VSCompiler.MsidbCustomActionTypeContinue | VSCompiler.MsidbCustomActionTypeRollback | VSCompiler.MsidbCustomActionTypeInScript;
-                    int rollbackExtraBitsPerMachine = rollbackExtraBitsPerUser | VSCompiler.MsidbCustomActionTypeNoImpersonate;
-                    string rollbackConditionPerUser = String.Format("NOT ALLUSERS AND NOT Installed AND ${0}=2 AND ?{0}>2", componentId); // NOT Installed && Component being installed but not installed already.
-                    string rollbackConditionPerMachine = String.Format("ALLUSERS AND NOT Installed AND ${0}=2 AND ?{0}>2", componentId); // NOT Installed && Component being installed but not installed already.
+                    var rollbackNamePerUser = this.ParseHelper.CreateIdentifier("vru", componentId, fileId, "per-user", target, targetVersion);
+                    var rollbackNamePerMachine = this.ParseHelper.CreateIdentifier("vrm", componentId, fileId, "per-machine", target, targetVersion);
+                    var rollbackCmdLinePerUser = String.Concat(cmdlinePrefix, " /u:\"", packageId, "\"");
+                    var rollbackCmdLinePerMachine = String.Concat(rollbackCmdLinePerUser, " /admin");
+                    var rollbackConditionPerUser = String.Format("NOT ALLUSERS AND NOT Installed AND ${0}=2 AND ?{0}>2", componentId); // NOT Installed && Component being installed but not installed already.
+                    var rollbackConditionPerMachine = String.Format("ALLUSERS AND NOT Installed AND ${0}=2 AND ?{0}>2", componentId); // NOT Installed && Component being installed but not installed already.
+                    var rollbackPerUserCA = new CustomActionTuple(sourceLineNumbers, rollbackNamePerUser)
+                    {
+                        ExecutionType = CustomActionExecutionType.Rollback,
+                        IgnoreResult = true,
+                        Impersonate = true,
+                    };
+                    var rollbackPerMachineCA = new CustomActionTuple(sourceLineNumbers, rollbackNamePerMachine)
+                    {
+                        ExecutionType = CustomActionExecutionType.Rollback,
+                        IgnoreResult = true,
+                        Impersonate = false,
+                    };
 
-                    this.SchedulePropertyExeAction(section, sourceLineNumbers, rollbackNamePerUser, propertyId, rollbackCmdLinePerUser, rollbackExtraBitsPerUser, rollbackConditionPerUser, null, installAfter);
-                    this.SchedulePropertyExeAction(section, sourceLineNumbers, rollbackNamePerMachine, propertyId, rollbackCmdLinePerMachine, rollbackExtraBitsPerMachine, rollbackConditionPerMachine, null, rollbackNamePerUser.Id);
+                    this.SchedulePropertyExeAction(section, sourceLineNumbers, rollbackNamePerUser, propertyId, rollbackCmdLinePerUser, rollbackPerUserCA, rollbackConditionPerUser, null, installAfter);
+                    this.SchedulePropertyExeAction(section, sourceLineNumbers, rollbackNamePerMachine, propertyId, rollbackCmdLinePerMachine, rollbackPerMachineCA, rollbackConditionPerMachine, null, rollbackNamePerUser.Id);
 
                     installAfter = rollbackNamePerMachine.Id;
                 }
 
-                Identifier installNamePerUser = this.ParseHelper.CreateIdentifier("viu", componentId, fileId, "per-user", target ?? String.Empty, targetVersion ?? String.Empty);
-                Identifier installNamePerMachine = this.ParseHelper.CreateIdentifier("vim", componentId, fileId, "per-machine", target ?? String.Empty, targetVersion ?? String.Empty);
-                string installCmdLinePerUser = String.Format("{0} \"[#{1}]\"", cmdlinePrefix, fileId);
-                string installCmdLinePerMachine = String.Concat(installCmdLinePerUser, " /admin");
-                string installConditionPerUser = String.Format("NOT ALLUSERS AND ${0}=3", componentId); // only execute if the Component being installed.
-                string installConditionPerMachine = String.Format("ALLUSERS AND ${0}=3", componentId); // only execute if the Component being installed.
-
-                this.SchedulePropertyExeAction(section, sourceLineNumbers, installNamePerUser, propertyId, installCmdLinePerUser, installExtraBits, installConditionPerUser, null, installAfter);
-                this.SchedulePropertyExeAction(section, sourceLineNumbers, installNamePerMachine, propertyId, installCmdLinePerMachine, installExtraBits | VSCompiler.MsidbCustomActionTypeNoImpersonate, installConditionPerMachine, null, installNamePerUser.Id);
+                this.SchedulePropertyExeAction(section, sourceLineNumbers, installNamePerUser, propertyId, installCmdLinePerUser, installPerUserCA, installConditionPerUser, null, installAfter);
+                this.SchedulePropertyExeAction(section, sourceLineNumbers, installNamePerMachine, propertyId, installCmdLinePerMachine, installPerMachineCA, installConditionPerMachine, null, installNamePerUser.Id);
 
                 // If not permanent, schedule the uninstall custom action.
                 if (permanent != YesNoType.Yes)
                 {
-                    Identifier uninstallNamePerUser = this.ParseHelper.CreateIdentifier("vuu", componentId, fileId, "per-user", target ?? String.Empty, targetVersion ?? String.Empty);
-                    Identifier uninstallNamePerMachine = this.ParseHelper.CreateIdentifier("vum", componentId, fileId, "per-machine", target ?? String.Empty, targetVersion ?? String.Empty);
-                    string uninstallCmdLinePerUser = String.Concat(cmdlinePrefix, " /u:\"", packageId, "\"");
-                    string uninstallCmdLinePerMachine = String.Concat(uninstallCmdLinePerUser, " /admin");
-                    int uninstallExtraBitsPerUser = VSCompiler.MsidbCustomActionTypeContinue | VSCompiler.MsidbCustomActionTypeInScript;
-                    int uninstallExtraBitsPerMachine = uninstallExtraBitsPerUser | VSCompiler.MsidbCustomActionTypeNoImpersonate;
-                    string uninstallConditionPerUser = String.Format("NOT ALLUSERS AND ${0}=2 AND ?{0}>2", componentId); // Only execute if component is being uninstalled.
-                    string uninstallConditionPerMachine = String.Format("ALLUSERS AND ${0}=2 AND ?{0}>2", componentId); // Only execute if component is being uninstalled.
+                    var uninstallNamePerUser = this.ParseHelper.CreateIdentifier("vuu", componentId, fileId, "per-user", target ?? String.Empty, targetVersion ?? String.Empty);
+                    var uninstallNamePerMachine = this.ParseHelper.CreateIdentifier("vum", componentId, fileId, "per-machine", target ?? String.Empty, targetVersion ?? String.Empty);
+                    var uninstallCmdLinePerUser = String.Concat(cmdlinePrefix, " /u:\"", packageId, "\"");
+                    var uninstallCmdLinePerMachine = String.Concat(uninstallCmdLinePerUser, " /admin");
+                    var uninstallConditionPerUser = String.Format("NOT ALLUSERS AND ${0}=2 AND ?{0}>2", componentId); // Only execute if component is being uninstalled.
+                    var uninstallConditionPerMachine = String.Format("ALLUSERS AND ${0}=2 AND ?{0}>2", componentId); // Only execute if component is being uninstalled.
+                    var uninstallPerUserCA = new CustomActionTuple(sourceLineNumbers, uninstallNamePerUser)
+                    {
+                        ExecutionType = CustomActionExecutionType.Deferred,
+                        IgnoreResult = true,
+                        Impersonate = true,
+                    };
+                    var uninstallPerMachineCA = new CustomActionTuple(sourceLineNumbers, uninstallNamePerMachine)
+                    {
+                        ExecutionType = CustomActionExecutionType.Deferred,
+                        IgnoreResult = true,
+                        Impersonate = false,
+                    };
 
-                    this.SchedulePropertyExeAction(section, sourceLineNumbers, uninstallNamePerUser, propertyId, uninstallCmdLinePerUser, uninstallExtraBitsPerUser, uninstallConditionPerUser, "InstallFinalize", null);
-                    this.SchedulePropertyExeAction(section, sourceLineNumbers, uninstallNamePerMachine, propertyId, uninstallCmdLinePerMachine, uninstallExtraBitsPerMachine, uninstallConditionPerMachine, "InstallFinalize", null);
+                    this.SchedulePropertyExeAction(section, sourceLineNumbers, uninstallNamePerUser, propertyId, uninstallCmdLinePerUser, uninstallPerUserCA, uninstallConditionPerUser, "InstallFinalize", null);
+                    this.SchedulePropertyExeAction(section, sourceLineNumbers, uninstallNamePerMachine, propertyId, uninstallCmdLinePerMachine, uninstallPerMachineCA, uninstallConditionPerMachine, "InstallFinalize", null);
                 }
             }
         }
 
-        private void SchedulePropertyExeAction(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier name, string source, string cmdline, int extraBits, string condition, string beforeAction, string afterAction)
+        private void SchedulePropertyExeAction(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier name, string source, string cmdline, CustomActionTuple caTemplate, string condition, string beforeAction, string afterAction)
         {
-            const string sequence = "InstallExecuteSequence";
+            const SequenceTable sequence = SequenceTable.InstallExecuteSequence;
 
-            var actionRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "CustomAction", name);
-            actionRow.Set(1, VSCompiler.MsidbCustomActionTypeProperty | VSCompiler.MsidbCustomActionTypeExe | extraBits);
-            actionRow.Set(2, source);
-            actionRow.Set(3, cmdline);
+            caTemplate.SourceType = CustomActionSourceType.Property;
+            caTemplate.Source = source;
+            caTemplate.TargetType = CustomActionTargetType.Exe;
+            caTemplate.Target = cmdline;
+            section.AddTuple(caTemplate);
 
-            var sequenceRow = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixAction", new Identifier(name.Access, sequence, name.Id));
-            sequenceRow.Set(0, sequence);
-            sequenceRow.Set(1, name.Id);
-            sequenceRow.Set(2, condition);
-            // no explicit sequence
-            sequenceRow.Set(4, beforeAction);
-            sequenceRow.Set(5, afterAction);
-            sequenceRow.Set(6, 0); // not overridable
+            section.AddTuple(new WixActionTuple(sourceLineNumbers, new Identifier(name.Access, sequence, name.Id))
+            {
+                SequenceTable = SequenceTable.InstallExecuteSequence,
+                Action = name.Id,
+                Condition = condition,
+                // no explicit sequence
+                Before = beforeAction,
+                After = afterAction,
+                Overridable = false,
+            });
 
             if (null != beforeAction)
             {
                 if (WindowsInstallerStandard.IsStandardAction(beforeAction))
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixAction", sequence, beforeAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), beforeAction);
                 }
                 else
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", beforeAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, beforeAction);
                 }
             }
 
@@ -763,13 +811,18 @@ namespace WixToolset.VisualStudio
             {
                 if (WindowsInstallerStandard.IsStandardAction(afterAction))
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixAction", sequence, afterAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), afterAction);
                 }
                 else
                 {
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", afterAction);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, afterAction);
                 }
             }
+        }
+
+        private void AddReferenceToRegisterMicrosoftHelp(IntermediateSection section, SourceLineNumber sourceLineNumbers)
+        {
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "CA_RegisterMicrosoftHelp.3643236F_FC70_11D3_A536_0090278A1BB8");
         }
     }
 }
