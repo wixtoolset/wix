@@ -252,8 +252,11 @@ namespace WixToolsetTest.BuildTasks
 
                 var cleanOutput = String.Join("\r\n", result.Output);
 
+                // Clean is only expected to delete the files listed in {Project}.FileListAbsolute.txt,
+                // so this is not quite right but close enough.
                 var remainingPaths = Directory.EnumerateFiles(baseFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
+                    .Where(s => s != "obj\\MsiPackage.wixproj.FileListAbsolute.txt")
                     .OrderBy(s => s)
                     .ToArray();
                 Assert.Empty(remainingPaths);
