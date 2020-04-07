@@ -65,7 +65,7 @@ namespace WixBuildTools.TestSupport
                 }
             }
 
-            var msbuildPath = Msbuild15Path ?? Msbuild16Path;
+            var msbuildPath = !String.IsNullOrEmpty(Msbuild15Path) ? Msbuild15Path : Msbuild16Path;
 
             if (msbuildVersion == "15")
             {
