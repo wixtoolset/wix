@@ -6,6 +6,7 @@ namespace WixToolset.VisualStudio
     using System.Collections.Generic;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
     /// <summary>

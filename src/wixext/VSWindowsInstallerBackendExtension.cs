@@ -2,6 +2,7 @@
 
 namespace WixToolset.VisualStudio
 {
+    using System.Collections.Generic;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
@@ -70,6 +71,6 @@ namespace WixToolset.VisualStudio
             ),
         };
 
-        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
+        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
     }
 }
