@@ -65,7 +65,7 @@ namespace TablesAndTuples
 
             foreach (var tableDefinition in tableDefinitions)
             {
-                var tupleType = tableDefinition.Name;
+                var tupleType = tableDefinition.TupleDefinitionName;
 
                 var fields = new JsonArray();
                 var firstField = true;
@@ -200,8 +200,8 @@ namespace TablesAndTuples
             var unrealDef =
                 "            unreal: true,";
             var endTableDef = String.Join(Environment.NewLine,
-                "            tupleDefinitionName: \"{1}\",",
-                "            tupleIdIsPrimaryKey: {2}",
+                "            tupleDefinitionName: {1}TupleDefinitions.{2}.Name,",
+                "            tupleIdIsPrimaryKey: {3}",
                 "        );",
                 "");
             var startAllTablesDef = String.Join(Environment.NewLine,
@@ -272,7 +272,7 @@ namespace TablesAndTuples
                 {
                     sb.AppendLine(unrealDef);
                 }
-                sb.AppendLine(endTableDef.Replace("{1}", tableDefinition.TupleDefinitionName).Replace("{2}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
+                sb.AppendLine(endTableDef.Replace("{1}", prefix).Replace("{2}", tableDefinition.TupleDefinitionName).Replace("{3}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
             }
             sb.AppendLine(startAllTablesDef);
             foreach (var tableDefinition in tableDefinitions)
