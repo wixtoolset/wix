@@ -112,11 +112,11 @@ namespace WixToolset.Util
             switch (parentElement.Name.LocalName)
             {
                 case "CreateFolder":
-                    string createFolderId = context["DirectoryId"];
-                    string createFolderComponentId = context["ComponentId"];
+                    var createFolderId = context["DirectoryId"];
+                    var createFolderComponentId = context["ComponentId"];
 
                     // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    bool createFolderWin64 = Boolean.Parse(context["Win64"]);
+                    var createFolderWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
@@ -129,9 +129,9 @@ namespace WixToolset.Util
                     }
                     break;
                 case "Component":
-                    string componentId = context["ComponentId"];
-                    string directoryId = context["DirectoryId"];
-                    bool componentWin64 = Boolean.Parse(context["Win64"]);
+                    var componentId = context["ComponentId"];
+                    var directoryId = context["DirectoryId"];
+                    var componentWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
@@ -174,11 +174,11 @@ namespace WixToolset.Util
                     }
                     break;
                 case "File":
-                    string fileId = context["FileId"];
-                    string fileComponentId = context["ComponentId"];
+                    var fileId = context["FileId"];
+                    var fileComponentId = context["ComponentId"];
 
                     // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    bool fileWin64 = Boolean.Parse(context["Win64"]);
+                    var fileWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
@@ -298,11 +298,11 @@ namespace WixToolset.Util
                 case "Registry":
                 case "RegistryKey":
                 case "RegistryValue":
-                    string registryId = context["RegistryId"];
-                    string registryComponentId = context["ComponentId"];
+                    var registryId = context["RegistryId"];
+                    var registryComponentId = context["ComponentId"];
 
                     // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    bool registryWin64 = Boolean.Parse(context["Win64"]);
+                    var registryWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
@@ -315,12 +315,12 @@ namespace WixToolset.Util
                     }
                     break;
                 case "ServiceInstall":
-                    string serviceInstallId = context["ServiceInstallId"];
-                    string serviceInstallName = context["ServiceInstallName"];
-                    string serviceInstallComponentId = context["ServiceInstallComponentId"];
+                    var serviceInstallId = context["ServiceInstallId"];
+                    var serviceInstallName = context["ServiceInstallName"];
+                    var serviceInstallComponentId = context["ServiceInstallComponentId"];
 
                     // If this doesn't parse successfully, something really odd is going on, so let the exception get thrown
-                    bool serviceInstallWin64 = Boolean.Parse(context["Win64"]);
+                    var serviceInstallWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
@@ -381,16 +381,16 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         private void ParseComponentSearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string variable = null;
             string condition = null;
             string after = null;
             string guid = null;
             string productCode = null;
-            Serialize.ComponentSearch.ResultType result = Serialize.ComponentSearch.ResultType.NotSet;
+            var result = Serialize.ComponentSearch.ResultType.NotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -409,7 +409,7 @@ namespace WixToolset.Util
                             productCode = this.ParseHelper.GetAttributeGuidValue(sourceLineNumbers, attrib);
                             break;
                         case "Result":
-                            string resultValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var resultValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (!Serialize.ComponentSearch.TryParseResultType(resultValue, out result))
                             {
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName,
@@ -446,7 +446,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                WixComponentSearchAttributes attributes = WixComponentSearchAttributes.KeyPath;
+                var attributes = WixComponentSearchAttributes.KeyPath;
                 switch (result)
                 {
                     case Serialize.ComponentSearch.ResultType.directory:
@@ -460,7 +460,7 @@ namespace WixToolset.Util
                         break;
                 }
 
-                section.Tuples.Add(new WixComponentSearchTuple(sourceLineNumbers, id)
+                section.AddTuple(new WixComponentSearchTuple(sourceLineNumbers, id)
                 {
                     Guid = guid,
                     ProductCode = productCode,
@@ -475,10 +475,10 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         private void ParseComponentSearchRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string refId = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -486,7 +486,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixComponentSearch", refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixComponentSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -548,7 +548,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.Tuples.Add(new WixDetectSHA2SupportTuple(sourceLineNumbers, id));
+                section.AddTuple(new WixDetectSHA2SupportTuple(sourceLineNumbers, id));
             }
         }
 
@@ -559,7 +559,6 @@ namespace WixToolset.Util
         private void ParseDetectSHA2SupportRefElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string refId = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -568,8 +567,8 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixDetectSHA2Support", refId);
+                            var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.WixDetectSHA2Support, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -592,17 +591,17 @@ namespace WixToolset.Util
         /// <param name="componentId">Identifier of parent component.</param>
         private IComponentKeyPath ParseEventSourceElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string sourceName = null;
             string logName = null;
             string categoryMessageFile = null;
-            int categoryCount = CompilerConstants.IntegerNotSet;
+            var categoryCount = CompilerConstants.IntegerNotSet;
             string eventMessageFile = null;
             string parameterMessageFile = null;
             int typesSupported = 0;
-            bool isKeyPath = false;
+            var isKeyPath = false;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -702,7 +701,7 @@ namespace WixToolset.Util
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             string eventSourceKey = $@"SYSTEM\CurrentControlSet\Services\EventLog\{logName}\{sourceName}";
-            Identifier id = this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
+            var id = this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, eventSourceKey, "EventMessageFile", String.Concat("#%", eventMessageFile), componentId, false);
 
             if (null != categoryMessageFile)
             {
@@ -737,18 +736,18 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         private void ParseCloseApplicationElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string condition = null;
             string description = null;
             string target = null;
             string property = null;
             Identifier id = null;
             int attributes = 2; // default to CLOSEAPP_ATTRIBUTE_REBOOTPROMPT enabled
-            int sequence = CompilerConstants.IntegerNotSet;
-            int terminateExitCode = CompilerConstants.IntegerNotSet;
-            int timeout = CompilerConstants.IntegerNotSet;
+            var sequence = CompilerConstants.IntegerNotSet;
+            var terminateExitCode = CompilerConstants.IntegerNotSet;
+            var timeout = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -875,14 +874,14 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new WixCloseApplicationTuple(sourceLineNumbers, id)
+                var tuple = section.AddTuple(new WixCloseApplicationTuple(sourceLineNumbers, id)
                 {
                     Target = target,
                     Description = description,
                     Condition = condition,
                     Attributes = attributes,
                     Property = property,
-                };
+                });
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
                     tuple.Sequence = sequence;
@@ -895,8 +894,6 @@ namespace WixToolset.Util
                 {
                     tuple.Timeout = timeout * 1000; // make the timeout milliseconds in the table.
                 }
-
-                section.Tuples.Add(tuple);
             }
         }
 
@@ -906,15 +903,15 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         private void ParseDirectorySearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string variable = null;
             string condition = null;
             string after = null;
             string path = null;
-            Serialize.DirectorySearch.ResultType result = Serialize.DirectorySearch.ResultType.NotSet;
+            var result = Serialize.DirectorySearch.ResultType.NotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -964,7 +961,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                WixFileSearchAttributes attributes = WixFileSearchAttributes.IsDirectory;
+                var attributes = WixFileSearchAttributes.IsDirectory;
                 switch (result)
                 {
                     case Serialize.DirectorySearch.ResultType.exists:
@@ -982,8 +979,7 @@ namespace WixToolset.Util
         /// <param name="node">Element to parse.</param>
         private void ParseWixSearchRefElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
-            string refId = null;
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             foreach (XAttribute attrib in node.Attributes())
             {
@@ -992,8 +988,8 @@ namespace WixToolset.Util
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", refId);
+                            var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(node, attrib);
@@ -1015,15 +1011,15 @@ namespace WixToolset.Util
         /// <param name="node">Element to parse.</param>
         private void ParseFileSearchElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
             string variable = null;
             string condition = null;
             string after = null;
             string path = null;
-            Serialize.FileSearch.ResultType result = Serialize.FileSearch.ResultType.NotSet;
+            var result = Serialize.FileSearch.ResultType.NotSet;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1075,7 +1071,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                WixFileSearchAttributes attributes = WixFileSearchAttributes.Default;
+                var attributes = WixFileSearchAttributes.Default;
                 switch (result)
                 {
                     case Serialize.FileSearch.ResultType.exists:
@@ -1099,7 +1095,7 @@ namespace WixToolset.Util
         /// <param name="attributes"></param>
         private void CreateWixFileSearchRow(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string path, WixFileSearchAttributes attributes)
         {
-            section.Tuples.Add(new WixFileSearchTuple(sourceLineNumbers, id)
+            section.AddTuple(new WixFileSearchTuple(sourceLineNumbers, id)
             {
                 Path = path,
                 Attributes = attributes,
@@ -1114,12 +1110,12 @@ namespace WixToolset.Util
         /// <param name="directoryId">Identifier of referred to directory.</param>
         private void ParseFileShareElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string directoryId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string description = null;
             string name = null;
             Identifier id = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1147,7 +1143,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("ufs", componentId, name);
             }
 
             if (null == name)
@@ -1160,7 +1156,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, element.Name.LocalName, "FileSharePermission"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -1185,15 +1181,13 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new FileShareTuple(sourceLineNumbers, id)
+                section.AddTuple(new FileShareTuple(sourceLineNumbers, id)
                 {
                     ShareName = name,
                     ComponentRef = componentId,
                     Description = description,
                     DirectoryRef = directoryId,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -1204,12 +1198,11 @@ namespace WixToolset.Util
         /// <param name="fileShareId">The identifier of the parent FileShare element.</param>
         private void ParseFileSharePermissionElement(Intermediate intermediate, IntermediateSection section, XElement element, Identifier fileShareId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            BitArray bits = new BitArray(32);
-            int permission = 0;
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var bits = new BitArray(32);
             string user = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1217,10 +1210,10 @@ namespace WixToolset.Util
                     {
                         case "User":
                             user = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "User", user);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.User, user);
                             break;
                         default:
-                            YesNoType attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             if (!this.TrySetBitFromName(UtilConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
                             {
                                 if (!this.TrySetBitFromName(UtilConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
@@ -1241,7 +1234,7 @@ namespace WixToolset.Util
                 }
             }
 
-            permission = this.CreateIntegerFromBitArray(bits);
+            var permission = this.CreateIntegerFromBitArray(bits);
 
             if (null == user)
             {
@@ -1257,14 +1250,12 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new FileSharePermissionsTuple(sourceLineNumbers)
+                section.AddTuple(new FileSharePermissionsTuple(sourceLineNumbers)
                 {
                     FileShareRef = fileShareId.Id,
                     UserRef = user,
                     Permissions = permission,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -1275,12 +1266,12 @@ namespace WixToolset.Util
         /// <param name="componentId">Component Id of the parent component of this element.</param>
         private void ParseGroupElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string domain = null;
             string name = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1308,21 +1299,19 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("ugr", componentId, domain, name);
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new GroupTuple(sourceLineNumbers, id)
+                section.AddTuple(new GroupTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
                     Domain = domain,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -1333,10 +1322,10 @@ namespace WixToolset.Util
         /// <param name="userId">Required user id to be joined to the group.</param>
         private void ParseGroupRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string userId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string groupId = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1344,7 +1333,7 @@ namespace WixToolset.Util
                     {
                         case "Id":
                             groupId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Group", groupId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.Group, groupId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1361,13 +1350,11 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new UserGroupTuple(sourceLineNumbers)
+                section.AddTuple(new UserGroupTuple(sourceLineNumbers)
                 {
                     UserRef = userId,
                     GroupRef = groupId,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -1379,7 +1366,7 @@ namespace WixToolset.Util
         /// <param name="defaultTarget">Default directory if none is specified on the InternetShortcut element.</param>
         private void ParseInternetShortcutElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string defaultTarget)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string name = null;
             string target = null;
@@ -1388,7 +1375,7 @@ namespace WixToolset.Util
             string iconFile = null;
             int iconIndex = 0;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1435,7 +1422,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("uis", componentId, directoryId, name, target);
             }
 
             // In theory this can never be the case, since InternetShortcut can only be under
@@ -1459,8 +1446,8 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            InternetShortcutType shortcutType = InternetShortcutType.Link;
-            if (0 == String.Compare(type, "url", StringComparison.OrdinalIgnoreCase))
+            var shortcutType = InternetShortcutType.Link;
+            if (String.Equals(type, "url", StringComparison.OrdinalIgnoreCase))
             {
                 shortcutType = InternetShortcutType.Url;
             }
@@ -1486,7 +1473,7 @@ namespace WixToolset.Util
             // add the appropriate extension based on type of shortcut
             name = String.Concat(name, InternetShortcutType.Url == type ? ".url" : ".lnk");
 
-            var tuple = new WixInternetShortcutTuple(sourceLineNumbers, shortcutId)
+            section.AddTuple(new WixInternetShortcutTuple(sourceLineNumbers, shortcutId)
             {
                 ComponentRef = componentId,
                 DirectoryRef = directoryId,
@@ -1495,9 +1482,7 @@ namespace WixToolset.Util
                 Attributes = (int)type,
                 IconFile = iconFile,
                 IconIndex = iconIndex,
-            };
-
-            section.Tuples.Add(tuple);
+            });
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedInternetShortcuts", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
@@ -1505,16 +1490,14 @@ namespace WixToolset.Util
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CreateFolder");
 
             // use built-in MSI functionality to remove the shortcuts rather than doing so via CA
-            var removeFileTuple = new RemoveFileTuple(sourceLineNumbers, shortcutId)
+            section.AddTuple(new RemoveFileTuple(sourceLineNumbers, shortcutId)
             {
                 ComponentRef = componentId,
                 DirProperty = directoryId,
                 OnUninstall = true,
                 // TODO: A better way?
                 FileName = this.ParseHelper.IsValidShortFilename(name, false) ? name : String.Concat(this.ParseHelper.CreateShortName(name, true, false, directoryId, name), "|", name),
-            };
-
-            section.Tuples.Add(removeFileTuple);
+            });
         }
 
         /// <summary>
@@ -1524,22 +1507,22 @@ namespace WixToolset.Util
         /// <param name="componentId">Identifier of parent component.</param>
         private void ParsePerformanceCategoryElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string name = null;
             string help = null;
-            YesNoType multiInstance = YesNoType.No;
+            var multiInstance = YesNoType.No;
             int defaultLanguage = 0x09; // default to "english"
 
-            ArrayList parsedPerformanceCounters = new ArrayList();
+            var parsedPerformanceCounters = new List<ParsedPerformanceCounter>();
 
             // default to managed performance counter
-            string library = "netfxperf.dll";
-            string openEntryPoint = "OpenPerformanceData";
-            string collectEntryPoint = "CollectPerformanceData";
-            string closeEntryPoint = "ClosePerformanceData";
+            var library = "netfxperf.dll";
+            var openEntryPoint = "OpenPerformanceData";
+            var collectEntryPoint = "CollectPerformanceData";
+            var closeEntryPoint = "ClosePerformanceData";
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -1583,25 +1566,28 @@ namespace WixToolset.Util
                 }
             }
 
-            if (null == id)
+            if (null == id && null == name)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                this.Messaging.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, element.Name.LocalName, "Id", "Name"));
             }
-
-            if (null == name)
+            else if (null == id)
             {
-                name = id?.Id;
+                id = this.ParseHelper.CreateIdentifier("upc", componentId, name);
+            }
+            else if (null == name)
+            {
+                name = id.Id;
             }
 
             // Process the child counter elements.
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
                     switch (child.Name.LocalName)
                     {
                         case "PerformanceCounter":
-                            ParsedPerformanceCounter counter = this.ParsePerformanceCounterElement(intermediate, section, child, defaultLanguage);
+                            var counter = this.ParsePerformanceCounterElement(intermediate, section, child, defaultLanguage);
                             if (null != counter)
                             {
                                 parsedPerformanceCounters.Add(counter);
@@ -1622,10 +1608,10 @@ namespace WixToolset.Util
             if (!this.Messaging.EncounteredError)
             {
                 // Calculate the ini and h file content.
-                string objectName = "OBJECT_1";
-                string objectLanguage = defaultLanguage.ToString("D3", CultureInfo.InvariantCulture);
+                var objectName = "OBJECT_1";
+                var objectLanguage = defaultLanguage.ToString("D3", CultureInfo.InvariantCulture);
 
-                StringBuilder sbIniData = new StringBuilder();
+                var sbIniData = new StringBuilder();
                 sbIniData.AppendFormat("[info]\r\ndrivername={0}\r\nsymbolfile=wixperf.h\r\n\r\n[objects]\r\n{1}_{2}_NAME=\r\n\r\n[languages]\r\n{2}=LANG{2}\r\n\r\n", name, objectName, objectLanguage);
                 sbIniData.AppendFormat("[text]\r\n{0}_{1}_NAME={2}\r\n", objectName, objectLanguage, name);
                 if (null != help)
@@ -1634,15 +1620,15 @@ namespace WixToolset.Util
                 }
 
                 int symbolConstantsCounter = 0;
-                StringBuilder sbSymbolicConstants = new StringBuilder();
+                var sbSymbolicConstants = new StringBuilder();
                 sbSymbolicConstants.AppendFormat("#define {0}    {1}\r\n", objectName, symbolConstantsCounter);
 
-                StringBuilder sbCounterNames = new StringBuilder("[~]");
-                StringBuilder sbCounterTypes = new StringBuilder("[~]");
+                var sbCounterNames = new StringBuilder("[~]");
+                var sbCounterTypes = new StringBuilder("[~]");
                 for (int i = 0; i < parsedPerformanceCounters.Count; ++i)
                 {
-                    ParsedPerformanceCounter counter = (ParsedPerformanceCounter)parsedPerformanceCounters[i];
-                    string counterName = String.Concat("DEVICE_COUNTER_", i + 1);
+                    var counter = parsedPerformanceCounters[i];
+                    var counterName = String.Concat("DEVICE_COUNTER_", i + 1);
 
                     sbIniData.AppendFormat("{0}_{1}_NAME={2}\r\n", counterName, counter.Language, counter.Name);
                     if (null != counter.Help)
@@ -1662,20 +1648,18 @@ namespace WixToolset.Util
                 sbSymbolicConstants.AppendFormat("#define LAST_{0}_COUNTER_OFFSET    {1}\r\n", objectName, symbolConstantsCounter);
 
                 // Add the calculated INI and H strings to the PerformanceCategory table.
-                var tuple = new PerformanceCategoryTuple(sourceLineNumbers, id)
+                section.AddTuple(new PerformanceCategoryTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
                     IniData = sbIniData.ToString(),
                     ConstantData = sbSymbolicConstants.ToString(),
-                };
-
-                section.Tuples.Add(tuple);
+                });
 
                 // Set up the application's performance key.
-                string escapedName = UtilCompiler.FindPropertyBrackets.Replace(name, this.EscapeProperties);
-                string linkageKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Linkage", escapedName);
-                string performanceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Performance", escapedName);
+                var escapedName = UtilCompiler.FindPropertyBrackets.Replace(name, this.EscapeProperties);
+                var linkageKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Linkage", escapedName);
+                var performanceKey = String.Format(@"SYSTEM\CurrentControlSet\Services\{0}\Performance", escapedName);
 
                 this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, linkageKey, "Export", escapedName, componentId, false);
                 this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "-", null, componentId, false);
@@ -1951,14 +1935,14 @@ namespace WixToolset.Util
         /// <param name="defaultLanguage">Default language for the performance counter.</param>
         private ParsedPerformanceCounter ParsePerformanceCounterElement(Intermediate intermediate, IntermediateSection section, XElement element, int defaultLanguage)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             ParsedPerformanceCounter parsedPerformanceCounter = null;
             string name = null;
             string help = null;
-            System.Diagnostics.PerformanceCounterType type = System.Diagnostics.PerformanceCounterType.NumberOfItems32;
+            var type = System.Diagnostics.PerformanceCounterType.NumberOfItems32;
             int language = defaultLanguage;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2015,7 +1999,7 @@ namespace WixToolset.Util
         /// <returns>Numeric representation of the language as per WinNT.h.</returns>
         private System.Diagnostics.PerformanceCounterType GetPerformanceCounterType(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
-            System.Diagnostics.PerformanceCounterType type = System.Diagnostics.PerformanceCounterType.NumberOfItems32;
+            var type = System.Diagnostics.PerformanceCounterType.NumberOfItems32;
             if (String.Empty == attribute.Value)
             {
                 this.Messaging.Write(ErrorMessages.IllegalEmptyAttributeValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
@@ -2125,12 +2109,12 @@ namespace WixToolset.Util
         /// <param name="fileId">Identifier of referenced file.</param>
         private void ParsePerfCounterElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string name = null;
 
             this.Messaging.Write(UtilWarnings.DeprecatedPerfCounterElement(sourceLineNumbers));
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2159,14 +2143,12 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new PerfmonTuple(sourceLineNumbers)
+                section.AddTuple(new PerfmonTuple(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     File = $"[#{fileId}]",
                     Name = name,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
@@ -2182,10 +2164,10 @@ namespace WixToolset.Util
         /// <param name="fileId">Identifier of referenced file.</param>
         private void ParsePerfCounterManifestElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string resourceFileDirectory = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2209,14 +2191,12 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new PerfmonManifestTuple(sourceLineNumbers)
+                section.AddTuple(new PerfmonManifestTuple(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     File = $"[#{fileId}]",
                     ResourceFileDirectory = resourceFileDirectory,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestRegister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
@@ -2231,10 +2211,10 @@ namespace WixToolset.Util
         /// <param name="win64">Flag to determine whether the component is 64-bit.</param>
         private void ParseFormatFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string fileId, bool win64)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string binaryId = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2265,15 +2245,13 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFormatFiles", this.Context.Platform, CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
 
-                var tuple = new WixFormatFilesTuple(sourceLineNumbers)
+                section.AddTuple(new WixFormatFilesTuple(sourceLineNumbers)
                 {
                     BinaryRef = binaryId,
                     FileRef = fileId,
-                };
+                });
 
-                section.Tuples.Add(tuple);
-
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Binary", binaryId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Binary, binaryId);
             }
         }
 
@@ -2285,12 +2263,12 @@ namespace WixToolset.Util
         /// <param name="fileId">Identifier of referenced file.</param>
         private void ParseEventManifestElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string messageFile = null;
             string resourceFile = null;
             string parameterFile = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2320,17 +2298,15 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new EventManifestTuple(sourceLineNumbers)
+                section.AddTuple(new EventManifestTuple(sourceLineNumbers)
                 {
                     ComponentRef = componentId,
                     File = $"[#{fileId}]",
-                };
-
-                section.Tuples.Add(tuple);
+                });
 
                 if (null != messageFile)
                 {
-                    var xmlTuple = new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}MessageFile"))
+                    section.AddTuple(new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}MessageFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@messageFileName[\\]]",
@@ -2338,12 +2314,11 @@ namespace WixToolset.Util
                         Value = messageFile,
                         Flags = 4 | 0x00001000,  //bulk write | preserve modified date
                         ComponentRef = componentId,
-                    };
-                    section.Tuples.Add(xmlTuple);
+                    });
                 }
                 if (null != parameterFile)
                 {
-                    var xmlTuple = new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ParameterFile"))
+                    section.AddTuple(new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ParameterFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@parameterFileName[\\]]",
@@ -2351,12 +2326,11 @@ namespace WixToolset.Util
                         Value = parameterFile,
                         Flags = 4 | 0x00001000,  //bulk write | preserve modified date
                         ComponentRef = componentId,
-                    };
-                    section.Tuples.Add(xmlTuple);
+                    });
                 }
                 if (null != resourceFile)
                 {
-                    var xmlTuple = new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ResourceFile"))
+                    section.AddTuple(new XmlFileTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, $"Config_{fileId}ResourceFile"))
                     {
                         File = $"[#{fileId}]",
                         ElementPath = "/*/*/*/*[\\[]@resourceFileName[\\]]",
@@ -2364,8 +2338,7 @@ namespace WixToolset.Util
                         Value = resourceFile,
                         Flags = 4 | 0x00001000,  //bulk write | preserve modified date
                         ComponentRef = componentId,
-                    };
-                    section.Tuples.Add(xmlTuple);
+                    });
                 }
 
             }
@@ -2375,7 +2348,7 @@ namespace WixToolset.Util
 
             if (null != messageFile || null != parameterFile || null != resourceFile)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+                this.AddReferenceToSchedXmlFile(sourceLineNumbers, section);
             }
         }
 
@@ -2389,14 +2362,13 @@ namespace WixToolset.Util
         /// <param name="tableName">Name of table that contains objectId.</param>
         private void ParsePermissionExElement(Intermediate intermediate, IntermediateSection section, XElement element, string objectId, string componentId, bool win64, string tableName)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            BitArray bits = new BitArray(32);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var bits = new BitArray(32);
             string domain = null;
-            int permission = 0;
             string[] specialPermissions = null;
             string user = null;
 
-            PermissionType permissionType = PermissionType.SecureObjects;
+            var permissionType = PermissionType.SecureObjects;
 
             switch (tableName)
             {
@@ -2422,7 +2394,7 @@ namespace WixToolset.Util
                     break;
             }
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2439,7 +2411,7 @@ namespace WixToolset.Util
                             user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            YesNoType attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            var attribValue = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             if (!this.TrySetBitFromName(UtilConstants.StandardPermissions, attrib.Name.LocalName, attribValue, bits, 16))
                             {
                                 if (!this.TrySetBitFromName(UtilConstants.GenericPermissions, attrib.Name.LocalName, attribValue, bits, 28))
@@ -2460,7 +2432,7 @@ namespace WixToolset.Util
                 }
             }
 
-            permission = this.CreateIntegerFromBitArray(bits);
+            var permission = this.CreateIntegerFromBitArray(bits);
 
             if (null == user)
             {
@@ -2479,7 +2451,7 @@ namespace WixToolset.Util
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedSecureObjects", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
 
                 var id = this.ParseHelper.CreateIdentifier("sec", objectId, tableName, domain, user);
-                var tuple = new SecureObjectsTuple(sourceLineNumbers, id)
+                section.AddTuple(new SecureObjectsTuple(sourceLineNumbers, id)
                 {
                     SecureObject = objectId,
                     Table = tableName,
@@ -2487,9 +2459,7 @@ namespace WixToolset.Util
                     User = user,
                     Permission = permission,
                     ComponentRef = componentId,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -2499,7 +2469,7 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         private void ParseProductSearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string variable = null;
             string condition = null;
@@ -2507,9 +2477,9 @@ namespace WixToolset.Util
             string productCode = null;
             string upgradeCode = null;
 
-            Serialize.ProductSearch.ResultType result = Serialize.ProductSearch.ResultType.NotSet;
+            var result = Serialize.ProductSearch.ResultType.NotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2528,7 +2498,7 @@ namespace WixToolset.Util
                             upgradeCode = this.ParseHelper.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
                             break;
                         case "Result":
-                            string resultValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var resultValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (!Serialize.ProductSearch.TryParseResultType(resultValue, out result))
                             {
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName,
@@ -2571,7 +2541,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                WixProductSearchAttributes attributes = WixProductSearchAttributes.Version;
+                var attributes = WixProductSearchAttributes.Version;
                 switch (result)
                 {
                     case Serialize.ProductSearch.ResultType.version:
@@ -2594,7 +2564,7 @@ namespace WixToolset.Util
                     attributes |= WixProductSearchAttributes.UpgradeCode;
                 }
 
-                section.Tuples.Add(new WixProductSearchTuple(sourceLineNumbers, id)
+                section.AddTuple(new WixProductSearchTuple(sourceLineNumbers, id)
                 {
                     Guid = productCode ?? upgradeCode,
                     Attributes = attributes,
@@ -2608,7 +2578,7 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         private void ParseRegistrySearchElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string variable = null;
             string condition = null;
@@ -2616,12 +2586,12 @@ namespace WixToolset.Util
             RegistryRootType? root = null;
             string key = null;
             string value = null;
-            YesNoType expand = YesNoType.NotSet;
-            YesNoType win64 = YesNoType.NotSet;
-            Serialize.RegistrySearch.ResultType result = Serialize.RegistrySearch.ResultType.NotSet;
-            Serialize.RegistrySearch.FormatType format = Serialize.RegistrySearch.FormatType.raw;
+            var expand = YesNoType.NotSet;
+            var win64 = YesNoType.NotSet;
+            var result = Serialize.RegistrySearch.ResultType.NotSet;
+            var format = Serialize.RegistrySearch.FormatType.raw;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2657,7 +2627,7 @@ namespace WixToolset.Util
                             }
                             break;
                         case "Result":
-                            string resultValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var resultValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (!Serialize.RegistrySearch.TryParseResultType(resultValue, out result))
                             {
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName,
@@ -2698,7 +2668,7 @@ namespace WixToolset.Util
                 id = this.ParseHelper.CreateIdentifier("wrs", variable, condition, after, root.ToString(), key, value, result.ToString());
             }
 
-            WixRegistrySearchAttributes attributes = WixRegistrySearchAttributes.Raw;
+            var attributes = WixRegistrySearchAttributes.Raw;
             switch (format)
             {
                 case Serialize.RegistrySearch.FormatType.raw:
@@ -2741,9 +2711,9 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.Tuples.Add(new WixRegistrySearchTuple(sourceLineNumbers, id)
+                section.AddTuple(new WixRegistrySearchTuple(sourceLineNumbers, id)
                 {
-                    Root = (RegistryRootType)root,
+                    Root = root.Value,
                     Key = key,
                     Value = value,
                     Attributes = attributes,
@@ -2758,12 +2728,12 @@ namespace WixToolset.Util
         /// <param name="componentId">Identifier of parent component.</param>
         private void ParseRemoveFolderExElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
-            int on = (int)WixRemoveFolderExOn.Uninstall;
+            var on = (int)WixRemoveFolderExOn.Uninstall;
             string property = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2773,7 +2743,7 @@ namespace WixToolset.Util
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "On":
-                            string onValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var onValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             if (onValue.Length == 0)
                             {
                                 on = CompilerConstants.IllegalInteger;
@@ -2828,14 +2798,12 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RemoveFoldersEx", this.Context.Platform, CustomActionPlatforms.X86);
 
-                var tuple = new WixRemoveFolderExTuple(sourceLineNumbers)
+                section.AddTuple(new WixRemoveFolderExTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Property = property,
-                    InstallMode = (int)on,
-                };
-
-                section.Tuples.Add(tuple);
+                    InstallMode = on,
+                });
 
                 this.ParseHelper.EnsureTable(section, sourceLineNumbers, "RemoveFile");
             }
@@ -2848,12 +2816,12 @@ namespace WixToolset.Util
         /// <param name="componentId">The identity of the parent component.</param>
         private void ParseRestartResourceElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string resource = null;
-            int attributes = CompilerConstants.IntegerNotSet;
+            var attributes = CompilerConstants.IntegerNotSet;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -2906,14 +2874,12 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RegisterRestartResources", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
-                var tuple = new WixRestartResourceTuple(sourceLineNumbers)
+                section.AddTuple(new WixRestartResourceTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Resource = resource,
                     Attributes = attributes,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -2926,18 +2892,18 @@ namespace WixToolset.Util
         /// <param name="parentTableServiceName">Optional name of service </param>
         private void ParseServiceConfigElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string parentTableName, string parentTableServiceName)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string firstFailureActionType = null;
-            bool newService = false;
+            var newService = false;
             string programCommandLine = null;
             string rebootMessage = null;
-            int resetPeriod = CompilerConstants.IntegerNotSet;
-            int restartServiceDelay = CompilerConstants.IntegerNotSet;
+            var resetPeriod = CompilerConstants.IntegerNotSet;
+            var restartServiceDelay = CompilerConstants.IntegerNotSet;
             string secondFailureActionType = null;
             string serviceName = null;
             string thirdFailureActionType = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -3000,7 +2966,7 @@ namespace WixToolset.Util
             {
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedServiceConfig", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
 
-                var tuple = new ServiceConfigTuple(sourceLineNumbers)
+                section.AddTuple(new ServiceConfigTuple(sourceLineNumbers)
                 {
                     ServiceName = serviceName,
                     ComponentRef = componentId,
@@ -3012,9 +2978,7 @@ namespace WixToolset.Util
                     RestartServiceDelayInSeconds = restartServiceDelay,
                     ProgramCommandLine = programCommandLine,
                     RebootMessage = rebootMessage,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -3026,16 +2990,16 @@ namespace WixToolset.Util
         /// <param name="win64">Indicates whether the path is a 64-bit path.</param>
         private void ParseTouchFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, bool win64)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string path = null;
-            YesNoType onInstall = YesNoType.NotSet;
-            YesNoType onReinstall = YesNoType.NotSet;
-            YesNoType onUninstall = YesNoType.NotSet;
-            YesNoType nonvital = YesNoType.NotSet;
+            var onInstall = YesNoType.NotSet;
+            var onReinstall = YesNoType.NotSet;
+            var onUninstall = YesNoType.NotSet;
+            var nonvital = YesNoType.NotSet;
             int attributes = 0;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -3097,14 +3061,12 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new WixTouchFileTuple(sourceLineNumbers)
+                section.AddTuple(new WixTouchFileTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Path = path,
                     Attributes = attributes,
-                };
-
-                section.Tuples.Add(tuple);
+                });
 
                 this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "TouchFileDuringInstall", this.Context.Platform, CustomActionPlatforms.X86);
             }
@@ -3117,14 +3079,14 @@ namespace WixToolset.Util
         /// <param name="componentId">Optional identifier of parent component.</param>
         private void ParseUserElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             int attributes = 0;
             string domain = null;
             string name = null;
             string password = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -3274,7 +3236,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("usr", componentId, name);
             }
 
             if (null == name)
@@ -3282,7 +3244,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -3291,7 +3253,7 @@ namespace WixToolset.Util
                         case "GroupRef":
                             if (null == componentId)
                             {
-                                SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
+                                var childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                                 this.Messaging.Write(UtilErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
@@ -3315,16 +3277,14 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new UserTuple(sourceLineNumbers, id)
+                section.AddTuple(new UserTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
                     Domain = domain,
                     Password = password,
                     Attributes = attributes,
-                };
-
-                section.Tuples.Add(tuple);
+                });
             }
         }
 
@@ -3335,7 +3295,7 @@ namespace WixToolset.Util
         /// <param name="componentId">Identifier of parent component.</param>
         private void ParseXmlFileElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string file = null;
             string elementPath = null;
@@ -3344,14 +3304,14 @@ namespace WixToolset.Util
             int sequence = -1;
             int flags = 0;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
                     switch (attrib.Name.LocalName)
                     {
                         case "Action":
-                            string actionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var actionValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (actionValue)
                             {
                                 case "createElement":
@@ -3429,7 +3389,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("uxf", componentId, file, elementPath, name);
             }
 
             if (null == file)
@@ -3451,7 +3411,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new XmlFileTuple(sourceLineNumbers, id)
+                var tuple = section.AddTuple(new XmlFileTuple(sourceLineNumbers, id)
                 {
                     File = file,
                     ElementPath = elementPath,
@@ -3459,15 +3419,14 @@ namespace WixToolset.Util
                     Value = value,
                     Flags = flags,
                     ComponentRef = componentId,
-                };
+                });
                 if (-1 != sequence)
                 {
                     tuple.Sequence = sequence;
                 }
-                section.Tuples.Add(tuple);
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.AddReferenceToSchedXmlFile(sourceLineNumbers, section);
         }
 
         /// <summary>
@@ -3478,18 +3437,18 @@ namespace WixToolset.Util
         /// <param name="nested">Whether or not the element is nested.</param>
         private void ParseXmlConfigElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, bool nested)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string elementId = null;
             string elementPath = null;
             int flags = 0;
             string file = null;
             string name = null;
-            int sequence = CompilerConstants.IntegerNotSet;
+            var sequence = CompilerConstants.IntegerNotSet;
             string value = null;
             string verifyPath = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -3539,7 +3498,7 @@ namespace WixToolset.Util
                             }
                             else
                             {
-                                string nodeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                                var nodeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                                 switch (nodeValue)
                                 {
                                     case "element":
@@ -3564,7 +3523,7 @@ namespace WixToolset.Util
                             }
                             else
                             {
-                                string onValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                                var onValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                                 switch (onValue)
                                 {
                                     case "install":
@@ -3607,7 +3566,7 @@ namespace WixToolset.Util
 
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("uxc", componentId, file, elementId, elementPath);
             }
 
             if (null == file)
@@ -3631,10 +3590,10 @@ namespace WixToolset.Util
                     this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, element.Name.LocalName, "ElementId", "Action", "Node", "On"));
                 }
 
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "XmlConfig", elementId);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, UtilTupleDefinitions.XmlConfig, elementId);
             }
 
-            string innerText = this.ParseHelper.GetTrimmedInnerText(element);
+            var innerText = this.ParseHelper.GetTrimmedInnerText(element);
             if (null != value)
             {
                 // cannot specify both the value attribute and inner text
@@ -3652,7 +3611,7 @@ namespace WixToolset.Util
             }
 
             // find unexpected child elements
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -3681,21 +3640,20 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new XmlConfigTuple(sourceLineNumbers, id)
+                var tuple = section.AddTuple(new XmlConfigTuple(sourceLineNumbers, id)
                 {
-                    File=file,
-                    ElementPath=elementId ??elementPath,
-                    VerifyPath=verifyPath,
-                    Name=name,
-                    Value=value,
-                    Flags=flags,
-                    ComponentRef=componentId,
-                };
+                    File = file,
+                    ElementPath = elementId ?? elementPath,
+                    VerifyPath = verifyPath,
+                    Name = name,
+                    Value = value,
+                    Flags = flags,
+                    ComponentRef = componentId,
+                });
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
                     tuple.Sequence = sequence;
                 }
-                section.Tuples.Add(tuple);
             }
 
             this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlConfig", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
@@ -3727,7 +3685,7 @@ namespace WixToolset.Util
                 throw new ArgumentException(String.Format("Can only convert a bit array with 32-bits to integer. Actual number of bits in array: {0}", bits.Length), "bits");
             }
 
-            int[] intArray = new int[1];
+            var intArray = new int[1];
             bits.CopyTo(intArray, 0);
 
             return intArray[0];
@@ -3735,7 +3693,7 @@ namespace WixToolset.Util
 
         private bool TrySetBitFromName(string[] attributeNames, string attributeName, YesNoType attributeValue, BitArray bits, int offset)
         {
-            for (int i = 0; i < attributeNames.Length; i++)
+            for (var i = 0; i < attributeNames.Length; i++)
             {
                 if (attributeName.Equals(attributeNames[i], StringComparison.Ordinal))
                 {
@@ -3745,6 +3703,11 @@ namespace WixToolset.Util
             }
 
             return false;
+        }
+
+        private void AddReferenceToSchedXmlFile(SourceLineNumber sourceLineNumbers, IntermediateSection section)
+        {
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
         }
 
         /// <summary>
