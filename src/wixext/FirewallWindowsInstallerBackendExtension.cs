@@ -2,6 +2,7 @@
 
 namespace WixToolset.Firewall
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
     using WixToolset.Data;
@@ -12,7 +13,7 @@ namespace WixToolset.Firewall
     {
         private static readonly TableDefinition[] Tables = LoadTables();
 
-        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
+        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
 
         public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output) => this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitionsForTuples, true);
 
