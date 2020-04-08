@@ -11,7 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusPartitionProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.Partition_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.PartitionRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusPartitionPropertyTupleFields.Value), IntermediateFieldType.String),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusPartitionPropertyTupleFields
     {
-        Partition_,
+        PartitionRef,
         Name,
         Value,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusPartitionPropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Partition_
+        public string PartitionRef
         {
-            get => this.Fields[(int)ComPlusPartitionPropertyTupleFields.Partition_].AsString();
-            set => this.Set((int)ComPlusPartitionPropertyTupleFields.Partition_, value);
+            get => this.Fields[(int)ComPlusPartitionPropertyTupleFields.PartitionRef].AsString();
+            set => this.Set((int)ComPlusPartitionPropertyTupleFields.PartitionRef, value);
         }
 
         public string Name

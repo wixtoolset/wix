@@ -11,10 +11,9 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusApplication.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.Application), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.Partition_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.CustomId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.PartitionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.ApplicationId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusApplicationTupleFields.Name), IntermediateFieldType.String),
             },
             typeof(ComPlusApplicationTuple));
@@ -27,10 +26,9 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusApplicationTupleFields
     {
-        Application,
-        Partition_,
-        Component_,
-        CustomId,
+        PartitionRef,
+        ComponentRef,
+        ApplicationId,
         Name,
     }
 
@@ -46,28 +44,22 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusApplicationTupleFields index] => this.Fields[(int)index];
 
-        public string Application
+        public string PartitionRef
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.Application].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.Application, value);
+            get => this.Fields[(int)ComPlusApplicationTupleFields.PartitionRef].AsString();
+            set => this.Set((int)ComPlusApplicationTupleFields.PartitionRef, value);
         }
 
-        public string Partition_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.Partition_].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.Partition_, value);
+            get => this.Fields[(int)ComPlusApplicationTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusApplicationTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string ApplicationId
         {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.Component_, value);
-        }
-
-        public string CustomId
-        {
-            get => this.Fields[(int)ComPlusApplicationTupleFields.CustomId].AsString();
-            set => this.Set((int)ComPlusApplicationTupleFields.CustomId, value);
+            get => this.Fields[(int)ComPlusApplicationTupleFields.ApplicationId].AsString();
+            set => this.Set((int)ComPlusApplicationTupleFields.ApplicationId, value);
         }
 
         public string Name

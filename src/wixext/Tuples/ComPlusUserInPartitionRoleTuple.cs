@@ -11,10 +11,9 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusUserInPartitionRole.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.UserInPartitionRole), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.PartitionRole_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.User_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.PartitionRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusUserInPartitionRoleTupleFields.UserRef), IntermediateFieldType.String),
             },
             typeof(ComPlusUserInPartitionRoleTuple));
     }
@@ -26,10 +25,9 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusUserInPartitionRoleTupleFields
     {
-        UserInPartitionRole,
-        PartitionRole_,
-        Component_,
-        User_,
+        PartitionRoleRef,
+        ComponentRef,
+        UserRef,
     }
 
     public class ComPlusUserInPartitionRoleTuple : IntermediateTuple
@@ -44,28 +42,22 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusUserInPartitionRoleTupleFields index] => this.Fields[(int)index];
 
-        public string UserInPartitionRole
+        public string PartitionRoleRef
         {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.UserInPartitionRole].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.UserInPartitionRole, value);
+            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.PartitionRoleRef].AsString();
+            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.PartitionRoleRef, value);
         }
 
-        public string PartitionRole_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.PartitionRole_].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.PartitionRole_, value);
+            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string UserRef
         {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.Component_, value);
-        }
-
-        public string User_
-        {
-            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.User_].AsString();
-            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.User_, value);
+            get => this.Fields[(int)ComPlusUserInPartitionRoleTupleFields.UserRef].AsString();
+            set => this.Set((int)ComPlusUserInPartitionRoleTupleFields.UserRef, value);
         }
     }
 }

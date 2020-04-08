@@ -3,25 +3,11 @@
 namespace WixToolset.ComPlus
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
     public class ComPlusWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        private static readonly TableDefinition[] Tables = LoadTables();
-
-        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
-
-        private static TableDefinition[] LoadTables()
-        {
-            using (var resourceStream = typeof(ComPlusWindowsInstallerBackendBinderExtension).Assembly.GetManifestResourceStream("WixToolset.ComPlus.tables.xml"))
-            using (var reader = XmlReader.Create(resourceStream))
-            {
-                var tables = TableDefinitionCollection.Load(reader);
-                return tables.ToArray();
-            }
-        }
+        public override IEnumerable<TableDefinition> TableDefinitions => ComPlusTableDefinitions.All;
     }
 }

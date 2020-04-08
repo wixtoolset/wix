@@ -11,8 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusInterface.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusInterfaceTupleFields.Interface), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusInterfaceTupleFields.ComPlusComponent_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusInterfaceTupleFields.ComPlusComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusInterfaceTupleFields.IID), IntermediateFieldType.String),
             },
             typeof(ComPlusInterfaceTuple));
@@ -25,8 +24,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusInterfaceTupleFields
     {
-        Interface,
-        ComPlusComponent_,
+        ComPlusComponentRef,
         IID,
     }
 
@@ -42,16 +40,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusInterfaceTupleFields index] => this.Fields[(int)index];
 
-        public string Interface
+        public string ComPlusComponentRef
         {
-            get => this.Fields[(int)ComPlusInterfaceTupleFields.Interface].AsString();
-            set => this.Set((int)ComPlusInterfaceTupleFields.Interface, value);
-        }
-
-        public string ComPlusComponent_
-        {
-            get => this.Fields[(int)ComPlusInterfaceTupleFields.ComPlusComponent_].AsString();
-            set => this.Set((int)ComPlusInterfaceTupleFields.ComPlusComponent_, value);
+            get => this.Fields[(int)ComPlusInterfaceTupleFields.ComPlusComponentRef].AsString();
+            set => this.Set((int)ComPlusInterfaceTupleFields.ComPlusComponentRef, value);
         }
 
         public string IID

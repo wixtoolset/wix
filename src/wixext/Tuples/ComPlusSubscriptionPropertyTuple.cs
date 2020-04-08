@@ -11,7 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusSubscriptionProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionPropertyTupleFields.Subscription_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionPropertyTupleFields.SubscriptionRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusSubscriptionPropertyTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusSubscriptionPropertyTupleFields.Value), IntermediateFieldType.String),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusSubscriptionPropertyTupleFields
     {
-        Subscription_,
+        SubscriptionRef,
         Name,
         Value,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusSubscriptionPropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Subscription_
+        public string SubscriptionRef
         {
-            get => this.Fields[(int)ComPlusSubscriptionPropertyTupleFields.Subscription_].AsString();
-            set => this.Set((int)ComPlusSubscriptionPropertyTupleFields.Subscription_, value);
+            get => this.Fields[(int)ComPlusSubscriptionPropertyTupleFields.SubscriptionRef].AsString();
+            set => this.Set((int)ComPlusSubscriptionPropertyTupleFields.SubscriptionRef, value);
         }
 
         public string Name

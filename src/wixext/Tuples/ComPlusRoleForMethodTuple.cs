@@ -11,10 +11,9 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusRoleForMethod.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.RoleForMethod), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.Method_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.ApplicationRole_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.MethodRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.ApplicationRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForMethodTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(ComPlusRoleForMethodTuple));
     }
@@ -26,10 +25,9 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusRoleForMethodTupleFields
     {
-        RoleForMethod,
-        Method_,
-        ApplicationRole_,
-        Component_,
+        MethodRef,
+        ApplicationRoleRef,
+        ComponentRef,
     }
 
     public class ComPlusRoleForMethodTuple : IntermediateTuple
@@ -44,28 +42,22 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusRoleForMethodTupleFields index] => this.Fields[(int)index];
 
-        public string RoleForMethod
+        public string MethodRef
         {
-            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.RoleForMethod].AsString();
-            set => this.Set((int)ComPlusRoleForMethodTupleFields.RoleForMethod, value);
+            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.MethodRef].AsString();
+            set => this.Set((int)ComPlusRoleForMethodTupleFields.MethodRef, value);
         }
 
-        public string Method_
+        public string ApplicationRoleRef
         {
-            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.Method_].AsString();
-            set => this.Set((int)ComPlusRoleForMethodTupleFields.Method_, value);
+            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.ApplicationRoleRef].AsString();
+            set => this.Set((int)ComPlusRoleForMethodTupleFields.ApplicationRoleRef, value);
         }
 
-        public string ApplicationRole_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.ApplicationRole_].AsString();
-            set => this.Set((int)ComPlusRoleForMethodTupleFields.ApplicationRole_, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusRoleForMethodTupleFields.Component_, value);
+            get => this.Fields[(int)ComPlusRoleForMethodTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusRoleForMethodTupleFields.ComponentRef, value);
         }
     }
 }

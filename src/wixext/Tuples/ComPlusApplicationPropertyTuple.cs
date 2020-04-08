@@ -11,7 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusApplicationProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationPropertyTupleFields.Application_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationPropertyTupleFields.ApplicationRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusApplicationPropertyTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusApplicationPropertyTupleFields.Value), IntermediateFieldType.String),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusApplicationPropertyTupleFields
     {
-        Application_,
+        ApplicationRef,
         Name,
         Value,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusApplicationPropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Application_
+        public string ApplicationRef
         {
-            get => this.Fields[(int)ComPlusApplicationPropertyTupleFields.Application_].AsString();
-            set => this.Set((int)ComPlusApplicationPropertyTupleFields.Application_, value);
+            get => this.Fields[(int)ComPlusApplicationPropertyTupleFields.ApplicationRef].AsString();
+            set => this.Set((int)ComPlusApplicationPropertyTupleFields.ApplicationRef, value);
         }
 
         public string Name

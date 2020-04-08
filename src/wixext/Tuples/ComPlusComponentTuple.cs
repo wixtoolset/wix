@@ -11,8 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusComponent.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusComponentTupleFields.ComPlusComponent), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusComponentTupleFields.Assembly_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusComponentTupleFields.AssemblyRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusComponentTupleFields.CLSID), IntermediateFieldType.String),
             },
             typeof(ComPlusComponentTuple));
@@ -25,8 +24,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusComponentTupleFields
     {
-        ComPlusComponent,
-        Assembly_,
+        AssemblyRef,
         CLSID,
     }
 
@@ -42,16 +40,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusComponentTupleFields index] => this.Fields[(int)index];
 
-        public string ComPlusComponent
+        public string AssemblyRef
         {
-            get => this.Fields[(int)ComPlusComponentTupleFields.ComPlusComponent].AsString();
-            set => this.Set((int)ComPlusComponentTupleFields.ComPlusComponent, value);
-        }
-
-        public string Assembly_
-        {
-            get => this.Fields[(int)ComPlusComponentTupleFields.Assembly_].AsString();
-            set => this.Set((int)ComPlusComponentTupleFields.Assembly_, value);
+            get => this.Fields[(int)ComPlusComponentTupleFields.AssemblyRef].AsString();
+            set => this.Set((int)ComPlusComponentTupleFields.AssemblyRef, value);
         }
 
         public string CLSID

@@ -12,9 +12,9 @@ namespace WixToolset.ComPlus
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.Subscription), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.ComPlusComponent_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.CustomId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.ComPlusComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.SubscriptionId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.EventCLSID), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusSubscriptionTupleFields.PublisherID), IntermediateFieldType.String),
@@ -30,9 +30,9 @@ namespace WixToolset.ComPlus.Tuples
     public enum ComPlusSubscriptionTupleFields
     {
         Subscription,
-        ComPlusComponent_,
-        Component_,
-        CustomId,
+        ComPlusComponentRef,
+        ComponentRef,
+        SubscriptionId,
         Name,
         EventCLSID,
         PublisherID,
@@ -56,22 +56,22 @@ namespace WixToolset.ComPlus.Tuples
             set => this.Set((int)ComPlusSubscriptionTupleFields.Subscription, value);
         }
 
-        public string ComPlusComponent_
+        public string ComPlusComponentRef
         {
-            get => this.Fields[(int)ComPlusSubscriptionTupleFields.ComPlusComponent_].AsString();
-            set => this.Set((int)ComPlusSubscriptionTupleFields.ComPlusComponent_, value);
+            get => this.Fields[(int)ComPlusSubscriptionTupleFields.ComPlusComponentRef].AsString();
+            set => this.Set((int)ComPlusSubscriptionTupleFields.ComPlusComponentRef, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusSubscriptionTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusSubscriptionTupleFields.Component_, value);
+            get => this.Fields[(int)ComPlusSubscriptionTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusSubscriptionTupleFields.ComponentRef, value);
         }
 
-        public string CustomId
+        public string SubscriptionId
         {
-            get => this.Fields[(int)ComPlusSubscriptionTupleFields.CustomId].AsString();
-            set => this.Set((int)ComPlusSubscriptionTupleFields.CustomId, value);
+            get => this.Fields[(int)ComPlusSubscriptionTupleFields.SubscriptionId].AsString();
+            set => this.Set((int)ComPlusSubscriptionTupleFields.SubscriptionId, value);
         }
 
         public string Name

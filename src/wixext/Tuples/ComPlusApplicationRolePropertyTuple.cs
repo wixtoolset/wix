@@ -11,7 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusApplicationRoleProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusApplicationRolePropertyTupleFields.ApplicationRole_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusApplicationRolePropertyTupleFields.ApplicationRoleRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusApplicationRolePropertyTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusApplicationRolePropertyTupleFields.Value), IntermediateFieldType.String),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusApplicationRolePropertyTupleFields
     {
-        ApplicationRole_,
+        ApplicationRoleRef,
         Name,
         Value,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusApplicationRolePropertyTupleFields index] => this.Fields[(int)index];
 
-        public string ApplicationRole_
+        public string ApplicationRoleRef
         {
-            get => this.Fields[(int)ComPlusApplicationRolePropertyTupleFields.ApplicationRole_].AsString();
-            set => this.Set((int)ComPlusApplicationRolePropertyTupleFields.ApplicationRole_, value);
+            get => this.Fields[(int)ComPlusApplicationRolePropertyTupleFields.ApplicationRoleRef].AsString();
+            set => this.Set((int)ComPlusApplicationRolePropertyTupleFields.ApplicationRoleRef, value);
         }
 
         public string Name

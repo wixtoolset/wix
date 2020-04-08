@@ -11,9 +11,8 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusAssembly.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.Assembly), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.Application_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.ApplicationRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.AssemblyName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.DllPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusAssemblyTupleFields.TlbPath), IntermediateFieldType.String),
@@ -30,9 +29,8 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusAssemblyTupleFields
     {
-        Assembly,
-        Application_,
-        Component_,
+        ApplicationRef,
+        ComponentRef,
         AssemblyName,
         DllPath,
         TlbPath,
@@ -52,22 +50,16 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusAssemblyTupleFields index] => this.Fields[(int)index];
 
-        public string Assembly
+        public string ApplicationRef
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.Assembly].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.Assembly, value);
+            get => this.Fields[(int)ComPlusAssemblyTupleFields.ApplicationRef].AsString();
+            set => this.Set((int)ComPlusAssemblyTupleFields.ApplicationRef, value);
         }
 
-        public string Application_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.Application_].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.Application_, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)ComPlusAssemblyTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusAssemblyTupleFields.Component_, value);
+            get => this.Fields[(int)ComPlusAssemblyTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusAssemblyTupleFields.ComponentRef, value);
         }
 
         public string AssemblyName

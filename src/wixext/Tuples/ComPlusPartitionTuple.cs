@@ -11,9 +11,8 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusPartition.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionTupleFields.Partition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusPartitionTupleFields.CustomId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusPartitionTupleFields.PartitionId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusPartitionTupleFields.Name), IntermediateFieldType.String),
             },
             typeof(ComPlusPartitionTuple));
@@ -26,9 +25,8 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusPartitionTupleFields
     {
-        Partition,
-        Component_,
-        CustomId,
+        ComponentRef,
+        PartitionId,
         Name,
     }
 
@@ -44,22 +42,16 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusPartitionTupleFields index] => this.Fields[(int)index];
 
-        public string Partition
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusPartitionTupleFields.Partition].AsString();
-            set => this.Set((int)ComPlusPartitionTupleFields.Partition, value);
+            get => this.Fields[(int)ComPlusPartitionTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusPartitionTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string PartitionId
         {
-            get => this.Fields[(int)ComPlusPartitionTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusPartitionTupleFields.Component_, value);
-        }
-
-        public string CustomId
-        {
-            get => this.Fields[(int)ComPlusPartitionTupleFields.CustomId].AsString();
-            set => this.Set((int)ComPlusPartitionTupleFields.CustomId, value);
+            get => this.Fields[(int)ComPlusPartitionTupleFields.PartitionId].AsString();
+            set => this.Set((int)ComPlusPartitionTupleFields.PartitionId, value);
         }
 
         public string Name

@@ -11,10 +11,9 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusRoleForComponent.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.RoleForComponent), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.ComPlusComponent_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.ApplicationRole_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.ComPlusComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.ApplicationRoleRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusRoleForComponentTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(ComPlusRoleForComponentTuple));
     }
@@ -26,10 +25,9 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusRoleForComponentTupleFields
     {
-        RoleForComponent,
-        ComPlusComponent_,
-        ApplicationRole_,
-        Component_,
+        ComPlusComponentRef,
+        ApplicationRoleRef,
+        ComponentRef,
     }
 
     public class ComPlusRoleForComponentTuple : IntermediateTuple
@@ -44,28 +42,22 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusRoleForComponentTupleFields index] => this.Fields[(int)index];
 
-        public string RoleForComponent
+        public string ComPlusComponentRef
         {
-            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.RoleForComponent].AsString();
-            set => this.Set((int)ComPlusRoleForComponentTupleFields.RoleForComponent, value);
+            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.ComPlusComponentRef].AsString();
+            set => this.Set((int)ComPlusRoleForComponentTupleFields.ComPlusComponentRef, value);
         }
 
-        public string ComPlusComponent_
+        public string ApplicationRoleRef
         {
-            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.ComPlusComponent_].AsString();
-            set => this.Set((int)ComPlusRoleForComponentTupleFields.ComPlusComponent_, value);
+            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.ApplicationRoleRef].AsString();
+            set => this.Set((int)ComPlusRoleForComponentTupleFields.ApplicationRoleRef, value);
         }
 
-        public string ApplicationRole_
+        public string ComponentRef
         {
-            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.ApplicationRole_].AsString();
-            set => this.Set((int)ComPlusRoleForComponentTupleFields.ApplicationRole_, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.Component_].AsString();
-            set => this.Set((int)ComPlusRoleForComponentTupleFields.Component_, value);
+            get => this.Fields[(int)ComPlusRoleForComponentTupleFields.ComponentRef].AsString();
+            set => this.Set((int)ComPlusRoleForComponentTupleFields.ComponentRef, value);
         }
     }
 }

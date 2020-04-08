@@ -11,7 +11,7 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusMethodProperty.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.Method_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.MethodRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComPlusMethodPropertyTupleFields.Value), IntermediateFieldType.String),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusMethodPropertyTupleFields
     {
-        Method_,
+        MethodRef,
         Name,
         Value,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusMethodPropertyTupleFields index] => this.Fields[(int)index];
 
-        public string Method_
+        public string MethodRef
         {
-            get => this.Fields[(int)ComPlusMethodPropertyTupleFields.Method_].AsString();
-            set => this.Set((int)ComPlusMethodPropertyTupleFields.Method_, value);
+            get => this.Fields[(int)ComPlusMethodPropertyTupleFields.MethodRef].AsString();
+            set => this.Set((int)ComPlusMethodPropertyTupleFields.MethodRef, value);
         }
 
         public string Name

@@ -11,8 +11,8 @@ namespace WixToolset.ComPlus
             ComPlusTupleDefinitionType.ComPlusAssemblyDependency.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencyTupleFields.Assembly_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencyTupleFields.RequiredAssembly_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencyTupleFields.AssemblyRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ComPlusAssemblyDependencyTupleFields.RequiredAssemblyRef), IntermediateFieldType.String),
             },
             typeof(ComPlusAssemblyDependencyTuple));
     }
@@ -24,8 +24,8 @@ namespace WixToolset.ComPlus.Tuples
 
     public enum ComPlusAssemblyDependencyTupleFields
     {
-        Assembly_,
-        RequiredAssembly_,
+        AssemblyRef,
+        RequiredAssemblyRef,
     }
 
     public class ComPlusAssemblyDependencyTuple : IntermediateTuple
@@ -40,16 +40,16 @@ namespace WixToolset.ComPlus.Tuples
 
         public IntermediateField this[ComPlusAssemblyDependencyTupleFields index] => this.Fields[(int)index];
 
-        public string Assembly_
+        public string AssemblyRef
         {
-            get => this.Fields[(int)ComPlusAssemblyDependencyTupleFields.Assembly_].AsString();
-            set => this.Set((int)ComPlusAssemblyDependencyTupleFields.Assembly_, value);
+            get => this.Fields[(int)ComPlusAssemblyDependencyTupleFields.AssemblyRef].AsString();
+            set => this.Set((int)ComPlusAssemblyDependencyTupleFields.AssemblyRef, value);
         }
 
-        public string RequiredAssembly_
+        public string RequiredAssemblyRef
         {
-            get => this.Fields[(int)ComPlusAssemblyDependencyTupleFields.RequiredAssembly_].AsString();
-            set => this.Set((int)ComPlusAssemblyDependencyTupleFields.RequiredAssembly_, value);
+            get => this.Fields[(int)ComPlusAssemblyDependencyTupleFields.RequiredAssemblyRef].AsString();
+            set => this.Set((int)ComPlusAssemblyDependencyTupleFields.RequiredAssemblyRef, value);
         }
     }
 }
