@@ -125,10 +125,10 @@ namespace WixToolset.Dependency
         /// <param name="element">Element to process.</param>
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         /// <returns>The component key path type if set.</returns>
-        public override ComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
+        public override IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
-            ComponentKeyPath keyPath = null;
+            IComponentKeyPath keyPath = null;
 
             switch (parentElement.Name.LocalName)
             {
@@ -223,10 +223,10 @@ namespace WixToolset.Dependency
         /// <param name="keyPath">Explicit key path.</param>
         /// <param name="parentId">The identifier of the parent component or package.</param>
         /// <returns>The type of key path if set.</returns>
-        private ComponentKeyPath ParseProvidesElement(Intermediate intermediate, IntermediateSection section, XElement node, PackageType packageType, string parentId)
+        private IComponentKeyPath ParseProvidesElement(Intermediate intermediate, IntermediateSection section, XElement node, PackageType packageType, string parentId)
         {
             SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
-            ComponentKeyPath keyPath = null;
+            IComponentKeyPath keyPath = null;
             Identifier id = null;
             string key = null;
             string version = null;
@@ -387,7 +387,10 @@ namespace WixToolset.Dependency
 
                     // Use the Version registry value and use that as a potential key path.
                     Identifier idVersion = this.ParseHelper.CreateIdentifier("reg", id.Id, "Version");
-                    keyPath = new ComponentKeyPath() { Id = idVersion.Id, Explicit = false, Type = ComponentKeyPathType.Registry };
+                    keyPath = this.CreateComponentKeyPath();
+                    keyPath.Id = idVersion.Id;
+                    keyPath.Explicit = false;
+                    keyPath.Type = PossibleKeyPathType.Registry;
 
                     row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", idVersion);
                     row.Set(1, -1);
