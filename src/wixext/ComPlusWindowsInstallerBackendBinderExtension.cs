@@ -2,6 +2,7 @@
 
 namespace WixToolset.ComPlus
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
     using WixToolset.Data.WindowsInstaller;
@@ -11,7 +12,7 @@ namespace WixToolset.ComPlus
     {
         private static readonly TableDefinition[] Tables = LoadTables();
 
-        protected override TableDefinition[] TableDefinitionsForTuples => Tables;
+        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
 
         private static TableDefinition[] LoadTables()
         {
