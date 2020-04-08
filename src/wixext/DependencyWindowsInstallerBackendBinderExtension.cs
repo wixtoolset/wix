@@ -3,28 +3,14 @@
 namespace WixToolset.Dependency
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
 
     public class DependencyWindowsInstallerBackendBinderExtension : BaseWindowsInstallerBackendBinderExtension
     {
-        private static readonly TableDefinition[] Tables = LoadTables();
+        public override IEnumerable<TableDefinition> TableDefinitions => DependencyTableDefinitions.All;
 
-        public override IEnumerable<TableDefinition> TableDefinitions => Tables;
-
-        private static TableDefinition[] LoadTables()
-        {
-            using (var resourceStream = typeof(DependencyWindowsInstallerBackendBinderExtension).Assembly.GetManifestResourceStream("WixToolset.Dependency.tables.xml"))
-            using (var reader = XmlReader.Create(resourceStream))
-            {
-                var tables = TableDefinitionCollection.Load(reader);
-                return tables.ToArray();
-            }
-        }
-
-#if TODO_TAG_BINDER_EXTENSION
+#if TODO_DEPENDENCY_BINDER_EXTENSION
         private Output output;
 
         /// <summary>

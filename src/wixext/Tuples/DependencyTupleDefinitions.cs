@@ -8,7 +8,6 @@ namespace WixToolset.Dependency
     public enum DependencyTupleDefinitionType
     {
         WixDependency,
-        WixDependencyProvider,
         WixDependencyRef,
     }
 
@@ -32,9 +31,6 @@ namespace WixToolset.Dependency
             {
                 case DependencyTupleDefinitionType.WixDependency:
                     return DependencyTupleDefinitions.WixDependency;
-
-                case DependencyTupleDefinitionType.WixDependencyProvider:
-                    return DependencyTupleDefinitions.WixDependencyProvider;
 
                 case DependencyTupleDefinitionType.WixDependencyRef:
                     return DependencyTupleDefinitions.WixDependencyRef;

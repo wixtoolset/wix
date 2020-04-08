@@ -11,8 +11,8 @@ namespace WixToolset.Dependency
             DependencyTupleDefinitionType.WixDependencyRef.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDependencyRefTupleFields.WixDependencyProvider_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixDependencyRefTupleFields.WixDependency_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyRefTupleFields.WixDependencyProviderRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixDependencyRefTupleFields.WixDependencyRef), IntermediateFieldType.String),
             },
             typeof(WixDependencyRefTuple));
     }
@@ -24,8 +24,8 @@ namespace WixToolset.Dependency.Tuples
 
     public enum WixDependencyRefTupleFields
     {
-        WixDependencyProvider_,
-        WixDependency_,
+        WixDependencyProviderRef,
+        WixDependencyRef,
     }
 
     public class WixDependencyRefTuple : IntermediateTuple
@@ -40,16 +40,16 @@ namespace WixToolset.Dependency.Tuples
 
         public IntermediateField this[WixDependencyRefTupleFields index] => this.Fields[(int)index];
 
-        public string WixDependencyProvider_
+        public string WixDependencyProviderRef
         {
-            get => this.Fields[(int)WixDependencyRefTupleFields.WixDependencyProvider_].AsString();
-            set => this.Set((int)WixDependencyRefTupleFields.WixDependencyProvider_, value);
+            get => this.Fields[(int)WixDependencyRefTupleFields.WixDependencyProviderRef].AsString();
+            set => this.Set((int)WixDependencyRefTupleFields.WixDependencyProviderRef, value);
         }
 
-        public string WixDependency_
+        public string WixDependencyRef
         {
-            get => this.Fields[(int)WixDependencyRefTupleFields.WixDependency_].AsString();
-            set => this.Set((int)WixDependencyRefTupleFields.WixDependency_, value);
+            get => this.Fields[(int)WixDependencyRefTupleFields.WixDependencyRef].AsString();
+            set => this.Set((int)WixDependencyRefTupleFields.WixDependencyRef, value);
         }
     }
 }

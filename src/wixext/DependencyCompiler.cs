@@ -8,6 +8,8 @@ namespace WixToolset.Dependency
     using System.Text;
     using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Dependency.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
 
@@ -38,7 +40,7 @@ namespace WixToolset.Dependency
         /// <param name="attribute">Attribute to process.</param>
         public override void ParseAttribute(Intermediate intermediate, IntermediateSection section, XElement parentElement, XAttribute attribute, IDictionary<string, string> context)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
             switch (parentElement.Name.LocalName)
             {
                 case "Bundle":
@@ -67,7 +69,7 @@ namespace WixToolset.Dependency
         /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
         public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            PackageType packageType = PackageType.None;
+            var packageType = PackageType.None;
 
             switch (parentElement.Name.LocalName)
             {
@@ -104,7 +106,7 @@ namespace WixToolset.Dependency
 
             if (PackageType.None != packageType)
             {
-                string packageId = context["PackageId"];
+                var packageId = context["PackageId"];
 
                 switch (element.Name.LocalName)
                 {
@@ -127,17 +129,16 @@ namespace WixToolset.Dependency
         /// <returns>The component key path type if set.</returns>
         public override IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(parentElement);
             IComponentKeyPath keyPath = null;
 
             switch (parentElement.Name.LocalName)
             {
                 case "Component":
-                    string componentId = context["ComponentId"];
+                    var componentId = context["ComponentId"];
 
                     // 64-bit components may cause issues downlevel.
-                    bool win64 = false;
-                    Boolean.TryParse(context["Win64"], out win64);
+                    Boolean.TryParse(context["Win64"], out var win64);
 
                     switch (element.Name.LocalName)
                     {
@@ -191,7 +192,7 @@ namespace WixToolset.Dependency
             }
             else if (0 <= (illegalChar = providerKey.IndexOfAny(DependencyCommon.InvalidCharacters)))
             {
-                StringBuilder sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
+                var sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
                 Array.ForEach<char>(DependencyCommon.InvalidCharacters, c => sb.Append(c).Append(" "));
 
                 this.Messaging.Write(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "ProviderKey", providerKey[illegalChar], sb.ToString()));
@@ -206,12 +207,14 @@ namespace WixToolset.Dependency
 
             if (!this.Messaging.EncounteredError)
             {
-                // Create the provider row for the bundle. The Component_ field is required
+                // Create the provider tuple for the bundle. The Component_ field is required
                 // in the table definition but unused for bundles, so just set it to the valid ID.
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyProvider", id);
-                row.Set(1, id.Id);
-                row.Set(2, providerKey);
-                row.Set(5, DependencyCommon.ProvidesAttributesBundle);
+                section.AddTuple(new WixDependencyProviderTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = id.Id,
+                    ProviderKey = providerKey,
+                    Attributes = WixDependencyProviderAttributes.ProvidesAttributesBundle,
+                });
             }
         }
 
@@ -225,16 +228,15 @@ namespace WixToolset.Dependency
         /// <returns>The type of key path if set.</returns>
         private IComponentKeyPath ParseProvidesElement(Intermediate intermediate, IntermediateSection section, XElement node, PackageType packageType, string parentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             IComponentKeyPath keyPath = null;
             Identifier id = null;
             string key = null;
             string version = null;
             string displayName = null;
-            int attributes = 0;
             int illegalChar = -1;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -270,7 +272,7 @@ namespace WixToolset.Dependency
                 // Make sure the key does not contain any illegal characters or values.
                 if (0 <= (illegalChar = key.IndexOfAny(DependencyCommon.InvalidCharacters)))
                 {
-                    StringBuilder sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
+                    var sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
                     Array.ForEach<char>(DependencyCommon.InvalidCharacters, c => sb.Append(c).Append(" "));
 
                     this.Messaging.Write(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "Key", key[illegalChar], sb.ToString()));
@@ -288,7 +290,7 @@ namespace WixToolset.Dependency
             else if (PackageType.None == packageType)
             {
                 // Make sure the ProductCode is authored and set the key.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "Property", "ProductCode");
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Property, "ProductCode");
                 key = "!(bind.property.ProductCode)";
             }
 
@@ -317,7 +319,7 @@ namespace WixToolset.Dependency
                 id = this.ParseHelper.CreateIdentifier("dep", node.Name.LocalName, parentId, key);
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (var child in node.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -342,24 +344,20 @@ namespace WixToolset.Dependency
 
             if (!this.Messaging.EncounteredError)
             {
-                // Create the row in the provider table.
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyProvider", id);
-                row.Set(1, parentId);
-                row.Set(2, key);
+                var tuple = section.AddTuple(new WixDependencyProviderTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = parentId,
+                    ProviderKey = key,
+                });
 
                 if (!String.IsNullOrEmpty(version))
                 {
-                    row.Set(3, version);
+                    tuple.Version = version;
                 }
 
                 if (!String.IsNullOrEmpty(displayName))
                 {
-                    row.Set(4, displayName);
-                }
-
-                if (0 != attributes)
-                {
-                    row.Set(5, attributes);
+                    tuple.DisplayName = displayName;
                 }
 
                 if (PackageType.None == packageType)
@@ -377,44 +375,24 @@ namespace WixToolset.Dependency
                     }
 
                     // Generate registry rows for the provider using binder properties.
-                    string keyProvides = String.Concat(DependencyCommon.RegistryRoot, key);
+                    var keyProvides = String.Concat(DependencyCommon.RegistryRoot, key);
+                    var root = RegistryRootType.MachineUser;
 
-                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", this.ParseHelper.CreateIdentifier("reg", id.Id, "(Default)"));
-                    row.Set(1, -1);
-                    row.Set(2, keyProvides);
-                    row.Set(4, "[ProductCode]");
-                    row.Set(5, parentId);
+                    var value = "[ProductCode]";
+                    this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, root, keyProvides, null, value, parentId, false);
+
+                    value = !String.IsNullOrEmpty(version) ? version : "[ProductVersion]";
+                    var versionRegistryTuple =
+                        this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, root, keyProvides, "Version", value, parentId, false);
+
+                    value = !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]";
+                    this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, root, keyProvides, "DisplayName", value, parentId, false);
 
                     // Use the Version registry value and use that as a potential key path.
-                    Identifier idVersion = this.ParseHelper.CreateIdentifier("reg", id.Id, "Version");
                     keyPath = this.CreateComponentKeyPath();
-                    keyPath.Id = idVersion.Id;
+                    keyPath.Id = versionRegistryTuple.Id;
                     keyPath.Explicit = false;
                     keyPath.Type = PossibleKeyPathType.Registry;
-
-                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", idVersion);
-                    row.Set(1, -1);
-                    row.Set(2, keyProvides);
-                    row.Set(3, "Version");
-                    row.Set(4, !String.IsNullOrEmpty(version) ? version : "[ProductVersion]");
-                    row.Set(5, parentId);
-
-                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", this.ParseHelper.CreateIdentifier("reg", id.Id, "DisplayName"));
-                    row.Set(1, -1);
-                    row.Set(2, keyProvides);
-                    row.Set(3, "DisplayName");
-                    row.Set(4, !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]");
-                    row.Set(5, parentId);
-
-                    if (0 != attributes)
-                    {
-                        row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "Registry", this.ParseHelper.CreateIdentifier("reg", id.Id, "Attributes"));
-                        row.Set(1, -1);
-                        row.Set(2, keyProvides);
-                        row.Set(3, "Attributes");
-                        row.Set(4, String.Concat("#", attributes.ToString(CultureInfo.InvariantCulture.NumberFormat)));
-                        row.Set(5, parentId);
-                    }
                 }
             }
 
@@ -429,7 +407,7 @@ namespace WixToolset.Dependency
         /// <param name="requiresAction">Whether the Requires custom action should be referenced.</param>
         private void ParseRequiresElement(Intermediate intermediate, IntermediateSection section, XElement node, string providerId, bool requiresAction)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
             string providerKey = null;
             string minVersion = null;
@@ -437,7 +415,7 @@ namespace WixToolset.Dependency
             int attributes = 0;
             int illegalChar = -1;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -502,47 +480,40 @@ namespace WixToolset.Dependency
             // Make sure the key does not contain any illegal characters.
             else if (0 <= (illegalChar = providerKey.IndexOfAny(DependencyCommon.InvalidCharacters)))
             {
-                StringBuilder sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
+                var sb = new StringBuilder(DependencyCommon.InvalidCharacters.Length * 2);
                 Array.ForEach<char>(DependencyCommon.InvalidCharacters, c => sb.Append(c).Append(" "));
 
                 this.Messaging.Write(DependencyErrors.IllegalCharactersInProvider(sourceLineNumbers, "ProviderKey", providerKey[illegalChar], sb.ToString()));
             }
-
 
             if (!this.Messaging.EncounteredError)
             {
                 // Reference the Require custom action if required.
                 if (requiresAction)
                 {
-                    if (Platform.ARM == this.Context.Platform)
-                    {
-                        // Ensure the ARM version of the CA is referenced.
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
-                    }
-                    else
-                    {
-                        // All other supported platforms use x86.
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire");
-                    }
+                    this.AddReferenceToWixDependencyRequire(section, sourceLineNumbers);
                 }
 
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependency", id);
-                row.Set(1, providerKey);
-                row.Set(2, minVersion);
-                row.Set(3, maxVersion);
+                var tuple = section.AddTuple(new WixDependencyTuple(sourceLineNumbers, id)
+                {
+                    ProviderKey = providerKey,
+                    MinVersion = minVersion,
+                    MaxVersion = maxVersion,
+                });
 
                 if (0 != attributes)
                 {
-                    row.Set(4, attributes);
+                    tuple.Attributes = attributes;
                 }
 
-                // Create the relationship between this WixDependency row and the WixDependencyProvider row.
+                // Create the relationship between this WixDependency tuple and the WixDependencyProvider tuple.
                 if (!String.IsNullOrEmpty(providerId))
                 {
-                    // Create the relationship between the WixDependency row and the parent WixDependencyProvider row.
-                    row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyRef");
-                    row.Set(0, providerId);
-                    row.Set(1, id.Id);
+                    section.AddTuple(new WixDependencyRefTuple(sourceLineNumbers)
+                    {
+                        WixDependencyProviderRef = providerId,
+                        WixDependencyRef = id.Id,
+                    });
                 }
             }
         }
@@ -555,10 +526,10 @@ namespace WixToolset.Dependency
         /// <param name="requiresAction">Whether the Requires custom action should be referenced.</param>
         private void ParseRequiresRefElement(Intermediate intermediate, IntermediateSection section, XElement node, string providerId, bool requiresAction)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string id = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -590,25 +561,32 @@ namespace WixToolset.Dependency
                 // Reference the Require custom action if required.
                 if (requiresAction)
                 {
-                    if (Platform.ARM == this.Context.Platform)
-                    {
-                        // Ensure the ARM version of the CA is referenced.
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
-                    }
-                    else
-                    {
-                        // All other supported platforms use x86.
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire");
-                    }
+                    this.AddReferenceToWixDependencyRequire(section, sourceLineNumbers);
                 }
 
                 // Create a link dependency on the row that contains information we'll need during bind.
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "WixDependency", id);
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, DependencyTupleDefinitions.WixDependency, id);
 
                 // Create the relationship between the WixDependency row and the parent WixDependencyProvider row.
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixDependencyRef");
-                row.Set(0, providerId);
-                row.Set(1, id);
+                section.AddTuple(new WixDependencyRefTuple(sourceLineNumbers)
+                {
+                    WixDependencyProviderRef = providerId,
+                    WixDependencyRef = id,
+                });
+            }
+        }
+
+        private void AddReferenceToWixDependencyRequire(IntermediateSection section, SourceLineNumber sourceLineNumbers)
+        {
+            if (Platform.ARM == this.Context.Platform)
+            {
+                // Ensure the ARM version of the CA is referenced.
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire_ARM");
+            }
+            else
+            {
+                // All other supported platforms use x86.
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixDependencyRequire");
             }
         }
     }

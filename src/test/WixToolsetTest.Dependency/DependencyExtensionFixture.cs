@@ -19,8 +19,8 @@ namespace WixToolsetTest.Dependency
             var results = build.BuildAndQuery(Build, "WixDependencyProvider");
             Assert.Equal(new[]
             {
-                "WixDependencyProvider:depJQsOasf1FRUsKxq8THB9sXk8yws\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t0",
-            }, results.OrderBy(s => s).ToArray());
+                "WixDependencyProvider:depJQsOasf1FRUsKxq8THB9sXk8yws\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tUsingProvides\t\t\t",
+            }, results);
         }
 
         private static void Build(string[] args)

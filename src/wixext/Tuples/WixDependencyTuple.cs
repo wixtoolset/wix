@@ -11,7 +11,6 @@ namespace WixToolset.Dependency
             DependencyTupleDefinitionType.WixDependency.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.WixDependency), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.MinVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixDependencyTupleFields.MaxVersion), IntermediateFieldType.String),
@@ -27,7 +26,6 @@ namespace WixToolset.Dependency.Tuples
 
     public enum WixDependencyTupleFields
     {
-        WixDependency,
         ProviderKey,
         MinVersion,
         MaxVersion,
@@ -45,12 +43,6 @@ namespace WixToolset.Dependency.Tuples
         }
 
         public IntermediateField this[WixDependencyTupleFields index] => this.Fields[(int)index];
-
-        public string WixDependency
-        {
-            get => this.Fields[(int)WixDependencyTupleFields.WixDependency].AsString();
-            set => this.Set((int)WixDependencyTupleFields.WixDependency, value);
-        }
 
         public string ProviderKey
         {
