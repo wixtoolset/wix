@@ -28,8 +28,8 @@ namespace WixToolset.Firewall
             switch (parentElement.Name.LocalName)
             {
                 case "File":
-                    string fileId = context["FileId"];
-                    string fileComponentId = context["ComponentId"];
+                    var fileId = context["FileId"];
+                    var fileComponentId = context["ComponentId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -42,7 +42,7 @@ namespace WixToolset.Firewall
                     }
                     break;
                 case "Component":
-                    string componentId = context["ComponentId"];
+                    var componentId = context["ComponentId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -68,22 +68,20 @@ namespace WixToolset.Firewall
         /// <param name="fileId">The file identifier of the parent element (null if nested under Component).</param>
         private void ParseFirewallExceptionElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId, string fileId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             Identifier id = null;
             string name = null;
             int attributes = 0;
             string file = null;
             string program = null;
             string port = null;
-            string protocolValue = null;
             int? protocol = null;
-            string profileValue = null;
             int? profile = null;
             string scope = null;
             string remoteAddresses = null;
             string description = null;
 
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -125,7 +123,7 @@ namespace WixToolset.Firewall
                             port = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Protocol":
-                            protocolValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var protocolValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (protocolValue)
                             {
                                 case "tcp":
@@ -155,7 +153,7 @@ namespace WixToolset.Firewall
                             }
                             break;
                         case "Profile":
-                            profileValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var profileValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (profileValue)
                             {
                                 case "domain":
@@ -190,11 +188,10 @@ namespace WixToolset.Firewall
             }
 
             // parse RemoteAddress children
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
-                    SourceLineNumber childSourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
                         case "RemoteAddress":
@@ -218,12 +215,12 @@ namespace WixToolset.Firewall
                 }
             }
 
-            // Id and Name are required
             if (null == id)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
+                id = this.ParseHelper.CreateIdentifier("fex", name, remoteAddresses, componentId);
             }
 
+            // Name is required
             if (null == name)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
@@ -255,14 +252,14 @@ namespace WixToolset.Firewall
                     fileId = file;
                 }
 
-                var tuple = new WixFirewallExceptionTuple(sourceLineNumbers, id)
+                var tuple = section.AddTuple(new WixFirewallExceptionTuple(sourceLineNumbers, id)
                 {
                     Name = name,
                     RemoteAddresses = remoteAddresses,
                     Profile = profile ?? FirewallConstants.NET_FW_PROFILE2_ALL,
                     ComponentRef = componentId,
                     Description = description,
-                };
+                });
 
                 if (!String.IsNullOrEmpty(port))
                 {
@@ -275,12 +272,15 @@ namespace WixToolset.Firewall
                     }
                 }
 
-                tuple.Protocol = protocol.Value;
+                if (protocol.HasValue)
+                {
+                    tuple.Protocol = protocol.Value;
+                }
 
                 if (!String.IsNullOrEmpty(fileId))
                 {
                     tuple.Program = $"[#{fileId}]";
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", fileId);
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, fileId);
                 }
                 else if (!String.IsNullOrEmpty(program))
                 {
@@ -292,19 +292,17 @@ namespace WixToolset.Firewall
                     tuple.Attributes = attributes;
                 }
 
-                section.Tuples.Add(tuple);
-
                 if (this.Context.Platform == Platform.ARM)
                 {
                     // Ensure ARM version of the CA is referenced
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedFirewallExceptionsInstall_ARM");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedFirewallExceptionsUninstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsInstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsUninstall_ARM");
                 }
                 else
                 {
                     // All other supported platforms use x86
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedFirewallExceptionsInstall");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedFirewallExceptionsUninstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsInstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsUninstall");
                 }
             }
         }
@@ -315,10 +313,10 @@ namespace WixToolset.Firewall
         /// <param name="element">The element to parse.</param>
         private void ParseRemoteAddressElement(Intermediate intermediate, IntermediateSection section, XElement element, ref string remoteAddresses)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
 
             // no attributes
-            foreach (XAttribute attrib in element.Attributes())
+            foreach (var attrib in element.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -332,7 +330,7 @@ namespace WixToolset.Firewall
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            string address = this.ParseHelper.GetTrimmedInnerText(element);
+            var address = this.ParseHelper.GetTrimmedInnerText(element);
             if (String.IsNullOrEmpty(address))
             {
                 this.Messaging.Write(FirewallErrors.IllegalEmptyRemoteAddress(sourceLineNumbers));

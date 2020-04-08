@@ -20,7 +20,7 @@ namespace WixToolsetTest.Firewall
             Assert.Equal(new[]
             {
                 "WixFirewallException:ExampleFirewall\texample\t*\t42\t6\t\t0\t2147483647\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example firewall",
-            }, results.OrderBy(s => s).ToArray());
+            }, results);
         }
 
         private static void Build(string[] args)

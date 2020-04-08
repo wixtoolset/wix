@@ -1,30 +1,39 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Firewall.Tuples
+namespace WixToolset.Firewall
 {
+    using System;
     using WixToolset.Data;
 
-    public static class FirewallTupleDefinitionNames
+    public enum FirewallTupleDefinitionType
     {
-        public static string WixFirewallException { get; } = "WixFirewallException";
+        WixFirewallException,
     }
 
     public static partial class FirewallTupleDefinitions
     {
-        public static readonly IntermediateTupleDefinition WixFirewallException = new IntermediateTupleDefinition(
-            FirewallTupleDefinitionNames.WixFirewallException,
-            new[]
+        public static readonly Version Version = new Version("4.0.0");
+
+        public static IntermediateTupleDefinition ByName(string name)
+        {
+            if (!Enum.TryParse(name, out FirewallTupleDefinitionType type))
             {
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.RemoteAddresses), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Port), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Protocol), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Program), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Profile), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixFirewallExceptionTupleFields.Description), IntermediateFieldType.String),
-            },
-            typeof(WixFirewallExceptionTuple));
+                return null;
+            }
+
+            return ByType(type);
+        }
+
+        public static IntermediateTupleDefinition ByType(FirewallTupleDefinitionType type)
+        {
+            switch (type)
+            {
+                case FirewallTupleDefinitionType.WixFirewallException:
+                    return FirewallTupleDefinitions.WixFirewallException;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
+            }
+        }
     }
 }

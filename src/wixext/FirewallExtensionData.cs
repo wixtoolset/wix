@@ -4,7 +4,6 @@ namespace WixToolset.Firewall
 {
     using WixToolset.Data;
     using WixToolset.Extensibility;
-    using WixToolset.Firewall.Tuples;
 
     public sealed class FirewallExtensionData : BaseExtensionData
     {
@@ -12,7 +11,7 @@ namespace WixToolset.Firewall
 
         public override bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            tupleDefinition = (name == FirewallTupleDefinitionNames.WixFirewallException) ? FirewallTupleDefinitions.WixFirewallException : null;
+            tupleDefinition = FirewallTupleDefinitions.ByName(name);
             return tupleDefinition != null;
         }
 

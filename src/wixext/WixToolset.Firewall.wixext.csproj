@@ -14,7 +14,6 @@
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
     <Content Include="firewall.xsd" PackagePath="tools" />
-    <EmbeddedResource Include="tables.xml" />
     <EmbeddedResource Include="$(OutputPath)..\firewall.wixlib" />
   </ItemGroup>
 
