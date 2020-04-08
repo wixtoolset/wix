@@ -11,7 +11,7 @@ namespace WixToolset.DifxApp
             DifxAppTupleDefinitionType.MsiDriverPackages.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiDriverPackagesTupleFields.Component), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MsiDriverPackagesTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiDriverPackagesTupleFields.Flags), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MsiDriverPackagesTupleFields.Sequence), IntermediateFieldType.Number),
             },
@@ -25,7 +25,7 @@ namespace WixToolset.DifxApp.Tuples
 
     public enum MsiDriverPackagesTupleFields
     {
-        Component,
+        ComponentRef,
         Flags,
         Sequence,
     }
@@ -42,10 +42,10 @@ namespace WixToolset.DifxApp.Tuples
 
         public IntermediateField this[MsiDriverPackagesTupleFields index] => this.Fields[(int)index];
 
-        public string Component
+        public string ComponentRef
         {
-            get => this.Fields[(int)MsiDriverPackagesTupleFields.Component].AsString();
-            set => this.Set((int)MsiDriverPackagesTupleFields.Component, value);
+            get => this.Fields[(int)MsiDriverPackagesTupleFields.ComponentRef].AsString();
+            set => this.Set((int)MsiDriverPackagesTupleFields.ComponentRef, value);
         }
 
         public int Flags

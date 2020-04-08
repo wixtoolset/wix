@@ -37,9 +37,9 @@ namespace WixToolset.DifxApp
             switch (parentElement.Name.LocalName)
             {
                 case "Component":
-                    string componentId = context["ComponentId"];
-                    string directoryId = context["DirectoryId"];
-                    bool componentWin64 = Boolean.Parse(context["Win64"]);
+                    var componentId = context["ComponentId"];
+                    var directoryId = context["DirectoryId"];
+                    var componentWin64 = Boolean.Parse(context["Win64"]);
 
                     switch (element.Name.LocalName)
                     {
@@ -64,9 +64,9 @@ namespace WixToolset.DifxApp
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseDriverElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, bool win64)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             int attributes = 0;
-            int sequence = CompilerConstants.IntegerNotSet;
+            var sequence = CompilerConstants.IntegerNotSet;
 
             // check the number of times a Driver element has been nested under this Component element
             if (null != componentId)
@@ -81,7 +81,7 @@ namespace WixToolset.DifxApp
                 }
             }
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -138,10 +138,10 @@ namespace WixToolset.DifxApp
                 switch (this.Context.Platform)
                 {
                     case Platform.X86:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MsiProcessDrivers");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MsiProcessDrivers");
                         break;
                     case Platform.X64:
-                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MsiProcessDrivers_x64");
+                        this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MsiProcessDrivers_x64");
                         break;
                     case Platform.IA64:
                     case Platform.ARM:
@@ -149,12 +149,15 @@ namespace WixToolset.DifxApp
                         break;
                 }
 
-                var row = (MsiDriverPackagesTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "MsiDriverPackages");
-                row.Set(0, componentId);
-                row.Set(1, attributes);
+                var tuple = section.AddTuple(new MsiDriverPackagesTuple(sourceLineNumbers)
+                {
+                    ComponentRef = componentId,
+                    Flags = attributes,
+                });
+
                 if (CompilerConstants.IntegerNotSet != sequence)
                 {
-                    row.Set(2, sequence);
+                    tuple.Sequence = sequence;
                 }
             }
         }

@@ -19,11 +19,11 @@ namespace WixToolsetTest.DifxApp
             var results = build.BuildAndQuery(Build, "CustomAction");
             Assert.Equal(new[]
             {
-                "CustomAction:MsiCleanupOnSuccess\t1\tDIFxApp.dll\tCleanupOnSuccess\t0",
-                "CustomAction:MsiInstallDrivers\t3073\tDIFxAppA.dll\tInstallDriverPackages\t0",
-                "CustomAction:MsiProcessDrivers\t1\tDIFxApp.dll\tProcessDriverPackages\t0",
-                "CustomAction:MsiRollbackInstall\t3329\tDIFxAppA.dll\tRollbackInstall\t0",
-                "CustomAction:MsiUninstallDrivers\t3073\tDIFxAppA.dll\tUninstallDriverPackages\t0",
+                "CustomAction:MsiCleanupOnSuccess\t1\tDIFxApp.dll\tCleanupOnSuccess\t",
+                "CustomAction:MsiInstallDrivers\t3073\tDIFxAppA.dll\tInstallDriverPackages\t",
+                "CustomAction:MsiProcessDrivers\t1\tDIFxApp.dll\tProcessDriverPackages\t",
+                "CustomAction:MsiRollbackInstall\t3329\tDIFxAppA.dll\tRollbackInstall\t",
+                "CustomAction:MsiUninstallDrivers\t3073\tDIFxAppA.dll\tUninstallDriverPackages\t",
             }, results.OrderBy(s => s).ToArray());
         }
 

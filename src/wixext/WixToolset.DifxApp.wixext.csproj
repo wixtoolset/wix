@@ -13,7 +13,6 @@
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
     <Content Include="difxapp.xsd" PackagePath="tools" />
-    <EmbeddedResource Include="tables.xml" />
     <EmbeddedResource Include="$(OutputPath)..\difxapp.wixlib" />
   </ItemGroup>
   <ItemGroup>
