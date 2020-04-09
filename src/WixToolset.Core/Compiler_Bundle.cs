@@ -1342,7 +1342,7 @@ namespace WixToolset.Core
 
             this.Core.ParseForExtensionElements(node);
 
-            this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId.Id, ComplexReferenceChildType.PayloadGroup, id.Id, previousType, previousId.Id);
+            this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PayloadGroup, id?.Id, previousType, previousId?.Id);
 
             return id;
         }
