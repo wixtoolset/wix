@@ -181,7 +181,7 @@ namespace WixToolset.PowerShell
             wixVariableRow.Value = major.ToString(CultureInfo.InvariantCulture);
             wixVariableRow.Overridable = false;
 
-            int registryRoot = 2; // HKLM
+            RegistryRootType registryRoot = RegistryRootType.LocalMachine; // HKLM
             string registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, major, id);
 
             this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "ApplicationBase", String.Format(CultureInfo.InvariantCulture, "[${0}]", componentId), componentId, false);
@@ -274,7 +274,7 @@ namespace WixToolset.PowerShell
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            int registryRoot = 2; // HKLM
+            RegistryRootType registryRoot = RegistryRootType.LocalMachine; // HKLM
             string registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, String.Format(CultureInfo.InvariantCulture, "!(wix.{0}_{1})", VarPrefix, snapIn), snapIn);
 
             this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", fileId);
