@@ -32,8 +32,8 @@ namespace WixToolset.PowerShell
             switch (parentElement.Name.LocalName)
             {
                 case "File":
-                    string fileId = context["FileId"];
-                    string componentId = context["ComponentId"];
+                    var fileId = context["FileId"];
+                    var componentId = context["ComponentId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -69,18 +69,17 @@ namespace WixToolset.PowerShell
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseSnapInElement(Intermediate intermediate, IntermediateSection section, XElement node, string fileId, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string id = null;
-            string assemblyName = null;
             string customSnapInType = null;
             string description = null;
             string descriptionIndirect = null;
-            Version requiredPowerShellVersion = CompilerConstants.IllegalVersion;
+            var requiredPowerShellVersion = CompilerConstants.IllegalVersion;
             string vendor = null;
             string vendorIndirect = null;
             string version = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -103,7 +102,7 @@ namespace WixToolset.PowerShell
                             break;
 
                         case "RequiredPowerShellVersion":
-                            string ver = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            var ver = this.ParseHelper.GetAttributeVersionValue(sourceLineNumbers, attrib);
                             requiredPowerShellVersion = new Version(ver);
                             break;
 
@@ -148,7 +147,7 @@ namespace WixToolset.PowerShell
                 version = String.Format("!(bind.assemblyVersion.{0})", fileId);
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (var child in node.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -174,56 +173,58 @@ namespace WixToolset.PowerShell
             // Get the major part of the required PowerShell version which is
             // needed for the registry key, and put that into a WiX variable
             // for use in Formats and Types files. PowerShell v2 still uses 1.
-            int major = (2 == requiredPowerShellVersion.Major) ? 1 : requiredPowerShellVersion.Major;
+            var major = (2 == requiredPowerShellVersion.Major) ? 1 : requiredPowerShellVersion.Major;
 
             var variableId = new Identifier(AccessModifier.Public, String.Format(CultureInfo.InvariantCulture, "{0}_{1}", VarPrefix, id));
-            var wixVariableRow = (WixVariableTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixVariable", variableId);
-            wixVariableRow.Value = major.ToString(CultureInfo.InvariantCulture);
-            wixVariableRow.Overridable = false;
+            section.AddTuple(new WixVariableTuple(sourceLineNumbers, variableId)
+            {
+                Value = major.ToString(CultureInfo.InvariantCulture),
+                Overridable = false,
+            });
 
-            RegistryRootType registryRoot = RegistryRootType.LocalMachine; // HKLM
-            string registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, major, id);
+            var registryRoot = RegistryRootType.LocalMachine; // HKLM
+            var registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, major, id);
 
-            this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "ApplicationBase", String.Format(CultureInfo.InvariantCulture, "[${0}]", componentId), componentId, false);
+            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "ApplicationBase", String.Format(CultureInfo.InvariantCulture, "[${0}]", componentId), componentId, false);
 
             // set the assembly name automatically when binding.
             // processorArchitecture is not handled correctly by PowerShell v1.0
             // so format the assembly name explicitly.
-            assemblyName = String.Format(CultureInfo.InvariantCulture, "!(bind.assemblyName.{0}), Version=!(bind.assemblyVersion.{0}), Culture=!(bind.assemblyCulture.{0}), PublicKeyToken=!(bind.assemblyPublicKeyToken.{0})", fileId);
-            this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "AssemblyName", assemblyName, componentId, false);
+            var assemblyName = String.Format(CultureInfo.InvariantCulture, "!(bind.assemblyName.{0}), Version=!(bind.assemblyVersion.{0}), Culture=!(bind.assemblyCulture.{0}), PublicKeyToken=!(bind.assemblyPublicKeyToken.{0})", fileId);
+            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "AssemblyName", assemblyName, componentId, false);
 
             if (null != customSnapInType)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "CustomPSSnapInType", customSnapInType, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "CustomPSSnapInType", customSnapInType, componentId, false);
             }
 
             if (null != description)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "Description", description, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "Description", description, componentId, false);
             }
 
             if (null != descriptionIndirect)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "DescriptionIndirect", descriptionIndirect, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "DescriptionIndirect", descriptionIndirect, componentId, false);
             }
 
-            this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "ModuleName", String.Format(CultureInfo.InvariantCulture, "[#{0}]", fileId), componentId, false);
+            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "ModuleName", String.Format(CultureInfo.InvariantCulture, "[#{0}]", fileId), componentId, false);
 
-            this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "PowerShellVersion", requiredPowerShellVersion.ToString(2), componentId, false);
+            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "PowerShellVersion", requiredPowerShellVersion.ToString(2), componentId, false);
 
             if (null != vendor)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "Vendor", vendor, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "Vendor", vendor, componentId, false);
             }
 
             if (null != vendorIndirect)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "VendorIndirect", vendorIndirect, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "VendorIndirect", vendorIndirect, componentId, false);
             }
 
             if (null != version)
             {
-                this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, "Version", version, componentId, false);
+                this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, "Version", version, componentId, false);
             }
         }
 
@@ -236,11 +237,11 @@ namespace WixToolset.PowerShell
         /// <param name="componentId">Identifier for parent component.</param>
         private void ParseExtensionsFile(Intermediate intermediate, IntermediateSection section, XElement node, string valueName, string id, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string fileId = null;
             string snapIn = null;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -274,11 +275,11 @@ namespace WixToolset.PowerShell
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            RegistryRootType registryRoot = RegistryRootType.LocalMachine; // HKLM
-            string registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, String.Format(CultureInfo.InvariantCulture, "!(wix.{0}_{1})", VarPrefix, snapIn), snapIn);
+            var registryRoot = RegistryRootType.LocalMachine; // HKLM
+            var registryKey = String.Format(CultureInfo.InvariantCulture, KeyFormat, String.Format(CultureInfo.InvariantCulture, "!(wix.{0}_{1})", VarPrefix, snapIn), snapIn);
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "File", fileId);
-            this.ParseHelper.CreateRegistryRow(section, sourceLineNumbers, registryRoot, registryKey, valueName, String.Format(CultureInfo.InvariantCulture, "[~][#{0}]", fileId), componentId, false);
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.File, fileId);
+            this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, registryRoot, registryKey, valueName, String.Format(CultureInfo.InvariantCulture, "[~][#{0}]", fileId), componentId, false);
         }
     }
 }
