@@ -11,7 +11,7 @@ namespace WixToolsetTest.Http
     public class HttpExtensionFixture
     {
         [Fact]
-        public void CanBuildUsingMessageQueue()
+        public void CanBuildUsingUrlReservation()
         {
             var folder = TestData.Get(@"TestData\UsingUrlReservation");
             var build = new Builder(folder, typeof(HttpExtensionFactory), new[] { folder });
@@ -21,7 +21,7 @@ namespace WixToolsetTest.Http
             {
                 "WixHttpUrlAce:ace3u9zYtPm8dLIoYgB0bARb0dbB9w\turlt8sDcF469vDrZNldk0moxI25IGM\tNT SERVICE\\TestService\t268435456",
                 "WixHttpUrlReservation:urlt8sDcF469vDrZNldk0moxI25IGM\t0\t\thttp://+:80/vroot/\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
-            }, results.OrderBy(s => s).ToArray());
+            }, results);
         }
 
         private static void Build(string[] args)

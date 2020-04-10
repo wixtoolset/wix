@@ -11,8 +11,7 @@ namespace WixToolset.Http
             HttpTupleDefinitionType.WixHttpUrlAce.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixHttpUrlAceTupleFields.WixHttpUrlAce), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixHttpUrlAceTupleFields.WixHttpUrlReservation_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixHttpUrlAceTupleFields.WixHttpUrlReservationRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixHttpUrlAceTupleFields.SecurityPrincipal), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixHttpUrlAceTupleFields.Rights), IntermediateFieldType.Number),
             },
@@ -26,8 +25,7 @@ namespace WixToolset.Http.Tuples
 
     public enum WixHttpUrlAceTupleFields
     {
-        WixHttpUrlAce,
-        WixHttpUrlReservation_,
+        WixHttpUrlReservationRef,
         SecurityPrincipal,
         Rights,
     }
@@ -44,16 +42,10 @@ namespace WixToolset.Http.Tuples
 
         public IntermediateField this[WixHttpUrlAceTupleFields index] => this.Fields[(int)index];
 
-        public string WixHttpUrlAce
+        public string WixHttpUrlReservationRef
         {
-            get => this.Fields[(int)WixHttpUrlAceTupleFields.WixHttpUrlAce].AsString();
-            set => this.Set((int)WixHttpUrlAceTupleFields.WixHttpUrlAce, value);
-        }
-
-        public string WixHttpUrlReservation_
-        {
-            get => this.Fields[(int)WixHttpUrlAceTupleFields.WixHttpUrlReservation_].AsString();
-            set => this.Set((int)WixHttpUrlAceTupleFields.WixHttpUrlReservation_, value);
+            get => this.Fields[(int)WixHttpUrlAceTupleFields.WixHttpUrlReservationRef].AsString();
+            set => this.Set((int)WixHttpUrlAceTupleFields.WixHttpUrlReservationRef, value);
         }
 
         public string SecurityPrincipal

@@ -28,9 +28,9 @@ namespace WixToolset.Http
             switch (parentElement.Name.LocalName)
             {
                 case "ServiceInstall":
-                    string serviceInstallName = context["ServiceInstallName"];
-                    string serviceUser = String.IsNullOrEmpty(serviceInstallName) ? null : String.Concat("NT SERVICE\\", serviceInstallName);
-                    string serviceComponentId = context["ServiceInstallComponentId"];
+                    var serviceInstallName = context["ServiceInstallName"];
+                    var serviceUser = String.IsNullOrEmpty(serviceInstallName) ? null : String.Concat("NT SERVICE\\", serviceInstallName);
+                    var serviceComponentId = context["ServiceInstallComponentId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -69,15 +69,14 @@ namespace WixToolset.Http
         /// <param name="securityPrincipal">The security principal of the parent element (null if nested under Component).</param>
         private void ParseUrlReservationElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, string securityPrincipal)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
-            int handleExisting = HttpConstants.heReplace;
-            string handleExistingValue = null;
+            var handleExisting = HttpConstants.heReplace;
             string sddl = null;
             string url = null;
-            bool foundACE = false;
+            var foundACE = false;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -87,7 +86,7 @@ namespace WixToolset.Http
                             id = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
                         case "HandleExisting":
-                            handleExistingValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var handleExistingValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (handleExistingValue)
                             {
                                 case "replace":
@@ -128,7 +127,7 @@ namespace WixToolset.Http
             }
 
             // Parse UrlAce children.
-            foreach (XElement child in node.Elements())
+            foreach (var child in node.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -170,23 +169,25 @@ namespace WixToolset.Http
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = (WixHttpUrlReservationTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixHttpUrlReservation", id);
-                row.HandleExisting = handleExisting;
-                row.Sddl = sddl;
-                row.Url = url;
-                row.Component_ = componentId;
+                section.AddTuple(new WixHttpUrlReservationTuple(sourceLineNumbers, id)
+                {
+                    HandleExisting = handleExisting,
+                    Sddl = sddl,
+                    Url = url,
+                    ComponentRef = componentId,
+                });
 
                 if (this.Context.Platform == Platform.ARM)
                 {
                     // Ensure ARM version of the CA is referenced.
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsInstall_ARM");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsUninstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall_ARM");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall_ARM");
                 }
                 else
                 {
                     // All other supported platforms use x86.
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsInstall");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "WixSchedHttpUrlReservationsUninstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsInstall");
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedHttpUrlReservationsUninstall");
                 }
             }
         }
@@ -199,13 +200,13 @@ namespace WixToolset.Http
         /// <param name="defaultSecurityPrincipal">The default security principal.</param>
         private void ParseUrlAceElement(Intermediate intermediate, IntermediateSection section, XElement node, string urlReservationId, string defaultSecurityPrincipal)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
-            string securityPrincipal = defaultSecurityPrincipal;
-            int rights = HttpConstants.GENERIC_ALL;
+            var securityPrincipal = defaultSecurityPrincipal;
+            var rights = HttpConstants.GENERIC_ALL;
             string rightsValue = null;
             
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -262,10 +263,12 @@ namespace WixToolset.Http
 
             if (!this.Messaging.EncounteredError)
             {
-                var row = (WixHttpUrlAceTuple)this.ParseHelper.CreateRow(section, sourceLineNumbers, "WixHttpUrlAce", id);
-                row.WixHttpUrlReservation_ = urlReservationId;
-                row.SecurityPrincipal = securityPrincipal;
-                row.Rights = rights;
+                section.AddTuple(new WixHttpUrlAceTuple(sourceLineNumbers, id)
+                {
+                    WixHttpUrlReservationRef = urlReservationId,
+                    SecurityPrincipal = securityPrincipal,
+                    Rights = rights,
+                });
             }
         }
     }

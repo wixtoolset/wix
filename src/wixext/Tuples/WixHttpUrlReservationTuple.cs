@@ -11,11 +11,10 @@ namespace WixToolset.Http
             HttpTupleDefinitionType.WixHttpUrlReservation.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.WixHttpUrlReservation), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.HandleExisting), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.Sddl), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.Url), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixHttpUrlReservationTupleFields.ComponentRef), IntermediateFieldType.String),
             },
             typeof(WixHttpUrlReservationTuple));
     }
@@ -27,11 +26,10 @@ namespace WixToolset.Http.Tuples
 
     public enum WixHttpUrlReservationTupleFields
     {
-        WixHttpUrlReservation,
         HandleExisting,
         Sddl,
         Url,
-        Component_,
+        ComponentRef,
     }
 
     public class WixHttpUrlReservationTuple : IntermediateTuple
@@ -45,12 +43,6 @@ namespace WixToolset.Http.Tuples
         }
 
         public IntermediateField this[WixHttpUrlReservationTupleFields index] => this.Fields[(int)index];
-
-        public string WixHttpUrlReservation
-        {
-            get => this.Fields[(int)WixHttpUrlReservationTupleFields.WixHttpUrlReservation].AsString();
-            set => this.Set((int)WixHttpUrlReservationTupleFields.WixHttpUrlReservation, value);
-        }
 
         public int HandleExisting
         {
@@ -70,10 +62,10 @@ namespace WixToolset.Http.Tuples
             set => this.Set((int)WixHttpUrlReservationTupleFields.Url, value);
         }
 
-        public string Component_
+        public string ComponentRef
         {
-            get => this.Fields[(int)WixHttpUrlReservationTupleFields.Component_].AsString();
-            set => this.Set((int)WixHttpUrlReservationTupleFields.Component_, value);
+            get => this.Fields[(int)WixHttpUrlReservationTupleFields.ComponentRef].AsString();
+            set => this.Set((int)WixHttpUrlReservationTupleFields.ComponentRef, value);
         }
     }
 }
