@@ -83,7 +83,7 @@ namespace WixToolset.Core.Burn.Bundles
             writer.WriteAttributeString("DisplayName", this.BundleTuple.Name);
             writer.WriteAttributeString("LogPathVariable", this.BundleTuple.LogPathVariable);
             writer.WriteAttributeString("Compressed", this.BundleTuple.Compressed == true ? "yes" : "no");
-            writer.WriteAttributeString("BundleId", this.BundleTuple.BundleId.ToUpperInvariant());
+            writer.WriteAttributeString("Id", this.BundleTuple.BundleId.ToUpperInvariant());
             writer.WriteAttributeString("UpgradeCode", this.BundleTuple.UpgradeCode);
             writer.WriteAttributeString("PerMachine", this.BundleTuple.PerMachine ? "yes" : "no");
 
@@ -98,12 +98,21 @@ namespace WixToolset.Core.Burn.Bundles
 
                 var size = package.PackageTuple.Size.ToString(CultureInfo.InvariantCulture);
 
-                writer.WriteStartElement("WixBundleProperties");
+                writer.WriteStartElement("WixPackageProperties");
 
                 writer.WriteAttributeString("Package", package.PackageId);
                 writer.WriteAttributeString("Vital", package.PackageTuple.Vital == true ? "yes" : "no");
-                writer.WriteAttributeString("DisplayName", package.PackageTuple.DisplayName);
-                writer.WriteAttributeString("Description", package.PackageTuple.Description);
+
+                if (!String.IsNullOrEmpty(package.PackageTuple.DisplayName))
+                {
+                    writer.WriteAttributeString("DisplayName", package.PackageTuple.DisplayName);
+                }
+
+                if (!String.IsNullOrEmpty(package.PackageTuple.Description))
+                {
+                    writer.WriteAttributeString("Description", package.PackageTuple.Description);
+                }
+
                 writer.WriteAttributeString("DownloadSize", size);
                 writer.WriteAttributeString("PackageSize", size);
                 writer.WriteAttributeString("InstalledSize", package.PackageTuple.InstallSize?.ToString(CultureInfo.InvariantCulture) ?? size);
@@ -175,9 +184,22 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("Package", featureTuple.PackageRef);
                 writer.WriteAttributeString("Feature", featureTuple.Name);
                 writer.WriteAttributeString("Size", featureTuple.Size.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("Parent", featureTuple.Parent);
-                writer.WriteAttributeString("Title", featureTuple.Title);
-                writer.WriteAttributeString("Description", featureTuple.Description);
+
+                if (!String.IsNullOrEmpty(featureTuple.Parent))
+                {
+                    writer.WriteAttributeString("Parent", featureTuple.Parent);
+                }
+
+                if (!String.IsNullOrEmpty(featureTuple.Title))
+                {
+                    writer.WriteAttributeString("Title", featureTuple.Title);
+                }
+
+                if (!String.IsNullOrEmpty(featureTuple.Description))
+                {
+                    writer.WriteAttributeString("Description", featureTuple.Description);
+                }
+
                 writer.WriteAttributeString("Display", featureTuple.Display.ToString(CultureInfo.InvariantCulture));
                 writer.WriteAttributeString("Level", featureTuple.Level.ToString(CultureInfo.InvariantCulture));
                 writer.WriteAttributeString("Directory", featureTuple.Directory);
@@ -193,14 +215,28 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (var payloadTuple in payloadTuples)
             {
-                writer.WriteStartElement("WixPackageFeatureInfo");
+                writer.WriteStartElement("WixPayloadProperties");
 
-                writer.WriteAttributeString("Id", payloadTuple.Id.Id);
-                writer.WriteAttributeString("Package", payloadTuple.PackageRef);
-                writer.WriteAttributeString("Container", payloadTuple.ContainerRef);
+                writer.WriteAttributeString("Payload", payloadTuple.Id.Id);
+
+                if (!String.IsNullOrEmpty(payloadTuple.PackageRef))
+                {
+                    writer.WriteAttributeString("Package", payloadTuple.PackageRef);
+                }
+
+                if (!String.IsNullOrEmpty(payloadTuple.ContainerRef))
+                {
+                    writer.WriteAttributeString("Container", payloadTuple.ContainerRef);
+                }
+
                 writer.WriteAttributeString("Name", payloadTuple.Name);
                 writer.WriteAttributeString("Size", payloadTuple.FileSize.ToString(CultureInfo.InvariantCulture));
-                writer.WriteAttributeString("DownloadUrl", payloadTuple.DownloadUrl);
+
+                if (!String.IsNullOrEmpty(payloadTuple.DownloadUrl))
+                {
+                    writer.WriteAttributeString("DownloadUrl", payloadTuple.DownloadUrl);
+                }
+
                 writer.WriteAttributeString("LayoutOnly", payloadTuple.LayoutOnly ? "yes" : "no");
 
                 writer.WriteEndElement();
