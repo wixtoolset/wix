@@ -11,8 +11,7 @@ namespace WixToolset.Msmq
             MsmqTupleDefinitionType.MessageQueue.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.MessageQueue), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.Component_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.ComponentRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.BasePriority), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.JournalQuota), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(MessageQueueTupleFields.Label), IntermediateFieldType.String),
@@ -33,8 +32,7 @@ namespace WixToolset.Msmq.Tuples
 
     public enum MessageQueueTupleFields
     {
-        MessageQueue,
-        Component_,
+        ComponentRef,
         BasePriority,
         JournalQuota,
         Label,
@@ -58,16 +56,10 @@ namespace WixToolset.Msmq.Tuples
 
         public IntermediateField this[MessageQueueTupleFields index] => this.Fields[(int)index];
 
-        public string MessageQueue
+        public string ComponentRef
         {
-            get => this.Fields[(int)MessageQueueTupleFields.MessageQueue].AsString();
-            set => this.Set((int)MessageQueueTupleFields.MessageQueue, value);
-        }
-
-        public string Component_
-        {
-            get => this.Fields[(int)MessageQueueTupleFields.Component_].AsString();
-            set => this.Set((int)MessageQueueTupleFields.Component_, value);
+            get => this.Fields[(int)MessageQueueTupleFields.ComponentRef].AsString();
+            set => this.Set((int)MessageQueueTupleFields.ComponentRef, value);
         }
 
         public int BasePriority

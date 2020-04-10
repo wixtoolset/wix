@@ -11,10 +11,9 @@ namespace WixToolset.Msmq
             MsmqTupleDefinitionType.MessageQueueUserPermission.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.MessageQueueUserPermission), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.Component_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.MessageQueue_), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.User_), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.MessageQueueRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.UserRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MessageQueueUserPermissionTupleFields.Permissions), IntermediateFieldType.Number),
             },
             typeof(MessageQueueUserPermissionTuple));
@@ -27,10 +26,9 @@ namespace WixToolset.Msmq.Tuples
 
     public enum MessageQueueUserPermissionTupleFields
     {
-        MessageQueueUserPermission,
-        Component_,
-        MessageQueue_,
-        User_,
+        ComponentRef,
+        MessageQueueRef,
+        UserRef,
         Permissions,
     }
 
@@ -46,28 +44,22 @@ namespace WixToolset.Msmq.Tuples
 
         public IntermediateField this[MessageQueueUserPermissionTupleFields index] => this.Fields[(int)index];
 
-        public string MessageQueueUserPermission
+        public string ComponentRef
         {
-            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.MessageQueueUserPermission].AsString();
-            set => this.Set((int)MessageQueueUserPermissionTupleFields.MessageQueueUserPermission, value);
+            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.ComponentRef].AsString();
+            set => this.Set((int)MessageQueueUserPermissionTupleFields.ComponentRef, value);
         }
 
-        public string Component_
+        public string MessageQueueRef
         {
-            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.Component_].AsString();
-            set => this.Set((int)MessageQueueUserPermissionTupleFields.Component_, value);
+            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.MessageQueueRef].AsString();
+            set => this.Set((int)MessageQueueUserPermissionTupleFields.MessageQueueRef, value);
         }
 
-        public string MessageQueue_
+        public string UserRef
         {
-            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.MessageQueue_].AsString();
-            set => this.Set((int)MessageQueueUserPermissionTupleFields.MessageQueue_, value);
-        }
-
-        public string User_
-        {
-            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.User_].AsString();
-            set => this.Set((int)MessageQueueUserPermissionTupleFields.User_, value);
+            get => this.Fields[(int)MessageQueueUserPermissionTupleFields.UserRef].AsString();
+            set => this.Set((int)MessageQueueUserPermissionTupleFields.UserRef, value);
         }
 
         public int Permissions

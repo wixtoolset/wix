@@ -7,6 +7,7 @@ namespace WixToolset.Msmq
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Msmq.Tuples;
 
     /// <summary>
     /// The compiler for the WiX Toolset MSMQ Extension.
@@ -69,8 +70,8 @@ namespace WixToolset.Msmq
             switch (parentElement.Name.LocalName)
             {
                 case "Component":
-                    string componentId = context["ComponentId"];
-                    string directoryId = context["DirectoryId"];
+                    var componentId = context["ComponentId"];
+                    var directoryId = context["DirectoryId"];
 
                     switch (element.Name.LocalName)
                     {
@@ -98,20 +99,20 @@ namespace WixToolset.Msmq
         ///	<param name="componentKey">Identifier of parent component.</param>
         private void ParseMessageQueueElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             Identifier id = null;
-            int basePriority = CompilerConstants.IntegerNotSet;
-            int journalQuota = CompilerConstants.IntegerNotSet;
+            var basePriority = CompilerConstants.IntegerNotSet;
+            var journalQuota = CompilerConstants.IntegerNotSet;
             string label = null;
             string multicastAddress = null;
             string pathName = null;
-            int privLevel = CompilerConstants.IntegerNotSet;
-            int quota = CompilerConstants.IntegerNotSet;
+            var privLevel = CompilerConstants.IntegerNotSet;
+            var quota = CompilerConstants.IntegerNotSet;
             string serviceTypeGuid = null;
             int attributes = 0;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -156,7 +157,7 @@ namespace WixToolset.Msmq
                             pathName = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PrivLevel":
-                            string privLevelAttr = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            var privLevelAttr = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (privLevelAttr)
                             {
                                 case "none":
@@ -200,7 +201,7 @@ namespace WixToolset.Msmq
                 }
             }
 
-            foreach (XElement child in node.Elements())
+            foreach (var child in node.Elements())
             {
                 if (this.Namespace == child.Name.Namespace)
                 {
@@ -220,32 +221,36 @@ namespace WixToolset.Msmq
                 }
             }
 
-            var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "MessageQueue", id);
-            row.Set(1, componentId);
+            var tuple = section.AddTuple(new MessageQueueTuple(sourceLineNumbers, id)
+            {
+                ComponentRef = componentId,
+                Label = label,
+                MulticastAddress = multicastAddress,
+                PathName = pathName,
+                ServiceTypeGuid = serviceTypeGuid,
+                Attributes = attributes,
+            });
+
             if (CompilerConstants.IntegerNotSet != basePriority)
             {
-                row.Set(2, basePriority);
+                tuple.BasePriority = basePriority;
             }
             if (CompilerConstants.IntegerNotSet != journalQuota)
             {
-                row.Set(3, journalQuota);
+                tuple.JournalQuota = journalQuota;
             }
-            row.Set(4, label);
-            row.Set(5, multicastAddress);
-            row.Set(6, pathName);
+
             if (CompilerConstants.IntegerNotSet != privLevel)
             {
-                row.Set(7, privLevel);
+                tuple.PrivLevel = privLevel;
             }
             if (CompilerConstants.IntegerNotSet != quota)
             {
-                row.Set(8, quota);
+                tuple.Quota = quota;
             }
-            row.Set(9, serviceTypeGuid);
-            row.Set(10, attributes);
 
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MessageQueuingInstall");
-            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "CustomAction", "MessageQueuingUninstall");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MessageQueuingInstall");
+            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "MessageQueuingUninstall");
         }
 
         ///	<summary>
@@ -256,14 +261,14 @@ namespace WixToolset.Msmq
         ///	<param name="applicationKey">Optional identifier of parent message queue.</param>
         private void ParseMessageQueuePermissionElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, string messageQueueId)
         {
-            SourceLineNumber sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
 
             Identifier id = null;
             string user = null;
             string group = null;
             int permissions = 0;
 
-            foreach (XAttribute attrib in node.Attributes())
+            foreach (var attrib in node.Attributes())
             {
                 if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
                 {
@@ -278,7 +283,7 @@ namespace WixToolset.Msmq
                                 this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                             }
                             messageQueueId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "MessageQueue", messageQueueId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, MsmqTupleDefinitions.MessageQueue, messageQueueId);
                             break;
                         case "User":
                             if (null != group)
@@ -467,6 +472,11 @@ namespace WixToolset.Msmq
                 }
             }
 
+            if (null == id)
+            {
+                id = this.ParseHelper.CreateIdentifier("mqp", componentId, messageQueueId, user, group);
+            }
+
             if (null == messageQueueId)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "MessageQueue"));
@@ -480,19 +490,23 @@ namespace WixToolset.Msmq
 
             if (null != user)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "MessageQueueUserPermission", id);
-                row.Set(1, componentId);
-                row.Set(2, messageQueueId);
-                row.Set(3, user);
-                row.Set(4, permissions);
+                section.AddTuple(new MessageQueueUserPermissionTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    MessageQueueRef = messageQueueId,
+                    UserRef = user,
+                    Permissions = permissions,
+                });
             }
             if (null != group)
             {
-                var row = this.ParseHelper.CreateRow(section, sourceLineNumbers, "MessageQueueGroupPermission", id);
-                row.Set(1, componentId);
-                row.Set(2, messageQueueId);
-                row.Set(3, group);
-                row.Set(4, permissions);
+                section.AddTuple(new MessageQueueGroupPermissionTuple(sourceLineNumbers, id)
+                {
+                    ComponentRef = componentId,
+                    MessageQueueRef = messageQueueId,
+                    GroupRef = group,
+                    Permissions = permissions,
+                });
             }
         }
 
@@ -504,19 +518,11 @@ namespace WixToolset.Msmq
         /// <returns></returns>
         string TryFormatGuidValue(string val)
         {
-            try
-            {
-                Guid guid = new Guid(val);
-                return guid.ToString("B").ToUpper();
-            }
-            catch (FormatException)
+            if (!Guid.TryParse(val, out var guid))
             {
                 return val;
             }
-            catch (OverflowException)
-            {
-                return val;
-            }
+            return guid.ToString("B").ToUpper();
         }
     }
 }

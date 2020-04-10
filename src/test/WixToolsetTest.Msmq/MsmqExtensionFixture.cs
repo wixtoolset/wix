@@ -19,8 +19,8 @@ namespace WixToolsetTest.Msmq
             var results = build.BuildAndQuery(Build, "MessageQueue");
             Assert.Equal(new[]
             {
-                "MessageQueue:TestMQ\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t0\t0\tMQLabel\t\tMQPath\t0\t0\t\t0",
-            }, results.OrderBy(s => s).ToArray());
+                "MessageQueue:TestMQ\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\t\t\tMQLabel\t\tMQPath\t\t\t\t0",
+            }, results);
         }
 
         private static void Build(string[] args)
