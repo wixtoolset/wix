@@ -124,10 +124,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddMsiEmbeddedUITuple((MsiEmbeddedUITuple)tuple);
                     break;
 
-                case TupleDefinitionType.MsiFileHash:
-                    this.AddMsiFileHashTuple((MsiFileHashTuple)tuple);
-                    break;
-
                 case TupleDefinitionType.MsiServiceConfig:
                     this.AddMsiServiceConfigTuple((MsiServiceConfigTuple)tuple);
                     break;
@@ -517,6 +513,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 fontRow[0] = tuple.Id.Id;
                 fontRow[1] = tuple.FontTitle;
             }
+
+            if (tuple.SelfRegCost.HasValue)
+            {
+                var selfRegRow = this.CreateRow(tuple, "SelfReg");
+                selfRegRow[0] = tuple.Id.Id;
+                selfRegRow[1] = tuple.SelfRegCost.Value;
+            }
         }
 
         private void AddIniFileTuple(IniFileTuple tuple)
@@ -575,17 +578,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[2] = attributes;
             row[3] = tuple.MessageFilter;
             row[4] = tuple.Source;
-        }
-
-        private void AddMsiFileHashTuple(MsiFileHashTuple tuple)
-        {
-            var row = this.CreateRow(tuple, "MsiFileHash");
-            row[0] = tuple.Id.Id;
-            row[1] = tuple.Options;
-            row[2] = tuple.HashPart1;
-            row[3] = tuple.HashPart2;
-            row[4] = tuple.HashPart3;
-            row[5] = tuple.HashPart4;
         }
 
         private void AddMsiServiceConfigTuple(MsiServiceConfigTuple tuple)

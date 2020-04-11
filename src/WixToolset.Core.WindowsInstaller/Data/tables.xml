@@ -11,7 +11,7 @@
         <columnDefinition name="Template" type="localized" length="0" nullable="yes" escapeIdtCharacters="yes" modularize="property"
                 category="template" description="Optional localized format template used to format action data records for display during action execution."/>
     </tableDefinition>
-    <tableDefinition name="AdminExecuteSequence">
+    <tableDefinition name="AdminExecuteSequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Name of action to invoke, either in the engine or the handler DLL."/>
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
@@ -27,7 +27,7 @@
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
                 category="condition" description="Expression evaluated to determine if Level in the Feature table is to change."/>
     </tableDefinition>
-    <tableDefinition name="AdminUISequence">
+    <tableDefinition name="AdminUISequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Name of action to invoke, either in the engine or the handler DLL."/>
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
@@ -35,7 +35,7 @@
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
                 minValue="-4" maxValue="32767" description="Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."/>
     </tableDefinition>
-    <tableDefinition name="AdvtExecuteSequence">
+    <tableDefinition name="AdvtExecuteSequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Name of action to invoke, either in the engine or the handler DLL."/>
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
@@ -43,7 +43,7 @@
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
                 minValue="-4" maxValue="32767" description="Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."/>
     </tableDefinition>
-    <tableDefinition name="AdvtUISequence">
+    <tableDefinition name="AdvtUISequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Name of action to invoke, either in the engine or the handler DLL."/>
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
@@ -133,7 +133,7 @@
         <columnDefinition name="Data" type="object" length="0"
                 category="binary" description="The unformatted binary data."/>
     </tableDefinition>
-    <tableDefinition name="BindImage">
+    <tableDefinition name="BindImage" tupleless="yes">
         <columnDefinition name="File_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="File" keyColumn="1" category="identifier" description="The index into the File table. This must be an executable file."/>
         <columnDefinition name="Path" type="string" length="255" nullable="yes" modularize="property"
@@ -161,7 +161,7 @@
         <columnDefinition name="Source" type="object" length="0" unreal="yes"
                 category="binary" description="Path to source of file."/>
     </tableDefinition>
-    <tableDefinition name="CCPSearch">
+    <tableDefinition name="CCPSearch" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="Signature_" type="string" length="72" primaryKey="yes"
                 keyTable="Signature;RegLocator;IniLocator;DrLocator;CompLocator" keyColumn="1" category="identifier" description="The Signature_ represents a unique file signature and is also the foreign key in the Signature,  RegLocator, IniLocator, CompLocator and the DrLocator tables."/>
     </tableDefinition>
@@ -387,7 +387,7 @@
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table referencing component that controls the installing of the environmental value."/>
     </tableDefinition>
-    <tableDefinition name="Error" createSymbols="yes">
+    <tableDefinition name="Error" createSymbols="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="Error" type="number" length="2" primaryKey="yes"
                 minValue="0" maxValue="32767" description="Integer error number, obtained from header file IError(...) macros."/>
         <columnDefinition name="Message" type="localized" length="0" nullable="yes" escapeIdtCharacters="yes" useCData="yes" modularize="property"
@@ -443,7 +443,7 @@
         <columnDefinition name="Dependency" type="string" length="0" nullable="yes" modularize="property"
                 category="formatted" description="Parent catalog - only used by SFP"/>
     </tableDefinition>
-    <tableDefinition name="Font">
+    <tableDefinition name="Font" tupleless="yes">
         <columnDefinition name="File_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="File" keyColumn="1" category="identifier" description="Primary key, foreign key into File table referencing font file."/>
         <columnDefinition name="FontTitle" type="string" length="128" nullable="yes"
@@ -481,7 +481,7 @@
         <columnDefinition name="Type" type="number" length="2" nullable="yes"
                 minValue="0" maxValue="2" description="An integer value that determines if the .INI value read is a filename or a directory location or to be used as is w/o interpretation."/>
     </tableDefinition>
-    <tableDefinition name="InstallExecuteSequence">
+    <tableDefinition name="InstallExecuteSequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Name of action to invoke, either in the engine or the handler DLL."/>
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
@@ -489,7 +489,7 @@
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
                 minValue="-4" maxValue="32767" description="Number that determines the sort order in which the actions are to be executed.  Leave blank to suppress action."/>
     </tableDefinition>
-    <tableDefinition name="InstallUISequence">
+    <tableDefinition name="InstallUISequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Name of action to invoke, either in the engine or the handler DLL."/>
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" localizable="yes"
@@ -585,7 +585,7 @@
         <columnDefinition name="Options" type="number" length="2"
                 minValue="0" maxValue="1" description="Integer value specifying the MoveFile operating mode, one of imfoEnum"/>
     </tableDefinition>
-    <tableDefinition name="MsiAssembly">
+    <tableDefinition name="MsiAssembly" tupleDefinitionName="Assembly">
         <columnDefinition name="Component_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into Component table."/>
         <columnDefinition name="Feature_" type="string" length="38"
@@ -645,7 +645,7 @@
         <columnDefinition name="Data" type="object" length="0"
                 category="binary" description="This column contains binary information."/>
     </tableDefinition>
-    <tableDefinition name="MsiFileHash">
+    <tableDefinition name="MsiFileHash" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="File_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="File" keyColumn="1" category="identifier" description="Primary key, foreign key into File table referencing file with this hash"/>
         <columnDefinition name="Options" type="number" length="2"
@@ -671,7 +671,7 @@
         <columnDefinition name="DigitalCertificate_" type="string" length="72" primaryKey="yes"
                 keyTable="MsiDigitalCertificate" keyColumn="1" category="identifier" description="Foreign key to MsiDigitalCertificate table identifying the signer certificate."/>
     </tableDefinition>
-    <tableDefinition name="MsiPatchHeaders">
+    <tableDefinition name="MsiPatchHeaders" tupleIdIsPrimaryKey="no">
         <columnDefinition name="StreamRef" type="string" length="38" primaryKey="yes"
                 category="identifier" description="Primary key. A unique identifier for the row."/>
         <columnDefinition name="Header" type="object" length="0"
@@ -845,7 +845,7 @@
         <columnDefinition name="Component_" type="string" length="72" modularize="column"
                 keyTable="Component" keyColumn="1" category="identifier" description="Foreign key into the Component table referencing component that controls the installing of the registry value."/>
     </tableDefinition>
-    <tableDefinition name="RegLocator" createSymbols="yes">
+    <tableDefinition name="RegLocator" createSymbols="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="Signature_" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="The table key. The Signature_ represents a unique file signature and is also the foreign key in the Signature table. If the type is 0, the registry values refers a directory, and _Signature is not a foreign key."/>
         <columnDefinition name="Root" type="number" length="2"
@@ -869,7 +869,7 @@
         <columnDefinition name="InstallMode" type="number" length="2"
                 set="1;2;3" description="Installation option, one of iimEnum."/>
     </tableDefinition>
-    <tableDefinition name="RemoveIniFile">
+    <tableDefinition name="RemoveIniFile" tupleless="yes">
         <columnDefinition name="RemoveIniFile" type="string" length="72" primaryKey="yes" modularize="column"
                 category="identifier" description="Primary key, non-localized token."/>
         <columnDefinition name="FileName" type="localized" length="255"
@@ -911,7 +911,7 @@
         <columnDefinition name="ReserveSource" type="number" length="4"
                 minValue="0" maxValue="2147483647" description="Disk space to reserve if linked component is installed to run from the source location."/>
     </tableDefinition>
-    <tableDefinition name="SelfReg">
+    <tableDefinition name="SelfReg" tupleless="yes">
         <columnDefinition name="File_" type="string" length="72" primaryKey="yes" modularize="column"
                 keyTable="File" keyColumn="1" category="identifier" description="Foreign key into the File table denoting the module that needs to be registered."/>
         <columnDefinition name="Cost" type="number" length="2" nullable="yes"
@@ -1122,7 +1122,7 @@
                 category="formatted" description="Optional value for the command arguments."/>
     </tableDefinition>
     <!-- Merge Module -->
-    <tableDefinition name="ModuleAdminExecuteSequence">
+    <tableDefinition name="ModuleAdminExecuteSequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="64" primaryKey="yes" modularize="column"
                 category="identifier" description="Action to insert"/>
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
@@ -1134,7 +1134,7 @@
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" modularize="condition" localizable="yes"
                 category="condition"/>
     </tableDefinition>
-    <tableDefinition name="ModuleAdminUISequence">
+    <tableDefinition name="ModuleAdminUISequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="64" primaryKey="yes" modularize="column"
                 category="identifier" description="Action to insert"/>
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
@@ -1146,7 +1146,7 @@
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" modularize="condition" localizable="yes"
                 category="condition"/>
     </tableDefinition>
-    <tableDefinition name="ModuleAdvtExecuteSequence">
+    <tableDefinition name="ModuleAdvtExecuteSequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="64" primaryKey="yes" modularize="column"
                 category="identifier" description="Action to insert"/>
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
@@ -1158,7 +1158,7 @@
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" modularize="condition" localizable="yes"
                 category="condition"/>
     </tableDefinition>
-    <tableDefinition name="ModuleAdvtUISequence">
+    <tableDefinition name="ModuleAdvtUISequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="64" primaryKey="yes" modularize="column"
                 category="identifier" description="Action to insert"/>
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
@@ -1238,7 +1238,7 @@
         <columnDefinition name="Table" type="string" length="72" primaryKey="yes"
                 category="identifier" description="Table name to ignore during merge operation."/>
     </tableDefinition>
-    <tableDefinition name="ModuleInstallExecuteSequence">
+    <tableDefinition name="ModuleInstallExecuteSequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="64" primaryKey="yes" modularize="column"
                 category="identifier" description="Action to insert"/>
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
@@ -1250,7 +1250,7 @@
         <columnDefinition name="Condition" type="string" length="255" nullable="yes" modularize="condition" localizable="yes"
                 category="condition"/>
     </tableDefinition>
-    <tableDefinition name="ModuleInstallUISequence">
+    <tableDefinition name="ModuleInstallUISequence" tupleless="yes">
         <columnDefinition name="Action" type="string" length="64" primaryKey="yes" modularize="column"
                 category="identifier" description="Action to insert"/>
         <columnDefinition name="Sequence" type="number" length="2" nullable="yes"
@@ -1389,7 +1389,7 @@
         <columnDefinition name="After" type="string" length="72" nullable="yes"/>
         <columnDefinition name="Overridable" type="number" length="2" nullable="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixBBControl" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBBControl" createSymbols="yes" unreal="yes" tupleless="yes">
         <columnDefinition name="Billboard_" type="string" length="50" primaryKey="yes" modularize="column"/>
         <columnDefinition name="BBControl_" type="string" length="50" primaryKey="yes"/>
         <columnDefinition name="SourceFile" type="object" length="0"/>
@@ -1405,7 +1405,7 @@
     <tableDefinition name="WixComponentGroup" createSymbols="yes" unreal="yes">
         <columnDefinition name="WixComponentGroup" type="string" length="0" primaryKey="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixControl" unreal="yes">
+    <tableDefinition name="WixControl" unreal="yes" tupleless="yes">
         <columnDefinition name="Dialog_" type="string" length="72" primaryKey="yes" modularize="column"/>
         <columnDefinition name="Control_" type="string" length="50" primaryKey="yes"/>
         <columnDefinition name="SourceFile" type="object" length="0"/>
@@ -1414,7 +1414,7 @@
         <columnDefinition name="Table" type="string" length="62"/>
         <columnDefinition name="FieldData" type="string" length="0"/>
     </tableDefinition>
-    <tableDefinition name="WixCustomTable" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixCustomTable" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="Table" type="string" length="62" primaryKey="yes"/>
         <columnDefinition name="ColumnCount" type="number" length="2"/>
         <columnDefinition name="ColumnNames" type="string" length="0"/>
@@ -1430,14 +1430,14 @@
         <columnDefinition name="Modularizations" type="string" length="0"/>
         <columnDefinition name="BootstrapperApplicationData" type="number" length="2"/>
     </tableDefinition>
-    <tableDefinition name="WixDirectory" unreal="yes">
+    <tableDefinition name="WixDirectory" unreal="yes" tupleless="yes">
         <columnDefinition name="Directory_" type="string" length="0" primaryKey="yes" modularize="column"/>
         <columnDefinition name="ComponentGuidGenerationSeed" type="string" length="38" nullable="yes"/>
     </tableDefinition>
     <tableDefinition name="WixEnsureTable" unreal="yes">
         <columnDefinition name="Table" type="string" length="31"/>
     </tableDefinition>
-    <tableDefinition name="WixFeatureGroup" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixFeatureGroup" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixFeatureGroup" type="string" length="0" primaryKey="yes"/>
     </tableDefinition>
     <tableDefinition name="WixPatchFamilyGroup" createSymbols="yes" unreal="yes">
@@ -1457,7 +1457,7 @@
         <columnDefinition name="Feature_" type="string" length="38" primaryKey="yes"/>
         <columnDefinition name="WixMerge_" type="string" length="72" primaryKey="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixFile" unreal="yes">
+    <tableDefinition name="WixFile" unreal="yes" tupleless="yes">
         <columnDefinition name="File_" type="string" length="0" category="identifier" primaryKey="yes"
                 modularize="column" keyTable="File" keyColumn="1" />
         <columnDefinition name="AssemblyType" type="number" length="2" minValue="0" maxValue="1" />
@@ -1487,20 +1487,20 @@
         <columnDefinition name="WixPdbFile" type="string" length="0" nullable="yes" escapeIdtCharacters="yes"
                 category="text" description="Path to .wixpdb file, if supplied."/>
     </tableDefinition>
-    <tableDefinition name="WixFragment" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixFragment" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixFragment" type="string" length="0" primaryKey="yes"/>
     </tableDefinition>
     <tableDefinition name="WixInstanceComponent" unreal="yes">
         <columnDefinition name="Component_" type="string" length="0" primaryKey="yes" modularize="column"/>
     </tableDefinition>
-    <tableDefinition name="WixInstanceTransforms" unreal="yes" createSymbols="yes">
+    <tableDefinition name="WixInstanceTransforms" unreal="yes" createSymbols="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="Id" type="string" length="0" primaryKey="yes"/>
         <columnDefinition name="PropertyId" type="string" length="0"/>
         <columnDefinition name="ProductCode" type="string" length="0" category="guid"/>
         <columnDefinition name="ProductName" type="localized" localizable="yes" length="0" nullable="yes"/>
         <columnDefinition name="UpgradeCode" type="string" length="38" category="guid" nullable="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixMedia" unreal="yes">
+    <tableDefinition name="WixMedia" unreal="yes" tupleless="yes">
         <columnDefinition name="DiskId_" type="number" length="2" primaryKey="yes"/>
         <columnDefinition name="CompressionLevel" type="number" length="2" nullable="yes" minValue="0" maxValue="4" />
         <columnDefinition name="Layout" type="string" length="0" nullable="yes"/>
@@ -1513,7 +1513,7 @@
       <columnDefinition name="MaximumUncompressedMediaSize" type="number" length="4" />
       <columnDefinition name="MaximumCabinetSizeForLargeFileSplitting" type="number" length="4" />
     </tableDefinition>
-    <tableDefinition name="WixMerge" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixMerge" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixMerge" type="string" length="72" primaryKey="yes"/>
         <columnDefinition name="Language" type="number" length="2" localizable="yes"/>
         <columnDefinition name="Directory_" type="string" nullable="yes" length="72"/>
@@ -1558,7 +1558,7 @@
         <columnDefinition name="SequenceTable" type="string" length="72" primaryKey="yes"/>
         <columnDefinition name="Action" type="string" length="72" primaryKey="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixSuppressModularization" unreal="yes">
+    <tableDefinition name="WixSuppressModularization" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixSuppressModularization" type="string" length="72"/>
     </tableDefinition>
     <tableDefinition name="WixPatchBaseline" unreal="yes">
@@ -1571,7 +1571,7 @@
         <columnDefinition name="Table" type="string" length="32"/>
         <columnDefinition name="PrimaryKeys" type="string" length="0"/>
     </tableDefinition>
-    <tableDefinition name="WixPatchId" unreal="yes">
+    <tableDefinition name="WixPatchId" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="ProductCode" type="string" length="38" nullable="no"/>
         <columnDefinition name="ClientPatchId" type="string" length="72" nullable="no"/>
         <columnDefinition name="OptimizePatchSizeForLargeFiles" type="number" length="2" nullable="yes"
@@ -1582,14 +1582,14 @@
     <tableDefinition name="WixPatchTarget" unreal="yes">
         <columnDefinition name="ProductCode" type="string" length="38" nullable="no" />
     </tableDefinition>
-    <tableDefinition name="WixPatchMetadata" unreal="yes">
+    <tableDefinition name="WixPatchMetadata" unreal="yes" tupleless="yes">
         <columnDefinition name="Property" type="string" length="72" primaryKey="yes"/>
         <columnDefinition name="Value" type="localized" length="0"/>
     </tableDefinition>
-    <tableDefinition name="WixUI" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixUI" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixUI" type="string" length="0" primaryKey="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixVariable" unreal="yes">
+    <tableDefinition name="WixVariable" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixVariable" type="string" length="0"/>
         <columnDefinition name="Value" type="localized" length="0" nullable="yes"/>
         <columnDefinition name="Attributes" type="number" length="4"/>
@@ -1694,7 +1694,7 @@
     <tableDefinition name="WixChainItem" createSymbols="yes" unreal="yes">
         <columnDefinition name="Id" type="string" length="0" category="identifier" primaryKey="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixBundleRollbackBoundary" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBundleRollbackBoundary" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixChainItem_" type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixChainItem" keyColumn="1" description="Reference to a WixChainItem entry in the WixChainItem table."/>
       <columnDefinition name="Vital" type="number" length="2" nullable="yes" minValue="0" maxValue="1"/>
@@ -1703,7 +1703,7 @@
     <tableDefinition name="WixBundlePackageGroup" createSymbols="yes" unreal="yes">
         <columnDefinition name="WixBundlePackageGroup" type="string" length="0" category="identifier" primaryKey="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixBundlePackage" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBundlePackage" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixChainItem_" type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixChainItem" keyColumn="1" description="Reference to a WixChainItem entry in the WixChainItem table."/>
         <columnDefinition name="Type" type="number" length="2" minValue="0" maxValue="3" />
@@ -1729,7 +1729,7 @@
                 keyTable="WixBundleRollbackBoundary" keyColumn="1" description="Reference to a rollback boundary entry in the WixBundleRollbackBoundary table."/>
       <columnDefinition name="x64" type="number" length="2" nullable="yes" minValue="0" maxValue="1"/>
     </tableDefinition>
-    <tableDefinition name="WixBundleExePackage" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBundleExePackage" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixBundlePackage_" type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixBundlePackage" keyColumn="1" description="Reference to a chain package entry in the WixBundlePackage table."/>
         <columnDefinition name="Attributes" type="number" length="4" nullable="no" minValue="0" maxValue="2147483647" description="A 32-bit word that specifies the attribute flags to be applied to this MSI package."/>
@@ -1739,7 +1739,7 @@
         <columnDefinition name="UninstallCommand" type="string" length="0" nullable="yes"/>
         <columnDefinition name="ExeProtocol" type="string" length="0" nullable="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixBundleMsiPackage" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBundleMsiPackage" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixBundlePackage_" type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixBundlePackage" keyColumn="1" description="Reference to a chain package entry in the WixBundlePackage table."/>
         <columnDefinition name="Attributes" type="number" length="4" nullable="no" minValue="0" maxValue="2147483647" description="A 32-bit word that specifies the attribute flags to be applied to this MSI package."/>
@@ -1750,7 +1750,7 @@
         <columnDefinition name="ProductName" type="string" length="0" />
         <columnDefinition name="Manufacturer" type="string" length="0" nullable="yes" />
     </tableDefinition>
-    <tableDefinition name="WixBundleMspPackage" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBundleMspPackage" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixBundlePackage_" type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixBundlePackage" keyColumn="1" description="Reference to a chain package entry in the WixBundlePackage table."/>
         <columnDefinition name="Attributes" type="number" length="2" nullable="yes" minValue="0" maxValue="1" />
@@ -1758,7 +1758,7 @@
         <columnDefinition name="Manufacturer" type="string" length="0" nullable="yes" />
         <columnDefinition name="PatchXml" type="string" length="0" nullable="yes" />
     </tableDefinition>
-    <tableDefinition name="WixBundleMsuPackage" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixBundleMsuPackage" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixBundlePackage_" type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixBundlePackage" keyColumn="1" description="Reference to a chain package entry in the WixBundlePackage table."/>
         <columnDefinition name="DetectCondition" type="string" length="0" nullable="yes"/>
@@ -1827,7 +1827,7 @@
         <columnDefinition name="Hidden" type="number" length="2" minValue="0" maxValue="1"/>
         <columnDefinition name="Persisted" type="number" length="2" minValue="0" maxValue="1"/>
     </tableDefinition>
-    <tableDefinition name="WixBundleProperties" unreal="yes" bootstrapperApplicationData="yes">
+    <tableDefinition name="WixBundleProperties" unreal="yes" bootstrapperApplicationData="yes" tupleless="yes">
         <columnDefinition name="DisplayName" type="string" length="0" nullable="yes"/>
         <columnDefinition name="LogPathVariable" type="string" length="0" nullable="yes"/>
         <columnDefinition name="Compressed" type="string" length="0" nullable="yes"/>
@@ -1835,7 +1835,7 @@
         <columnDefinition name="UpgradeCode" type="string" length="0" nullable="yes"/>
         <columnDefinition name="PerMachine" type="string" length="0" nullable="yes"/>
     </tableDefinition>
-    <tableDefinition name="WixPackageFeatureInfo" unreal="yes" bootstrapperApplicationData="yes">
+    <tableDefinition name="WixPackageFeatureInfo" unreal="yes" bootstrapperApplicationData="yes" tupleless="yes">
         <columnDefinition name="Package" type="string" length="0" />
         <columnDefinition name="Feature" type="string" length="0" />
         <columnDefinition name="Size" type="string" length="0" />
@@ -1847,7 +1847,7 @@
         <columnDefinition name="Directory" type="string" length="0" nullable="yes"/>
         <columnDefinition name="Attributes" type="string" length="0" />
     </tableDefinition>
-    <tableDefinition name="WixPackageProperties" unreal="yes" bootstrapperApplicationData="yes">
+    <tableDefinition name="WixPackageProperties" unreal="yes" bootstrapperApplicationData="yes" tupleless="yes">
         <columnDefinition name="Package"  type="string" length="0" category="identifier" primaryKey="yes"
                 keyTable="WixBundlePackage" keyColumn="1" description="Reference to a chain package entry in the WixBundlePackage table."/>
         <columnDefinition name="Vital" type="string" length="0" nullable="yes" minValue="0" maxValue="1" />
@@ -1868,7 +1868,7 @@
         <columnDefinition name="InstallCondition" type="string" length="0" nullable="yes" />
         <columnDefinition name="Cache" type="string" length="0" nullable="yes" minValue="0" maxValue="2" />
     </tableDefinition>
-    <tableDefinition name="WixPayloadProperties" unreal="yes" bootstrapperApplicationData="yes">
+    <tableDefinition name="WixPayloadProperties" unreal="yes" bootstrapperApplicationData="yes" tupleless="yes">
         <columnDefinition name="Payload"  type="string" length="0" category="identifier" primaryKey="yes" />
         <columnDefinition name="Package"  type="string" length="0" category="identifier" primaryKey="yes" nullable="yes"
                 keyTable="WixBundlePackage" keyColumn="1" description="Reference to a chain package entry in the WixBundlePackage table."/>
@@ -1879,7 +1879,7 @@
         <columnDefinition name="DownloadUrl" type="string" length="0" nullable="yes" />
         <columnDefinition name="LayoutOnly" type="string" length="3" nullable="no" />
     </tableDefinition>
-    <tableDefinition name="_Streams" unreal="yes">
+    <tableDefinition name="_Streams" unreal="yes" tupleless="yes">
         <columnDefinition name="Name" type="string" length="62" primaryKey="yes"/>
         <columnDefinition name="Data" type="object" length="0" nullable="yes"/>
     </tableDefinition>
@@ -1887,14 +1887,14 @@
         <columnDefinition name="PropertyId" type="number" length="2" primaryKey="yes"/>
         <columnDefinition name="Value" type="localized" length="255" escapeIdtCharacters="yes"/>
     </tableDefinition>
-    <tableDefinition name="_TransformView" unreal="yes">
+    <tableDefinition name="_TransformView" unreal="yes" tupleless="yes">
         <columnDefinition name="Table" type="string" length="0" primaryKey="yes"/>
         <columnDefinition name="Column" type="string" length="0" primaryKey="yes"/>
         <columnDefinition name="Row" type="string" length="0"/>
         <columnDefinition name="Data" type="string" length="0"/>
         <columnDefinition name="Current" type="string" length="0"/>
     </tableDefinition>
-    <tableDefinition name="_Validation">
+    <tableDefinition name="_Validation" tupleless="yes">
         <columnDefinition name="Table" type="string" length="32" primaryKey="yes"
                 category="identifier" description="Name of table"/>
         <columnDefinition name="Column" type="string" length="32" primaryKey="yes"
@@ -1922,14 +1922,14 @@
         <columnDefinition name="Variable" type="string" length="72" category="identifier" nullable="yes" />
         <columnDefinition name="Condition" type="string" length="255" category="condition" nullable="yes" />
     </tableDefinition>
-    <tableDefinition name="WixSearchRelation" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixSearchRelation" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixSearch_" type="string" length="72" category="identifier" primaryKey="yes"
                 keyTable="WixSearch" keyColumn="1" description="Reference to a WixSearch entry in the WixSearch table."/>
         <columnDefinition name="ParentId_" type="string" length="72" category="identifier" primaryKey="yes"
                 keyTable="WixSearch" keyColumn="1" description="Reference to a WixSearch entry in the WixSearch table."/>
         <columnDefinition name="Attributes" type="number" length="4" category="doubleInteger" />
     </tableDefinition>
-    <tableDefinition name="WixFileSearch" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixFileSearch" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixSearch_" type="string" length="72" category="identifier" primaryKey="yes"
                 keyTable="WixSearch" keyColumn="1" description="Reference to a WixSearch entry in the WixSearch table."/>
         <columnDefinition name="Path" type="string" category="text" length="255" />
@@ -1942,7 +1942,7 @@
         <columnDefinition name="Languages" type="string" category="text" length="0" nullable="yes" />
         <columnDefinition name="Attributes" type="number" length="4" category="doubleInteger" />
     </tableDefinition>
-    <tableDefinition name="WixRegistrySearch" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixRegistrySearch" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixSearch_" type="string" length="72" category="identifier" primaryKey="yes"
                 keyTable="WixSearch" keyColumn="1" description="Reference to a WixSearch entry in the WixSearch table."/>
         <columnDefinition name="Root" type="number" length="2" category="doubleInteger" />
@@ -1950,14 +1950,14 @@
         <columnDefinition name="Value" type="string" category="text" length="255" nullable="yes" />
         <columnDefinition name="Attributes" type="number" length="4" category="doubleInteger" />
     </tableDefinition>
-    <tableDefinition name="WixComponentSearch" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixComponentSearch" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixSearch_" type="string" length="72" category="identifier" primaryKey="yes"
                 keyTable="WixSearch" keyColumn="1" description="Reference to a WixSearch entry in the WixSearch table."/>
         <columnDefinition name="Guid" type="string" length="38" category="guid" />
         <columnDefinition name="ProductCode" type="string" length="38" category="guid" nullable="yes" />
         <columnDefinition name="Attributes" type="number" length="4" category="doubleInteger" />
     </tableDefinition>
-    <tableDefinition name="WixProductSearch" createSymbols="yes" unreal="yes">
+    <tableDefinition name="WixProductSearch" createSymbols="yes" unreal="yes" tupleIdIsPrimaryKey="yes">
         <columnDefinition name="WixSearch_" type="string" length="72" category="identifier" primaryKey="yes"
                 keyTable="WixSearch" keyColumn="1" description="Reference to a WixSearch entry in the WixSearch table."/>
         <columnDefinition name="Guid" type="string" length="38" category="guid" />
