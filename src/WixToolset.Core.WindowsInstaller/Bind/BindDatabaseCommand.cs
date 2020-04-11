@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs.
         internal static readonly Guid WixComponentGuidNamespace = new Guid("{3064E5C6-FB63-4FE9-AC49-E446A792EFA5}");
 
-        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator):this(context, backendExtension, null, validator)
+        public BindDatabaseCommand(IBindContext context, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtension, Validator validator) : this(context, backendExtension, null, validator)
         {
         }
 
@@ -225,167 +225,155 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             WindowsInstallerData output;
-            if (this.PdbType == PdbType.Partial)
-            {
-                // Time to create the output object, since we're bypassing everything that touches files.
-                this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.PartiallyBound);
+            this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
+            this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
 
+            // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
+            {
+                var command = new ExtractEmbeddedFilesCommand(this.ExpectedEmbeddedFiles);
+                command.Execute();
+            }
+
+            // This must occur after all variables and source paths have been resolved.
+            List<FileFacade> fileFacades;
+            {
+                var command = new GetFileFacadesCommand(section);
+                command.Execute();
+
+                fileFacades = command.FileFacades;
+            }
+
+            // Retrieve file information from merge modules.
+            if (SectionType.Product == section.Type)
+            {
+                var wixMergeTuples = section.Tuples.OfType<WixMergeTuple>().ToList();
+
+                if (wixMergeTuples.Any())
+                {
+                    containsMergeModules = true;
+
+                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, section, wixMergeTuples);
+                    command.FileFacades = fileFacades;
+                    command.OutputInstallerVersion = installerVersion;
+                    command.SuppressLayout = this.SuppressLayout;
+                    command.IntermediateFolder = this.IntermediateFolder;
+                    command.Execute();
+
+                    fileFacades.AddRange(command.MergeModulesFileFacades);
+                }
+            }
+            else if (SectionType.Patch == section.Type)
+            {
+                // Merge transform data into the output object.
+                //IEnumerable<FileFacade> filesFromTransform = this.CopyFromTransformData(this.Output);
+
+                //var command = new CopyTransformDataCommand(this.Messaging, /*output*/this.SubStorages, tableDefinitions, copyOutFileRows: true);
+                //command.Output = output;
+                //command.TableDefinitions = this.TableDefinitions;
+                //command.CopyOutFileRows = true;
+                var command = new GetFileFacadesFromTransforms(this.Messaging, this.SubStorages, tableDefinitions);
+                command.Execute();
+                var filesFromTransforms = command.FileFacades;
+
+                fileFacades.AddRange(filesFromTransforms);
+            }
+
+            // stop processing if an error previously occurred
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
+            // Gather information about files that do not come from merge modules.
+            {
+                var command = new UpdateFileFacadesCommand(this.Messaging, section);
+                command.FileFacades = fileFacades;
+                command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
+                command.OverwriteHash = true;
+                command.TableDefinitions = tableDefinitions;
+                command.VariableCache = variableCache;
+                command.Execute();
+            }
+
+            // Assign files to media.
+            Dictionary<int, MediaTuple> assignedMediaRows;
+            Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
+            IEnumerable<FileFacade> uncompressedFiles;
+            {
+                var command = new AssignMediaCommand(section, this.Messaging);
+                command.FileFacades = fileFacades;
+                command.FilesCompressed = compressed;
+                command.Execute();
+
+                assignedMediaRows = command.MediaRows;
+                filesByCabinetMedia = command.FileFacadesByCabinetMedia;
+                uncompressedFiles = command.UncompressedFileFacades;
+            }
+
+            // stop processing if an error previously occurred
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
+            // Now that the variable cache is populated, resolve any delayed fields.
+            if (this.DelayedFields.Any())
+            {
+                var command = new ResolveDelayedFieldsCommand(this.Messaging, this.DelayedFields, variableCache);
+                command.Execute();
+            }
+
+            // Set generated component guids.
+            {
+                var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section);
+                command.Execute();
+            }
+
+            // Add missing CreateFolder tuples to null-keypath components.
+            {
+                var command = new AddCreateFoldersCommand(section);
+                command.Execute();
+            }
+
+            // stop processing if an error previously occurred
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
+            // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
+            {
                 var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);
                 command.Execute();
 
                 output = command.Output;
             }
-            else
+
+            // Update file sequence.
             {
-                this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
-                this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
+                var command = new UpdateMediaSequencesCommand(output, fileFacades);
+                command.Execute();
+            }
 
-                // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
+            // Modularize identifiers.
+            if (OutputType.Module == output.Type)
+            {
+                var command = new ModularizeCommand(output, modularizationGuid, section.Tuples.OfType<WixSuppressModularizationTuple>());
+                command.Execute();
+            }
+            else if (output.Type == OutputType.Patch)
+            {
+                foreach (var storage in this.SubStorages)
                 {
-                    var command = new ExtractEmbeddedFilesCommand(this.ExpectedEmbeddedFiles);
-                    command.Execute();
+                    output.SubStorages.Add(storage);
                 }
-
-                // This must occur after all variables and source paths have been resolved.
-                List<FileFacade> fileFacades;
-                {
-                    var command = new GetFileFacadesCommand(section);
-                    command.Execute();
-
-                    fileFacades = command.FileFacades;
-                }
-
-                // Retrieve file information from merge modules.
-                if (SectionType.Product == section.Type)
-                {
-                    var wixMergeTuples = section.Tuples.OfType<WixMergeTuple>().ToList();
-
-                    if (wixMergeTuples.Any())
-                    {
-                        containsMergeModules = true;
-
-                        var command = new ExtractMergeModuleFilesCommand(this.Messaging, section, wixMergeTuples);
-                        command.FileFacades = fileFacades;
-                        command.OutputInstallerVersion = installerVersion;
-                        command.SuppressLayout = this.SuppressLayout;
-                        command.IntermediateFolder = this.IntermediateFolder;
-                        command.Execute();
-
-                        fileFacades.AddRange(command.MergeModulesFileFacades);
-                    }
-                }
-                else if (SectionType.Patch == section.Type)
-                {
-                    // Merge transform data into the output object.
-                    //IEnumerable<FileFacade> filesFromTransform = this.CopyFromTransformData(this.Output);
-
-                    //var command = new CopyTransformDataCommand(this.Messaging, /*output*/this.SubStorages, tableDefinitions, copyOutFileRows: true);
-                    //command.Output = output;
-                    //command.TableDefinitions = this.TableDefinitions;
-                    //command.CopyOutFileRows = true;
-                    var command = new GetFileFacadesFromTransforms(this.Messaging, this.SubStorages, tableDefinitions);
-                    command.Execute();
-                    var filesFromTransforms = command.FileFacades;
-
-                    fileFacades.AddRange(filesFromTransforms);
-                }
-
-                // stop processing if an error previously occurred
-                if (this.Messaging.EncounteredError)
-                {
-                    return null;
-                }
-
-                // Gather information about files that do not come from merge modules.
-                {
-                    var command = new UpdateFileFacadesCommand(this.Messaging, section);
-                    command.FileFacades = fileFacades;
-                    command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
-                    command.OverwriteHash = true;
-                    command.TableDefinitions = tableDefinitions;
-                    command.VariableCache = variableCache;
-                    command.Execute();
-                }
-
-                // Assign files to media.
-                Dictionary<int, MediaTuple> assignedMediaRows;
-                Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
-                IEnumerable<FileFacade> uncompressedFiles;
-                {
-                    var command = new AssignMediaCommand(section, this.Messaging);
-                    command.FileFacades = fileFacades;
-                    command.FilesCompressed = compressed;
-                    command.Execute();
-
-                    assignedMediaRows = command.MediaRows;
-                    filesByCabinetMedia = command.FileFacadesByCabinetMedia;
-                    uncompressedFiles = command.UncompressedFileFacades;
-                }
-
-                // stop processing if an error previously occurred
-                if (this.Messaging.EncounteredError)
-                {
-                    return null;
-                }
-
-                // Now that the variable cache is populated, resolve any delayed fields.
-                if (this.DelayedFields.Any())
-                {
-                    var command = new ResolveDelayedFieldsCommand(this.Messaging, this.DelayedFields, variableCache);
-                    command.Execute();
-                }
-
-                // Set generated component guids.
-                {
-                    var command = new CalculateComponentGuids(this.Messaging, this.BackendHelper, this.PathResolver, section);
-                    command.Execute();
-                }
-
-                // Add missing CreateFolder tuples to null-keypath components.
-                {
-                    var command = new AddCreateFoldersCommand(section);
-                    command.Execute();
-                }
-
-                // stop processing if an error previously occurred
-                if (this.Messaging.EncounteredError)
-                {
-                    return null;
-                }
-
-                // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
-                {
-                    var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);
-                    command.Execute();
-
-                    output = command.Output;
-                }
-
-                // Update file sequence.
-                {
-                    var command = new UpdateMediaSequencesCommand(output, fileFacades);
-                    command.Execute();
-                }
-
-                // Modularize identifiers.
-                if (OutputType.Module == output.Type)
-                {
-                    var command = new ModularizeCommand(output, modularizationGuid, section.Tuples.OfType<WixSuppressModularizationTuple>());
-                    command.Execute();
-                }
-                else if (output.Type == OutputType.Patch)
-                {
-                    foreach (var storage in this.SubStorages)
-                    {
-                        output.SubStorages.Add(storage);
-                    }
-                }
-                else // we can create instance transforms since Component Guids are set.
-                {
+            }
+            else // we can create instance transforms since Component Guids are set.
+            {
 #if TODO_FIX_INSTANCE_TRANSFORM
                     this.CreateInstanceTransforms(this.Output);
 #endif
-                }
+            }
 
 #if TODO_FINISH_UPDATE
             // Extended binder extensions can be called now that fields are resolved.
@@ -423,48 +411,48 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 #endif
 
-                this.ValidateComponentGuids(output);
+            this.ValidateComponentGuids(output);
 
-                // Stop processing if an error previously occurred.
-                if (this.Messaging.EncounteredError)
-                {
-                    return null;
-                }
+            // Stop processing if an error previously occurred.
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
 
-                // Ensure the intermediate folder is created since delta patches will be
-                // created there.
-                Directory.CreateDirectory(this.IntermediateFolder);
+            // Ensure the intermediate folder is created since delta patches will be
+            // created there.
+            Directory.CreateDirectory(this.IntermediateFolder);
 
-                if (SectionType.Patch == section.Type && this.DeltaBinaryPatch)
-                {
-                    var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Tuples.OfType<WixPatchIdTuple>().FirstOrDefault());
-                    command.Execute();
-                }
+            if (SectionType.Patch == section.Type && this.DeltaBinaryPatch)
+            {
+                var command = new CreateDeltaPatchesCommand(fileFacades, this.IntermediateFolder, section.Tuples.OfType<WixPatchIdTuple>().FirstOrDefault());
+                command.Execute();
+            }
 
-                // create cabinet files and process uncompressed files
-                var layoutDirectory = Path.GetDirectoryName(this.OutputPath);
-                if (!this.SuppressLayout || OutputType.Module == output.Type)
-                {
-                    this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
+            // create cabinet files and process uncompressed files
+            var layoutDirectory = Path.GetDirectoryName(this.OutputPath);
+            if (!this.SuppressLayout || OutputType.Module == output.Type)
+            {
+                this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                    var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper);
-                    command.CabbingThreadCount = this.CabbingThreadCount;
-                    command.CabCachePath = this.CabCachePath;
-                    command.DefaultCompressionLevel = this.DefaultCompressionLevel;
-                    command.Output = output;
-                    command.Messaging = this.Messaging;
-                    command.BackendExtensions = this.BackendExtensions;
-                    command.LayoutDirectory = layoutDirectory;
-                    command.Compressed = compressed;
-                    command.FileRowsByCabinet = filesByCabinetMedia;
-                    command.ResolveMedia = this.ResolveMedia;
-                    command.TableDefinitions = tableDefinitions;
-                    command.TempFilesLocation = this.IntermediateFolder;
-                    command.Execute();
+                var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper);
+                command.CabbingThreadCount = this.CabbingThreadCount;
+                command.CabCachePath = this.CabCachePath;
+                command.DefaultCompressionLevel = this.DefaultCompressionLevel;
+                command.Output = output;
+                command.Messaging = this.Messaging;
+                command.BackendExtensions = this.BackendExtensions;
+                command.LayoutDirectory = layoutDirectory;
+                command.Compressed = compressed;
+                command.FileRowsByCabinet = filesByCabinetMedia;
+                command.ResolveMedia = this.ResolveMedia;
+                command.TableDefinitions = tableDefinitions;
+                command.TempFilesLocation = this.IntermediateFolder;
+                command.Execute();
 
-                    fileTransfers.AddRange(command.FileTransfers);
-                    trackedFiles.AddRange(command.TrackedFiles);
-                }
+                fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
+            }
 
 #if DELETE
                 if (OutputType.Patch == output.Type)
@@ -479,65 +467,65 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 #endif
 
-                // stop processing if an error previously occurred
-                if (this.Messaging.EncounteredError)
+            // stop processing if an error previously occurred
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
+            // Generate database file.
+            this.Messaging.Write(VerboseMessages.GeneratingDatabase());
+
+            {
+                var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
+                trackedFiles.Add(trackMsi);
+
+                var temporaryFiles = this.GenerateDatabase(output, tableDefinitions, trackMsi.Path, false, false);
+                trackedFiles.AddRange(temporaryFiles);
+            }
+
+            // Stop processing if an error previously occurred.
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
+
+            // Merge modules.
+            if (containsMergeModules)
+            {
+                this.Messaging.Write(VerboseMessages.MergingModules());
+
+                // Add back possibly suppressed sequence tables since all sequence tables must be present
+                // for the merge process to work. We'll drop the suppressed sequence tables again as
+                // necessary.
+                foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
                 {
-                    return null;
-                }
+                    var sequenceTableName = sequence.ToString();
+                    var sequenceTable = output.Tables[sequenceTableName];
 
-                // Generate database file.
-                this.Messaging.Write(VerboseMessages.GeneratingDatabase());
-
-                {
-                    var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
-                    trackedFiles.Add(trackMsi);
-
-                    var temporaryFiles = this.GenerateDatabase(output, tableDefinitions, trackMsi.Path, false, false);
-                    trackedFiles.AddRange(temporaryFiles);
-                }
-
-                // Stop processing if an error previously occurred.
-                if (this.Messaging.EncounteredError)
-                {
-                    return null;
-                }
-
-                // Merge modules.
-                if (containsMergeModules)
-                {
-                    this.Messaging.Write(VerboseMessages.MergingModules());
-
-                    // Add back possibly suppressed sequence tables since all sequence tables must be present
-                    // for the merge process to work. We'll drop the suppressed sequence tables again as
-                    // necessary.
-                    foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
+                    if (null == sequenceTable)
                     {
-                        var sequenceTableName = sequence.ToString();
-                        var sequenceTable = output.Tables[sequenceTableName];
-
-                        if (null == sequenceTable)
-                        {
-                            sequenceTable = output.EnsureTable(tableDefinitions[sequenceTableName]);
-                        }
-
-                        if (0 == sequenceTable.Rows.Count)
-                        {
-                            suppressedTableNames.Add(sequenceTableName);
-                        }
+                        sequenceTable = output.EnsureTable(tableDefinitions[sequenceTableName]);
                     }
 
-                    var command = new MergeModulesCommand();
-                    command.FileFacades = fileFacades;
-                    command.Output = output;
-                    command.OutputPath = this.OutputPath;
-                    command.SuppressedTableNames = suppressedTableNames;
-                    command.Execute();
+                    if (0 == sequenceTable.Rows.Count)
+                    {
+                        suppressedTableNames.Add(sequenceTableName);
+                    }
                 }
 
-                if (this.Messaging.EncounteredError)
-                {
-                    return null;
-                }
+                var command = new MergeModulesCommand();
+                command.FileFacades = fileFacades;
+                command.Output = output;
+                command.OutputPath = this.OutputPath;
+                command.SuppressedTableNames = suppressedTableNames;
+                command.Execute();
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return null;
+            }
 
 #if TODO_FINISH_VALIDATION
             // Validate the output if there is an MSI validator.
@@ -563,25 +551,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 #endif
 
-                // Process uncompressed files.
-                if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
-                {
-                    var command = new ProcessUncompressedFilesCommand(section, this.BackendHelper, this.PathResolver);
-                    command.Compressed = compressed;
-                    command.FileFacades = uncompressedFiles;
-                    command.LayoutDirectory = layoutDirectory;
-                    command.LongNamesInImage = longNames;
-                    command.ResolveMedia = this.ResolveMedia;
-                    command.DatabasePath = this.OutputPath;
-                    command.Execute();
+            // Process uncompressed files.
+            if (!this.Messaging.EncounteredError && !this.SuppressLayout && uncompressedFiles.Any())
+            {
+                var command = new ProcessUncompressedFilesCommand(section, this.BackendHelper, this.PathResolver);
+                command.Compressed = compressed;
+                command.FileFacades = uncompressedFiles;
+                command.LayoutDirectory = layoutDirectory;
+                command.LongNamesInImage = longNames;
+                command.ResolveMedia = this.ResolveMedia;
+                command.DatabasePath = this.OutputPath;
+                command.Execute();
 
-                    fileTransfers.AddRange(command.FileTransfers);
-                    trackedFiles.AddRange(command.TrackedFiles);
-                }
-
-                // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
-                trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.SourcePath, TrackedFileType.Input, f.SourceLineNumber)));
+                fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
             }
+
+            // TODO: this is not sufficient to collect all Input files (for example, it misses Binary and Icon tables).
+            trackedFiles.AddRange(fileFacades.Select(f => this.BackendHelper.TrackFile(f.SourcePath, TrackedFileType.Input, f.SourceLineNumber)));
 
             var result = this.ServiceProvider.GetService<IBindResult>();
             result.FileTransfers = fileTransfers;

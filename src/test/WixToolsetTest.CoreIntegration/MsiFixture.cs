@@ -436,50 +436,6 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanBuildWithPartialWixpdbInput()
-        {
-            var folder = TestData.Get(@"TestData\SingleFile");
-
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var wixpdbPath = Path.Combine(baseFolder, @"partial\test.wixpdb");
-
-                var result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(folder, "Package.wxs"),
-                    Path.Combine(folder, "PackageComponents.wxs"),
-                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    //"-o", Path.Combine(baseFolder, @"partial\test.msi"),
-                    "-pdb", wixpdbPath,
-                    "-pdbtype", "Partial",
-                }, out var messages);
-                Assert.Equal(0, result);
-
-                result = WixRunner.Execute(new[]
-                {
-                    "build",
-                    wixpdbPath,
-                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
-                    "-bindpath", Path.Combine(folder, "data"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.msi"),
-                }, out messages);
-                Assert.Equal(0, result);
-
-                var builtFiles = Directory.GetFiles(Path.Combine(baseFolder, @"bin"));
-                Assert.Equal(new[]{
-                    "test.msi",
-                    "test.wixpdb",
-                }, builtFiles.Select(Path.GetFileName).ToArray());
-            }
-        }
-
-        [Fact]
         public void CanBuildWixlib()
         {
             var folder = TestData.Get(@"TestData\SingleFile");
