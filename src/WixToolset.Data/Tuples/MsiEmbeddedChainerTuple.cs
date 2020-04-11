@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.MsiEmbeddedChainer,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.MsiEmbeddedChainer), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.Condition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.CommandLine), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(MsiEmbeddedChainerTupleFields.Source), IntermediateFieldType.String),
@@ -24,7 +23,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiEmbeddedChainerTupleFields
     {
-        MsiEmbeddedChainer,
         Condition,
         CommandLine,
         Source,
@@ -42,12 +40,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[MsiEmbeddedChainerTupleFields index] => this.Fields[(int)index];
-
-        public string MsiEmbeddedChainer
-        {
-            get => (string)this.Fields[(int)MsiEmbeddedChainerTupleFields.MsiEmbeddedChainer];
-            set => this.Set((int)MsiEmbeddedChainerTupleFields.MsiEmbeddedChainer, value);
-        }
 
         public string Condition
         {

@@ -31,7 +31,7 @@ namespace WixToolset.Data.Tuples
         {
         }
 
-        public WixBundleUpdateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleUpdate,sourceLineNumber,id)
+        public WixBundleUpdateTuple(SourceLineNumber sourceLineNumber, Identifier id = null) : base(TupleDefinitions.WixBundleUpdate, sourceLineNumber, id)
         {
         }
 

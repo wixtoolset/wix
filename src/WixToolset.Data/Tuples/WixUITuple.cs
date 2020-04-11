@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixUI = new IntermediateTupleDefinition(
             TupleDefinitionType.WixUI,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(WixUITuple));
     }
 }
@@ -30,5 +32,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixUITupleFields index] => this.Fields[(int)index];
-   }
+    }
 }

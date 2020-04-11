@@ -14,7 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(AssemblyTupleFields.FeatureRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ManifestFileRef), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ApplicationFileRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(AssemblyTupleFields.Type), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(AssemblyTupleFields.ProcessorArchitecture), IntermediateFieldType.String),
             },
             typeof(AssemblyTuple));
@@ -29,7 +29,7 @@ namespace WixToolset.Data.Tuples
         FeatureRef,
         ManifestFileRef,
         ApplicationFileRef,
-        Attributes,
+        Type,
         ProcessorArchitecture,
     }
 
@@ -83,8 +83,8 @@ namespace WixToolset.Data.Tuples
 
         public AssemblyType Type
         {
-            get => (AssemblyType)this.Fields[(int)AssemblyTupleFields.Attributes].AsNumber();
-            set => this.Set((int)AssemblyTupleFields.Attributes, (int)value);
+            get => (AssemblyType)this.Fields[(int)AssemblyTupleFields.Type].AsNumber();
+            set => this.Set((int)AssemblyTupleFields.Type, (int)value);
         }
 
         public string ProcessorArchitecture

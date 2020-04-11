@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixChainItem = new IntermediateTupleDefinition(
             TupleDefinitionType.WixChainItem,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(WixChainItemTuple));
     }
 }

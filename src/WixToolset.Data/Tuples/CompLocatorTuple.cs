@@ -41,8 +41,8 @@ namespace WixToolset.Data.Tuples
 
         public string SignatureRef
         {
-            get => (string)this.Fields[(int)IniLocatorTupleFields.SignatureRef];
-            set => this.Set((int)IniLocatorTupleFields.SignatureRef, value);
+            get => (string)this.Fields[(int)CompLocatorTupleFields.SignatureRef];
+            set => this.Set((int)CompLocatorTupleFields.SignatureRef, value);
         }
 
         public string ComponentId

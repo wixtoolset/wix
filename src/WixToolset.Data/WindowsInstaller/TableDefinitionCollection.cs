@@ -33,6 +33,14 @@ namespace WixToolset.Data.WindowsInstaller
         }
 
         /// <summary>
+        /// Creates a table definition collection with the given table definitions.
+        /// </summary>
+        public TableDefinitionCollection(IEnumerable<TableDefinition> tableDefinitions)
+        {
+            this.collection = tableDefinitions.ToDictionary(t => t.Name);
+        }
+
+        /// <summary>
         /// Gets the number of items in the collection.
         /// </summary>
         /// <value>Number of items in collection.</value>

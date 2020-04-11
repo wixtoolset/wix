@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixFragment = new IntermediateTupleDefinition(
             TupleDefinitionType.WixFragment,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(WixFragmentTuple));
     }
 }

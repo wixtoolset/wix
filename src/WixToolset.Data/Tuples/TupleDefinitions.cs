@@ -7,11 +7,7 @@ namespace WixToolset.Data
     public enum TupleDefinitionType
     {
         SummaryInformation,
-        Validation,
         ActionText,
-        AdminExecuteSequence,
-        AdminUISequence,
-        AdvtExecuteSequence,
         AppId,
         AppSearch,
         BBControl,
@@ -48,8 +44,6 @@ namespace WixToolset.Data
         ImageFamilies,
         IniFile,
         IniLocator,
-        InstallExecuteSequence,
-        InstallUISequence,
         IsolatedComponent,
         LaunchCondition,
         ListBox,
@@ -57,16 +51,11 @@ namespace WixToolset.Data
         LockPermissions,
         Media,
         MIME,
-        ModuleAdminExecuteSequence,
-        ModuleAdminUISequence,
-        ModuleAdvtExecuteSequence,
         ModuleComponents,
         ModuleConfiguration,
         ModuleDependency,
         ModuleExclusion,
         ModuleIgnoreTable,
-        ModuleInstallExecuteSequence,
-        ModuleInstallUISequence,
         ModuleSignature,
         ModuleSubstitution,
         MoveFile,
@@ -106,7 +95,6 @@ namespace WixToolset.Data
         Registry,
         RegLocator,
         RemoveFile,
-        RemoveIniFile,
         RemoveRegistry,
         ReserveCost,
         ServiceControl,
@@ -164,7 +152,6 @@ namespace WixToolset.Data
         WixEnsureTable,
         WixFeatureGroup,
         WixFeatureModules,
-        WixFile,
         WixFileSearch,
         WixFragment,
         WixGroup,
@@ -176,7 +163,6 @@ namespace WixToolset.Data
         WixPatchBaseline,
         WixPatchFamilyGroup,
         WixPatchId,
-        WixPatchMetadata,
         WixPatchRef,
         WixPatchTarget,
         WixProductSearch,
@@ -218,15 +204,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.ActionText:
                     return TupleDefinitions.ActionText;
-
-                case TupleDefinitionType.AdminExecuteSequence:
-                    return TupleDefinitions.AdminExecuteSequence;
-
-                case TupleDefinitionType.AdminUISequence:
-                    return TupleDefinitions.AdminUISequence;
-
-                case TupleDefinitionType.AdvtExecuteSequence:
-                    return TupleDefinitions.AdvtExecuteSequence;
 
                 case TupleDefinitionType.AppId:
                     return TupleDefinitions.AppId;
@@ -336,12 +313,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.IniLocator:
                     return TupleDefinitions.IniLocator;
 
-                case TupleDefinitionType.InstallExecuteSequence:
-                    return TupleDefinitions.InstallExecuteSequence;
-
-                case TupleDefinitionType.InstallUISequence:
-                    return TupleDefinitions.InstallUISequence;
-
                 case TupleDefinitionType.IsolatedComponent:
                     return TupleDefinitions.IsolatedComponent;
 
@@ -363,15 +334,6 @@ namespace WixToolset.Data
                 case TupleDefinitionType.MIME:
                     return TupleDefinitions.MIME;
 
-                case TupleDefinitionType.ModuleAdminExecuteSequence:
-                    return TupleDefinitions.ModuleAdminExecuteSequence;
-
-                case TupleDefinitionType.ModuleAdminUISequence:
-                    return TupleDefinitions.ModuleAdminUISequence;
-
-                case TupleDefinitionType.ModuleAdvtExecuteSequence:
-                    return TupleDefinitions.ModuleAdvtExecuteSequence;
-
                 case TupleDefinitionType.ModuleComponents:
                     return TupleDefinitions.ModuleComponents;
 
@@ -386,12 +348,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.ModuleIgnoreTable:
                     return TupleDefinitions.ModuleIgnoreTable;
-
-                case TupleDefinitionType.ModuleInstallExecuteSequence:
-                    return TupleDefinitions.ModuleInstallExecuteSequence;
-
-                case TupleDefinitionType.ModuleInstallUISequence:
-                    return TupleDefinitions.ModuleInstallUISequence;
 
                 case TupleDefinitionType.ModuleSignature:
                     return TupleDefinitions.ModuleSignature;
@@ -509,9 +465,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.RemoveFile:
                     return TupleDefinitions.RemoveFile;
-
-                case TupleDefinitionType.RemoveIniFile:
-                    return TupleDefinitions.RemoveIniFile;
 
                 case TupleDefinitionType.RemoveRegistry:
                     return TupleDefinitions.RemoveRegistry;
@@ -666,6 +619,9 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixCustomTable:
                     return TupleDefinitions.WixCustomTable;
 
+                case TupleDefinitionType.WixDeltaPatchFile:
+                    return TupleDefinitions.WixDeltaPatchFile;
+
                 case TupleDefinitionType.WixDeltaPatchSymbolPaths:
                     return TupleDefinitions.WixDeltaPatchSymbolPaths;
 
@@ -710,9 +666,6 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixPatchId:
                     return TupleDefinitions.WixPatchId;
-
-                case TupleDefinitionType.WixPatchMetadata:
-                    return TupleDefinitions.WixPatchMetadata;
 
                 case TupleDefinitionType.WixPatchRef:
                     return TupleDefinitions.WixPatchRef;

@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition ModuleIgnoreTable = new IntermediateTupleDefinition(
             TupleDefinitionType.ModuleIgnoreTable,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(ModuleIgnoreTableTuple));
     }
 }
@@ -30,5 +32,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ModuleIgnoreTableTupleFields index] => this.Fields[(int)index];
-   }
+    }
 }

@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition CCPSearch = new IntermediateTupleDefinition(
             TupleDefinitionType.CCPSearch,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(CCPSearchTuple));
     }
 }

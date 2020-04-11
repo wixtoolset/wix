@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixFeatureGroup = new IntermediateTupleDefinition(
             TupleDefinitionType.WixFeatureGroup,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(WixFeatureGroupTuple));
     }
 }
@@ -30,5 +32,5 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[WixFeatureGroupTupleFields index] => this.Fields[(int)index];
-   }
+    }
 }

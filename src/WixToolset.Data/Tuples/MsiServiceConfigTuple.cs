@@ -26,7 +26,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum MsiServiceConfigTupleFields
     {
-        MsiServiceConfig,
         Name,
         OnInstall,
         OnReinstall,

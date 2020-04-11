@@ -8,7 +8,9 @@ namespace WixToolset.Data
     {
         public static readonly IntermediateTupleDefinition WixSuppressModularization = new IntermediateTupleDefinition(
             TupleDefinitionType.WixSuppressModularization,
-            new IntermediateFieldDefinition[0],
+            new IntermediateFieldDefinition[]
+            {
+            },
             typeof(WixSuppressModularizationTuple));
     }
 }

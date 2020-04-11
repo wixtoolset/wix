@@ -10,7 +10,6 @@ namespace WixToolset.Data
             TupleDefinitionType.ServiceControl,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.ServiceControl), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.InstallRemove), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(ServiceControlTupleFields.UninstallRemove), IntermediateFieldType.Bool),
@@ -30,7 +29,6 @@ namespace WixToolset.Data.Tuples
 {
     public enum ServiceControlTupleFields
     {
-        ServiceControl,
         Name,
         InstallRemove,
         UninstallRemove,
@@ -54,12 +52,6 @@ namespace WixToolset.Data.Tuples
         }
 
         public IntermediateField this[ServiceControlTupleFields index] => this.Fields[(int)index];
-
-        public string ServiceControl
-        {
-            get => (string)this.Fields[(int)ServiceControlTupleFields.ServiceControl];
-            set => this.Set((int)ServiceControlTupleFields.ServiceControl, value);
-        }
 
         public string Name
         {
