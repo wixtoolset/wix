@@ -7,7 +7,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Globalization;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using WixToolset.Core.WindowsInstaller;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
@@ -58,7 +57,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public AttachPatchTransformsCommand(IMessaging messaging, Intermediate intermediate, IEnumerable<PatchTransform> transforms)
         {
-            this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandardInternal.GetTableDefinitions());
+            this.tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
             this.Messaging = messaging;
             this.Intermediate = intermediate;
             this.Transforms = transforms;

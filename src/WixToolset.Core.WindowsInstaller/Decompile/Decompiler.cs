@@ -116,7 +116,7 @@ namespace WixToolset.Core.WindowsInstaller
             }
 
             // add any missing standard and wix-specific table definitions
-            foreach (var tableDefinition in WindowsInstallerStandardInternal.GetTableDefinitions())
+            foreach (var tableDefinition in WindowsInstallerTableDefinitions.All)
             {
                 if (!this.tableDefinitions.Contains(tableDefinition.Name))
                 {

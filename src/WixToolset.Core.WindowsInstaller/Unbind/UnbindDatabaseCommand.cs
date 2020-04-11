@@ -30,7 +30,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.SuppressDemodularization = suppressDemodularization;
             this.SkipSummaryInfo = skipSummaryInfo;
 
-            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
+            this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
         }
 
         public IMessaging Messaging { get; }

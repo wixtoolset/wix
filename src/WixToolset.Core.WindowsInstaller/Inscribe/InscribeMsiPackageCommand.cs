@@ -21,7 +21,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
         {
             this.Context = context;
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
-            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
+            this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
         }
 
         private IInscribeContext Context { get; }

@@ -31,7 +31,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public TableDefinitionCollection Execute()
         {
-            var tableDefinitions = new TableDefinitionCollection(WindowsInstallerStandardInternal.GetTableDefinitions());
+            var tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
 
             foreach (var tuple in this.Section.Tuples.OfType<WixCustomTableTuple>())
             {

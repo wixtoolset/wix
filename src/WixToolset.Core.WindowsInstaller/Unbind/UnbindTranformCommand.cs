@@ -24,7 +24,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             this.ExportBasePath = exportBasePath;
             this.IntermediateFolder = intermediateFolder;
 
-            this.TableDefinitions = WindowsInstallerStandardInternal.GetTableDefinitions();
+            this.TableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
         }
 
         private IMessaging Messaging { get; }

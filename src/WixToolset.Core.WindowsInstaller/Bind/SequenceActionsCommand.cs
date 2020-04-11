@@ -470,7 +470,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         break;
                     case TupleDefinitionType.IniFile:
-                    case TupleDefinitionType.RemoveIniFile:
                         set.Add("InstallExecuteSequence/WriteIniValues");
                         set.Add("InstallExecuteSequence/RemoveIniValues");
                         break;
