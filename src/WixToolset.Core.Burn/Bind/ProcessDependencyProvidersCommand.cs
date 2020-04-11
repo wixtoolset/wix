@@ -56,14 +56,14 @@ namespace WixToolset.Core.Burn.Bind
 
                 if (this.Facades.TryGetValue(packageId, out var facade))
                 {
-                    var dependency = new ProvidesDependencyTuple(wixDependencyProviderTuple.SourceLineNumbers, wixDependencyProviderTuple.Id)
+                    var dependency = this.Section.AddTuple(new ProvidesDependencyTuple(wixDependencyProviderTuple.SourceLineNumbers, wixDependencyProviderTuple.Id)
                     {
                         PackageRef = packageId,
                         Key = wixDependencyProviderTuple.ProviderKey,
                         Version = wixDependencyProviderTuple.Version,
                         DisplayName = wixDependencyProviderTuple.DisplayName,
                         Attributes = (int)wixDependencyProviderTuple.Attributes
-                    };
+                    });
 
                     if (String.IsNullOrEmpty(dependency.Key))
                     {
@@ -94,8 +94,6 @@ namespace WixToolset.Core.Burn.Bind
                     {
                         dependency.DisplayName = facade.PackageTuple.DisplayName;
                     }
-
-                    this.Section.Tuples.Add(dependency);
                 }
             }
 
@@ -121,15 +119,13 @@ namespace WixToolset.Core.Burn.Bind
 
                 if (!String.IsNullOrEmpty(key) && !this.DependencyTuplesByKey.ContainsKey(key))
                 {
-                    var dependency = new ProvidesDependencyTuple(facade.PackageTuple.SourceLineNumbers, facade.PackageTuple.Id)
+                    var dependency = this.Section.AddTuple(new ProvidesDependencyTuple(facade.PackageTuple.SourceLineNumbers, facade.PackageTuple.Id)
                     {
                         PackageRef = facade.PackageId,
                         Key = key,
                         Version = facade.PackageTuple.Version,
                         DisplayName = facade.PackageTuple.DisplayName
-                    };
-
-                    this.Section.Tuples.Add(dependency);
+                    });
 
                     this.DependencyTuplesByKey.Add(dependency.Key, dependency);
                 }

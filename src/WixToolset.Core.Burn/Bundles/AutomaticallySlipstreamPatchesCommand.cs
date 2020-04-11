@@ -102,17 +102,12 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (slipstreamMspIds.Add(id.Id))
             {
-                var slipstreamTuple = new WixBundleSlipstreamMspTuple(patchTargetCode.SourceLineNumbers)
+                this.Section.AddTuple(new WixBundleSlipstreamMspTuple(patchTargetCode.SourceLineNumbers)
                 {
                     TargetPackageRef = msiPackage.Id.Id,
-                    MspPackageRef = patchTargetCode.PackageRef
-                };
+                    MspPackageRef = patchTargetCode.PackageRef,
+                });
 
-                //var slipstreamMspRow = SlipstreamMspTable.CreateRow(tuple.SourceLineNumbers, false);
-                //slipstreamMspRow[0] = msi.ChainPackageId;
-                //slipstreamMspRow[1] = tuple.MspPackageId;
-
-                this.Section.Tuples.Add(slipstreamTuple);
                 return true;
             }
 

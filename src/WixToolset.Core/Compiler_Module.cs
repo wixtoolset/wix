@@ -136,7 +136,7 @@ namespace WixToolset.Core
                             this.ParseCustomActionElement(child);
                             break;
                         case "CustomActionRef":
-                            this.ParseSimpleRefElement(child, "CustomAction");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.CustomAction);
                             break;
                         case "CustomTable":
                             this.ParseCustomTableElement(child);
@@ -154,7 +154,7 @@ namespace WixToolset.Core
                             this.ParseEmbeddedChainerElement(child);
                             break;
                         case "EmbeddedChainerRef":
-                            this.ParseSimpleRefElement(child, "MsiEmbeddedChainer");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.MsiEmbeddedChainer);
                             break;
                         case "EnsureTable":
                             this.ParseEnsureTableElement(child);
@@ -178,7 +178,7 @@ namespace WixToolset.Core
                             this.ParsePropertyElement(child);
                             break;
                         case "PropertyRef":
-                            this.ParseSimpleRefElement(child, "Property");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.Property);
                             break;
                         case "SetDirectory":
                             this.ParseSetDirectoryElement(child);
@@ -197,7 +197,7 @@ namespace WixToolset.Core
                             this.ParseUIElement(child);
                             break;
                         case "UIRef":
-                            this.ParseSimpleRefElement(child, "WixUI");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.WixUI);
                             break;
                         case "WixVariable":
                             this.ParseWixVariableElement(child);
@@ -216,15 +216,13 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new ModuleSignatureTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
+                    var tuple = this.Core.AddTuple(new ModuleSignatureTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, this.activeName, this.activeLanguage))
                     {
                         ModuleID = this.activeName,
                         Version = version
-                    };
+                    });
 
                     tuple.Set((int)ModuleSignatureTupleFields.Language, this.activeLanguage);
-
-                    this.Core.AddTuple(tuple);
                 }
             }
             finally
@@ -286,17 +284,15 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ModuleDependencyTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new ModuleDependencyTuple(sourceLineNumbers)
                 {
                     ModuleID = this.activeName,
                     RequiredID = requiredId,
                     RequiredLanguage  = requiredLanguage,
                     RequiredVersion = requiredVersion
-                };
+                });
 
                 tuple.Set((int)ModuleDependencyTupleFields.ModuleLanguage, this.activeLanguage);
-
-                this.Core.AddTuple(tuple);
             }
         }
 
@@ -369,18 +365,16 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ModuleExclusionTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new ModuleExclusionTuple(sourceLineNumbers)
                 {
                     ModuleID = this.activeName,
                     ExcludedID = excludedId,
                     ExcludedMinVersion = excludedMinVersion,
                     ExcludedMaxVersion = excludedMaxVersion
-                };
+                });
 
                 tuple.Set((int)ModuleExclusionTupleFields.ModuleLanguage, this.activeLanguage);
                 tuple.Set((int)ModuleExclusionTupleFields.ExcludedLanguage, excludedLanguageField);
-
-                this.Core.AddTuple(tuple);
             }
         }
 
@@ -491,7 +485,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ModuleConfigurationTuple(sourceLineNumbers, name)
+                this.Core.AddTuple(new ModuleConfigurationTuple(sourceLineNumbers, name)
                 {
                     Format = format,
                     Type = type,
@@ -503,9 +497,7 @@ namespace WixToolset.Core
                     Description = description,
                     HelpLocation = helpLocation,
                     HelpKeyword = helpKeyword
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -571,15 +563,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ModuleSubstitutionTuple(sourceLineNumbers)
+                this.Core.AddTuple(new ModuleSubstitutionTuple(sourceLineNumbers)
                 {
                     Table = table,
                     Row = rowKeys,
                     Column = column,
                     Value = value
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 

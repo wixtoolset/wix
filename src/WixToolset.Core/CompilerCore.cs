@@ -14,6 +14,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -166,9 +167,10 @@ namespace WixToolset.Core
         /// Add a tuple to the active section.
         /// </summary>
         /// <param name="tuple">Tuple to add.</param>
-        public void AddTuple(IntermediateTuple tuple)
+        public T AddTuple<T>(T tuple)
+            where T : IntermediateTuple
         {
-            this.ActiveSection.Tuples.Add(tuple);
+            return this.ActiveSection.AddTuple(tuple);
         }
 
         /// <summary>
@@ -351,23 +353,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Creates a tuple in the active section.
-        /// </summary>
-        /// <param name="sourceLineNumbers">Source and line number of current row.</param>
-        /// <param name="tupleType">Type of tuple to create.</param>
-        /// <param name="identifier">Optional identifier.</param>
-        /// <returns>New tuple.</returns>
-        public IntermediateTuple CreateTuple(SourceLineNumber sourceLineNumbers, TupleDefinitionType tupleType, Identifier identifier = null)
-        {
-            var tupleDefinition = TupleDefinitions.ByType(tupleType);
-            var tuple = tupleDefinition.CreateTuple(sourceLineNumbers, identifier);
-
-            this.ActiveSection.Tuples.Add(tuple);
-
-            return tuple;
-        }
-
-        /// <summary>
         /// Creates directories using the inline directory syntax.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information.</param>
@@ -394,24 +379,35 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Create a WixSimpleReference row in the active section.
+        /// Create a WixSimpleReferenceTuple in the active section.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information for the row.</param>
-        /// <param name="tableName">The table name of the simple reference.</param>
+        /// <param name="tupleName">The tuple name of the simple reference.</param>
         /// <param name="primaryKeys">The primary keys of the simple reference.</param>
-        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string tableName, params string[] primaryKeys)
+        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys)
         {
             if (!this.EncounteredError)
             {
-                string joinedKeys = String.Join("/", primaryKeys);
-                string id = String.Concat(tableName, ":", joinedKeys);
+                var joinedKeys = String.Join("/", primaryKeys);
+                var id = String.Concat(tupleName, ":", joinedKeys);
 
                 // If this simple reference hasn't been added to the active section already, add it.
                 if (this.activeSectionSimpleReferences.Add(id))
                 {
-                    this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, tableName, primaryKeys);
+                    this.parseHelper.CreateSimpleReference(this.ActiveSection, sourceLineNumbers, tupleName, primaryKeys);
                 }
             }
+        }
+
+        /// <summary>
+        /// Create a WixSimpleReferenceTuple in the active section.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information for the row.</param>
+        /// <param name="tupleDefinition">The tuple definition of the simple reference.</param>
+        /// <param name="primaryKeys">The primary keys of the simple reference.</param>
+        public void CreateSimpleReference(SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys)
+        {
+            this.CreateSimpleReference(sourceLineNumbers, tupleDefinition.Name, primaryKeys);
         }
 
         /// <summary>
@@ -431,7 +427,7 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Add the appropriate rows to make sure that the given table shows up
+        /// Add the appropriate tuples to make sure that the given table shows up
         /// in the resulting output.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line numbers.</param>
@@ -441,6 +437,20 @@ namespace WixToolset.Core
             if (!this.EncounteredError)
             {
                 this.parseHelper.EnsureTable(this.ActiveSection, sourceLineNumbers, tableName);
+            }
+        }
+
+        /// <summary>
+        /// Add the appropriate tuples to make sure that the given table shows up
+        /// in the resulting output.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line numbers.</param>
+        /// <param name="tableDefinition">Definition of the table to ensure existance of.</param>
+        public void EnsureTable(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
+        {
+            if (!this.EncounteredError)
+            {
+                this.parseHelper.EnsureTable(this.ActiveSection, sourceLineNumbers, tableDefinition);
             }
         }
 

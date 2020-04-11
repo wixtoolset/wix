@@ -44,10 +44,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.InstallerVersion = 0;
             this.ModularizationGuid = null;
 
-            bool foundCreateDataTime = false;
-            bool foundLastSaveDataTime = false;
-            bool foundCreatingApplication = false;
-            string now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+            var foundCreateDataTime = false;
+            var foundLastSaveDataTime = false;
+            var foundCreatingApplication = false;
+            var now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
             foreach (var summaryInformationTuple in this.Section.Tuples.OfType<SummaryInformationTuple>())
             {
@@ -110,31 +110,31 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // add a summary information row for the create time/date property if its not already set
             if (!foundCreateDataTime)
             {
-                var createTimeDateRow = new SummaryInformationTuple(null);
-                createTimeDateRow.PropertyId = SumaryInformationType.Created;
-                createTimeDateRow.Value = now;
-
-                this.Section.Tuples.Add(createTimeDateRow);
+                this.Section.AddTuple(new SummaryInformationTuple(null)
+                {
+                    PropertyId = SumaryInformationType.Created,
+                    Value = now,
+                });
             }
 
             // add a summary information row for the last save time/date property if its not already set
             if (!foundLastSaveDataTime)
             {
-                var lastSaveTimeDateRow = new SummaryInformationTuple(null);
-                lastSaveTimeDateRow.PropertyId = SumaryInformationType.LastSaved;
-                lastSaveTimeDateRow.Value = now;
-
-                this.Section.Tuples.Add(lastSaveTimeDateRow);
+                this.Section.AddTuple(new SummaryInformationTuple(null)
+                {
+                    PropertyId = SumaryInformationType.LastSaved,
+                    Value = now,
+                });
             }
 
             // add a summary information row for the creating application property if its not already set
             if (!foundCreatingApplication)
             {
-                var creatingApplicationRow = new SummaryInformationTuple(null);
-                creatingApplicationRow.PropertyId = SumaryInformationType.CreatingApplication;
-                creatingApplicationRow.Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString());
-
-                this.Section.Tuples.Add(creatingApplicationRow);
+                this.Section.AddTuple(new SummaryInformationTuple(null)
+                {
+                    PropertyId = SumaryInformationType.CreatingApplication,
+                    Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString()),
+                });
             }
         }
     }

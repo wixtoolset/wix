@@ -193,7 +193,7 @@ namespace WixToolset.Core
                             this.ParseCustomActionElement(child);
                             break;
                         case "CustomActionRef":
-                            this.ParseSimpleRefElement(child, "CustomAction");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.CustomAction);
                             break;
                         case "CustomTable":
                             this.ParseCustomTableElement(child);
@@ -208,7 +208,7 @@ namespace WixToolset.Core
                             this.ParseEmbeddedChainerElement(child);
                             break;
                         case "EmbeddedChainerRef":
-                            this.ParseSimpleRefElement(child, "MsiEmbeddedChainer");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.MsiEmbeddedChainer);
                             break;
                         case "EnsureTable":
                             this.ParseEnsureTableElement(child);
@@ -248,7 +248,7 @@ namespace WixToolset.Core
                             this.ParsePropertyElement(child);
                             break;
                         case "PropertyRef":
-                            this.ParseSimpleRefElement(child, "Property");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.Property);
                             break;
                         case "SetDirectory":
                             this.ParseSetDirectoryElement(child);
@@ -274,7 +274,7 @@ namespace WixToolset.Core
                             this.ParseUIElement(child);
                             break;
                         case "UIRef":
-                            this.ParseSimpleRefElement(child, "WixUI");
+                            this.ParseSimpleRefElement(child, TupleDefinitions.WixUI);
                             break;
                         case "Upgrade":
                             this.ParseUpgradeElement(child);
@@ -297,14 +297,12 @@ namespace WixToolset.Core
                 {
                     if (null != symbols)
                     {
-                        var tuple = new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers)
+                        this.Core.AddTuple(new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers)
                         {
                             SymbolId = productCode,
                             SymbolType = SymbolPathType.Product,
-                            SymbolPaths = symbols
-                        };
-
-                        this.Core.AddTuple(tuple);
+                            SymbolPaths = symbols,
+                        });
                     }
                 }
             }
@@ -340,14 +338,14 @@ namespace WixToolset.Core
                         break;
                     case "File":
                         driver = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", driver);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, driver);
                         break;
                     case "Name":
                         name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "SetupFile":
                         setup = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", setup);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, setup);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -405,11 +403,29 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.CreateTuple(sourceLineNumbers, tupleDefinitionType, id);
-                tuple.Set(1, componentId);
-                tuple.Set(2, name);
-                tuple.Set(3, driver);
-                tuple.Set(4, setup);
+                switch (tupleDefinitionType)
+                {
+                    case TupleDefinitionType.ODBCDriver:
+                        this.Core.AddTuple(new ODBCDriverTuple(sourceLineNumbers, id)
+                        {
+                            ComponentRef = componentId,
+                            Description = name,
+                            FileRef = driver,
+                            SetupFileRef = setup,
+                        });
+                        break;
+                    case TupleDefinitionType.ODBCTranslator:
+                        this.Core.AddTuple(new ODBCTranslatorTuple(sourceLineNumbers, id)
+                        {
+                            ComponentRef = componentId,
+                            Description = name,
+                            FileRef = driver,
+                            SetupFileRef = setup,
+                        });
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(tupleDefinitionType));
+                }
             }
         }
 
@@ -457,10 +473,28 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = this.Core.CreateTuple(sourceLineNumbers, tupleDefinitionType, new Identifier(AccessModifier.Private, parentId, id));
-                tuple.Set(0, parentId);
-                tuple.Set(1, id);
-                tuple.Set(2, propertyValue);
+                var identifier = new Identifier(AccessModifier.Private, parentId, id);
+                switch (tupleDefinitionType)
+                {
+                    case TupleDefinitionType.ODBCAttribute:
+                        this.Core.AddTuple(new ODBCAttributeTuple(sourceLineNumbers, identifier)
+                        {
+                            DriverRef = parentId,
+                            Attribute = id,
+                            Value = propertyValue,
+                        });
+                        break;
+                    case TupleDefinitionType.ODBCSourceAttribute:
+                        this.Core.AddTuple(new ODBCSourceAttributeTuple(sourceLineNumbers, identifier)
+                        {
+                            DataSourceRef = parentId,
+                            Attribute = id,
+                            Value = propertyValue,
+                        });
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(tupleDefinitionType));
+                }
             }
         }
 
@@ -674,13 +708,11 @@ namespace WixToolset.Core
                         switch (installScope)
                         {
                         case "perMachine":
-                            {
                             this.Core.AddTuple(new PropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "ALLUSERS"))
                             {
                                 Value = "1"
                             });
                             installScopeSeen = true;
-                            }
                             break;
                         case "perUser":
                             sourceBits |= 8;
@@ -1353,18 +1385,18 @@ namespace WixToolset.Core
             {
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new ProgIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, progId))
+                    var tuple = this.Core.AddTuple(new ProgIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, progId))
                     {
                         ProgId = progId,
                         ParentProgIdRef = parent,
                         ClassRef = classId,
                         Description = description,
-                    };
+                    });
 
                     if (null != icon)
                     {
                         tuple.IconRef = icon;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Icon, icon);
                     }
 
                     if (CompilerConstants.IntegerNotSet != iconIndex)
@@ -1372,9 +1404,7 @@ namespace WixToolset.Core
                         tuple.IconIndex = iconIndex;
                     }
 
-                    this.Core.AddTuple(tuple);
-
-                    this.Core.EnsureTable(sourceLineNumbers, "Class");
+                    this.Core.EnsureTable(sourceLineNumbers, WindowsInstallerTableDefinitions.Class);
                 }
             }
             else if (YesNoType.No == advertise)
@@ -1403,7 +1433,7 @@ namespace WixToolset.Core
 
                 if (null != icon)   // ProgId's Default Icon
                 {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "File", icon);
+                    this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, icon);
 
                     icon = String.Format(CultureInfo.InvariantCulture, "\"[#{0}]\"", icon);
 
@@ -1513,7 +1543,7 @@ namespace WixToolset.Core
 
             if ("ErrorDialog" == id.Id)
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "Dialog", value);
+                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Dialog, value);
             }
 
             foreach (var child in node.Elements())
@@ -1764,15 +1794,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError && null != name)
             {
-                var tuple = new RegistryTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RegistryTuple(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
                     Name = name,
                     ComponentRef = componentId,
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
 
             return keyPath;
@@ -2011,7 +2039,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new RegistryTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RegistryTuple(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
@@ -2020,15 +2048,7 @@ namespace WixToolset.Core
                     ValueType = valueType,
                     ValueAction = actionType,
                     ComponentRef = componentId,
-                };
-
-                this.Core.AddTuple(tuple);
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Registry, id);
-                //row.Set(1, (int)root);
-                //row.Set(2, key);
-                //row.Set(3, name);
-                //row.Set(4, value);
-                //row.Set(5, componentId);
+                });
             }
 
             // If this was just a regular registry key (that could be the key path)
@@ -2134,16 +2154,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new RemoveRegistryTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RemoveRegistryTuple(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
                     Name = name,
                     Action = actionType.Value,
-                    ComponentRef = componentId
-                };
-
-                this.Core.AddTuple(tuple);
+                    ComponentRef = componentId,
+                });
             }
         }
 
@@ -2212,15 +2230,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new RemoveRegistryTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RemoveRegistryTuple(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
                     Name = name,
                     ComponentRef = componentId
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -2333,16 +2349,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new RemoveFileTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RemoveFileTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     FileName = this.GetMsiFilenameValue(shortName, name),
                     DirProperty = directory ?? property ?? parentDirectory,
                     OnInstall = onInstall,
-                    OnUninstall = onUninstall
-                };
-
-                this.Core.AddTuple(tuple);
+                    OnUninstall = onUninstall,
+                });
             }
         }
 
@@ -2423,15 +2437,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new RemoveFileTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RemoveFileTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     DirProperty = directory ?? property ?? parentDirectory,
                     OnInstall = onInstall,
                     OnUninstall = onUninstall
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -2540,7 +2552,7 @@ namespace WixToolset.Core
                             if (customAction)
                             {
                                 actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "CustomAction", actionName);
+                                this.Core.CreateSimpleReference(childSourceLineNumbers, TupleDefinitions.CustomAction, actionName);
                             }
                             else
                             {
@@ -2551,7 +2563,7 @@ namespace WixToolset.Core
                             if (customAction || showDialog || specialAction || specialStandardAction)
                             {
                                 afterAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "WixAction", sequenceTable.ToString(), afterAction);
+                                this.Core.CreateSimpleReference(childSourceLineNumbers, TupleDefinitions.WixAction, sequenceTable.ToString(), afterAction);
                             }
                             else
                             {
@@ -2562,7 +2574,7 @@ namespace WixToolset.Core
                             if (customAction || showDialog || specialAction || specialStandardAction)
                             {
                                 beforeAction = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "WixAction", sequenceTable.ToString(), beforeAction);
+                                this.Core.CreateSimpleReference(childSourceLineNumbers, TupleDefinitions.WixAction, sequenceTable.ToString(), beforeAction);
                             }
                             else
                             {
@@ -2573,7 +2585,7 @@ namespace WixToolset.Core
                             if (showDialog)
                             {
                                 actionName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, attrib);
-                                this.Core.CreateSimpleReference(childSourceLineNumbers, "Dialog", actionName);
+                                this.Core.CreateSimpleReference(childSourceLineNumbers, TupleDefinitions.Dialog, actionName);
                             }
                             else
                             {
@@ -2699,7 +2711,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        var tuple = new WixActionTuple(childSourceLineNumbers, new Identifier(AccessModifier.Public, sequenceTable, actionName))
+                        var tuple = this.Core.AddTuple(new WixActionTuple(childSourceLineNumbers, new Identifier(AccessModifier.Public, sequenceTable, actionName))
                         {
                             SequenceTable = sequenceTable,
                             Action = actionName,
@@ -2707,14 +2719,12 @@ namespace WixToolset.Core
                             Before = beforeAction,
                             After = afterAction,
                             Overridable = overridable,
-                        };
+                        });
 
                         if (CompilerConstants.IntegerNotSet != sequence)
                         {
                             tuple.Sequence = sequence;
                         }
-
-                        this.Core.AddTuple(tuple);
                     }
                 }
             }
@@ -3008,7 +3018,7 @@ namespace WixToolset.Core
             {
                 if (!String.IsNullOrEmpty(delayedAutoStart))
                 {
-                    var tuple = new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".DS")))
+                    this.Core.AddTuple(new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".DS")))
                     {
                         Name = name,
                         OnInstall = install,
@@ -3017,20 +3027,12 @@ namespace WixToolset.Core
                         ConfigType = MsiServiceConfigType.DelayedAutoStart,
                         Argument = delayedAutoStart,
                         ComponentRef = componentId,
-                    };
-
-                    this.Core.AddTuple(tuple);
-                    //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".DS"), id.Access));
-                    //row.Set(1, name);
-                    //row.Set(2, events);
-                    //row.Set(3, 3);
-                    //row.Set(4, delayedAutoStart);
-                    //row.Set(5, componentId);
+                    });
                 }
 
                 if (!String.IsNullOrEmpty(failureActionsWhen))
                 {
-                    var tuple = new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".FA")))
+                    this.Core.AddTuple(new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".FA")))
                     {
                         Name = name,
                         OnInstall = install,
@@ -3039,20 +3041,12 @@ namespace WixToolset.Core
                         ConfigType = MsiServiceConfigType.FailureActionsFlag,
                         Argument = failureActionsWhen,
                         ComponentRef = componentId,
-                    };
-
-                    this.Core.AddTuple(tuple);
-                    //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".FA"), id.Access));
-                    //row.Set(1, name);
-                    //row.Set(2, events);
-                    //row.Set(3, 4);
-                    //row.Set(4, failureActionsWhen);
-                    //row.Set(5, componentId);
+                    });
                 }
 
                 if (!String.IsNullOrEmpty(sid))
                 {
-                    var tuple = new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".SS")))
+                    this.Core.AddTuple(new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".SS")))
                     {
                         Name = name,
                         OnInstall = install,
@@ -3061,20 +3055,12 @@ namespace WixToolset.Core
                         ConfigType = MsiServiceConfigType.ServiceSidInfo,
                         Argument = sid,
                         ComponentRef = componentId,
-                    };
-
-                    this.Core.AddTuple(tuple);
-                    //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".SS"), id.Access));
-                    //row.Set(1, name);
-                    //row.Set(2, events);
-                    //row.Set(3, 5);
-                    //row.Set(4, sid);
-                    //row.Set(5, componentId);
+                    });
                 }
 
                 if (!String.IsNullOrEmpty(requiredPrivileges))
                 {
-                    var tuple = new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".RP")))
+                    this.Core.AddTuple(new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".RP")))
                     {
                         Name = name,
                         OnInstall = install,
@@ -3083,20 +3069,12 @@ namespace WixToolset.Core
                         ConfigType = MsiServiceConfigType.RequiredPrivilegesInfo,
                         Argument = requiredPrivileges,
                         ComponentRef = componentId,
-                    };
-
-                    this.Core.AddTuple(tuple);
-                    //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".RP"), id.Access));
-                    //row.Set(1, name);
-                    //row.Set(2, events);
-                    //row.Set(3, 6);
-                    //row.Set(4, requiredPrivileges);
-                    //row.Set(5, componentId);
+                    });
                 }
 
                 if (!String.IsNullOrEmpty(preShutdownDelay))
                 {
-                    var tuple = new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".PD")))
+                    this.Core.AddTuple(new MsiServiceConfigTuple(sourceLineNumbers, new Identifier(id.Access, String.Concat(id.Id, ".PD")))
                     {
                         Name = name,
                         OnInstall = install,
@@ -3105,15 +3083,7 @@ namespace WixToolset.Core
                         ConfigType = MsiServiceConfigType.PreshutdownInfo,
                         Argument = preShutdownDelay,
                         ComponentRef = componentId,
-                    };
-
-                    this.Core.AddTuple(tuple);
-                    //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.MsiServiceConfig, new Identifier(String.Concat(id.Id, ".PD"), id.Access));
-                    //row.Set(1, name);
-                    //row.Set(2, events);
-                    //row.Set(3, 7);
-                    //row.Set(4, preShutdownDelay);
-                    //row.Set(5, componentId);
+                    });
                 }
             }
         }
@@ -3284,7 +3254,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new MsiServiceConfigFailureActionsTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new MsiServiceConfigFailureActionsTuple(sourceLineNumbers, id)
                 {
                     Name = name,
                     OnInstall = install, 
@@ -3296,9 +3266,7 @@ namespace WixToolset.Core
                     Actions = actions,
                     DelayActions = actionsDelays,
                     ComponentRef = componentId,
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -3438,7 +3406,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ServiceControlTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new ServiceControlTuple(sourceLineNumbers, id)
                 {
                     Name = name,
                     InstallRemove = installRemove,
@@ -3450,9 +3418,7 @@ namespace WixToolset.Core
                     Arguments = arguments,
                     Wait = wait,
                     ComponentRef = componentId
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -3697,7 +3663,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ServiceInstallTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new ServiceInstallTuple(sourceLineNumbers, id)
                 {
                     Name = name,
                     DisplayName = displayName,
@@ -3713,23 +3679,7 @@ namespace WixToolset.Core
                     Description  = description,
                     Interactive = interactive,
                     Vital = vital
-                };
-
-                this.Core.AddTuple(tuple);
-
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.ServiceInstall, id);
-                //row.Set(1, name);
-                //row.Set(2, displayName);
-                //row.Set(3, typebits);
-                //row.Set(4, startType);
-                //row.Set(5, errorbits);
-                //row.Set(6, loadOrderGroup);
-                //row.Set(7, dependencies);
-                //row.Set(8, account);
-                //row.Set(9, password);
-                //row.Set(10, arguments);
-                //row.Set(11, componentId);
-                //row.Set(12, description);
+                });
             }
         }
 
@@ -3758,7 +3708,7 @@ namespace WixToolset.Core
                         break;
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Directory", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Directory, id);
                         break;
                     case "Sequence":
                         var sequenceValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3816,16 +3766,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new CustomActionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, actionName))
+                this.Core.AddTuple(new CustomActionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, actionName))
                 {
                     ExecutionType = executionType,
                     SourceType = CustomActionSourceType.Directory,
                     TargetType = CustomActionTargetType.TextData,
                     Source = id,
                     Target = value
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 foreach (var sequence in sequences)
                 {
@@ -3966,16 +3914,14 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
                 }
 
-                var tuple = new CustomActionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, actionName))
+                this.Core.AddTuple(new CustomActionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, actionName))
                 {
                     ExecutionType = executionType,
                     SourceType = CustomActionSourceType.Property,
                     TargetType = CustomActionTargetType.TextData,
                     Source = id,
-                    Target = value
-                };
-
-                this.Core.AddTuple(tuple);
+                    Target = value,
+                });
 
                 foreach (var sequence in sequences)
                 {
@@ -4192,7 +4138,7 @@ namespace WixToolset.Core
                         break;
                     case "Icon":
                         icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Icon, icon);
                         break;
                     case "IconIndex":
                         iconIndex = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int16.MinValue + 1, Int16.MaxValue);
@@ -4390,7 +4336,7 @@ namespace WixToolset.Core
                     target = String.Format(CultureInfo.InvariantCulture, "[#{0}]", defaultTarget);
                 }
 
-                var tuple = new ShortcutTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new ShortcutTuple(sourceLineNumbers, id)
                 {
                     DirectoryRef = directory,
                     Name = name,
@@ -4408,9 +4354,7 @@ namespace WixToolset.Core
                     DisplayResourceId = displayResourceId,
                     DescriptionResourceDll = descriptionResourceDll,
                     DescriptionResourceId = descriptionResourceId,
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -4679,7 +4623,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new TypeLibTuple(sourceLineNumbers)
+                    var tuple = this.Core.AddTuple(new TypeLibTuple(sourceLineNumbers)
                     {
                         LibId = id,
                         Language = language,
@@ -4687,7 +4631,7 @@ namespace WixToolset.Core
                         Description = description,
                         DirectoryRef = helpDirectory,
                         FeatureRef = Guid.Empty.ToString("B")
-                    };
+                    });
 
                     if (CompilerConstants.IntegerNotSet != majorVersion || CompilerConstants.IntegerNotSet != minorVersion)
                     {
@@ -4698,8 +4642,6 @@ namespace WixToolset.Core
                     {
                         tuple.Cost = cost;
                     }
-
-                    this.Core.AddTuple(tuple);
                 }
             }
             else if (YesNoType.No == advertise)
@@ -4894,7 +4836,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new UpgradeTuple(sourceLineNumbers)
+                this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeId,
                     VersionMin = minimum,
@@ -4908,15 +4850,13 @@ namespace WixToolset.Core
                     OnlyDetect = onlyDetect,
                     Remove = removeFeatures,
                     ActionProperty = actionProperty
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 // Ensure that RemoveExistingProducts is authored in InstallExecuteSequence
                 // if at least one row in Upgrade table lacks the OnlyDetect attribute.
                 if (!onlyDetect)
                 {
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "WixAction", "InstallExecuteSequence", "RemoveExistingProducts");
+                    this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixAction, "InstallExecuteSequence", "RemoveExistingProducts");
                 }
             }
         }
@@ -4964,7 +4904,7 @@ namespace WixToolset.Core
                         break;
                     case "TargetFile":
                         targetFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", targetFile);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, targetFile);
                         break;
                     case "TargetProperty":
                         targetProperty = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -5021,20 +4961,18 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new VerbTuple(sourceLineNumbers)
+                    var tuple = this.Core.AddTuple(new VerbTuple(sourceLineNumbers)
                     {
                         ExtensionRef = extension,
                         Verb = id,
                         Command = command,
                         Argument = argument,
-                    };
+                    });
 
                     if (CompilerConstants.IntegerNotSet != sequence)
                     {
                         tuple.Sequence = sequence;
                     }
-
-                    this.Core.AddTuple(tuple);
                 }
             }
             else if (YesNoType.No == advertise)

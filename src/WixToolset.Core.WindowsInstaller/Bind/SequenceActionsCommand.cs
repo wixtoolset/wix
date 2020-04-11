@@ -186,7 +186,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var action in scheduledActionTuples)
             {
-                this.Section.Tuples.Add(action);
+                this.Section.AddTuple(action);
             }
         }
 

@@ -157,10 +157,10 @@ namespace Example.Extension
 
             if (!this.Messaging.EncounteredError)
             {
-
-                var tuple = new ExampleSearchTuple(sourceLineNumbers, id);
-                section.Tuples.Add(tuple);
-                tuple.SearchFor = searchFor;
+                var tuple = section.AddTuple(new ExampleSearchTuple(sourceLineNumbers, id)
+                {
+                    SearchFor = searchFor,
+                });
             }
         }
 
@@ -176,7 +176,7 @@ namespace Example.Extension
                     {
                         case "Id":
                             var refId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, "ExampleSearch", refId);
+                            this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, ExampleTupleDefinitions.ExampleSearch, refId);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);

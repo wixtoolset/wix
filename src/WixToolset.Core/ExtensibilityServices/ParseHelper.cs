@@ -54,7 +54,7 @@ namespace WixToolset.Core.ExtensibilityServices
         public void CreateComplexReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, ComplexReferenceParentType parentType, string parentId, string parentLanguage, ComplexReferenceChildType childType, string childId, bool isPrimary)
         {
 
-            var tuple = new WixComplexReferenceTuple(sourceLineNumbers)
+            section.AddTuple(new WixComplexReferenceTuple(sourceLineNumbers)
             {
                 Parent = parentId,
                 ParentType = parentType,
@@ -62,9 +62,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 Child = childId,
                 ChildType = childType,
                 IsPrimary = isPrimary
-            };
-
-            section.Tuples.Add(tuple);
+            });
 
             this.CreateWixGroupTuple(section, sourceLineNumbers, parentType, parentId, childType, childId);
         }
@@ -100,24 +98,22 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
             }
 
-            var tuple = new DirectoryTuple(sourceLineNumbers, id)
+            var tuple = section.AddTuple(new DirectoryTuple(sourceLineNumbers, id)
             {
                 ParentDirectoryRef = parentId,
                 Name = name,
                 ShortName = shortName,
                 SourceName = sourceName,
                 SourceShortName = shortSourceName
-            };
+            });
 
-            section.Tuples.Add(tuple);
-
-            return id;
+            return tuple.Id;
         }
 
         public string CreateDirectoryReferenceFromInlineSyntax(IntermediateSection section, SourceLineNumber sourceLineNumbers, string parentId, XAttribute attribute, ISet<string> sectionInlinedDirectoryIds)
         {
             string id = null;
-            string[] inlineSyntax = this.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, true);
+            var inlineSyntax = this.GetAttributeInlineDirectorySyntax(sourceLineNumbers, attribute, true);
 
             if (null != inlineSyntax)
             {
@@ -126,13 +122,13 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (1 == inlineSyntax.Length)
                 {
                     id = inlineSyntax[0];
-                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.Directory), id);
+                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, id);
                 }
                 else // start creating tuples for the entries in the inline syntax
                 {
                     id = parentId;
 
-                    int pathStartsAt = 0;
+                    var pathStartsAt = 0;
                     if (inlineSyntax[0].EndsWith(":"))
                     {
                         // TODO: should overriding the parent identifier with a specific id be an error or a warning or just let it slide?
@@ -142,14 +138,14 @@ namespace WixToolset.Core.ExtensibilityServices
                         //}
 
                         id = inlineSyntax[0].TrimEnd(':');
-                        this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.Directory), id);
+                        this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.Directory, id);
 
                         pathStartsAt = 1;
                     }
 
-                    for (int i = pathStartsAt; i < inlineSyntax.Length; ++i)
+                    for (var i = pathStartsAt; i < inlineSyntax.Length; ++i)
                     {
-                        Identifier inlineId = this.CreateDirectoryTuple(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
+                        var inlineId = this.CreateDirectoryTuple(section, sourceLineNumbers, null, id, inlineSyntax[i], sectionInlinedDirectoryIds);
                         id = inlineId.Id;
                     }
                 }
@@ -206,29 +202,25 @@ namespace WixToolset.Core.ExtensibilityServices
 
             var id = this.CreateIdentifier("reg", componentId, ((int)root).ToString(CultureInfo.InvariantCulture.NumberFormat), key.ToLowerInvariant(), (null != name ? name.ToLowerInvariant() : name));
 
-            var tuple = new RegistryTuple(sourceLineNumbers, id)
+            var tuple = section.AddTuple(new RegistryTuple(sourceLineNumbers, id)
             {
                 Root = root,
                 Key = key,
                 Name = name,
                 Value = value,
                 ComponentRef = componentId,
-            };
+            });
 
-            section.Tuples.Add(tuple);
-
-            return id;
+            return tuple.Id;
         }
 
         public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tupleName, params string[] primaryKeys)
         {
-            var tuple = new WixSimpleReferenceTuple(sourceLineNumbers)
+            section.AddTuple(new WixSimpleReferenceTuple(sourceLineNumbers)
             {
                 Table = tupleName,
                 PrimaryKeys = String.Join("/", primaryKeys)
-            };
-
-            section.Tuples.Add(tuple);
+            });
         }
 
         public void CreateSimpleReference(IntermediateSection section, SourceLineNumber sourceLineNumbers, IntermediateTupleDefinition tupleDefinition, params string[] primaryKeys)
@@ -254,15 +246,13 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentNullException("childId");
             }
 
-            var tuple = new WixGroupTuple(sourceLineNumbers)
+            section.AddTuple(new WixGroupTuple(sourceLineNumbers)
             {
                 ParentId = parentId,
                 ParentType = parentType,
                 ChildId = childId,
                 ChildType = childType,
-            };
-
-            section.Tuples.Add(tuple);
+            });
         }
 
         public void CreateWixSearchTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId)
@@ -273,7 +263,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, elementName, "Variable"));
             }
 
-            section.Tuples.Add(new WixSearchTuple(sourceLineNumbers, id)
+            section.AddTuple(new WixSearchTuple(sourceLineNumbers, id)
             {
                 Variable = variable,
                 Condition = condition,
@@ -282,20 +272,20 @@ namespace WixToolset.Core.ExtensibilityServices
 
             if (after != null)
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, "WixSearch", after);
+                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixSearch, after);
                 // TODO: We're currently defaulting to "always run after", which we will need to change...
                 this.CreateWixSearchRelationTuple(section, sourceLineNumbers, id, after, 2);
             }
 
             if (!String.IsNullOrEmpty(bundleExtensionId))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, "WixBundleExtension", bundleExtensionId);
+                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixBundleExtension, bundleExtensionId);
             }
         }
 
         public void CreateWixSearchRelationTuple(IntermediateSection section, SourceLineNumber sourceLineNumbers, Identifier id, string parentId, int attributes)
         {
-            section.Tuples.Add(new WixSearchRelationTuple(sourceLineNumbers, id)
+            section.AddTuple(new WixSearchRelationTuple(sourceLineNumbers, id)
             {
                 ParentSearchRef = parentId,
                 Attributes = attributes,
@@ -351,13 +341,13 @@ namespace WixToolset.Core.ExtensibilityServices
             }
 
             // collect all the data
-            List<string> strings = new List<string>(1 + args.Length);
+            var strings = new List<string>(1 + args.Length);
             strings.Add(longName);
             strings.AddRange(args);
 
             // prepare for hashing
-            string stringData = String.Join("|", strings);
-            byte[] data = Encoding.UTF8.GetBytes(stringData);
+            var stringData = String.Join("|", strings);
+            var data = Encoding.UTF8.GetBytes(stringData);
 
             // hash the data
             byte[] hash;
@@ -367,12 +357,12 @@ namespace WixToolset.Core.ExtensibilityServices
             }
 
             // generate the short file/directory name without an extension
-            StringBuilder shortName = new StringBuilder(Convert.ToBase64String(hash));
+            var shortName = new StringBuilder(Convert.ToBase64String(hash));
             shortName.Remove(8, shortName.Length - 8).Replace('+', '-').Replace('/', '_');
 
             if (keepExtension)
             {
-                string extension = Path.GetExtension(longName);
+                var extension = Path.GetExtension(longName);
 
                 if (4 < extension.Length)
                 {
@@ -405,9 +395,9 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void EnsureTable(IntermediateSection section, SourceLineNumber sourceLineNumbers, string tableName)
         {
-            section.Tuples.Add(new WixEnsureTableTuple(sourceLineNumbers)
+            section.AddTuple(new WixEnsureTableTuple(sourceLineNumbers)
             {
-                Table = tableName
+                Table = tableName,
             });
 
             if (this.Creator == null)
@@ -419,7 +409,7 @@ namespace WixToolset.Core.ExtensibilityServices
             // We don't add custom table definitions to the tableDefinitions collection,
             // so if it's not in there, it better be a custom table. If the Id is just wrong,
             // instead of a custom table, we get an unresolved reference at link time.
-            if (!this.Creator.TryGetTupleDefinitionByName(tableName, out var ignored))
+            if (!this.Creator.TryGetTupleDefinitionByName(tableName, out var _))
             {
                 this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixCustomTable, tableName);
             }
@@ -432,8 +422,8 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentNullException("attribute");
             }
 
-            EmptyRule emptyRule = canBeEmpty ? EmptyRule.CanBeEmpty : EmptyRule.CanBeWhitespaceOnly;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
+            var emptyRule = canBeEmpty ? EmptyRule.CanBeEmpty : EmptyRule.CanBeWhitespaceOnly;
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute, emptyRule);
 
             if (String.IsNullOrEmpty(value) && canBeEmpty)
             {
@@ -516,15 +506,15 @@ namespace WixToolset.Core.ExtensibilityServices
         public string[] GetAttributeInlineDirectorySyntax(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool resultUsedToCreateReference = false)
         {
             string[] result = null;
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             if (!String.IsNullOrEmpty(value))
             {
-                int pathStartsAt = 0;
+                var pathStartsAt = 0;
                 result = value.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
                 if (result[0].EndsWith(":", StringComparison.Ordinal))
                 {
-                    string id = result[0].TrimEnd(':');
+                    var id = result[0].TrimEnd(':');
                     if (1 == result.Length)
                     {
                         this.Messaging.Write(ErrorMessages.InlineDirectorySyntaxRequiresPath(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value, id));
@@ -558,7 +548,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
 
                 // Check each part of the relative path to ensure that it is a valid directory name.
-                for (int i = pathStartsAt; i < result.Length; ++i)
+                for (var i = pathStartsAt; i < result.Length; ++i)
                 {
                     if (!this.IsValidLongFilename(result[i], false, false))
                     {
@@ -588,7 +578,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 throw new ArgumentNullException("attribute");
             }
 
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             if (0 < value.Length)
             {
@@ -605,7 +595,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else if (allowRelative)
                 {
-                    string normalizedPath = value.Replace('\\', '/');
+                    var normalizedPath = value.Replace('\\', '/');
                     if (normalizedPath.StartsWith("../", StringComparison.Ordinal) || normalizedPath.Contains("/../"))
                     {
                         this.Messaging.Write(ErrorMessages.PayloadMustBeRelativeToCache(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
@@ -624,13 +614,13 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             Debug.Assert(minimum > CompilerConstants.LongNotSet && minimum > CompilerConstants.IllegalLong, "The legal values for this attribute collide with at least one sentinel used during parsing.");
 
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
 
             if (0 < value.Length)
             {
                 try
                 {
-                    long longValue = Convert.ToInt64(value, CultureInfo.InvariantCulture.NumberFormat);
+                    var longValue = Convert.ToInt64(value, CultureInfo.InvariantCulture.NumberFormat);
 
                     if (CompilerConstants.LongNotSet == longValue || CompilerConstants.IllegalLong == longValue)
                     {
@@ -664,7 +654,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public RegistryRootType? GetAttributeRegistryRootValue(SourceLineNumber sourceLineNumbers, XAttribute attribute, bool allowHkmu)
         {
-            string value = this.GetAttributeValue(sourceLineNumbers, attribute);
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute);
             if (String.IsNullOrEmpty(value))
             {
                 return null;
@@ -814,8 +804,8 @@ namespace WixToolset.Core.ExtensibilityServices
             }
 
             // Check for a non-period character (all periods is not legal)
-            bool nonPeriodFound = false;
-            foreach (char character in filename)
+            var nonPeriodFound = false;
+            foreach (var character in filename)
             {
                 if ('.' != character)
                 {
@@ -867,7 +857,6 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (ParseHelper.TryFindExtension(extensions, element.Name.Namespace, out var extension))
             {
-                SourceLineNumber sourceLineNumbers = Preprocessor.GetSourceLineNumbers(parentElement);
                 extension.ParseElement(intermediate, section, parentElement, element, context);
             }
             else
@@ -896,7 +885,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
         public void ParseForExtensionElements(IEnumerable<ICompilerExtension> extensions, Intermediate intermediate, IntermediateSection section, XElement element)
         {
-            foreach (XElement child in element.Elements())
+            foreach (var child in element.Elements())
             {
                 if (element.Name.Namespace == child.Name.Namespace)
                 {
@@ -913,7 +902,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             var actionId = new Identifier(access, sequence, actionName);
 
-            var actionTuple = new WixActionTuple(sourceLineNumbers, actionId)
+            var actionTuple = section.AddTuple(new WixActionTuple(sourceLineNumbers, actionId)
             {
                 SequenceTable = sequence,
                 Action = actionName,
@@ -921,19 +910,17 @@ namespace WixToolset.Core.ExtensibilityServices
                 Before = beforeAction,
                 After = afterAction,
                 Overridable = overridable,
-            };
-
-            section.Tuples.Add(actionTuple);
+            });
 
             if (null != beforeAction)
             {
                 if (WindowsInstallerStandard.IsStandardAction(beforeAction))
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.WixAction), sequence.ToString(), beforeAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), beforeAction);
                 }
                 else
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), beforeAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, beforeAction);
                 }
             }
 
@@ -941,11 +928,11 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (WindowsInstallerStandard.IsStandardAction(afterAction))
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.WixAction), sequence.ToString(), afterAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixAction, sequence.ToString(), afterAction);
                 }
                 else
                 {
-                    this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), afterAction);
+                    this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, afterAction);
                 }
             }
 
@@ -981,7 +968,7 @@ namespace WixToolset.Core.ExtensibilityServices
                         break;
                 }
 
-                this.CreateSimpleReference(section, sourceLineNumbers, nameof(TupleDefinitionType.CustomAction), name + suffix);
+                this.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, name + suffix);
             }
         }
 

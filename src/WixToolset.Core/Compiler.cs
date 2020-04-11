@@ -12,6 +12,7 @@ namespace WixToolset.Core
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -163,7 +164,7 @@ namespace WixToolset.Core
                 this.Core = null;
             }
 
-            target.UpdateLevel(IntermediateLevels.Compiled);
+            target.UpdateLevel(Data.IntermediateLevels.Compiled);
 
             return this.Messaging.EncounteredError ? null : target;
         }
@@ -324,13 +325,11 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.SearchPropertyNotUppercase(sourceLineNumbers, "Property", "Id", propertyId.Id));
                 }
 
-                var tuple = new AppSearchTuple(sourceLineNumbers, new Identifier(propertyId.Access, propertyId.Id, signature))
+                this.Core.AddTuple(new AppSearchTuple(sourceLineNumbers, new Identifier(propertyId.Access, propertyId.Id, signature))
                 {
                     PropertyRef = propertyId.Id,
                     SignatureRef = signature
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -371,7 +370,7 @@ namespace WixToolset.Core
             {
                 var section = this.Core.ActiveSection;
 
-                // Add the row to a separate section if requested.
+                // Add the tuple to a separate section if requested.
                 if (fragment)
                 {
                     var id = String.Concat(this.Core.ActiveSection.Id, ".", propertyId.Id);
@@ -379,26 +378,24 @@ namespace WixToolset.Core
                     section = this.Core.CreateSection(id, SectionType.Fragment, this.Core.ActiveSection.Codepage, this.Context.CompilationId);
 
                     // Reference the property in the active section.
-                    this.Core.CreateSimpleReference(sourceLineNumbers, "Property", propertyId.Id);
+                    this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, propertyId.Id);
                 }
 
-                // Allow row to exist with no value so that PropertyRefs can be made for *Search elements
-                // the linker will remove these rows before the final output is created.
-                var tuple = new PropertyTuple(sourceLineNumbers, propertyId)
+                // Allow tuple to exist with no value so that PropertyRefs can be made for *Search elements
+                // the linker will remove these tuples before the final output is created.
+                section.AddTuple(new PropertyTuple(sourceLineNumbers, propertyId)
                 {
                     Value = value,
-                };
-
-                section.Tuples.Add(tuple);
+                });
 
                 if (admin || hidden || secure)
                 {
-                    this.AddWixPropertyRow(sourceLineNumbers, propertyId, admin, secure, hidden, section);
+                    this.AddWixPropertyTuple(sourceLineNumbers, propertyId, admin, secure, hidden, section);
                 }
             }
         }
 
-        private void AddWixPropertyRow(SourceLineNumber sourceLineNumbers, Identifier property, bool admin, bool secure, bool hidden, IntermediateSection section = null)
+        private void AddWixPropertyTuple(SourceLineNumber sourceLineNumbers, Identifier property, bool admin, bool secure, bool hidden, IntermediateSection section = null)
         {
             if (secure && property.Id != property.Id.ToUpperInvariant())
             {
@@ -409,18 +406,16 @@ namespace WixToolset.Core
             {
                 section = this.Core.ActiveSection;
 
-                this.Core.EnsureTable(sourceLineNumbers, "Property"); // Property table is always required when using WixProperty table.
+                this.Core.EnsureTable(sourceLineNumbers, WindowsInstallerTableDefinitions.Property); // Property table is always required when using WixProperty table.
             }
 
-            var tuple = new WixPropertyTuple(sourceLineNumbers)
+            section.AddTuple(new WixPropertyTuple(sourceLineNumbers)
             {
                 PropertyRef = property.Id,
                 Admin = admin,
                 Hidden = hidden,
                 Secure = secure
-            };
-
-            section.Tuples.Add(tuple);
+            });
         }
 
         /// <summary>
@@ -550,7 +545,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new AppIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, appId))
+                    this.Core.AddTuple(new AppIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, appId))
                     {
                         AppId = appId,
                         RemoteServerName = remoteServerName,
@@ -558,10 +553,8 @@ namespace WixToolset.Core
                         ServiceParameters = serviceParameters,
                         DllSurrogate = dllSurrogate,
                         ActivateAtStorage = activateAtStorage,
-                        RunAsInteractiveUser = runAsInteractiveUser
-                    };
-
-                    this.Core.AddTuple(tuple);
+                        RunAsInteractiveUser = runAsInteractiveUser,
+                    });
                 }
             }
             else if (YesNoType.No == advertise)
@@ -650,14 +643,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new MsiAssemblyNameTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, componentId, id))
+                this.Core.AddTuple(new MsiAssemblyNameTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, componentId, id))
                 {
                     ComponentRef = componentId,
                     Name = id,
-                    Value = value
-                };
-
-                this.Core.AddTuple(tuple);
+                    Value = value,
+                });
             }
         }
 
@@ -739,12 +730,10 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new BinaryTuple(sourceLineNumbers, id)
+                var tuple = this.Core.AddTuple(new BinaryTuple(sourceLineNumbers, id)
                 {
                     Data = new IntermediateFieldPathValue { Path = sourceFile }
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 if (YesNoType.Yes == suppressModularization)
                 {
@@ -820,7 +809,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new IconTuple(sourceLineNumbers, id)
                 {
-                    Data = new IntermediateFieldPathValue { Path = sourceFile }
+                    Data = new IntermediateFieldPathValue { Path = sourceFile },
                 });
             }
 
@@ -844,7 +833,7 @@ namespace WixToolset.Core
                     {
                     case "Property":
                         property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Property", property);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, property);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -940,15 +929,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixInstanceTransformsTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new WixInstanceTransformsTuple(sourceLineNumbers, id)
                 {
                     PropertyId = propertyId,
                     ProductCode = productCode,
                     ProductName = productName,
                     UpgradeCode = upgradeCode
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -979,7 +966,7 @@ namespace WixToolset.Core
                         break;
                     case "Feature":
                         feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Feature", feature);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Feature, feature);
                         break;
                     case "Qualifier":
                         qualifier = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -1009,16 +996,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new PublishComponentTuple(sourceLineNumbers)
+                this.Core.AddTuple(new PublishComponentTuple(sourceLineNumbers)
                 {
                     ComponentId = id,
                     Qualifier = qualifier,
                     ComponentRef = componentId,
                     AppData = appData,
                     FeatureRef = feature ?? Guid.Empty.ToString("B"),
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -1195,7 +1180,7 @@ namespace WixToolset.Core
 
             if (!String.IsNullOrEmpty(localFileServer))
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "File", localFileServer);
+                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, localFileServer);
             }
 
             // Local variables used strictly for child node processing.
@@ -1268,7 +1253,7 @@ namespace WixToolset.Core
                 {
                     foreach (var context in contexts)
                     {
-                        var tuple = new ClassTuple(sourceLineNumbers)
+                        var tuple = this.Core.AddTuple(new ClassTuple(sourceLineNumbers)
                         {
                             CLSID = classId,
                             Context = context,
@@ -1280,26 +1265,24 @@ namespace WixToolset.Core
                             Argument = argument,
                             FeatureRef = Guid.Empty.ToString("B"),
                             RelativePath = YesNoType.Yes == relativePath,
-                        };
+                        });
 
                         if (null != appId)
                         {
                             tuple.AppIdRef = appId;
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "AppId", appId);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.AppId, appId);
                         }
 
                         if (null != icon)
                         {
                             tuple.IconRef = icon;
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Icon", icon);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Icon, icon);
                         }
 
                         if (CompilerConstants.IntegerNotSet != iconIndex)
                         {
                             tuple.IconIndex = iconIndex;
                         }
-
-                        this.Core.AddTuple(tuple);
                     }
                 }
             }
@@ -1379,7 +1362,7 @@ namespace WixToolset.Core
 
                     if (null != icon) // ClassId default icon
                     {
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", icon);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, icon);
 
                         icon = String.Format(CultureInfo.InvariantCulture, "\"[#{0}]\"", icon);
 
@@ -1709,7 +1692,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new UpgradeTuple(sourceLineNumbers)
+                this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeCode,
                     VersionMin = minimum,
@@ -1720,9 +1703,7 @@ namespace WixToolset.Core
                     ExcludeLanguages = excludeLanguages,
                     VersionMaxInclusive = maxInclusive,
                     VersionMinInclusive = minInclusive,
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -1862,7 +1843,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, "Signature"); // FileSearch signatures override parent signatures
+                        var newId = this.ParseSimpleRefElement(child, TupleDefinitions.Signature); // FileSearch signatures override parent signatures
                         id = new Identifier(AccessModifier.Private, newId);
                         signature = null;
                         break;
@@ -1879,16 +1860,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new RegLocatorTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new RegLocatorTuple(sourceLineNumbers, id)
                 {
                     Root = root.Value,
                     Key = key,
                     Name = name,
                     Type = type.Value,
-                    Win64 = search64bit
-                };
-
-                this.Core.AddTuple(tuple);
+                    Win64 = search64bit,
+                });
             }
 
             return signature;
@@ -1912,7 +1891,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "RegLocator", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.RegLocator, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2524,7 +2503,7 @@ namespace WixToolset.Core
             // finally add the Component table row
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ComponentTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new ComponentTuple(sourceLineNumbers, id)
                 {
                     ComponentId = guid,
                     DirectoryRef = directoryId,
@@ -2539,10 +2518,8 @@ namespace WixToolset.Core
                     Shared = shared,
                     Transitive = transitive,
                     UninstallWhenSuperseded = uninstallWhenSuperseded,
-                    Win64 = win64
-                };
-
-                this.Core.AddTuple(tuple);
+                    Win64 = win64,
+                });
 
                 if (multiInstance)
                 {
@@ -2554,26 +2531,22 @@ namespace WixToolset.Core
 
                 if (0 < symbols.Count)
                 {
-                    var tupleDelaPatch = new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Component, id.Id))
+                    this.Core.AddTuple(new WixDeltaPatchSymbolPathsTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, SymbolPathType.Component, id.Id))
                     {
                         SymbolType = SymbolPathType.Component,
                         SymbolId = id.Id,
-                        SymbolPaths = String.Join(";", symbols)
-                    };
-
-                    this.Core.AddTuple(tupleDelaPatch);
+                        SymbolPaths = String.Join(";", symbols),
+                    });
                 }
 
                 // Complus
                 if (CompilerConstants.IntegerNotSet != comPlusBits)
                 {
-                    var complusTuple = new ComplusTuple(sourceLineNumbers)
+                    this.Core.AddTuple(new ComplusTuple(sourceLineNumbers)
                     {
                         ComponentRef = id.Id,
                         ExpType = comPlusBits,
-                    };
-
-                    this.Core.AddTuple(complusTuple);
+                    });
                 }
 
                 // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
@@ -2698,7 +2671,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixComponentGroup", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixComponentGroup, id);
                         break;
                     case "Primary":
                         primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2747,7 +2720,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Component", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Component, id);
                         break;
                     case "Primary":
                         primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2871,7 +2844,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, "Signature"); // FileSearch signatures override parent signatures
+                        var newId = this.ParseSimpleRefElement(child, TupleDefinitions.Signature); // FileSearch signatures override parent signatures
                         id = new Identifier(AccessModifier.Private, newId);
                         signature = null;
                         break;
@@ -2888,18 +2861,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new CompLocatorTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new CompLocatorTuple(sourceLineNumbers, id)
                 {
                     SignatureRef = id.Id,
                     ComponentId = componentId,
                     Type = type,
-                };
-
-                this.Core.AddTuple(tuple);
-
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.CompLocator, id);
-                //row.Set(1, componentId);
-                //row.Set(2, type);
+                });
             }
 
             return signature;
@@ -2965,13 +2932,11 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new CreateFolderTuple(sourceLineNumbers)
+                this.Core.AddTuple(new CreateFolderTuple(sourceLineNumbers)
                 {
                     DirectoryRef = directoryId,
-                    ComponentRef = componentId
-                };
-
-                this.Core.AddTuple(tuple);
+                    ComponentRef = componentId,
+                });
             }
 
             return directoryId;
@@ -3027,7 +2992,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
                         }
                         fileId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", fileId);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, fileId);
                         break;
                     case "SourceDirectory":
                         sourceDirectory = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
@@ -3092,17 +3057,15 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new MoveFileTuple(sourceLineNumbers, id)
+                    this.Core.AddTuple(new MoveFileTuple(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
                         SourceName  = sourceName,
                         DestName= String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
                         SourceFolder = sourceDirectory ?? sourceProperty,
                         DestFolder = destinationDirectory ?? destinationProperty,
-                        Delete = delete
-                    };
-
-                    this.Core.AddTuple(tuple);
+                        Delete = delete,
+                    });
                 }
             }
             else // copy the file
@@ -3139,15 +3102,13 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new DuplicateFileTuple(sourceLineNumbers, id)
+                    this.Core.AddTuple(new DuplicateFileTuple(sourceLineNumbers, id)
                     {
                         ComponentRef = componentId,
                         FileRef = fileId,
                         DestinationName = String.IsNullOrEmpty(destinationShortName) && String.IsNullOrEmpty(destinationName) ? null : this.GetMsiFilenameValue(destinationShortName, destinationName),
-                        DestinationFolder = destinationDirectory ?? destinationProperty
-                    };
-
-                    this.Core.AddTuple(tuple);
+                        DestinationFolder = destinationDirectory ?? destinationProperty,
+                    });
                 }
             }
         }
@@ -3194,7 +3155,7 @@ namespace WixToolset.Core
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         //sourceBits = MsiInterop.MsidbCustomActionTypeBinaryData;
                         sourceType = CustomActionSourceType.Binary;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", source); // add a reference to the appropriate Binary
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, source); // add a reference to the appropriate Binary
                         break;
                     case "Directory":
                         if (null != source)
@@ -3229,7 +3190,7 @@ namespace WixToolset.Core
                         // to add a reference. No need to look at the value.
                         if (Int32.TryParse(target, out var ignored))
                         {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, "Error", target);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Error, target);
                         }
                         break;
                     case "ExeCommand":
@@ -3285,7 +3246,7 @@ namespace WixToolset.Core
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         //sourceBits = MsiInterop.MsidbCustomActionTypeSourceFile;
                         sourceType = CustomActionSourceType.File;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", source); // add a reference to the appropriate File
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, source); // add a reference to the appropriate File
                         break;
                     case "HideTarget":
                         hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -3533,7 +3494,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new CustomActionTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new CustomActionTuple(sourceLineNumbers, id)
                 {
                     ExecutionType = executionType,
                     Source = source,
@@ -3547,9 +3508,7 @@ namespace WixToolset.Core
                     TSAware = tsAware,
                     Win64 = win64,
                     Hidden = hidden,
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 if (YesNoType.Yes == suppressModularization)
                 {
@@ -3562,9 +3521,9 @@ namespace WixToolset.Core
         /// Parses a simple reference element.
         /// </summary>
         /// <param name="node">Element to parse.</param>
-        /// <param name="table">Table which contains the target of the simple reference.</param>
+        /// <param name="tupleDefinition">Tuple which contains the target of the simple reference.</param>
         /// <returns>Id of the referenced element.</returns>
-        private string ParseSimpleRefElement(XElement node, string table)
+        private string ParseSimpleRefElement(XElement node, IntermediateTupleDefinition tupleDefinition)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string id = null;
@@ -3577,7 +3536,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, table, id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, tupleDefinition.Name, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3640,7 +3599,7 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, "MsiPatchSequence", primaryKeys);
+            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.MsiPatchSequence, primaryKeys);
 
             this.Core.ParseForExtensionElements(node);
 
@@ -3932,14 +3891,14 @@ namespace WixToolset.Core
                             }
                         }
 
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixCustomTable", tableId);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixCustomTable, tableId);
 
                         if (!this.Core.EncounteredError)
                         {
                             this.Core.AddTuple(new WixCustomRowTuple(childSourceLineNumbers)
                             {
                                 Table = tableId,
-                                FieldData = dataValue
+                                FieldData = dataValue,
                             });
                         }
                         break;
@@ -3963,7 +3922,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new WixCustomTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
+                    this.Core.AddTuple(new WixCustomTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
                     {
                         ColumnCount = columnCount,
                         ColumnNames = columnNames,
@@ -3977,10 +3936,8 @@ namespace WixToolset.Core
                         Sets = sets,
                         Descriptions = descriptions,
                         Modularizations = modularizations,
-                        Unreal = bootstrapperApplicationData
-                    };
-
-                    this.Core.AddTuple(tuple);
+                        Unreal = bootstrapperApplicationData,
+                    });
                 }
             }
         }
@@ -4079,7 +4036,7 @@ namespace WixToolset.Core
                     if (inlineSyntax[0].EndsWith(":"))
                     {
                         parentId = inlineSyntax[0].TrimEnd(':');
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Directory", parentId);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Directory, parentId);
 
                         pathStartsAt = 1;
                     }
@@ -4224,7 +4181,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new DirectoryTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new DirectoryTuple(sourceLineNumbers, id)
                 {
                     ParentDirectoryRef = parentId,
                     Name = name,
@@ -4232,9 +4189,7 @@ namespace WixToolset.Core
                     SourceName = sourceName,
                     SourceShortName = shortSourceName,
                     ComponentGuidGenerationSeed = componentGuidGenerationSeed
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 if (null != symbols)
                 {
@@ -4268,7 +4223,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Directory", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Directory, id);
                         break;
                     case "DiskId":
                         diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
@@ -4415,7 +4370,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        signature = this.ParseSimpleRefElement(child, "Signature");
+                        signature = this.ParseSimpleRefElement(child, TupleDefinitions.Signature);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -4460,19 +4415,17 @@ namespace WixToolset.Core
                     signature = id.Id;
                 }
 
-                var tuple = new DrLocatorTuple(sourceLineNumbers, new Identifier(access, rowId, parentSignature, path))
+                var tuple = this.Core.AddTuple(new DrLocatorTuple(sourceLineNumbers, new Identifier(access, rowId, parentSignature, path))
                 {
                     SignatureRef = rowId,
                     Parent = parentSignature,
                     Path = path,
-                };
+                });
 
                 if (CompilerConstants.IntegerNotSet != depth)
                 {
                     tuple.Depth = depth;
                 }
-
-                this.Core.AddTuple(tuple);
             }
 
             return signature;
@@ -4575,7 +4528,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        signature = this.ParseSimpleRefElement(child, "Signature");
+                        signature = this.ParseSimpleRefElement(child, TupleDefinitions.Signature);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -4589,7 +4542,7 @@ namespace WixToolset.Core
             }
 
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, "DrLocator", id.Id, parentSignature, path);
+            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.DrLocator, id.Id, parentSignature, path);
 
             return signature;
         }
@@ -4829,7 +4782,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new FeatureTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new FeatureTuple(sourceLineNumbers, id)
                 {
                     ParentFeatureRef = null, // this field is set in the linker
                     Title = title,
@@ -4841,9 +4794,7 @@ namespace WixToolset.Core
                     DisallowAdvertise = disallowAdvertise,
                     InstallDefault = installDefault,
                     TypicalDefault = typicalDefault,
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 if (ComplexReferenceParentType.Unknown != parentType)
                 {
@@ -4873,7 +4824,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Feature", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Feature, id);
                         break;
                     case "IgnoreParent":
                         ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -5053,7 +5004,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixFeatureGroup", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixFeatureGroup, id);
                         break;
                     case "IgnoreParent":
                         ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -5222,7 +5173,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new EnvironmentTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new EnvironmentTuple(sourceLineNumbers, id)
                 {
                     Name = name,
                     Value = value,
@@ -5232,14 +5183,7 @@ namespace WixToolset.Core
                     Permanent = permanent,
                     System = system,
                     ComponentRef = componentId
-                };
-
-                this.Core.AddTuple(tuple);
-
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.Environment, id);
-                //row.Set(1, String.Concat(action, uninstall, system ? "*" : String.Empty, name));
-                //row.Set(2, text);
-                //row.Set(3, componentId);
+                });
             }
         }
 
@@ -5282,12 +5226,10 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ErrorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
+                this.Core.AddTuple(new ErrorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
                 {
                     Message = Common.GetInnerText(node)
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -5373,18 +5315,16 @@ namespace WixToolset.Core
             {
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new ExtensionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, extension, componentId))
+                    this.Core.AddTuple(new ExtensionTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, extension, componentId))
                     {
                         Extension = extension,
                         ComponentRef = componentId,
                         ProgIdRef = progId,
                         MimeRef = mime,
-                        FeatureRef = Guid.Empty.ToString("B")
-                    };
+                        FeatureRef = Guid.Empty.ToString("B"),
+                    });
 
-                    this.Core.AddTuple(tuple);
-
-                    this.Core.EnsureTable(sourceLineNumbers, "Verb");
+                    this.Core.EnsureTable(sourceLineNumbers, WindowsInstallerTableDefinitions.Verb);
                 }
             }
             else if (YesNoType.No == advertise)
@@ -5481,11 +5421,11 @@ namespace WixToolset.Core
                         break;
                     case "AssemblyApplication":
                         assemblyApplication = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", assemblyApplication);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, assemblyApplication);
                         break;
                     case "AssemblyManifest":
                         assemblyManifest = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", assemblyManifest);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, assemblyManifest);
                         break;
                     case "BindPath":
                         bindPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
@@ -5499,7 +5439,7 @@ namespace WixToolset.Core
                         break;
                     case "CompanionFile":
                         companionFile = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", companionFile);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, companionFile);
                         break;
                     case "Compressed":
                         var compressedValue = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
@@ -5797,7 +5737,7 @@ namespace WixToolset.Core
                 attributes |= compressed.HasValue && compressed == false ? FileTupleAttributes.Uncompressed : 0;
                 attributes |= generatedShortFileName ? FileTupleAttributes.GeneratedShortFileName : 0;
 
-                var tuple = new FileTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new FileTuple(sourceLineNumbers, id)
                 {
                     ComponentRef = componentId,
                     Name = name,
@@ -5831,10 +5771,8 @@ namespace WixToolset.Core
                     IgnoreOffsets = ignoreOffsets,
                     IgnoreLengths = ignoreLengths,
                     RetainOffsets = protectOffsets,
-                    SymbolPaths = symbols
-                };
-
-                this.Core.AddTuple(tuple);
+                    SymbolPaths = symbols,
+                });
 
                 if (AssemblyType.NotAnAssembly != assemblyType)
                 {
@@ -5850,7 +5788,7 @@ namespace WixToolset.Core
                 }
             }
 
-            this.Core.CreateSimpleReference(sourceLineNumbers, "Media", diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
+            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
 
             // If this component does not have a companion file this file is a possible keypath.
             possibleKeyPath = null;
@@ -5990,13 +5928,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new SignatureTuple(sourceLineNumbers, id)
+                var tuple = this.Core.AddTuple(new SignatureTuple(sourceLineNumbers, id)
                 {
                     FileName = name ?? shortName,
                     MinVersion = minVersion,
                     MaxVersion = maxVersion,
                     Languages = languages
-                };
+                });
 
                 if (CompilerConstants.IntegerNotSet != minSize)
                 {
@@ -6017,8 +5955,6 @@ namespace WixToolset.Core
                 {
                     tuple.MaxDate = maxDate;
                 }
-
-                this.Core.AddTuple(tuple);
 
                 // Create a DrLocator row to associate the file with a directory
                 // when a different identifier is specified for the FileSearch.
@@ -6125,7 +6061,7 @@ namespace WixToolset.Core
                         this.ParseBundleExtensionElement(child);
                         break;
                     case "BundleExtensionRef":
-                        this.ParseSimpleRefElement(child, "WixBundleExtension");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.WixBundleExtension);
                         break;
                     case "ComplianceCheck":
                         this.ParseComplianceCheckElement(child);
@@ -6146,7 +6082,7 @@ namespace WixToolset.Core
                         this.ParseCustomActionElement(child);
                         break;
                     case "CustomActionRef":
-                        this.ParseSimpleRefElement(child, "CustomAction");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.CustomAction);
                         break;
                     case "CustomTable":
                         this.ParseCustomTableElement(child);
@@ -6161,7 +6097,7 @@ namespace WixToolset.Core
                         this.ParseEmbeddedChainerElement(child);
                         break;
                     case "EmbeddedChainerRef":
-                        this.ParseSimpleRefElement(child, "MsiEmbeddedChainer");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.MsiEmbeddedChainer);
                         break;
                     case "EnsureTable":
                         this.ParseEnsureTableElement(child);
@@ -6210,7 +6146,7 @@ namespace WixToolset.Core
                         this.ParsePropertyElement(child);
                         break;
                     case "PropertyRef":
-                        this.ParseSimpleRefElement(child, "Property");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.Property);
                         break;
                     case "RelatedBundle":
                         this.ParseRelatedBundleElement(child);
@@ -6225,7 +6161,7 @@ namespace WixToolset.Core
                         this.ParseSetVariableElement(child);
                         break;
                     case "SetVariableRef":
-                        this.ParseSimpleRefElement(child, "WixSetVariable");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.WixSetVariable);
                         break;
                     case "SFPCatalog":
                         string parentName = null;
@@ -6235,7 +6171,7 @@ namespace WixToolset.Core
                         this.ParseUIElement(child);
                         break;
                     case "UIRef":
-                        this.ParseSimpleRefElement(child, "WixUI");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.WixUI);
                         break;
                     case "Upgrade":
                         this.ParseUpgradeElement(child);
@@ -6555,7 +6491,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new IniFileTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new IniFileTuple(sourceLineNumbers, id)
                 {
                     FileName = this.GetMsiFilenameValue(shortName, name),
                     DirProperty = directory,
@@ -6564,9 +6500,7 @@ namespace WixToolset.Core
                     Value = value,
                     Action = action.Value,
                     ComponentRef = componentId
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -6724,7 +6658,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
                         }
                         oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, "Signature"); // FileSearch signatures override parent signatures
+                        var newId = this.ParseSimpleRefElement(child, TupleDefinitions.Signature); // FileSearch signatures override parent signatures
                         id = new Identifier(AccessModifier.Private, newId);
                         signature = null;
                         break;
@@ -6741,21 +6675,19 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new IniLocatorTuple(sourceLineNumbers, id)
+                var tuple = this.Core.AddTuple(new IniLocatorTuple(sourceLineNumbers, id)
                 {
                     SignatureRef = id.Id,
                     FileName = this.GetMsiFilenameValue(shortName, name),
                     Section = section,
                     Key = key,
                     Type = type
-                };
+                });
 
                 if (CompilerConstants.IntegerNotSet != field)
                 {
                     tuple.Field = field;
                 }
-
-                this.Core.AddTuple(tuple);
             }
 
             return signature;
@@ -6779,7 +6711,7 @@ namespace WixToolset.Core
                     {
                     case "Shared":
                         shared = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Component", shared);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Component, shared);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -6841,9 +6773,22 @@ namespace WixToolset.Core
 
                         if (!this.Core.EncounteredError)
                         {
-                            var tuple = this.Core.CreateTuple(sourceLineNumbers, "PatchCertificates" == node.Name.LocalName ? TupleDefinitionType.MsiPatchCertificate : TupleDefinitionType.MsiPackageCertificate);
-                            tuple.Set(0, name);
-                            tuple.Set(1, name);
+                            if ("PatchCertificates" == node.Name.LocalName)
+                            {
+                                this.Core.AddTuple(new MsiPatchCertificateTuple(sourceLineNumbers)
+                                {
+                                    PatchCertificate = name,
+                                    DigitalCertificateRef = name,
+                                });
+                            }
+                            else
+                            {
+                                this.Core.AddTuple(new MsiPackageCertificateTuple(sourceLineNumbers)
+                                {
+                                    PackageCertificate = name,
+                                    DigitalCertificateRef = name,
+                                });
+                            }
                         }
                         break;
                     default:
@@ -7109,14 +7054,14 @@ namespace WixToolset.Core
             if (!this.Core.EncounteredError)
             {
                 // create the row that performs the upgrade (or downgrade)
-                var tuple = new UpgradeTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeCode,
                     Remove = removeFeatures,
                     MigrateFeatures = migrateFeatures,
                     IgnoreRemoveFailures = ignoreRemoveFailure,
                     ActionProperty = Common.UpgradeDetectedProperty
-                };
+                });
 
                 if (allowDowngrades)
                 {
@@ -7131,24 +7076,20 @@ namespace WixToolset.Core
                     tuple.VersionMaxInclusive = allowSameVersionUpgrades;
                 }
 
-                this.Core.AddTuple(tuple);
-
                 // Add launch condition that blocks upgrades
                 if (blockUpgrades)
                 {
-                    var conditionTuple = new LaunchConditionTuple(sourceLineNumbers)
+                    this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
                     {
                         Condition = Common.UpgradePreventedCondition,
                         Description = downgradeErrorMessage
-                    };
-
-                    this.Core.AddTuple(conditionTuple);
+                    });
                 }
 
                 // now create the Upgrade row and launch conditions to prevent downgrades (unless explicitly permitted)
                 if (!allowDowngrades)
                 {
-                    var upgradeTuple = new UpgradeTuple(sourceLineNumbers)
+                    this.Core.AddTuple(new UpgradeTuple(sourceLineNumbers)
                     {
                         UpgradeCode = upgradeCode,
                         VersionMin = productVersion,
@@ -7156,17 +7097,13 @@ namespace WixToolset.Core
                         OnlyDetect = true,
                         IgnoreRemoveFailures = ignoreRemoveFailure,
                         ActionProperty = Common.DowngradeDetectedProperty
-                    };
+                    });
 
-                    this.Core.AddTuple(upgradeTuple);
-
-                    var conditionTuple = new LaunchConditionTuple(sourceLineNumbers)
+                    this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
                     {
                         Condition = Common.DowngradePreventedCondition,
                         Description = downgradeErrorMessage
-                    };
-
-                    this.Core.AddTuple(conditionTuple);
+                    });
                 }
 
                 // finally, schedule RemoveExistingProducts
@@ -7232,7 +7169,7 @@ namespace WixToolset.Core
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Property", "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
                         break;
                     case "EmbedCab":
                         embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -7364,7 +7301,7 @@ namespace WixToolset.Core
             // add the row to the section
             if (!this.Core.EncounteredError)
             {
-                var tuple = new MediaTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
+                this.Core.AddTuple(new MediaTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
                 {
                     DiskId = id,
                     DiskPrompt = diskPrompt,
@@ -7373,9 +7310,7 @@ namespace WixToolset.Core
                     Source = source, // the Source column is only set when creating a patch
                     CompressionLevel = compressionLevel,
                     Layout = layout
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 if (null != symbols)
                 {
@@ -7441,7 +7376,7 @@ namespace WixToolset.Core
                         break;
                     case "DiskPrompt":
                         diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Property", "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
                         this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                         break;
                     case "EmbedCab":
@@ -7480,7 +7415,7 @@ namespace WixToolset.Core
                     DiskId = 1
                 });
 
-                var tuple = new WixMediaTemplateTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixMediaTemplateTuple(sourceLineNumbers)
                 {
                     CabinetTemplate = cabinetTemplate,
                     VolumeLabel = volumeLabel,
@@ -7488,7 +7423,7 @@ namespace WixToolset.Core
                     MaximumUncompressedMediaSize = maximumUncompressedMediaSize,
                     MaximumCabinetSizeForLargeFileSplitting = maximumCabinetSizeForLargeFileSplitting,
                     CompressionLevel = compressionLevel
-                };
+                });
 
                 //else
                 //{
@@ -7499,8 +7434,6 @@ namespace WixToolset.Core
                 //{
                 //    mediaTemplateRow.MaximumCabinetSizeForLargeFileSplitting = 0; // Default value of 0 corresponds to max size of 2048 MB (i.e. 2 GB)
                 //}
-
-                this.Core.AddTuple(tuple);
             }
         }
 
@@ -7530,7 +7463,7 @@ namespace WixToolset.Core
                         break;
                     case "DiskId":
                         diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Media", diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
                         break;
                     case "FileCompression":
                         var compress = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -7604,7 +7537,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixMergeTuple(sourceLineNumbers, id)
+                var tuple = this.Core.AddTuple(new WixMergeTuple(sourceLineNumbers, id)
                 {
                     DirectoryRef = directoryId,
                     SourceFile = sourceFile,
@@ -7612,11 +7545,9 @@ namespace WixToolset.Core
                     ConfigurationData = configData,
                     FileAttributes = attributes,
                     FeatureRef = Guid.Empty.ToString("B")
-                };
+                });
 
                 tuple.Set((int)WixMergeTupleFields.Language, language);
-
-                this.Core.AddTuple(tuple);
             }
         }
 
@@ -7701,7 +7632,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixMerge", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixMerge, id);
                         break;
                     case "Primary":
                         primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -7794,14 +7725,12 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    var tuple = new MIMETuple(sourceLineNumbers, new Identifier(AccessModifier.Private, contentType))
+                    this.Core.AddTuple(new MIMETuple(sourceLineNumbers, new Identifier(AccessModifier.Private, contentType))
                     {
                         ContentType = contentType,
                         ExtensionRef = extension,
                         CLSID = classId
-                    };
-
-                    this.Core.AddTuple(tuple);
+                    });
                 }
             }
             else if (YesNoType.No == advertise)
@@ -7902,12 +7831,10 @@ namespace WixToolset.Core
         {
             if (!this.Core.EncounteredError)
             {
-                var tuple = new PropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
+                this.Core.AddTuple(new PropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
                 {
                     Value = value
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -8063,13 +7990,11 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixPatchRefTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixPatchRefTuple(sourceLineNumbers)
                 {
                     Table = "*",
-                    PrimaryKeys = "*"
-                };
-
-                this.Core.AddTuple(tuple);
+                    PrimaryKeys = "*",
+                });
             }
         }
 
@@ -8112,13 +8037,11 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixPatchRefTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixPatchRefTuple(sourceLineNumbers)
                 {
                     Table = tableName,
                     PrimaryKeys = id
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -8232,16 +8155,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixPatchBaselineTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new WixPatchBaselineTuple(sourceLineNumbers, id)
                 {
                     DiskId = diskId ?? 1,
                     ValidationFlags = validationFlags,
                     BaselineFile = new IntermediateFieldPathValue { Path = baselineFile },
                     UpdateFile = new IntermediateFieldPathValue { Path = updateFile },
-                    TransformFile = new IntermediateFieldPathValue { Path = transformFile }
-                };
-
-                this.Core.AddTuple(tuple);
+                    TransformFile = new IntermediateFieldPathValue { Path = transformFile },
+                });
             }
         }
 

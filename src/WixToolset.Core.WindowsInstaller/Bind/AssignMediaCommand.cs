@@ -71,12 +71,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // When building merge module, all the files go to "#MergeModule.CABinet".
             if (SectionType.Module == this.Section.Type)
             {
-                var mergeModuleMediaRow = new MediaTuple();
-                mergeModuleMediaRow.Cabinet = "#MergeModule.CABinet";
+                var mergeModuleMediaTuple = this.Section.AddTuple(new MediaTuple
+                {
+                    Cabinet = "#MergeModule.CABinet",
+                });
 
-                this.Section.Tuples.Add(mergeModuleMediaRow);
-
-                filesByCabinetMedia.Add(mergeModuleMediaRow, new List<FileFacade>(this.FileFacades));
+                filesByCabinetMedia.Add(mergeModuleMediaTuple, new List<FileFacade>(this.FileFacades));
             }
             else if (mediaTemplateTable.Count == 0)
             {
@@ -212,13 +212,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // If there are uncompressed files and no MediaRow, create a default one.
             if (uncompressedFiles.Count > 0 && !this.Section.Tuples.OfType<MediaTuple>().Any())
             {
-                var defaultMediaRow = new MediaTuple(null, new Identifier(AccessModifier.Private, 1))
+                var defaultMediaRow = this.Section.AddTuple(new MediaTuple(null, new Identifier(AccessModifier.Private, 1))
                 {
-                    DiskId = 1
-                };
+                    DiskId = 1,
+                });
 
                 mediaRows.Add(1, defaultMediaRow);
-                this.Section.Tuples.Add(defaultMediaRow);
             }
         }
 
@@ -298,14 +297,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <returns></returns>
         private MediaTuple AddMediaRow(WixMediaTemplateTuple mediaTemplateTuple, int cabIndex)
         {
-            var currentMediaTuple = new MediaTuple(mediaTemplateTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, cabIndex));
-            currentMediaTuple.DiskId = cabIndex;
-            currentMediaTuple.Cabinet = String.Format(CultureInfo.InvariantCulture, this.CabinetNameTemplate, cabIndex);
-            currentMediaTuple.CompressionLevel = mediaTemplateTuple.CompressionLevel;
-
-            this.Section.Tuples.Add(currentMediaTuple);
-
-            return currentMediaTuple;
+            return this.Section.AddTuple(new MediaTuple(mediaTemplateTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, cabIndex))
+            {
+                DiskId = cabIndex,
+                Cabinet = String.Format(CultureInfo.InvariantCulture, this.CabinetNameTemplate, cabIndex),
+                CompressionLevel = mediaTemplateTuple.CompressionLevel,
+            });
         }
     }
 }

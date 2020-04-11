@@ -84,14 +84,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixApprovedExeForElevationTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new WixApprovedExeForElevationTuple(sourceLineNumbers, id)
                 {
                     Key = key,
                     ValueName = valueName,
-                    Attributes = attributes
-                };
-
-                this.Core.AddTuple(tuple);
+                    Attributes = attributes,
+                });
             }
         }
 
@@ -282,7 +280,7 @@ namespace WixToolset.Core
                         this.ParseBundleExtensionElement(child);
                         break;
                     case "BundleExtensionRef":
-                        this.ParseSimpleRefElement(child, "WixBundleExtension");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.WixBundleExtension);
                         break;
                     case "OptionalUpdateRegistration":
                         this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
@@ -303,7 +301,7 @@ namespace WixToolset.Core
                         this.ParseContainerElement(child);
                         break;
                     case "ContainerRef":
-                        this.ParseSimpleRefElement(child, "WixBundleContainer");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.WixBundleContainer);
                         break;
                     case "Log":
                         if (logSeen)
@@ -327,7 +325,7 @@ namespace WixToolset.Core
                         this.ParseSetVariableElement(child);
                         break;
                     case "SetVariableRef":
-                        this.ParseSimpleRefElement(child, "WixSetVariable");
+                        this.ParseSimpleRefElement(child, TupleDefinitions.WixSetVariable);
                         break;
                     case "Update":
                         this.ParseUpdateElement(child);
@@ -356,7 +354,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixBundleTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new WixBundleTuple(sourceLineNumbers)
                 {
                     UpgradeCode = upgradeCode,
                     Version = version,
@@ -375,7 +373,7 @@ namespace WixToolset.Core
                     Tag = tag,
                     Platform = this.CurrentPlatform,
                     ParentName = parentName,
-                };
+                });
 
                 if (!String.IsNullOrEmpty(logVariablePrefixAndExtension))
                 {
@@ -384,8 +382,6 @@ namespace WixToolset.Core
                     tuple.LogPrefix = split[1];
                     tuple.LogExtension = split[2];
                 }
-
-                this.Core.AddTuple(tuple);;
 
                 if (null != upgradeCode)
                 {
@@ -399,32 +395,32 @@ namespace WixToolset.Core
                 this.Core.AddTuple(new WixBundleContainerTuple(sourceLineNumbers, Compiler.BurnDefaultAttachedContainerId)
                 {
                     Name = "bundle-attached.cab",
-                    Type = ContainerType.Attached
+                    Type = ContainerType.Attached,
                 });
 
                 // Ensure that the bundle stores the well-known persisted values.
                 this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_NAME))
                 {
                     Hidden = false,
-                    Persisted = true
+                    Persisted = true,
                 });
 
                 this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE))
                 {
                     Hidden = false,
-                    Persisted = true
+                    Persisted = true,
                 });
 
                 this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_ORIGINAL_SOURCE_FOLDER))
                 {
                     Hidden = false,
-                    Persisted = true
+                    Persisted = true,
                 });
 
                 this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, BurnConstants.BURN_BUNDLE_LAST_USED_SOURCE))
                 {
                     Hidden = false,
-                    Persisted = true
+                    Persisted = true,
                 });
             }
         }
@@ -767,7 +763,7 @@ namespace WixToolset.Core
             }
             else
             {
-                this.Core.CreateSimpleReference(sourceLineNumbers, "WixBootstrapperApplication", id);
+                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBootstrapperApplication, id);
             }
         }
 
@@ -830,11 +826,10 @@ namespace WixToolset.Core
             // Add the BundleExtension.
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixBundleExtensionTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new WixBundleExtensionTuple(sourceLineNumbers, id)
                 {
                     PayloadRef = id.Id,
-                };
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -1194,7 +1189,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                tuple = new WixBundlePayloadTuple(sourceLineNumbers, id)
+                tuple = this.Core.AddTuple(new WixBundlePayloadTuple(sourceLineNumbers, id)
                 {
                     Name = String.IsNullOrEmpty(name) ? Path.GetFileName(sourceFile) : name,
                     SourceFile = new IntermediateFieldPathValue { Path = sourceFile },
@@ -1204,7 +1199,7 @@ namespace WixToolset.Core
                     DisplayName = displayName,
                     Description = description,
                     EnableSignatureValidation = (YesNoType.Yes == enableSignatureVerification)
-                };
+                });
 
                 if (null != remotePayload)
                 {
@@ -1216,8 +1211,6 @@ namespace WixToolset.Core
                     tuple.FileSize = remotePayload.Size;
                     tuple.Version = remotePayload.Version;
                 }
-
-                this.Core.AddTuple(tuple);
 
                 this.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId.Id, ComplexReferenceChildType.Payload, id.Id, previousType, previousId?.Id);
             }
@@ -1322,7 +1315,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePayloadGroup", id.Id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundlePayloadGroup, id.Id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -1377,15 +1370,13 @@ namespace WixToolset.Core
                 // TODO: Should we define our own enum for this, just to ensure there's no "cross-contamination"?
                 // TODO: Also, we could potentially include an 'Attributes' field to track things like
                 // 'before' vs. 'after', and explicit vs. inferred dependencies.
-                var tuple = new WixOrderingTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixOrderingTuple(sourceLineNumbers)
                 {
                     ItemType = type,
                     ItemIdRef = id,
                     DependsOnType = previousType,
                     DependsOnIdRef = previousId
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -2101,7 +2092,7 @@ namespace WixToolset.Core
                 attributes |= (YesNoType.Yes == permanent) ? WixBundlePackageAttributes.Permanent : 0;
                 attributes |= (YesNoType.Yes == visible) ? WixBundlePackageAttributes.Visible : 0;
 
-                var chainPackageTuple = new WixBundlePackageTuple(sourceLineNumbers, id)
+                var chainPackageTuple = this.Core.AddTuple(new WixBundlePackageTuple(sourceLineNumbers, id)
                 {
                     Type = packageType,
                     PayloadRef = id.Id,
@@ -2110,7 +2101,7 @@ namespace WixToolset.Core
                     CacheId = cacheId,
                     LogPathVariable = logPathVariable,
                     RollbackLogPathVariable = rollbackPathVariable,
-                };
+                });
 
                 if (YesNoAlwaysType.NotSet != cache)
                 {
@@ -2131,8 +2122,6 @@ namespace WixToolset.Core
                 {
                     chainPackageTuple.InstallSize = installSize;
                 }
-
-                this.Core.AddTuple(chainPackageTuple);
 
                 switch (packageType)
                 {
@@ -2370,7 +2359,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePackageGroup", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundlePackageGroup, id);
                         break;
                     case "After":
                         after = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -2425,7 +2414,7 @@ namespace WixToolset.Core
         {
             this.Core.AddTuple(new WixChainItemTuple(sourceLineNumbers, id));
 
-            var rollbackBoundary = new WixBundleRollbackBoundaryTuple(sourceLineNumbers, id);
+            var rollbackBoundary = this.Core.AddTuple(new WixBundleRollbackBoundaryTuple(sourceLineNumbers, id));
 
             if (YesNoType.NotSet != vital)
             {
@@ -2436,8 +2425,6 @@ namespace WixToolset.Core
             {
                 rollbackBoundary.Transaction = (transaction == YesNoType.Yes);
             }
-
-            this.Core.AddTuple(rollbackBoundary);
 
             this.CreateChainPackageMetaRows(sourceLineNumbers, parentType, parentId, ComplexReferenceChildType.Package, id.Id, previousType, previousId, null);
         }
@@ -2520,19 +2507,17 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixBundleMsiPropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, name))
+                var tuple = this.Core.AddTuple(new WixBundleMsiPropertyTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, packageId, name))
                 {
                     PackageRef = packageId,
                     Name = name,
                     Value = value
-                };
+                });
 
                 if (!String.IsNullOrEmpty(condition))
                 {
                     tuple.Condition = condition;
                 }
-
-                this.Core.AddTuple(tuple);
             }
         }
 
@@ -2554,7 +2539,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixBundlePackage", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundlePackage, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -2650,16 +2635,11 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixRelatedBundleTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixRelatedBundleTuple(sourceLineNumbers)
                 {
                     BundleId = id,
                     Action = actionType,
-                };
-
-                this.Core.AddTuple(tuple);
-                //var row = this.Core.CreateRow(sourceLineNumbers, TupleDefinitionType.WixRelatedBundle);
-                //row.Set(0, id);
-                //row.Set(1, (int)actionType);
+                });
             }
         }
 
@@ -2701,12 +2681,10 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixBundleUpdateTuple(sourceLineNumbers)
+                this.Core.AddTuple(new WixBundleUpdateTuple(sourceLineNumbers)
                 {
                     Location = location
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -2773,12 +2751,11 @@ namespace WixToolset.Core
 
             if (!this.Messaging.EncounteredError)
             {
-                var tuple = new WixSetVariableTuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new WixSetVariableTuple(sourceLineNumbers, id)
                 {
                     Value = value,
                     Type = type,
-                };
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -2848,15 +2825,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
+                this.Core.AddTuple(new WixBundleVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, name))
                 {
                     Value = value,
                     Type = type,
                     Hidden = hidden,
                     Persisted = persisted
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 

@@ -127,14 +127,12 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (uniqueTargetCodes.Add(targetCode))
                 {
-                    var tuple = new WixBundlePatchTargetCodeTuple(packagePayload.SourceLineNumbers)
+                    this.Section.AddTuple(new WixBundlePatchTargetCodeTuple(packagePayload.SourceLineNumbers)
                     {
                         PackageRef = packagePayload.Id.Id,
                         TargetCode = targetCode,
                         Attributes = attributes
-                    };
-
-                    this.Section.Tuples.Add(tuple);
+                    });
                 }
             }
 

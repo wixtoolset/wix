@@ -283,7 +283,7 @@ namespace WixToolset.Core.Burn.Bundles
                             attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesVersionMaxInclusive ? WixBundleRelatedPackageAttributes.MaxInclusive : 0;
                             attributes |= (recordAttributes & WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive) == WindowsInstallerConstants.MsidbUpgradeAttributesLanguagesExclusive ? WixBundleRelatedPackageAttributes.LangInclusive : 0;
 
-                            var related = new WixBundleRelatedPackageTuple(this.Facade.PackageTuple.SourceLineNumbers)
+                            this.Section.AddTuple(new WixBundleRelatedPackageTuple(this.Facade.PackageTuple.SourceLineNumbers)
                             {
                                 PackageRef = this.Facade.PackageId,
                                 RelatedId = record.GetString(1),
@@ -291,7 +291,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 MaxVersion = record.GetString(3),
                                 Languages = record.GetString(4),
                                 Attributes = attributes,
-                            };
+                            });
                         }
                     }
                 }
@@ -358,7 +358,7 @@ namespace WixToolset.Core.Burn.Bundles
                                         }
                                     }
 
-                                    var feature = new WixBundleMsiFeatureTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, this.Facade.PackageId, featureName))
+                                    this.Section.AddTuple(new WixBundleMsiFeatureTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, this.Facade.PackageId, featureName))
                                     {
                                         PackageRef = this.Facade.PackageId,
                                         Name = featureName,
@@ -370,7 +370,7 @@ namespace WixToolset.Core.Burn.Bundles
                                         Directory = allFeaturesResultRecord.GetString(7),
                                         Attributes = allFeaturesResultRecord.GetInteger(8),
                                         Size = size
-                                    };
+                                    });
                                 }
                             }
                         }
@@ -397,7 +397,7 @@ namespace WixToolset.Core.Burn.Bundles
                             var generatedId = Common.GenerateIdentifier("cab", packagePayload.Id.Id, cabinet);
                             var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, cabinet, "Cabinet", this.Facade.PackageTuple.SourceLineNumbers, BindStage.Normal);
 
-                            var tuple = new WixBundlePayloadTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+                            this.Section.AddTuple(new WixBundlePayloadTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
                             {
                                 Name = cabinetName,
                                 SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
@@ -409,9 +409,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 EnableSignatureValidation = packagePayload.EnableSignatureValidation,
                                 Packaging = packagePayload.Packaging,
                                 ParentPackagePayloadRef = packagePayload.Id.Id,
-                            };
-
-                            this.Section.Tuples.Add(tuple);
+                            });
                         }
                     }
                 }
@@ -477,7 +475,7 @@ namespace WixToolset.Core.Burn.Bundles
                                     var generatedId = Common.GenerateIdentifier("f", packagePayload.Id.Id, record.GetString(2));
                                     var payloadSourceFile = this.ResolveRelatedFile(packagePayload.SourceFile.Path, packagePayload.UnresolvedSourceFile, fileSourcePath, "File", this.Facade.PackageTuple.SourceLineNumbers, BindStage.Normal);
 
-                                    var tuple = new WixBundlePayloadTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+                                    this.Section.AddTuple(new WixBundlePayloadTuple(this.Facade.PackageTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
                                     {
                                         Name = name,
                                         SourceFile = new IntermediateFieldPathValue { Path = payloadSourceFile },
@@ -489,9 +487,7 @@ namespace WixToolset.Core.Burn.Bundles
                                         EnableSignatureValidation = packagePayload.EnableSignatureValidation,
                                         Packaging = packagePayload.Packaging,
                                         ParentPackagePayloadRef = packagePayload.Id.Id,
-                                    };
-
-                                    this.Section.Tuples.Add(tuple);
+                                    });
                                 }
                             }
 
@@ -506,14 +502,12 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void AddMsiProperty(WixBundleMsiPackageTuple msiPackage, string name, string value)
         {
-            var tuple = new WixBundleMsiPropertyTuple(msiPackage.SourceLineNumbers, new Identifier(AccessModifier.Private, msiPackage.Id.Id, name))
+            this.Section.AddTuple(new WixBundleMsiPropertyTuple(msiPackage.SourceLineNumbers, new Identifier(AccessModifier.Private, msiPackage.Id.Id, name))
             {
                 PackageRef = msiPackage.Id.Id,
                 Name = name,
-                Value = value
-            };
-
-            this.Section.Tuples.Add(tuple);
+                Value = value,
+            });
         }
 
         private void ImportDependencyProviders(WixBundleMsiPackageTuple msiPackage, Dtf.Database db)
@@ -535,7 +529,7 @@ namespace WixToolset.Core.Burn.Bundles
                             }
 
                             // Import the provider key and attributes.
-                            var tuple = new ProvidesDependencyTuple(msiPackage.SourceLineNumbers)
+                            this.Section.AddTuple(new ProvidesDependencyTuple(msiPackage.SourceLineNumbers)
                             {
                                 PackageRef = msiPackage.Id.Id,
                                 Key = record.GetString(1),
@@ -543,9 +537,7 @@ namespace WixToolset.Core.Burn.Bundles
                                 DisplayName = record.GetString(3) ?? this.Facade.PackageTuple.DisplayName,
                                 Attributes = record.GetInteger(4),
                                 Imported = true
-                            };
-
-                            this.Section.Tuples.Add(tuple);
+                            });
                         }
                     }
                 }

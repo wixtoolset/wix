@@ -26,13 +26,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (!createFolderTuplesByComponentRef.Contains(componentTuple.Id.Id))
                 {
-                    var createFolderTuple = new CreateFolderTuple(componentTuple.SourceLineNumbers)
+                    this.Section.AddTuple(new CreateFolderTuple(componentTuple.SourceLineNumbers)
                     {
                         DirectoryRef = componentTuple.DirectoryRef,
                         ComponentRef = componentTuple.Id.Id,
-                    };
-
-                    this.Section.Tuples.Add(createFolderTuple);
+                    });
                 }
             }
         }

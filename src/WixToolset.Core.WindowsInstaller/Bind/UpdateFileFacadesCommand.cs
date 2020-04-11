@@ -158,8 +158,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (null == facade.Hash)
                     {
-                        facade.Hash = new MsiFileHashTuple(facade.SourceLineNumber, facade.Identifier);
-                        this.Section.Tuples.Add(facade.Hash);
+                        facade.Hash = this.Section.AddTuple(new MsiFileHashTuple(facade.SourceLineNumber, facade.Identifier));
                     }
 
                     facade.Hash.Options = 0;
@@ -337,23 +336,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 // override directly authored value
                 var lookup = String.Concat(facade.ComponentRef, "/", name);
-                if (!assemblyNameTuples.TryGetValue(lookup, out var assemblyNameRow))
+                if (!assemblyNameTuples.TryGetValue(lookup, out var assemblyNameTuple))
                 {
-                    assemblyNameRow = new MsiAssemblyNameTuple(facade.SourceLineNumber);
-                    assemblyNameRow.ComponentRef = facade.ComponentRef;
-                    assemblyNameRow.Name = name;
-                    assemblyNameRow.Value = value;
+                    assemblyNameTuple = this.Section.AddTuple(new MsiAssemblyNameTuple(facade.SourceLineNumber)
+                    {
+                        ComponentRef = facade.ComponentRef,
+                        Name = name,
+                        Value = value,
+                    });
 
                     if (null == facade.AssemblyNames)
                     {
                         facade.AssemblyNames = new List<MsiAssemblyNameTuple>();
                     }
 
-                    facade.AssemblyNames.Add(assemblyNameRow);
-                    this.Section.Tuples.Add(assemblyNameRow);
+                    facade.AssemblyNames.Add(assemblyNameTuple);
                 }
 
-                assemblyNameRow.Value = value;
+                assemblyNameTuple.Value = value;
 
                 if (this.VariableCache != null)
                 {

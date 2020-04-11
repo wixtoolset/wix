@@ -225,7 +225,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Put the summary information that was extracted back in now that it is updated.
             foreach (var readSummaryInfo in summaryInfo.Values.OrderBy(s => s.PropertyId))
             {
-                section.Tuples.Add(readSummaryInfo);
+                section.AddTuple(readSummaryInfo);
             }
 
             this.SubStorages = subStorages;

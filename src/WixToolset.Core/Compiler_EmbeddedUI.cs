@@ -42,7 +42,7 @@ namespace WixToolset.Core
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         type = 0x2;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "Binary", source); // add a reference to the appropriate Binary
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, source); // add a reference to the appropriate Binary
                         break;
                     case "CommandLine":
                         commandLine = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -54,7 +54,7 @@ namespace WixToolset.Core
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         type = 0x12;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "File", source); // add a reference to the appropriate File
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, source); // add a reference to the appropriate File
                         break;
                     case "PropertySource":
                         if (null != source)
@@ -317,16 +317,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new MsiEmbeddedUITuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new MsiEmbeddedUITuple(sourceLineNumbers, id)
                 {
                     FileName = name,
                     EntryPoint = true,
                     SupportsBasicUI = supportsBasicUI,
                     MessageFilter = messageFilter,
                     Source = sourceFile
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
 
@@ -406,13 +404,11 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new MsiEmbeddedUITuple(sourceLineNumbers, id)
+                this.Core.AddTuple(new MsiEmbeddedUITuple(sourceLineNumbers, id)
                 {
                     FileName = name,
                     Source = sourceFile
-                };
-
-                this.Core.AddTuple(tuple);
+                });
             }
         }
     }

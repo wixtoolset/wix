@@ -171,15 +171,15 @@ namespace WixToolset.Core.Link
             // does WiX (although they do, currently). We probably want to "upgrade" this to a new
             // table that includes a sequence number, and then change the code that uses ordered
             // groups to read from that table instead.
-            foreach (Item item in orderedItems)
+            foreach (var item in orderedItems)
             {
-                var row = new WixGroupTuple(item.Row.SourceLineNumbers);
-                row.ParentId = parentId;
-                row.ParentType = (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), parentType);
-                row.ChildId = item.Id;
-                row.ChildType = (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), item.Type);
-
-                this.EntrySection.Tuples.Add(row);
+                this.EntrySection.AddTuple(new WixGroupTuple(item.Row.SourceLineNumbers)
+                {
+                    ParentId = parentId,
+                    ParentType = (ComplexReferenceParentType)Enum.Parse(typeof(ComplexReferenceParentType), parentType),
+                    ChildId = item.Id,
+                    ChildType = (ComplexReferenceChildType)Enum.Parse(typeof(ComplexReferenceChildType), item.Type),
+                });
             }
         }
 

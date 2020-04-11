@@ -211,9 +211,6 @@ namespace WixToolset.Core
                 // resolve the feature to feature connects
                 this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.Symbols);
 
-                // start generating OutputTables and OutputRows for all the sections in the output
-                var ensureTableRows = new List<IntermediateTuple>();
-
                 // Create the section to hold the linked content.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
 
@@ -239,7 +236,7 @@ namespace WixToolset.Core
                             case TupleDefinitionType.Class:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 2, 11, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(tuple, (int)ClassTupleFields.ComponentRef, (int)ClassTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
@@ -294,7 +291,7 @@ namespace WixToolset.Core
                             case TupleDefinitionType.Extension:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 1, 4, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(tuple, (int)ExtensionTupleFields.ComponentRef, (int)ExtensionTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
@@ -311,33 +308,29 @@ namespace WixToolset.Core
                             case TupleDefinitionType.Assembly:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 0, 1, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(tuple, (int)AssemblyTupleFields.ComponentRef, (int)AssemblyTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case TupleDefinitionType.PublishComponent:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 2, 4, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(tuple, (int)PublishComponentTupleFields.ComponentRef, (int)PublishComponentTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case TupleDefinitionType.Shortcut:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 3, 4, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(tuple, (int)ShortcutTupleFields.ComponentRef, (int)ShortcutTupleFields.Target, componentsToFeatures, multipleFeatureComponents);
                                 }
                                 break;
 
                             case TupleDefinitionType.TypeLib:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 2, 6, componentsToFeatures, multipleFeatureComponents);
+                                    this.ResolveFeatures(tuple, (int)TypeLibTupleFields.ComponentRef, (int)TypeLibTupleFields.FeatureRef, componentsToFeatures, multipleFeatureComponents);
                                 }
-                                break;
-
-                            case TupleDefinitionType.WixEnsureTable:
-                                ensureTableRows.Add(tuple);
                                 break;
 
 #if MOVE_TO_BACKEND
@@ -404,7 +397,7 @@ namespace WixToolset.Core
 
                         if (copyTuple)
                         {
-                            resolvedSection.Tuples.Add(tuple);
+                            resolvedSection.AddTuple(tuple);
                         }
                     }
                 }
@@ -414,13 +407,11 @@ namespace WixToolset.Core
                 {
                     foreach (var feature in connectToFeature.ConnectFeatures)
                     {
-                        var row = new WixFeatureModulesTuple
+                        resolvedSection.AddTuple(new WixFeatureModulesTuple
                         {
                             FeatureRef = feature,
                             WixMergeRef = connectToFeature.ChildId
-                        };
-
-                        resolvedSection.Tuples.Add(row);
+                        });
                     }
                 }
 
@@ -554,9 +545,9 @@ namespace WixToolset.Core
 #endif
 
                 // copy the wix variable rows to the output after all overriding has been accounted for.
-                foreach (var row in wixVariables.Values)
+                foreach (var tuple in wixVariables.Values)
                 {
-                    resolvedSection.Tuples.Add(row);
+                    resolvedSection.AddTuple(tuple);
                 }
 
                 // Bundles have groups of data that must be flattened in a way different from other types.
@@ -774,9 +765,8 @@ namespace WixToolset.Core
 
             foreach (var section in sections)
             {
-                var featureComponents = new List<FeatureComponentsTuple>();
-
-                foreach (var wixComplexReferenceRow in section.Tuples.OfType<WixComplexReferenceTuple>())
+                // Need ToList since we might want to add tuples while processing.
+                foreach (var wixComplexReferenceRow in section.Tuples.OfType<WixComplexReferenceTuple>().ToList())
                 {
                     ConnectToFeature connection;
                     switch (wixComplexReferenceRow.ParentType)
@@ -810,11 +800,11 @@ namespace WixToolset.Core
                                     }
 
                                     // add a row to the FeatureComponents table
-                                    var featureComponent = new FeatureComponentsTuple();
-                                    featureComponent.FeatureRef = wixComplexReferenceRow.Parent;
-                                    featureComponent.ComponentRef = wixComplexReferenceRow.Child;
-
-                                    featureComponents.Add(featureComponent);
+                                    section.AddTuple(new FeatureComponentsTuple
+                                    {
+                                        FeatureRef = wixComplexReferenceRow.Parent,
+                                        ComponentRef = wixComplexReferenceRow.Child,
+                                    });
 
                                     // index the component for finding orphaned records
                                     var symbolName = String.Concat("Component:", wixComplexReferenceRow.Child);
@@ -878,10 +868,12 @@ namespace WixToolset.Core
                                         componentsToModules.Add(wixComplexReferenceRow.Child, wixComplexReferenceRow); // should always be new
 
                                         // add a row to the ModuleComponents table
-                                        var moduleComponent = new ModuleComponentsTuple();
-                                        moduleComponent.Component = wixComplexReferenceRow.Child;
-                                        moduleComponent.ModuleID = wixComplexReferenceRow.Parent;
-                                        moduleComponent.Language = Convert.ToInt32(wixComplexReferenceRow.ParentLanguage);
+                                        section.AddTuple(new ModuleComponentsTuple
+                                        {
+                                            Component = wixComplexReferenceRow.Child,
+                                            ModuleID = wixComplexReferenceRow.Parent,
+                                            Language = Convert.ToInt32(wixComplexReferenceRow.ParentLanguage),
+                                        });
                                     }
 
                                     // index the component for finding orphaned records
@@ -930,11 +922,6 @@ namespace WixToolset.Core
                             // Note: Groups have been processed before getting here so they are not handled by any case above.
                             throw new InvalidOperationException(String.Format(CultureInfo.CurrentUICulture, "Unexpected complex reference child type: {0}", Enum.GetName(typeof(ComplexReferenceParentType), wixComplexReferenceRow.ParentType)));
                     }
-                }
-
-                foreach (var featureComponent in featureComponents)
-                {
-                    section.Tuples.Add(featureComponent);
                 }
             }
         }
@@ -1048,7 +1035,7 @@ namespace WixToolset.Core
                         (ComplexReferenceParentType.ComponentGroup != wixComplexReferenceRow.ParentType) &&
                         (ComplexReferenceParentType.PatchFamilyGroup != wixComplexReferenceRow.ParentType))
                     {
-                        section.Tuples.Add(wixComplexReferenceRow);
+                        section.AddTuple(wixComplexReferenceRow);
                     }
                 }
             }
@@ -1322,15 +1309,15 @@ namespace WixToolset.Core
         /// <summary>
         /// Resolve features for columns that have null guid placeholders.
         /// </summary>
-        /// <param name="rows">Rows to resolve.</param>
+        /// <param name="tuple">Tuple to resolve.</param>
         /// <param name="connectionColumn">Number of the column containing the connection identifier.</param>
         /// <param name="featureColumn">Number of the column containing the feature.</param>
         /// <param name="connectToFeatures">Connect to feature complex references.</param>
         /// <param name="multipleFeatureComponents">Hashtable of known components under multiple features.</param>
-        private void ResolveFeatures(IntermediateTuple row, int connectionColumn, int featureColumn, ConnectToFeatureCollection connectToFeatures, Hashtable multipleFeatureComponents)
+        private void ResolveFeatures(IntermediateTuple tuple, int connectionColumn, int featureColumn, ConnectToFeatureCollection connectToFeatures, Hashtable multipleFeatureComponents)
         {
-            var connectionId = row.AsString(connectionColumn);
-            var featureId = row.AsString(featureColumn);
+            var connectionId = tuple.AsString(connectionColumn);
+            var featureId = tuple.AsString(featureColumn);
 
             if (EmptyGuid == featureId)
             {
@@ -1338,14 +1325,14 @@ namespace WixToolset.Core
 
                 if (null == connection)
                 {
-                    // display an error for the component or merge module as approrpriate
+                    // display an error for the component or merge module as appropriate
                     if (null != multipleFeatureComponents)
                     {
-                        this.Messaging.Write(ErrorMessages.ComponentExpectedFeature(row.SourceLineNumbers, connectionId, row.Definition.Name, row.Id.Id));
+                        this.Messaging.Write(ErrorMessages.ComponentExpectedFeature(tuple.SourceLineNumbers, connectionId, tuple.Definition.Name, tuple.Id.Id));
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.MergeModuleExpectedFeature(row.SourceLineNumbers, connectionId));
+                        this.Messaging.Write(ErrorMessages.MergeModuleExpectedFeature(tuple.SourceLineNumbers, connectionId));
                     }
                 }
                 else
@@ -1373,7 +1360,7 @@ namespace WixToolset.Core
                     }
 
                     // set the feature
-                    row.Set(featureColumn, connection.PrimaryFeature);
+                    tuple.Set(featureColumn, connection.PrimaryFeature);
                 }
             }
         }

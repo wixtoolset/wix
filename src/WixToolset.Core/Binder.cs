@@ -81,16 +81,16 @@ namespace WixToolset.Core
             var executingAssembly = Assembly.GetExecutingAssembly();
             var fileVersion = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
 
-            var buildInfoTuple = new WixBuildInfoTuple();
-            buildInfoTuple.WixVersion = fileVersion.FileVersion;
-            buildInfoTuple.WixOutputFile = outputFile;
+            var buildInfoTuple = entrySection.AddTuple(new WixBuildInfoTuple()
+            {
+                WixVersion = fileVersion.FileVersion,
+                WixOutputFile = outputFile,
+            });
 
             if (!String.IsNullOrEmpty(outputPdbPath))
             {
                 buildInfoTuple.WixPdbFile = outputPdbPath;
             }
-
-            entrySection.Tuples.Add(buildInfoTuple);
         }
     }
 }

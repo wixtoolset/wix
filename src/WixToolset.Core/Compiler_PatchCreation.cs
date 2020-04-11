@@ -258,13 +258,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ImageFamiliesTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new ImageFamiliesTuple(sourceLineNumbers)
                 {
                     Family = name,
                     MediaSrcPropName = mediaSrcProp,
                     DiskPrompt = diskPrompt,
                     VolumeLabel = volumeLabel
-                };
+                });
 
                 if (CompilerConstants.IntegerNotSet != diskId)
                 {
@@ -275,8 +275,6 @@ namespace WixToolset.Core
                 {
                     tuple.FileSequenceStart = sequenceStart;
                 }
-
-                this.Core.AddTuple(tuple);
             }
         }
 
@@ -675,16 +673,14 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new TargetFilesOptionalDataTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new TargetFilesOptionalDataTuple(sourceLineNumbers)
                 {
                     Target = target,
                     FTK = file,
                     SymbolPaths = symbols,
                     IgnoreOffsets = ignoreOffsets,
-                    IgnoreLengths = ignoreLengths
-                };
-
-                this.Core.AddTuple(tuple);
+                    IgnoreLengths = ignoreLengths,
+                });
 
                 if (null != protectOffsets)
                 {
@@ -695,7 +691,7 @@ namespace WixToolset.Core
                         Family = family,
                         FTK = file,
                         RetainOffsets = protectOffsets,
-                        RetainLengths = protectLengths
+                        RetainLengths = protectLengths,
                     });
                 }
             }
@@ -797,15 +793,15 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new ExternalFilesTuple(sourceLineNumbers)
+                var tuple = this.Core.AddTuple(new ExternalFilesTuple(sourceLineNumbers)
                 {
                     Family = family,
                     FTK = file,
                     FilePath = source,
                     SymbolPaths = symbols,
                     IgnoreOffsets = ignoreOffsets,
-                    IgnoreLengths = ignoreLengths
-                };
+                    IgnoreLengths = ignoreLengths,
+                });
 
                 if (null != protectOffsets)
                 {
@@ -817,8 +813,6 @@ namespace WixToolset.Core
                     tuple.Order = order;
                 }
 
-                this.Core.AddTuple(tuple);
-
                 if (null != protectOffsets)
                 {
                     this.Core.AddTuple(new FamilyFileRangesTuple(sourceLineNumbers)
@@ -826,7 +820,7 @@ namespace WixToolset.Core
                         Family = family,
                         FTK = file,
                         RetainOffsets = protectOffsets,
-                        RetainLengths = protectLengths
+                        RetainLengths = protectLengths,
                     });
                 }
             }
@@ -1257,7 +1251,7 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttributes(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Target", "ProductCode"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "TargetImages", target);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.TargetImages, target);
                         break;
                     case "Sequence":
                         sequence = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
@@ -1288,15 +1282,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new PatchSequenceTuple(sourceLineNumbers)
+                this.Core.AddTuple(new PatchSequenceTuple(sourceLineNumbers)
                 {
                     PatchFamily = family,
                     Target = target,
                     Sequence = sequence,
-                    Supersede = attributes
-                };
-
-                this.Core.AddTuple(tuple);
+                    Supersede = attributes,
+                });
             }
         }
 
@@ -1306,7 +1298,7 @@ namespace WixToolset.Core
             {
                 Company = company,
                 Property = property,
-                Value = value
+                Value = value,
             });
         }
     }

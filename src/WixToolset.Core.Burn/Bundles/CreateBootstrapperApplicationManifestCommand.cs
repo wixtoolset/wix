@@ -285,7 +285,7 @@ namespace WixToolset.Core.Burn.Bundles
         {
             var generatedId = Common.GenerateIdentifier("ux", BurnCommon.BADataFileName);
 
-            var tuple = new WixBundlePayloadTuple(this.BundleTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
+            var tuple = this.Section.AddTuple(new WixBundlePayloadTuple(this.BundleTuple.SourceLineNumbers, new Identifier(AccessModifier.Private, generatedId))
             {
                 Name = BurnCommon.BADataFileName,
                 SourceFile = new IntermediateFieldPathValue { Path = baManifestPath },
@@ -294,15 +294,13 @@ namespace WixToolset.Core.Burn.Bundles
                 ContainerRef = BurnConstants.BurnUXContainerName,
                 EmbeddedId = String.Format(CultureInfo.InvariantCulture, BurnCommon.BurnUXContainerEmbeddedIdFormat, this.LastUXPayloadIndex),
                 Packaging = PackagingType.Embedded,
-            };
+            });
 
             var fileInfo = new FileInfo(baManifestPath);
 
             tuple.FileSize = (int)fileInfo.Length;
 
             tuple.Hash = BundleHashAlgorithm.Hash(fileInfo);
-
-            this.Section.Tuples.Add(tuple);
 
             return tuple;
         }

@@ -197,14 +197,12 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new WixPatchIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, patchId))
+                this.Core.AddTuple(new WixPatchIdTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, patchId))
                 {
                     ClientPatchId = clientPatchId,
                     OptimizePatchSizeForLargeFiles = optimizePatchSizeForLargeFiles,
-                    ApiPatchingSymbolFlags = apiPatchingSymbolFlags
-                };
-
-                this.Core.AddTuple(tuple);
+                    ApiPatchingSymbolFlags = apiPatchingSymbolFlags,
+                });
 
                 if (allowRemoval)
                 {
@@ -427,15 +425,13 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var tuple = new MsiPatchSequenceTuple(sourceLineNumbers)
+                this.Core.AddTuple(new MsiPatchSequenceTuple(sourceLineNumbers)
                 {
                     PatchFamily = id.Id,
                     ProductCode = productCode,
                     Sequence = version,
                     Attributes = attributes
-                };
-
-                this.Core.AddTuple(tuple);
+                });
 
                 if (ComplexReferenceParentType.Unknown != parentType)
                 {
@@ -536,7 +532,7 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, "WixPatchFamilyGroup", id);
+                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixPatchFamilyGroup, id);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
