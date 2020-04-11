@@ -6,12 +6,13 @@ namespace TablesAndTuples
 {
     class WixTableDefinition
     {
-        public WixTableDefinition(string name, IEnumerable<WixColumnDefinition> columns, bool unreal, string tupleDefinitionName, bool? tupleIdIsPrimaryKey)
+        public WixTableDefinition(string name, IEnumerable<WixColumnDefinition> columns, bool unreal, bool tupleless, string tupleDefinitionName, bool? tupleIdIsPrimaryKey)
         {
             this.Name = name;
             this.Unreal = unreal;
             this.Columns = columns?.ToArray();
-            this.TupleDefinitionName = tupleDefinitionName ?? name;
+            this.Tupleless = tupleless;
+            this.TupleDefinitionName = tupleless ? null : tupleDefinitionName ?? name.Replace("_", "");
             this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey ?? DeriveTupleIdIsPrimaryKey(this.Columns);
         }
 
@@ -25,6 +26,8 @@ namespace TablesAndTuples
 
         public bool TupleIdIsPrimaryKey { get; }
 
+        public bool Tupleless { get; }
+
         static WixTableDefinition Read(XmlReader reader)
         {
             var empty = reader.IsEmptyElement;
@@ -32,6 +35,7 @@ namespace TablesAndTuples
             string tupleDefinitionName = null;
             var unreal = false;
             bool? tupleIdIsPrimaryKey = null;
+            var tupleless = false;
 
             while (reader.MoveToNextAttribute())
             {
@@ -45,6 +49,9 @@ namespace TablesAndTuples
                         break;
                     case "tupleIdIsPrimaryKey":
                         tupleIdIsPrimaryKey = reader.Value.Equals("yes");
+                        break;
+                    case "tupleless":
+                        tupleless = reader.Value.Equals("yes");
                         break;
                     case "unreal":
                         unreal = reader.Value.Equals("yes");
@@ -91,7 +98,7 @@ namespace TablesAndTuples
                 }
             }
 
-            return new WixTableDefinition(name, columns.ToArray(), unreal, tupleDefinitionName, tupleIdIsPrimaryKey);
+            return new WixTableDefinition(name, columns.ToArray(), unreal, tupleless, tupleDefinitionName, tupleIdIsPrimaryKey);
         }
 
         static bool DeriveTupleIdIsPrimaryKey(WixColumnDefinition[] columns)

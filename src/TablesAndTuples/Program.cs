@@ -65,6 +65,10 @@ namespace TablesAndTuples
 
             foreach (var tableDefinition in tableDefinitions)
             {
+                if (tableDefinition.Tupleless)
+                {
+                    continue;
+                }
                 var tupleType = tableDefinition.TupleDefinitionName;
 
                 var fields = new JsonArray();
@@ -199,9 +203,10 @@ namespace TablesAndTuples
                 "            },");
             var unrealDef =
                 "            unreal: true,";
+            var tupleNameDef =
+                "            tupleDefinitionName: {1}TupleDefinitions.{2}.Name,";
             var endTableDef = String.Join(Environment.NewLine,
-                "            tupleDefinitionName: {1}TupleDefinitions.{2}.Name,",
-                "            tupleIdIsPrimaryKey: {3}",
+                "            tupleIdIsPrimaryKey: {1}",
                 "        );",
                 "");
             var startAllTablesDef = String.Join(Environment.NewLine,
@@ -247,7 +252,7 @@ namespace TablesAndTuples
                     }
                     if (!String.IsNullOrEmpty(columnDefinition.Description))
                     {
-                        sb.AppendFormat(", description: \"{0}\"", columnDefinition.Description);
+                        sb.AppendFormat(", description: \"{0}\"", columnDefinition.Description.Replace("\\", "\\\\").Replace("\"", "\\\""));
                     }
                     if (columnDefinition.ModularizeType.HasValue && columnDefinition.ModularizeType.Value != ColumnModularizeType.None)
                     {
@@ -272,7 +277,11 @@ namespace TablesAndTuples
                 {
                     sb.AppendLine(unrealDef);
                 }
-                sb.AppendLine(endTableDef.Replace("{1}", prefix).Replace("{2}", tableDefinition.TupleDefinitionName).Replace("{3}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
+                if (!tableDefinition.Tupleless)
+                {
+                    sb.AppendLine(tupleNameDef.Replace("{1}", prefix).Replace("{2}", tableDefinition.TupleDefinitionName));
+                }
+                sb.AppendLine(endTableDef.Replace("{1}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
             }
             sb.AppendLine(startAllTablesDef);
             foreach (var tableDefinition in tableDefinitions)
@@ -290,19 +299,21 @@ namespace TablesAndTuples
             var ns = prefix ?? "Data";
             var toString = String.IsNullOrEmpty(prefix) ? null : ".ToString()";
 
-            var startTupleDef = String.Join(Environment.NewLine,
+            var startFileDef = String.Join(Environment.NewLine,
                 "// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.",
                 "",
                 "namespace WixToolset.{2}",
-                "{",
-                "    using WixToolset.Data;",
+                "{");
+            var usingDataDef =
+                "    using WixToolset.Data;";
+            var startTupleDef = String.Join(Environment.NewLine,
                 "    using WixToolset.{2}.Tuples;",
                 "",
                 "    public static partial class {3}TupleDefinitions",
                 "    {",
                 "        public static readonly IntermediateTupleDefinition {1} = new IntermediateTupleDefinition(",
                 "            {3}TupleDefinitionType.{1}{4},",
-                "            new[]",
+                "            new{5}[]",
                 "            {");
             var fieldDef =
                 "                new IntermediateFieldDefinition(nameof({1}TupleFields.{2}), IntermediateFieldType.{3}),";
@@ -313,9 +324,8 @@ namespace TablesAndTuples
                 "}",
                 "",
                 "namespace WixToolset.{2}.Tuples",
-                "{",
-                "    using WixToolset.Data;",
-                "",
+                "{");
+            var startEnumDef = String.Join(Environment.NewLine,
                 "    public enum {1}TupleFields",
                 "    {");
             var fieldEnum =
@@ -338,7 +348,7 @@ namespace TablesAndTuples
                 "",
                 "        public {4} {2}",
                 "        {",
-                "            get => this.Fields[(int){1}TupleFields.{2}].{5};",
+                "            get => {6}this.Fields[(int){1}TupleFields.{2}]{5};",
                 "            set => this.Set((int){1}TupleFields.{2}, value);",
                 "        }");
             var endTuple = String.Join(Environment.NewLine,
@@ -347,20 +357,34 @@ namespace TablesAndTuples
 
             var sb = new StringBuilder();
 
-            sb.AppendLine(startTupleDef.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix).Replace("{4}", toString));
+            sb.AppendLine(startFileDef.Replace("{2}", ns));
+            if (ns != "Data")
+            {
+                sb.AppendLine(usingDataDef);
+            }
+            sb.AppendLine(startTupleDef.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix).Replace("{4}", toString).Replace("{5}", tupleFields.Any() ? null : " IntermediateFieldDefinition"));
             foreach (var field in tupleFields)
             {
-                sb.AppendLine(fieldDef.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type).Replace("{4}", field.ClrType).Replace("{5}", field.AsFunction));
+                sb.AppendLine(fieldDef.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type));
             }
             sb.AppendLine(endTupleDef.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix));
+            if (ns != "Data")
+            {
+                sb.AppendLine(usingDataDef);
+                sb.AppendLine();
+            }
+            sb.AppendLine(startEnumDef.Replace("{1}", tupleName));
             foreach (var field in tupleFields)
             {
-                sb.AppendLine(fieldEnum.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type).Replace("{4}", field.ClrType).Replace("{5}", field.AsFunction));
+                sb.AppendLine(fieldEnum.Replace("{1}", tupleName).Replace("{2}", field.Name));
             }
             sb.AppendLine(startTuple.Replace("{1}", tupleName).Replace("{2}", ns).Replace("{3}", prefix));
             foreach (var field in tupleFields)
             {
-                sb.AppendLine(fieldProp.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type).Replace("{4}", field.ClrType).Replace("{5}", field.AsFunction));
+                var useCast = ns == "Data" && field.AsFunction != "AsPath()";
+                var cast = useCast ? $"({field.ClrType})" : null;
+                var asFunction = useCast ? null : $".{field.AsFunction}";
+                sb.AppendLine(fieldProp.Replace("{1}", tupleName).Replace("{2}", field.Name).Replace("{3}", field.Type).Replace("{4}", field.ClrType).Replace("{5}", asFunction).Replace("{6}", cast));
             }
             sb.Append(endTuple);
 
