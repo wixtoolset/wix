@@ -12,8 +12,5 @@ namespace WixToolset.Data
 
         /// <summary>No .wixpdb file.</summary>
         None,
-
-        /// <summary>A .wixpdb file with partial, pre-bind data. No other output will be generated.</summary>
-        Partial,
     }
 }
