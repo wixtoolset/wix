@@ -66,15 +66,6 @@ namespace WixToolsetTest.BuildTasks
         }
 
         [Fact]
-        public void CanBuildWithPartialWixpdb()
-        {
-            this.AssertWixpdb("partial", new[]
-                {
-                    @"bin\en-US\MsiPackage.wixpdb",
-                });
-        }
-
-        [Fact]
         public void CanBuildWithNoWixpdb()
         {
             this.AssertWixpdb("NONE", new[]

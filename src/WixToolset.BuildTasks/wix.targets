@@ -233,8 +233,8 @@
 
     <Error
       Code="WIX103"
-      Condition=" '$(WixPdbType)' != 'none' and '$(WixPdbType)' != 'full' and '$(WixPdbType)' != 'partial' "
-      Text="The WixPdbType property '$(WixPdbType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. Supported values are: 'full', 'none', 'partial'" />
+      Condition=" '$(WixPdbType)' != 'none' and '$(WixPdbType)' != 'full' "
+      Text="The WixPdbType property '$(WixPdbType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. Supported values are: 'full', 'none'" />
 
   </Target>
 
