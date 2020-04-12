@@ -567,6 +567,12 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.TooManyProgIds, "Class '{0}' tried to use ProgId '{1}' which has already been associated with class '{2}'. This information will be left out of the decompiled output.", clsId, progId, otherClsId);
         }
 
+        public static Message TupleNotTranslatedToOutput(IntermediateTuple tuple)
+        {
+            var tupleString = $"TupleName: '{tuple.Definition.Name}', Id: '{tuple.Id?.Id}'";
+            return Message(tuple.SourceLineNumbers, Ids.TupleNotTranslatedToOutput, "The binder doesn't know how to place the following tuple into the output: {0}", tupleString);
+        }
+
         public static Message UnableToFindFileFromCabOrImage(SourceLineNumber sourceLineNumbers, string existingFileSpec, string srcFileSpec)
         {
             return Message(sourceLineNumbers, Ids.UnableToFindFileFromCabOrImage, "Unable to find existing file {0} to place in src location {1}.  Will likely cause a linker break.", existingFileSpec, srcFileSpec);
@@ -773,6 +779,7 @@ namespace WixToolset.Data
             BackslashTerminateInlineDirectorySyntax = 1147,
             VersionTruncated = 1148,
             ServiceConfigFamilyNotSupported = 1149,
+            TupleNotTranslatedToOutput = 1150,
         }
     }
 }
