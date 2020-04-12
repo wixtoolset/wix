@@ -2,7 +2,6 @@
 
 namespace WixToolset.Extensibility.Services
 {
-    using System.Collections.Generic;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
 
@@ -11,6 +10,7 @@ namespace WixToolset.Extensibility.Services
     /// </summary>
     public interface IWindowsInstallerBackendHelper
     {
-        bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateTuple tuple, WindowsInstallerData output, IEnumerable<TableDefinition> tableDefinitions);
+        Row CreateRow(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinition tableDefinition);
+        bool TryAddTupleToOutputMatchingTableDefinitions(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions);
     }
 }

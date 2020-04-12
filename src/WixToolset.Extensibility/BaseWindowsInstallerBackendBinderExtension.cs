@@ -53,11 +53,11 @@ namespace WixToolset.Extensibility
 
         public virtual string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory) => null;
 
-        public virtual bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
+        public virtual bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
             if (this.TableDefinitions.Any())
             {
-                return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, this.TableDefinitions);
+                return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(section, tuple, output, tableDefinitions);
             }
 
             return false;
