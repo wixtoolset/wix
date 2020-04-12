@@ -56,6 +56,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             foreach (var tuple in this.Section.Tuples)
             {
+                var unknownTuple = false;
                 switch (tuple.Definition.Type)
                 {
                 case TupleDefinitionType.AppSearch:
@@ -192,10 +193,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple);
                     break;
 
-                case TupleDefinitionType.MustBeFromAnExtension:
-                    this.AddTupleFromExtension(tuple);
-                    break;
-
                 case TupleDefinitionType.WixCustomRow:
                     this.AddWixCustomRowTuple((WixCustomRowTuple)tuple);
                     break;
@@ -215,9 +212,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 case TupleDefinitionType.WixCustomTable:
                     break;
 
-                default:
-                    this.AddTupleDefaultly(tuple);
+                case TupleDefinitionType.MustBeFromAnExtension:
+                    unknownTuple = !this.AddTupleFromExtension(tuple);
                     break;
+
+                default:
+                    unknownTuple = !this.AddTupleDefaultly(tuple);
+                    break;
+                }
+
+                if (unknownTuple)
+                {
+                    this.Messaging.Write(WarningMessages.TupleNotTranslatedToOutput(tuple));
                 }
             }
         }
@@ -1029,18 +1035,20 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.MaximumCabinetSizeForLargeFileSplitting = tuple.MaximumCabinetSizeForLargeFileSplitting ?? MaxValueOfMaxCabSizeForLargeFileSplitting;
         }
 
-        private void AddTupleFromExtension(IntermediateTuple tuple)
+        private bool AddTupleFromExtension(IntermediateTuple tuple)
         {
             foreach (var extension in this.BackendExtensions)
             {
                 if (extension.TryAddTupleToOutput(this.Section, tuple, this.Output, this.TableDefinitions))
                 {
-                    break;
+                    return true;
                 }
             }
+
+            return false;
         }
 
-        private void AddTupleDefaultly(IntermediateTuple tuple) =>
+        private bool AddTupleDefaultly(IntermediateTuple tuple) =>
             this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(this.Section, tuple, this.Output, this.TableDefinitions);
 
         private static OutputType SectionTypeToOutputType(SectionType type)
