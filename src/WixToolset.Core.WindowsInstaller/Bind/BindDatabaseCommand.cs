@@ -33,6 +33,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
+            this.WindowsInstallerBackendHelper = context.ServiceProvider.GetService<IWindowsInstallerBackendHelper>();
 
             this.PathResolver = this.ServiceProvider.GetService<IPathResolver>();
 
@@ -59,6 +60,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IWindowsInstallerBackendHelper WindowsInstallerBackendHelper { get; }
 
         private IPathResolver PathResolver { get; }
 
@@ -343,7 +346,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
             {
-                var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions);
+                var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions, this.WindowsInstallerBackendHelper);
                 command.Execute();
 
                 output = command.Output;

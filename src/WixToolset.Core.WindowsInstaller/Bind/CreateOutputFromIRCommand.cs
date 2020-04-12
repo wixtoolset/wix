@@ -20,15 +20,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private static readonly char[] ColonCharacter = new[] { ':' };
 
-        public CreateOutputFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions)
+        public CreateOutputFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Messaging = messaging;
             this.Section = section;
             this.TableDefinitions = tableDefinitions;
             this.BackendExtensions = backendExtensions;
+            this.BackendHelper = backendHelper;
         }
 
         private IEnumerable<IWindowsInstallerBackendBinderExtension> BackendExtensions { get; }
+
+        private IWindowsInstallerBackendHelper BackendHelper { get; }
 
         private IMessaging Messaging { get; }
 
@@ -171,10 +174,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 case TupleDefinitionType.Shortcut:
                     this.AddShortcutTuple((ShortcutTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.SummaryInformation:
-                    this.AddTupleDefaultly(tuple, tableName: "_SummaryInformation");
                     break;
 
                 case TupleDefinitionType.TextStyle:
@@ -1034,48 +1033,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             foreach (var extension in this.BackendExtensions)
             {
-                if (extension.TryAddTupleToOutput(tuple, this.Output))
+                if (extension.TryAddTupleToOutput(this.Section, tuple, this.Output, this.TableDefinitions))
                 {
                     break;
                 }
             }
         }
 
-        private void AddTupleDefaultly(IntermediateTuple tuple, string tableName = null)
-        {
-            if (!this.TableDefinitions.TryGet(tableName ?? tuple.Definition.Name, out var tableDefinition))
-            {
-                return;
-            }
-
-            var row = this.CreateRow(tuple, tableDefinition);
-            var rowOffset = 0;
-
-            if (tableDefinition.TupleIdIsPrimaryKey)
-            {
-                row[0] = tuple.Id.Id;
-                rowOffset = 1;
-            }
-
-            for (var i = 0; i < tuple.Fields.Length; ++i)
-            {
-                if (i < tableDefinition.Columns.Length)
-                {
-                    var column = tableDefinition.Columns[i + rowOffset];
-
-                    switch (column.Type)
-                    {
-                        case ColumnType.Number:
-                            row[i + rowOffset] = column.Nullable ? tuple.AsNullableNumber(i) : tuple.AsNumber(i);
-                            break;
-
-                        default:
-                            row[i + rowOffset] = tuple.AsString(i);
-                            break;
-                    }
-                }
-            }
-        }
+        private void AddTupleDefaultly(IntermediateTuple tuple) =>
+            this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(this.Section, tuple, this.Output, this.TableDefinitions);
 
         private static OutputType SectionTypeToOutputType(SectionType type)
         {
@@ -1097,17 +1063,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private Row CreateRow(IntermediateTuple tuple, string tableDefinitionName) => this.CreateRow(tuple, this.TableDefinitions[tableDefinitionName]);
+        private Row CreateRow(IntermediateTuple tuple, string tableDefinitionName) =>
+            this.CreateRow(tuple, this.TableDefinitions[tableDefinitionName]);
 
-        private Row CreateRow(IntermediateTuple tuple, TableDefinition tableDefinition)
-        {
-            var table = this.Output.EnsureTable(tableDefinition);
-
-            var row = table.CreateRow(tuple.SourceLineNumbers);
-            row.SectionId = this.Section.Id;
-
-            return row;
-        }
+        private Row CreateRow(IntermediateTuple tuple, TableDefinition tableDefinition) =>
+            this.BackendHelper.CreateRow(this.Section, tuple, this.Output, tableDefinition);
 
         private static string GetMsiFilenameValue(string shortName, string longName)
         {

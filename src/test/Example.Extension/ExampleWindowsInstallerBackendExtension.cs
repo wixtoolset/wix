@@ -11,15 +11,14 @@ namespace Example.Extension
     {
         public override IEnumerable<TableDefinition> TableDefinitions => ExampleTableDefinitions.All;
 
-        public override bool TryAddTupleToOutput(IntermediateTuple tuple, WindowsInstallerData output)
+        public override bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
 #if ALTERNATIVE_TO_USING_HELPER
             switch (tuple.Definition.Name)
             {
-                case TupleDefinitions.ExampleName:
+                case ExampleTupleDefinitions.ExampleName:
                     {
-                        var table = output.EnsureTable(ExampleTableDefinitions.ExampleTable);
-                        var row = table.CreateRow(tuple.SourceLineNumbers);
+                        var row = this.BackendHelper.CreateRow(section, tuple, output, ExampleTableDefinitions.ExampleTable);
                         row[0] = tuple[0].AsString();
                         row[1] = tuple[1].AsString();
                     }
@@ -28,7 +27,7 @@ namespace Example.Extension
 
             return false;
 #else
-            return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(tuple, output, ExampleTableDefinitions.All);
+            return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(section, tuple, output, tableDefinitions);
 #endif
         }
     }
