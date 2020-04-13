@@ -421,7 +421,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                 }
             }
 
-            return new TableDefinition(tableName, columns, false);
+            return new TableDefinition(tableName, null, columns, false);
         }
 
         /// <summary>
