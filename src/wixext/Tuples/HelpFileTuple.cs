@@ -56,9 +56,9 @@ namespace WixToolset.VisualStudio.Tuples
             set => this.Set((int)HelpFileTupleFields.HelpFileName, value);
         }
 
-        public int LangID
+        public int? LangID
         {
-            get => this.Fields[(int)HelpFileTupleFields.LangID].AsNumber();
+            get => this.Fields[(int)HelpFileTupleFields.LangID].AsNullableNumber();
             set => this.Set((int)HelpFileTupleFields.LangID, value);
         }
 

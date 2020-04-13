@@ -8,6 +8,7 @@ namespace WixToolset.VisualStudio
     {
         public static readonly TableDefinition HelpFile = new TableDefinition(
             "HelpFile",
+            VSTupleDefinitions.HelpFile,
             new[]
             {
                 new ColumnDefinition("HelpFileKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary Key for HelpFile Table (required).", modularizeType: ColumnModularizeType.Column),
@@ -19,46 +20,46 @@ namespace WixToolset.VisualStudio
                 new ColumnDefinition("File_HxR", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Key for HxR (Attributes) file (optional).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("File_Samples", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Key for a file that is in the 'root' of the samples directory for this HelpFile (optional).", modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: VSTupleDefinitions.HelpFile.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition HelpFileToNamespace = new TableDefinition(
             "HelpFileToNamespace",
+            VSTupleDefinitions.HelpFileToNamespace,
             new[]
             {
                 new ColumnDefinition("HelpFile_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "HelpFile", keyColumn: 1, description: "Foreign key into HelpFile table (required).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("HelpNamespace_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "HelpNamespace", keyColumn: 1, description: "Foreign key into HelpNamespace table (required)."),
             },
-            tupleDefinitionName: VSTupleDefinitions.HelpFileToNamespace.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition HelpFilter = new TableDefinition(
             "HelpFilter",
+            VSTupleDefinitions.HelpFilter,
             new[]
             {
                 new ColumnDefinition("FilterKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary Key for HelpFilter (required).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Friendly name for Filter (required)."),
                 new ColumnDefinition("QueryString", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Query String for Help Filter (optional)."),
             },
-            tupleDefinitionName: VSTupleDefinitions.HelpFilter.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition HelpFilterToNamespace = new TableDefinition(
             "HelpFilterToNamespace",
+            VSTupleDefinitions.HelpFilterToNamespace,
             new[]
             {
                 new ColumnDefinition("HelpFilter_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "HelpFilter", keyColumn: 1, description: "Foreign key into HelpFilter table (required).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("HelpNamespace_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "HelpNamespace", keyColumn: 1, description: "Foreign key into HelpNamespace table (required)."),
             },
-            tupleDefinitionName: VSTupleDefinitions.HelpFilterToNamespace.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition HelpNamespace = new TableDefinition(
             "HelpNamespace",
+            VSTupleDefinitions.HelpNamespace,
             new[]
             {
                 new ColumnDefinition("NamespaceKey", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Primary Key for HelpNamespace (required)."),
@@ -66,12 +67,12 @@ namespace WixToolset.VisualStudio
                 new ColumnDefinition("File_Collection", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Key for HxC (Collection) file (required).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.Localized, 0, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Friendly name for Namespace (optional)."),
             },
-            tupleDefinitionName: VSTupleDefinitions.HelpNamespace.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition HelpPlugin = new TableDefinition(
             "HelpPlugin",
+            VSTupleDefinitions.HelpPlugin,
             new[]
             {
                 new ColumnDefinition("HelpNamespace_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "HelpNamespace", keyColumn: 1, description: "Foreign key into HelpNamespace table for the child namespace that will be plugged into the parent namespace (required)."),
@@ -80,7 +81,6 @@ namespace WixToolset.VisualStudio
                 new ColumnDefinition("File_HxA", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Key for HxA (Attributes) file of child namespace (optional).", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("File_ParentHxT", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File", keyColumn: 1, description: "Key for HxT  file of parent namespace that now includes the new child namespace (optional).", modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: VSTupleDefinitions.HelpPlugin.Name,
             tupleIdIsPrimaryKey: false
         );
 
