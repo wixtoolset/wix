@@ -92,15 +92,15 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)ServiceConfigTupleFields.ThirdFailureActionType, value);
         }
 
-        public int ResetPeriodInDays
+        public int? ResetPeriodInDays
         {
-            get => this.Fields[(int)ServiceConfigTupleFields.ResetPeriodInDays].AsNumber();
+            get => this.Fields[(int)ServiceConfigTupleFields.ResetPeriodInDays].AsNullableNumber();
             set => this.Set((int)ServiceConfigTupleFields.ResetPeriodInDays, value);
         }
 
-        public int RestartServiceDelayInSeconds
+        public int? RestartServiceDelayInSeconds
         {
-            get => this.Fields[(int)ServiceConfigTupleFields.RestartServiceDelayInSeconds].AsNumber();
+            get => this.Fields[(int)ServiceConfigTupleFields.RestartServiceDelayInSeconds].AsNullableNumber();
             set => this.Set((int)ServiceConfigTupleFields.RestartServiceDelayInSeconds, value);
         }
 

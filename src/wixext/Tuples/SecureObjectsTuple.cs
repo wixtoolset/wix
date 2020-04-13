@@ -72,9 +72,9 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)SecureObjectsTupleFields.User, value);
         }
 
-        public int Permission
+        public int? Permission
         {
-            get => this.Fields[(int)SecureObjectsTupleFields.Permission].AsNumber();
+            get => this.Fields[(int)SecureObjectsTupleFields.Permission].AsNullableNumber();
             set => this.Set((int)SecureObjectsTupleFields.Permission, value);
         }
 

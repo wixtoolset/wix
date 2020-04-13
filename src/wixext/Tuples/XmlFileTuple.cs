@@ -86,9 +86,9 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)XmlFileTupleFields.ComponentRef, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => this.Fields[(int)XmlFileTupleFields.Sequence].AsNumber();
+            get => this.Fields[(int)XmlFileTupleFields.Sequence].AsNullableNumber();
             set => this.Set((int)XmlFileTupleFields.Sequence, value);
         }
     }

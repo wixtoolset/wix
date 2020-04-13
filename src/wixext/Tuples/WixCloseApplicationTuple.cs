@@ -76,9 +76,9 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)WixCloseApplicationTupleFields.Attributes, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => this.Fields[(int)WixCloseApplicationTupleFields.Sequence].AsNumber();
+            get => this.Fields[(int)WixCloseApplicationTupleFields.Sequence].AsNullableNumber();
             set => this.Set((int)WixCloseApplicationTupleFields.Sequence, value);
         }
 
@@ -88,15 +88,15 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)WixCloseApplicationTupleFields.Property, value);
         }
 
-        public int TerminateExitCode
+        public int? TerminateExitCode
         {
-            get => this.Fields[(int)WixCloseApplicationTupleFields.TerminateExitCode].AsNumber();
+            get => this.Fields[(int)WixCloseApplicationTupleFields.TerminateExitCode].AsNullableNumber();
             set => this.Set((int)WixCloseApplicationTupleFields.TerminateExitCode, value);
         }
 
-        public int Timeout
+        public int? Timeout
         {
-            get => this.Fields[(int)WixCloseApplicationTupleFields.Timeout].AsNumber();
+            get => this.Fields[(int)WixCloseApplicationTupleFields.Timeout].AsNullableNumber();
             set => this.Set((int)WixCloseApplicationTupleFields.Timeout, value);
         }
     }

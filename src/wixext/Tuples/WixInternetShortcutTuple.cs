@@ -86,9 +86,9 @@ namespace WixToolset.Util.Tuples
             set => this.Set((int)WixInternetShortcutTupleFields.IconFile, value);
         }
 
-        public int IconIndex
+        public int? IconIndex
         {
-            get => this.Fields[(int)WixInternetShortcutTupleFields.IconIndex].AsNumber();
+            get => this.Fields[(int)WixInternetShortcutTupleFields.IconIndex].AsNullableNumber();
             set => this.Set((int)WixInternetShortcutTupleFields.IconIndex, value);
         }
     }
