@@ -67,9 +67,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)TypeLibTupleFields.ComponentRef, value);
         }
 
-        public int Version
+        public int? Version
         {
-            get => (int)this.Fields[(int)TypeLibTupleFields.Version];
+            get => (int?)this.Fields[(int)TypeLibTupleFields.Version];
             set => this.Set((int)TypeLibTupleFields.Version, value);
         }
 
@@ -91,9 +91,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)TypeLibTupleFields.FeatureRef, value);
         }
 
-        public int Cost
+        public int? Cost
         {
-            get => (int)this.Fields[(int)TypeLibTupleFields.Cost];
+            get => (int?)this.Fields[(int)TypeLibTupleFields.Cost];
             set => this.Set((int)TypeLibTupleFields.Cost, value);
         }
     }

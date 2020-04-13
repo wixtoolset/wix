@@ -1663,7 +1663,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Sequence", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown),
                 new ColumnDefinition("Before", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown),
                 new ColumnDefinition("After", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown),
-                new ColumnDefinition("Overridable", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown),
+                new ColumnDefinition("Overridable", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
             tupleIdIsPrimaryKey: false

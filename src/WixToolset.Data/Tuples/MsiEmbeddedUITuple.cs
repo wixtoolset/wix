@@ -61,9 +61,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiEmbeddedUITupleFields.SupportsBasicUI, value);
         }
 
-        public int MessageFilter
+        public int? MessageFilter
         {
-            get => (int)this.Fields[(int)MsiEmbeddedUITupleFields.MessageFilter];
+            get => (int?)this.Fields[(int)MsiEmbeddedUITupleFields.MessageFilter];
             set => this.Set((int)MsiEmbeddedUITupleFields.MessageFilter, value);
         }
 

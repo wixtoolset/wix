@@ -45,15 +45,15 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixPatchIdTupleFields.ClientPatchId, value);
         }
 
-        public bool OptimizePatchSizeForLargeFiles
+        public bool? OptimizePatchSizeForLargeFiles
         {
-            get => (bool)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles];
+            get => (bool?)this.Fields[(int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles];
             set => this.Set((int)WixPatchIdTupleFields.OptimizePatchSizeForLargeFiles, value);
         }
 
-        public int ApiPatchingSymbolFlags
+        public int? ApiPatchingSymbolFlags
         {
-            get => (int)this.Fields[(int)WixPatchIdTupleFields.ApiPatchingSymbolFlags];
+            get => (int?)this.Fields[(int)WixPatchIdTupleFields.ApiPatchingSymbolFlags];
             set => this.Set((int)WixPatchIdTupleFields.ApiPatchingSymbolFlags, value);
         }
     }

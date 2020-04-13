@@ -79,7 +79,7 @@ namespace WixToolset.Data.Tuples
 
         public int? ResetPeriod
         {
-            get => (int)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.ResetPeriod].AsNullableNumber();
+            get => (int?)this.Fields[(int)MsiServiceConfigFailureActionsTupleFields.ResetPeriod];
             set => this.Set((int)MsiServiceConfigFailureActionsTupleFields.ResetPeriod, value);
         }
 

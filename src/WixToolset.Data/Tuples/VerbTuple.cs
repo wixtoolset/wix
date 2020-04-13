@@ -55,9 +55,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)VerbTupleFields.Verb, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => (int)this.Fields[(int)VerbTupleFields.Sequence];
+            get => (int?)this.Fields[(int)VerbTupleFields.Sequence];
             set => this.Set((int)VerbTupleFields.Sequence, value);
         }
 

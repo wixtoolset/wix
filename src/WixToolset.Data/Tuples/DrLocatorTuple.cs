@@ -59,9 +59,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)DrLocatorTupleFields.Path, value);
         }
 
-        public int Depth
+        public int? Depth
         {
-            get => (int)this.Fields[(int)DrLocatorTupleFields.Depth];
+            get => (int?)this.Fields[(int)DrLocatorTupleFields.Depth];
             set => this.Set((int)DrLocatorTupleFields.Depth, value);
         }
     }

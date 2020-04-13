@@ -75,9 +75,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ControlEventTupleFields.Condition, value);
         }
 
-        public int Ordering
+        public int? Ordering
         {
-            get => (int)this.Fields[(int)ControlEventTupleFields.Ordering];
+            get => (int?)this.Fields[(int)ControlEventTupleFields.Ordering];
             set => this.Set((int)ControlEventTupleFields.Ordering, value);
         }
     }

@@ -57,9 +57,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ImageFamiliesTupleFields.MediaSrcPropName, value);
         }
 
-        public int MediaDiskId
+        public int? MediaDiskId
         {
-            get => (int)this.Fields[(int)ImageFamiliesTupleFields.MediaDiskId];
+            get => (int?)this.Fields[(int)ImageFamiliesTupleFields.MediaDiskId];
             set => this.Set((int)ImageFamiliesTupleFields.MediaDiskId, value);
         }
 

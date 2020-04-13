@@ -59,9 +59,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)MsiPatchSequenceTupleFields.Sequence, value);
         }
 
-        public int Attributes
+        public int? Attributes
         {
-            get => (int)this.Fields[(int)MsiPatchSequenceTupleFields.Attributes];
+            get => (int?)this.Fields[(int)MsiPatchSequenceTupleFields.Attributes];
             set => this.Set((int)MsiPatchSequenceTupleFields.Attributes, value);
         }
     }

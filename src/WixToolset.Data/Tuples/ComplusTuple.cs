@@ -43,9 +43,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ComplusTupleFields.ComponentRef, value);
         }
 
-        public int ExpType
+        public int? ExpType
         {
-            get => (int)this.Fields[(int)ComplusTupleFields.ExpType];
+            get => (int?)this.Fields[(int)ComplusTupleFields.ExpType];
             set => this.Set((int)ComplusTupleFields.ExpType, value);
         }
     }

@@ -51,9 +51,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)BillboardTupleFields.Action, value);
         }
 
-        public int Ordering
+        public int? Ordering
         {
-            get => (int)this.Fields[(int)BillboardTupleFields.Ordering];
+            get => (int?)this.Fields[(int)BillboardTupleFields.Ordering];
             set => this.Set((int)BillboardTupleFields.Ordering, value);
         }
     }

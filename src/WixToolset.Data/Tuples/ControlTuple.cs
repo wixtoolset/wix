@@ -119,9 +119,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ControlTupleFields.Height, value);
         }
 
-        public int Attributes
+        public int? Attributes
         {
-            get => this.Fields[(int)ControlTupleFields.Attributes].AsNumber();
+            get => (int?)this.Fields[(int)ControlTupleFields.Attributes];
             set => this.Set((int)ControlTupleFields.Attributes, value);
         }
 

@@ -125,9 +125,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.EnableSignatureValidation, value);
         }
 
-        public int FileSize
+        public int? FileSize
         {
-            get => (int)this.Fields[(int)WixBundlePayloadTupleFields.FileSize];
+            get => (int?)this.Fields[(int)WixBundlePayloadTupleFields.FileSize];
             set => this.Set((int)WixBundlePayloadTupleFields.FileSize, value);
         }
 
@@ -191,10 +191,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePayloadTupleFields.LayoutOnly, value);
         }
 
-        public PackagingType Packaging
+        public PackagingType? Packaging
         {
-            get => (PackagingType)this.Fields[(int)WixBundlePayloadTupleFields.Packaging].AsNumber();
-            set => this.Set((int)WixBundlePayloadTupleFields.Packaging, (int)value);
+            get => (PackagingType?)this.Fields[(int)WixBundlePayloadTupleFields.Packaging].AsNumber();
+            set => this.Set((int)WixBundlePayloadTupleFields.Packaging, (int?)value);
         }
 
         public string ParentPackagePayloadRef

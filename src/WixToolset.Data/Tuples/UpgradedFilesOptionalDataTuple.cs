@@ -61,15 +61,15 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)UpgradedFilesOptionalDataTupleFields.SymbolPaths, value);
         }
 
-        public bool AllowIgnoreOnPatchError
+        public bool? AllowIgnoreOnPatchError
         {
-            get => (bool)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.AllowIgnoreOnPatchError];
+            get => (bool?)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.AllowIgnoreOnPatchError];
             set => this.Set((int)UpgradedFilesOptionalDataTupleFields.AllowIgnoreOnPatchError, value);
         }
 
-        public bool IncludeWholeFile
+        public bool? IncludeWholeFile
         {
-            get => (bool)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.IncludeWholeFile];
+            get => (bool?)this.Fields[(int)UpgradedFilesOptionalDataTupleFields.IncludeWholeFile];
             set => this.Set((int)UpgradedFilesOptionalDataTupleFields.IncludeWholeFile, value);
         }
     }

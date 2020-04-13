@@ -86,27 +86,27 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixFileSearchTupleFields.MaxVersion, value);
         }
 
-        public int MinSize
+        public int? MinSize
         {
-            get => (int)this.Fields[(int)WixFileSearchTupleFields.MinSize];
+            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MinSize];
             set => this.Set((int)WixFileSearchTupleFields.MinSize, value);
         }
 
-        public int MaxSize
+        public int? MaxSize
         {
-            get => (int)this.Fields[(int)WixFileSearchTupleFields.MaxSize];
+            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MaxSize];
             set => this.Set((int)WixFileSearchTupleFields.MaxSize, value);
         }
 
-        public int MinDate
+        public int? MinDate
         {
-            get => (int)this.Fields[(int)WixFileSearchTupleFields.MinDate];
+            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MinDate];
             set => this.Set((int)WixFileSearchTupleFields.MinDate, value);
         }
 
-        public int MaxDate
+        public int? MaxDate
         {
-            get => (int)this.Fields[(int)WixFileSearchTupleFields.MaxDate];
+            get => (int?)this.Fields[(int)WixFileSearchTupleFields.MaxDate];
             set => this.Set((int)WixFileSearchTupleFields.MaxDate, value);
         }
 

@@ -59,9 +59,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)PatchSequenceTupleFields.Sequence, value);
         }
 
-        public int Supersede
+        public int? Supersede
         {
-            get => (int)this.Fields[(int)PatchSequenceTupleFields.Supersede];
+            get => (int?)this.Fields[(int)PatchSequenceTupleFields.Supersede];
             set => this.Set((int)PatchSequenceTupleFields.Supersede, value);
         }
     }

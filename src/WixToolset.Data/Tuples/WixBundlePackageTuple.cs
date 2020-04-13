@@ -171,9 +171,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundlePackageTupleFields.Version, value);
         }
 
-        public int Language
+        public int? Language
         {
-            get => (int)this.Fields[(int)WixBundlePackageTupleFields.Language];
+            get => (int?)this.Fields[(int)WixBundlePackageTupleFields.Language];
             set => this.Set((int)WixBundlePackageTupleFields.Language, value);
         }
 

@@ -77,7 +77,7 @@ namespace WixToolset.Data.Tuples
 
         public int? Type
         {
-            get => this.Fields[(int)IniLocatorTupleFields.Type].AsNullableNumber();
+            get => (int?)this.Fields[(int)IniLocatorTupleFields.Type];
             set => this.Set((int)IniLocatorTupleFields.Type, value);
         }
     }

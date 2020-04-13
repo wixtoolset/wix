@@ -67,27 +67,27 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)SignatureTupleFields.MaxVersion, value);
         }
 
-        public int MinSize
+        public int? MinSize
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MinSize];
+            get => (int?)this.Fields[(int)SignatureTupleFields.MinSize];
             set => this.Set((int)SignatureTupleFields.MinSize, value);
         }
 
-        public int MaxSize
+        public int? MaxSize
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MaxSize];
+            get => (int?)this.Fields[(int)SignatureTupleFields.MaxSize];
             set => this.Set((int)SignatureTupleFields.MaxSize, value);
         }
 
-        public int MinDate
+        public int? MinDate
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MinDate];
+            get => (int?)this.Fields[(int)SignatureTupleFields.MinDate];
             set => this.Set((int)SignatureTupleFields.MinDate, value);
         }
 
-        public int MaxDate
+        public int? MaxDate
         {
-            get => (int)this.Fields[(int)SignatureTupleFields.MaxDate];
+            get => (int?)this.Fields[(int)SignatureTupleFields.MaxDate];
             set => this.Set((int)SignatureTupleFields.MaxDate, value);
         }
 

@@ -76,9 +76,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundleContainerTupleFields.DownloadUrl, value);
         }
 
-        public long Size
+        public long? Size
         {
-            get => (long)this.Fields[(int)WixBundleContainerTupleFields.Size];
+            get => (long?)this.Fields[(int)WixBundleContainerTupleFields.Size];
             set => this.Set((int)WixBundleContainerTupleFields.Size, value);
         }
 
@@ -88,9 +88,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixBundleContainerTupleFields.Hash, value);
         }
 
-        public int AttachedContainerIndex
+        public int? AttachedContainerIndex
         {
-            get => (int)this.Fields[(int)WixBundleContainerTupleFields.AttachedContainerIndex];
+            get => (int?)this.Fields[(int)WixBundleContainerTupleFields.AttachedContainerIndex];
             set => this.Set((int)WixBundleContainerTupleFields.AttachedContainerIndex, value);
         }
 
