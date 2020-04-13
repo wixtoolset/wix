@@ -72,9 +72,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebSiteTupleFields.Description, value);
         }
 
-        public int ConnectionTimeout
+        public int? ConnectionTimeout
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.ConnectionTimeout].AsNumber();
+            get => this.Fields[(int)IIsWebSiteTupleFields.ConnectionTimeout].AsNullableNumber();
             set => this.Set((int)IIsWebSiteTupleFields.ConnectionTimeout, value);
         }
 
@@ -84,9 +84,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebSiteTupleFields.DirectoryRef, value);
         }
 
-        public int State
+        public int? State
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.State].AsNumber();
+            get => this.Fields[(int)IIsWebSiteTupleFields.State].AsNullableNumber();
             set => this.Set((int)IIsWebSiteTupleFields.State, value);
         }
 
@@ -114,9 +114,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebSiteTupleFields.ApplicationRef, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => this.Fields[(int)IIsWebSiteTupleFields.Sequence].AsNumber();
+            get => this.Fields[(int)IIsWebSiteTupleFields.Sequence].AsNullableNumber();
             set => this.Set((int)IIsWebSiteTupleFields.Sequence, value);
         }
 

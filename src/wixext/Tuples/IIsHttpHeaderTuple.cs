@@ -86,9 +86,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsHttpHeaderTupleFields.Attributes, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => this.Fields[(int)IIsHttpHeaderTupleFields.Sequence].AsNumber();
+            get => this.Fields[(int)IIsHttpHeaderTupleFields.Sequence].AsNullableNumber();
             set => this.Set((int)IIsHttpHeaderTupleFields.Sequence, value);
         }
     }

@@ -70,9 +70,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebAddressTupleFields.Header, value);
         }
 
-        public int Secure
+        public int? Secure
         {
-            get => this.Fields[(int)IIsWebAddressTupleFields.Secure].AsNumber();
+            get => this.Fields[(int)IIsWebAddressTupleFields.Secure].AsNullableNumber();
             set => this.Set((int)IIsWebAddressTupleFields.Secure, value);
         }
     }

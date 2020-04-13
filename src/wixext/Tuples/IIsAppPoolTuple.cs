@@ -90,15 +90,15 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsAppPoolTupleFields.UserRef, value);
         }
 
-        public int RecycleMinutes
+        public int? RecycleMinutes
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleMinutes].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleMinutes].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.RecycleMinutes, value);
         }
 
-        public int RecycleRequests
+        public int? RecycleRequests
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleRequests].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.RecycleRequests].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.RecycleRequests, value);
         }
 
@@ -108,15 +108,15 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsAppPoolTupleFields.RecycleTimes, value);
         }
 
-        public int IdleTimeout
+        public int? IdleTimeout
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.IdleTimeout].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.IdleTimeout].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.IdleTimeout, value);
         }
 
-        public int QueueLimit
+        public int? QueueLimit
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.QueueLimit].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.QueueLimit].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.QueueLimit, value);
         }
 
@@ -126,21 +126,21 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsAppPoolTupleFields.CPUMon, value);
         }
 
-        public int MaxProc
+        public int? MaxProc
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.MaxProc].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.MaxProc].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.MaxProc, value);
         }
 
-        public int VirtualMemory
+        public int? VirtualMemory
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.VirtualMemory].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.VirtualMemory].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.VirtualMemory, value);
         }
 
-        public int PrivateMemory
+        public int? PrivateMemory
         {
-            get => this.Fields[(int)IIsAppPoolTupleFields.PrivateMemory].AsNumber();
+            get => this.Fields[(int)IIsAppPoolTupleFields.PrivateMemory].AsNullableNumber();
             set => this.Set((int)IIsAppPoolTupleFields.PrivateMemory, value);
         }
 

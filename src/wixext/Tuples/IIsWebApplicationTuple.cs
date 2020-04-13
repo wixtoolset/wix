@@ -70,27 +70,27 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebApplicationTupleFields.Isolation, value);
         }
 
-        public int AllowSessions
+        public int? AllowSessions
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.AllowSessions].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.AllowSessions].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.AllowSessions, value);
         }
 
-        public int SessionTimeout
+        public int? SessionTimeout
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.SessionTimeout].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.SessionTimeout].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.SessionTimeout, value);
         }
 
-        public int Buffer
+        public int? Buffer
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.Buffer].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.Buffer].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.Buffer, value);
         }
 
-        public int ParentPaths
+        public int? ParentPaths
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.ParentPaths].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.ParentPaths].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.ParentPaths, value);
         }
 
@@ -100,21 +100,21 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebApplicationTupleFields.DefaultScript, value);
         }
 
-        public int ScriptTimeout
+        public int? ScriptTimeout
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.ScriptTimeout].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.ScriptTimeout].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.ScriptTimeout, value);
         }
 
-        public int ServerDebugging
+        public int? ServerDebugging
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.ServerDebugging].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.ServerDebugging].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.ServerDebugging, value);
         }
 
-        public int ClientDebugging
+        public int? ClientDebugging
         {
-            get => this.Fields[(int)IIsWebApplicationTupleFields.ClientDebugging].AsNumber();
+            get => this.Fields[(int)IIsWebApplicationTupleFields.ClientDebugging].AsNullableNumber();
             set => this.Set((int)IIsWebApplicationTupleFields.ClientDebugging, value);
         }
 

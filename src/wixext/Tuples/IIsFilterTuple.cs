@@ -86,9 +86,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsFilterTupleFields.Flags, value);
         }
 
-        public int LoadOrder
+        public int? LoadOrder
         {
-            get => this.Fields[(int)IIsFilterTupleFields.LoadOrder].AsNumber();
+            get => this.Fields[(int)IIsFilterTupleFields.LoadOrder].AsNullableNumber();
             set => this.Set((int)IIsFilterTupleFields.LoadOrder, value);
         }
     }

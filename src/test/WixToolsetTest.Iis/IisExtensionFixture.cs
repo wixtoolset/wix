@@ -20,7 +20,7 @@ namespace WixToolsetTest.Iis
             Assert.Equal(new[]
             {
                 "IIsWebAddress:TestAddress\tTest\t\t[PORT]\t\t0",
-            }, results.OrderBy(s => s).ToArray());
+            }, results);
         }
 
         private static void Build(string[] args)

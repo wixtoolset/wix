@@ -64,15 +64,15 @@ namespace WixToolset.Iis.Tuples
 
         public IntermediateField this[IIsWebDirPropertiesTupleFields index] => this.Fields[(int)index];
 
-        public int Access
+        public int? Access
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Access].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Access].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.Access, value);
         }
 
-        public int Authorization
+        public int? Authorization
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Authorization].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Authorization].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.Authorization, value);
         }
 
@@ -82,21 +82,21 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebDirPropertiesTupleFields.AnonymousUserRef, value);
         }
 
-        public int IIsControlledPassword
+        public int? IIsControlledPassword
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.IIsControlledPassword].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.IIsControlledPassword].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.IIsControlledPassword, value);
         }
 
-        public int LogVisits
+        public int? LogVisits
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.LogVisits].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.LogVisits].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.LogVisits, value);
         }
 
-        public int Index
+        public int? Index
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Index].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.Index].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.Index, value);
         }
 
@@ -106,9 +106,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebDirPropertiesTupleFields.DefaultDoc, value);
         }
 
-        public int AspDetailedError
+        public int? AspDetailedError
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AspDetailedError].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AspDetailedError].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.AspDetailedError, value);
         }
 
@@ -118,9 +118,9 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebDirPropertiesTupleFields.HttpExpires, value);
         }
 
-        public int CacheControlMaxAge
+        public int? CacheControlMaxAge
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.CacheControlMaxAge].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.CacheControlMaxAge].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.CacheControlMaxAge, value);
         }
 
@@ -130,15 +130,15 @@ namespace WixToolset.Iis.Tuples
             set => this.Set((int)IIsWebDirPropertiesTupleFields.CacheControlCustom, value);
         }
 
-        public int NoCustomError
+        public int? NoCustomError
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.NoCustomError].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.NoCustomError].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.NoCustomError, value);
         }
 
-        public int AccessSSLFlags
+        public int? AccessSSLFlags
         {
-            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AccessSSLFlags].AsNumber();
+            get => this.Fields[(int)IIsWebDirPropertiesTupleFields.AccessSSLFlags].AsNullableNumber();
             set => this.Set((int)IIsWebDirPropertiesTupleFields.AccessSSLFlags, value);
         }
 
