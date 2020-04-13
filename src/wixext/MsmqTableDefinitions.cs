@@ -8,6 +8,7 @@ namespace WixToolset.Msmq
     {
         public static readonly TableDefinition MessageQueue = new TableDefinition(
             "MessageQueue",
+            MsmqTupleDefinitions.MessageQueue,
             new[]
             {
                 new ColumnDefinition("MessageQueue", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -22,12 +23,12 @@ namespace WixToolset.Msmq
                 new ColumnDefinition("ServiceTypeGuid", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
-            tupleDefinitionName: MsmqTupleDefinitions.MessageQueue.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MessageQueueUserPermission = new TableDefinition(
             "MessageQueueUserPermission",
+            MsmqTupleDefinitions.MessageQueueUserPermission,
             new[]
             {
                 new ColumnDefinition("MessageQueueUserPermission", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -36,12 +37,12 @@ namespace WixToolset.Msmq
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Permissions", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
-            tupleDefinitionName: MsmqTupleDefinitions.MessageQueueUserPermission.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition MessageQueueGroupPermission = new TableDefinition(
             "MessageQueueGroupPermission",
+            MsmqTupleDefinitions.MessageQueueGroupPermission,
             new[]
             {
                 new ColumnDefinition("MessageQueueGroupPermission", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -50,7 +51,6 @@ namespace WixToolset.Msmq
                 new ColumnDefinition("Group_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Permissions", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
-            tupleDefinitionName: MsmqTupleDefinitions.MessageQueueGroupPermission.Name,
             tupleIdIsPrimaryKey: true
         );
 

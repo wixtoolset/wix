@@ -62,15 +62,15 @@ namespace WixToolset.Msmq.Tuples
             set => this.Set((int)MessageQueueTupleFields.ComponentRef, value);
         }
 
-        public int BasePriority
+        public int? BasePriority
         {
-            get => this.Fields[(int)MessageQueueTupleFields.BasePriority].AsNumber();
+            get => this.Fields[(int)MessageQueueTupleFields.BasePriority].AsNullableNumber();
             set => this.Set((int)MessageQueueTupleFields.BasePriority, value);
         }
 
-        public int JournalQuota
+        public int? JournalQuota
         {
-            get => this.Fields[(int)MessageQueueTupleFields.JournalQuota].AsNumber();
+            get => this.Fields[(int)MessageQueueTupleFields.JournalQuota].AsNullableNumber();
             set => this.Set((int)MessageQueueTupleFields.JournalQuota, value);
         }
 
@@ -92,15 +92,15 @@ namespace WixToolset.Msmq.Tuples
             set => this.Set((int)MessageQueueTupleFields.PathName, value);
         }
 
-        public int PrivLevel
+        public int? PrivLevel
         {
-            get => this.Fields[(int)MessageQueueTupleFields.PrivLevel].AsNumber();
+            get => this.Fields[(int)MessageQueueTupleFields.PrivLevel].AsNullableNumber();
             set => this.Set((int)MessageQueueTupleFields.PrivLevel, value);
         }
 
-        public int Quota
+        public int? Quota
         {
-            get => this.Fields[(int)MessageQueueTupleFields.Quota].AsNumber();
+            get => this.Fields[(int)MessageQueueTupleFields.Quota].AsNullableNumber();
             set => this.Set((int)MessageQueueTupleFields.Quota, value);
         }
 
