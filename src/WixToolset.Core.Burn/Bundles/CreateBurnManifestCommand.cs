@@ -640,7 +640,7 @@ namespace WixToolset.Core.Burn.Bundles
         private void WriteBurnManifestContainerAttributes(XmlTextWriter writer, string executableName, WixBundleContainerTuple container)
         {
             writer.WriteAttributeString("Id", container.Id.Id);
-            writer.WriteAttributeString("FileSize", container.Size.ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("FileSize", container.Size.Value.ToString(CultureInfo.InvariantCulture));
             writer.WriteAttributeString("Hash", container.Hash);
 
             if (ContainerType.Detached == container.Type)
@@ -665,7 +665,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 writer.WriteAttributeString("FilePath", executableName); // attached containers use the name of the bundle since they are attached to the executable.
-                writer.WriteAttributeString("AttachedIndex", container.AttachedContainerIndex.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("AttachedIndex", container.AttachedContainerIndex.Value.ToString(CultureInfo.InvariantCulture));
                 writer.WriteAttributeString("Attached", "yes");
                 writer.WriteAttributeString("Primary", "yes");
             }
@@ -677,7 +677,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             writer.WriteAttributeString("Id", payload.Id.Id);
             writer.WriteAttributeString("FilePath", payload.Name);
-            writer.WriteAttributeString("FileSize", payload.FileSize.ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("FileSize", payload.FileSize.Value.ToString(CultureInfo.InvariantCulture));
             writer.WriteAttributeString("Hash", payload.Hash);
 
             if (payload.LayoutOnly)

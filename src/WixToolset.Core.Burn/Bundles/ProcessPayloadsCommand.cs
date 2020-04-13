@@ -150,6 +150,10 @@ namespace WixToolset.Core.Burn.Bundles
                     }
                 }
             }
+            else
+            {
+                payload.FileSize = 0;
+            }
         }
 
         private void UpdatePayloadVersionInformation(WixBundlePayloadTuple payload, IntermediateFieldPathValue sourceFile)

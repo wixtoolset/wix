@@ -230,7 +230,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 writer.WriteAttributeString("Name", payloadTuple.Name);
-                writer.WriteAttributeString("Size", payloadTuple.FileSize.ToString(CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("Size", payloadTuple.FileSize.Value.ToString(CultureInfo.InvariantCulture));
 
                 if (!String.IsNullOrEmpty(payloadTuple.DownloadUrl))
                 {

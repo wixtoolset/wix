@@ -262,7 +262,7 @@ namespace WixToolset.Core.Burn
 
                     foreach (var payload in packagePayloads)
                     {
-                        facade.PackageTuple.Size += payload.FileSize;
+                        facade.PackageTuple.Size += payload.FileSize.Value;
                     }
 
                     if (!facade.PackageTuple.InstallSize.HasValue)
