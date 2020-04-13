@@ -8,6 +8,7 @@ namespace WixToolset.ComPlus
     {
         public static readonly TableDefinition ComPlusPartition = new TableDefinition(
             "ComPlusPartition",
+            ComPlusTupleDefinitions.ComPlusPartition,
             new[]
             {
                 new ColumnDefinition("Partition", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -15,24 +16,24 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Id", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusPartition.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusPartitionProperty = new TableDefinition(
             "ComPlusPartitionProperty",
+            ComPlusTupleDefinitions.ComPlusPartitionProperty,
             new[]
             {
                 new ColumnDefinition("Partition_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusPartition", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusPartitionProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusPartitionRole = new TableDefinition(
             "ComPlusPartitionRole",
+            ComPlusTupleDefinitions.ComPlusPartitionRole,
             new[]
             {
                 new ColumnDefinition("PartitionRole", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -40,12 +41,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusPartitionRole.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusUserInPartitionRole = new TableDefinition(
             "ComPlusUserInPartitionRole",
+            ComPlusTupleDefinitions.ComPlusUserInPartitionRole,
             new[]
             {
                 new ColumnDefinition("UserInPartitionRole", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -53,12 +54,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusUserInPartitionRole.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusGroupInPartitionRole = new TableDefinition(
             "ComPlusGroupInPartitionRole",
+            ComPlusTupleDefinitions.ComPlusGroupInPartitionRole,
             new[]
             {
                 new ColumnDefinition("GroupInPartitionRole", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -66,12 +67,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Group_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusGroupInPartitionRole.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusPartitionUser = new TableDefinition(
             "ComPlusPartitionUser",
+            ComPlusTupleDefinitions.ComPlusPartitionUser,
             new[]
             {
                 new ColumnDefinition("PartitionUser", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -79,12 +80,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusPartitionUser.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusApplication = new TableDefinition(
             "ComPlusApplication",
+            ComPlusTupleDefinitions.ComPlusApplication,
             new[]
             {
                 new ColumnDefinition("Application", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -93,24 +94,24 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Id", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusApplication.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusApplicationProperty = new TableDefinition(
             "ComPlusApplicationProperty",
+            ComPlusTupleDefinitions.ComPlusApplicationProperty,
             new[]
             {
                 new ColumnDefinition("Application_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusApplication", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusApplicationProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusApplicationRole = new TableDefinition(
             "ComPlusApplicationRole",
+            ComPlusTupleDefinitions.ComPlusApplicationRole,
             new[]
             {
                 new ColumnDefinition("ApplicationRole", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -118,24 +119,24 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusApplicationRole.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusApplicationRoleProperty = new TableDefinition(
             "ComPlusApplicationRoleProperty",
+            ComPlusTupleDefinitions.ComPlusApplicationRoleProperty,
             new[]
             {
                 new ColumnDefinition("ApplicationRole_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusApplicationRole", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusApplicationRoleProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusUserInApplicationRole = new TableDefinition(
             "ComPlusUserInApplicationRole",
+            ComPlusTupleDefinitions.ComPlusUserInApplicationRole,
             new[]
             {
                 new ColumnDefinition("UserInApplicationRole", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -143,12 +144,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("User_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusUserInApplicationRole.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusGroupInApplicationRole = new TableDefinition(
             "ComPlusGroupInApplicationRole",
+            ComPlusTupleDefinitions.ComPlusGroupInApplicationRole,
             new[]
             {
                 new ColumnDefinition("GroupInApplicationRole", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -156,12 +157,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Group_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusGroupInApplicationRole.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusAssembly = new TableDefinition(
             "ComPlusAssembly",
+            ComPlusTupleDefinitions.ComPlusAssembly,
             new[]
             {
                 new ColumnDefinition("Assembly", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -173,47 +174,47 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("PSDllPath", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusAssembly.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusAssemblyDependency = new TableDefinition(
             "ComPlusAssemblyDependency",
+            ComPlusTupleDefinitions.ComPlusAssemblyDependency,
             new[]
             {
                 new ColumnDefinition("Assembly_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusAssembly", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("RequiredAssembly_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusAssembly", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusAssemblyDependency.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusComponent = new TableDefinition(
             "ComPlusComponent",
+            ComPlusTupleDefinitions.ComPlusComponent,
             new[]
             {
                 new ColumnDefinition("ComPlusComponent", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Assembly_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusAssembly", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("CLSID", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusComponent.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusComponentProperty = new TableDefinition(
             "ComPlusComponentProperty",
+            ComPlusTupleDefinitions.ComPlusComponentProperty,
             new[]
             {
                 new ColumnDefinition("ComPlusComponent_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusComponent", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusComponentProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusRoleForComponent = new TableDefinition(
             "ComPlusRoleForComponent",
+            ComPlusTupleDefinitions.ComPlusRoleForComponent,
             new[]
             {
                 new ColumnDefinition("RoleForComponent", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -221,36 +222,36 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("ApplicationRole_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusApplicationRole", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusRoleForComponent.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusInterface = new TableDefinition(
             "ComPlusInterface",
+            ComPlusTupleDefinitions.ComPlusInterface,
             new[]
             {
                 new ColumnDefinition("Interface", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("ComPlusComponent_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusComponent", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("IID", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusInterface.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusInterfaceProperty = new TableDefinition(
             "ComPlusInterfaceProperty",
+            ComPlusTupleDefinitions.ComPlusInterfaceProperty,
             new[]
             {
                 new ColumnDefinition("Interface_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusInterface", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusInterfaceProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusRoleForInterface = new TableDefinition(
             "ComPlusRoleForInterface",
+            ComPlusTupleDefinitions.ComPlusRoleForInterface,
             new[]
             {
                 new ColumnDefinition("RoleForInterface", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -258,12 +259,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("ApplicationRole_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusApplicationRole", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusRoleForInterface.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusMethod = new TableDefinition(
             "ComPlusMethod",
+            ComPlusTupleDefinitions.ComPlusMethod,
             new[]
             {
                 new ColumnDefinition("Method", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -271,24 +272,24 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("Index", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown),
                 new ColumnDefinition("Name", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusMethod.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusMethodProperty = new TableDefinition(
             "ComPlusMethodProperty",
+            ComPlusTupleDefinitions.ComPlusMethodProperty,
             new[]
             {
                 new ColumnDefinition("Method_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusMethod", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusMethodProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusRoleForMethod = new TableDefinition(
             "ComPlusRoleForMethod",
+            ComPlusTupleDefinitions.ComPlusRoleForMethod,
             new[]
             {
                 new ColumnDefinition("RoleForMethod", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -296,12 +297,12 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("ApplicationRole_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusApplicationRole", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusRoleForMethod.Name,
             tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition ComPlusSubscription = new TableDefinition(
             "ComPlusSubscription",
+            ComPlusTupleDefinitions.ComPlusSubscription,
             new[]
             {
                 new ColumnDefinition("Subscription", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, modularizeType: ColumnModularizeType.Column),
@@ -312,19 +313,18 @@ namespace WixToolset.ComPlus
                 new ColumnDefinition("EventCLSID", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("PublisherID", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusSubscription.Name,
             tupleIdIsPrimaryKey: false
         );
 
         public static readonly TableDefinition ComPlusSubscriptionProperty = new TableDefinition(
             "ComPlusSubscriptionProperty",
+            ComPlusTupleDefinitions.ComPlusSubscriptionProperty,
             new[]
             {
                 new ColumnDefinition("Subscription_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "ComPlusSubscription", keyColumn: 1, modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Name", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Value", ColumnType.String, 255, primaryKey: false, nullable: false, ColumnCategory.Formatted, modularizeType: ColumnModularizeType.Property),
             },
-            tupleDefinitionName: ComPlusTupleDefinitions.ComPlusSubscriptionProperty.Name,
             tupleIdIsPrimaryKey: false
         );
 

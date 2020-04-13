@@ -48,9 +48,9 @@ namespace WixToolset.ComPlus.Tuples
             set => this.Set((int)ComPlusMethodTupleFields.InterfaceRef, value);
         }
 
-        public int Index
+        public int? Index
         {
-            get => this.Fields[(int)ComPlusMethodTupleFields.Index].AsNumber();
+            get => this.Fields[(int)ComPlusMethodTupleFields.Index].AsNullableNumber();
             set => this.Set((int)ComPlusMethodTupleFields.Index, value);
         }
 
