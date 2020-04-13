@@ -22,14 +22,15 @@ namespace WixToolset.Data.WindowsInstaller
         /// Creates a table definition.
         /// </summary>
         /// <param name="name">Name of table to create.</param>
+        /// <param name="tupleDefinition">Optional tuple definition for this table.</param>
         /// <param name="columns">Column definitions for the table.</param>
         /// <param name="unreal">Flag if table is unreal.</param>
-        /// <param name="tupleDefinitionName">Optional name of tuple definition for this table.</param>
         /// <param name="tupleIdIsPrimaryKey">Whether the primary key is the id of the tuple definition associated with this table.</param>
-        public TableDefinition(string name, IEnumerable<ColumnDefinition> columns, bool unreal = false, string tupleDefinitionName = null, bool? tupleIdIsPrimaryKey = null)
+        public TableDefinition(string name, IntermediateTupleDefinition tupleDefinition, IEnumerable<ColumnDefinition> columns, bool unreal = false, bool tupleIdIsPrimaryKey = false)
         {
             this.Name = name;
-            this.TupleDefinitionName = tupleDefinitionName ?? name;
+            this.TupleDefinition = tupleDefinition;
+            this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey;
             this.Unreal = unreal;
             this.Columns = columns?.ToArray();
 
@@ -37,7 +38,6 @@ namespace WixToolset.Data.WindowsInstaller
             {
                 throw new ArgumentOutOfRangeException(nameof(columns));
             }
-            this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey ?? DeriveTupleIdIsPrimaryKey(this.Columns);
         }
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace WixToolset.Data.WindowsInstaller
         public string Name { get; }
 
         /// <summary>
-        /// Gets the name of the tuple definition associated with this table.
+        /// Gets the tuple definition associated with this table.
         /// </summary>
-        /// <value>Name of the tuple definition.</value>
-        public string TupleDefinitionName { get; }
+        /// <value>The tuple definition.</value>
+        public IntermediateTupleDefinition TupleDefinition { get; }
 
         /// <summary>
         /// Gets if the table is unreal.
@@ -130,9 +130,7 @@ namespace WixToolset.Data.WindowsInstaller
         {
             var empty = reader.IsEmptyElement;
             string name = null;
-            string tupleDefinitionName = null;
             var unreal = false;
-            bool? tupleIdIsPrimaryKey = null;
 
             while (reader.MoveToNextAttribute())
             {
@@ -140,12 +138,6 @@ namespace WixToolset.Data.WindowsInstaller
                 {
                     case "name":
                         name = reader.Value;
-                        break;
-                    case "tupleDefinitionName":
-                        tupleDefinitionName = reader.Value;
-                        break;
-                    case "tupleIdIsPrimaryKey":
-                        tupleIdIsPrimaryKey = reader.Value.Equals("yes");
                         break;
                     case "unreal":
                         unreal = reader.Value.Equals("yes");
@@ -203,7 +195,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            return new TableDefinition(name, columns.ToArray(), unreal, tupleDefinitionName, tupleIdIsPrimaryKey);
+            return new TableDefinition(name, null, columns.ToArray(), unreal);
         }
 
         /// <summary>
@@ -227,15 +219,6 @@ namespace WixToolset.Data.WindowsInstaller
             }
 
             writer.WriteEndElement();
-        }
-
-        private static bool DeriveTupleIdIsPrimaryKey(ColumnDefinition[] columns)
-        {
-            return columns[0].PrimaryKey &&
-                   columns[0].Type == ColumnType.String &&
-                   columns[0].Category == ColumnCategory.Identifier &&
-                   !columns[0].Name.EndsWith("_") &&
-                   (columns.Length == 1 || !columns.Skip(1).Any(t => t.PrimaryKey));
         }
     }
 }

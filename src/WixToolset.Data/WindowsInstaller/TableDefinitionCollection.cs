@@ -77,19 +77,6 @@ namespace WixToolset.Data.WindowsInstaller
         public bool TryGet(string tableName, out TableDefinition table) => this.collection.TryGetValue(tableName, out table);
 
         /// <summary>
-        /// Load a table definition collection from an XmlReader.
-        /// </summary>
-        /// <param name="reader">Reader to get data from.</param>
-        /// <param name="suppressSchema">Suppress xml schema validation while loading.</param>
-        /// <returns>The TableDefinitionCollection represented by the xml.</returns>
-        public static TableDefinitionCollection Load(XmlReader reader)
-        {
-            reader.MoveToContent();
-
-            return Read(reader);
-        }
-
-        /// <summary>
         /// Adds a table definition to the collection.
         /// </summary>
         /// <param name="tableDefinition">Table definition to add to the collection.</param>
