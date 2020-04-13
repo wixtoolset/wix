@@ -54,9 +54,9 @@ namespace WixToolset.DifxApp.Tuples
             set => this.Set((int)MsiDriverPackagesTupleFields.Flags, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => this.Fields[(int)MsiDriverPackagesTupleFields.Sequence].AsNumber();
+            get => this.Fields[(int)MsiDriverPackagesTupleFields.Sequence].AsNullableNumber();
             set => this.Set((int)MsiDriverPackagesTupleFields.Sequence, value);
         }
     }

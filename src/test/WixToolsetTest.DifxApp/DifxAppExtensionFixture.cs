@@ -24,7 +24,7 @@ namespace WixToolsetTest.DifxApp
                 "CustomAction:MsiProcessDrivers\t1\tDIFxApp.dll\tProcessDriverPackages\t",
                 "CustomAction:MsiRollbackInstall\t3329\tDIFxAppA.dll\tRollbackInstall\t",
                 "CustomAction:MsiUninstallDrivers\t3073\tDIFxAppA.dll\tUninstallDriverPackages\t",
-            }, results.OrderBy(s => s).ToArray());
+            }, results);
         }
 
         private static void Build(string[] args)
