@@ -9,14 +9,17 @@ namespace TablesAndTuples
         public WixTableDefinition(string name, IEnumerable<WixColumnDefinition> columns, bool unreal, bool tupleless, string tupleDefinitionName, bool? tupleIdIsPrimaryKey)
         {
             this.Name = name;
+            this.VariableName = name.Replace("_", "");
             this.Unreal = unreal;
             this.Columns = columns?.ToArray();
             this.Tupleless = tupleless;
-            this.TupleDefinitionName = tupleless ? null : tupleDefinitionName ?? name.Replace("_", "");
+            this.TupleDefinitionName = tupleless ? null : tupleDefinitionName ?? this.VariableName;
             this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey ?? DeriveTupleIdIsPrimaryKey(this.Columns);
         }
 
         public string Name { get; }
+
+        public string VariableName { get; }
 
         public string TupleDefinitionName { get; }
 

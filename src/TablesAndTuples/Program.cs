@@ -100,6 +100,16 @@ namespace TablesAndTuples
                     {
                         type = "path";
                     }
+                    else if (columnDefinition.Type == ColumnType.Number && columnDefinition.Length == 2 &&
+                             columnDefinition.MinValue == 0 && columnDefinition.MaxValue == 1)
+                    {
+                        type = "bool";
+                    }
+
+                    if (columnDefinition.Type == ColumnType.Number && columnDefinition.Nullable)
+                    {
+                        type += "?";
+                    }
 
                     var field = new JsonObject
                     {
@@ -173,7 +183,7 @@ namespace TablesAndTuples
                 var clrType = ConvertToClrType(fieldType);
                 fieldType = ConvertToFieldType(fieldType);
 
-                var asFunction = $"As{fieldType}()";
+                var asFunction = $"As{(clrType.Contains("?") ? "Nullable" : "")}{fieldType}()";
 
                 yield return (Name: fieldName, Type: fieldType, ClrType: clrType, AsFunction: asFunction);
             }
@@ -194,7 +204,8 @@ namespace TablesAndTuples
                 "    {");
             var startTableDef = String.Join(Environment.NewLine,
                 "        public static readonly TableDefinition {1} = new TableDefinition(",
-                "            \"{1}\",",
+                "            \"{2}\",",
+                "            {3},",
                 "            new[]",
                 "            {");
             var columnDef =
@@ -203,8 +214,6 @@ namespace TablesAndTuples
                 "            },");
             var unrealDef =
                 "            unreal: true,";
-            var tupleNameDef =
-                "            tupleDefinitionName: {1}TupleDefinitions.{2}.Name,";
             var endTableDef = String.Join(Environment.NewLine,
                 "            tupleIdIsPrimaryKey: {1}",
                 "        );",
@@ -225,7 +234,8 @@ namespace TablesAndTuples
             sb.AppendLine(startClassDef.Replace("{1}", ns).Replace("{2}", prefix));
             foreach (var tableDefinition in tableDefinitions)
             {
-                sb.AppendLine(startTableDef.Replace("{1}", tableDefinition.Name));
+                var tupleDefinition = tableDefinition.Tupleless ? "null" : $"{prefix}TupleDefinitions.{tableDefinition.TupleDefinitionName}";
+                sb.AppendLine(startTableDef.Replace("{1}", tableDefinition.VariableName).Replace("{2}", tableDefinition.Name).Replace("{3}", tupleDefinition));
                 foreach (var columnDefinition in tableDefinition.Columns)
                 {
                     sb.Append(columnDef.Replace("{1}", columnDefinition.Name).Replace("{2}", columnDefinition.Type.ToString()).Replace("{3}", columnDefinition.Length.ToString())
@@ -277,16 +287,12 @@ namespace TablesAndTuples
                 {
                     sb.AppendLine(unrealDef);
                 }
-                if (!tableDefinition.Tupleless)
-                {
-                    sb.AppendLine(tupleNameDef.Replace("{1}", prefix).Replace("{2}", tableDefinition.TupleDefinitionName));
-                }
                 sb.AppendLine(endTableDef.Replace("{1}", tableDefinition.TupleIdIsPrimaryKey.ToString().ToLower()));
             }
             sb.AppendLine(startAllTablesDef);
             foreach (var tableDefinition in tableDefinitions)
             {
-                sb.AppendLine(allTableDef.Replace("{1}", tableDefinition.Name));
+                sb.AppendLine(allTableDef.Replace("{1}", tableDefinition.VariableName));
             }
             sb.AppendLine(endAllTablesDef);
             sb.AppendLine(endClassDef);
@@ -465,12 +471,15 @@ namespace TablesAndTuples
             {
                 case "bool":
                     return "Bool";
+                case "bool?":
+                    return "Number";
 
                 case "string":
                 case "preserved":
                     return "String";
 
                 case "number":
+                case "number?":
                     return "Number";
 
                 case "path":
@@ -486,6 +495,8 @@ namespace TablesAndTuples
             {
                 case "bool":
                     return "bool";
+                case "bool?":
+                    return "bool?";
 
                 case "string":
                 case "preserved":
@@ -493,9 +504,11 @@ namespace TablesAndTuples
 
                 case "number":
                     return "int";
+                case "number?":
+                    return "int?";
 
                 case "path":
-                    return "string";
+                    return "IntermediateFieldPathValue";
             }
 
             throw new ArgumentException(fieldType);
