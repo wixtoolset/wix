@@ -78,9 +78,9 @@ namespace WixToolset.Sql.Tuples
             set => this.Set((int)SqlScriptTupleFields.Attributes, value);
         }
 
-        public int Sequence
+        public int? Sequence
         {
-            get => this.Fields[(int)SqlScriptTupleFields.Sequence].AsNumber();
+            get => this.Fields[(int)SqlScriptTupleFields.Sequence].AsNullableNumber();
             set => this.Set((int)SqlScriptTupleFields.Sequence, value);
         }
     }
