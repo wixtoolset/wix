@@ -8,6 +8,7 @@ namespace WixToolset.Firewall
     {
         public static readonly TableDefinition WixFirewallException = new TableDefinition(
             "WixFirewallException",
+            FirewallTupleDefinitions.WixFirewallException,
             new[]
             {
                 new ColumnDefinition("WixFirewallException", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The primary key, a non-localized token.", modularizeType: ColumnModularizeType.Column),
@@ -21,7 +22,6 @@ namespace WixToolset.Firewall
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the firewall configuration.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Description displayed in Windows Firewall manager for this firewall rule."),
             },
-            tupleDefinitionName: FirewallTupleDefinitions.WixFirewallException.Name,
             tupleIdIsPrimaryKey: true
         );
 
