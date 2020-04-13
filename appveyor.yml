@@ -33,8 +33,6 @@ skip_tags: true
 artifacts:
 - path: build\Release\**\*.nupkg
   name: nuget
-- path: build\Release\**\*.msi
-  name: msi
 
 notifications:
 - provider: Slack
