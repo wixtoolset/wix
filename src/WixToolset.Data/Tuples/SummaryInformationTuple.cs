@@ -25,7 +25,7 @@ namespace WixToolset.Data.Tuples
         Value,
     }
 
-    public enum SumaryInformationType
+    public enum SummaryInformationType
     {
         Codepage = 1,
         Title,
@@ -87,9 +87,9 @@ namespace WixToolset.Data.Tuples
 
         public IntermediateField this[SummaryInformationTupleFields index] => this.Fields[(int)index];
 
-        public SumaryInformationType PropertyId
+        public SummaryInformationType PropertyId
         {
-            get => (SumaryInformationType)this.Fields[(int)SummaryInformationTupleFields.PropertyId].AsNumber();
+            get => (SummaryInformationType)this.Fields[(int)SummaryInformationTupleFields.PropertyId].AsNumber();
             set => this.Set((int)SummaryInformationTupleFields.PropertyId, (int)value);
         }
 
