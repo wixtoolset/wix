@@ -53,7 +53,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 switch (summaryInformationTuple.PropertyId)
                 {
-                    case SumaryInformationType.Codepage: // PID_CODEPAGE
+                    case SummaryInformationType.Codepage: // PID_CODEPAGE
                         // make sure the code page is an int and not a web name or null
                         var codepage = summaryInformationTuple.Value;
 
@@ -66,7 +66,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             summaryInformationTuple.Value = Common.GetValidCodePage(codepage, false, false, summaryInformationTuple.SourceLineNumbers).ToString(CultureInfo.InvariantCulture);
                         }
                         break;
-                    case SumaryInformationType.PackageCode: // PID_REVNUMBER
+                    case SummaryInformationType.PackageCode: // PID_REVNUMBER
                         var packageCode = summaryInformationTuple.Value;
 
                         if (SectionType.Module == this.Section.Type)
@@ -79,16 +79,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             summaryInformationTuple.Value = Common.GenerateGuid();
                         }
                         break;
-                    case SumaryInformationType.Created:
+                    case SummaryInformationType.Created:
                         foundCreateDataTime = true;
                         break;
-                    case SumaryInformationType.LastSaved:
+                    case SummaryInformationType.LastSaved:
                         foundLastSaveDataTime = true;
                         break;
-                    case SumaryInformationType.WindowsInstallerVersion:
+                    case SummaryInformationType.WindowsInstallerVersion:
                         this.InstallerVersion = summaryInformationTuple[SummaryInformationTupleFields.Value].AsNumber();
                         break;
-                    case SumaryInformationType.WordCount:
+                    case SummaryInformationType.WordCount:
                         if (SectionType.Patch == this.Section.Type)
                         {
                             this.LongNames = true;
@@ -101,7 +101,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             this.Compressed = (2 == (attributes & 2));
                         }
                         break;
-                    case SumaryInformationType.CreatingApplication: // PID_APPNAME
+                    case SummaryInformationType.CreatingApplication: // PID_APPNAME
                         foundCreatingApplication = true;
                         break;
                 }
@@ -112,7 +112,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Section.AddTuple(new SummaryInformationTuple(null)
                 {
-                    PropertyId = SumaryInformationType.Created,
+                    PropertyId = SummaryInformationType.Created,
                     Value = now,
                 });
             }
@@ -122,7 +122,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Section.AddTuple(new SummaryInformationTuple(null)
                 {
-                    PropertyId = SumaryInformationType.LastSaved,
+                    PropertyId = SummaryInformationType.LastSaved,
                     Value = now,
                 });
             }
@@ -132,7 +132,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Section.AddTuple(new SummaryInformationTuple(null)
                 {
-                    PropertyId = SumaryInformationType.CreatingApplication,
+                    PropertyId = SummaryInformationType.CreatingApplication,
                     Value = String.Format(CultureInfo.InvariantCulture, AppCommon.GetCreatingApplicationString()),
                 });
             }

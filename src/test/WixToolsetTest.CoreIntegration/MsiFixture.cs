@@ -654,7 +654,7 @@ namespace WixToolsetTest.CoreIntegration
                 var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
-                var platformSummary = section.Tuples.OfType<SummaryInformationTuple>().Single(s => s.PropertyId == SumaryInformationType.PlatformAndLanguage);
+                var platformSummary = section.Tuples.OfType<SummaryInformationTuple>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
                 Assert.Equal("x64;1033", platformSummary.Value);
             }
         }

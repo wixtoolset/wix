@@ -865,67 +865,67 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Codepage,
+                    PropertyId = SummaryInformationType.Codepage,
                     Value = codepage
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Title,
+                    PropertyId = SummaryInformationType.Title,
                     Value = "Installation Database"
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Subject,
+                    PropertyId = SummaryInformationType.Subject,
                     Value = packageName
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Author,
+                    PropertyId = SummaryInformationType.Author,
                     Value = packageAuthor
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Keywords,
+                    PropertyId = SummaryInformationType.Keywords,
                     Value = keywords
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Comments,
+                    PropertyId = SummaryInformationType.Comments,
                     Value = comments
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.PlatformAndLanguage,
+                    PropertyId = SummaryInformationType.PlatformAndLanguage,
                     Value = String.Format(CultureInfo.InvariantCulture, "{0};{1}", platform, packageLanguages)
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.PackageCode,
+                    PropertyId = SummaryInformationType.PackageCode,
                     Value = packageCode
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.WindowsInstallerVersion,
+                    PropertyId = SummaryInformationType.WindowsInstallerVersion,
                     Value = msiVersion.ToString(CultureInfo.InvariantCulture)
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.WordCount,
+                    PropertyId = SummaryInformationType.WordCount,
                     Value = sourceBits.ToString(CultureInfo.InvariantCulture)
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Security,
+                    PropertyId = SummaryInformationType.Security,
                     Value = YesNoDefaultType.No == security ? "0" : YesNoDefaultType.Yes == security ? "4" : "2"
                 });
             }
@@ -1002,13 +1002,13 @@ namespace WixToolset.Core
             {
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Codepage,
+                    PropertyId = SummaryInformationType.Codepage,
                     Value = codepage
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Title,
+                    PropertyId = SummaryInformationType.Title,
                     Value = "Patch"
                 });
 
@@ -1016,7 +1016,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                     {
-                        PropertyId = SumaryInformationType.Subject,
+                        PropertyId = SummaryInformationType.Subject,
                         Value = packageName
                     });
                 }
@@ -1025,7 +1025,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                     {
-                        PropertyId = SumaryInformationType.Author,
+                        PropertyId = SummaryInformationType.Author,
                         Value = packageAuthor
                     });
                 }
@@ -1034,7 +1034,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                     {
-                        PropertyId = SumaryInformationType.Keywords,
+                        PropertyId = SummaryInformationType.Keywords,
                         Value = keywords
                     });
                 }
@@ -1043,26 +1043,26 @@ namespace WixToolset.Core
                 {
                     this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                     {
-                        PropertyId = SumaryInformationType.Comments,
+                        PropertyId = SummaryInformationType.Comments,
                         Value = comments
                     });
                 }
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.WindowsInstallerVersion,
+                    PropertyId = SummaryInformationType.WindowsInstallerVersion,
                     Value = msiVersion.ToString(CultureInfo.InvariantCulture)
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.WordCount,
+                    PropertyId = SummaryInformationType.WordCount,
                     Value = "0"
                 });
 
                 this.Core.AddTuple(new SummaryInformationTuple(sourceLineNumbers)
                 {
-                    PropertyId = SumaryInformationType.Security,
+                    PropertyId = SummaryInformationType.Security,
                     Value = YesNoDefaultType.No == security ? "0" : YesNoDefaultType.Yes == security ? "4" : "2"
                 });
             }

@@ -209,16 +209,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             productCodes = FinalizePatchProductCodes(tuples, productCodes);
 
             // Semicolon delimited list of the product codes that can accept the patch.
-            summaryInfo.Add(SumaryInformationType.PatchProductCodes, new SummaryInformationTuple(patchIdTuple.SourceLineNumbers)
+            summaryInfo.Add(SummaryInformationType.PatchProductCodes, new SummaryInformationTuple(patchIdTuple.SourceLineNumbers)
             {
-                PropertyId = SumaryInformationType.PatchProductCodes,
+                PropertyId = SummaryInformationType.PatchProductCodes,
                 Value = String.Join(";", productCodes)
             });
 
             // Semicolon delimited list of transform substorage names in the order they are applied.
-            summaryInfo.Add(SumaryInformationType.TransformNames, new SummaryInformationTuple(patchIdTuple.SourceLineNumbers)
+            summaryInfo.Add(SummaryInformationType.TransformNames, new SummaryInformationTuple(patchIdTuple.SourceLineNumbers)
             {
-                PropertyId = SumaryInformationType.TransformNames,
+                PropertyId = SummaryInformationType.TransformNames,
                 Value = String.Join(";", transformNames)
             });
 
@@ -233,9 +233,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return subStorages;
         }
 
-        private Dictionary<SumaryInformationType, SummaryInformationTuple> ExtractPatchSummaryInfo()
+        private Dictionary<SummaryInformationType, SummaryInformationTuple> ExtractPatchSummaryInfo()
         {
-            var result = new Dictionary<SumaryInformationType, SummaryInformationTuple>();
+            var result = new Dictionary<SummaryInformationType, SummaryInformationTuple>();
 
             foreach (var section in this.Intermediate.Sections)
             {
@@ -247,12 +247,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // are not calculated or reserved.
                         section.Tuples.RemoveAt(i);
 
-                        if (patchSummaryInfo.PropertyId != SumaryInformationType.PatchProductCodes &&
-                            patchSummaryInfo.PropertyId != SumaryInformationType.PatchCode &&
-                            patchSummaryInfo.PropertyId != SumaryInformationType.PatchInstallerRequirement &&
-                            patchSummaryInfo.PropertyId != SumaryInformationType.Reserved11 &&
-                            patchSummaryInfo.PropertyId != SumaryInformationType.Reserved14 &&
-                            patchSummaryInfo.PropertyId != SumaryInformationType.Reserved16)
+                        if (patchSummaryInfo.PropertyId != SummaryInformationType.PatchProductCodes &&
+                            patchSummaryInfo.PropertyId != SummaryInformationType.PatchCode &&
+                            patchSummaryInfo.PropertyId != SummaryInformationType.PatchInstallerRequirement &&
+                            patchSummaryInfo.PropertyId != SummaryInformationType.Reserved11 &&
+                            patchSummaryInfo.PropertyId != SummaryInformationType.Reserved14 &&
+                            patchSummaryInfo.PropertyId != SummaryInformationType.Reserved16)
                         {
                             result.Add(patchSummaryInfo.PropertyId, patchSummaryInfo);
                         }
@@ -263,25 +263,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return result;
         }
 
-        private Dictionary<string, MsiPatchMetadataTuple> PopulateSummaryInformation(Dictionary<SumaryInformationType, SummaryInformationTuple> summaryInfo, List<IntermediateTuple> tuples, WixPatchIdTuple patchIdTuple, int codepage)
+        private Dictionary<string, MsiPatchMetadataTuple> PopulateSummaryInformation(Dictionary<SummaryInformationType, SummaryInformationTuple> summaryInfo, List<IntermediateTuple> tuples, WixPatchIdTuple patchIdTuple, int codepage)
         {
             // PID_CODEPAGE
-            if (!summaryInfo.ContainsKey(SumaryInformationType.Codepage))
+            if (!summaryInfo.ContainsKey(SummaryInformationType.Codepage))
             {
                 // Set the code page by default to the same code page for the
                 // string pool in the database.
-                AddSummaryInformation(SumaryInformationType.Codepage, codepage.ToString(CultureInfo.InvariantCulture), patchIdTuple.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Codepage, codepage.ToString(CultureInfo.InvariantCulture), patchIdTuple.SourceLineNumbers);
             }
 
             // GUID patch code for the patch.
-            AddSummaryInformation(SumaryInformationType.PatchCode, patchIdTuple.Id.Id, patchIdTuple.SourceLineNumbers);
+            AddSummaryInformation(SummaryInformationType.PatchCode, patchIdTuple.Id.Id, patchIdTuple.SourceLineNumbers);
 
             // Indicates the minimum Windows Installer version that is required to install the patch.
-            AddSummaryInformation(SumaryInformationType.PatchInstallerRequirement, ((int)SummaryInformation.InstallerRequirement.Version31).ToString(CultureInfo.InvariantCulture), patchIdTuple.SourceLineNumbers);
+            AddSummaryInformation(SummaryInformationType.PatchInstallerRequirement, ((int)SummaryInformation.InstallerRequirement.Version31).ToString(CultureInfo.InvariantCulture), patchIdTuple.SourceLineNumbers);
 
-            if (!summaryInfo.ContainsKey(SumaryInformationType.Security))
+            if (!summaryInfo.ContainsKey(SummaryInformationType.Security))
             {
-                AddSummaryInformation(SumaryInformationType.Security, "4", patchIdTuple.SourceLineNumbers); // Read-only enforced;
+                AddSummaryInformation(SummaryInformationType.Security, "4", patchIdTuple.SourceLineNumbers); // Read-only enforced;
             }
 
             // Use authored comments or default to display name.
@@ -289,32 +289,32 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var metadataTuples = tuples.OfType<MsiPatchMetadataTuple>().Where(t => String.IsNullOrEmpty(t.Company)).ToDictionary(t => t.Property);
 
-            if (!summaryInfo.ContainsKey(SumaryInformationType.Title) &&
+            if (!summaryInfo.ContainsKey(SummaryInformationType.Title) &&
                 metadataTuples.TryGetValue("DisplayName", out var displayName))
             {
-                AddSummaryInformation(SumaryInformationType.Title, displayName.Value, displayName.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Title, displayName.Value, displayName.SourceLineNumbers);
 
                 // Default comments to use display name as-is.
                 commentsTuple = displayName;
             }
 
             // TODO: This code below seems unnecessary given the codepage is set at the top of this method.
-            //if (!summaryInfo.ContainsKey(SumaryInformationType.Codepage) &&
+            //if (!summaryInfo.ContainsKey(SummaryInformationType.Codepage) &&
             //    metadataValues.TryGetValue("CodePage", out var codepage))
             //{
-            //    AddSummaryInformation(SumaryInformationType.Codepage, codepage);
+            //    AddSummaryInformation(SummaryInformationType.Codepage, codepage);
             //}
 
-            if (!summaryInfo.ContainsKey(SumaryInformationType.PatchPackageName) &&
+            if (!summaryInfo.ContainsKey(SummaryInformationType.PatchPackageName) &&
                 metadataTuples.TryGetValue("Description", out var description))
             {
-                AddSummaryInformation(SumaryInformationType.PatchPackageName, description.Value, description.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.PatchPackageName, description.Value, description.SourceLineNumbers);
             }
 
-            if (!summaryInfo.ContainsKey(SumaryInformationType.Author) &&
+            if (!summaryInfo.ContainsKey(SummaryInformationType.Author) &&
                 metadataTuples.TryGetValue("ManufacturerName", out var manufacturer))
             {
-                AddSummaryInformation(SumaryInformationType.Author, manufacturer.Value, manufacturer.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Author, manufacturer.Value, manufacturer.SourceLineNumbers);
             }
 
             // Special metadata marshalled through the build.
@@ -327,15 +327,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Write the package comments to summary info.
-            if (!summaryInfo.ContainsKey(SumaryInformationType.Comments) &&
+            if (!summaryInfo.ContainsKey(SummaryInformationType.Comments) &&
                 commentsTuple != null)
             {
-                AddSummaryInformation(SumaryInformationType.Comments, commentsTuple.Value, commentsTuple.SourceLineNumbers);
+                AddSummaryInformation(SummaryInformationType.Comments, commentsTuple.Value, commentsTuple.SourceLineNumbers);
             }
 
             return metadataTuples;
 
-            void AddSummaryInformation(SumaryInformationType type, string value, SourceLineNumber sourceLineNumber)
+            void AddSummaryInformation(SummaryInformationType type, string value, SourceLineNumber sourceLineNumber)
             {
                 summaryInfo.Add(type, new SummaryInformationTuple(sourceLineNumber)
                 {
@@ -1091,7 +1091,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Create the #transform for the given main transform.
         /// </summary>
-        private WindowsInstallerData BuildPairedTransform(Dictionary<SumaryInformationType, SummaryInformationTuple> summaryInfo, Dictionary<string, MsiPatchMetadataTuple> patchMetadata, WixPatchIdTuple patchIdTuple, WindowsInstallerData mainTransform, MediaTuple mediaTuple, WixPatchBaselineTuple baselineTuple, out string productCode)
+        private WindowsInstallerData BuildPairedTransform(Dictionary<SummaryInformationType, SummaryInformationTuple> summaryInfo, Dictionary<string, MsiPatchMetadataTuple> patchMetadata, WixPatchIdTuple patchIdTuple, WindowsInstallerData mainTransform, MediaTuple mediaTuple, WixPatchBaselineTuple baselineTuple, out string productCode)
         {
             productCode = null;
 
@@ -1109,10 +1109,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var baselineValidationFlags = ((int)baselineTuple.ValidationFlags).ToString(CultureInfo.InvariantCulture);
 
-            if (!mainSummaryRows.ContainsKey((int)SumaryInformationType.TransformValidationFlags))
+            if (!mainSummaryRows.ContainsKey((int)SummaryInformationType.TransformValidationFlags))
             {
                 var mainSummaryRow = mainSummaryTable.CreateRow(baselineTuple.SourceLineNumbers);
-                mainSummaryRow[0] = (int)SumaryInformationType.TransformValidationFlags;
+                mainSummaryRow[0] = (int)SummaryInformationType.TransformValidationFlags;
                 mainSummaryRow[1] = baselineValidationFlags;
             }
 
@@ -1121,11 +1121,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var mainSummaryRow in mainSummaryTable.Rows)
             {
-                var type = (SumaryInformationType)mainSummaryRow.FieldAsInteger(0);
+                var type = (SummaryInformationType)mainSummaryRow.FieldAsInteger(0);
                 var value = mainSummaryRow.FieldAsString(1);
                 switch (type)
                 {
-                    case SumaryInformationType.TransformProductCodes:
+                    case SummaryInformationType.TransformProductCodes:
                         var propertyData = value.Split(';');
                         var oldProductVersion = propertyData[0].Substring(38);
                         var upgradeCode = propertyData[2];
@@ -1140,7 +1140,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         mainSummaryRow[1] = String.Concat(productCode, oldProductVersion, ';', productCode, newProductVersion, ';', upgradeCode);
                         value = String.Concat(productCode, newProductVersion, ';', productCode, newProductVersion, ';', upgradeCode);
                         break;
-                    case SumaryInformationType.TransformValidationFlags: // use validation flags authored into the patch XML.
+                    case SummaryInformationType.TransformValidationFlags: // use validation flags authored into the patch XML.
                         value = baselineValidationFlags;
                         mainSummaryRow[1] = value;
                         break;
@@ -1260,7 +1260,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             pairedPropertyRow[1] = patchIdTuple.Id.Id;
 
             // Add PATCHNEWSUMMARYCOMMENTS and PATCHNEWSUMMARYSUBJECT to apply to admin layouts.
-            if (summaryInfo.TryGetValue(SumaryInformationType.Subject, out var subjectTuple))
+            if (summaryInfo.TryGetValue(SummaryInformationType.Subject, out var subjectTuple))
             {
                 pairedPropertyRow = pairedPropertyTable.CreateRow(subjectTuple.SourceLineNumbers);
                 pairedPropertyRow.Operation = RowOperation.Add;
@@ -1268,7 +1268,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 pairedPropertyRow[1] = subjectTuple.Value;
             }
 
-            if (summaryInfo.TryGetValue(SumaryInformationType.Comments, out var commentsTuple))
+            if (summaryInfo.TryGetValue(SummaryInformationType.Comments, out var commentsTuple))
             {
                 pairedPropertyRow = pairedPropertyTable.CreateRow(commentsTuple.SourceLineNumbers);
                 pairedPropertyRow.Operation = RowOperation.Add;
