@@ -63,26 +63,8 @@ namespace WixToolset.Data.WindowsInstaller
                 case "BBControl":
                     row = new BBControlRow(sourceLineNumbers, this);
                     break;
-                case "WixBundlePackage":
-                    row = new WixBundlePackageRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleExePackage":
-                    row = new WixBundleExePackageRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleMsiPackage":
-                    row = new WixBundleMsiPackageRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleMspPackage":
-                    row = new WixBundleMspPackageRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleMsuPackage":
-                    row = new WixBundleMsuPackageRow(sourceLineNumbers, this);
-                    break;
                 case "Component":
                     row = new ComponentRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleContainer":
-                    row = new WixBundleContainerRow(sourceLineNumbers, this);
                     break;
                 case "Control":
                     row = new ControlRow(sourceLineNumbers, this);
@@ -90,68 +72,17 @@ namespace WixToolset.Data.WindowsInstaller
                 case "File":
                     row = new FileRow(sourceLineNumbers, this);
                     break;
-                case "WixBundleMsiFeature":
-                    row = new WixBundleMsiFeatureRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleMsiProperty":
-                    row = new WixBundleMsiPropertyRow(sourceLineNumbers, this);
-                    break;
                 case "Media":
                     row = new MediaRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundlePayload":
-                    row = new WixBundlePayloadRow(sourceLineNumbers, this);
                     break;
                 case "Property":
                     row = new PropertyRow(sourceLineNumbers, this);
                     break;
-                case "WixRelatedBundle":
-                    row = new WixRelatedBundleRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleRelatedPackage":
-                    row = new WixBundleRelatedPackageRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleRollbackBoundary":
-                    row = new WixBundleRollbackBoundaryRow(sourceLineNumbers, this);
-                    break;
                 case "Upgrade":
                     row = new UpgradeRow(sourceLineNumbers, this);
                     break;
-                case "WixBundleVariable":
-                    row = new WixBundleVariableRow(sourceLineNumbers, this);
-                    break;
                 case "WixAction":
                     row = new WixActionRow(sourceLineNumbers, this);
-                    break;
-                case "WixApprovedExeForElevation":
-                    row = new WixApprovedExeForElevationRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundle":
-                    row = new WixBundleRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundlePackageExitCode":
-                    row = new WixBundlePackageExitCodeRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundlePatchTargetCode":
-                    row = new WixBundlePatchTargetCodeRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleSlipstreamMsp":
-                    row = new WixBundleSlipstreamMspRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleUpdate":
-                    row = new WixBundleUpdateRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundleCatalog":
-                    row = new WixBundleCatalogRow(sourceLineNumbers, this);
-                    break;
-                case "WixChain":
-                    row = new WixChainRow(sourceLineNumbers, this);
-                    break;
-                case "WixChainItem":
-                    row = new WixChainItemRow(sourceLineNumbers, this);
-                    break;
-                case "WixBundlePackageCommandLine":
-                    row = new WixBundlePackageCommandLineRow(sourceLineNumbers, this);
                     break;
                 case "WixComplexReference":
                     row = new WixComplexReferenceRow(sourceLineNumbers, this);
@@ -174,17 +105,11 @@ namespace WixToolset.Data.WindowsInstaller
                 case "WixMerge":
                     row = new WixMergeRow(sourceLineNumbers, this);
                     break;
-                case "WixPayloadProperties":
-                    row = new WixPayloadPropertiesRow(sourceLineNumbers, this);
-                    break;
                 case "WixProperty":
                     row = new WixPropertyRow(sourceLineNumbers, this);
                     break;
                 case "WixSimpleReference":
                     row = new WixSimpleReferenceRow(sourceLineNumbers, this);
-                    break;
-                case "WixUpdateRegistration":
-                    row = new WixUpdateRegistrationRow(sourceLineNumbers, this);
                     break;
 
                 default:
