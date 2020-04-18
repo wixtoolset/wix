@@ -47,22 +47,6 @@ namespace WixToolset.Data.WindowsInstaller
         }
 
         /// <summary>
-        /// Creates a shallow copy of a row from another row.
-        /// </summary>
-        /// <param name="source">The row the data is copied from.</param>
-        protected Row(Row source)
-        {
-            this.Table = source.Table;
-            this.TableDefinition = source.TableDefinition;
-            this.Number = source.Number;
-            this.Operation = source.Operation;
-            this.Redundant = source.Redundant;
-            this.SectionId = source.SectionId;
-            this.SourceLineNumbers = source.SourceLineNumbers;
-            this.Fields = source.Fields;
-        }
-
-        /// <summary>
         /// Gets or sets the row transform operation.
         /// </summary>
         /// <value>The row transform operation.</value>

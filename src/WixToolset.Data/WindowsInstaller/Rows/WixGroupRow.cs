@@ -19,6 +19,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public WixGroupRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
+            : base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets or sets the parent identifier of the complex reference.
         /// </summary>

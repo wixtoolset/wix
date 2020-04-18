@@ -18,6 +18,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public WixPropertyRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets and sets the id for this property row.
         /// </summary>

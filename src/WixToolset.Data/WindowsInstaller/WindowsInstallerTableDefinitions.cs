@@ -2,6 +2,8 @@
 
 namespace WixToolset.Data.WindowsInstaller
 {
+    using WixToolset.Data.WindowsInstaller.Rows;
+
     public static class WindowsInstallerTableDefinitions
     {
         public static readonly TableDefinition ActionText = new TableDefinition(
@@ -111,6 +113,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Property", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "Name of property, uppercase if settable by launcher or loader.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Value", ColumnType.Localized, 0, primaryKey: false, nullable: false, ColumnCategory.Text, description: "String value for property.  Never null or empty."),
             },
+            strongRowType: typeof(PropertyRow),
             tupleIdIsPrimaryKey: true
         );
 
@@ -129,6 +132,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 2147483647, description: "A 32-bit word that specifies the attribute flags to be applied to this control."),
                 new ColumnDefinition("Text", ColumnType.Localized, 50, primaryKey: false, nullable: true, ColumnCategory.Text, description: "A string used to set the initial text contained within a control (if appropriate)."),
             },
+            strongRowType: typeof(BBControlRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -200,6 +204,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("DiskId", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 1, maxValue: 32767, description: "Disk identifier for the file.", unreal: true),
                 new ColumnDefinition("Source", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Binary, description: "Path to source of file.", unreal: true),
             },
+            strongRowType: typeof(FileRow),
             tupleIdIsPrimaryKey: true
         );
 
@@ -258,6 +263,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Condition", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Condition, description: "A conditional statement that will disable this component if the specified condition evaluates to the 'True' state. If a component is disabled, it will not be installed, regardless of the 'Action' state associated with the component.", modularizeType: ColumnModularizeType.Condition, forceLocalizable: true),
                 new ColumnDefinition("KeyPath", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "File;Registry;ODBCDataSource", keyColumn: 1, description: "Either the primary key into the File table, Registry table, or ODBCDataSource table. This extract path is stored when the component is installed, and is used to detect the presence of the component and to return the path to it.", modularizeType: ColumnModularizeType.Column),
             },
+            strongRowType: typeof(ComponentRow),
             tupleIdIsPrimaryKey: true
         );
 
@@ -353,6 +359,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Control_Next", ColumnType.String, 50, primaryKey: false, nullable: true, ColumnCategory.Identifier, keyTable: "Control", keyColumn: 2, description: "The name of an other control on the same dialog. This link defines the tab order of the controls. The links have to form one or more cycles!"),
                 new ColumnDefinition("Help", ColumnType.Localized, 50, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The help strings used with the button. The text is optional. "),
             },
+            strongRowType: typeof(ControlRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -708,6 +715,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("VolumeLabel", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Text, description: "The label attributed to the volume."),
                 new ColumnDefinition("Source", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Property, description: "The property defining the location of the cabinet file."),
             },
+            strongRowType: typeof(MediaRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1330,6 +1338,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Remove", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "The list of features to remove when uninstalling a product from this set.  The default is \"ALL\"."),
                 new ColumnDefinition("ActionProperty", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.UpperCase, description: "The property to set when a product in this set is found."),
             },
+            strongRowType: typeof(UpgradeRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1666,6 +1675,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Overridable", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixActionRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1695,6 +1705,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixComplexReferenceRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1814,6 +1825,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("ChildType", ColumnType.String, 0, primaryKey: true, nullable: false, ColumnCategory.Unknown, description: "Primary key used to identify a particular child type in a child table."),
             },
             unreal: true,
+            strongRowType: typeof(WixGroupRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1923,6 +1935,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Layout", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixMediaRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1939,6 +1952,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("MaximumCabinetSizeForLargeFileSplitting", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixMediaTemplateRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -1957,6 +1971,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Feature_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixMergeRow),
             tupleIdIsPrimaryKey: true
         );
 
@@ -1987,6 +2002,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("SymbolPaths", ColumnType.Preserved, 0, primaryKey: false, nullable: true, ColumnCategory.Text),
             },
             unreal: true,
+            strongRowType: typeof(WixDeltaPatchFileRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -2000,6 +2016,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("SymbolPaths", ColumnType.Preserved, 0, primaryKey: false, nullable: false, ColumnCategory.Text),
             },
             unreal: true,
+            strongRowType: typeof(WixDeltaPatchSymbolPathsRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -2012,6 +2029,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixPropertyRow),
             tupleIdIsPrimaryKey: false
         );
 
@@ -2024,6 +2042,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new ColumnDefinition("PrimaryKeys", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
             },
             unreal: true,
+            strongRowType: typeof(WixSimpleReferenceRow),
             tupleIdIsPrimaryKey: false
         );
 

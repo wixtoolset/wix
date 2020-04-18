@@ -17,6 +17,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public PropertyRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets and sets the property name for the row.
         /// </summary>

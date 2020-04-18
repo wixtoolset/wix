@@ -17,6 +17,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public MediaRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets or sets the disk id for this media row.
         /// </summary>

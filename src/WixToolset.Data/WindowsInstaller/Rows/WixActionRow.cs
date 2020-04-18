@@ -23,13 +23,8 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
-        /// <summary>
-        /// Instantiates an ActionRow by copying data from another ActionRow.
-        /// </summary>
-        /// <param name="source">The row the data is copied from.</param>
-        /// <remarks>The previous and next action collections are not copied.</remarks>
-        private WixActionRow(WixActionRow source)
-            : base(source)
+        public WixActionRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
         {
         }
 

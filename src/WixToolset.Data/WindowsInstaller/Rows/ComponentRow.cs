@@ -19,6 +19,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public ComponentRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets or sets the identifier for this Component row.
         /// </summary>

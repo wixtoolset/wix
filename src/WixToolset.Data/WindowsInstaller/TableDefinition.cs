@@ -26,18 +26,22 @@ namespace WixToolset.Data.WindowsInstaller
         /// <param name="columns">Column definitions for the table.</param>
         /// <param name="unreal">Flag if table is unreal.</param>
         /// <param name="tupleIdIsPrimaryKey">Whether the primary key is the id of the tuple definition associated with this table.</param>
-        public TableDefinition(string name, IntermediateTupleDefinition tupleDefinition, IEnumerable<ColumnDefinition> columns, bool unreal = false, bool tupleIdIsPrimaryKey = false)
+        public TableDefinition(string name, IntermediateTupleDefinition tupleDefinition, IEnumerable<ColumnDefinition> columns, bool unreal = false, bool tupleIdIsPrimaryKey = false, Type strongRowType = null)
         {
             this.Name = name;
             this.TupleDefinition = tupleDefinition;
             this.TupleIdIsPrimaryKey = tupleIdIsPrimaryKey;
             this.Unreal = unreal;
             this.Columns = columns?.ToArray();
+            this.StrongRowType = strongRowType ?? typeof(Row);
 
             if (this.Columns == null || this.Columns.Length == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(columns));
             }
+#if DEBUG
+            if (this.StrongRowType != typeof(Row) && !this.StrongRowType.IsSubclassOf(typeof(Row))) { throw new ArgumentException(nameof(strongRowType)); }
+#endif
         }
 
         /// <summary>
@@ -70,12 +74,39 @@ namespace WixToolset.Data.WindowsInstaller
         /// <value>Flag if table is unreal.</value>
         public bool TupleIdIsPrimaryKey { get; }
 
+        private Type StrongRowType { get; }
+
         /// <summary>
         /// Gets the column definition in the table by index.
         /// </summary>
         /// <param name="columnIndex">Index of column to locate.</param>
         /// <value>Column definition in the table by index.</value>
         public ColumnDefinition this[int columnIndex] => this.Columns[columnIndex];
+
+        /// <summary>
+        /// In general this method shouldn't be used - create rows from a Table instead.
+        /// Creates a new row object of the type specified in this definition.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Original source lines for this row.</param>
+        /// <returns>Created row.</returns>
+        public Row CreateRow(SourceLineNumber sourceLineNumbers)
+        {
+            var result = (Row)Activator.CreateInstance(this.StrongRowType, sourceLineNumbers, this);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new row object of the type specified in this definition for the given table.
+        /// External callers should create the row from the table.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Original source lines for this row.</param>
+        /// <param name="table">The owning table for this row.</param>
+        /// <returns>Created row.</returns>
+        internal Row CreateRow(SourceLineNumber sourceLineNumbers, Table table)
+        {
+            var result = (Row)Activator.CreateInstance(this.StrongRowType, sourceLineNumbers, table);
+            return result;
+        }
 
         /// <summary>
         /// Compares this table definition to another table definition.

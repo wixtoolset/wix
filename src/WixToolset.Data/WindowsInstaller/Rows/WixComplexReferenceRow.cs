@@ -20,6 +20,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public WixComplexReferenceRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
+            : base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets the parent type of the complex reference.
         /// </summary>

@@ -17,6 +17,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public UpgradeRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets and sets the upgrade code for the row.
         /// </summary>

@@ -6,7 +6,6 @@ namespace WixToolset.Data.WindowsInstaller
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Xml;
-    using WixToolset.Data.WindowsInstaller.Rows;
 
     /// <summary>
     /// Object that represents a table in a database.
@@ -49,79 +48,14 @@ namespace WixToolset.Data.WindowsInstaller
         public IList<Row> Rows { get; }
 
         /// <summary>
-        /// Creates a new row in the table.
+        /// Creates a new row and adds it to the table.
         /// </summary>
         /// <param name="sourceLineNumbers">Original source lines for this row.</param>
-        /// <param name="add">Specifies whether to only create the row or add it to the table automatically.</param>
         /// <returns>Row created in table.</returns>
-        public Row CreateRow(SourceLineNumber sourceLineNumbers, bool add = true)
+        public Row CreateRow(SourceLineNumber sourceLineNumbers)
         {
-            Row row;
-
-            switch (this.Name)
-            {
-                case "BBControl":
-                    row = new BBControlRow(sourceLineNumbers, this);
-                    break;
-                case "Component":
-                    row = new ComponentRow(sourceLineNumbers, this);
-                    break;
-                case "Control":
-                    row = new ControlRow(sourceLineNumbers, this);
-                    break;
-                case "File":
-                    row = new FileRow(sourceLineNumbers, this);
-                    break;
-                case "Media":
-                    row = new MediaRow(sourceLineNumbers, this);
-                    break;
-                case "Property":
-                    row = new PropertyRow(sourceLineNumbers, this);
-                    break;
-                case "Upgrade":
-                    row = new UpgradeRow(sourceLineNumbers, this);
-                    break;
-                case "WixAction":
-                    row = new WixActionRow(sourceLineNumbers, this);
-                    break;
-                case "WixComplexReference":
-                    row = new WixComplexReferenceRow(sourceLineNumbers, this);
-                    break;
-                case "WixDeltaPatchFile":
-                    row = new WixDeltaPatchFileRow(sourceLineNumbers, this);
-                    break;
-                case "WixDeltaPatchSymbolPaths":
-                    row = new WixDeltaPatchSymbolPathsRow(sourceLineNumbers, this);
-                    break;
-                case "WixGroup":
-                    row = new WixGroupRow(sourceLineNumbers, this);
-                    break;
-                case "WixMedia":
-                    row = new WixMediaRow(sourceLineNumbers, this);
-                    break;
-                case "WixMediaTemplate":
-                    row = new WixMediaTemplateRow(sourceLineNumbers, this);
-                    break;
-                case "WixMerge":
-                    row = new WixMergeRow(sourceLineNumbers, this);
-                    break;
-                case "WixProperty":
-                    row = new WixPropertyRow(sourceLineNumbers, this);
-                    break;
-                case "WixSimpleReference":
-                    row = new WixSimpleReferenceRow(sourceLineNumbers, this);
-                    break;
-
-                default:
-                    row = new Row(sourceLineNumbers, this);
-                    break;
-            }
-
-            if (add)
-            {
-                this.Rows.Add(row);
-            }
-
+            var row = this.Definition.CreateRow(sourceLineNumbers, this);
+            this.Rows.Add(row);
             return row;
         }
 

@@ -19,6 +19,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public BBControlRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition) :
+            base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets or sets the dialog of the Control row.
         /// </summary>

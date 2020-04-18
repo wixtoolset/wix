@@ -17,6 +17,11 @@ namespace WixToolset.Data.WindowsInstaller.Rows
         {
         }
 
+        public WixMediaTemplateRow(SourceLineNumber sourceLineNumbers, TableDefinition tableDefinition)
+            : base(sourceLineNumbers, tableDefinition)
+        {
+        }
+
         /// <summary>
         /// Gets or sets the cabinet template name for this media template row.
         /// </summary>
