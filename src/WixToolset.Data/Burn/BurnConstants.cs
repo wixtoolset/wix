@@ -8,6 +8,10 @@ namespace WixToolset.Data.Burn
         public const string BurnDefaultAttachedContainerName = "WixAttachedContainer";
         public const string BundleLayoutOnlyPayloadsName = "BundleLayoutOnlyPayloads";
 
+        public const string BurnManifestWixOutputStreamName = "wix-burndata.xml";
+        public const string BundleExtensionDataWixOutputStreamName = "wix-bextdata";
+        public const string BootstrapperApplicationDataWixOutputStreamName = "wix-badata.xml";
+
         public const string BootstrapperApplicationDataTupleDefinitionTag = "WixBootstrapperApplicationData";
         public const string BundleExtensionSearchTupleDefinitionTag = "WixBundleExtensionSearch";
 
