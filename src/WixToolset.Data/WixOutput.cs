@@ -222,14 +222,12 @@ namespace WixToolset.Data
         {
             var entry = this.archive.GetEntry(name);
 
-            var bytes = new byte[entry.Length];
-
+            // Use StreamReader to "swallow" BOM if present.
             using (var stream = entry.Open())
+            using (var streamReader = new StreamReader(stream, Encoding.UTF8))
             {
-                stream.Read(bytes, 0, bytes.Length);
+                return streamReader.ReadToEnd();
             }
-
-            return Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>
