@@ -747,7 +747,7 @@ namespace WixToolset.Core.WindowsInstaller
                 property.Id = id;
 
                 // create a dummy row for indexing
-                var row = new Row(null, this.tableDefinitions["Property"]);
+                var row = this.tableDefinitions["Property"].CreateRow(null);
                 row[0] = id;
 
                 this.core.RootElement.AddChild(property);

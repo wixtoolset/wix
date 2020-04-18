@@ -16,21 +16,7 @@ namespace Example.Extension
 
         public bool TryGetTupleDefinitionByName(string name, out IntermediateTupleDefinition tupleDefinition)
         {
-            switch (name)
-            {
-                case "Example":
-                    tupleDefinition = ExampleTupleDefinitions.Example;
-                    break;
-
-                case "ExampleSearch":
-                    tupleDefinition = ExampleTupleDefinitions.ExampleSearch;
-                    break;
-
-                default:
-                    tupleDefinition = null;
-                    break;
-            }
-
+            tupleDefinition = ExampleTupleDefinitions.ByName(name);
             return tupleDefinition != null;
         }
     }

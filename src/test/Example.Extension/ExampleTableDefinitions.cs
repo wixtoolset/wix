@@ -14,6 +14,7 @@ namespace Example.Extension
                 new ColumnDefinition("Example", ColumnType.String, 72, true, false, ColumnCategory.Identifier),
                 new ColumnDefinition("Value", ColumnType.String, 0, false, false, ColumnCategory.Formatted),
             },
+            strongRowType: typeof(ExampleRow),
             tupleIdIsPrimaryKey: true
         );
 

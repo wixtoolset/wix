@@ -2,15 +2,20 @@
 
 namespace Example.Extension
 {
+    using System;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
 
+    public enum ExampleTupleDefinitionType
+    {
+        Example,
+        ExampleSearch,
+    }
+
     public static class ExampleTupleDefinitions
     {
-        public const string ExampleName = "Example";
-
         public static readonly IntermediateTupleDefinition Example = new IntermediateTupleDefinition(
-            ExampleName,
+            ExampleTupleDefinitionType.Example.ToString(),
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ExampleTupleFields.Value), IntermediateFieldType.String),
@@ -18,7 +23,7 @@ namespace Example.Extension
             typeof(ExampleTuple));
 
         public static readonly IntermediateTupleDefinition ExampleSearch = new IntermediateTupleDefinition(
-            nameof(ExampleSearch),
+            ExampleTupleDefinitionType.ExampleSearch.ToString(),
             new[]
             {
                 new IntermediateFieldDefinition(nameof(ExampleSearchTupleFields.SearchFor), IntermediateFieldType.String),
@@ -28,6 +33,35 @@ namespace Example.Extension
         static ExampleTupleDefinitions()
         {
             ExampleSearch.AddTag(BurnConstants.BundleExtensionSearchTupleDefinitionTag);
+        }
+
+        public static bool TryGetTupleType(string name, out ExampleTupleDefinitionType type)
+        {
+            return Enum.TryParse(name, out type);
+        }
+
+        public static IntermediateTupleDefinition ByName(string name)
+        {
+            if (!TryGetTupleType(name, out var type))
+            {
+                return null;
+            }
+            return ByType(type);
+        }
+
+        public static IntermediateTupleDefinition ByType(ExampleTupleDefinitionType type)
+        {
+            switch (type)
+            {
+                case ExampleTupleDefinitionType.Example:
+                    return ExampleTupleDefinitions.Example;
+
+                case ExampleTupleDefinitionType.ExampleSearch:
+                    return ExampleTupleDefinitions.ExampleSearch;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type));
+            }
         }
     }
 }

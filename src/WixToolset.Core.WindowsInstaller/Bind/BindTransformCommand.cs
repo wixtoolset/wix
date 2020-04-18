@@ -307,7 +307,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     // process modified and unmodified rows
                     var modifiedRow = false;
-                    var targetRow = new Row(null, table.Definition);
+                    var targetRow = table.Definition.CreateRow(null);
                     var updatedRow = row;
                     for (var i = 0; i < row.Fields.Length; i++)
                     {

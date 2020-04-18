@@ -13,22 +13,21 @@ namespace Example.Extension
 
         public override bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
-#if ALTERNATIVE_TO_USING_HELPER
-            switch (tuple.Definition.Name)
+            if (ExampleTupleDefinitions.TryGetTupleType(tuple.Definition.Name, out var tupleType))
             {
-                case ExampleTupleDefinitions.ExampleName:
-                    {
-                        var row = this.BackendHelper.CreateRow(section, tuple, output, ExampleTableDefinitions.ExampleTable);
-                        row[0] = tuple[0].AsString();
-                        row[1] = tuple[1].AsString();
-                    }
-                    return true;
+                switch (tupleType)
+                {
+                    case ExampleTupleDefinitionType.Example:
+                        {
+                            var row = (ExampleRow)this.BackendHelper.CreateRow(section, tuple, output, ExampleTableDefinitions.ExampleTable);
+                            row.Example = tuple.Id.Id;
+                            row.Value = tuple[0].AsString();
+                        }
+                        return true;
+                }
             }
 
-            return false;
-#else
             return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(section, tuple, output, tableDefinitions);
-#endif
         }
     }
 }
