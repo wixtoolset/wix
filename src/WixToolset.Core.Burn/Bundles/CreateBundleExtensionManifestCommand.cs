@@ -37,11 +37,13 @@ namespace WixToolset.Core.Burn.Bundles
 
         public WixBundlePayloadTuple BundleExtensionManifestPayloadRow { get; private set; }
 
+        public string OutputPath { get; private set; }
+
         public void Execute()
         {
-            var bextManifestPath = this.CreateBundleExtensionManifest();
+            this.OutputPath = this.CreateBundleExtensionManifest();
 
-            this.BundleExtensionManifestPayloadRow = this.CreateBundleExtensionManifestPayloadRow(bextManifestPath);
+            this.BundleExtensionManifestPayloadRow = this.CreateBundleExtensionManifestPayloadRow(this.OutputPath);
         }
 
         private string CreateBundleExtensionManifest()

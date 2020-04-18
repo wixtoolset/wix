@@ -74,6 +74,8 @@ namespace WixToolset.Core.Burn
 
         public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
 
+        public WixOutput Wixout { get; private set; }
+
         public void Execute()
         {
             var section = this.Output.Sections.Single();
@@ -381,21 +383,25 @@ namespace WixToolset.Core.Burn
             this.ResolveBundleInstallScope(section, bundleTuple, orderedFacades);
 
             // Generate the core-defined BA manifest tables...
+            string baManifestPath;
             {
                 var command = new CreateBootstrapperApplicationManifestCommand(section, bundleTuple, orderedFacades, uxPayloadIndex, payloadTuples, this.IntermediateFolder);
                 command.Execute();
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;
+                baManifestPath = command.OutputPath;
                 payloadTuples.Add(baManifestPayload.Id.Id, baManifestPayload);
                 ++uxPayloadIndex;
             }
 
             // Generate the bundle extension manifest...
+            string bextManifestPath;
             {
                 var command = new CreateBundleExtensionManifestCommand(section, bundleTuple, extensionSearchTuplesById, uxPayloadIndex, this.IntermediateFolder);
                 command.Execute();
 
                 var bextManifestPayload = command.BundleExtensionManifestPayloadRow;
+                bextManifestPath = command.OutputPath;
                 payloadTuples.Add(bextManifestPayload.Id.Id, bextManifestPayload);
                 ++uxPayloadIndex;
             }
@@ -450,29 +456,39 @@ namespace WixToolset.Core.Burn
                 fileTransfers.Add(command.Transfer);
             }
 
-#if TODO
-            this.Pdb = new Pdb { Output = output };
-
-            if (!String.IsNullOrEmpty(this.OutputPdbPath))
-            {
-                var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
-                trackedFiles.Add(trackPdb);
-
-                this.Pdb.Save(trackPdb.Path);
-            }
-#endif
-
 #if TODO // does this need to come back, or do they only need to be in TrackedFiles?
             this.ContentFilePaths = payloadTuples.Values.Where(p => p.ContentFile).Select(p => p.FullFileName).ToList();
 #endif
             this.FileTransfers = fileTransfers;
             this.TrackedFiles = trackedFiles;
+            this.Wixout = this.CreateWixout(trackedFiles, this.Output, manifestPath, baManifestPath, bextManifestPath);
+        }
 
-            // TODO: Eventually this gets removed
-            var intermediate = new Intermediate(this.Output.Id, new[] { section }, this.Output.Localizations.ToDictionary(l => l.Culture, StringComparer.OrdinalIgnoreCase));
-            var trackIntermediate = this.BackendHelper.TrackFile(Path.Combine(this.IntermediateFolder, Path.GetFileName(Path.ChangeExtension(this.OutputPath, "wir"))), TrackedFileType.Intermediate);
-            intermediate.Save(trackIntermediate.Path);
-            trackedFiles.Add(trackIntermediate);
+        private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, string manifestPath, string baDataPath, string bextDataPath)
+        {
+            WixOutput wixout;
+
+            if (String.IsNullOrEmpty(this.OutputPdbPath))
+            {
+                wixout = WixOutput.Create();
+            }
+            else
+            {
+                var trackPdb = this.BackendHelper.TrackFile(this.OutputPdbPath, TrackedFileType.Final);
+                trackedFiles.Add(trackPdb);
+
+                wixout = WixOutput.Create(trackPdb.Path);
+            }
+
+            intermediate.Save(wixout);
+
+            wixout.ImportDataStream(BurnConstants.BurnManifestWixOutputStreamName, manifestPath);
+            wixout.ImportDataStream(BurnConstants.BootstrapperApplicationDataWixOutputStreamName, baDataPath);
+            wixout.ImportDataStream(BurnConstants.BundleExtensionDataWixOutputStreamName, bextDataPath);
+
+            wixout.Reopen();
+
+            return wixout;
         }
 
         /// <summary>

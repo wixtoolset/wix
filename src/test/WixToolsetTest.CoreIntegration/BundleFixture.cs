@@ -5,10 +5,12 @@ namespace WixToolsetTest.CoreIntegration
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Tuples;
     using Xunit;
 
@@ -40,21 +42,7 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
-#if TODO
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-#endif
-
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
-                var section = intermediate.Sections.Single();
-
-                var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
-                Assert.Equal("1.0.0.0", bundleTuple.Version);
-
-                var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
-                Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
-
-                var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
-                Assert.Equal("test.msi", msiTuple.Id.Id);
             }
         }
 
@@ -68,6 +56,10 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var pdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -77,27 +69,44 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-burnStub", burnStubPath,
-                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                    "-o", exePath,
                 });
 
                 result.AssertSuccess();
 
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
-#if TODO
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-#endif
+                Assert.True(File.Exists(exePath));
+                Assert.True(File.Exists(pdbPath));
 
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
-                var section = intermediate.Sections.Single();
+                using (var wixOutput = WixOutput.Read(pdbPath))
+                {
 
-                var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
-                Assert.Equal("1.0.0.0", bundleTuple.Version);
+                    var intermediate = Intermediate.Load(wixOutput);
+                    var section = intermediate.Sections.Single();
 
-                var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
-                Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
+                    var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
+                    Assert.Equal("1.0.0.0", bundleTuple.Version);
 
-                var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
-                Assert.Equal("test.msi", msiTuple.Id.Id);
+                    var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
+                    Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
+
+                    var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
+                    Assert.Equal("test.msi", msiTuple.Id.Id);
+
+                    var extractResult = BundleExtractor.ExtractBAContainer(null, exePath, baFolderPath, extractFolderPath);
+                    extractResult.AssertSuccess();
+
+                    var burnManifestData = wixOutput.GetData(BurnConstants.BurnManifestWixOutputStreamName);
+                    var extractedBurnManifestData = File.ReadAllText(Path.Combine(baFolderPath, "manifest.xml"), Encoding.UTF8);
+                    Assert.Equal(extractedBurnManifestData, burnManifestData);
+
+                    var baManifestData = wixOutput.GetData(BurnConstants.BootstrapperApplicationDataWixOutputStreamName);
+                    var extractedBaManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BootstrapperApplicationData.xml"), Encoding.UTF8);
+                    Assert.Equal(extractedBaManifestData, baManifestData);
+
+                    var bextManifestData = wixOutput.GetData(BurnConstants.BundleExtensionDataWixOutputStreamName);
+                    var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BundleExtensionData.xml"), Encoding.UTF8);
+                    Assert.Equal(extractedBextManifestData, bextManifestData);
+                }
             }
         }
 
@@ -128,21 +137,7 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
-#if TODO
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
-#endif
-
-                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"test.wir"));
-                var section = intermediate.Sections.Single();
-
-                var bundleTuple = section.Tuples.OfType<WixBundleTuple>().Single();
-                Assert.Equal("1.0.0.0", bundleTuple.Version);
-
-                var previousVersion = bundleTuple.Fields[(int)WixBundleTupleFields.Version].PreviousValue;
-                Assert.Equal("!(bind.packageVersion.test.msi)", previousVersion.AsString());
-
-                var msiTuple = section.Tuples.OfType<WixBundlePackageTuple>().Single();
-                Assert.Equal("test.msi", msiTuple.Id.Id);
             }
         }
     }

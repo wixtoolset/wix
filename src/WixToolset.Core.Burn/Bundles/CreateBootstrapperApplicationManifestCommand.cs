@@ -40,11 +40,13 @@ namespace WixToolset.Core.Burn.Bundles
 
         public WixBundlePayloadTuple BootstrapperApplicationManifestPayloadRow { get; private set; }
 
+        public string OutputPath { get; private set; }
+
         public void Execute()
         {
-            var baManifestPath = this.CreateBootstrapperApplicationManifest();
+            this.OutputPath = this.CreateBootstrapperApplicationManifest();
 
-            this.BootstrapperApplicationManifestPayloadRow = this.CreateBootstrapperApplicationManifestPayloadRow(baManifestPath);
+            this.BootstrapperApplicationManifestPayloadRow = this.CreateBootstrapperApplicationManifestPayloadRow(this.OutputPath);
         }
 
         private string CreateBootstrapperApplicationManifest()
