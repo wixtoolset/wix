@@ -402,7 +402,7 @@ static HRESULT BalBaseBAProcOnExecutePackageBegin(
     __inout BA_ONEXECUTEPACKAGEBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnExecutePackageBegin(pArgs->wzPackageId, pArgs->fExecute, &pResults->fCancel);
+    return pBA->OnExecutePackageBegin(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnExecutePatchTarget(

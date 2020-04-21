@@ -388,7 +388,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     //
     STDMETHOD(OnExecutePackageBegin)(
         __in_z LPCWSTR wzPackageId,
-        __in BOOL fExecute,
+        __in BOOL fExecute, // false means rollback.
+        __in BOOTSTRAPPER_ACTION_STATE action,
         __inout BOOL* pfCancel
         ) = 0;
 

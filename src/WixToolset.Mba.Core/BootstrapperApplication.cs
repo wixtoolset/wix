@@ -1466,9 +1466,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnExecutePackageBegin(string wzPackageId, bool fExecute, ref bool fCancel)
+        int IBootstrapperApplication.OnExecutePackageBegin(string wzPackageId, bool fExecute, ActionState action, ref bool fCancel)
         {
-            ExecutePackageBeginEventArgs args = new ExecutePackageBeginEventArgs(wzPackageId, fExecute, fCancel);
+            ExecutePackageBeginEventArgs args = new ExecutePackageBeginEventArgs(wzPackageId, fExecute, action, fCancel);
             this.OnExecutePackageBegin(args);
 
             fCancel = args.Cancel;

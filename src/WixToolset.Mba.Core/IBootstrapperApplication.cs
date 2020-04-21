@@ -392,6 +392,7 @@ namespace WixToolset.Mba.Core
         int OnExecutePackageBegin(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.Bool)] bool fExecute,
+            [MarshalAs(UnmanagedType.U4)] ActionState action,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 

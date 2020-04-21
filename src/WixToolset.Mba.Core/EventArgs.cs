@@ -1501,13 +1501,15 @@ namespace WixToolset.Mba.Core
         /// Creates a new instance of the <see cref="ExecutePackageBeginEventArgs"/> class.
         /// </summary>
         /// <param name="packageId">The identity of the package to act on.</param>
-        /// <param name="shouldExecute">Whether the package should really be acted on.</param>
+        /// <param name="shouldExecute">Whether the package is being executed or rolled back.</param>
+        /// <param name="action">The action about to be executed.</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public ExecutePackageBeginEventArgs(string packageId, bool shouldExecute, bool cancelRecommendation)
+        public ExecutePackageBeginEventArgs(string packageId, bool shouldExecute, ActionState action, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.ShouldExecute = shouldExecute;
+            this.Action = action;
         }
 
         /// <summary>
@@ -1516,9 +1518,14 @@ namespace WixToolset.Mba.Core
         public string PackageId { get; private set; }
 
         /// <summary>
-        /// Gets whether the package should really be acted on.
+        /// Gets whether the package is being executed or rolled back.
         /// </summary>
         public bool ShouldExecute { get; private set; }
+
+        /// <summary>
+        /// Gets the action about to be executed.
+        /// </summary>
+        public ActionState Action { get; private set; }
     }
 
     /// <summary>
