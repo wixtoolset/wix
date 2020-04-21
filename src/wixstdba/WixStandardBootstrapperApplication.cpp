@@ -748,8 +748,12 @@ public: // IBootstrapperApplication
                 wz = sczFormattedString ? sczFormattedString : pPackage->sczDisplayName ? pPackage->sczDisplayName : wzPackageId;
             }
 
-            //Burn engine doesn't show internal UI for msi packages during uninstall or repair actions.
-            m_fShowingInternalUiThisPackage = pPackage && pPackage->fDisplayInternalUI && BOOTSTRAPPER_ACTION_UNINSTALL != m_plannedAction && BOOTSTRAPPER_ACTION_REPAIR != m_plannedAction;
+            // Needs to match MsiEngineCalculateInstallUiLevel in msiengine.cpp in Burn.
+            m_fShowingInternalUiThisPackage = pPackage && pPackage->fDisplayInternalUI &&
+                                              BOOTSTRAPPER_ACTION_STATE_UNINSTALL != action &&
+                                              BOOTSTRAPPER_ACTION_STATE_REPAIR != action &&
+                                              (BOOTSTRAPPER_DISPLAY_FULL == m_command.display ||
+                                              BOOTSTRAPPER_DISPLAY_PASSIVE == m_command.display);
 
             ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT, wz);
             ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
