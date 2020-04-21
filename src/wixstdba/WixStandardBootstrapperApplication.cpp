@@ -705,6 +705,7 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP OnExecutePackageBegin(
         __in_z LPCWSTR wzPackageId,
         __in BOOL fExecute,
+        __in BOOTSTRAPPER_ACTION_STATE action,
         __inout BOOL* pfCancel
         )
     {
@@ -759,7 +760,7 @@ public: // IBootstrapperApplication
         }
 
         ReleaseStr(sczFormattedString);
-        return __super::OnExecutePackageBegin(wzPackageId, fExecute, pfCancel);
+        return __super::OnExecutePackageBegin(wzPackageId, fExecute, action, pfCancel);
     }
 
 
