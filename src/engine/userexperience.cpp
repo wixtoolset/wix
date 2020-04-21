@@ -1209,7 +1209,8 @@ LExit:
 EXTERN_C BAAPI UserExperienceOnExecutePackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
-    __in BOOL fExecute
+    __in BOOL fExecute,
+    __in BOOTSTRAPPER_ACTION_STATE action
     )
 {
     HRESULT hr = S_OK;
@@ -1219,6 +1220,7 @@ EXTERN_C BAAPI UserExperienceOnExecutePackageBegin(
     args.cbSize = sizeof(args);
     args.wzPackageId = wzPackageId;
     args.fExecute = fExecute;
+    args.action = action;
 
     results.cbSize = sizeof(results);
 

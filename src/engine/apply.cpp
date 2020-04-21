@@ -2064,7 +2064,7 @@ static HRESULT ExecuteExePackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->exePackage.pPackage->sczId, !fRollback);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->exePackage.pPackage->sczId, !fRollback, pExecuteAction->exePackage.action);
     ExitOnRootFailure(hr, "BA aborted execute EXE package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
@@ -2072,7 +2072,7 @@ static HRESULT ExecuteExePackage(
     message.progress.dwPercentage = fRollback ? 100 : 0;
     nResult = GenericExecuteMessageHandler(&message, pContext);
     hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
-    ExitOnRootFailure(hr, "UX aborted EXE progress.");
+    ExitOnRootFailure(hr, "BA aborted EXE progress.");
 
     // Execute package.
     if (pExecuteAction->exePackage.pPackage->fPerMachine)
@@ -2091,13 +2091,13 @@ static HRESULT ExecuteExePackage(
     message.progress.dwPercentage = fRollback ? 0 : 100;
     nResult = GenericExecuteMessageHandler(&message, pContext);
     hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
-    ExitOnRootFailure(hr, "UX aborted EXE progress.");
+    ExitOnRootFailure(hr, "BA aborted EXE progress.");
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
     (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
     hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
-    ExitOnRootFailure(hr, "UX aborted EXE package execute progress.");
+    ExitOnRootFailure(hr, "BA aborted EXE package execute progress.");
 
 LExit:
     if (fBeginCalled)
@@ -2133,7 +2133,7 @@ static HRESULT ExecuteMsiPackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msiPackage.pPackage->sczId, !fRollback);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msiPackage.pPackage->sczId, !fRollback, pExecuteAction->msiPackage.action);
     ExitOnRootFailure(hr, "BA aborted execute MSI package begin.");
 
     // execute package
@@ -2152,7 +2152,7 @@ static HRESULT ExecuteMsiPackage(
     (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
     hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
-    ExitOnRootFailure(hr, "UX aborted MSI package execute progress.");
+    ExitOnRootFailure(hr, "BA aborted MSI package execute progress.");
 
 LExit:
     if (fBeginCalled)
@@ -2188,7 +2188,7 @@ static HRESULT ExecuteMspPackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->mspTarget.pPackage->sczId, !fRollback);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->mspTarget.pPackage->sczId, !fRollback, pExecuteAction->mspTarget.action);
     ExitOnRootFailure(hr, "BA aborted execute MSP package begin.");
 
     // Now send all the patches that target this product code.
@@ -2216,7 +2216,7 @@ static HRESULT ExecuteMspPackage(
     (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
     hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
-    ExitOnRootFailure(hr, "UX aborted MSP package execute progress.");
+    ExitOnRootFailure(hr, "BA aborted MSP package execute progress.");
 
 LExit:
     if (fBeginCalled)
@@ -2255,7 +2255,7 @@ static HRESULT ExecuteMsuPackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msuPackage.pPackage->sczId, !fRollback);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msuPackage.pPackage->sczId, !fRollback, pExecuteAction->msuPackage.action);
     ExitOnRootFailure(hr, "BA aborted execute MSU package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
@@ -2263,7 +2263,7 @@ static HRESULT ExecuteMsuPackage(
     message.progress.dwPercentage = fRollback ? 100 : 0;
     nResult = GenericExecuteMessageHandler(&message, pContext);
     hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
-    ExitOnRootFailure(hr, "UX aborted MSU progress.");
+    ExitOnRootFailure(hr, "BA aborted MSU progress.");
 
     // execute package
     if (pExecuteAction->msuPackage.pPackage->fPerMachine)
@@ -2282,13 +2282,13 @@ static HRESULT ExecuteMsuPackage(
     message.progress.dwPercentage = fRollback ? 0 : 100;
     nResult = GenericExecuteMessageHandler(&message, pContext);
     hr = UserExperienceInterpretExecuteResult(&pEngineState->userExperience, fRollback, message.dwAllowedResults, nResult);
-    ExitOnRootFailure(hr, "UX aborted MSU progress.");
+    ExitOnRootFailure(hr, "BA aborted MSU progress.");
 
     pContext->cExecutedPackages += fRollback ? -1 : 1;
     (*pContext->pcOverallProgressTicks) += fRollback ? -1 : 1;
 
     hr = ReportOverallProgressTicks(&pEngineState->userExperience, fRollback, pEngineState->plan.cOverallProgressTicksTotal, *pContext->pcOverallProgressTicks);
-    ExitOnRootFailure(hr, "UX aborted MSU package execute progress.");
+    ExitOnRootFailure(hr, "BA aborted MSU package execute progress.");
 
 LExit:
     if (fBeginCalled)
