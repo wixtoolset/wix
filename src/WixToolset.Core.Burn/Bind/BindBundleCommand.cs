@@ -406,12 +406,15 @@ namespace WixToolset.Core.Burn
                 ++uxPayloadIndex;
             }
 
-#if TODO
-            foreach (BinderExtension extension in this.Extensions)
+            foreach (var extension in this.BackendExtensions)
             {
-                extension.PostBind(this.Context);
+                extension.BundleFinalize();
             }
-#endif
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
 
             // Create all the containers except the UX container first so the manifest (that goes in the UX container)
             // can contain all size and hash information about the non-UX containers.
