@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage
+                InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+                RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+                UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx462FullLog].html&quot;"
+                PerMachine="yes"
+                DetectCondition="A"
+                InstallCondition="B"
+                Id="NetFx462Web"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="netfx4"
+                DownloadUrl="C"
+                LogPathVariable="NetFx462FullLog"
+                Compressed="no"
+                Name="NDP462-KB3151802-Web.exe">
+                <RemotePayload
+                  CertificatePublicKey="52868DFCA6E3AF2632389E6C1EE7D0468D3797D0"
+                  CertificateThumbprint="3BDA323E552DB1FDE5F4FBEE75D6D5B2B187EEDC"
+                  Description="Microsoft .NET Framework 4.6.2 Setup"
+                  Hash="C42E6ED280290648BBD59F664008852F4CFE4548"
+                  ProductName="Microsoft .NET Framework 4.6.2"
+                  Size="1429344"
+                  Version="4.6.1590.0" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

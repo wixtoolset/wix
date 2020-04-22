@@ -117,6 +117,8 @@
     <Content Include="TestData\SimpleBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\MultiFileBootstrapperApplication.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\MultiFileBundle.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleExeBundle\SingleExePackageGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleExeBundle\SingleExeRemotePayload.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SingleFile\Package.wxs" CopyToOutputDirectory="PreserveNewest" />

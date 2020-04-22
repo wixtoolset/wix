@@ -140,5 +140,64 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
             }
         }
+
+        [Fact]
+        public void CanBuildSingleExeBundle()
+        {
+            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SingleExeBundle", "SingleExePackageGroup.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-burnStub", burnStubPath,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(exePath));
+            }
+        }
+
+        [Fact]
+        public void CanBuildSingleExeRemotePayloadBundle()
+        {
+            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SingleExeBundle", "SingleExeRemotePayload.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-burnStub", burnStubPath,
+                    "-o", exePath,
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(exePath));
+            }
+        }
     }
 }

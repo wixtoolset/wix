@@ -56,7 +56,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // Embedded files (aka: files from binary .wixlibs) are not content files (because they are hidden
                 // in the .wixlib).
                 var sourceFile = payload.SourceFile;
-                payload.ContentFile = !sourceFile.Embed;
+                payload.ContentFile = sourceFile != null && !sourceFile.Embed;
 
                 this.UpdatePayloadPackagingType(payload);
 
@@ -85,7 +85,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         private void UpdatePayloadPackagingType(WixBundlePayloadTuple payload)
         {
-            if (PackagingType.Unknown == payload.Packaging)
+            if (!payload.Packaging.HasValue || PackagingType.Unknown == payload.Packaging)
             {
                 if (!payload.Compressed.HasValue)
                 {
