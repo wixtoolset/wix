@@ -19,6 +19,12 @@ namespace WixToolset.Extensibility
         /// <summary>
         /// Called after all output changes occur and right before the output is bound into its final format.
         /// </summary>
+        void BundleFinalize();
+
+        /// <summary>
+        /// Called after output is bound into its final format.
+        /// </summary>
+        /// <param name="result"></param>
         void PostBackendBind(IBindResult result);
     }
 }

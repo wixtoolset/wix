@@ -18,6 +18,10 @@ namespace WixToolset.Extensibility
         /// </summary>
         protected IMessaging Messaging { get; private set; }
 
+        public virtual void BundleFinalize()
+        {
+        }
+
         public virtual void PostBackendBind(IBindResult result)
         {
         }
