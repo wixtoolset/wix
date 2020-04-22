@@ -13,7 +13,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.SourceFile), IntermediateFieldType.Path),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.DownloadUrl), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Compressed), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Compressed), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.UnresolvedSourceFile), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePayloadTupleFields.Description), IntermediateFieldType.String),

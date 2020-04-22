@@ -17,7 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Cache), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.CacheId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Vital), IntermediateFieldType.Bool),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.PerMachine), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.PerMachine), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.LogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.RollbackLogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageTupleFields.Size), IntermediateFieldType.Number),
