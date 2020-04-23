@@ -3,13 +3,13 @@
 #include "precomp.h"
 
 HRESULT TestEngine::LoadBA(
+    __in LPCWSTR wzBundleFilePath,
     __in LPCWSTR wzBAFilePath
     )
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_COMMAND command = { };
     BOOTSTRAPPER_CREATE_ARGS args = { };
-    HMODULE hBAModule = NULL;
     PFN_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = NULL;
 
     if (m_pCreateResults)
@@ -19,7 +19,7 @@ HRESULT TestEngine::LoadBA(
 
     LogInitialize(::GetModuleHandleW(NULL));
 
-    hr = LogOpen(NULL, L"ExampleTestEngine", NULL, L"txt", FALSE, FALSE, NULL);
+    hr = LogOpen(NULL, PathFile(wzBundleFilePath), NULL, L"txt", FALSE, FALSE, NULL);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to open log.");
 
     m_pCreateResults = static_cast<BOOTSTRAPPER_CREATE_RESULTS*>(MemAlloc(sizeof(BOOTSTRAPPER_CREATE_RESULTS), TRUE));
@@ -34,10 +34,10 @@ HRESULT TestEngine::LoadBA(
 
     m_pCreateResults->cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
-    hBAModule = ::LoadLibraryExW(wzBAFilePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);    
-    ExitOnNullWithLastError(hBAModule, hr, "Failed to load BA dll.");
+    m_hBAModule = ::LoadLibraryExW(wzBAFilePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    ExitOnNullWithLastError(m_hBAModule, hr, "Failed to load BA dll.");
 
-    pfnCreate = (PFN_BOOTSTRAPPER_APPLICATION_CREATE)::GetProcAddress(hBAModule, "BootstrapperApplicationCreate");
+    pfnCreate = (PFN_BOOTSTRAPPER_APPLICATION_CREATE)::GetProcAddress(m_hBAModule, "BootstrapperApplicationCreate");
     ConsoleExitOnNull(pfnCreate, hr, E_OUTOFMEMORY, CONSOLE_COLOR_RED, "Failed to get address for BootstrapperApplicationCreate.");
 
     hr = pfnCreate(&args, m_pCreateResults);
@@ -66,6 +66,29 @@ HRESULT TestEngine::SendShutdownEvent(
     shutdownResults.cbSize = sizeof(BA_ONSHUTDOWN_RESULTS);
     hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSHUTDOWN, &shutdownArgs, &shutdownResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
     return hr;
+}
+
+HRESULT TestEngine::SendStartupEvent()
+{
+    HRESULT hr = S_OK;
+    BA_ONSTARTUP_ARGS startupArgs = { };
+    BA_ONSTARTUP_RESULTS startupResults = { };
+    startupArgs.cbSize = sizeof(BA_ONSTARTUP_ARGS);
+    startupResults.cbSize = sizeof(BA_ONSTARTUP_RESULTS);
+    hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &startupArgs, &startupResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
+    return hr;
+}
+
+void TestEngine::UnloadBA()
+{
+    PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = NULL;
+
+    pfnDestroy = (PFN_BOOTSTRAPPER_APPLICATION_DESTROY)::GetProcAddress(m_hBAModule, "BootstrapperApplicationDestroy");
+
+    if (pfnDestroy)
+    {
+        pfnDestroy();
+    }
 }
 
 HRESULT TestEngine::BAEngineLog(
@@ -108,6 +131,7 @@ LExit:
 
 TestEngine::TestEngine()
 {
+    m_hBAModule = NULL;
     m_pCreateResults = NULL;
 }
 

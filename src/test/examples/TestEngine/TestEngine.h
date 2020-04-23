@@ -7,6 +7,7 @@ class TestEngine
 {
 public:
     HRESULT LoadBA(
+        __in LPCWSTR wzBundleFilePath,
         __in LPCWSTR wzBAFilePath
         );
 
@@ -17,6 +18,10 @@ public:
     HRESULT SendShutdownEvent(
         __in BOOTSTRAPPER_SHUTDOWN_ACTION defaultAction
         );
+
+    HRESULT SendStartupEvent();
+
+    void UnloadBA();
 
 private:
     static HRESULT BAEngineLog(
@@ -38,5 +43,6 @@ public:
     ~TestEngine();
 
 private:
+    HMODULE m_hBAModule;
     BOOTSTRAPPER_CREATE_RESULTS* m_pCreateResults;
 };

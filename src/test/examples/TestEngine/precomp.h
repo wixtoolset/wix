@@ -8,6 +8,7 @@
 #include "conutil.h"
 #include "logutil.h"
 #include "memutil.h"
+#include "pathutil.h"
 
 #include "BootstrapperEngine.h"
 #include "BootstrapperApplication.h"
@@ -15,5 +16,6 @@
 #include "TestEngine.h"
 
 HRESULT RunShutdownEngine(
+    __in LPCWSTR wzBundleFilePath,
     __in LPCWSTR wzBAFilePath
     );

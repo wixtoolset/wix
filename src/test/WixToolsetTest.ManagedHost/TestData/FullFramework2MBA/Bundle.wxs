@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+    <Bundle Name="FullFramework2MBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
+        <BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost">
+            <Payload SourceFile="Example.FullFramework2MBA\Example.FullFramework2MBA.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\mbanative.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\WixToolset.Mba.Core.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\WixToolset.Mba.Host.config" />
+        </BootstrapperApplicationRef>
+        <Chain>
+            <PackageGroupRef Id="NetFx462RedistAsPrereq" />
+        </Chain>
+    </Bundle>
+</Wix>

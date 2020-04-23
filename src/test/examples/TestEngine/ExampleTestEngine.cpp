@@ -8,15 +8,15 @@ int __cdecl wmain(int argc, LPWSTR argv[])
 
     ConsoleInitialize();
 
-    if (argc != 2)
+    if (argc != 3)
     {
-        ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Usage: Example.TestEngine.exe BA.dll");
+        ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Usage: Example.TestEngine.exe Bundle.exe BA.dll");
     }
     else
     {
-        hr = RunShutdownEngine(argv[1]);
+        hr = RunShutdownEngine(argv[1], argv[2]);
     }
 
     ConsoleUninitialize();
-    return HRESULT_CODE(hr);
+    return hr;
 }

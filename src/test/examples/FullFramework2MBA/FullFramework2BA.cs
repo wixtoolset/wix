@@ -16,6 +16,13 @@ namespace Example.FullFramework2MBA
         {
         }
 
+        protected override void OnStartup(StartupEventArgs args)
+        {
+            base.OnStartup(args);
+
+            this.engine.Log(LogLevel.Standard, nameof(FullFramework2BA));
+        }
+
         protected override void OnShutdown(ShutdownEventArgs args)
         {
             base.OnShutdown(args);

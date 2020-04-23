@@ -4,15 +4,26 @@ namespace WixToolsetTest.ManagedHost
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using WixBuildTools.TestSupport;
+    using WixToolset.Core.TestPackage;
 
     public class TestEngine
     {
         private static readonly string TestEngineFile = TestData.Get(@"..\Win32\examples\Example.TestEngine\Example.TestEngine.exe");
+        public static readonly string BurnStubFile = TestData.Get(@"runtimes\win-x86\native\burn.x86.exe");
 
-        public TestEngineResult RunShutdownEngine(string baFile)
+        public TestEngineResult RunShutdownEngine(string bundleFilePath, string tempFolderPath)
         {
-            var args = new string[] { '"' + baFile + '"' };
+            var baFolderPath = Path.Combine(tempFolderPath, "ba");
+            var extractFolderPath = Path.Combine(tempFolderPath, "extract");
+            var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFilePath, baFolderPath, extractFolderPath);
+            extractResult.AssertSuccess();
+
+            var args = new string[] {
+                '"' + bundleFilePath + '"',
+                '"' + extractResult.GetBAFilePath(baFolderPath) + '"',
+            };
             return RunProcessCaptureOutput(TestEngineFile, args);
         }
 

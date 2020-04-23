@@ -16,6 +16,13 @@ namespace Example.FullFramework4MBA
         {
         }
 
+        protected override void OnStartup(StartupEventArgs args)
+        {
+            base.OnStartup(args);
+
+            this.engine.Log(LogLevel.Standard, nameof(FullFramework4BA));
+        }
+
         protected override void OnShutdown(ShutdownEventArgs args)
         {
             base.OnShutdown(args);

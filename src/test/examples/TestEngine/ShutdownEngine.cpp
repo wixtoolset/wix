@@ -3,6 +3,7 @@
 #include "precomp.h"
 
 HRESULT RunShutdownEngine(
+    __in LPCWSTR wzBundleFilePath,
     __in LPCWSTR wzBAFilePath
     )
 {
@@ -12,11 +13,16 @@ HRESULT RunShutdownEngine(
     pTestEngine = new TestEngine();
     ConsoleExitOnNull(pTestEngine, hr, E_OUTOFMEMORY, CONSOLE_COLOR_RED, "Failed to create new test engine.");
 
-    hr = pTestEngine->LoadBA(wzBAFilePath);
+    hr = pTestEngine->LoadBA(wzBundleFilePath, wzBAFilePath);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to load BA.");
+
+    hr = pTestEngine->SendStartupEvent();
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnStartup.");
 
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
+
+    pTestEngine->UnloadBA();
 
 LExit:
     return hr;

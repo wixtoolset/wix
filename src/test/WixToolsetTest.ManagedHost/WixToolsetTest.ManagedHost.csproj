@@ -12,15 +12,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\FullFramework2MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\FullFramework4MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
+
+  <Target Name="CopyExtensions" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(WixExtension)" />
+  </Target>
 
   <ItemGroup>
     <ProjectReference Include="..\examples\FullFramework2MBA\Example.FullFramework2MBA.csproj" />
+    <ProjectReference Include="..\examples\FullFramework4MBA\Example.FullFramework4MBA.csproj" />
     <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" />
+    <ProjectReference Include="..\..\wixext\WixToolset.Bal.wixext.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="runtime.win.WixToolset.Burn" Version="4.0.*" />
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>

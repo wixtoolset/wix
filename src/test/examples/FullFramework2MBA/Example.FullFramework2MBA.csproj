@@ -28,7 +28,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BootstrapperApplicationData.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
@@ -43,22 +42,6 @@
       <HintPath>..\..\..\..\packages\WixToolset.Mba.Core.4.0.18\lib\net20\WixToolset.Mba.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\mbahost\mbahost.vcxproj">
-      <Project>{12c87c77-3547-44f8-8134-29bc915cb19d}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj">
-      <Project>{F2BA1935-70FA-4156-B161-FD03850B4FAA}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <MbaHostDependency Include="$(BaseOutputPath)$(Configuration)\Win32\mbahost.dll" />
-  </ItemGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 
@@ -69,9 +52,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\..\..\packages\WixToolset.Mba.Core.4.0.18\build\net20\WixToolset.Mba.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\WixToolset.Mba.Core.4.0.18\build\net20\WixToolset.Mba.Core.props'))" />
     <Error Condition="!Exists('..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-  </Target>
-
-  <Target Name="CopyMbaHostDependencies" AfterTargets="Build">
-    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(MbaHostDependency)" SkipUnchangedFiles="true" />
   </Target>
 </Project>

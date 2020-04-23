@@ -3752,6 +3752,11 @@ HRESULT CreateBootstrapperApplication(
     HRESULT hr = S_OK;
     CWixStandardBootstrapperApplication* pApplication = NULL;
 
+    if (BOOTSTRAPPER_DISPLAY_UNKNOWN == pArgs->pCommand->display)
+    {
+        ExitOnFailure(hr = E_INVALIDARG, "Engine requested Unknown display type.");
+    }
+
     pApplication = new CWixStandardBootstrapperApplication(hModule, fPrereq, hrHostInitialization, pEngine, pArgs);
     ExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new standard bootstrapper application object.");
 
