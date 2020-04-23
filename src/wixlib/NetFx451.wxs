@@ -2,7 +2,9 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
         .NET Framework installation state properties
@@ -15,6 +17,9 @@
   <?define NetFx451MinRelease = 378675 ?>
   <?define NetFx451WebLink = http://go.microsoft.com/fwlink/?LinkId=322115 ?>
   <?define NetFx451RedistLink = http://go.microsoft.com/fwlink/?LinkId=322116 ?>
+  <?define NetFx451EulaLink = http://wixtoolset.org/licenses/netfx451 ?>
+  <?define NetFx451WebId = NetFx451Web ?>
+  <?define NetFx451RedistId = NetFx451Redist ?>
 
   <Fragment>
     <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
@@ -31,7 +36,7 @@
     <WixVariable Id="NetFx451WebInstallCondition" Value="" Overridable="yes" />
     <WixVariable Id="NetFx451WebPackageDirectory" Value="redist\" Overridable="yes" />
 
-    <PackageGroup Id="NetFx451Web">
+    <PackageGroup Id="$(var.NetFx451WebId)">
       <ExePackage
           InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
           RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullWebLog].html&quot;"
@@ -39,7 +44,7 @@
           PerMachine="yes"
           DetectCondition="!(wix.NetFx451WebDetectCondition)"
           InstallCondition="!(wix.NetFx451WebInstallCondition)"
-          Id="NetFx451Web"
+          Id="$(var.NetFx451WebId)"
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
@@ -60,13 +65,19 @@
   </Fragment>
 
   <Fragment>
+    <PackageGroup Id="$(var.NetFx451WebId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx451WebId)" LicenseUrl="$(var.NetFx451EulaLink)" />
+  </Fragment>
+
+  <Fragment>
     <util:RegistrySearchRef Id="NETFRAMEWORK45"/>
 
     <WixVariable Id="NetFx451RedistDetectCondition" Value="NETFRAMEWORK45 &gt;= $(var.NetFx451MinRelease)" Overridable="yes" />
     <WixVariable Id="NetFx451RedistInstallCondition" Value="" Overridable="yes" />
     <WixVariable Id="NetFx451RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
-    <PackageGroup Id="NetFx451Redist">
+    <PackageGroup Id="$(var.NetFx451RedistId)">
       <ExePackage
           InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
           RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot; /log &quot;[NetFx451FullLog].html&quot;"
@@ -74,7 +85,7 @@
           PerMachine="yes"
           DetectCondition="!(wix.NetFx451RedistDetectCondition)"
           InstallCondition="!(wix.NetFx451RedistInstallCondition)"
-          Id="NetFx451Redist"
+          Id="$(var.NetFx451RedistId)"
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
@@ -92,5 +103,11 @@
             Hash="5934DD101414BBC0B7F1EE2780D2FC8B9BEC5C4D" />
       </ExePackage>
     </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx451RedistId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx451RedistId)" LicenseUrl="$(var.NetFx451EulaLink)" />
   </Fragment>
 </Wix>

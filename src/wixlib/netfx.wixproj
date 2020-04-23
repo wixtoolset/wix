@@ -46,8 +46,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0086\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0086\build\WixToolset.MSBuild.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.Bal.wixext.4.0.29\build\WixToolset.Bal.wixext.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Bal.wixext.4.0.29\build\WixToolset.Bal.wixext.targets'))" />
     <Error Condition="!Exists('..\..\packages\WixToolset.Util.wixext.4.0.30\build\WixToolset.Util.wixext.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.Util.wixext.4.0.30\build\WixToolset.Util.wixext.targets'))" />
   </Target>
   <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\..\packages\WixToolset.Bal.wixext.4.0.29\build\WixToolset.Bal.wixext.targets" Condition="Exists('..\..\packages\WixToolset.Bal.wixext.4.0.29\build\WixToolset.Bal.wixext.targets')" />
   <Import Project="..\..\packages\WixToolset.Util.wixext.4.0.30\build\WixToolset.Util.wixext.targets" Condition="Exists('..\..\packages\WixToolset.Util.wixext.4.0.30\build\WixToolset.Util.wixext.targets')" />
 </Project>

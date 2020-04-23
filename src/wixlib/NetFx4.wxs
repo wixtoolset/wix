@@ -2,7 +2,9 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <!--
         .NET Framework installation state properties
@@ -16,6 +18,11 @@
   <?define NetFx40RedistLink =  http://go.microsoft.com/fwlink/?LinkId=247729 ?>
   <?define NetFx40ClientWebLink = http://go.microsoft.com/fwlink/?linkid=182804 ?>
   <?define NetFx40ClientRedistLink =  http://go.microsoft.com/fwlink/?LinkId=247730 ?>
+  <?define NetFx40EulaLink = http://go.microsoft.com/fwlink/?LinkID=188993 ?>
+  <?define NetFx40WebId = NetFx40Web ?>
+  <?define NetFx40RedistId = NetFx40Redist ?>
+  <?define NetFx40ClientWebId = NetFx40ClientWeb ?>
+  <?define NetFx40ClientRedistId = NetFx40ClientRedist ?>
 
   <Fragment>
     <PropertyRef Id="NETFRAMEWORK40FULL" />
@@ -38,14 +45,14 @@
   <Fragment>
     <util:RegistrySearchRef Id="NETFRAMEWORK40"/>
 
-    <PackageGroup Id="NetFx40Web">
+    <PackageGroup Id="$(var.NetFx40WebId)">
       <ExePackage
           InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
           UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40"
-          Id="NetFx40Web"
+          Id="$(var.NetFx40WebId)"
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
@@ -65,16 +72,22 @@
   </Fragment>
 
   <Fragment>
+    <PackageGroup Id="$(var.NetFx40WebId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40WebId)" LicenseUrl="$(var.NetFx40EulaLink)" />
+  </Fragment>
+
+  <Fragment>
     <util:RegistrySearchRef Id="NETFRAMEWORK40"/>
 
-    <PackageGroup Id="NetFx40Redist">
+    <PackageGroup Id="$(var.NetFx40RedistId)">
       <ExePackage
           InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
           UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40"
-          Id="NetFx40Redist"
+          Id="$(var.NetFx40RedistId)"
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
@@ -94,6 +107,12 @@
   </Fragment>
 
   <Fragment>
+    <PackageGroup Id="$(var.NetFx40RedistId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40RedistId)" LicenseUrl="$(var.NetFx40EulaLink)" />
+  </Fragment>
+
+  <Fragment>
     <util:RegistrySearch
         Id="NETFRAMEWORK40CLIENT"
         Variable="NETFRAMEWORK40CLIENT"
@@ -103,18 +122,17 @@
         Result="value" />
   </Fragment>
 
-
   <Fragment>
     <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT"/>
 
-    <PackageGroup Id="NetFx40ClientWeb">
+    <PackageGroup Id="$(var.NetFx40ClientWebId)">
       <ExePackage
           InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
           UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40CLIENT"
-          Id="NetFx40ClientWeb"
+          Id="$(var.NetFx40ClientWebId)"
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
@@ -134,16 +152,22 @@
   </Fragment>
 
   <Fragment>
+    <PackageGroup Id="$(var.NetFx40ClientWebId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40ClientWebId)" LicenseUrl="$(var.NetFx40EulaLink)" />
+  </Fragment>
+
+  <Fragment>
     <util:RegistrySearchRef Id="NETFRAMEWORK40CLIENT"/>
 
-    <PackageGroup Id="NetFx40ClientRedist">
+    <PackageGroup Id="$(var.NetFx40ClientRedistId)">
       <ExePackage
           InstallCommand="/q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           RepairCommand="/q /norestart /repair /ChainingPackage &quot;[WixBundleName]&quot;"
           UninstallCommand="/uninstall /q /norestart /ChainingPackage &quot;[WixBundleName]&quot;"
           PerMachine="yes"
           DetectCondition="NETFRAMEWORK40CLIENT"
-          Id="NetFx40ClientRedist"
+          Id="$(var.NetFx40ClientRedistId)"
           Vital="yes"
           Permanent="yes"
           Protocol="netfx4"
@@ -160,6 +184,12 @@
             Hash="4CD67F609F89D617D2B206341B8C211E1B88B287"/>
       </ExePackage>
     </PackageGroup>
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.NetFx40ClientRedistId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx40ClientRedistId)" LicenseUrl="$(var.NetFx40EulaLink)" />
   </Fragment>
 
   <!-- set to #1 if the .NET Framework 4.0 client is installed (not set otherwise) -->
