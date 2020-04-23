@@ -14,8 +14,5 @@
 #include "BootstrapperApplication.h"
 
 #include "TestEngine.h"
-
-HRESULT RunShutdownEngine(
-    __in LPCWSTR wzBundleFilePath,
-    __in LPCWSTR wzBAFilePath
-    );
+#include "ReloadEngine.h"
+#include "ShutdownEngine.h"

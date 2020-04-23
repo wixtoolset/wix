@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-HRESULT RunShutdownEngine(
+HRESULT RunReloadEngine(
     __in LPCWSTR wzBundleFilePath,
     __in LPCWSTR wzBAFilePath
     )
@@ -23,6 +23,17 @@ HRESULT RunShutdownEngine(
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnStartup.");
 
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
+
+    pTestEngine->UnloadBA();
+
+    hr = pTestEngine->LoadBA(wzBAFilePath);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to load BA.");
+
+    hr = pTestEngine->SendStartupEvent();
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnStartup.");
+
+    hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
 
     pTestEngine->UnloadBA();

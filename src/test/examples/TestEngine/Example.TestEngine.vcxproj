@@ -46,12 +46,15 @@
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ReloadEngine.cpp" />
     <ClCompile Include="ShutdownEngine.cpp" />
     <ClCompile Include="ExampleTestEngine.cpp" />
     <ClCompile Include="TestEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precomp.h" />
+    <ClInclude Include="ReloadEngine.h" />
+    <ClInclude Include="ShutdownEngine.h" />
     <ClInclude Include="TestEngine.h" />
   </ItemGroup>
   <ItemGroup>

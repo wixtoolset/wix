@@ -13,7 +13,17 @@ namespace WixToolsetTest.ManagedHost
         private static readonly string TestEngineFile = TestData.Get(@"..\Win32\examples\Example.TestEngine\Example.TestEngine.exe");
         public static readonly string BurnStubFile = TestData.Get(@"runtimes\win-x86\native\burn.x86.exe");
 
+        public TestEngineResult RunReloadEngine(string bundleFilePath, string tempFolderPath)
+        {
+            return this.RunTestEngine("reload", bundleFilePath, tempFolderPath);
+        }
+
         public TestEngineResult RunShutdownEngine(string bundleFilePath, string tempFolderPath)
+        {
+            return this.RunTestEngine("shutdown", bundleFilePath, tempFolderPath);
+        }
+
+        private TestEngineResult RunTestEngine(string engineMode, string bundleFilePath, string tempFolderPath)
         {
             var baFolderPath = Path.Combine(tempFolderPath, "ba");
             var extractFolderPath = Path.Combine(tempFolderPath, "extract");
@@ -21,6 +31,7 @@ namespace WixToolsetTest.ManagedHost
             extractResult.AssertSuccess();
 
             var args = new string[] {
+                engineMode,
                 '"' + bundleFilePath + '"',
                 '"' + extractResult.GetBAFilePath(baFolderPath) + '"',
             };

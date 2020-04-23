@@ -6,8 +6,15 @@ namespace Example.FullFramework2MBA
 
     public class FullFramework2BAFactory : BaseBootstrapperApplicationFactory
     {
+        private static int loadCount = 0;
+
         protected override IBootstrapperApplication Create(IEngine engine, IBootstrapperCommand bootstrapperCommand)
         {
+            if (loadCount > 0)
+            {
+                engine.Log(LogLevel.Standard, $"Reloaded {loadCount} time(s)");
+            }
+            ++loadCount;
             return new FullFramework2BA(engine);
         }
     }

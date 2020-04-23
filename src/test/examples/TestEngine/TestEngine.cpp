@@ -2,8 +2,22 @@
 
 #include "precomp.h"
 
+HRESULT TestEngine::Initialize(
+    __in LPCWSTR wzBundleFilePath
+    )
+{
+    HRESULT hr = S_OK;
+
+    LogInitialize(::GetModuleHandleW(NULL));
+
+    hr = LogOpen(NULL, PathFile(wzBundleFilePath), NULL, L"txt", FALSE, FALSE, NULL);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to open log.");
+
+LExit:
+    return hr;
+}
+
 HRESULT TestEngine::LoadBA(
-    __in LPCWSTR wzBundleFilePath,
     __in LPCWSTR wzBAFilePath
     )
 {
@@ -12,15 +26,10 @@ HRESULT TestEngine::LoadBA(
     BOOTSTRAPPER_CREATE_ARGS args = { };
     PFN_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = NULL;
 
-    if (m_pCreateResults)
+    if (m_pCreateResults || m_hBAModule)
     {
         ExitFunction1(hr = E_INVALIDSTATE);
     }
-
-    LogInitialize(::GetModuleHandleW(NULL));
-
-    hr = LogOpen(NULL, PathFile(wzBundleFilePath), NULL, L"txt", FALSE, FALSE, NULL);
-    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to open log.");
 
     m_pCreateResults = static_cast<BOOTSTRAPPER_CREATE_RESULTS*>(MemAlloc(sizeof(BOOTSTRAPPER_CREATE_RESULTS), TRUE));
 
@@ -51,6 +60,7 @@ HRESULT TestEngine::Log(
     __in LPCWSTR wzMessage
     )
 {
+    LogStringLine(REPORT_STANDARD, "%ls", wzMessage);
     return ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls", wzMessage);
 }
 
@@ -83,11 +93,19 @@ void TestEngine::UnloadBA()
 {
     PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = NULL;
 
+    ReleaseNullMem(m_pCreateResults);
+
     pfnDestroy = (PFN_BOOTSTRAPPER_APPLICATION_DESTROY)::GetProcAddress(m_hBAModule, "BootstrapperApplicationDestroy");
 
     if (pfnDestroy)
     {
         pfnDestroy();
+    }
+
+    if (m_hBAModule)
+    {
+        ::FreeLibrary(m_hBAModule);
+        m_hBAModule = NULL;
     }
 }
 

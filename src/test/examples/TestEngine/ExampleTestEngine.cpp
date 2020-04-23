@@ -5,16 +5,30 @@
 int __cdecl wmain(int argc, LPWSTR argv[])
 {
     HRESULT hr = E_INVALIDARG;
+    BOOL fShowUsage = FALSE;
 
     ConsoleInitialize();
 
-    if (argc != 3)
+    if (argc != 4)
     {
-        ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Usage: Example.TestEngine.exe Bundle.exe BA.dll");
+        fShowUsage = TRUE;
+    }
+    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"reload", -1))
+    {
+        hr = RunReloadEngine(argv[2], argv[3]);
+    }
+    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"shutdown", -1))
+    {
+        hr = RunShutdownEngine(argv[2], argv[3]);
     }
     else
     {
-        hr = RunShutdownEngine(argv[1], argv[2]);
+        fShowUsage = TRUE;
+    }
+
+    if (fShowUsage)
+    {
+        ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Usage: {reload|shutdown} Example.TestEngine.exe Bundle.exe BA.dll");
     }
 
     ConsoleUninitialize();
