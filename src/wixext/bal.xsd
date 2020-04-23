@@ -186,6 +186,35 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="ManagedBootstrapperApplicationPrereqInformation">
+        <xs:annotation>
+            <xs:documentation>
+                Adds license information for a prereq package, should only be used when unable to add the license attributes to the package directly.
+            </xs:documentation>
+            <xs:appinfo>
+                <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+                <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="PackageId" type="xs:string" use="required">
+                <xs:annotation>
+                    <xs:documentation>Id of the target package.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="LicenseFile" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Source file of the license. May not be used with LicenseUrl.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="LicenseUrl" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Source url of the license. May not be used with LicenseFile.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
     <xs:attribute name="BAFunctions" type="YesNoType">
         <xs:annotation>
             <xs:documentation>

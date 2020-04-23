@@ -46,6 +46,9 @@ namespace WixToolset.Bal
                         case "Condition":
                             this.ParseConditionElement(intermediate, section, element);
                             break;
+                        case "ManagedBootstrapperApplicationPrereqInformation":
+                            this.ParseMbaPrereqInfoElement(intermediate, section, element);
+                            break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
@@ -289,6 +292,68 @@ namespace WixToolset.Bal
                     Condition = condition,
                     Message = message,
                 });
+            }
+        }
+
+        /// <summary>
+        /// Parses a Condition element for Bundles.
+        /// </summary>
+        /// <param name="node">The element to parse.</param>
+        private void ParseMbaPrereqInfoElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            string packageId = null;
+            string licenseFile = null;
+            string licenseUrl = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "LicenseFile":
+                            licenseFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "LicenseUrl":
+                            licenseUrl = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "PackageId":
+                            packageId = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
+
+            if (null == packageId)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PackageId"));
+            }
+
+            if (null == licenseFile && null == licenseUrl ||
+                null != licenseFile && null != licenseUrl)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "LicenseFile", "LicenseUrl", true));
+            }
+
+            if (!this.Messaging.EncounteredError)
+            {
+                section.AddTuple(new WixMbaPrereqInformationTuple(sourceLineNumbers)
+                {
+                    PackageId = packageId,
+                    LicenseFile = licenseFile,
+                    LicenseUrl = licenseUrl,
+                });
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.WixBundlePackage, packageId);
             }
         }
 

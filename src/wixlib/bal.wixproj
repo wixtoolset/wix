@@ -15,13 +15,6 @@
   <ItemGroup>
     <Compile Include="BalExtension.wxs" />
     <Compile Include="Mba.wxs" />
-    <Compile Include="NetFx4AsPrereq.wxs" />
-    <Compile Include="NetFx45AsPrereq.wxs" />
-    <Compile Include="NetFx451AsPrereq.wxs" />
-    <Compile Include="NetFx452AsPrereq.wxs" />
-    <Compile Include="NetFx46AsPrereq.wxs" />
-    <Compile Include="NetFx461AsPrereq.wxs" />
-    <Compile Include="NetFx462AsPrereq.wxs" />
     <Compile Include="wixstdba.wxs" />
     <Compile Include="wixstdba_x86.wxs" />
   </ItemGroup>
