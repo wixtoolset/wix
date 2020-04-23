@@ -9,21 +9,14 @@ namespace WixToolset.Bal
     using WixToolset.Data.Burn;
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Data;
 
     public class BalBurnBackendExtension : BaseBurnBackendExtension
     {
-        public override void PostBackendBind(IBindResult result)
+        public override void BundleFinalize()
         {
-            base.PostBackendBind(result);
+            base.BundleFinalize();
 
-            if (result.Wixout == null)
-            {
-                this.Messaging.Write(new Message(null, MessageLevel.Warning, 1, "BurnBackend didn't provide Wixout so skipping BalExtension PostBind verification."));
-                return;
-            }
-
-            var intermediate = Intermediate.Load(result.Wixout);
+            var intermediate = this.Context.IntermediateRepresentation;
             var section = intermediate.Sections.Single();
 
             var baTuple = section.Tuples.OfType<WixBootstrapperApplicationTuple>().SingleOrDefault();

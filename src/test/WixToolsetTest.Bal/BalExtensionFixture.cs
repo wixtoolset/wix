@@ -34,5 +34,33 @@ namespace WixToolsetTest.Bal
                 Assert.True(File.Exists(bundleFile));
             }
         }
+
+        [Fact]
+        public void CantBuildUsingMBAWithNoPrereqs()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\MBA");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-burnStub", TestData.Get(@"runtimes\win-x86\native\burn.x86.exe"),
+                    "-o", bundleFile,
+                });
+                Assert.Equal(6802, compileResult.ExitCode);
+                Assert.Equal("There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.", compileResult.Messages[0].ToString());
+
+                Assert.False(File.Exists(bundleFile));
+                Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
+            }
+        }
     }
 }
