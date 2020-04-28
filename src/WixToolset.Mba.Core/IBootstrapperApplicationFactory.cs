@@ -23,19 +23,20 @@ namespace WixToolset.Mba.Core
     [GeneratedCodeAttribute("WixToolset.Bootstrapper.InteropCodeGenerator", "1.0.0.0")]
     public struct Command
     {
+        // Strings must be declared as pointers so that Marshaling doesn't free them.
         [MarshalAs(UnmanagedType.I4)] internal int cbSize;
         [MarshalAs(UnmanagedType.U4)] private readonly LaunchAction action;
         [MarshalAs(UnmanagedType.U4)] private readonly Display display;
         [MarshalAs(UnmanagedType.U4)] private readonly Restart restart;
-        [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzCommandLine;
+        private readonly IntPtr wzCommandLine;
         [MarshalAs(UnmanagedType.I4)] private readonly int nCmdShow;
         [MarshalAs(UnmanagedType.U4)] private readonly ResumeType resume;
         private readonly IntPtr hwndSplashScreen;
         [MarshalAs(UnmanagedType.I4)] private readonly RelationType relation;
         [MarshalAs(UnmanagedType.Bool)] private readonly bool passthrough;
-        [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzLayoutDirectory;
-        [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzBootstrapperWorkingFolder;
-        [MarshalAs(UnmanagedType.LPWStr)] private readonly string wzBootstrapperApplicationDataPath;
+        private readonly IntPtr wzLayoutDirectory;
+        private readonly IntPtr wzBootstrapperWorkingFolder;
+        private readonly IntPtr wzBootstrapperApplicationDataPath;
 
         public IBootstrapperCommand GetBootstrapperCommand()
         {
@@ -43,15 +44,15 @@ namespace WixToolset.Mba.Core
                 this.action,
                 this.display,
                 this.restart,
-                this.wzCommandLine,
+                Marshal.PtrToStringUni(this.wzCommandLine),
                 this.nCmdShow,
                 this.resume,
                 this.hwndSplashScreen,
                 this.relation,
                 this.passthrough,
-                this.wzLayoutDirectory,
-                this.wzBootstrapperWorkingFolder,
-                this.wzBootstrapperApplicationDataPath);
+                Marshal.PtrToStringUni(this.wzLayoutDirectory),
+                Marshal.PtrToStringUni(this.wzBootstrapperWorkingFolder),
+                Marshal.PtrToStringUni(this.wzBootstrapperApplicationDataPath));
         }
     }
 

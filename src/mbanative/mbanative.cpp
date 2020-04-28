@@ -14,7 +14,7 @@ extern "C" HRESULT WINAPI InitializeFromCreateArgs(
     hr = BalInitializeFromCreateArgs(pArgs, ppEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
 
-    memcpy_s(pCommand, pCommand->cbSize, pArgs->pCommand, pArgs->pCommand->cbSize);
+    memcpy_s(pCommand, pCommand->cbSize, pArgs->pCommand, min(pArgs->pCommand->cbSize, pCommand->cbSize));
 LExit:
     return hr;
 }
