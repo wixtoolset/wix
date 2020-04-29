@@ -97,7 +97,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(0, 0, 0, 6); // TODO: need to decide whether to keep this, and if so when to update it.
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(0, 0, 0, 7); // TODO: need to decide whether to keep this, and if so when to update it.
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -115,6 +115,7 @@ extern "C" HRESULT UserExperienceLoad(
 
     pUserExperience->pfnBAProc = results.pfnBootstrapperApplicationProc;
     pUserExperience->pvBAProcContext = results.pvBootstrapperApplicationProcContext;
+    pUserExperience->fDisableUnloading = results.fDisableUnloading;
 
 LExit:
     return hr;
@@ -139,8 +140,8 @@ extern "C" HRESULT UserExperienceUnload(
             pfnDestroy();
         }
 
-        // Free BA DLL.
-        if (!::FreeLibrary(pUserExperience->hUXModule))
+        // Free BA DLL if it supports it.
+        if (!pUserExperience->fDisableUnloading && !::FreeLibrary(pUserExperience->hUXModule))
         {
             hr = HRESULT_FROM_WIN32(::GetLastError());
             TraceError(hr, "Failed to unload BA DLL.");
