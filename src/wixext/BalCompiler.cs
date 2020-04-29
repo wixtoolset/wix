@@ -63,6 +63,9 @@ namespace WixToolset.Bal
                         case "WixManagedBootstrapperApplicationHost":
                             this.ParseWixManagedBootstrapperApplicationHostElement(intermediate, section, element);
                             break;
+                        case "WixDotNetCoreBootstrapperApplication":
+                            this.ParseWixDotNetCoreBootstrapperApplicationElement(intermediate, section, element);
+                            break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
                             break;
@@ -200,7 +203,9 @@ namespace WixToolset.Bal
                             case "BAFactoryAssembly":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
                                 {
-                                    section.AddTuple(new WixBalBAFactoryAssemblyTuple(sourceLineNumbers)
+                                    // There can only be one.
+                                    var id = new Identifier(AccessModifier.Public, "TheBAFactoryAssembly");
+                                    section.AddTuple(new WixBalBAFactoryAssemblyTuple(sourceLineNumbers, id)
                                     {
                                         PayloadId = payloadId,
                                     });
@@ -651,6 +656,85 @@ namespace WixToolset.Bal
                     section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "PreqbaThemeWxl"))
                     {
                         Value = localizationFile,
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses a WixDotNetCoreBootstrapperApplication element for Bundles.
+        /// </summary>
+        /// <param name="node">The element to parse.</param>
+        private void ParseWixDotNetCoreBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            string logoFile = null;
+            string themeFile = null;
+            string localizationFile = null;
+            var selfContainedDeployment = YesNoType.NotSet;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "LogoFile":
+                            logoFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ThemeFile":
+                            themeFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "LocalizationFile":
+                            localizationFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "SelfContainedDeployment":
+                            selfContainedDeployment = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
+
+            if (!this.Messaging.EncounteredError)
+            {
+                if (!String.IsNullOrEmpty(logoFile))
+                {
+                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaLogo"))
+                    {
+                        Value = logoFile,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(themeFile))
+                {
+                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaThemeXml"))
+                    {
+                        Value = themeFile,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(localizationFile))
+                {
+                    section.AddTuple(new WixVariableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, "DncPreqbaThemeWxl"))
+                    {
+                        Value = localizationFile,
+                    });
+                }
+
+                if (YesNoType.Yes == selfContainedDeployment)
+                {
+                    section.AddTuple(new WixDncOptionsTuple(sourceLineNumbers)
+                    {
+                        SelfContainedDeployment = 1,
                     });
                 }
             }

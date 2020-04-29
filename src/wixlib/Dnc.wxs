@@ -14,6 +14,31 @@
     </Fragment>
 
     <Fragment>
+        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.RtfLicense' SourceFile='dnchost.dll'>
+            <PayloadGroupRef Id='Dnc' />
+            <PayloadGroupRef Id='DncPreqStandard' />
+        </BootstrapperApplication>
+    </Fragment>
+
+    <Fragment>
+        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.Minimal' SourceFile='dnchost.dll'>
+            <PayloadGroupRef Id='Dnc' />
+        </BootstrapperApplication>
+    </Fragment>
+
+    <Fragment>
+        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.RtfLicense.Minimal' SourceFile='dnchost.dll'>
+            <PayloadGroupRef Id='Dnc' />
+        </BootstrapperApplication>
+    </Fragment>
+
+    <Fragment>
+        <BootstrapperApplication Id='DotNetCoreBootstrapperApplicationHost.Foundation' SourceFile='dnchost.dll'>
+            <PayloadGroupRef Id='Dnc' />
+        </BootstrapperApplication>
+    </Fragment>
+
+    <Fragment>
         <PayloadGroup Id='Dnc'>
             <Payload Compressed='yes' SourceFile='nethost.dll' />
             <Payload Compressed='yes' SourceFile='WixToolset.Dnc.Host.dll' />

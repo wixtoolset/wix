@@ -3,6 +3,7 @@
      xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="TrimmedSCDEarliestCoreMBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
         <BootstrapperApplicationRef Id="DotNetCoreBootstrapperApplicationHost">
+            <bal:WixDotNetCoreBootstrapperApplication SelfContainedDeployment="yes" />
             <PayloadGroupRef Id="publish.Example.EarliestCoreMBA.trimmedscd" />
         </BootstrapperApplicationRef>
         <Chain>

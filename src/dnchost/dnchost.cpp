@@ -97,15 +97,22 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
             BalExitOnFailure(hr, "Failed to create the .NET Core bootstrapper application factory.");
         }
 
-        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading .NET Core SCD bootstrapper application.");
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading .NET Core %ls bootstrapper application.", DNCHOSTTYPE_FDD == vstate.type ? L"FDD" : L"SCD");
 
         hr = vstate.pAppFactory->Create(pArgs, pResults);
         BalExitOnFailure(hr, "Failed to create the .NET Core bootstrapper application.");
     }
     else // fallback to the prerequisite BA.
     {
-        hrHostInitialization = E_DNCHOST_SCD_RUNTIME_FAILURE;
-        BalLogError(hr, "The self-contained .NET Core runtime failed to load. This is an unrecoverable error.");
+        if (DNCHOSTTYPE_SCD == vstate.type)
+        {
+            hrHostInitialization = E_DNCHOST_SCD_RUNTIME_FAILURE;
+            BalLogError(hr, "The self-contained .NET Core runtime failed to load. This is an unrecoverable error.");
+        }
+        else
+        {
+            hrHostInitialization = S_OK;
+        }
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application because .NET Core host could not be loaded, error: 0x%08x.", hr);
 
         hr = CreatePrerequisiteBA(hrHostInitialization, pEngine, vstate.sczAppBase, pArgs, pResults);
@@ -166,6 +173,7 @@ static HRESULT LoadDncConfiguration(
     LPWSTR sczPayloadId = NULL;
     LPWSTR sczPayloadXPath = NULL;
     LPWSTR sczPayloadName = NULL;
+    DWORD dwBool = 0;
 
     hr = XmlLoadDocumentFromFile(pArgs->pCommand->wzBootstrapperApplicationDataPath, &pixdManifest);
     BalExitOnFailure(hr, "Failed to load BalManifest '%ls'", pArgs->pCommand->wzBootstrapperApplicationDataPath);
@@ -219,6 +227,26 @@ static HRESULT LoadDncConfiguration(
 
     hr = StrAllocConcat(&pState->sczBaFactoryRuntimeConfigPath, L".runtimeconfig.json", 0);
     BalExitOnFailure(hr, "Failed to concat extension to runtime config path.");
+
+    pState->type = DNCHOSTTYPE_FDD;
+
+    hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixDncOptions", &pixnHost);
+    if (S_FALSE == hr)
+    {
+        ExitFunction1(hr = S_OK);
+    }
+    BalExitOnFailure(hr, "Failed to find WixDncOptions element in bootstrapper application config.");
+
+    hr = XmlGetAttributeNumber(pixnHost, L"SelfContainedDeployment", &dwBool);
+    if (S_FALSE == hr)
+    {
+        hr = S_OK;
+    }
+    else if (SUCCEEDED(hr) && dwBool)
+    {
+        pState->type = DNCHOSTTYPE_SCD;
+    }
+    BalExitOnFailure(hr, "Failed to get SelfContainedDeployment value.");
 
 LExit:
     ReleaseStr(sczPayloadName);

@@ -28,15 +28,17 @@ namespace WixToolset.Bal
 
             var isStdBA = baId.StartsWith("WixStandardBootstrapperApplication");
             var isMBA = baId.StartsWith("ManagedBootstrapperApplicationHost");
+            var isDNC = baId.StartsWith("DotNetCoreBootstrapperApplicationHost");
+            var isSCD = isDNC && this.VerifySCD(section);
 
-            if (isStdBA || isMBA)
+            if (isStdBA || isMBA || isDNC)
             {
                 this.VerifyBAFunctions(section);
             }
 
-            if (isMBA)
+            if (isMBA || (isDNC && !isSCD))
             {
-                this.VerifyPrereqPackages(section);
+                this.VerifyPrereqPackages(section, isDNC);
             }
         }
 
@@ -78,12 +80,13 @@ namespace WixToolset.Bal
             }
         }
 
-        private void VerifyPrereqPackages(IntermediateSection section)
+        private void VerifyPrereqPackages(IntermediateSection section, bool isDNC)
         {
             var prereqInfoTuples = section.Tuples.OfType<WixMbaPrereqInformationTuple>().ToList();
             if (prereqInfoTuples.Count == 0)
             {
-                this.Messaging.Write(BalErrors.MissingPrereq());
+                var message = isDNC ? BalErrors.MissingDNCPrereq() : BalErrors.MissingMBAPrereq();
+                this.Messaging.Write(message);
                 return;
             }
 
@@ -114,6 +117,19 @@ namespace WixToolset.Bal
                     foundLicenseUrl = true;
                 }
             }
+        }
+
+        private bool VerifySCD(IntermediateSection section)
+        {
+            var isSCD = false;
+
+            var dncOptions = section.Tuples.OfType<WixDncOptionsTuple>().SingleOrDefault();
+            if (dncOptions != null)
+            {
+                isSCD = dncOptions.SelfContainedDeployment != 0;
+            }
+
+            return isSCD;
         }
     }
 }

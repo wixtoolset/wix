@@ -18,12 +18,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\EarliestCoreMBA\FrameworkDependentBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\EarliestCoreMBA\HarvestedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\EarliestCoreMBA\HarvestedTrimmedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\EarliestCoreMBA\SelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\EarliestCoreMBA\TrimmedSelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\FullFramework2MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\FullFramework4MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\LatestCoreMBA\FrameworkDependentBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\LatestCoreMBA\HarvestedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\LatestCoreMBA\HarvestedTrimmedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\LatestCoreMBA\SelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
@@ -67,6 +69,7 @@
   </ItemGroup>
 
   <Target Name="PublishExamples" AfterTargets="Build">
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x86 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"' />
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x86 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"' />
     <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x86 -c $(Configuration) --self-contained true -p:PublishTrimmed=true "%(CoreMBAProject.Identity)"' />
   </Target>

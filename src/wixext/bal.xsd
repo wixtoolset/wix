@@ -215,6 +215,42 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="WixDotNetCoreBootstrapperApplication">
+        <xs:annotation>
+            <xs:documentation>
+                Configures the DotNetCoreBootstrapperApplicationHost for a Bundle.
+            </xs:documentation>
+            <xs:appinfo>
+                <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplicationRef" />
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="LogoFile" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Source file of the logo graphic.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ThemeFile" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Source file of the theme XML.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="LocalizationFile" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Source file of the theme localization .wxl file.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="SelfContainedDeployment" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>
+                        Whether the .NET Core BA was published as self-contained (SCD).
+                        If using PublishTrimmed in the .NET Core project, there must be an item group with &lt;TrimmerRootAssembly Include="System.Runtime.Loader" /&gt;
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
     <xs:attribute name="BAFactoryAssembly" type="YesNoType">
         <xs:annotation>
             <xs:documentation>

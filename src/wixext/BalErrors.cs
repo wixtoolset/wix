@@ -18,9 +18,14 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.BAFunctionsPayloadRequiredInUXContainer, "The BAFunctions DLL Payload element must be located inside the BootstrapperApplication container.");
         }
 
-        public static Message MissingPrereq()
+        public static Message MissingDNCPrereq()
         {
-            return Message(null, Ids.MissingPrereq, "There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
+            return Message(null, Ids.MissingDNCPrereq, "There must be at least one PrereqPackage when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
+        }
+
+        public static Message MissingMBAPrereq()
+        {
+            return Message(null, Ids.MissingMBAPrereq, "There must be at least one PrereqPackage when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
         }
 
         public static Message MultipleBAFunctions(SourceLineNumber sourceLineNumbers)
@@ -46,10 +51,11 @@ namespace WixToolset.Bal
         public enum Ids
         {
             AttributeRequiresPrereqPackage = 6801,
-            MissingPrereq = 6802,
+            MissingMBAPrereq = 6802,
             MultiplePrereqLicenses = 6803,
             MultipleBAFunctions = 6804,
             BAFunctionsPayloadRequiredInUXContainer = 6805,
+            MissingDNCPrereq = 6806,
         }
     }
 }
