@@ -55,6 +55,32 @@ extern "C" void WINAPI BootstrapperApplicationDestroy()
 }
 
 
+extern "C" HRESULT WINAPI DncPrereqBootstrapperApplicationCreate(
+    __in HRESULT hrHostInitialization,
+    __in IBootstrapperEngine* pEngine,
+    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
+    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+    )
+{
+    HRESULT hr = S_OK;
+
+    BalInitialize(pEngine);
+
+    hr = CreateBootstrapperApplication(vhInstance, TRUE, hrHostInitialization, pEngine, pArgs, pResults, &vpApplication);
+    BalExitOnFailure(hr, "Failed to create .NET Core prerequisite bootstrapper application interface.");
+
+LExit:
+    return hr;
+}
+
+
+extern "C" void WINAPI DncPrereqBootstrapperApplicationDestroy()
+{
+    ReleaseNullObject(vpApplication);
+    BalUninitialize();
+}
+
+
 extern "C" HRESULT WINAPI MbaPrereqBootstrapperApplicationCreate(
     __in HRESULT hrHostInitialization,
     __in IBootstrapperEngine* pEngine,

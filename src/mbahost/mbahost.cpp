@@ -129,6 +129,8 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     }
 
 LExit:
+    ReleaseNullObject(pEngine);
+
     return hr;
 }
 

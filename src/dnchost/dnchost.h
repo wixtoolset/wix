@@ -2,6 +2,13 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
+extern "C" typedef HRESULT(WINAPI* PFN_DNCPREQ_BOOTSTRAPPER_APPLICATION_CREATE)(
+    __in HRESULT hrHostInitialization,
+    __in IBootstrapperEngine* pEngine,
+    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
+    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+    );
+
 struct DNCSTATE
 {
     BOOL fInitialized;
@@ -16,4 +23,5 @@ struct DNCSTATE
     LPWSTR sczBaFactoryRuntimeConfigPath;
     HOSTFXR_STATE hostfxrState;
     IBootstrapperApplicationFactory* pAppFactory;
+    HMODULE hMbapreqModule;
 };

@@ -20,6 +20,13 @@ static HRESULT LoadRuntime(
 static HRESULT LoadManagedBootstrapperApplicationFactory(
     __in DNCSTATE* pState
     );
+static HRESULT CreatePrerequisiteBA(
+    __in HRESULT hrHostInitialization,
+    __in IBootstrapperEngine* pEngine,
+    __in LPCWSTR wzAppBase,
+    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
+    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+    );
 
 
 // function definitions
@@ -51,6 +58,7 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     )
 {
     HRESULT hr = S_OK;
+    HRESULT hrHostInitialization = S_OK;
     IBootstrapperEngine* pEngine = NULL;
 
     // coreclr.dll doesn't support unloading, so the rest of the .NET Core hosting stack doesn't support it either.
@@ -77,18 +85,32 @@ extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
     if (!vstate.fInitializedRuntime)
     {
         hr = LoadRuntime(&vstate);
-        BalExitOnFailure(hr, "Failed to load .NET Core runtime.");
 
-        vstate.fInitializedRuntime = TRUE;
-
-        hr = LoadManagedBootstrapperApplicationFactory(&vstate);
-        BalExitOnFailure(hr, "Failed to create the .NET Core bootstrapper application factory.");
+        vstate.fInitializedRuntime = SUCCEEDED(hr);
     }
 
-    BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading .NET Core SCD bootstrapper application.");
+    if (vstate.fInitializedRuntime)
+    {
+        if (!vstate.pAppFactory)
+        {
+            hr = LoadManagedBootstrapperApplicationFactory(&vstate);
+            BalExitOnFailure(hr, "Failed to create the .NET Core bootstrapper application factory.");
+        }
 
-    hr = vstate.pAppFactory->Create(pArgs, pResults);
-    BalExitOnFailure(hr, "Failed to create the .NET Core bootstrapper application.");
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading .NET Core SCD bootstrapper application.");
+
+        hr = vstate.pAppFactory->Create(pArgs, pResults);
+        BalExitOnFailure(hr, "Failed to create the .NET Core bootstrapper application.");
+    }
+    else // fallback to the prerequisite BA.
+    {
+        hrHostInitialization = E_DNCHOST_SCD_RUNTIME_FAILURE;
+        BalLogError(hr, "The self-contained .NET Core runtime failed to load. This is an unrecoverable error.");
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Loading prerequisite bootstrapper application because .NET Core host could not be loaded, error: 0x%08x.", hr);
+
+        hr = CreatePrerequisiteBA(hrHostInitialization, pEngine, vstate.sczAppBase, pArgs, pResults);
+        BalExitOnFailure(hr, "Failed to create the pre-requisite bootstrapper application.");
+    }
 
 LExit:
     ReleaseNullObject(pEngine);
@@ -98,6 +120,18 @@ LExit:
 
 extern "C" void WINAPI BootstrapperApplicationDestroy()
 {
+    if (vstate.hMbapreqModule)
+    {
+        PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = reinterpret_cast<PFN_BOOTSTRAPPER_APPLICATION_DESTROY>(::GetProcAddress(vstate.hMbapreqModule, "DncPrereqBootstrapperApplicationDestroy"));
+        if (pfnDestroy)
+        {
+            (*pfnDestroy)();
+        }
+
+        ::FreeLibrary(vstate.hMbapreqModule);
+        vstate.hMbapreqModule = NULL;
+    }
+
     BalUninitialize();
 }
 
@@ -224,6 +258,43 @@ static HRESULT LoadManagedBootstrapperApplicationFactory(
         pState->sczBaFactoryAssemblyName,
         pState->sczBaFactoryAssemblyPath,
         &pState->pAppFactory);
+
+    return hr;
+}
+
+static HRESULT CreatePrerequisiteBA(
+    __in HRESULT hrHostInitialization,
+    __in IBootstrapperEngine* pEngine,
+    __in LPCWSTR wzAppBase,
+    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
+    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczDncpreqPath = NULL;
+    HMODULE hModule = NULL;
+
+    hr = PathConcat(wzAppBase, L"dncpreq.dll", &sczDncpreqPath);
+    BalExitOnFailure(hr, "Failed to get path to pre-requisite BA.");
+
+    hModule = ::LoadLibraryW(sczDncpreqPath);
+    BalExitOnNullWithLastError(hModule, hr, "Failed to load pre-requisite BA DLL.");
+
+    PFN_DNCPREQ_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = reinterpret_cast<PFN_DNCPREQ_BOOTSTRAPPER_APPLICATION_CREATE>(::GetProcAddress(hModule, "DncPrereqBootstrapperApplicationCreate"));
+    BalExitOnNullWithLastError(pfnCreate, hr, "Failed to get DncPrereqBootstrapperApplicationCreate entry-point from: %ls", sczDncpreqPath);
+
+    hr = pfnCreate(hrHostInitialization, pEngine, pArgs, pResults);
+    BalExitOnFailure(hr, "Failed to create prequisite bootstrapper app.");
+
+    vstate.hMbapreqModule = hModule;
+    hModule = NULL;
+
+LExit:
+    if (hModule)
+    {
+        ::FreeLibrary(hModule);
+    }
+    ReleaseStr(sczDncpreqPath);
 
     return hr;
 }

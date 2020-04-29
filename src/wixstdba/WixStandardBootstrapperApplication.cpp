@@ -2892,6 +2892,23 @@ private: // privates
                                 }
                             }
                         }
+                        else if (E_DNCHOST_SCD_RUNTIME_FAILURE == m_hrFinal)
+                        {
+                            HRESULT hr = StrAllocString(&sczUnformattedText, L"#(loc.SCDRUNTIMEFAILUREErrorMessage)", 0);
+                            if (FAILED(hr))
+                            {
+                                BalLogError(hr, "Failed to initialize SCDRUNTIMEFAILUREErrorMessage loc identifier.");
+                            }
+                            else
+                            {
+                                hr = LocLocalizeString(m_pWixLoc, &sczUnformattedText);
+                                if (FAILED(hr))
+                                {
+                                    BalLogError(hr, "Failed to localize SCDRUNTIMEFAILUREErrorMessage: %ls", sczUnformattedText);
+                                    ReleaseNullStr(sczUnformattedText);
+                                }
+                            }
+                        }
                         else // try to get the error message from the error code.
                         {
                             StrAllocFromError(&sczUnformattedText, m_hrFinal, NULL);
@@ -2909,6 +2926,13 @@ private: // privates
                             }
                         }
                         else if (E_MBAHOST_NET452_ON_WIN7RTM == m_hrFinal)
+                        {
+                            if (sczUnformattedText)
+                            {
+                                BalFormatString(sczUnformattedText, &sczText);
+                            }
+                        }
+                        else if (E_DNCHOST_SCD_RUNTIME_FAILURE == m_hrFinal)
                         {
                             if (sczUnformattedText)
                             {
@@ -3754,7 +3778,7 @@ HRESULT CreateBootstrapperApplication(
 
     if (BOOTSTRAPPER_DISPLAY_UNKNOWN == pArgs->pCommand->display)
     {
-        ExitOnFailure(hr = E_INVALIDARG, "Engine requested Unknown display type.");
+        BalExitOnFailure(hr = E_INVALIDARG, "Engine requested Unknown display type.");
     }
 
     pApplication = new CWixStandardBootstrapperApplication(hModule, fPrereq, hrHostInitialization, pEngine, pArgs);
