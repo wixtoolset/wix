@@ -17,3 +17,4 @@
 #include "TestEngine.h"
 #include "ReloadEngine.h"
 #include "ShutdownEngine.h"
+#include "WaitForQuitEngine.h"

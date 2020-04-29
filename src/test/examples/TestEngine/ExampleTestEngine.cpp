@@ -4,8 +4,14 @@
 
 int __cdecl wmain(int argc, LPWSTR argv[])
 {
-    HRESULT hr = E_INVALIDARG;
+    HRESULT hr = S_OK;
+    BOOL fComInitialized = FALSE;
     BOOL fShowUsage = FALSE;
+
+    // initialize COM
+    hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    ExitOnFailure(hr, "Failed to initialize COM.");
+    fComInitialized = TRUE;
 
     ConsoleInitialize();
 
@@ -21,6 +27,10 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     {
         hr = RunShutdownEngine(argv[2], argv[3]);
     }
+    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"waitforquit", -1))
+    {
+        hr = RunWaitForQuitEngine(argv[2], argv[3]);
+    }
     else
     {
         fShowUsage = TRUE;
@@ -28,9 +38,16 @@ int __cdecl wmain(int argc, LPWSTR argv[])
 
     if (fShowUsage)
     {
-        ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Usage: {reload|shutdown} Example.TestEngine.exe Bundle.exe BA.dll");
+        ConsoleWriteError(hr = E_INVALIDARG, CONSOLE_COLOR_RED, "Usage: Example.TestEngine.exe {reload|shutdown|waitforquit} Bundle.exe BA.dll");
     }
 
     ConsoleUninitialize();
+
+LExit:
+    if (fComInitialized)
+    {
+        ::CoUninitialize();
+    }
+
     return hr;
 }

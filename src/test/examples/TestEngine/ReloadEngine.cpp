@@ -22,6 +22,12 @@ HRESULT RunReloadEngine(
     hr = pTestEngine->SendStartupEvent();
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnStartup.");
 
+    hr = pTestEngine->SimulateQuit(0);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to simulate quit.");
+
+    hr = pTestEngine->RunApplication();
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to run engine.");
+
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RELOAD_BOOTSTRAPPER);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");
 
@@ -32,6 +38,12 @@ HRESULT RunReloadEngine(
 
     hr = pTestEngine->SendStartupEvent();
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnStartup.");
+
+    hr = pTestEngine->SimulateQuit(0);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to simulate quit.");
+
+    hr = pTestEngine->RunApplication();
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to run engine.");
 
     hr = pTestEngine->SendShutdownEvent(BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnShutdown.");

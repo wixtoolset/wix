@@ -7,11 +7,14 @@ HRESULT TestEngine::Initialize(
     )
 {
     HRESULT hr = S_OK;
+    MSG msg = { };
 
     LogInitialize(::GetModuleHandleW(NULL));
 
     hr = LogOpen(NULL, PathFile(wzBundleFilePath), NULL, L"txt", FALSE, FALSE, NULL);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to open log.");
+
+    ::PeekMessageW(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 
 LExit:
     return hr;
@@ -73,6 +76,29 @@ HRESULT TestEngine::Log(
     return ConsoleWriteLine(CONSOLE_COLOR_NORMAL, "%ls", wzMessage);
 }
 
+HRESULT TestEngine::RunApplication()
+{
+    HRESULT hr = S_OK;
+    MSG msg = { };
+    BOOL fRet = FALSE;
+
+    // Enter the message pump.
+    while (0 != (fRet = ::GetMessageW(&msg, NULL, 0, 0)))
+    {
+        if (-1 == fRet)
+        {
+            ConsoleExitOnFailure(hr = E_UNEXPECTED, CONSOLE_COLOR_RED, "Unexpected return value from message pump.");
+        }
+        else
+        {
+            ProcessBAMessage(&msg);
+        }
+    }
+
+LExit:
+    return hr;
+}
+
 HRESULT TestEngine::SendShutdownEvent(
     __in BOOTSTRAPPER_SHUTDOWN_ACTION defaultAction
     )
@@ -96,6 +122,21 @@ HRESULT TestEngine::SendStartupEvent()
     startupResults.cbSize = sizeof(BA_ONSTARTUP_RESULTS);
     hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &startupArgs, &startupResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
     return hr;
+}
+
+HRESULT TestEngine::SimulateQuit(
+    __in DWORD dwExitCode
+    )
+{
+    BAENGINE_QUIT_ARGS args = { };
+    BAENGINE_QUIT_RESULTS results = { };
+
+    args.cbSize = sizeof(BAENGINE_QUIT_ARGS);
+    args.dwExitCode = dwExitCode;
+
+    results.cbSize = sizeof(BAENGINE_QUIT_RESULTS);
+
+    return BAEngineQuit(&args, &results);
 }
 
 void TestEngine::UnloadBA()
@@ -124,12 +165,27 @@ void TestEngine::UnloadBA()
 }
 
 HRESULT TestEngine::BAEngineLog(
-    __in TestEngine* pContext,
     __in BAENGINE_LOG_ARGS* pArgs,
     __in BAENGINE_LOG_RESULTS* /*pResults*/
     )
 {
-    return pContext->Log(pArgs->wzMessage);
+    return Log(pArgs->wzMessage);
+}
+
+HRESULT TestEngine::BAEngineQuit(
+    __in BAENGINE_QUIT_ARGS* pArgs,
+    __in BAENGINE_QUIT_RESULTS* /*pResults*/
+    )
+{
+    HRESULT hr = S_OK;
+
+    if (!::PostThreadMessageW(m_dwThreadId, WM_TESTENG_QUIT, static_cast<WPARAM>(pArgs->dwExitCode), 0))
+    {
+        ExitWithLastError(hr, "Failed to post shutdown message.");
+    }
+
+LExit:
+    return hr;
 }
 
 HRESULT WINAPI TestEngine::EngineProc(
@@ -150,8 +206,10 @@ HRESULT WINAPI TestEngine::EngineProc(
     switch (message)
     {
     case BOOTSTRAPPER_ENGINE_MESSAGE_LOG:
-        hr = BAEngineLog(pContext, reinterpret_cast<BAENGINE_LOG_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_LOG_RESULTS*>(pvResults));
+        hr = pContext->BAEngineLog(reinterpret_cast<BAENGINE_LOG_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_LOG_RESULTS*>(pvResults));
         break;
+    case BOOTSTRAPPER_ENGINE_MESSAGE_QUIT:
+        hr = pContext->BAEngineQuit(reinterpret_cast<BAENGINE_QUIT_ARGS*>(pvArgs), reinterpret_cast<BAENGINE_QUIT_RESULTS*>(pvResults));
     default:
         hr = E_NOTIMPL;
         break;
@@ -161,10 +219,27 @@ LExit:
     return hr;
 }
 
+HRESULT TestEngine::ProcessBAMessage(
+    __in const MSG* pmsg
+    )
+{
+    HRESULT hr = S_OK;
+
+    switch (pmsg->message)
+    {
+    case WM_TESTENG_QUIT:
+        ::PostQuitMessage(static_cast<int>(pmsg->wParam)); // go bye-bye.
+        break;
+    }
+
+    return hr;
+}
+
 TestEngine::TestEngine()
 {
     m_hBAModule = NULL;
     m_pCreateResults = NULL;
+    m_dwThreadId = ::GetCurrentThreadId();
 }
 
 TestEngine::~TestEngine()

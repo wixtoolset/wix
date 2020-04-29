@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Description>WPF .NET Core MBA</Description>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.19" />
+  </ItemGroup>
+</Project>

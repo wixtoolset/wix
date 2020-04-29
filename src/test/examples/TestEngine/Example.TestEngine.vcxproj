@@ -50,12 +50,14 @@
     <ClCompile Include="ShutdownEngine.cpp" />
     <ClCompile Include="ExampleTestEngine.cpp" />
     <ClCompile Include="TestEngine.cpp" />
+    <ClCompile Include="WaitForQuitEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precomp.h" />
     <ClInclude Include="ReloadEngine.h" />
     <ClInclude Include="ShutdownEngine.h" />
     <ClInclude Include="TestEngine.h" />
+    <ClInclude Include="WaitForQuitEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

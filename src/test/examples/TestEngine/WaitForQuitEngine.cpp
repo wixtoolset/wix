@@ -2,7 +2,7 @@
 
 #include "precomp.h"
 
-HRESULT RunShutdownEngine(
+HRESULT RunWaitForQuitEngine(
     __in LPCWSTR wzBundleFilePath,
     __in LPCWSTR wzBAFilePath
     )
@@ -21,9 +21,6 @@ HRESULT RunShutdownEngine(
 
     hr = pTestEngine->SendStartupEvent();
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure for OnStartup.");
-
-    hr = pTestEngine->SimulateQuit(0);
-    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to simulate quit.");
 
     hr = pTestEngine->RunApplication();
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to run engine.");

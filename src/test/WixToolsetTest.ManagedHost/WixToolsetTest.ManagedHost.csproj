@@ -14,6 +14,7 @@
   <PropertyGroup>
     <EarliestCoreMBAProjectPath>..\examples\EarliestCoreMBA\Example.EarliestCoreMBA.csproj</EarliestCoreMBAProjectPath>
     <LatestCoreMBAProjectPath>..\examples\LatestCoreMBA\Example.LatestCoreMBA.csproj</LatestCoreMBAProjectPath>
+    <WPFCoreMBAProjectPath>..\examples\WPFCoreMBA\Example.WPFCoreMBA.csproj</WPFCoreMBAProjectPath>
     <MBAPublishPath>$(OutputPath)examples\publish\</MBAPublishPath>
   </PropertyGroup>
 
@@ -30,6 +31,7 @@
     <Content Include="TestData\LatestCoreMBA\HarvestedTrimmedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\LatestCoreMBA\SelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\LatestCoreMBA\TrimmedSelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\WPFCoreMBA\FrameworkDependentBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
 
   <Target Name="CopyExtensions" AfterTargets="Build">
@@ -43,11 +45,17 @@
     <CoreMBAProject Include="$(LatestCoreMBAProjectPath)">
       <PublishPath>$(MBAPublishPath)Example.LatestCoreMBA</PublishPath>
     </CoreMBAProject>
+    <CoreMBAProject Include="$(WPFCoreMBAProjectPath)">
+      <PublishPath>$(MBAPublishPath)Example.WPFCoreMBA</PublishPath>
+      <SkipSCD>true</SkipSCD>
+      <SkipTrimmedSCD>true</SkipTrimmedSCD>
+    </CoreMBAProject>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(EarliestCoreMBAProjectPath)" />
     <ProjectReference Include="$(LatestCoreMBAProjectPath)" />
+    <ProjectReference Include="$(WPFCoreMBAProjectPath)" />
     <ProjectReference Include="..\examples\FullFramework2MBA\Example.FullFramework2MBA.csproj" />
     <ProjectReference Include="..\examples\FullFramework4MBA\Example.FullFramework4MBA.csproj" />
     <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" />
@@ -69,8 +77,11 @@
   </ItemGroup>
 
   <Target Name="PublishExamples" AfterTargets="Build">
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x86 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"' />
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x86 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"' />
-    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x86 -c $(Configuration) --self-contained true -p:PublishTrimmed=true "%(CoreMBAProject.Identity)"' />
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\fdd" -r win-x86 -c $(Configuration) --self-contained false "%(CoreMBAProject.Identity)"'
+          Condition="'%(CoreMBAProject.SkipFDD)'==''" />
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x86 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"'
+          Condition="'%(CoreMBAProject.SkipSCD)'==''" />
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x86 -c $(Configuration) --self-contained true -p:PublishTrimmed=true "%(CoreMBAProject.Identity)"'
+          Condition="'%(CoreMBAProject.SkipTrimmedSCD)'==''" />
   </Target>
 </Project>

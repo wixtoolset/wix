@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+    <Bundle Name="FDDWPFCoreMBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
+        <BootstrapperApplicationRef Id="DotNetCoreBootstrapperApplicationHost">
+            <Payload SourceFile='publish\Example.WPFCoreMBA\fdd\Example.WPFCoreMBA.deps.json' Name='Example.WPFCoreMBA.deps.json' />
+            <Payload SourceFile='publish\Example.WPFCoreMBA\fdd\Example.WPFCoreMBA.dll' Name='Example.WPFCoreMBA.dll' bal:BAFactoryAssembly='yes' />
+            <Payload SourceFile='publish\Example.WPFCoreMBA\fdd\Example.WPFCoreMBA.pdb' Name='Example.WPFCoreMBA.pdb' />
+            <Payload SourceFile='publish\Example.WPFCoreMBA\fdd\Example.WPFCoreMBA.runtimeconfig.json' Name='Example.WPFCoreMBA.runtimeconfig.json' />
+            <Payload SourceFile='publish\Example.WPFCoreMBA\fdd\mbanative.dll' Name='mbanative.dll' />
+            <Payload SourceFile='publish\Example.WPFCoreMBA\fdd\WixToolset.Mba.Core.dll' Name='WixToolset.Mba.Core.dll' />
+        </BootstrapperApplicationRef>
+        <Chain>
+            <ExePackage SourceFile="c:\windows\system32\kernel32.dll" bal:PrereqPackage="yes" />
+        </Chain>
+    </Bundle>
+</Wix>

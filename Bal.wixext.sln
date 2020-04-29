@@ -13,7 +13,7 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "bal", "src\wixlib\bal.wixpr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Bal.wixext", "src\wixext\WixToolset.Bal.wixext.csproj", "{BF720A63-9D7B-456E-B60C-8122852D9FED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixToolset.Dnc.Host", "src\WixToolset.Dnc.Host\WixToolset.Dnc.Host.csproj", "{0D780900-C2FF-4FA2-8CB5-8A19768724C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Dnc.Host", "src\WixToolset.Dnc.Host\WixToolset.Dnc.Host.csproj", "{0D780900-C2FF-4FA2-8CB5-8A19768724C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixToolset.Mba.Host", "src\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj", "{F2BA1935-70FA-4156-B161-FD03850B4FAA}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dnchost", "src\dnchost\dnchost.vcxproj", "{B6F70281-6583-4138-BB7F-AABFEBBB3CA2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.LatestCoreMBA", "src\test\examples\LatestCoreMBA\Example.LatestCoreMBA.csproj", "{A4247D9D-3CC9-4BE1-B23A-BEC166AF3618}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.WPFCoreMBA", "src\test\examples\WPFCoreMBA\Example.WPFCoreMBA.csproj", "{8E707BF2-FD72-4649-8727-BA5955D48D40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -215,6 +217,18 @@ Global
 		{A4247D9D-3CC9-4BE1-B23A-BEC166AF3618}.Release|x64.Build.0 = Release|Any CPU
 		{A4247D9D-3CC9-4BE1-B23A-BEC166AF3618}.Release|x86.ActiveCfg = Release|Any CPU
 		{A4247D9D-3CC9-4BE1-B23A-BEC166AF3618}.Release|x86.Build.0 = Release|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Release|x64.Build.0 = Release|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E707BF2-FD72-4649-8727-BA5955D48D40}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -225,6 +239,7 @@ Global
 		{44297646-706D-4508-8E96-1B35B109694C} = {C70E3534-A018-4D0A-A340-916C9777EEF7}
 		{1E86D8DF-DABD-4B6E-A812-64CD2040C73A} = {C70E3534-A018-4D0A-A340-916C9777EEF7}
 		{A4247D9D-3CC9-4BE1-B23A-BEC166AF3618} = {C70E3534-A018-4D0A-A340-916C9777EEF7}
+		{8E707BF2-FD72-4649-8727-BA5955D48D40} = {C70E3534-A018-4D0A-A340-916C9777EEF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74046961-48BF-467A-A6C2-F886C75CE0BE}
