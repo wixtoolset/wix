@@ -35,6 +35,12 @@ HRESULT TestEngine::LoadBA(
 
     command.cbSize = sizeof(BOOTSTRAPPER_COMMAND);
 
+    hr = PathGetDirectory(wzBAFilePath, &command.wzBootstrapperWorkingFolder);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to allocate wzBootstrapperWorkingFolder");
+
+    hr = PathConcat(command.wzBootstrapperWorkingFolder, L"BootstrapperApplicationData.xml", &command.wzBootstrapperApplicationDataPath);
+    ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to allocate wzBootstrapperApplicationDataPath");
+
     args.cbSize = sizeof(BOOTSTRAPPER_CREATE_ARGS);
     args.pCommand = &command;
     args.pfnBootstrapperEngineProc = TestEngine::EngineProc;
@@ -53,6 +59,9 @@ HRESULT TestEngine::LoadBA(
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure on BootstrapperApplicationCreate.");
 
 LExit:
+    ReleaseStr(command.wzBootstrapperApplicationDataPath);
+    ReleaseStr(command.wzBootstrapperWorkingFolder);
+
     return hr;
 }
 
@@ -92,6 +101,7 @@ HRESULT TestEngine::SendStartupEvent()
 void TestEngine::UnloadBA()
 {
     PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = NULL;
+    BOOL fDisableUnloading = m_pCreateResults && m_pCreateResults->fDisableUnloading;
 
     ReleaseNullMem(m_pCreateResults);
 
@@ -104,7 +114,11 @@ void TestEngine::UnloadBA()
 
     if (m_hBAModule)
     {
-        ::FreeLibrary(m_hBAModule);
+        if (!fDisableUnloading)
+        {
+            ::FreeLibrary(m_hBAModule);
+        }
+
         m_hBAModule = NULL;
     }
 }

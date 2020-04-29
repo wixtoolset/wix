@@ -9,7 +9,7 @@
               xmlns="http://wixtoolset.org/schemas/v4/wxs/bal">
     <xs:annotation>
         <xs:documentation>
-            The source code schema for the WiX Toolset Burn User Experience Extension.
+            The source code schema for the WiX Toolset Bootstrapper Application Layer Extension.
         </xs:documentation>
     </xs:annotation>
 
@@ -215,10 +215,25 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:attribute name="BAFactoryAssembly" type="YesNoType">
+        <xs:annotation>
+            <xs:documentation>
+                When set to "yes", DotNetCoreBootstrapperApplicationHost will load the DLL and instantiate the type with the BootstrapperApplicationFactoryAttribute.
+                There must be corresponding deps.json and runtimeconfig.json files (set EnableDynamicLoading to True in the .NET Core project).
+                The .NET Core project must have been published, not just built.
+                Only one payload may be marked with this attribute set to "yes".
+            </xs:documentation>
+            <xs:appinfo>
+                <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Payload" />
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+
     <xs:attribute name="BAFunctions" type="YesNoType">
         <xs:annotation>
             <xs:documentation>
                 When set to "yes", WixStdBA will load the DLL and work with it to handle BA messages.
+                Only one payload may be marked with this attribute set to "yes".
             </xs:documentation>
             <xs:appinfo>
                 <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Payload" />

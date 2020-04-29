@@ -60,9 +60,9 @@
       <Output TaskParameter="Assemblies" ItemName="AssemblyIdentity" />
     </GetAssemblyIdentity>
     <ItemGroup>
-      <Line Include="#define MBA_ASSEMBLY_FULL_NAME L&quot;%(AssemblyIdentity.Identity)&quot;" />
-      <Line Include="#define MBA_CONFIG_FILE_NAME L&quot;$(AssemblyName).config&quot;" />
-      <Line Include="#define MBA_ENTRY_TYPE L&quot;$(RootNamespace).BootstrapperApplicationFactory&quot;" />
+      <Line Include='#define MBA_ASSEMBLY_FULL_NAME L"%(AssemblyIdentity.Identity)"' />
+      <Line Include='#define MBA_CONFIG_FILE_NAME L"$(AssemblyName).config"' />
+      <Line Include='#define MBA_ENTRY_TYPE L"$(RootNamespace).BootstrapperApplicationFactory"' />
     </ItemGroup>
     <Message Importance="normal" Text="Generating identity definitions into @(HeaderPath->'%(FullPath)')" />
     <WriteLinesToFile File="@(HeaderPath)" Lines="@(Line)" Overwrite="True" />

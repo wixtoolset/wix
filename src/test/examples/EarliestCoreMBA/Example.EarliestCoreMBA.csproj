@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Description>Earliest .NET Core MBA</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="System.Runtime.Loader" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.19" />
+  </ItemGroup>
+</Project>

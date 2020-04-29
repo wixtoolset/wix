@@ -11,9 +11,23 @@
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <EarliestCoreMBAProjectPath>..\examples\EarliestCoreMBA\Example.EarliestCoreMBA.csproj</EarliestCoreMBAProjectPath>
+    <LatestCoreMBAProjectPath>..\examples\LatestCoreMBA\Example.LatestCoreMBA.csproj</LatestCoreMBAProjectPath>
+    <MBAPublishPath>$(OutputPath)examples\publish\</MBAPublishPath>
+  </PropertyGroup>
+
   <ItemGroup>
+    <Content Include="TestData\EarliestCoreMBA\HarvestedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\EarliestCoreMBA\HarvestedTrimmedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\EarliestCoreMBA\SelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\EarliestCoreMBA\TrimmedSelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\FullFramework2MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="TestData\FullFramework4MBA\Bundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\LatestCoreMBA\HarvestedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\LatestCoreMBA\HarvestedTrimmedSCD.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\LatestCoreMBA\SelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="TestData\LatestCoreMBA\TrimmedSelfContainedBundle.wxs" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
 
   <Target Name="CopyExtensions" AfterTargets="Build">
@@ -21,6 +35,17 @@
   </Target>
 
   <ItemGroup>
+    <CoreMBAProject Include="$(EarliestCoreMBAProjectPath)">
+      <PublishPath>$(MBAPublishPath)Example.EarliestCoreMBA</PublishPath>
+    </CoreMBAProject>
+    <CoreMBAProject Include="$(LatestCoreMBAProjectPath)">
+      <PublishPath>$(MBAPublishPath)Example.LatestCoreMBA</PublishPath>
+    </CoreMBAProject>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(EarliestCoreMBAProjectPath)" />
+    <ProjectReference Include="$(LatestCoreMBAProjectPath)" />
     <ProjectReference Include="..\examples\FullFramework2MBA\Example.FullFramework2MBA.csproj" />
     <ProjectReference Include="..\examples\FullFramework4MBA\Example.FullFramework4MBA.csproj" />
     <ProjectReference Include="..\examples\TestEngine\Example.TestEngine.vcxproj" />
@@ -40,4 +65,9 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
   </ItemGroup>
+
+  <Target Name="PublishExamples" AfterTargets="Build">
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\scd" -r win-x86 -c $(Configuration) --self-contained true "%(CoreMBAProject.Identity)"' />
+    <Exec Command='dotnet publish -o "%(CoreMBAProject.PublishPath)\trimmedscd" -r win-x86 -c $(Configuration) --self-contained true -p:PublishTrimmed=true "%(CoreMBAProject.Identity)"' />
+  </Target>
 </Project>

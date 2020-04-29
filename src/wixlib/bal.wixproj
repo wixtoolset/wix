@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Compile Include="BalExtension.wxs" />
+    <Compile Include="Dnc.wxs" />
     <Compile Include="Mba.wxs" />
     <Compile Include="wixstdba.wxs" />
     <Compile Include="wixstdba_x86.wxs" />
@@ -33,6 +34,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\dnchost\dnchost.vcxproj">
+      <Name>dnchost</Name>
+      <Project>{B6F70281-6583-4138-BB7F-AABFEBBB3CA2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\mbahost\mbahost.vcxproj">
       <Name>mbahost</Name>
       <Project>{12C87C77-3547-44F8-8134-29BC915CB19D}</Project>

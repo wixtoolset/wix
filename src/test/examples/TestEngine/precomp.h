@@ -9,6 +9,7 @@
 #include "logutil.h"
 #include "memutil.h"
 #include "pathutil.h"
+#include "strutil.h"
 
 #include "BootstrapperEngine.h"
 #include "BootstrapperApplication.h"

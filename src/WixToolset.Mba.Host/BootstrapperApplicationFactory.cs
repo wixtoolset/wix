@@ -9,13 +9,14 @@ namespace WixToolset.Mba.Host
     using WixToolset.Mba.Core;
 
     /// <summary>
-    /// Entry point for the MBA host to create and return the BA to the engine.
+    /// Entry point for the managed host to create and return the BA to the engine.
     /// </summary>
     [ClassInterface(ClassInterfaceType.None)]
     public sealed class BootstrapperApplicationFactory : MarshalByRefObject, IBootstrapperApplicationFactory
     {
         /// <summary>
         /// Creates a new instance of the <see cref="BootstrapperApplicationFactory"/> class.
+        /// Entry point for the MBA host.
         /// </summary>
         public BootstrapperApplicationFactory()
         {

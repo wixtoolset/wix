@@ -197,6 +197,15 @@ namespace WixToolset.Bal
                     {
                         switch (attribute.Name.LocalName)
                         {
+                            case "BAFactoryAssembly":
+                                if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
+                                {
+                                    section.AddTuple(new WixBalBAFactoryAssemblyTuple(sourceLineNumbers)
+                                    {
+                                        PayloadId = payloadId,
+                                    });
+                                }
+                                break;
                             case "BAFunctions":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
                                 {

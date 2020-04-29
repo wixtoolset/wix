@@ -4,9 +4,11 @@ namespace WixToolset.Bal
 {
     using System;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
 
     public enum BalTupleDefinitionType
     {
+        WixBalBAFactoryAssembly,
         WixBalBAFunctions,
         WixBalCondition,
         WixMbaPrereqInformation,
@@ -32,6 +34,9 @@ namespace WixToolset.Bal
         {
             switch (type)
             {
+                case BalTupleDefinitionType.WixBalBAFactoryAssembly:
+                    return BalTupleDefinitions.WixBalBAFactoryAssembly;
+
                 case BalTupleDefinitionType.WixBalBAFunctions:
                     return BalTupleDefinitions.WixBalBAFunctions;
 
@@ -50,6 +55,16 @@ namespace WixToolset.Bal
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }
+        }
+
+        static BalTupleDefinitions()
+        {
+            WixBalBAFactoryAssembly.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixBalBAFunctions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixBalCondition.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixStdbaOverridableVariable.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
         }
     }
 }

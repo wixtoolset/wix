@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>WixToolset.Dnc.Host</RootNamespace>
+    <Description>WiX Toolset .NET Core BA Host</Description>
+    <Title>WiX Toolset .NET Core BA Host</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <HeaderPath Include="$(BaseOutputPath)obj\$(AssemblyName).h">
+      <Visible>False</Visible>
+    </HeaderPath>
+  </ItemGroup>
+
+  <Target Name="GenerateIdentityHeader" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="@(HeaderPath)">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyIdentity" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <Line Include='#define DNC_ASSEMBLY_FILE_NAME L"$(AssemblyName).dll"' />
+      <Line Include='#define DNC_ASSEMBLY_FULL_NAME "%(AssemblyIdentity.Identity)"' />
+      <Line Include='#define DNC_ENTRY_TYPE "$(RootNamespace).BootstrapperApplicationFactory"' />
+      <Line Include='#define DNC_STATIC_ENTRY_METHOD "CreateBAFactory"' />
+    </ItemGroup>
+    <Message Importance="normal" Text="Generating identity definitions into @(HeaderPath->'%(FullPath)')" />
+    <WriteLinesToFile File="@(HeaderPath)" Lines="@(Line)" Overwrite="True" />
+    <ItemGroup>
+      <FileWrites Include="@(HeaderPath)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
