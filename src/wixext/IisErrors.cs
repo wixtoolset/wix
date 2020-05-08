@@ -7,11 +7,6 @@ namespace WixToolset.Data
 
     public static class IIsErrors
     {
-        public static Message CannotHarvestWebSite()
-        {
-            return Message(null, Ids.CannotHarvestWebSite, "Cannot harvest website. On Windows Vista, you must install IIS 6 Management Compatibility.");
-        }
-
         public static Message DeprecatedBinaryChildElement(SourceLineNumber sourceLineNumbers, string elementName)
         {
             return Message(sourceLineNumbers, Ids.DeprecatedBinaryChildElement, "The {0} element contains a deprecated child Binary element.  Please move the Binary element under a Fragment, Module, or Product element and set the {0}/@BinaryKey attribute to the value of the Binary/@Id attribute.", elementName);
@@ -30,11 +25,6 @@ namespace WixToolset.Data
         public static Message IllegalElementWithoutComponent(SourceLineNumber sourceLineNumbers, string elementName)
         {
             return Message(sourceLineNumbers, Ids.IllegalElementWithoutComponent, "The {0} element cannot be specified unless the element has a Component as an ancestor. A {0} that does not have a Component ancestor is not installed.", elementName);
-        }
-
-        public static Message InsufficientPermissionHarvestWebSite()
-        {
-            return Message(null, Ids.InsufficientPermissionHarvestWebSite, "Not enough permissions to harvest website. On Windows Vista, you must run Heat elevated.");
         }
 
         public static Message MimeMapExtensionMissingPeriod(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attributeValue)
@@ -62,11 +52,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.WebSiteAttributeUnderWebSite, "The {0}/@WebSite attribute cannot be specified when the {0} element is nested under a WebSite element.", elementName);
         }
 
-        public static Message WebSiteNotFound(string webSiteDescription)
-        {
-            return Message(null, Ids.WebSiteNotFound, "The web site '{0}' could not be found.  Please check that the web site exists, and that it is spelled correctly (please note, you must use the correct case).", webSiteDescription);
-        }
-
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -87,9 +72,6 @@ namespace WixToolset.Data
             WebApplicationAlreadySpecified = 5155,
             IllegalCharacterInAttributeValue = 5156,
             DeprecatedBinaryChildElement = 5157,
-            WebSiteNotFound = 5158,
-            InsufficientPermissionHarvestWebSite = 5159,
-            CannotHarvestWebSite = 5160,
             RequiredAttributeUnderComponent = 5161,
         }
     }
