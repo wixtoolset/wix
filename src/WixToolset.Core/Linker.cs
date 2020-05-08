@@ -263,9 +263,9 @@ namespace WixToolset.Core
                                             // if the directory table contains references to standard windows folders
                                             // mergemod.dll will add customactions to set the MSM directory to 
                                             // the same directory as the standard windows folder and will add references to 
-                                            // custom action to all the standard sequence tables.  A problem will occur
+                                            // custom action to all the standard sequence tables. A problem will occur
                                             // if the MSI does not have these tables as mergemod.dll does not add these
-                                            // tables to the MSI if absent.  This code adds the tables in case mergemod.dll
+                                            // tables to the MSI if absent. This code adds the tables in case mergemod.dll
                                             // needs them.
                                             this.activeOutput.EnsureTable(this.tableDefinitions["CustomAction"]);
                                             this.activeOutput.EnsureTable(this.tableDefinitions["AdminExecuteSequence"]);
@@ -938,9 +938,9 @@ namespace WixToolset.Core
 
             // DisplaySectionComplexReferences("--- section's complex references before flattening ---", sections);
 
-            // Step 1:  Gather all of the complex references that are going participate
-            // in the flatting process.  This means complex references that have "grouping
-            //  parents" of Features, Modules, and, of course, Groups.  These references
+            // Step 1:  Gather all of the complex references that are going to participate
+            // in the flatting process. This means complex references that have "grouping
+            //  parents" of Features, Modules, and, of course, Groups. These references
             // that participate in a "grouping parent" will be removed from their section
             // now and after processing added back in Step 3 below.
             foreach (var section in sections)
@@ -949,7 +949,7 @@ namespace WixToolset.Core
                 for (var i = section.Tuples.Count - 1; i >= 0; --i)
                 {
                     // Only process the "grouping parents" such as FeatureGroup, ComponentGroup, Feature,
-                    // and Module.  Non-grouping complex references are simple and
+                    // and Module. Non-grouping complex references are simple and
                     // resolved during normal complex reference resolutions.
                     if (section.Tuples[i] is WixComplexReferenceTuple wixComplexReferenceRow &&
                         (ComplexReferenceParentType.FeatureGroup == wixComplexReferenceRow.ParentType ||
@@ -974,7 +974,7 @@ namespace WixToolset.Core
                         section.Tuples.RemoveAt(i);
 
                         // Remember the mapping from set of complex references with a common
-                        // parent to their section.  We'll need this to add them back to the
+                        // parent to their section. We'll need this to add them back to the
                         // correct section in Step 3.
                         if (!parentGroupsSections.TryGetValue(parentTypeAndId, out var parentSection))
                         {
@@ -1003,7 +1003,7 @@ namespace WixToolset.Core
             // DisplaySectionComplexReferences("\r\n\r\n--- section's complex references middle of flattening ---", sections);
 
             // Step 2:  Loop through the parent groups that have nested groups removing
-            // them from the hash table as they are processed.  At the end of this the
+            // them from the hash table as they are processed. At the end of this the
             // complex references should all be flattened.
             var keys = parentGroupsNeedingProcessing.Keys.ToList();
 
@@ -1023,7 +1023,7 @@ namespace WixToolset.Core
 
             // Step 3:  Finally, ensure that all of the groups that were removed
             // in Step 1 and flattened in Step 2 are added to their appropriate
-            // section.  This is where we will toss out the final no-longer-needed
+            // section. This is where we will toss out the final no-longer-needed
             // groups.
             foreach (var parentGroup in parentGroups.Keys)
             {
@@ -1057,7 +1057,7 @@ namespace WixToolset.Core
         /// Recursively processes the group.
         /// </summary>
         /// <param name="parentTypeAndId">String combination type and id of group to process next.</param>
-        /// <param name="loopDetector">Stack of groups processed thus far.  Used to detect loops.</param>
+        /// <param name="loopDetector">Stack of groups processed thus far. Used to detect loops.</param>
         /// <param name="parentGroups">Hash table of complex references grouped by parent id.</param>
         /// <param name="parentGroupsNeedingProcessing">Hash table of parent groups that still have nested groups that need to be flattened.</param>
         private void FlattenGroup(string parentTypeAndId, Stack<string> loopDetector, Dictionary<string, List<WixComplexReferenceTuple>> parentGroups, Dictionary<string, IntermediateSection> parentGroupsNeedingProcessing)
@@ -1082,7 +1082,7 @@ namespace WixToolset.Core
                     if (loopDetector.Contains(childTypeAndId))
                     {
                         // Create a comma delimited list of the references that participate in the 
-                        // loop for the error message.  Start at the bottom of the stack and work the
+                        // loop for the error message. Start at the bottom of the stack and work the
                         // way up to present the loop as a directed graph.
                         var loop = String.Join(" -> ", loopDetector);
 
@@ -1096,7 +1096,7 @@ namespace WixToolset.Core
                         return; // bail
                     }
 
-                    // Check to see if the child group still needs to be processed.  If so,
+                    // Check to see if the child group still needs to be processed. If so,
                     // go do that so that we'll get all of that children's (and children's 
                     // children) complex references correctly merged into our parent group.
                     if (parentGroupsNeedingProcessing.ContainsKey(childTypeAndId))
@@ -1132,7 +1132,7 @@ namespace WixToolset.Core
             }
 
             // Add the children group's complex references to the parent
-            // group.  Clean out any left over groups and quietly remove any
+            // group. Clean out any left over groups and quietly remove any
             // duplicate complex references that occurred during the merge.
             referencesToParent.AddRange(allNewChildComplexReferences);
             referencesToParent.Sort(ComplexReferenceComparision);
@@ -1219,7 +1219,7 @@ namespace WixToolset.Core
             }
 
             // We need to flatten the nested PayloadGroups and PackageGroups under
-            // UX, Chain, and any Containers.  When we're done, the WixGroups table
+            // UX, Chain, and any Containers. When we're done, the WixGroups table
             // will hold Payloads under UX, ChainPackages (references?) under Chain,
             // and ChainPackages/Payloads under the attached and any detatched
             // Containers.

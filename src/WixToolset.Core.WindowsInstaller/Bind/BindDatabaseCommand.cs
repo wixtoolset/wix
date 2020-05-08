@@ -45,10 +45,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
             this.FileSystemExtensions = context.FileSystemExtensions;
             this.Intermediate = context.IntermediateRepresentation;
+            this.IntermediateFolder = context.IntermediateFolder;
             this.OutputPath = context.OutputPath;
             this.OutputPdbPath = context.PdbPath;
             this.PdbType = context.PdbType;
-            this.IntermediateFolder = context.IntermediateFolder;
+            this.SuppressLayout = context.SuppressLayout;
+
             this.SubStorages = subStorages;
             this.Validator = validator;
 
@@ -186,18 +188,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            if (!this.Intermediate.HasLevel(Data.WindowsInstaller.IntermediateLevels.PartiallyBound))
+            // Sequence all the actions.
             {
-                // Sequence all the actions.
-                {
-                    var command = new SequenceActionsCommand(this.Messaging, section);
-                    command.Execute();
-                }
+                var command = new SequenceActionsCommand(this.Messaging, section);
+                command.Execute();
+            }
 
-                {
-                    var command = new CreateSpecialPropertiesCommand(section);
-                    command.Execute();
-                }
+            {
+                var command = new CreateSpecialPropertiesCommand(section);
+                command.Execute();
             }
 
 #if TODO_PATCHING

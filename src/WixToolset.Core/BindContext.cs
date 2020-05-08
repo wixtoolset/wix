@@ -53,5 +53,7 @@ namespace WixToolset.Core
         public IEnumerable<string> SuppressIces { get; set; }
 
         public bool SuppressValidation { get; set; }
+
+        public bool SuppressLayout { get; set; }
     }
 }
