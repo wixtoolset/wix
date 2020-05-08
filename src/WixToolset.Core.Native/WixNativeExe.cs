@@ -11,7 +11,7 @@ namespace WixToolset.Core.Native
 
     internal class WixNativeExe
     {
-        private const int FiveMinutesInMilliseconds = 300000;
+        private const int TenMinutesInMilliseconds = 600000;
         private static string PathToWixNativeExe;
 
         private readonly string commandLine;
@@ -63,17 +63,22 @@ namespace WixToolset.Core.Native
                     process.StandardInput.WriteLine();
                 }
 
-                if (process.WaitForExit(FiveMinutesInMilliseconds))
+                if (process.WaitForExit(TenMinutesInMilliseconds))
                 {
                     // If the process successfully exits documentation says we need to wait again
                     // without a timeout to ensure that all of the redirected output is captured.
                     //
                     process.WaitForExit();
-                }
 
-                if (process.ExitCode != 0)
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Win32Exception(process.ExitCode);
+                    }
+                }
+                else
                 {
-                    throw new Win32Exception(process.ExitCode);
+                    process.Kill();
+                    throw new Win32Exception(1460/*ERROR_TIMEOUT*/);
                 }
             }
 
