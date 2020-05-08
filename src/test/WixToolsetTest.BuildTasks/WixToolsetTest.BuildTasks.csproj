@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\HeatFilePackage\HeatFilePackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFilePackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.de-de.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
@@ -24,6 +32,7 @@
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" Condition="'$(TargetFramework)'=='net461' or '$(TargetFramework)'=='net472'" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" Condition="'$(TargetFramework)'=='netcoreapp2.1' " />
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>

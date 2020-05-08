@@ -7,7 +7,7 @@
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildThisFileFullPath)</WixTargetsPath>
-    <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixTargetsPath)WixTasks.dll</WixTasksPath>
+    <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixTargetsPath)WixToolset.BuildTasks.dll</WixTasksPath>
   </PropertyGroup>
 
   <!-- These tasks are extensions for harvesting WiX source code from other sources. -->
@@ -260,10 +260,9 @@
     Condition=" $(EnableProjectHarvesting) and ('@(HeatProject)' != '' or '@(HarvestProject)' != '') ">
 
     <HeatProject
-      NoLogo="$(HarvestProjectsNoLogo)"
+      NoLogo="true"
       SuppressAllWarnings="$(HarvestProjectsSuppressAllWarnings)"
       SuppressSpecificWarnings="$(HarvestProjectsSuppressSpecificWarnings)"
-      ToolPath="$(WixToolPath)"
       TreatWarningsAsErrors="$(HarvestProjectsTreatWarningsAsErrors)"
       TreatSpecificWarningsAsErrors="$(HarvestProjectsTreatSpecificWarningsAsErrors)"
       VerboseOutput="$(HarvestProjectsVerboseOutput)"
@@ -280,7 +279,6 @@
       ProjectName="%(_AllHeatProjects.ProjectName)"
       Configuration="%(_AllHeatProjects.Configuration)"
       Platform="%(_AllHeatProjects.Platform)"
-      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
       GenerateWixVariables="$(HarvestProjectsGenerateWixVariables)"
       AdditionalOptions="$(HarvestProjectsAdditionalOptions)">
 
@@ -347,10 +345,9 @@
     Condition=" '@(HarvestDirectory)' != '' ">
 
     <HeatDirectory
-      NoLogo="$(HarvestDirectoryNoLogo)"
+      NoLogo="true"
       SuppressAllWarnings="$(HarvestDirectorySuppressAllWarnings)"
       SuppressSpecificWarnings="$(HarvestDirectorySuppressSpecificWarnings)"
-      ToolPath="$(WixToolPath)"
       TreatWarningsAsErrors="$(HarvestDirectoryTreatWarningsAsErrors)"
       TreatSpecificWarningsAsErrors="$(HarvestDirectoryTreatSpecificWarningsAsErrors)"
       VerboseOutput="$(HarvestDirectoryVerboseOutput)"
@@ -365,7 +362,6 @@
       DirectoryRefId="%(HarvestDirectory.DirectoryRefId)"
       KeepEmptyDirectories="%(HarvestDirectory.KeepEmptyDirectories)"
       PreprocessorVariable="%(HarvestDirectory.PreprocessorVariable)"
-      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
       SuppressCom="%(HarvestDirectory.SuppressCom)"
       SuppressRootDirectory="%(HarvestDirectory.SuppressRootDirectory)"
       SuppressRegistry="%(HarvestDirectory.SuppressRegistry)"
@@ -423,10 +419,9 @@
     Condition=" '@(HarvestFile)' != '' ">
 
     <HeatFile
-      NoLogo="$(HarvestFileNoLogo)"
+      NoLogo="true"
       SuppressAllWarnings="$(HarvestFileSuppressAllWarnings)"
       SuppressSpecificWarnings="$(HarvestFileSuppressSpecificWarnings)"
-      ToolPath="$(WixToolPath)"
       TreatWarningsAsErrors="$(HarvestFileTreatWarningsAsErrors)"
       TreatSpecificWarningsAsErrors="$(HarvestFileTreatSpecificWarningsAsErrors)"
       VerboseOutput="$(HarvestFileVerboseOutput)"
@@ -440,7 +435,6 @@
       ComponentGroupName="%(HarvestFile.ComponentGroupName)"
       DirectoryRefId="%(HarvestFile.DirectoryRefId)"
       PreprocessorVariable="%(HarvestFile.PreprocessorVariable)"
-      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
       SuppressCom="%(HarvestFile.SuppressCom)"
       SuppressRegistry="%(HarvestFile.SuppressRegistry)"
       SuppressRootDirectory="%(HarvestFile.SuppressRootDirectory)"

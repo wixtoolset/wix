@@ -122,8 +122,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <WixToolDir Condition=" '$(WixToolDir)' == ''">$(WixBinDir)</WixToolDir>
-    <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixToolDir)</WixExtDir>
+    <WixExtDir Condition=" '$(WixExtDir)' == ''">$(WixBinDir)</WixExtDir>
   </PropertyGroup>
 
   <!--

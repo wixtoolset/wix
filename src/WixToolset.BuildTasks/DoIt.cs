@@ -16,10 +16,8 @@ namespace WixToolset.BuildTasks
     /// <summary>
     /// An MSBuild task to run the WiX compiler.
     /// </summary>
-    public sealed class DoIt : Task
+    public sealed class DoIt : ToolsetTask
     {
-        public string AdditionalOptions { get; set; }
-
         public string[] Cultures { get; set; }
 
         public string[] DefineConstants { get; set; }
@@ -36,8 +34,6 @@ namespace WixToolset.BuildTasks
         public ITaskItem IntermediateDirectory { get; set; }
 
         public ITaskItem[] LocalizationFiles { get; set; }
-
-        public bool NoLogo { get; set; }
 
         public ITaskItem[] LibraryFiles { get; set; }
 
@@ -57,32 +53,6 @@ namespace WixToolset.BuildTasks
         public ITaskItem[] SourceFiles { get; set; }
 
         public string[] ReferencePaths { get; set; }
-
-
-        /// <summary>
-        /// Gets or sets whether all warnings should be suppressed.
-        /// </summary>
-        public bool SuppressAllWarnings { get; set; }
-
-        /// <summary>
-        /// Gets or sets a list of specific warnings to be suppressed.
-        /// </summary>
-        public string[] SuppressSpecificWarnings { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether all warnings should be treated as errors.
-        /// </summary>
-        public bool TreatWarningsAsErrors { get; set; }
-
-        /// <summary>
-        /// Gets or sets a list of specific warnings to treat as errors.
-        /// </summary>
-        public string[] TreatSpecificWarningsAsErrors { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether to display verbose output.
-        /// </summary>
-        public bool VerboseOutput { get; set; }
 
 
         public ITaskItem[] BindInputPaths { get; set; }
@@ -109,37 +79,10 @@ namespace WixToolset.BuildTasks
         public string[] SuppressIces { get; set; }
         public string AdditionalCub { get; set; }
 
-        public override bool Execute()
+        protected override string TaskShortName => "WIX";
+
+        protected override void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
         {
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
-
-            var listener = new MsbuildMessageListener(this.Log, "WIX", this.BuildEngine.ProjectFileOfTaskNode);
-
-            try
-            {
-                this.ExecuteCore(serviceProvider, listener);
-            }
-            catch (WixException e)
-            {
-                listener.Write(e.Error);
-            }
-            catch (Exception e)
-            {
-                this.Log.LogErrorFromException(e, showStackTrace: true, showDetail: true, null);
-
-                if (e is NullReferenceException || e is SEHException)
-                {
-                    throw;
-                }
-            }
-
-            return !this.Log.HasLoggedErrors;
-        }
-
-        private void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener)
-        {
-            var commandLineString = this.BuildCommandLine();
-
             this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
 
             var messaging = serviceProvider.GetService<IMessaging>();
@@ -155,10 +98,8 @@ namespace WixToolset.BuildTasks
             command?.Execute();
         }
 
-        private string BuildCommandLine()
+        protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
-            var commandLineBuilder = new WixCommandLineBuilder();
-
             commandLineBuilder.AppendTextUnquoted("build");
 
             commandLineBuilder.AppendSwitchIfNotNull("-platform ", this.InstallerPlatform);
@@ -166,14 +107,12 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-outputType ", this.OutputType);
             commandLineBuilder.AppendSwitchIfNotNull("-pdb ", this.PdbFile);
             commandLineBuilder.AppendSwitchIfNotNull("-pdbType ", this.PdbType);
-            commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
             commandLineBuilder.AppendArrayIfNotNull("-culture ", this.Cultures);
             commandLineBuilder.AppendArrayIfNotNull("-d ", this.DefineConstants);
             commandLineBuilder.AppendArrayIfNotNull("-I ", this.IncludeSearchPaths);
             commandLineBuilder.AppendExtensions(this.Extensions, this.ExtensionDirectory, this.ReferencePaths);
             commandLineBuilder.AppendIfTrue("-sval", this.SuppressValidation);
             commandLineBuilder.AppendArrayIfNotNull("-sice ", this.SuppressIces);
-            commandLineBuilder.AppendArrayIfNotNull("-sw ", this.SuppressSpecificWarnings);
             commandLineBuilder.AppendSwitchIfNotNull("-usf ", this.UnreferencedSymbolsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-cc ", this.CabinetCachePath);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
@@ -181,14 +120,14 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-outputsfile ", this.BindOutputsFile);
             commandLineBuilder.AppendSwitchIfNotNull("-builtoutputsfile ", this.BindBuiltOutputsFile);
 
+            base.BuildCommandLine(commandLineBuilder);
+
             commandLineBuilder.AppendIfTrue("-bindFiles", this.BindFiles);
             commandLineBuilder.AppendArrayIfNotNull("-bindPath ", this.CalculateBindPathStrings());
             commandLineBuilder.AppendArrayIfNotNull("-loc ", this.LocalizationFiles);
             commandLineBuilder.AppendArrayIfNotNull("-lib ", this.LibraryFiles);
             commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
             commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
-
-            return commandLineBuilder.ToString();
         }
 
         private IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)

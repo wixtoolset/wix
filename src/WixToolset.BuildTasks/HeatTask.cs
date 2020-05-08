@@ -2,24 +2,18 @@
 
 namespace WixToolset.BuildTasks
 {
-    using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.IO;
-    using System.Text;
-
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Utilities;
+    using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
+    using WixToolset.Harvesters;
 
-#if false
     /// <summary>
     /// A base MSBuild task to run the WiX harvester.
     /// Specific harvester tasks should extend this class.
     /// </summary>
-    public abstract class HeatTask : WixToolTask
+    public abstract class HeatTask : ToolsetTask
     {
-        private const string HeatToolName = "Heat.exe";
-
         private bool autogenerageGuids;
         private bool generateGuidsNow;
         private ITaskItem outputFile;
@@ -65,15 +59,7 @@ namespace WixToolset.BuildTasks
             set { this.transforms = value; }
         }
 
-        /// <summary>
-        /// Get the name of the executable.
-        /// </summary>
-        /// <remarks>The ToolName is used with the ToolPath to get the location of heat.exe.</remarks>
-        /// <value>The name of the executable.</value>
-        protected override string ToolName
-        {
-            get { return HeatToolName; }
-        }
+        protected override string TaskShortName => "HEAT";
 
         /// <summary>
         /// Gets the name of the heat operation performed by the task.
@@ -85,20 +71,19 @@ namespace WixToolset.BuildTasks
             get;
         }
 
-        /// <summary>
-        /// Get the path to the executable. 
-        /// </summary>
-        /// <remarks>GetFullPathToTool is only called when the ToolPath property is not set (see the ToolName remarks above).</remarks>
-        /// <returns>The full path to the executable or simply heat.exe if it's expected to be in the system path.</returns>
-        protected override string GenerateFullPathToTool()
+        protected override void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
         {
-            // If there's not a ToolPath specified, it has to be in the system path.
-            if (String.IsNullOrEmpty(this.ToolPath))
-            {
-                return HeatToolName;
-            }
+            this.Log.LogMessage(MessageImportance.Normal, "heat.exe " + commandLineString);
 
-            return Path.Combine(Path.GetFullPath(this.ToolPath), HeatToolName);
+            var messaging = serviceProvider.GetService<IMessaging>();
+            messaging.SetListener(listener);
+
+            var arguments = serviceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(commandLineString);
+
+            var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider, true);
+            var command = commandLine.ParseStandardCommandLine(arguments);
+            command?.Execute();
         }
 
         /// <summary>
@@ -110,14 +95,11 @@ namespace WixToolset.BuildTasks
 
             commandLineBuilder.AppendIfTrue("-ag", this.AutogenerateGuids);
             commandLineBuilder.AppendIfTrue("-gg", this.GenerateGuidsNow);
-            commandLineBuilder.AppendIfTrue("-nologo", this.NoLogo);
             commandLineBuilder.AppendIfTrue("-sfrag", this.SuppressFragments);
             commandLineBuilder.AppendIfTrue("-suid", this.SuppressUniqueIds);
-            commandLineBuilder.AppendArrayIfNotNull("-sw", this.SuppressSpecificWarnings);
             commandLineBuilder.AppendArrayIfNotNull("-t ", this.Transforms);
             commandLineBuilder.AppendTextIfNotNull(this.AdditionalOptions);
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
         }
     }
-#endif
 }

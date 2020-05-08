@@ -4,7 +4,6 @@ namespace WixToolset.BuildTasks
 {
     using Microsoft.Build.Framework;
 
-#if false
     public sealed class HeatFile : HeatTask
     {
         private string file;
@@ -70,14 +69,8 @@ namespace WixToolset.BuildTasks
             get { return "file"; }
         }
 
-        /// <summary>
-        /// Generate the command line arguments to write to the response file from the properties.
-        /// </summary>
-        /// <returns>Command line string.</returns>
-        protected override string GenerateResponseFileCommands()
+        protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
-            WixCommandLineBuilder commandLineBuilder = new WixCommandLineBuilder();
-
             commandLineBuilder.AppendSwitch(this.OperationName);
             commandLineBuilder.AppendFileNameIfNotNull(this.File);
 
@@ -90,8 +83,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-var ", this.PreprocessorVariable);
 
             base.BuildCommandLine(commandLineBuilder);
-            return commandLineBuilder.ToString();
         }
     }
-#endif
 }
