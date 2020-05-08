@@ -8,7 +8,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
 
     internal class HelpCommand : ICommandLineCommand
     {
-        public bool ShowLogo => false;
+        public bool ShowLogo => true;
 
         public bool StopParsing => true;
 

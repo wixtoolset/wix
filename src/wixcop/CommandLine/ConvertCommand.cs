@@ -14,7 +14,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
     {
         private const string SettingsFileDefault = "wixcop.settings.xml";
 
-        public ConvertCommand(IWixToolsetServiceProvider serviceProvider, bool fixErrors, int indentationAmount, List<string> searchPatterns, bool subDirectories, string settingsFile1, string settingsFile2)
+        public ConvertCommand(IWixToolsetServiceProvider serviceProvider, bool showLogo, bool fixErrors, int indentationAmount, List<string> searchPatterns, bool subDirectories, string settingsFile1, string settingsFile2)
         {
             this.ErrorsAsWarnings = new HashSet<string>();
             this.ExemptFiles = new HashSet<string>();
@@ -26,6 +26,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
             this.ServiceProvider = serviceProvider;
             this.SettingsFile1 = settingsFile1;
             this.SettingsFile2 = settingsFile2;
+            this.ShowLogo = showLogo;
             this.SubDirectories = subDirectories;
         }
 
@@ -51,7 +52,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
 
         private bool SubDirectories { get; }
 
-        public bool ShowLogo => throw new NotImplementedException();
+        public bool ShowLogo { get; }
 
         public bool StopParsing => throw new NotImplementedException();
 

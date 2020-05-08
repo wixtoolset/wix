@@ -3,6 +3,7 @@
 namespace WixToolset.Tools.WixCop
 {
     using System;
+    using System.Diagnostics;
     using WixToolset.Core;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -54,6 +55,17 @@ namespace WixToolset.Tools.WixCop
                 var commandLine = serviceProvider.GetService<IWixCopCommandLineParser>();
                 commandLine.Arguments = arguments;
                 var command = commandLine.ParseWixCopCommandLine();
+
+                if (command.ShowLogo)
+                {
+                    var wixcopAssembly = this.GetType().Assembly;
+                    var fv = FileVersionInfo.GetVersionInfo(wixcopAssembly.Location);
+
+                    Console.WriteLine("WiX Cop version {0}", fv.FileVersion);
+                    Console.WriteLine("Copyright (C) .NET Foundation and contributors. All rights reserved.");
+                    Console.WriteLine();
+                }
+
                 return command?.Execute() ?? 1;
             }
             catch (Exception e)

@@ -49,6 +49,7 @@ namespace WixToolset.Tools.WixCop.CommandLine
 
             return new ConvertCommand(
                 this.serviceProvider,
+                this.showLogo,
                 this.fixErrors,
                 this.indentationAmount,
                 this.searchPatterns,
