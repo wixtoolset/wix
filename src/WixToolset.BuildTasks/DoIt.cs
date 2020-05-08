@@ -253,27 +253,32 @@ namespace WixToolset.BuildTasks
 
             public void Write(Message message)
             {
+                var code = this.ShortAppName + message.Id.ToString();
+                var file = message.SourceLineNumbers?.FileName ?? this.LongAppName;
+                var lineNumber = message.SourceLineNumbers?.LineNumber ?? 0;
                 switch (message.Level)
                 {
                     case MessageLevel.Error:
-                        this.Logger.LogError(null, this.ShortAppName + message.Id.ToString(), null, message.SourceLineNumbers?.FileName ?? this.LongAppName, message.SourceLineNumbers?.LineNumber ?? 0, 0, 0, 0, message.ResourceNameOrFormat, message.MessageArgs);
+                        this.Logger.LogError(null, code, null, file, lineNumber, 0, 0, 0, message.ResourceNameOrFormat, message.MessageArgs);
+                        break;
+
+                    case MessageLevel.Verbose:
+                        this.Logger.LogMessage(null, code, null, file, lineNumber, 0, 0, 0, MessageImportance.Low, message.ResourceNameOrFormat, message.MessageArgs);
                         break;
 
                     case MessageLevel.Warning:
-                        this.Logger.LogWarning(null, this.ShortAppName + message.Id.ToString(), null, message.SourceLineNumbers?.FileName ?? this.LongAppName, message.SourceLineNumbers?.LineNumber ?? 0, 0, 0, 0, message.ResourceNameOrFormat, message.MessageArgs);
+                        this.Logger.LogWarning(null, code, null, file, lineNumber, 0, 0, 0, message.ResourceNameOrFormat, message.MessageArgs);
                         break;
 
                     default:
-                        // TODO: Revisit this because something is going horribly awry. The commented out LogMessage call is crashing saying that the "message" parameter is null. When you look at the call stack, the code
-                        //       is in the wrong LogMessage override and the "null" subcategory was passed in as the message. Not clear why it is picking the wrong overload.
-                        //if (message.Id > 0)
-                        //{
-                        //    this.Logger.LogMessage(null, code, null, message.SourceLineNumber?.FileName, message.SourceLineNumber?.LineNumber ?? 0, 0, 0, 0, MessageImportance.Normal, message.Format, message.FormatData);
-                        //}
-                        //else
-                        //{
-                        this.Logger.LogMessage(MessageImportance.Normal, message.ResourceNameOrFormat, message.MessageArgs);
-                        //}
+                        if (message.Id > 0)
+                        {
+                            this.Logger.LogMessage(null, code, null, file, lineNumber, 0, 0, 0, MessageImportance.Normal, message.ResourceNameOrFormat, message.MessageArgs);
+                        }
+                        else
+                        {
+                            this.Logger.LogMessage(MessageImportance.Normal, message.ResourceNameOrFormat, message.MessageArgs);
+                        }
                         break;
                 }
             }
