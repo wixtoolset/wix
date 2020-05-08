@@ -44,5 +44,7 @@ namespace WixToolset.Extensibility.Data
         IEnumerable<string> SuppressIces { get; set; }
 
         bool SuppressValidation { get; set; }
+
+        bool SuppressLayout { get; set; }
     }
 }
