@@ -39,7 +39,6 @@ namespace WixToolsetTest.Data
             Assert.True(loaded.HasLevel(IntermediateLevels.Compiled));
             Assert.True(loaded.HasLevel(IntermediateLevels.Linked));
             Assert.True(loaded.HasLevel(IntermediateLevels.Resolved));
-            Assert.False(loaded.HasLevel(WixToolset.Data.WindowsInstaller.IntermediateLevels.PartiallyBound));
 
             var tuple = (ComponentTuple)loaded.Sections.Single().Tuples.Single();
 
