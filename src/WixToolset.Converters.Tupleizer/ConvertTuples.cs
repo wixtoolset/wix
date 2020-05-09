@@ -86,8 +86,6 @@ namespace WixToolset.Converters.Tupleizer
                 return DefaultTupleFromRow(typeof(SummaryInformationTuple), row, columnZeroIsId: false);
             case "ActionText":
                 return DefaultTupleFromRow(typeof(ActionTextTuple), row, columnZeroIsId: false);
-            case "AdvtExecuteSequence":
-                return DefaultTupleFromRow(typeof(AdvtExecuteSequenceTuple), row, columnZeroIsId: false);
             case "AppId":
                 return DefaultTupleFromRow(typeof(AppIdTuple), row, columnZeroIsId: false);
             case "AppSearch":
@@ -292,8 +290,6 @@ namespace WixToolset.Converters.Tupleizer
                 return DefaultTupleFromRow(typeof(IconTuple), row, columnZeroIsId: true);
             case "IniLocator":
                 return DefaultTupleFromRow(typeof(IniLocatorTuple), row, columnZeroIsId: false);
-            case "InstallExecuteSequence":
-                return DefaultTupleFromRow(typeof(InstallExecuteSequenceTuple), row, columnZeroIsId: false);
             case "LockPermissions":
                 return DefaultTupleFromRow(typeof(LockPermissionsTuple), row, columnZeroIsId: false);
             case "Media":
