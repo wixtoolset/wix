@@ -14,7 +14,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBundleExeCommand
     {
-        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBundleTuple bundleTuple, WixBundleContainerTuple uxContainer, IEnumerable<WixBundleContainerTuple> containers, string burnStubPath)
+        public CreateBundleExeCommand(IMessaging messaging, IBackendHelper backendHelper, string intermediateFolder, string outputPath, WixBundleTuple bundleTuple, WixBundleContainerTuple uxContainer, IEnumerable<WixBundleContainerTuple> containers)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
@@ -23,7 +23,6 @@ namespace WixToolset.Core.Burn.Bundles
             this.BundleTuple = bundleTuple;
             this.UXContainer = uxContainer;
             this.Containers = containers;
-            this.BurnStubPath = burnStubPath;
         }
 
         public IFileTransfer Transfer { get; private set; }
@@ -42,23 +41,14 @@ namespace WixToolset.Core.Burn.Bundles
 
         private IEnumerable<WixBundleContainerTuple> Containers { get; }
 
-        private string BurnStubPath { get; }
-
         public void Execute()
         {
             var bundleFilename = Path.GetFileName(this.OutputPath);
 
-            // Copy the burn.exe to a writable location then mark it to be moved to its final build location. Note
-            // that today, the x64 Burn uses the x86 stub.
+            // Copy the burn.exe to a writable location then mark it to be moved to its final build location.
 
-            var stubFile = this.BurnStubPath;
-
-            if (String.IsNullOrEmpty(stubFile))
-            {
-                var stubPlatform = (Platform.X64 == this.BundleTuple.Platform) ? "x86" : this.BundleTuple.Platform.ToString();
-
-                stubFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), stubPlatform, "burn.exe");
-            }
+            var stubPlatform = this.BundleTuple.Platform.ToString();
+            var stubFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), stubPlatform, "burn.exe");
 
             var bundleTempPath = Path.Combine(this.IntermediateFolder, bundleFilename);
 

@@ -157,7 +157,7 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, this.commandLine.BurnStubPath);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths);
                             }
                         }
                     }
@@ -294,7 +294,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<IBindPath> bindPaths, string burnStubPath)
+        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<IBindPath> bindPaths)
         {
             var intermediateFolder = this.IntermediateFolder;
             if (String.IsNullOrEmpty(intermediateFolder))
@@ -328,7 +328,6 @@ namespace WixToolset.Core.CommandLine
                 {
                     var context = this.ServiceProvider.GetService<IBindContext>();
                     //context.CabbingThreadCount = this.CabbingThreadCount;
-                    context.BurnStubPath = burnStubPath;
                     context.CabCachePath = cabCachePath;
                     context.Codepage = resolveResult.Codepage;
                     //context.DefaultCompressionLevel = this.DefaultCompressionLevel;
@@ -491,8 +490,6 @@ namespace WixToolset.Core.CommandLine
 
             public List<IBindPath> BindPaths { get; } = new List<IBindPath>();
 
-            public string BurnStubPath { get; private set; }
-
             public string CabCachePath { get; private set; }
 
             public List<string> Cultures { get; } = new List<string>();
@@ -579,9 +576,6 @@ namespace WixToolset.Core.CommandLine
                             }
                             break;
                         }
-                        case "burnstub":
-                            this.BurnStubPath = parser.GetNextArgumentOrError(arg);
-                            return true;
 
                         case "cc":
                             this.CabCachePath = parser.GetNextArgumentOrError(arg);

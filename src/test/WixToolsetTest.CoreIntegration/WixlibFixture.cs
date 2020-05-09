@@ -17,7 +17,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimpleBundleUsingWixlib()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData\SimpleBundle");
 
             using (var fs = new DisposableFileSystem())
@@ -43,7 +42,6 @@ namespace WixToolsetTest.CoreIntegration
                     "-lib", Path.Combine(intermediateFolder, @"test.wixlib"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 

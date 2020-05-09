@@ -31,7 +31,6 @@ namespace WixToolset.Core.Burn
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
 
-            this.BurnStubPath = context.BurnStubPath;
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
@@ -49,8 +48,6 @@ namespace WixToolset.Core.Burn
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
-
-        private string BurnStubPath { get; }
 
         private CompressionLevel? DefaultCompressionLevel { get; }
 
@@ -453,7 +450,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleTuple, uxContainer, containers, this.BurnStubPath);
+                var command = new CreateBundleExeCommand(this.Messaging, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleTuple, uxContainer, containers);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);

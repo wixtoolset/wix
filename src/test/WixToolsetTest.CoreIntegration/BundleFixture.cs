@@ -19,7 +19,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildMultiFileBundle()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData\SimpleBundle");
 
             using (var fs = new DisposableFileSystem())
@@ -35,7 +34,6 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
@@ -49,7 +47,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimpleBundle()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData\SimpleBundle");
 
             using (var fs = new DisposableFileSystem())
@@ -68,7 +65,6 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", exePath,
                 });
 
@@ -113,7 +109,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimpleBundleUsingExtensionBA()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var folder = TestData.Get(@"TestData\SimpleBundle");
 
@@ -130,7 +125,6 @@ namespace WixToolsetTest.CoreIntegration
                     "-ext", extensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
@@ -144,7 +138,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSingleExeBundle()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData");
 
             using (var fs = new DisposableFileSystem())
@@ -161,7 +154,6 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", exePath,
                 });
 
@@ -174,7 +166,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSingleExeRemotePayloadBundle()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData");
 
             using (var fs = new DisposableFileSystem())
@@ -190,7 +181,6 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", exePath,
                 });
 

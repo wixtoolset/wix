@@ -15,7 +15,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void PopulatesManifestWithBundleExtension()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData");
 
             using (var fs = new DisposableFileSystem())
@@ -35,7 +34,6 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", bundlePath
                 });
 
@@ -63,7 +61,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void PopulatesManifestWithBundleExtensionSearches()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var extensionPath = Path.GetFullPath(new Uri(typeof(ExampleExtensionFactory).Assembly.CodeBase).LocalPath);
             var folder = TestData.Get(@"TestData");
 
@@ -85,7 +82,6 @@ namespace WixToolsetTest.CoreIntegration
                     "-ext", extensionPath,
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", bundlePath
                 });
 
@@ -117,7 +113,6 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void PopulatesManifestWithSetVariables()
         {
-            var burnStubPath = TestData.Get(@"TestData\.Data\burn.exe");
             var folder = TestData.Get(@"TestData");
 
             using (var fs = new DisposableFileSystem())
@@ -136,7 +131,6 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", bundlePath
                 });
 
