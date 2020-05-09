@@ -11,6 +11,7 @@ namespace WixToolset.Core.Native
 
     internal class WixNativeExe
     {
+        private const string WixNativeExeFileName = "wixnative.exe";
         private static string PathToWixNativeExe;
 
         private readonly string commandLine;
@@ -80,7 +81,25 @@ namespace WixToolset.Core.Native
         {
             if (String.IsNullOrEmpty(PathToWixNativeExe))
             {
-                var path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), "wixnative.x86.exe");
+                var path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), WixNativeExeFileName);
+
+                if (!File.Exists(path))
+                {
+                    var searchDirectoriesString = AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES") as string;
+                    var searchDirectories = searchDirectoriesString?.Split(';');
+                    if (searchDirectories != null)
+                    {
+                        foreach (string directoryPath in searchDirectories)
+                        {
+                            var possiblePath = Path.Combine(directoryPath, WixNativeExeFileName);
+                            if (File.Exists(possiblePath))
+                            {
+                                path = possiblePath;
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 if (!File.Exists(path))
                 {

@@ -25,12 +25,10 @@
     <file src="$id$.dll" target="lib\netstandard2.0" />
 
     <!--
-      These native executables are included in this .nupkg to place the .exe correctly for tests to work.
-      That are ignored when published. The dependency above is used when publishing the tools.
-     -->
     <file src="..\Win32\wixnative.x86.exe" target="lib\netstandard2.0" />
     <file src="..\Win32\wixnative.x86.pdb" target="lib\netstandard2.0" />
     <file src="..\x64\wixnative.amd64.exe" target="lib\netstandard2.0" />
     <file src="..\x64\wixnative.amd64.pdb" target="lib\netstandard2.0" />
+     -->
   </files>
 </package>

@@ -23,16 +23,11 @@
     </ProjectConfiguration>
   </ItemGroup>
 
-  <PropertyGroup>
-    <NameSuffix Condition=" '$(Platform)'=='Win32' ">x86</NameSuffix>
-    <NameSuffix Condition=" '$(Platform)'=='x64' ">amd64</NameSuffix>
-  </PropertyGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8497EC72-B8D0-4272-A9D0-7E9D871CEFBF}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
     <ProjectSubSystem>Console</ProjectSubSystem>
-    <TargetName>wixnative.$(NameSuffix)</TargetName>
+    <TargetName>wixnative</TargetName>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Core</Description>
