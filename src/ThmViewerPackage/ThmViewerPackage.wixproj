@@ -23,7 +23,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Import Project="$(OutputPath)\net461\wix.targets" />
+  <Import Project="$(OutputPath)\net461\win-x86\wix.targets" />
 
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

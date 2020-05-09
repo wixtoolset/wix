@@ -6,6 +6,7 @@
     <TargetFramework>net461</TargetFramework>
     <IsPackable>false</IsPackable>
     <DebugType>embedded</DebugType>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

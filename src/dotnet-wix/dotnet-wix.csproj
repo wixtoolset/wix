@@ -9,6 +9,7 @@
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)publish\dotnet-wix\</NuspecBasePath>
     <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
