@@ -11,8 +11,6 @@ namespace WixToolset.Extensibility.Data
     {
         IWixToolsetServiceProvider ServiceProvider { get; }
 
-        string BurnStubPath { get; set; }
-
         int CabbingThreadCount { get; set; }
 
         string CabCachePath { get; set; }
