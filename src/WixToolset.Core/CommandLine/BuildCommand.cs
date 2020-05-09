@@ -74,8 +74,6 @@ namespace WixToolset.Core.CommandLine
 
             this.Platform = this.commandLine.Platform;
 
-            this.OutputFile = this.commandLine.OutputFile;
-
             this.ContentsFile = this.commandLine.ContentsFile;
 
             this.OutputsFile = this.commandLine.OutputsFile;
@@ -91,6 +89,21 @@ namespace WixToolset.Core.CommandLine
             var creator = this.ServiceProvider.GetService<ITupleDefinitionCreator>();
 
             this.EvaluateSourceFiles(sourceFiles, creator, out var codeFiles, out var wixipl);
+
+            this.OutputFile = this.commandLine.OutputFile;
+
+            if (String.IsNullOrEmpty(this.OutputFile))
+            {
+                if (codeFiles.Count == 1)
+                {
+                    // If output type is unknown, the extension will be replaced with the right default based on output type.
+                    this.OutputFile = Path.ChangeExtension(codeFiles[0].OutputPath, DefaultExtensionForOutputType(this.OutputType));
+                }
+                else
+                {
+                    this.Messaging.Write(ErrorMessages.MustSpecifyOutputWithMoreThanOneInput());
+                }
+            }
 
             if (this.Messaging.EncounteredError)
             {
@@ -114,7 +127,7 @@ namespace WixToolset.Core.CommandLine
 
                     if (!this.Messaging.EncounteredError)
                     {
-                        wixlib.Save(this.commandLine.OutputFile);
+                        wixlib.Save(this.OutputFile);
                     }
                 }
             }
@@ -129,9 +142,16 @@ namespace WixToolset.Core.CommandLine
 
                     if (!this.Messaging.EncounteredError)
                     {
+                        var outputExtension = Path.GetExtension(this.OutputFile);
+                        if (String.IsNullOrEmpty(outputExtension) || ".wix" == outputExtension)
+                        {
+                            var entrySectionType = wixipl.Sections.Single().Type;
+                            this.OutputFile = Path.ChangeExtension(this.OutputFile, DefaultExtensionForSectionType(entrySectionType));
+                        }
+
                         if (this.OutputType == OutputType.IntermediatePostLink)
                         {
-                            wixipl.Save(this.commandLine.OutputFile);
+                            wixipl.Save(this.OutputFile);
                         }
                         else
                         {
@@ -414,6 +434,53 @@ namespace WixToolset.Core.CommandLine
             }
 
             return result?.Document;
+        }
+
+        private static string DefaultExtensionForSectionType(SectionType sectionType)
+        {
+            switch (sectionType)
+            {
+                case SectionType.Bundle:
+                    return ".exe";
+                case SectionType.Module:
+                    return ".msm";
+                case SectionType.Product:
+                    return ".msi";
+                case SectionType.PatchCreation:
+                    return ".pcp";
+                case SectionType.Patch:
+                    return ".msp";
+                case SectionType.Fragment:
+                case SectionType.Unknown:
+                default:
+                    return ".wix";
+            }
+        }
+
+        private static string DefaultExtensionForOutputType(OutputType outputType)
+        {
+            switch (outputType)
+            {
+                case OutputType.Bundle:
+                    return ".exe";
+                case OutputType.Library:
+                    return ".wixlib";
+                case OutputType.Module:
+                    return ".msm";
+                case OutputType.Patch:
+                    return ".msp";
+                case OutputType.PatchCreation:
+                    return ".pcp";
+                case OutputType.Product:
+                    return ".msi";
+                case OutputType.Transform:
+                    return ".mst";
+                case OutputType.IntermediatePostLink:
+                    return ".wixipl";
+                case OutputType.Unknown:
+                default:
+                    return ".wix";
+            }
         }
 
         private class CommandLine
