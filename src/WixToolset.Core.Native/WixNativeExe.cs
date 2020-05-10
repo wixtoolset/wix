@@ -8,6 +8,7 @@ namespace WixToolset.Core.Native
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using System.Runtime.InteropServices;
 
     internal class WixNativeExe
     {
@@ -82,28 +83,29 @@ namespace WixToolset.Core.Native
             if (String.IsNullOrEmpty(PathToWixNativeExe))
             {
                 var path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath), WixNativeExeFileName);
+                var possiblePaths = path;
 
-                if (!File.Exists(path))
+                var found = File.Exists(path);
+                if (!found && AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES") is string searchDirectoriesString)
                 {
-                    var searchDirectoriesString = AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES") as string;
-                    var searchDirectories = searchDirectoriesString?.Split(';');
-                    if (searchDirectories != null)
+                    possiblePaths = searchDirectoriesString;
+                    var separatorChar = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':';
+                    var searchDirectories = searchDirectoriesString?.Split(separatorChar);
+                    foreach (var directoryPath in searchDirectories)
                     {
-                        foreach (string directoryPath in searchDirectories)
+                        var possiblePath = Path.Combine(directoryPath, WixNativeExeFileName);
+                        if (File.Exists(possiblePath))
                         {
-                            var possiblePath = Path.Combine(directoryPath, WixNativeExeFileName);
-                            if (File.Exists(possiblePath))
-                            {
-                                path = possiblePath;
-                                break;
-                            }
+                            path = possiblePath;
+                            found = true;
+                            break;
                         }
                     }
                 }
 
-                if (!File.Exists(path))
+                if (!found)
                 {
-                    throw new FileNotFoundException($"Could not find internal piece of WiX Toolset at: {path}", path);
+                    throw new FileNotFoundException($"Could not find internal piece of WiX Toolset at: {possiblePaths}", WixNativeExeFileName);
                 }
 
                 PathToWixNativeExe = path;
