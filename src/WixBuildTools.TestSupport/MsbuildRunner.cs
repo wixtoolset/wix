@@ -15,6 +15,8 @@ namespace WixBuildTools.TestSupport
         private static readonly string Msbuild15RelativePath = @"MSBuild\15.0\Bin\MSBuild.exe";
         private static readonly string Msbuild16RelativePath = @"MSBuild\Current\Bin\MSBuild.exe";
 
+        private static readonly object InitLock = new object();
+
         private static string Msbuild15Path;
         private static string Msbuild16Path;
 
@@ -26,40 +28,43 @@ namespace WixBuildTools.TestSupport
 
         private static MsbuildRunnerResult InitAndExecute(string msbuildVersion, string projectPath, string[] arguments)
         {
-            if (Msbuild15Path == null && Msbuild16Path == null)
+            lock (InitLock)
             {
-                var vswherePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), VswhereRelativePath);
-                if (!File.Exists(vswherePath))
+                if (Msbuild15Path == null && Msbuild16Path == null)
                 {
-                    throw new InvalidOperationException($"Failed to find vswhere at: {vswherePath}");
-                }
-
-                var result = RunProcessCaptureOutput(vswherePath, VswhereFindArguments);
-                if (result.ExitCode != 0)
-                {
-                    throw new InvalidOperationException($"Failed to execute vswhere.exe, exit code: {result.ExitCode}");
-                }
-
-                Msbuild15Path = String.Empty;
-                Msbuild16Path = String.Empty;
-
-                foreach (var installPath in result.Output)
-                {
-                    if (String.IsNullOrEmpty(Msbuild16Path))
+                    var vswherePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), VswhereRelativePath);
+                    if (!File.Exists(vswherePath))
                     {
-                        var path = Path.Combine(installPath, Msbuild16RelativePath);
-                        if (File.Exists(path))
-                        {
-                            Msbuild16Path = path;
-                        }
+                        throw new InvalidOperationException($"Failed to find vswhere at: {vswherePath}");
                     }
 
-                    if (String.IsNullOrEmpty(Msbuild15Path))
+                    var result = RunProcessCaptureOutput(vswherePath, VswhereFindArguments);
+                    if (result.ExitCode != 0)
                     {
-                        var path = Path.Combine(installPath, Msbuild15RelativePath);
-                        if (File.Exists(path))
+                        throw new InvalidOperationException($"Failed to execute vswhere.exe, exit code: {result.ExitCode}");
+                    }
+
+                    Msbuild15Path = String.Empty;
+                    Msbuild16Path = String.Empty;
+
+                    foreach (var installPath in result.Output)
+                    {
+                        if (String.IsNullOrEmpty(Msbuild16Path))
                         {
-                            Msbuild15Path = path;
+                            var path = Path.Combine(installPath, Msbuild16RelativePath);
+                            if (File.Exists(path))
+                            {
+                                Msbuild16Path = path;
+                            }
+                        }
+
+                        if (String.IsNullOrEmpty(Msbuild15Path))
+                        {
+                            var path = Path.Combine(installPath, Msbuild15RelativePath);
+                            if (File.Exists(path))
+                            {
+                                Msbuild15Path = path;
+                            }
                         }
                     }
                 }
