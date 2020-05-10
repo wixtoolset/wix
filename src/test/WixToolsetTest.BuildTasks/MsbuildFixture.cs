@@ -44,7 +44,7 @@ namespace WixToolsetTest.BuildTasks
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    //@"bin\SimpleBundle.exe",
+                    @"bin\SimpleBundle.exe",
                     @"bin\SimpleBundle.wixpdb",
                 }, paths);
             }
