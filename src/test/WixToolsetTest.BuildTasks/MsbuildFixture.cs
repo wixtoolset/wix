@@ -14,6 +14,43 @@ namespace WixToolsetTest.BuildTasks
         private static readonly string WixTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(DoIt).Assembly.CodeBase).AbsolutePath), "wix.targets");
 
         [Fact]
+        public void CanBuildSimpleBundle()
+        {
+            var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\SimpleBundle\SimpleBundle.wixproj");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+
+                var result = MsbuildRunner.Execute(projectPath, new[]
+                {
+                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:IntermediateOutputPath={intermediateFolder}",
+                    $"-p:OutputPath={binFolder}"
+                });
+                result.AssertSuccess();
+
+                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
+                Assert.Single(platformSwitches);
+
+                var warnings = result.Output.Where(line => line.Contains(": warning"));
+                Assert.Empty(warnings);
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.Equal(new[]
+                {
+                    //@"bin\SimpleBundle.exe",
+                    @"bin\SimpleBundle.wixpdb",
+                }, paths);
+            }
+        }
+
+        [Fact]
         public void CanBuildSimpleMsiPackage()
         {
             var projectPath = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj");
