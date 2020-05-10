@@ -10,7 +10,8 @@
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <!-- <PackAsTool>true</PackAsTool> -->
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='netcoreapp2.1' ">win-x86</RuntimeIdentifier>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup>
