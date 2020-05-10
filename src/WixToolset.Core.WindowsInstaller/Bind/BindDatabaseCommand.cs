@@ -232,8 +232,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
-                var command = new ExtractEmbeddedFilesCommand(this.ExpectedEmbeddedFiles);
+                var command = new ExtractEmbeddedFilesCommand(this.BackendHelper, this.ExpectedEmbeddedFiles);
                 command.Execute();
+
+                trackedFiles.AddRange(command.TrackedFiles);
             }
 
             // This must occur after all variables and source paths have been resolved.

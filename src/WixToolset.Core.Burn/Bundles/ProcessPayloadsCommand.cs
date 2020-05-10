@@ -31,6 +31,8 @@ namespace WixToolset.Core.Burn.Bundles
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
@@ -44,6 +46,7 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var fileTransfers = new List<IFileTransfer>();
+            var trackedFiles = new List<ITrackedFile>();
 
             foreach (var payload in this.Payloads)
             {
@@ -77,10 +80,16 @@ namespace WixToolset.Core.Burn.Bundles
                         var transfer = this.BackendHelper.CreateFileTransfer(sourceFile.Path, Path.Combine(this.LayoutDirectory, payload.Name), false, payload.SourceLineNumbers);
                         fileTransfers.Add(transfer);
                     }
+
+                    if (payload.ContentFile)
+                    {
+                        trackedFiles.Add(this.BackendHelper.TrackFile(sourceFile.Path, TrackedFileType.Input, payload.SourceLineNumbers));
+                    }
                 }
             }
 
             this.FileTransfers = fileTransfers;
+            this.TrackedFiles = trackedFiles;
         }
 
         private void UpdatePayloadPackagingType(WixBundlePayloadTuple payload)

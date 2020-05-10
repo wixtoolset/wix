@@ -123,8 +123,10 @@ namespace WixToolset.Core.Burn
 
             // Extract files that come from binary .wixlibs and WixExtensions (this does not extract files from merge modules).
             {
-                var command = new ExtractEmbeddedFilesCommand(this.ExpectedEmbeddedFiles);
+                var command = new ExtractEmbeddedFilesCommand(this.BackendHelper, this.ExpectedEmbeddedFiles);
                 command.Execute();
+
+                trackedFiles.AddRange(command.TrackedFiles);
             }
 
             // Get the explicit payloads.
@@ -164,6 +166,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
 
                 processedPayloads = new HashSet<string>(payloadTuples.Keys);
             }
@@ -245,6 +248,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
 
                 processedPayloads = null;
             }
@@ -379,6 +383,17 @@ namespace WixToolset.Core.Burn
             // Update the bundle per-machine/per-user scope based on the chained packages.
             this.ResolveBundleInstallScope(section, bundleTuple, orderedFacades);
 
+            // Give the extension one last hook before generating the output files.
+            foreach (var extension in this.BackendExtensions)
+            {
+                extension.BundleFinalize();
+            }
+
+            if (this.Messaging.EncounteredError)
+            {
+                return;
+            }
+
             // Generate the core-defined BA manifest tables...
             string baManifestPath;
             {
@@ -389,6 +404,8 @@ namespace WixToolset.Core.Burn
                 baManifestPath = command.OutputPath;
                 payloadTuples.Add(baManifestPayload.Id.Id, baManifestPayload);
                 ++uxPayloadIndex;
+
+                trackedFiles.Add(this.BackendHelper.TrackFile(baManifestPath, TrackedFileType.Temporary));
             }
 
             // Generate the bundle extension manifest...
@@ -401,16 +418,8 @@ namespace WixToolset.Core.Burn
                 bextManifestPath = command.OutputPath;
                 payloadTuples.Add(bextManifestPayload.Id.Id, bextManifestPayload);
                 ++uxPayloadIndex;
-            }
 
-            foreach (var extension in this.BackendExtensions)
-            {
-                extension.BundleFinalize();
-            }
-
-            if (this.Messaging.EncounteredError)
-            {
-                return;
+                trackedFiles.Add(this.BackendHelper.TrackFile(bextManifestPath, TrackedFileType.Temporary));
             }
 
             // Create all the containers except the UX container first so the manifest (that goes in the UX container)
@@ -423,6 +432,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
+                trackedFiles.AddRange(command.TrackedFiles);
 
                 uxContainer = command.UXContainer;
                 uxPayloads = command.UXContainerPayloads;
@@ -438,6 +448,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 manifestPath = command.OutputPath;
+                trackedFiles.Add(this.BackendHelper.TrackFile(manifestPath, TrackedFileType.Temporary));
             }
 
             // Create the UX container.
@@ -447,6 +458,8 @@ namespace WixToolset.Core.Burn
 
                 uxContainer.Hash = command.Hash;
                 uxContainer.Size = command.Size;
+
+                trackedFiles.Add(this.BackendHelper.TrackFile(uxContainer.WorkingPath, TrackedFileType.Temporary));
             }
 
             {
@@ -454,6 +467,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);
+                trackedFiles.Add(this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final));
             }
 
 #if TODO // does this need to come back, or do they only need to be in TrackedFiles?

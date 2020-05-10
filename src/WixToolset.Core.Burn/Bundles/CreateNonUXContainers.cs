@@ -27,6 +27,8 @@ namespace WixToolset.Core.Burn.Bundles
 
         public IEnumerable<IFileTransfer> FileTransfers { get; private set; }
 
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+
         public WixBundleContainerTuple UXContainer { get; set; }
 
         public IEnumerable<WixBundlePayloadTuple> UXContainerPayloads { get; private set; }
@@ -50,7 +52,7 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             var fileTransfers = new List<IFileTransfer>();
-
+            var trackedFiles = new List<ITrackedFile>();
             var uxPayloadTuples = new List<WixBundlePayloadTuple>();
 
             var attachedContainerIndex = 1; // count starts at one because UX container is "0".
@@ -114,12 +116,14 @@ namespace WixToolset.Core.Burn.Bundles
                     }
 
                     this.CreateContainer(container, containerPayloads);
+                    trackedFiles.Add(this.BackendHelper.TrackFile(container.WorkingPath, TrackedFileType.Temporary, container.SourceLineNumbers));
                 }
             }
 
             this.Containers = containerTuples;
             this.UXContainerPayloads = uxPayloadTuples;
             this.FileTransfers = fileTransfers;
+            this.TrackedFiles = trackedFiles;
         }
 
         private void CreateContainer(WixBundleContainerTuple container, IEnumerable<WixBundlePayloadTuple> containerPayloads)

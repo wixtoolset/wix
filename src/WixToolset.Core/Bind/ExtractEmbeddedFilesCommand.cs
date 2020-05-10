@@ -7,18 +7,25 @@ namespace WixToolset.Core.Bind
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     public class ExtractEmbeddedFilesCommand
     {
-        public ExtractEmbeddedFilesCommand(IEnumerable<IExpectedExtractFile> embeddedFiles)
+        public ExtractEmbeddedFilesCommand(IBackendHelper backendHelper, IEnumerable<IExpectedExtractFile> embeddedFiles)
         {
+            this.BackendHelper = backendHelper;
             this.FilesWithEmbeddedFiles = embeddedFiles;
         }
+
+        public IEnumerable<ITrackedFile> TrackedFiles { get; private set; }
+
+        private IBackendHelper BackendHelper { get; }
 
         private IEnumerable<IExpectedExtractFile> FilesWithEmbeddedFiles { get; }
 
         public void Execute()
         {
+            var trackedFiles = new List<ITrackedFile>();
             var group = this.FilesWithEmbeddedFiles.GroupBy(e => e.Uri);
 
             foreach (var expectedEmbeddedFileByUri in group)
@@ -34,10 +41,13 @@ namespace WixToolset.Core.Bind
                         if (uniqueIds.Add(embeddedFile.EmbeddedFileId))
                         {
                             wixout.ExtractEmbeddedFile(embeddedFile.EmbeddedFileId, embeddedFile.OutputPath);
+                            trackedFiles.Add(this.BackendHelper.TrackFile(embeddedFile.OutputPath, TrackedFileType.Temporary));
                         }
                     }
                 }
             }
+
+            this.TrackedFiles = trackedFiles;
         }
     }
 }
