@@ -14,7 +14,8 @@
   </metadata>
 
   <files>
-    <file src="Win32\burn.x86.exe" target="runtimes\win-x86\native" />
-    <file src="Win32\burn.x86.pdb" target="runtimes\win-x86\native" />
+    <file src="$projectFolder$$id$.props" target="buildTransitive" />
+    <file src="Win32\burn.exe" target="tools\x86" />
+    <file src="Win32\burn.pdb" target="tools\x86" />
   </files>
 </package>

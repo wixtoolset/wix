@@ -23,16 +23,11 @@
     </ProjectConfiguration>
   </ItemGroup>
 
-  <PropertyGroup>
-    <NameSuffix Condition=" '$(Platform)'=='Win32' ">x86</NameSuffix>
-    <NameSuffix Condition=" '$(Platform)'=='x64' ">amd64</NameSuffix>
-  </PropertyGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C38373AA-882F-4F55-B03F-2AAB4BFBE3F1}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
     <ProjectSubSystem>Windows</ProjectSubSystem>
-    <TargetName>burn.$(NameSuffix)</TargetName>
+    <TargetName>burn</TargetName>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <Description>Native component of WixToolset.Burn</Description>
@@ -90,7 +85,7 @@
   </ItemGroup>
 
   <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack runtime.win.WixToolset.Burn.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Burn;Version="$(BuildVersionSimple)";Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
+    <Exec Command='nuget pack WixToolset.Burn.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=WixToolset.Burn;Version="$(BuildVersionSimple)";ProjectFolder=$(MSBuildThisFileDirectory);Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
   </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
