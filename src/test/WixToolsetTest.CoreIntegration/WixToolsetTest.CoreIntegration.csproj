@@ -172,6 +172,13 @@
     <Content Include="TestData\Components\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Components\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Components\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\data\alpha\foo.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\data\mips\foo.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\data\powerpc\foo.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WixlibWithBinaries\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

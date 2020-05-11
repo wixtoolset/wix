@@ -53,6 +53,42 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWixlibWithBinariesFromNamedBindPaths()
+        {
+            var folder = TestData.Get(@"TestData\WixlibWithBinaries");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(intermediateFolder, @"test.wixlib");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageComponents.wxs"),
+                    "-bf",
+                    "-bindpath", Path.Combine(folder, "data"),
+                    // Use names that aren't excluded in default .gitignores.
+                    "-bindpath", $"AlphaBits={Path.Combine(folder, "data", "alpha")}",
+                    "-bindpath", $"MipsBits={Path.Combine(folder, "data", "mips")}",
+                    "-bindpath", $"PowerBits={Path.Combine(folder, "data", "powerpc")}",
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath,
+                });
+
+                result.AssertSuccess();
+
+                var wixlib = Intermediate.Load(wixlibPath);
+                var binaryTuples = wixlib.Sections.SelectMany(s => s.Tuples).OfType<BinaryTuple>().ToList();
+                Assert.Equal(3, binaryTuples.Count);
+                Assert.Single(binaryTuples.Where(t => t.Data.Path == "wix-ir/foo.dll"));
+                Assert.Single(binaryTuples.Where(t => t.Data.Path == "wix-ir/foo.dll-1"));
+                Assert.Single(binaryTuples.Where(t => t.Data.Path == "wix-ir/foo.dll-2"));
+            }
+        }
+
+        [Fact]
         public void CanBuildSingleFileUsingWixlib()
         {
             var folder = TestData.Get(@"TestData\SingleFile");

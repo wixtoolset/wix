@@ -21,8 +21,6 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLine : ICommandLine
     {
-        private static readonly char[] BindPathSplit = { '=' };
-
         public CommandLine(IWixToolsetServiceProvider serviceProvider)
         {
             this.ServiceProvider = serviceProvider;

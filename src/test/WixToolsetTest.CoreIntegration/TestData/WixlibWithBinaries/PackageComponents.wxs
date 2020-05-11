@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <Binary Id="FooAlpha" SourceFile="!(bindpath.AlphaBits)foo.dll" />
+    </Fragment>
+
+    <Fragment>
+        <Binary Id="FooMips" SourceFile="!(bindpath.MipsBits)foo.dll" />
+    </Fragment>
+
+    <Fragment>
+        <Binary Id="FooPowerPC" SourceFile="!(bindpath.PowerBits)foo.dll" />
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+            
+            <Component Id="Shared.dll" Shared="yes">
+                <File Name="Shared.dll" Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
