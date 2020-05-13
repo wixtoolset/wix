@@ -105,7 +105,9 @@ namespace WixToolset.Core.Native
 
                 if (!found)
                 {
-                    throw new FileNotFoundException($"Could not find internal piece of WiX Toolset at: {possiblePaths}", WixNativeExeFileName);
+                    throw new PlatformNotSupportedException(
+                        $"Could not find platform specific '{WixNativeExeFileName}'",
+                        new FileNotFoundException($"Could not find internal piece of WiX Toolset from: {possiblePaths}", WixNativeExeFileName));
                 }
 
                 PathToWixNativeExe = path;
