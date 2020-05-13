@@ -2044,6 +2044,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.UnexpectedEmptySubexpression, "The empty subexpression is unexpected in the expression '{0}'.", expression);
         }
 
+        public static Message UnexpectedException(Exception exception)
+        {
+            return Message(null, Ids.UnexpectedException, exception.ToString());
+        }
+
         public static Message UnexpectedException(string message, string type, string stackTrace)
         {
             return Message(null, Ids.UnexpectedException, "{0}\r\n\r\nException Type: {1}\r\n\r\nStack Trace:\r\n{2}", message, type, stackTrace);
