@@ -62,5 +62,48 @@ namespace WixToolsetTest.BuildTasks
                 Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
             }
         }
+
+        [Fact(Skip = "Requires deleting wixnative.exe from output folder after build but before running the test.")]
+        public void ReportsInnerExceptionForUnexpectedExceptions()
+        {
+            var folder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var pdbPath = Path.Combine(baseFolder, @"bin\testpackage.wixpdb");
+                var engine = new FakeBuildEngine();
+
+                var task = new DoIt
+                {
+                    BuildEngine = engine,
+                    SourceFiles = new[]
+                    {
+                        new TaskItem(Path.Combine(folder, "Package.wxs")),
+                        new TaskItem(Path.Combine(folder, "PackageComponents.wxs")),
+                    },
+                    LocalizationFiles = new[]
+                    {
+                        new TaskItem(Path.Combine(folder, "Package.en-us.wxl")),
+                    },
+                    BindInputPaths = new[]
+                    {
+                        new TaskItem(Path.Combine(folder, "data")),
+                    },
+                    IntermediateDirectory = new TaskItem(intermediateFolder),
+                    OutputFile = new TaskItem(Path.Combine(baseFolder, @"bin\test.msi")),
+                    PdbType = "Full",
+                    PdbFile = new TaskItem(pdbPath),
+                };
+
+                var result = task.Execute();
+                Assert.False(result, $"MSBuild task succeeded unexpectedly. Output:\r\n{engine.Output}");
+
+                Assert.Contains(
+                    "System.PlatformNotSupportedException: Could not find platform specific 'wixnative.exe' ---> System.IO.FileNotFoundException: Could not find internal piece of WiX Toolset from",
+                    engine.Output);
+            }
+        }
     }
 }
