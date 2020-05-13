@@ -125,7 +125,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (Exception e)
             {
-                this.Messaging.Write(ErrorMessages.UnexpectedException(e.Message, e.GetType().ToString(), e.StackTrace));
+                this.Messaging.Write(ErrorMessages.UnexpectedException(e));
             }
         }
 
