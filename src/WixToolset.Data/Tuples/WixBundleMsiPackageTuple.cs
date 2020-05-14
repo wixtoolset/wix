@@ -40,7 +40,6 @@ namespace WixToolset.Data.Tuples
     [Flags]
     public enum WixBundleMsiPackageAttributes
     {
-        DisplayInternalUI = 0x1,
         EnableFeatureSelection = 0x4,
         ForcePerMachine = 0x2,
     }
@@ -98,8 +97,6 @@ namespace WixToolset.Data.Tuples
             get => (string)this.Fields[(int)WixBundleMsiPackageTupleFields.Manufacturer];
             set => this.Set((int)WixBundleMsiPackageTupleFields.Manufacturer, value);
         }
-
-        public bool DisplayInternalUI => (this.Attributes & WixBundleMsiPackageAttributes.DisplayInternalUI) == WixBundleMsiPackageAttributes.DisplayInternalUI;
 
         public bool EnableFeatureSelection => (this.Attributes & WixBundleMsiPackageAttributes.EnableFeatureSelection) == WixBundleMsiPackageAttributes.EnableFeatureSelection;
 

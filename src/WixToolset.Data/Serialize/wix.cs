@@ -3772,10 +3772,6 @@ namespace WixToolset.Data.Serialize
         
         private bool enableSignatureVerificationFieldSet;
         
-        private YesNoType displayInternalUIField;
-        
-        private bool displayInternalUIFieldSet;
-        
         private YesNoType enableFeatureSelectionField;
         
         private bool enableFeatureSelectionFieldSet;
@@ -4115,25 +4111,6 @@ namespace WixToolset.Data.Serialize
         }
         
         /// <summary>
-        /// Specifies whether the bundle will show the UI authored into the msi package. The default is "no"
-        /// which means all information is routed to the bootstrapper application to provide a unified installation
-        /// experience. If "yes" is specified the UI authored into the msi package will be displayed on top of
-        /// any bootstrapper application UI.
-        /// </summary>
-        public YesNoType DisplayInternalUI
-        {
-            get
-            {
-                return this.displayInternalUIField;
-            }
-            set
-            {
-                this.displayInternalUIFieldSet = true;
-                this.displayInternalUIField = value;
-            }
-        }
-        
-        /// <summary>
         /// Specifies whether the bundle will allow individual control over the installation state of Features inside
         /// the msi package. Managing feature selection requires special care to ensure the install, modify, update and
         /// uninstall behavior of the package is always correct. The default is "no".
@@ -4389,17 +4366,6 @@ namespace WixToolset.Data.Serialize
                     writer.WriteAttributeString("EnableSignatureVerification", "yes");
                 }
             }
-            if (this.displayInternalUIFieldSet)
-            {
-                if ((this.displayInternalUIField == YesNoType.no))
-                {
-                    writer.WriteAttributeString("DisplayInternalUI", "no");
-                }
-                if ((this.displayInternalUIField == YesNoType.yes))
-                {
-                    writer.WriteAttributeString("DisplayInternalUI", "yes");
-                }
-            }
             if (this.enableFeatureSelectionFieldSet)
             {
                 if ((this.enableFeatureSelectionField == YesNoType.no))
@@ -4545,11 +4511,6 @@ namespace WixToolset.Data.Serialize
                 this.enableSignatureVerificationField = Enums.ParseYesNoType(value);
                 this.enableSignatureVerificationFieldSet = true;
             }
-            if (("DisplayInternalUI" == name))
-            {
-                this.displayInternalUIField = Enums.ParseYesNoType(value);
-                this.displayInternalUIFieldSet = true;
-            }
             if (("EnableFeatureSelection" == name))
             {
                 this.enableFeatureSelectionField = Enums.ParseYesNoType(value);
@@ -4649,10 +4610,6 @@ namespace WixToolset.Data.Serialize
         private YesNoType enableSignatureVerificationField;
         
         private bool enableSignatureVerificationFieldSet;
-        
-        private YesNoType displayInternalUIField;
-        
-        private bool displayInternalUIFieldSet;
         
         private YesNoDefaultType perMachineField;
         
@@ -4984,25 +4941,6 @@ namespace WixToolset.Data.Serialize
         }
         
         /// <summary>
-        /// Specifies whether the bundle will show the UI authored into the msp package. The default is "no"
-        /// which means all information is routed to the bootstrapper application to provide a unified installation
-        /// experience. If "yes" is specified the UI authored into the msp package will be displayed on top of
-        /// any bootstrapper application UI.
-        /// </summary>
-        public YesNoType DisplayInternalUI
-        {
-            get
-            {
-                return this.displayInternalUIField;
-            }
-            set
-            {
-                this.displayInternalUIFieldSet = true;
-                this.displayInternalUIField = value;
-            }
-        }
-        
-        /// <summary>
         /// Indicates the package must be executed elevated. The default is "no".
         /// </summary>
         public YesNoDefaultType PerMachine
@@ -5216,17 +5154,6 @@ namespace WixToolset.Data.Serialize
                     writer.WriteAttributeString("EnableSignatureVerification", "yes");
                 }
             }
-            if (this.displayInternalUIFieldSet)
-            {
-                if ((this.displayInternalUIField == YesNoType.no))
-                {
-                    writer.WriteAttributeString("DisplayInternalUI", "no");
-                }
-                if ((this.displayInternalUIField == YesNoType.yes))
-                {
-                    writer.WriteAttributeString("DisplayInternalUI", "yes");
-                }
-            }
             if (this.perMachineFieldSet)
             {
                 if ((this.perMachineField == YesNoDefaultType.@default))
@@ -5353,11 +5280,6 @@ namespace WixToolset.Data.Serialize
             {
                 this.enableSignatureVerificationField = Enums.ParseYesNoType(value);
                 this.enableSignatureVerificationFieldSet = true;
-            }
-            if (("DisplayInternalUI" == name))
-            {
-                this.displayInternalUIField = Enums.ParseYesNoType(value);
-                this.displayInternalUIFieldSet = true;
             }
             if (("PerMachine" == name))
             {

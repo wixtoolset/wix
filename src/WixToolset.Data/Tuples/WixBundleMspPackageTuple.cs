@@ -34,7 +34,6 @@ namespace WixToolset.Data.Tuples
     [Flags]
     public enum WixBundleMspPackageAttributes
     {
-        DisplayInternalUI = 0x1,
         Slipstream = 0x2,
         TargetUnspecified = 0x4,
     }
@@ -74,8 +73,6 @@ namespace WixToolset.Data.Tuples
             get => (string)this.Fields[(int)WixBundleMspPackageTupleFields.PatchXml];
             set => this.Set((int)WixBundleMspPackageTupleFields.PatchXml, value);
         }
-
-        public bool DisplayInternalUI => (this.Attributes & WixBundleMspPackageAttributes.DisplayInternalUI) == WixBundleMspPackageAttributes.DisplayInternalUI;
 
         public bool Slipstream => (this.Attributes & WixBundleMspPackageAttributes.Slipstream) == WixBundleMspPackageAttributes.Slipstream;
 
