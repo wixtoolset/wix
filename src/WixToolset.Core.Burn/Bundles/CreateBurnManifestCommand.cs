@@ -410,7 +410,6 @@ namespace WixToolset.Core.Burn.Bundles
                         writer.WriteAttributeString("ProductCode", msiPackage.ProductCode);
                         writer.WriteAttributeString("Language", msiPackage.ProductLanguage.ToString(CultureInfo.InvariantCulture));
                         writer.WriteAttributeString("Version", msiPackage.ProductVersion);
-                        writer.WriteAttributeString("DisplayInternalUI", msiPackage.DisplayInternalUI ? "yes" : "no");
                         if (!String.IsNullOrEmpty(msiPackage.UpgradeCode))
                         {
                             writer.WriteAttributeString("UpgradeCode", msiPackage.UpgradeCode);
@@ -420,7 +419,6 @@ namespace WixToolset.Core.Burn.Bundles
                     {
                         writer.WriteAttributeString("PatchCode", mspPackage.PatchCode);
                         writer.WriteAttributeString("PatchXml", mspPackage.PatchXml);
-                        writer.WriteAttributeString("DisplayInternalUI", mspPackage.DisplayInternalUI ? "yes" : "no");
 
                         // If there is still a chance that all of our patches will target a narrow set of
                         // product codes, add the patch list to the overall list.

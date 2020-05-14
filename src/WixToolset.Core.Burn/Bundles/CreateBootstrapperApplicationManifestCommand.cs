@@ -126,8 +126,6 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (package.SpecificPackageTuple is WixBundleMsiPackageTuple msiPackage)
                 {
-                    writer.WriteAttributeString("DisplayInternalUI", msiPackage.DisplayInternalUI ? "yes" : "no");
-
                     if (!String.IsNullOrEmpty(msiPackage.ProductCode))
                     {
                         writer.WriteAttributeString("ProductCode", msiPackage.ProductCode);
@@ -140,8 +138,6 @@ namespace WixToolset.Core.Burn.Bundles
                 }
                 else if (package.SpecificPackageTuple is WixBundleMspPackageTuple mspPackage)
                 {
-                    writer.WriteAttributeString("DisplayInternalUI", mspPackage.DisplayInternalUI ? "yes" : "no");
-
                     if (!String.IsNullOrEmpty(mspPackage.PatchCode))
                     {
                         writer.WriteAttributeString("ProductCode", mspPackage.PatchCode);

@@ -1735,7 +1735,6 @@ namespace WixToolset.Core
             string msuKB = null;
             var enableSignatureVerification = YesNoType.No;
             var compressed = YesNoDefaultType.Default;
-            var displayInternalUI = YesNoType.NotSet;
             var enableFeatureSelection = YesNoType.NotSet;
             var forcePerMachine = YesNoType.NotSet;
             RemotePayload remotePayload = null;
@@ -1804,10 +1803,6 @@ namespace WixToolset.Core
                         break;
                     case "DisplayName":
                         displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisplayInternalUI":
-                        displayInternalUI = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        allowed = (packageType == WixBundlePackageType.Msi || packageType == WixBundlePackageType.Msp);
                         break;
                     case "EnableFeatureSelection":
                         enableFeatureSelection = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -2139,7 +2134,6 @@ namespace WixToolset.Core
 
                 case WixBundlePackageType.Msi:
                     WixBundleMsiPackageAttributes msiAttributes = 0;
-                    msiAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMsiPackageAttributes.DisplayInternalUI : 0;
                     msiAttributes |= (YesNoType.Yes == enableFeatureSelection) ? WixBundleMsiPackageAttributes.EnableFeatureSelection : 0;
                     msiAttributes |= (YesNoType.Yes == forcePerMachine) ? WixBundleMsiPackageAttributes.ForcePerMachine : 0;
 
@@ -2151,7 +2145,6 @@ namespace WixToolset.Core
 
                 case WixBundlePackageType.Msp:
                     WixBundleMspPackageAttributes mspAttributes = 0;
-                    mspAttributes |= (YesNoType.Yes == displayInternalUI) ? WixBundleMspPackageAttributes.DisplayInternalUI : 0;
                     mspAttributes |= (YesNoType.Yes == slipstream) ? WixBundleMspPackageAttributes.Slipstream : 0;
 
                     this.Core.AddTuple(new WixBundleMspPackageTuple(sourceLineNumbers, id)
