@@ -59,7 +59,7 @@
       <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\Microsoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' />
       <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' />
       <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\mscordaccore.dll' Name='mscordaccore.dll' />
-      <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\mscordaccore_x86_x86_4.700.19.57202.dll' Name='mscordaccore_x86_x86_4.700.19.57202.dll' />
+      <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\mscordaccore_x86_x86_4.700.20.6603.dll' Name='mscordaccore_x86_x86_4.700.20.6603.dll' />
       <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\mscordbi.dll' Name='mscordbi.dll' />
       <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\mscorrc.debug.dll' Name='mscorrc.debug.dll' />
       <Payload SourceFile='publish\Example.EarliestCoreMBA\trimmedscd\mscorrc.dll' Name='mscorrc.dll' />

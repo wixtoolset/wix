@@ -26,7 +26,6 @@ namespace WixToolsetTest.Bal
                     Path.Combine(bundleSourceFolder, "Bundle.wxs"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", TestData.Get(@"runtimes\win-x86\native\burn.x86.exe"),
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -52,7 +51,6 @@ namespace WixToolsetTest.Bal
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
                     "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", TestData.Get(@"runtimes\win-x86\native\burn.x86.exe"),
                     "-o", bundleFile,
                 });
                 Assert.Equal(6802, compileResult.ExitCode);

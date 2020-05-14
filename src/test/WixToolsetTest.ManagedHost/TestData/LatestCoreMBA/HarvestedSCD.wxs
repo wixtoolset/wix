@@ -63,7 +63,7 @@
       <Payload SourceFile='publish\Example.LatestCoreMBA\scd\Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' />
       <Payload SourceFile='publish\Example.LatestCoreMBA\scd\Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' />
       <Payload SourceFile='publish\Example.LatestCoreMBA\scd\mscordaccore.dll' Name='mscordaccore.dll' />
-      <Payload SourceFile='publish\Example.LatestCoreMBA\scd\mscordaccore_x86_x86_4.700.19.60701.dll' Name='mscordaccore_x86_x86_4.700.19.60701.dll' />
+      <Payload SourceFile='publish\Example.LatestCoreMBA\scd\mscordaccore_x86_x86_4.700.20.11803.dll' Name='mscordaccore_x86_x86_4.700.20.11803.dll' />
       <Payload SourceFile='publish\Example.LatestCoreMBA\scd\mscordbi.dll' Name='mscordbi.dll' />
       <Payload SourceFile='publish\Example.LatestCoreMBA\scd\mscorlib.dll' Name='mscorlib.dll' />
       <Payload SourceFile='publish\Example.LatestCoreMBA\scd\mscorrc.debug.dll' Name='mscorrc.debug.dll' />

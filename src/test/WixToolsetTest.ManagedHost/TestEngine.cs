@@ -11,7 +11,6 @@ namespace WixToolsetTest.ManagedHost
     public class TestEngine
     {
         private static readonly string TestEngineFile = TestData.Get(@"..\Win32\examples\Example.TestEngine\Example.TestEngine.exe");
-        public static readonly string BurnStubFile = TestData.Get(@"runtimes\win-x86\native\burn.x86.exe");
 
         public TestEngineResult RunReloadEngine(string bundleFilePath, string tempFolderPath)
         {

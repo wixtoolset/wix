@@ -6,7 +6,7 @@
             <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" />
         </BootstrapperApplicationRef>
         <Chain>
-            <ExePackage SourceFile="runtimes\win-x86\native\wixnative.x86.exe" />
+            <ExePackage SourceFile="runtimes\win-x86\native\wixnative.exe" />
         </Chain>
     </Bundle>
 </Wix>

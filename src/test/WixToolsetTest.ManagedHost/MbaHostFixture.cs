@@ -29,7 +29,6 @@ namespace WixToolsetTest.ManagedHost
                     "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", baSourceFolder,
-                    "-burnStub", TestEngine.BurnStubFile,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -64,7 +63,6 @@ namespace WixToolsetTest.ManagedHost
                     "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", baSourceFolder,
-                    "-burnStub", TestEngine.BurnStubFile,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -99,7 +97,6 @@ namespace WixToolsetTest.ManagedHost
                     "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", baSourceFolder,
-                    "-burnStub", TestEngine.BurnStubFile,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -138,7 +135,6 @@ namespace WixToolsetTest.ManagedHost
                     "-ext", TestData.Get(@"WixToolset.NetFx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", baSourceFolder,
-                    "-burnStub", TestEngine.BurnStubFile,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();

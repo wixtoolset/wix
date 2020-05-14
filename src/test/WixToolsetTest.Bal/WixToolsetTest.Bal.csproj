@@ -25,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="runtime.win.WixToolset.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
