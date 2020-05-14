@@ -920,8 +920,42 @@ LExit:
 
 
 /********************************************************************
+StrAllocConcatFormattedSecure - allocates or reuses dynamic string
+memory and adds a formatted string. If the memory needs to be
+reallocated, calls SecureZeroMemory on original block of memory after
+it is moved.
+
+NOTE: caller is responsible for freeing ppwz even if function fails
+********************************************************************/
+extern "C" HRESULT __cdecl StrAllocConcatFormattedSecure(
+    __deref_out_z LPWSTR* ppwz,
+    __in __format_string LPCWSTR wzFormat,
+    ...
+    )
+{
+    Assert(ppwz && wzFormat && *wzFormat);
+
+    HRESULT hr = S_OK;
+    LPWSTR sczFormatted = NULL;
+    va_list args;
+
+    va_start(args, wzFormat);
+    hr = StrAllocFormattedArgsSecure(&sczFormatted, wzFormat, args);
+    va_end(args);
+    ExitOnFailure(hr, "Failed to allocate formatted string");
+
+    hr = StrAllocConcatSecure(ppwz, sczFormatted, 0);
+
+LExit:
+    ReleaseStr(sczFormatted);
+
+    return hr;
+}
+
+
+/********************************************************************
 StrAllocFormattedSecure - allocates or reuses dynamic string memory 
-and formats it. If the memory needs to reallocated, 
+and formats it. If the memory needs to be reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
