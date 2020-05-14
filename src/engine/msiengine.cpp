@@ -4,7 +4,10 @@
 
 
 // constants
-
+#define BURNMSIINSTALL_PROPERTY_NAME L"BURNMSIINSTALL"
+#define BURNMSIMODIFY_PROPERTY_NAME L"BURNMSIMODIFY"
+#define BURNMSIREPAIR_PROPERTY_NAME L"BURNMSIREPAIR"
+#define BURNMSIUNINSTALL_PROPERTY_NAME L"BURNMSIUNINSTALL"
 
 // structs
 
@@ -78,10 +81,6 @@ extern "C" HRESULT MsiEngineParsePackageFromXml(
 
     hr = FileVersionFromStringEx(scz, 0, &pPackage->Msi.qwVersion);
     ExitOnFailure(hr, "Failed to parse @Version: %ls", scz);
-
-    // @DisplayInternalUI
-    hr = XmlGetYesNoAttribute(pixnMsiPackage, L"DisplayInternalUI", &pPackage->Msi.fDisplayInternalUI);
-    ExitOnFailure(hr, "Failed to get @DisplayInternalUI.");
 
     // @UpgradeCode
     hr = XmlGetAttributeEx(pixnMsiPackage, L"UpgradeCode", &pPackage->Msi.sczUpgradeCode);
@@ -874,7 +873,7 @@ LExit:
 // PlanAdd - adds the calculated execute and rollback actions for the package.
 //
 extern "C" HRESULT MsiEnginePlanAddPackage(
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -926,9 +925,12 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
         pAction->type = BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE;
         pAction->msiPackage.pPackage = pPackage;
         pAction->msiPackage.action = pPackage->rollback;
-        pAction->msiPackage.uiLevel = MsiEngineCalculateInstallUiLevel(pPackage->Msi.fDisplayInternalUI, display, pAction->msiPackage.action);
         pAction->msiPackage.rgFeatures = rgRollbackFeatureActions;
         rgRollbackFeatureActions = NULL;
+
+        hr = MsiEngineCalculateInstallUiLevel(pUserExperience, pPackage->sczId, FALSE, pAction->msiPackage.action,
+            &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler);
+        ExitOnFailure(hr, "Failed to get msi ui options.");
 
         LoggingSetPackageVariable(pPackage, NULL, TRUE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
         pAction->msiPackage.dwLoggingAttributes = pLog->dwAttributes;
@@ -949,9 +951,12 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
         pAction->type = BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE;
         pAction->msiPackage.pPackage = pPackage;
         pAction->msiPackage.action = pPackage->execute;
-        pAction->msiPackage.uiLevel = MsiEngineCalculateInstallUiLevel(pPackage->Msi.fDisplayInternalUI, display, pAction->msiPackage.action);
         pAction->msiPackage.rgFeatures = rgFeatureActions;
         rgFeatureActions = NULL;
+
+        hr = MsiEngineCalculateInstallUiLevel(pUserExperience, pPackage->sczId, TRUE, pAction->msiPackage.action,
+            &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler);
+        ExitOnFailure(hr, "Failed to get msi ui options.");
 
         LoggingSetPackageVariable(pPackage, NULL, FALSE, pLog, pVariables, &pAction->msiPackage.sczLogPath); // ignore errors.
         pAction->msiPackage.dwLoggingAttributes = pLog->dwAttributes;
@@ -1073,7 +1078,6 @@ extern "C" HRESULT MsiEngineAddCompatiblePackage(
     }
 
     pCompatiblePackage->type = BURN_PACKAGE_TYPE_MSI;
-    pCompatiblePackage->Msi.fDisplayInternalUI = pPackage->Msi.fDisplayInternalUI;
 
     if (ppCompatiblePackage)
     {
@@ -1161,8 +1165,16 @@ extern "C" HRESULT MsiEngineExecutePackage(
     VariableSetNumeric(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, pExecuteAction->msiPackage.action, TRUE);
     
     // Wire up the external UI handler and logging.
-    hr = WiuInitializeExternalUI(pfnMessageHandler, pExecuteAction->msiPackage.uiLevel, hwndParent, pvContext, fRollback, &context);
-    ExitOnFailure(hr, "Failed to initialize external UI handler.");
+    if (pExecuteAction->msiPackage.fDisableExternalUiHandler)
+    {
+        hr = WiuInitializeInternalUI(pExecuteAction->msiPackage.uiLevel, hwndParent, &context);
+        ExitOnFailure(hr, "Failed to initialize internal UI for MSI package.");
+    }
+    else
+    {
+        hr = WiuInitializeExternalUI(pfnMessageHandler, pExecuteAction->msiPackage.uiLevel, hwndParent, pvContext, fRollback, &context);
+        ExitOnFailure(hr, "Failed to initialize external UI handler.");
+    }
 
     if (pExecuteAction->msiPackage.sczLogPath && *pExecuteAction->msiPackage.sczLogPath)
     {
@@ -1190,6 +1202,12 @@ extern "C" HRESULT MsiEngineExecutePackage(
 
     hr = ConcatPatchProperty(pExecuteAction->msiPackage.pPackage, pExecuteAction->msiPackage.rgSlipstreamPatches, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
+
+    hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczProperties);
+    ExitOnFailure(hr, "Failed to add action property to argument string.");
+
+    hr = MsiEngineConcatActionProperty(pExecuteAction->msiPackage.actionMsiProperty, &sczObfuscatedProperties);
+    ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pExecuteAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), sczMsiPath, sczObfuscatedProperties ? sczObfuscatedProperties : L"");
 
@@ -1300,6 +1318,40 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT MsiEngineConcatActionProperty(
+    __in BURN_MSI_PROPERTY actionMsiProperty,
+    __deref_out_z LPWSTR* psczProperties
+    )
+{
+    HRESULT hr = S_OK;
+    LPCWSTR wzPropertyName = NULL;
+
+    switch (actionMsiProperty)
+    {
+    case BURN_MSI_PROPERTY_INSTALL:
+        wzPropertyName = BURNMSIINSTALL_PROPERTY_NAME;
+        break;
+    case BURN_MSI_PROPERTY_MODIFY:
+        wzPropertyName = BURNMSIMODIFY_PROPERTY_NAME;
+        break;
+    case BURN_MSI_PROPERTY_REPAIR:
+        wzPropertyName = BURNMSIREPAIR_PROPERTY_NAME;
+        break;
+    case BURN_MSI_PROPERTY_UNINSTALL:
+        wzPropertyName = BURNMSIUNINSTALL_PROPERTY_NAME;
+        break;
+    }
+
+    if (wzPropertyName)
+    {
+        hr = StrAllocConcatFormattedSecure(psczProperties, L" %ls=1", wzPropertyName);
+        ExitOnFailure(hr, "Failed to add burn action property.");
+    }
+
+LExit:
+    return hr;
+}
+
 // The contents of psczProperties may be sensitive, should keep encrypted and SecureZeroFree.
 extern "C" HRESULT MsiEngineConcatProperties(
     __in_ecount(cProperties) BURN_MSIPROPERTY* rgProperties,
@@ -1363,31 +1415,36 @@ LExit:
     return hr;
 }
 
-extern "C" INSTALLUILEVEL MsiEngineCalculateInstallUiLevel(
-    __in BOOL fDisplayInternalUI,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_ACTION_STATE actionState
+extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzPackageId,
+    __in BOOL fExecute,
+    __in BOOTSTRAPPER_ACTION_STATE actionState,
+    __out BURN_MSI_PROPERTY* pActionMsiProperty,
+    __out INSTALLUILEVEL* pUiLevel,
+    __out BOOL* pfDisableExternalUiHandler
     )
 {
-    // Assume there will be no internal UI displayed.
-    INSTALLUILEVEL uiLevel = static_cast<INSTALLUILEVEL>(INSTALLUILEVEL_NONE | INSTALLUILEVEL_SOURCERESONLY);
+    *pUiLevel = static_cast<INSTALLUILEVEL>(INSTALLUILEVEL_NONE | INSTALLUILEVEL_SOURCERESONLY);
+    *pfDisableExternalUiHandler = FALSE;
 
-    // suppress internal UI during uninstall to mimic ARP and "msiexec /x" behavior
-    if (fDisplayInternalUI && BOOTSTRAPPER_ACTION_STATE_UNINSTALL != actionState && BOOTSTRAPPER_ACTION_STATE_REPAIR != actionState)
+    switch (actionState)
     {
-        switch (display)
-        {
-        case BOOTSTRAPPER_DISPLAY_FULL:
-            uiLevel = INSTALLUILEVEL_FULL;
-            break;
-
-        case BOOTSTRAPPER_DISPLAY_PASSIVE:
-            uiLevel = INSTALLUILEVEL_REDUCED;
-            break;
-        }
+    case BOOTSTRAPPER_ACTION_STATE_UNINSTALL:
+        *pActionMsiProperty = BURN_MSI_PROPERTY_UNINSTALL;
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_REPAIR:
+        *pActionMsiProperty = BURN_MSI_PROPERTY_REPAIR;
+        break;
+    case BOOTSTRAPPER_ACTION_STATE_MODIFY:
+        *pActionMsiProperty = BURN_MSI_PROPERTY_MODIFY;
+        break;
+    default:
+        *pActionMsiProperty = BURN_MSI_PROPERTY_INSTALL;
+        break;
     }
 
-    return uiLevel;
+    return UserExperienceOnPlanMsiPackage(pUserExperience, wzPackageId, fExecute, actionState, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler);
 }
 
 

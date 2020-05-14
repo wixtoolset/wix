@@ -245,7 +245,9 @@ typedef struct _BURN_EXECUTE_ACTION
             BURN_PACKAGE* pPackage;
             LPWSTR sczLogPath;
             DWORD dwLoggingAttributes;
+            BURN_MSI_PROPERTY actionMsiProperty;
             INSTALLUILEVEL uiLevel;
+            BOOL fDisableExternalUiHandler;
             BOOTSTRAPPER_ACTION_STATE action;
 
             BOOTSTRAPPER_FEATURE_ACTION* rgFeatures;
@@ -262,7 +264,9 @@ typedef struct _BURN_EXECUTE_ACTION
             BOOL fSlipstream;
             BOOL fPerMachineTarget;
             LPWSTR sczLogPath;
+            BURN_MSI_PROPERTY actionMsiProperty;
             INSTALLUILEVEL uiLevel;
+            BOOL fDisableExternalUiHandler;
             BOOTSTRAPPER_ACTION_STATE action;
 
             BURN_ORDERED_PATCHES* rgOrderedPatches;
@@ -404,7 +408,6 @@ HRESULT PlanPackages(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fBundleInstalled,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent
@@ -423,7 +426,6 @@ HRESULT PlanPassThroughBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout HANDLE* phSyncpointEvent
     );
@@ -433,7 +435,6 @@ HRESULT PlanUpdateBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout HANDLE* phSyncpointEvent
     );
@@ -452,7 +453,6 @@ HRESULT PlanCachePackage(
     );
 HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,

@@ -44,7 +44,7 @@ static void DeterminePatchChainedTarget(
     __out BOOL* pfSlipstreamed
     );
 static HRESULT PlanTargetProduct(
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fRollback,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -72,10 +72,6 @@ extern "C" HRESULT MspEngineParsePackageFromXml(
     // @PatchXml
     hr = XmlGetAttributeEx(pixnMspPackage, L"PatchXml", &pPackage->Msp.sczApplicabilityXml);
     ExitOnFailure(hr, "Failed to get @PatchXml.");
-
-    // @DisplayInternalUI
-    hr = XmlGetYesNoAttribute(pixnMspPackage, L"DisplayInternalUI", &pPackage->Msp.fDisplayInternalUI);
-    ExitOnFailure(hr, "Failed to get @DisplayInternalUI.");
 
     // Read properties.
     hr = MsiEngineParsePropertiesFromXml(pixnMspPackage, &pPackage->Msp.rgProperties, &pPackage->Msp.cProperties);
@@ -400,7 +396,7 @@ LExit:
 // PlanAdd - adds the calculated execute and rollback actions for the package.
 //
 extern "C" HRESULT MspEnginePlanAddPackage(
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -437,13 +433,13 @@ extern "C" HRESULT MspEnginePlanAddPackage(
 
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->execute)
         {
-            hr = PlanTargetProduct(display, FALSE, pPlan, pLog, pVariables, pTargetProduct->execute, pPackage, pTargetProduct, hCacheEvent);
+            hr = PlanTargetProduct(pUserExperience, FALSE, pPlan, pLog, pVariables, pTargetProduct->execute, pPackage, pTargetProduct, hCacheEvent);
             ExitOnFailure(hr, "Failed to plan target product.");
         }
 
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->rollback)
         {
-            hr = PlanTargetProduct(display, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct, hCacheEvent);
+            hr = PlanTargetProduct(pUserExperience, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct, hCacheEvent);
             ExitOnFailure(hr, "Failed to plan rollack target product.");
         }
     }
@@ -464,7 +460,6 @@ extern "C" HRESULT MspEngineExecutePackage(
     )
 {
     HRESULT hr = S_OK;
-    INSTALLUILEVEL uiLevel = pExecuteAction->mspTarget.pPackage->Msp.fDisplayInternalUI ? INSTALLUILEVEL_DEFAULT : static_cast<INSTALLUILEVEL>(INSTALLUILEVEL_NONE | INSTALLUILEVEL_SOURCERESONLY);
     WIU_MSI_EXECUTE_CONTEXT context = { };
     WIU_RESTART restart = WIU_RESTART_NONE;
 
@@ -517,8 +512,16 @@ extern "C" HRESULT MspEngineExecutePackage(
     VariableSetNumeric(pVariables, BURN_BUNDLE_EXECUTE_PACKAGE_ACTION, pExecuteAction->mspTarget.action, TRUE);
 
     // Wire up the external UI handler and logging.
-    hr = WiuInitializeExternalUI(pfnMessageHandler, uiLevel, hwndParent, pvContext, fRollback, &context);
-    ExitOnFailure(hr, "Failed to initialize external UI handler.");
+    if (pExecuteAction->mspTarget.fDisableExternalUiHandler)
+    {
+        hr = WiuInitializeInternalUI(pExecuteAction->mspTarget.uiLevel, hwndParent, &context);
+        ExitOnFailure(hr, "Failed to initialize internal UI for MSP package.");
+    }
+    else
+    {
+        hr = WiuInitializeExternalUI(pfnMessageHandler, pExecuteAction->mspTarget.uiLevel, hwndParent, pvContext, fRollback, &context);
+        ExitOnFailure(hr, "Failed to initialize external UI handler.");
+    }
 
     //if (BURN_LOGGING_LEVEL_DEBUG == logLevel)
     //{
@@ -537,6 +540,12 @@ extern "C" HRESULT MspEngineExecutePackage(
 
     hr = MsiEngineConcatProperties(pExecuteAction->mspTarget.pPackage->Msp.rgProperties, pExecuteAction->mspTarget.pPackage->Msp.cProperties, pVariables, fRollback, &sczObfuscatedProperties, TRUE);
     ExitOnFailure(hr, "Failed to add properties to obfuscated argument string.");
+
+    hr = MsiEngineConcatActionProperty(pExecuteAction->mspTarget.actionMsiProperty, &sczProperties);
+    ExitOnFailure(hr, "Failed to add action property to argument string.");
+
+    hr = MsiEngineConcatActionProperty(pExecuteAction->mspTarget.actionMsiProperty, &sczObfuscatedProperties);
+    ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PATCH_PACKAGE, pExecuteAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pExecuteAction->mspTarget.action), sczPatches, sczObfuscatedProperties, pExecuteAction->mspTarget.sczTargetProductCode);
 
@@ -868,7 +877,7 @@ static void DeterminePatchChainedTarget(
 }
 
 static HRESULT PlanTargetProduct(
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fRollback,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -920,11 +929,14 @@ static HRESULT PlanTargetProduct(
         pAction->mspTarget.action = actionState;
         pAction->mspTarget.pPackage = pPackage;
         pAction->mspTarget.fPerMachineTarget = (MSIINSTALLCONTEXT_MACHINE == pTargetProduct->context);
-        pAction->mspTarget.uiLevel = MsiEngineCalculateInstallUiLevel(pPackage->Msp.fDisplayInternalUI, display, pAction->mspTarget.action);
         pAction->mspTarget.pChainedTargetPackage = pTargetProduct->pChainedTargetPackage;
         pAction->mspTarget.fSlipstream = pTargetProduct->fSlipstream;
         hr = StrAllocString(&pAction->mspTarget.sczTargetProductCode, pTargetProduct->wzTargetProductCode, 0);
         ExitOnFailure(hr, "Failed to copy target product code.");
+
+        hr = MsiEngineCalculateInstallUiLevel(pUserExperience, pPackage->sczId, !fRollback, pAction->mspTarget.action,
+            &pAction->mspTarget.actionMsiProperty, &pAction->mspTarget.uiLevel, &pAction->mspTarget.fDisableExternalUiHandler);
+        ExitOnFailure(hr, "Failed to get msp ui options.");
 
         // If this is a per-machine target product, then the plan needs to be per-machine as well.
         if (pAction->mspTarget.fPerMachineTarget)

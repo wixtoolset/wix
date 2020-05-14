@@ -97,7 +97,7 @@ extern "C" HRESULT UserExperienceLoad(
     args.pCommand = pCommand;
     args.pfnBootstrapperEngineProc = EngineForApplicationProc;
     args.pvBootstrapperEngineProcContext = pEngineContext;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(0, 0, 0, 7); // TODO: need to decide whether to keep this, and if so when to update it.
+    args.qwEngineAPIVersion = MAKEQWORDVERSION(2020, 5, 14, 0);
 
     results.cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
@@ -1211,7 +1211,9 @@ EXTERN_C BAAPI UserExperienceOnExecutePackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in BOOL fExecute,
-    __in BOOTSTRAPPER_ACTION_STATE action
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __in INSTALLUILEVEL uiLevel,
+    __in BOOL fDisableExternalUiHandler
     )
 {
     HRESULT hr = S_OK;
@@ -1222,6 +1224,8 @@ EXTERN_C BAAPI UserExperienceOnExecutePackageBegin(
     args.wzPackageId = wzPackageId;
     args.fExecute = fExecute;
     args.action = action;
+    args.uiLevel = uiLevel;
+    args.fDisableExternalUiHandler = fDisableExternalUiHandler;
 
     results.cbSize = sizeof(results);
 
@@ -1521,6 +1525,45 @@ EXTERN_C BAAPI UserExperienceOnPlanComplete(
 
     hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANCOMPLETE, &args, &results, pUserExperience->pvBAProcContext);
     ExitOnFailure(hr, "BA OnPlanComplete failed.");
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BAAPI UserExperienceOnPlanMsiPackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in BOOL fExecute,
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __inout BURN_MSI_PROPERTY* pActionMsiProperty,
+    __inout INSTALLUILEVEL* pUiLevel,
+    __inout BOOL* pfDisableExternalUiHandler
+    )
+{
+    HRESULT hr = S_OK;
+    BA_ONPLANMSIPACKAGE_ARGS args = { };
+    BA_ONPLANMSIPACKAGE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzPackageId = wzPackageId;
+    args.fExecute = fExecute;
+    args.action = action;
+
+    results.cbSize = sizeof(results);
+    results.actionMsiProperty = *pActionMsiProperty;
+    results.uiLevel = *pUiLevel;
+    results.fDisableExternalUiHandler = *pfDisableExternalUiHandler;
+
+    hr = pUserExperience->pfnBAProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE, &args, &results, pUserExperience->pvBAProcContext);
+    ExitOnFailure(hr, "BA OnPlanMsiPackage failed.");
+
+    if (results.fCancel)
+    {
+        hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
+    }
+    *pActionMsiProperty = results.actionMsiProperty;
+    *pUiLevel = results.uiLevel;
+    *pfDisableExternalUiHandler = results.fDisableExternalUiHandler;
 
 LExit:
     return hr;

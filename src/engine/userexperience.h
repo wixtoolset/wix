@@ -294,7 +294,9 @@ BAAPI UserExperienceOnExecutePackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
     __in BOOL fExecute,
-    __in BOOTSTRAPPER_ACTION_STATE action
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __in INSTALLUILEVEL uiLevel,
+    __in BOOL fDisableExternalUiHandler
     );
 BAAPI UserExperienceOnExecutePackageComplete(
     __in BURN_USER_EXPERIENCE* pUserExperience,
@@ -353,6 +355,15 @@ BAAPI UserExperienceOnPlanMsiFeature(
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzFeatureId,
     __inout BOOTSTRAPPER_FEATURE_STATE* pRequestedState
+    );
+BAAPI UserExperienceOnPlanMsiPackage(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in_z LPCWSTR wzPackageId,
+    __in BOOL fExecute,
+    __in BOOTSTRAPPER_ACTION_STATE action,
+    __inout BURN_MSI_PROPERTY* pActionMsiProperty,
+    __inout INSTALLUILEVEL* pUiLevel,
+    __inout BOOL* pfDisableExternalUiHandler
     );
 BAAPI UserExperienceOnPlanPackageBegin(
     __in BURN_USER_EXPERIENCE* pUserExperience,

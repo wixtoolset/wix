@@ -2064,7 +2064,7 @@ static HRESULT ExecuteExePackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->exePackage.pPackage->sczId, !fRollback, pExecuteAction->exePackage.action);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->exePackage.pPackage->sczId, !fRollback, pExecuteAction->exePackage.action, INSTALLUILEVEL_NOCHANGE, false);
     ExitOnRootFailure(hr, "BA aborted execute EXE package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;
@@ -2133,7 +2133,7 @@ static HRESULT ExecuteMsiPackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msiPackage.pPackage->sczId, !fRollback, pExecuteAction->msiPackage.action);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msiPackage.pPackage->sczId, !fRollback, pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.uiLevel, pExecuteAction->msiPackage.fDisableExternalUiHandler);
     ExitOnRootFailure(hr, "BA aborted execute MSI package begin.");
 
     // execute package
@@ -2188,7 +2188,7 @@ static HRESULT ExecuteMspPackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->mspTarget.pPackage->sczId, !fRollback, pExecuteAction->mspTarget.action);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->mspTarget.pPackage->sczId, !fRollback, pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.uiLevel, pExecuteAction->mspTarget.fDisableExternalUiHandler);
     ExitOnRootFailure(hr, "BA aborted execute MSP package begin.");
 
     // Now send all the patches that target this product code.
@@ -2255,7 +2255,7 @@ static HRESULT ExecuteMsuPackage(
     fBeginCalled = TRUE;
 
     // Send package execute begin to BA.
-    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msuPackage.pPackage->sczId, !fRollback, pExecuteAction->msuPackage.action);
+    hr = UserExperienceOnExecutePackageBegin(&pEngineState->userExperience, pExecuteAction->msuPackage.pPackage->sczId, !fRollback, pExecuteAction->msuPackage.action, INSTALLUILEVEL_NOCHANGE, false);
     ExitOnRootFailure(hr, "BA aborted execute MSU package begin.");
 
     message.type = GENERIC_EXECUTE_MESSAGE_PROGRESS;

@@ -239,7 +239,6 @@ typedef struct _BURN_PACKAGE
             DWORD64 qwVersion;
             LPWSTR sczInstalledProductCode;
             DWORD64 qwInstalledVersion;
-            BOOL fDisplayInternalUI;
             LPWSTR sczUpgradeCode;
 
             BURN_MSIPROPERTY* rgProperties;
@@ -261,7 +260,6 @@ typedef struct _BURN_PACKAGE
         {
             LPWSTR sczPatchCode;
             LPWSTR sczApplicabilityXml;
-            BOOL fDisplayInternalUI;
 
             BURN_MSIPROPERTY* rgProperties;
             DWORD cProperties;

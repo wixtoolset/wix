@@ -821,8 +821,14 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->msiPackage.sczLogPath);
     ExitOnFailure(hr, "Failed to write package log to message buffer.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.actionMsiProperty);
+    ExitOnFailure(hr, "Failed to write actionMsiProperty to message buffer.");
+
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.uiLevel);
     ExitOnFailure(hr, "Failed to write UI level to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.fDisableExternalUiHandler);
+    ExitOnFailure(hr, "Failed to write fDisableExternalUiHandler to message buffer.");
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->msiPackage.action);
     ExitOnFailure(hr, "Failed to write action to message buffer.");
@@ -897,8 +903,14 @@ extern "C" HRESULT ElevationExecuteMspPackage(
     hr = BuffWriteString(&pbData, &cbData, pExecuteAction->mspTarget.sczLogPath);
     ExitOnFailure(hr, "Failed to write package log to message buffer.");
 
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.actionMsiProperty);
+    ExitOnFailure(hr, "Failed to write actionMsiProperty to message buffer.");
+
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.uiLevel);
     ExitOnFailure(hr, "Failed to write UI level to message buffer.");
+
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.fDisableExternalUiHandler);
+    ExitOnFailure(hr, "Failed to write fDisableExternalUiHandler to message buffer.");
 
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)pExecuteAction->mspTarget.action);
     ExitOnFailure(hr, "Failed to write action to message buffer.");
@@ -2237,8 +2249,14 @@ static HRESULT OnExecuteMsiPackage(
     hr = BuffReadString(pbData, cbData, &iData, &executeAction.msiPackage.sczLogPath);
     ExitOnFailure(hr, "Failed to read package log.");
 
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.actionMsiProperty);
+    ExitOnFailure(hr, "Failed to read actionMsiProperty.");
+
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.uiLevel);
     ExitOnFailure(hr, "Failed to read UI level.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.fDisableExternalUiHandler);
+    ExitOnFailure(hr, "Failed to read fDisableExternalUiHandler.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.msiPackage.action);
     ExitOnFailure(hr, "Failed to read action.");
@@ -2334,8 +2352,14 @@ static HRESULT OnExecuteMspPackage(
     hr = BuffReadString(pbData, cbData, &iData, &executeAction.mspTarget.sczLogPath);
     ExitOnFailure(hr, "Failed to read package log.");
 
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.actionMsiProperty);
+    ExitOnFailure(hr, "Failed to read actionMsiProperty.");
+
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.uiLevel);
     ExitOnFailure(hr, "Failed to read UI level.");
+
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.fDisableExternalUiHandler);
+    ExitOnFailure(hr, "Failed to read fDisableExternalUiHandler.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.mspTarget.action);
     ExitOnFailure(hr, "Failed to read action.");

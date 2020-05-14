@@ -31,7 +31,6 @@ static HRESULT ProcessPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
@@ -473,7 +472,6 @@ extern "C" HRESULT PlanPackages(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fBundleInstalled,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent
@@ -511,7 +509,7 @@ extern "C" HRESULT PlanPackages(
             }
         }
 
-        hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
+        hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
         ExitOnFailure(hr, "Failed to process package.");
 
         // Attempt to remove orphaned packages during uninstall. Currently only MSI packages are supported and should not require source.
@@ -536,7 +534,7 @@ extern "C" HRESULT PlanPackages(
             ExitOnFailure(hr, "Failed to copy installed ProductCode");
 
             // Process the compatible MSI package like any other.
-            hr = ProcessPackage(fBundlePerMachine, pPackage, pUX, pPlan, pCompatiblePackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
+            hr = ProcessPackage(fBundlePerMachine, pPackage, pUX, pPlan, pCompatiblePackage, pLog, pVariables, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
             ExitOnFailure(hr, "Failed to process compatible package.");
 
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pCompatiblePackage->execute)
@@ -787,7 +785,6 @@ extern "C" HRESULT PlanPassThroughBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout HANDLE* phSyncpointEvent
     )
@@ -797,7 +794,7 @@ extern "C" HRESULT PlanPassThroughBundle(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan passthrough package.
-    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
+    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
     ExitOnFailure(hr, "Failed to process passthrough package.");
 
     // If we still have an open rollback boundary, complete it.
@@ -821,7 +818,6 @@ extern "C" HRESULT PlanUpdateBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout HANDLE* phSyncpointEvent
     )
@@ -831,7 +827,7 @@ extern "C" HRESULT PlanUpdateBundle(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan update package.
-    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
+    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
     ExitOnFailure(hr, "Failed to process update package.");
 
     // If we still have an open rollback boundary, complete it.
@@ -857,7 +853,6 @@ static HRESULT ProcessPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
@@ -911,7 +906,7 @@ static HRESULT ProcessPackage(
                 }
             }
 
-            hr = PlanExecutePackage(fBundlePerMachine, display, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
+            hr = PlanExecutePackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
             ExitOnFailure(hr, "Failed to plan execute package.");
 
             if (pPackage->fUninstallable && pNonpermanentPackageIndices)
@@ -1091,7 +1086,6 @@ LExit:
 
 extern "C" HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,
-    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
@@ -1156,11 +1150,11 @@ extern "C" HRESULT PlanExecutePackage(
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
-        hr = MsiEnginePlanAddPackage(display, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
+        hr = MsiEnginePlanAddPackage(pUserExperience, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
         break;
 
     case BURN_PACKAGE_TYPE_MSP:
-        hr = MspEnginePlanAddPackage(display, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
+        hr = MspEnginePlanAddPackage(pUserExperience, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
         break;
 
     case BURN_PACKAGE_TYPE_MSU:
@@ -3074,7 +3068,7 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, ui level: %u, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), pAction->msiPackage.uiLevel, pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %u, ui level: %u, disable externaluihandler: %ls, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), pAction->msiPackage.actionMsiProperty, pAction->msiPackage.uiLevel, pAction->msiPackage.fDisableExternalUiHandler ? L"yes" : L"no", pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
         for (DWORD j = 0; j < pAction->msiPackage.cPatches; ++j)
         {
             LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->msiPackage.rgOrderedPatches->dwOrder, pAction->msiPackage.rgOrderedPatches[j].dwOrder, pAction->msiPackage.rgOrderedPatches[j].pPackage->sczId);
@@ -3082,7 +3076,7 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSP_TARGET:
-        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, ui level: %u, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", pAction->mspTarget.uiLevel, pAction->mspTarget.sczLogPath);
+        LogStringLine(REPORT_STANDARD, "%ls action[%u]: MSP_TARGET package id: %ls, action: %hs, target product code: %ls, target per-machine: %ls, action msi property: %u, ui level: %u, disable externaluihandler: %ls, log path: %ls", wzBase, iAction, pAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pAction->mspTarget.action), pAction->mspTarget.sczTargetProductCode, pAction->mspTarget.fPerMachineTarget ? L"yes" : L"no", pAction->mspTarget.actionMsiProperty, pAction->mspTarget.uiLevel, pAction->mspTarget.fDisableExternalUiHandler ? L"yes" : L"no", pAction->mspTarget.sczLogPath);
         for (DWORD j = 0; j < pAction->mspTarget.cOrderedPatches; ++j)
         {
             LogStringLine(REPORT_STANDARD, "      Patch[%u]: order: %u, msp package id: %ls", j, pAction->mspTarget.rgOrderedPatches[j].dwOrder, pAction->mspTarget.rgOrderedPatches[j].pPackage->sczId);

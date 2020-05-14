@@ -32,7 +32,7 @@ HRESULT MsiEnginePlanCalculatePackage(
     __out_opt BOOL* pfBARequestedCache
     );
 HRESULT MsiEnginePlanAddPackage(
-    __in BOOTSTRAPPER_DISPLAY display,
+    __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
@@ -54,6 +54,10 @@ HRESULT MsiEngineExecutePackage(
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
     );
+HRESULT MsiEngineConcatActionProperty(
+    __in BURN_MSI_PROPERTY actionMsiProperty,
+    __deref_out_z LPWSTR* psczProperties
+    );
 HRESULT MsiEngineConcatProperties(
     __in_ecount(cProperties) BURN_MSIPROPERTY* rgProperties,
     __in DWORD cProperties,
@@ -62,10 +66,14 @@ HRESULT MsiEngineConcatProperties(
     __deref_out_z LPWSTR* psczProperties,
     __in BOOL fObfuscateHiddenVariables
     );
-INSTALLUILEVEL MsiEngineCalculateInstallUiLevel(
-    __in BOOL fDisplayInternalUI,
-    __in BOOTSTRAPPER_DISPLAY display,
-    __in BOOTSTRAPPER_ACTION_STATE actionState
+HRESULT MsiEngineCalculateInstallUiLevel(
+    __in BURN_USER_EXPERIENCE* pUserExperience,
+    __in LPCWSTR wzPackageId,
+    __in BOOL fExecute,
+    __in BOOTSTRAPPER_ACTION_STATE actionState,
+    __out BURN_MSI_PROPERTY* pActionMsiProperty,
+    __out INSTALLUILEVEL* pUiLevel,
+    __out BOOL* pfDisableExternalUiHandler
     );
 
 #if defined(__cplusplus)
