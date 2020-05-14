@@ -330,10 +330,15 @@ HRESULT DAPI WiuEnableLog(
     __in_z LPCWSTR wzLogFile,
     __in DWORD dwLogAttributes
     );
+HRESULT DAPI WiuInitializeInternalUI(
+    __in INSTALLUILEVEL internalUILevel,
+    __in_opt HWND hwndParent,
+    __in WIU_MSI_EXECUTE_CONTEXT* pExecuteContext
+    );
 HRESULT DAPI WiuInitializeExternalUI(
     __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
     __in INSTALLUILEVEL internalUILevel,
-    __in HWND hwndParent,
+    __in_opt HWND hwndParent,
     __in LPVOID pvContext,
     __in BOOL fRollback,
     __in WIU_MSI_EXECUTE_CONTEXT* pExecuteContext

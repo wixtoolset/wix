@@ -715,10 +715,32 @@ LExit:
 }
 
 
+extern "C" HRESULT DAPI WiuInitializeInternalUI(
+    __in INSTALLUILEVEL internalUILevel,
+    __in_opt HWND hwndParent,
+    __in WIU_MSI_EXECUTE_CONTEXT* pExecuteContext
+    )
+{
+    HRESULT hr = S_OK;
+
+    memset(pExecuteContext, 0, sizeof(WIU_MSI_EXECUTE_CONTEXT));
+
+    pExecuteContext->previousInstallUILevel = vpfnMsiSetInternalUI(internalUILevel, &hwndParent);
+    pExecuteContext->hwndPreviousParentWindow = hwndParent;
+
+    if (INSTALLUILEVEL_NOCHANGE == pExecuteContext->previousInstallUILevel)
+    {
+        hr = E_INVALIDARG;
+    }
+
+    return hr;
+}
+
+
 extern "C" HRESULT DAPI WiuInitializeExternalUI(
     __in PFN_MSIEXECUTEMESSAGEHANDLER pfnMessageHandler,
     __in INSTALLUILEVEL internalUILevel,
-    __in HWND hwndParent,
+    __in_opt HWND hwndParent,
     __in LPVOID pvContext,
     __in BOOL fRollback,
     __in WIU_MSI_EXECUTE_CONTEXT* pExecuteContext
@@ -730,7 +752,7 @@ extern "C" HRESULT DAPI WiuInitializeExternalUI(
     DWORD dwMessageFilter = INSTALLLOGMODE_INITIALIZE | INSTALLLOGMODE_TERMINATE |
                             INSTALLLOGMODE_FATALEXIT | INSTALLLOGMODE_ERROR | INSTALLLOGMODE_WARNING |
                             INSTALLLOGMODE_RESOLVESOURCE | INSTALLLOGMODE_OUTOFDISKSPACE |
-                            INSTALLLOGMODE_ACTIONSTART | INSTALLLOGMODE_ACTIONDATA | INSTALLLOGMODE_COMMONDATA|
+                            INSTALLLOGMODE_ACTIONSTART | INSTALLLOGMODE_ACTIONDATA | INSTALLLOGMODE_COMMONDATA |
                             INSTALLLOGMODE_PROGRESS | INSTALLLOGMODE_FILESINUSE;
 
     if (MAKEDWORD(0, 4) <= vdwMsiDllMajorMinor)
@@ -738,14 +760,13 @@ extern "C" HRESULT DAPI WiuInitializeExternalUI(
         dwMessageFilter |= INSTALLLOGMODE_RMFILESINUSE;
     }
 
-    memset(pExecuteContext, 0, sizeof(WIU_MSI_EXECUTE_CONTEXT));
+    // Wire the internal and external UI handler.
+    hr = WiuInitializeInternalUI(internalUILevel, hwndParent, pExecuteContext);
+    ExitOnFailure(hr, "Failed to set internal UI level and window.");
+
     pExecuteContext->fRollback = fRollback;
     pExecuteContext->pfnMessageHandler = pfnMessageHandler;
     pExecuteContext->pvContext = pvContext;
-
-    // Wire the internal and external UI handler.
-    pExecuteContext->previousInstallUILevel = vpfnMsiSetInternalUI(internalUILevel, &hwndParent);
-    pExecuteContext->hwndPreviousParentWindow = hwndParent;
 
     // If the external UI record is available (MSI version >= 3.1) use it but fall back to the standard external
     // UI handler if necesary.
