@@ -15,7 +15,7 @@
 
   <files>
     <file src="build\net20\$id$.props" target="build\net20" />
-    <file src="..\..\build\$configuration$\v141_xp\x86\mbanative.dll" target="build\net20\x86" />
+    <file src="..\..\build\$configuration$\v141\x86\mbanative.dll" target="build\net20\x86" />
     <file src="..\..\build\$configuration$\$id$.dll" target="lib\net20" />
   </files>
 </package>
