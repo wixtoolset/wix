@@ -194,6 +194,18 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __inout BOOL* pfCancel
         ) = 0;
 
+    // OnPlanMsiPackage - called when the engine plans an MSI or MSP package.
+    //
+    STDMETHOD(OnPlanMsiPackage)(
+        __in_z LPCWSTR wzPackageId,
+        __in BOOL fExecute, // false means rollback.
+        __in BOOTSTRAPPER_ACTION_STATE action,
+        __inout BOOL* pfCancel,
+        __inout BURN_MSI_PROPERTY* pActionMsiProperty,
+        __inout INSTALLUILEVEL* pUiLevel,
+        __inout BOOL* pfDisableExternalUiHandler
+        ) = 0;
+
     // OnPlanPackageComplete - called after the engine plans a package.
     //
     STDMETHOD(OnPlanPackageComplete)(
@@ -390,6 +402,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z LPCWSTR wzPackageId,
         __in BOOL fExecute, // false means rollback.
         __in BOOTSTRAPPER_ACTION_STATE action,
+        __in INSTALLUILEVEL uiLevel,
+        __in BOOL fDisableExternalUiHandler,
         __inout BOOL* pfCancel
         ) = 0;
 

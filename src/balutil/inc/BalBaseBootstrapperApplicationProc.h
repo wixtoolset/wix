@@ -402,7 +402,7 @@ static HRESULT BalBaseBAProcOnExecutePackageBegin(
     __inout BA_ONEXECUTEPACKAGEBEGIN_RESULTS* pResults
     )
 {
-    return pBA->OnExecutePackageBegin(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, &pResults->fCancel);
+    return pBA->OnExecutePackageBegin(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, pArgs->uiLevel, pArgs->fDisableExternalUiHandler, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAProcOnExecutePatchTarget(
@@ -502,6 +502,15 @@ static HRESULT BalBaseBAProcOnLaunchApprovedExeComplete(
     )
 {
     return pBA->OnLaunchApprovedExeComplete(pArgs->hrStatus, pArgs->dwProcessId);
+}
+
+static HRESULT BalBaseBAProcOnPlanMsiPackage(
+    __in IBootstrapperApplication* pBA,
+    __in BA_ONPLANMSIPACKAGE_ARGS* pArgs,
+    __inout BA_ONPLANMSIPACKAGE_RESULTS* pResults
+    )
+{
+    return pBA->OnPlanMsiPackage(pArgs->wzPackageId, pArgs->fExecute, pArgs->action, &pResults->fCancel, &pResults->actionMsiProperty, &pResults->uiLevel, &pResults->fDisableExternalUiHandler);
 }
 
 /*******************************************************************
@@ -688,6 +697,9 @@ static HRESULT WINAPI BalBaseBootstrapperApplicationProc(
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE:
             hr = BalBaseBAProcOnLaunchApprovedExeComplete(pBA, reinterpret_cast<BA_ONLAUNCHAPPROVEDEXECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONLAUNCHAPPROVEDEXECOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE:
+            hr = BalBaseBAProcOnPlanMsiPackage(pBA, reinterpret_cast<BA_ONPLANMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANMSIPACKAGE_RESULTS*>(pvResults));
             break;
         }
     }

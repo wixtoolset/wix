@@ -996,6 +996,64 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Additional arguments used when the engine is planning an MSI or MSP package.
+    /// </summary>
+    [Serializable]
+    public class PlanMsiPackageEventArgs : CancellableHResultEventArgs
+    {
+        /// <summary>
+        /// Creates a new instance of the <see cref="PlanMsiPackageEventArgs"/> class.
+        /// </summary>
+        /// <param name="packageId">The identity of the package planned for.</param>
+        /// <param name="shouldExecute">Whether the package is planned to execute or roll back.</param>
+        /// <param name="action">The action planned for the package.</param>
+        /// <param name="cancelRecommendation">The recommendation from the engine.</param>
+        /// <param name="actionMsiProperty">The requested MSI property to add.</param>
+        /// <param name="uiLevel">The requested internal UI level.</param>
+        /// <param name="disableExternalUiHandler">Whether Burn is requested to set up an external UI handler.</param>
+        public PlanMsiPackageEventArgs(string packageId, bool shouldExecute, ActionState action, bool cancelRecommendation, BURN_MSI_PROPERTY actionMsiProperty, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler)
+            : base(cancelRecommendation)
+        {
+            this.PackageId = packageId;
+            this.ShouldExecute = shouldExecute;
+            this.Action = action;
+            this.ActionMsiProperty = actionMsiProperty;
+            this.UiLevel = uiLevel;
+            this.DisableExternalUiHandler = disableExternalUiHandler;
+        }
+
+        /// <summary>
+        /// Gets identity of the package planned for.
+        /// </summary>
+        public string PackageId { get; private set; }
+
+        /// <summary>
+        /// Gets whether the package is planned to execute or roll back.
+        /// </summary>
+        public bool ShouldExecute { get; private set; }
+
+        /// <summary>
+        /// Gets the action planned for the package.
+        /// </summary>
+        public ActionState Action { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the requested MSI property to add.
+        /// </summary>
+        public BURN_MSI_PROPERTY ActionMsiProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the requested internal UI level.
+        /// </summary>
+        public INSTALLUILEVEL UiLevel { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether Burn is requested to set up an external UI handler.
+        /// </summary>
+        public bool DisableExternalUiHandler { get; set; }
+    }
+
+    /// <summary>
     /// Additional arguments used when then engine has completed planning the installation of a specific package.
     /// </summary>
     [Serializable]
@@ -1503,13 +1561,17 @@ namespace WixToolset.Mba.Core
         /// <param name="packageId">The identity of the package to act on.</param>
         /// <param name="shouldExecute">Whether the package is being executed or rolled back.</param>
         /// <param name="action">The action about to be executed.</param>
+        /// <param name="uiLevel">The internal UI level (if this is an MSI or MSP package).</param>
+        /// <param name="disableExternalUiHandler">Whether Burn will set up an external UI handler (if this is an MSI or MSP package).</param>
         /// <param name="cancelRecommendation">The recommendation from the engine.</param>
-        public ExecutePackageBeginEventArgs(string packageId, bool shouldExecute, ActionState action, bool cancelRecommendation)
+        public ExecutePackageBeginEventArgs(string packageId, bool shouldExecute, ActionState action, INSTALLUILEVEL uiLevel, bool disableExternalUiHandler, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
             this.PackageId = packageId;
             this.ShouldExecute = shouldExecute;
             this.Action = action;
+            this.UiLevel = uiLevel;
+            this.DisableExternalUiHandler = disableExternalUiHandler;
         }
 
         /// <summary>
@@ -1526,6 +1588,16 @@ namespace WixToolset.Mba.Core
         /// Gets the action about to be executed.
         /// </summary>
         public ActionState Action { get; private set; }
+
+        /// <summary>
+        /// Gets the internal UI level (if this is an MSI or MSP package).
+        /// </summary>
+        public INSTALLUILEVEL UiLevel { get; private set; }
+
+        /// <summary>
+        /// Gets whether Burn will set up an external UI handler (if this is an MSI or MSP package).
+        /// </summary>
+        public bool DisableExternalUiHandler { get; private set; }
     }
 
     /// <summary>

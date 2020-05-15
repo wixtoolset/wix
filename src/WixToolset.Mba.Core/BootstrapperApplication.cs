@@ -162,6 +162,11 @@ namespace WixToolset.Mba.Core
         public event EventHandler<PlanMsiFeatureEventArgs> PlanMsiFeature;
 
         /// <summary>
+        /// Fired when the engine is planning an MSI or MSP package.
+        /// </summary>
+        public event EventHandler<PlanMsiPackageEventArgs> PlanMsiPackage;
+
+        /// <summary>
         /// Fired when the engine has completed planning the installation of a specific package.
         /// </summary>
         public event EventHandler<PlanPackageCompleteEventArgs> PlanPackageComplete;
@@ -652,6 +657,19 @@ namespace WixToolset.Mba.Core
         protected virtual void OnPlanMsiFeature(PlanMsiFeatureEventArgs args)
         {
             EventHandler<PlanMsiFeatureEventArgs> handler = this.PlanMsiFeature;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called when the engine is planning an MSI or MSP package.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnPlanMsiPackage(PlanMsiPackageEventArgs args)
+        {
+            EventHandler<PlanMsiPackageEventArgs> handler = this.PlanMsiPackage;
             if (null != handler)
             {
                 handler(this, args);
@@ -1288,6 +1306,18 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
+        int IBootstrapperApplication.OnPlanMsiPackage(string wzPackageId, bool fExecute, ActionState action, ref bool fCancel, ref BURN_MSI_PROPERTY actionMsiProperty, ref INSTALLUILEVEL uiLevel, ref bool fDisableExternalUiHandler)
+        {
+            PlanMsiPackageEventArgs args = new PlanMsiPackageEventArgs(wzPackageId, fExecute, action, fCancel, actionMsiProperty, uiLevel, fDisableExternalUiHandler);
+            this.OnPlanMsiPackage(args);
+
+            fCancel = args.Cancel;
+            actionMsiProperty = args.ActionMsiProperty;
+            uiLevel = args.UiLevel;
+            fDisableExternalUiHandler = args.DisableExternalUiHandler;
+            return args.HResult;
+        }
+
         int IBootstrapperApplication.OnPlanPackageComplete(string wzPackageId, int hrStatus, PackageState state, RequestState requested, ActionState execute, ActionState rollback)
         {
             var args = new PlanPackageCompleteEventArgs(wzPackageId, hrStatus, state, requested, execute, rollback);
@@ -1466,9 +1496,9 @@ namespace WixToolset.Mba.Core
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnExecutePackageBegin(string wzPackageId, bool fExecute, ActionState action, ref bool fCancel)
+        int IBootstrapperApplication.OnExecutePackageBegin(string wzPackageId, bool fExecute, ActionState action, INSTALLUILEVEL uiLevel, bool fDisableExternalUiHandler, ref bool fCancel)
         {
-            ExecutePackageBeginEventArgs args = new ExecutePackageBeginEventArgs(wzPackageId, fExecute, action, fCancel);
+            ExecutePackageBeginEventArgs args = new ExecutePackageBeginEventArgs(wzPackageId, fExecute, action, uiLevel, fDisableExternalUiHandler, fCancel);
             this.OnExecutePackageBegin(args);
 
             fCancel = args.Cancel;

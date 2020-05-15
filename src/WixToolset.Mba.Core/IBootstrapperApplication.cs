@@ -221,6 +221,18 @@ namespace WixToolset.Mba.Core
 
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
+        int OnPlanMsiPackage(
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
+            [MarshalAs(UnmanagedType.Bool)] bool fExecute,
+            [MarshalAs(UnmanagedType.U4)] ActionState action,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fCancel,
+            [MarshalAs(UnmanagedType.U4)] ref BURN_MSI_PROPERTY actionMsiProperty,
+            [MarshalAs(UnmanagedType.U4)] ref INSTALLUILEVEL uiLevel,
+            [MarshalAs(UnmanagedType.Bool)] ref bool fDisableExternalUiHandler
+            );
+
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanPackageComplete(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             int hrStatus,
@@ -393,6 +405,8 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.Bool)] bool fExecute,
             [MarshalAs(UnmanagedType.U4)] ActionState action,
+            [MarshalAs(UnmanagedType.U4)] INSTALLUILEVEL uiLevel,
+            [MarshalAs(UnmanagedType.Bool)] bool fDisableExternalUiHandler,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
             );
 
@@ -831,5 +845,100 @@ namespace WixToolset.Mba.Core
         None,
         Restart,
         ReloadBootstrapper,
+    }
+
+    /// <summary>
+    /// The property Burn will add so the MSI can know the planned action for the package.
+    /// </summary>
+    public enum BURN_MSI_PROPERTY
+    {
+        /// <summary>
+        /// No property will be added.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Add BURNMSIINSTALL=1
+        /// </summary>
+        Install,
+
+        /// <summary>
+        /// Add BURNMSIMODFIY=1
+        /// </summary>
+        Modify,
+
+        /// <summary>
+        /// Add BURNMSIREPAIR=1
+        /// </summary>
+        Repair,
+
+        /// <summary>
+        /// Add BURNMSIUNINSTALL=1
+        /// </summary>
+        Uninstall,
+    }
+
+    /// <summary>
+    /// From msi.h
+    /// https://docs.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msisetinternalui
+    /// </summary>
+    [Flags]
+    public enum INSTALLUILEVEL
+    {
+        /// <summary>
+        /// UI level is unchanged
+        /// </summary>
+        NoChange = 0,
+
+        /// <summary>
+        /// default UI is used
+        /// </summary>
+        Default = 1,
+
+        /// <summary>
+        /// completely silent installation
+        /// </summary>
+        None = 2,
+
+        /// <summary>
+        /// simple progress and error handling
+        /// </summary>
+        Basic = 3,
+
+        /// <summary>
+        /// authored UI, wizard dialogs suppressed
+        /// </summary>
+        Reduced = 4,
+
+        /// <summary>
+        /// authored UI with wizards, progress, errors
+        /// </summary>
+        Full = 5,
+
+        /// <summary>
+        /// display success/failure dialog at end of install
+        /// </summary>
+        EndDialog = 0x80,
+
+        /// <summary>
+        /// display only progress dialog
+        /// </summary>
+        ProgressOnly = 0x40,
+
+        /// <summary>
+        /// do not display the cancel button in basic UI
+        /// </summary>
+        HideCancel = 0x20,
+
+        /// <summary>
+        /// force display of source resolution even if quiet
+        /// </summary>
+        SourceResOnly = 0x100,
+
+        /// <summary>
+        /// show UAC prompt even if quiet
+        /// Can only be used if on Windows Installer 5.0 or later
+        /// </summary>
+        UacOnly = 0x200,
     }
 }

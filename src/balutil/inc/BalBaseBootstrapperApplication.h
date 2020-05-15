@@ -311,6 +311,20 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
+    virtual STDMETHODIMP OnPlanMsiPackage(
+        __in_z LPCWSTR /*wzPackageId*/,
+        __in BOOL /*fExecute*/,
+        __in BOOTSTRAPPER_ACTION_STATE /*action*/,
+        __inout BOOL* pfCancel,
+        __inout BURN_MSI_PROPERTY* /*pActionMsiProperty*/,
+        __inout INSTALLUILEVEL* /*pUiLevel*/,
+        __inout BOOL* /*pfDisableExternalUiHandler*/
+        )
+    {
+        *pfCancel |= CheckCanceled();
+        return S_OK;
+    }
+
     virtual STDMETHODIMP OnPlanPackageComplete(
         __in_z LPCWSTR /*wzPackageId*/,
         __in HRESULT /*hrStatus*/,
@@ -604,6 +618,8 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR wzPackageId,
         __in BOOL fExecute,
         __in BOOTSTRAPPER_ACTION_STATE /*action*/,
+        __in INSTALLUILEVEL /*uiLevel*/,
+        __in BOOL /*fDisableExternalUiHandler*/,
         __inout BOOL* pfCancel
         )
     {
