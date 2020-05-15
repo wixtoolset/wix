@@ -34,12 +34,16 @@ typedef struct _BAL_INFO_PACKAGE
     BAL_INFO_PACKAGE_TYPE type;
     BOOL fPermanent;
     BOOL fVital;
-    BOOL fDisplayInternalUI;
+    LPWSTR sczDisplayInternalUICondition;
     LPWSTR sczProductCode;
     LPWSTR sczUpgradeCode;
     LPWSTR sczVersion;
     LPWSTR sczInstallCondition;
     BAL_INFO_CACHE_TYPE cacheType;
+    BOOL fPrereqPackage;
+    LPWSTR sczPrereqLicenseFile;
+    LPWSTR sczPrereqLicenseUrl;
+    LPVOID pvCustomData;
 } BAL_INFO_PACKAGE;
 
 
@@ -78,7 +82,8 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
     __in BAL_INFO_PACKAGES* pPackages,
     __in LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOL fPerMachine
+    __in BOOL fPerMachine,
+    __out_opt BAL_INFO_PACKAGE** ppPackage
     );
 
 

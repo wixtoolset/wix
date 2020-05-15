@@ -7,6 +7,10 @@ static HRESULT ParsePackagesFromXml(
     __in BAL_INFO_PACKAGES* pPackages,
     __in IXMLDOMDocument* pixdManifest
     );
+static HRESULT ParseBalPackageInfoFromXml(
+    __in BAL_INFO_PACKAGES* pPackages,
+    __in IXMLDOMDocument* pixdManifest
+    );
 
 
 DAPI_(HRESULT) BalInfoParseFromXml(
@@ -44,6 +48,9 @@ DAPI_(HRESULT) BalInfoParseFromXml(
     hr = ParsePackagesFromXml(&pBundle->packages, pixdManifest);
     BalExitOnFailure(hr, "Failed to parse package information from bootstrapper application data.");
 
+    hr = ParseBalPackageInfoFromXml(&pBundle->packages, pixdManifest);
+    BalExitOnFailure(hr, "Failed to parse bal package information from bootstrapper application data.");
+
 LExit:
     ReleaseObject(pNode);
 
@@ -55,7 +62,8 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
     __in BAL_INFO_PACKAGES* pPackages,
     __in LPCWSTR wzId,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
-    __in BOOL /*fPerMachine*/
+    __in BOOL /*fPerMachine*/,
+    __out_opt BAL_INFO_PACKAGE** ppPackage
     )
 {
     HRESULT hr = S_OK;
@@ -104,6 +112,11 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
 
     // TODO: try to look up the DisplayName and Description in Add/Remove Programs with the wzId.
 
+    if (ppPackage)
+    {
+        *ppPackage = pPackage;
+    }
+
 LExit:
     return hr;
 }
@@ -139,10 +152,13 @@ DAPI_(void) BalInfoUninitialize(
         ReleaseStr(pBundle->packages.rgPackages[i].sczDisplayName);
         ReleaseStr(pBundle->packages.rgPackages[i].sczDescription);
         ReleaseStr(pBundle->packages.rgPackages[i].sczId);
+        ReleaseStr(pBundle->packages.rgPackages[i].sczDisplayInternalUICondition);
         ReleaseStr(pBundle->packages.rgPackages[i].sczProductCode);
         ReleaseStr(pBundle->packages.rgPackages[i].sczUpgradeCode);
         ReleaseStr(pBundle->packages.rgPackages[i].sczVersion);
         ReleaseStr(pBundle->packages.rgPackages[i].sczInstallCondition);
+        ReleaseStr(pBundle->packages.rgPackages[i].sczPrereqLicenseFile);
+        ReleaseStr(pBundle->packages.rgPackages[i].sczPrereqLicenseUrl);
     }
 
     ReleaseMem(pBundle->packages.rgPackages);
@@ -218,12 +234,6 @@ static HRESULT ParsePackagesFromXml(
         hr = XmlGetYesNoAttribute(pNode, L"Vital", &prgPackages[iPackage].fVital);
         ExitOnFailure(hr, "Failed to get vital setting for package.");
 
-        hr = XmlGetYesNoAttribute(pNode, L"DisplayInternalUI", &prgPackages[iPackage].fDisplayInternalUI);
-        if (E_NOTFOUND != hr)
-        {
-            ExitOnFailure(hr, "Failed to get DisplayInternalUI setting for package.");
-        }
-
         hr = XmlGetAttributeEx(pNode, L"ProductCode", &prgPackages[iPackage].sczProductCode);
         if (E_NOTFOUND != hr)
         {
@@ -281,6 +291,81 @@ static HRESULT ParsePackagesFromXml(
 LExit:
     ReleaseStr(scz);
     ReleaseMem(prgPackages);
+    ReleaseObject(pNode);
+    ReleaseObject(pNodeList);
+
+    return hr;
+}
+
+
+static HRESULT ParseBalPackageInfoFromXml(
+    __in BAL_INFO_PACKAGES* pPackages,
+    __in IXMLDOMDocument* pixdManifest
+    )
+{
+    HRESULT hr = S_OK;
+    IXMLDOMNodeList* pNodeList = NULL;
+    IXMLDOMNode* pNode = NULL;
+    LPWSTR scz = NULL;
+    BAL_INFO_PACKAGE* pPackage = NULL;
+
+    hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixBalPackageInfo", &pNodeList);
+    ExitOnFailure(hr, "Failed to select all packages.");
+
+    while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
+    {
+        hr = XmlGetAttributeEx(pNode, L"PackageId", &scz);
+        ExitOnFailure(hr, "Failed to get package identifier for WixBalPackageInfo.");
+
+        hr = BalInfoFindPackageById(pPackages, scz, &pPackage);
+        ExitOnFailure(hr, "Failed to find package specified in WixBalPackageInfo: %ls", scz);
+
+        hr = XmlGetAttributeEx(pNode, L"DisplayInternalUICondition", &pPackage->sczDisplayInternalUICondition);
+        if (E_NOTFOUND != hr)
+        {
+            ExitOnFailure(hr, "Failed to get DisplayInternalUICondition setting for package.");
+        }
+
+        ReleaseNullObject(pNode);
+    }
+    ExitOnFailure(hr, "Failed to parse all WixBalPackageInfo elements.");
+
+    hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixMbaPrereqInformation", &pNodeList);
+    ExitOnFailure(hr, "Failed to select all packages.");
+
+    while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
+    {
+        hr = XmlGetAttributeEx(pNode, L"PackageId", &scz);
+        ExitOnFailure(hr, "Failed to get package identifier for WixMbaPrereqInformation.");
+
+        hr = BalInfoFindPackageById(pPackages, scz, &pPackage);
+        ExitOnFailure(hr, "Failed to find package specified in WixMbaPrereqInformation: %ls", scz);
+
+        pPackage->fPrereqPackage = TRUE;
+
+        hr = XmlGetAttributeEx(pNode, L"LicenseFile", &pPackage->sczPrereqLicenseFile);
+        if (E_NOTFOUND != hr)
+        {
+            ExitOnFailure(hr, "Failed to get LicenseFile setting for prereq package.");
+        }
+
+        hr = XmlGetAttributeEx(pNode, L"LicenseUrl", &pPackage->sczPrereqLicenseUrl);
+        if (E_NOTFOUND != hr)
+        {
+            ExitOnFailure(hr, "Failed to get LicenseUrl setting for prereq package.");
+        }
+
+        ReleaseNullObject(pNode);
+    }
+    ExitOnFailure(hr, "Failed to parse all WixMbaPrereqInformation elements.");
+
+    if (S_FALSE == hr)
+    {
+        hr = S_OK;
+    }
+
+LExit:
+    ReleaseStr(scz);
     ReleaseObject(pNode);
     ReleaseObject(pNodeList);
 

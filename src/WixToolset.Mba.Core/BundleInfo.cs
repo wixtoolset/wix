@@ -20,10 +20,11 @@ namespace WixToolset.Mba.Core
             this.Packages = new Dictionary<string, IPackageInfo>();
         }
 
-        public void AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e)
+        public IPackageInfo AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e)
         {
             var package = PackageInfo.GetRelatedBundleAsPackage(e.ProductCode, e.RelationType, e.PerMachine, e.Version);
             this.Packages.Add(package.Id, package);
+            return package;
         }
 
         public static IBundleInfo ParseBundleFromStream(Stream stream)
@@ -56,10 +57,7 @@ namespace WixToolset.Mba.Core
 
             bundle.LogVariable = BootstrapperApplicationData.GetAttribute(bundleNode, "LogPathVariable");
 
-            foreach (var package in PackageInfo.ParsePackagesFromXml(root))
-            {
-                bundle.Packages.Add(package.Id, package);
-            }
+            bundle.Packages = PackageInfo.ParsePackagesFromXml(root);
 
             return bundle;
         }

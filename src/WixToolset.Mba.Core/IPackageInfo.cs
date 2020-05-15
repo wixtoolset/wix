@@ -5,12 +5,16 @@ namespace WixToolset.Mba.Core
     public interface IPackageInfo
     {
         CacheType CacheType { get; }
+        object CustomData { get; set; }
         string Description { get; }
-        bool DisplayInternalUI { get; }
+        string DisplayInternalUICondition { get; }
         string DisplayName { get; }
         string Id { get; }
         string InstallCondition { get; }
         bool Permanent { get; }
+        bool PrereqPackage { get; }
+        string PrereqLicenseFile { get; }
+        string PrereqLicenseUrl { get; }
         string ProductCode { get; }
         PackageType Type { get; }
         string UpgradeCode { get; }

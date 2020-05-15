@@ -11,6 +11,6 @@ namespace WixToolset.Mba.Core
         IDictionary<string, IPackageInfo> Packages { get; }
         bool PerMachine { get; }
 
-        void AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e);
+        IPackageInfo AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e);
     }
 }

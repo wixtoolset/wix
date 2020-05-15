@@ -34,17 +34,22 @@ namespace WixToolset.Mba.Core
         public PackageType Type { get; internal set; }
         public bool Permanent { get; internal set; }
         public bool Vital { get; internal set; }
-        public bool DisplayInternalUI { get; internal set; }
+        public string DisplayInternalUICondition { get; internal set; }
         public string ProductCode { get; internal set; }
         public string UpgradeCode { get; internal set; }
         public string Version { get; internal set; }
         public string InstallCondition { get; internal set; }
         public CacheType CacheType { get; internal set; }
+        public bool PrereqPackage { get; internal set; }
+        public string PrereqLicenseFile { get; internal set; }
+        public string PrereqLicenseUrl { get; internal set; }
+        public object CustomData { get; set; }
 
         internal PackageInfo() { }
 
-        public static IEnumerable<IPackageInfo> ParsePackagesFromXml(XPathNavigator root)
+        public static IDictionary<string, IPackageInfo> ParsePackagesFromXml(XPathNavigator root)
         {
+            var packagesById = new Dictionary<string, IPackageInfo>();
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(root.NameTable);
             namespaceManager.AddNamespace("p", BootstrapperApplicationData.XMLNamespace);
             XPathNodeIterator nodes = root.Select("/p:BootstrapperApplicationData/p:WixPackageProperties", namespaceManager);
@@ -85,9 +90,6 @@ namespace WixToolset.Mba.Core
                 }
                 package.Vital = vital.Value;
 
-                bool? displayInternalUI = BootstrapperApplicationData.GetYesNoAttribute(node, "DisplayInternalUI");
-                package.DisplayInternalUI = displayInternalUI.HasValue && displayInternalUI.Value;
-
                 package.ProductCode = BootstrapperApplicationData.GetAttribute(node, "ProductCode");
 
                 package.UpgradeCode = BootstrapperApplicationData.GetAttribute(node, "UpgradeCode");
@@ -96,8 +98,11 @@ namespace WixToolset.Mba.Core
 
                 package.InstallCondition = BootstrapperApplicationData.GetAttribute(node, "InstallCondition");
 
-                yield return package;
+                packagesById.Add(package.Id, package);
             }
+
+            ParseBalPackageInfoFromXml(root, namespaceManager, packagesById);
+            return packagesById;
         }
 
         public static CacheType? GetCacheTypeAttribute(XPathNavigator node, string attributeName)
@@ -154,7 +159,7 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        public static PackageInfo GetRelatedBundleAsPackage(string id, RelationType relationType, bool perMachine, Version version)
+        public static IPackageInfo GetRelatedBundleAsPackage(string id, RelationType relationType, bool perMachine, Version version)
         {
             PackageInfo package = new PackageInfo();
             package.Id = id;
@@ -176,6 +181,51 @@ namespace WixToolset.Mba.Core
             }
 
             return package;
+        }
+
+        internal static void ParseBalPackageInfoFromXml(XPathNavigator root, XmlNamespaceManager namespaceManager, Dictionary<string, IPackageInfo> packagesById)
+        {
+            XPathNodeIterator nodes = root.Select("/p:BootstrapperApplicationData/p:WixBalPackageInfo", namespaceManager);
+
+            foreach (XPathNavigator node in nodes)
+            {
+                string id = BootstrapperApplicationData.GetAttribute(node, "PackageId");
+                if (id == null)
+                {
+                    throw new Exception("Failed to get package identifier for WixBalPackageInfo.");
+                }
+
+                if (!packagesById.TryGetValue(id, out var ipackage))
+                {
+                    throw new Exception(string.Format("Failed to find package specified in WixBalPackageInfo: {0}", id));
+                }
+
+                var package = (PackageInfo)ipackage;
+
+                package.DisplayInternalUICondition = BootstrapperApplicationData.GetAttribute(node, "DisplayInternalUICondition");
+            }
+
+            nodes = root.Select("/p:BootstrapperApplicationData/p:WixMbaPrereqInformation", namespaceManager);
+
+            foreach (XPathNavigator node in nodes)
+            {
+                string id = BootstrapperApplicationData.GetAttribute(node, "PackageId");
+                if (id == null)
+                {
+                    throw new Exception("Failed to get package identifier for WixMbaPrereqInformation.");
+                }
+
+                if (!packagesById.TryGetValue(id, out var ipackage))
+                {
+                    throw new Exception(string.Format("Failed to find package specified in WixMbaPrereqInformation: {0}", id));
+                }
+
+                var package = (PackageInfo)ipackage;
+
+                package.PrereqPackage = true;
+                package.PrereqLicenseFile = BootstrapperApplicationData.GetAttribute(node, "LicenseFile");
+                package.PrereqLicenseUrl = BootstrapperApplicationData.GetAttribute(node, "LicenseUrl");
+            }
         }
     }
 }
