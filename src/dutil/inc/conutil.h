@@ -9,12 +9,8 @@ extern "C" {
 #define ConsoleExitOnFailure(x, c, f, ...) if (FAILED(x)) { ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
 #define ConsoleExitOnLastError(x, c, f, ...) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; } }
 #define ConsoleExitOnNull(p, x, e, c, f, ...) if (NULL == p) { x = e; ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-
-
-// the following macros need to go away
-#define ConsoleTrace(l, f, ...) { ConsoleWriteLine(CONSOLE_COLOR_NORMAL, f, __VA_ARGS__); Trace(l, f, __VA_ARGS__); }
-#define ConsoleWarning(f, ...) { ConsoleWriteLine(CONSOLE_COLOR_YELLOW, f, __VA_ARGS__); Trace(REPORT_STANDARD, f, __VA_ARGS__); }
-#define ConsoleError(x, f, ...) { ConsoleWriteError(x, CONSOLE_COLOR_RED, f, __VA_ARGS__); TraceError(x, f, __VA_ARGS__); }
+#define ConsoleExitOnNullWithLastError(p, x, c, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
+#define ConsoleExitWithLastError(x, c, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
 
 
 // enums
