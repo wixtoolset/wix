@@ -94,7 +94,7 @@ namespace WixToolset.Core.Burn
             // this behavior.
             var bundleTuple = this.GetSingleTuple<WixBundleTuple>();
 
-            bundleTuple.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
+            bundleTuple.ProviderKey = bundleTuple.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
             bundleTuple.Attributes |= WixBundleAttributes.PerMachine; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
@@ -376,7 +376,10 @@ namespace WixToolset.Core.Burn
                 var command = new ProcessDependencyProvidersCommand(this.Messaging, section, facades);
                 command.Execute();
 
-                bundleTuple.ProviderKey = command.BundleProviderKey; // set the overridable bundle provider key.
+                if (!String.IsNullOrEmpty(command.BundleProviderKey))
+                {
+                    bundleTuple.ProviderKey = command.BundleProviderKey; // set the overridable bundle provider key.
+                }
                 dependencyTuplesByKey = command.DependencyTuplesByKey;
             }
 

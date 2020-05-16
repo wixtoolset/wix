@@ -230,13 +230,13 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(name))
             {
-                logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup:.log");
+                logVariablePrefixAndExtension = String.Concat("WixBundleLog:Setup:log");
             }
             else
             {
                 // Ensure only allowable path characters are in "name" (and change spaces to underscores).
                 fileSystemSafeBundleName = CompilerCore.MakeValidLongFileName(name.Replace(' ', '_'), "_");
-                logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ":.log");
+                logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ":log");
             }
 
             this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;

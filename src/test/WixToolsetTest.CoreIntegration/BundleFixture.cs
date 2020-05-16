@@ -6,6 +6,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Xml;
     using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
@@ -102,6 +103,16 @@ namespace WixToolsetTest.CoreIntegration
                     var bextManifestData = wixOutput.GetData(BurnConstants.BundleExtensionDataWixOutputStreamName);
                     var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BundleExtensionData.xml"), Encoding.UTF8);
                     Assert.Equal(extractedBextManifestData, bextManifestData);
+
+                    var logElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Log");
+                    var logElement = (XmlNode)Assert.Single(logElements);
+                    Assert.Equal("<Log PathVariable='WixBundleLog' Prefix='~TestBundle' Extension='log' />", logElement.GetTestXml());
+
+                    var registrationElements = extractResult.SelectManifestNodes("/burn:BurnManifest/burn:Registration");
+                    var registrationElement = (XmlNode)Assert.Single(registrationElements);
+                    Assert.Equal($"<Registration Id='{bundleTuple.BundleId}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleTuple.BundleId}'>" +
+                        "<Arp Register='yes' DisplayName='~TestBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' />" +
+                        "</Registration>", registrationElement.GetTestXml());
                 }
             }
         }
