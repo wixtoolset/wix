@@ -53,7 +53,7 @@ HRESULT TestEngine::LoadBA(
     m_pCreateResults->cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
 
     m_hBAModule = ::LoadLibraryExW(wzBAFilePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    ExitOnNullWithLastError(m_hBAModule, hr, "Failed to load BA dll.");
+    ConsoleExitOnNullWithLastError(m_hBAModule, hr, CONSOLE_COLOR_RED, "Failed to load BA dll.");
 
     pfnCreate = (PFN_BOOTSTRAPPER_APPLICATION_CREATE)::GetProcAddress(m_hBAModule, "BootstrapperApplicationCreate");
     ConsoleExitOnNull(pfnCreate, hr, E_OUTOFMEMORY, CONSOLE_COLOR_RED, "Failed to get address for BootstrapperApplicationCreate.");
@@ -181,7 +181,7 @@ HRESULT TestEngine::BAEngineQuit(
 
     if (!::PostThreadMessageW(m_dwThreadId, WM_TESTENG_QUIT, static_cast<WPARAM>(pArgs->dwExitCode), 0))
     {
-        ExitWithLastError(hr, "Failed to post shutdown message.");
+        ConsoleExitWithLastError(hr, CONSOLE_COLOR_RED, "Failed to post shutdown message.");
     }
 
 LExit:

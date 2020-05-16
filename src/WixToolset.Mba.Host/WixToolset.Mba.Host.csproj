@@ -44,7 +44,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WixToolset.Mba.Core">
-      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.19\lib\net20\WixToolset.Mba.Core.dll</HintPath>
+      <HintPath>..\..\packages\WixToolset.Mba.Core.4.0.22\lib\net20\WixToolset.Mba.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

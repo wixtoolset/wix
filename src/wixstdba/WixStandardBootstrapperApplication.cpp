@@ -146,13 +146,13 @@ static THEME_ASSIGN_CONTROL_ID vrgInitControls[] = {
     { WIXSTDBA_CONTROL_FAILURE_RESTART_BUTTON, L"FailureRestartButton" },
 };
 
-typedef struct _WIXSTDBA_PREREQ_PACKAGE
+typedef struct _WIXSTDBA_PACKAGE_INFO
 {
     LPWSTR sczPackageId;
     BOOL fWasAlreadyInstalled;
     BOOL fPlannedToBeInstalled;
     BOOL fSuccessfullyInstalled;
-} WIXSTDBA_PREREQ_PACKAGE;
+} WIXSTDBA_PACKAGE_INFO;
 
 
 static HRESULT DAPI EvaluateVariableConditionCallback(
@@ -268,7 +268,11 @@ public: // IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-        BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleId, relationType, fPerMachine);
+        BAL_INFO_PACKAGE* pPackage = NULL;
+        if (SUCCEEDED(BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleId, relationType, fPerMachine, &pPackage)))
+        {
+            InitializePackageInfoForPackage(pPackage);
+        }
 
         // If we're not doing a prerequisite install, remember when our bundle would cause a downgrade.
         if (!m_fPrereq && BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE == operation)
@@ -286,13 +290,15 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_PACKAGE_STATE state
         )
     {
-        WIXSTDBA_PREREQ_PACKAGE* pPrereqPackage = NULL;
+        WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
         BAL_INFO_PACKAGE* pPackage = NULL;
-        HRESULT hr = GetPrereqPackage(wzPackageId, &pPrereqPackage, &pPackage);
-        if (SUCCEEDED(hr) && BOOTSTRAPPER_PACKAGE_STATE_PRESENT == state)
+
+        if (BOOTSTRAPPER_PACKAGE_STATE_PRESENT == state &&
+            SUCCEEDED(GetPackageInfo(wzPackageId, &pPackageInfo, &pPackage)) &&
+            pPackageInfo)
         {
-            // If the prerequisite package is already installed, remember that.
-            pPrereqPackage->fWasAlreadyInstalled = TRUE;
+            // If the package is already installed, remember that.
+            pPackageInfo->fWasAlreadyInstalled = TRUE;
         }
 
         return S_OK;
@@ -314,9 +320,11 @@ public: // IBootstrapperApplication
                 m_fPrereqAlreadyInstalled = TRUE;
 
                 // At this point we have to assume that all prerequisite packages need to be installed, so set to false if any of them aren't installed.
-                for (DWORD i = 0; i < m_cPrereqPackages; ++i)
+                for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
                 {
-                    if (m_rgPrereqPackages[i].sczPackageId && !m_rgPrereqPackages[i].fWasAlreadyInstalled)
+                    BAL_INFO_PACKAGE* pPackage = &m_Bundle.packages.rgPackages[i];
+                    WIXSTDBA_PACKAGE_INFO* pPackageInfo = reinterpret_cast<WIXSTDBA_PACKAGE_INFO*>(pPackage->pvCustomData);
+                    if (pPackage->fPrereqPackage && pPackageInfo && !pPackageInfo->fWasAlreadyInstalled)
                     {
                         m_fPrereqAlreadyInstalled = FALSE;
                         break;
@@ -384,17 +392,17 @@ public: // IBootstrapperApplication
         )
     {
         HRESULT hr = S_OK;
-        WIXSTDBA_PREREQ_PACKAGE* pPrereqPackage = NULL;
+        WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
         BAL_INFO_PACKAGE* pPackage = NULL;
 
         // If we're planning to install a prerequisite, install it. The prerequisite needs to be installed
         // in all cases (even uninstall!) so the BA can load next.
         if (m_fPrereq)
         {
-            // Only install prerequisite packages, and check the InstallCondition on prerequisite support packages.
+            // Only install prerequisite packages, and check the InstallCondition on them.
             BOOL fInstall = FALSE;
-            hr = GetPrereqPackage(wzPackageId, &pPrereqPackage, &pPackage);
-            if (SUCCEEDED(hr) && pPackage)
+            hr = GetPackageInfo(wzPackageId, &pPackageInfo, &pPackage);
+            if (SUCCEEDED(hr) && pPackage->fPrereqPackage && pPackageInfo)
             {
                 if (pPackage->sczInstallCondition && *pPackage->sczInstallCondition)
                 {
@@ -410,7 +418,7 @@ public: // IBootstrapperApplication
                     fInstall = TRUE;
                 }
 
-                pPrereqPackage->fPlannedToBeInstalled = fInstall;
+                pPackageInfo->fPlannedToBeInstalled = fInstall;
             }
 
             if (fInstall)
@@ -459,9 +467,11 @@ public: // IBootstrapperApplication
             m_fPrereqAlreadyInstalled = TRUE;
 
             // Now that we've planned the packages, we can focus on the prerequisite packages that are supposed to be installed.
-            for (DWORD i = 0; i < m_cPrereqPackages; ++i)
+            for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
             {
-                if (m_rgPrereqPackages[i].sczPackageId && !m_rgPrereqPackages[i].fWasAlreadyInstalled && m_rgPrereqPackages[i].fPlannedToBeInstalled)
+                BAL_INFO_PACKAGE* pPackage = &m_Bundle.packages.rgPackages[i];
+                WIXSTDBA_PACKAGE_INFO* pPackageInfo = reinterpret_cast<WIXSTDBA_PACKAGE_INFO*>(pPackage->pvCustomData);
+                if (pPackage->fPrereqPackage && pPackageInfo && !pPackageInfo->fWasAlreadyInstalled && pPackageInfo->fPlannedToBeInstalled)
                 {
                     m_fPrereqAlreadyInstalled = FALSE;
                     break;
@@ -706,6 +716,8 @@ public: // IBootstrapperApplication
         __in_z LPCWSTR wzPackageId,
         __in BOOL fExecute,
         __in BOOTSTRAPPER_ACTION_STATE action,
+        __in INSTALLUILEVEL uiLevel,
+        __in BOOL fDisableExternalUiHandler,
         __inout BOOL* pfCancel
         )
     {
@@ -750,12 +762,7 @@ public: // IBootstrapperApplication
                 wz = sczFormattedString ? sczFormattedString : pPackage->sczDisplayName ? pPackage->sczDisplayName : wzPackageId;
             }
 
-            // Needs to match MsiEngineCalculateInstallUiLevel in msiengine.cpp in Burn.
-            fShowingInternalUiThisPackage = pPackage && pPackage->fDisplayInternalUI &&
-                                            BOOTSTRAPPER_ACTION_STATE_UNINSTALL != action &&
-                                            BOOTSTRAPPER_ACTION_STATE_REPAIR != action &&
-                                            (BOOTSTRAPPER_DISPLAY_FULL == m_command.display ||
-                                            BOOTSTRAPPER_DISPLAY_PASSIVE == m_command.display);
+            fShowingInternalUiThisPackage = INSTALLUILEVEL_NONE != (INSTALLUILEVEL_NONE & uiLevel);
 
             ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_EXECUTE_PROGRESS_PACKAGE_TEXT, wz);
             ThemeSetTextControl(m_pTheme, WIXSTDBA_CONTROL_OVERALL_PROGRESS_PACKAGE_TEXT, wz);
@@ -763,7 +770,7 @@ public: // IBootstrapperApplication
 
         ::EnterCriticalSection(&m_csShowingInternalUiThisPackage);
         m_fShowingInternalUiThisPackage = fShowingInternalUiThisPackage;
-        hr = __super::OnExecutePackageBegin(wzPackageId, fExecute, action, pfCancel);
+        hr = __super::OnExecutePackageBegin(wzPackageId, fExecute, action, uiLevel, fDisableExternalUiHandler, pfCancel);
         ::LeaveCriticalSection(&m_csShowingInternalUiThisPackage);
 
         ReleaseStr(sczFormattedString);
@@ -811,16 +818,16 @@ public: // IBootstrapperApplication
 
         hr = __super::OnExecutePackageComplete(wzPackageId, hrStatus, restart, recommendation, pAction);
 
-        WIXSTDBA_PREREQ_PACKAGE* pPrereqPackage = NULL;
+        WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
         BAL_INFO_PACKAGE* pPackage;
-        HRESULT hrPrereq = GetPrereqPackage(wzPackageId, &pPrereqPackage, &pPackage);
-        if (SUCCEEDED(hrPrereq))
+        HRESULT hrPrereq = GetPackageInfo(wzPackageId, &pPackageInfo, &pPackage);
+        if (SUCCEEDED(hrPrereq) && pPackageInfo)
         {
-            pPrereqPackage->fSuccessfullyInstalled = SUCCEEDED(hrStatus);
+            pPackageInfo->fSuccessfullyInstalled = SUCCEEDED(hrStatus);
 
             // If the prerequisite required a restart (any restart) then do an immediate
             // restart to ensure that the bundle will get launched again post reboot.
-            if (BOOTSTRAPPER_APPLY_RESTART_NONE != restart)
+            if (m_fPrereq && pPackage->fPrereqPackage && BOOTSTRAPPER_APPLY_RESTART_NONE != restart)
             {
                 *pAction = BOOTSTRAPPER_EXECUTEPACKAGECOMPLETE_ACTION_RESTART;
             }
@@ -931,11 +938,13 @@ public: // IBootstrapperApplication
             m_fPrereqInstalled = TRUE;
             BOOL fInstalledAPackage = FALSE;
 
-            for (DWORD i = 0; i < m_cPrereqPackages; ++i)
+            for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
             {
-                if (m_rgPrereqPackages[i].sczPackageId && m_rgPrereqPackages[i].fPlannedToBeInstalled && !m_rgPrereqPackages[i].fWasAlreadyInstalled)
+                BAL_INFO_PACKAGE* pPackage = &m_Bundle.packages.rgPackages[i];
+                WIXSTDBA_PACKAGE_INFO* pPackageInfo = reinterpret_cast<WIXSTDBA_PACKAGE_INFO*>(pPackage->pvCustomData);
+                if (pPackage->fPrereqPackage && pPackageInfo && pPackageInfo->fPlannedToBeInstalled && !pPackageInfo->fWasAlreadyInstalled)
                 {
-                    if (m_rgPrereqPackages[i].fSuccessfullyInstalled)
+                    if (pPackageInfo->fSuccessfullyInstalled)
                     {
                         fInstalledAPackage = TRUE;
                     }
@@ -1163,6 +1172,9 @@ public: // IBootstrapperApplication
             break;
         case BOOTSTRAPPER_APPLICATION_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE:
             OnLaunchApprovedExeCompleteFallback(reinterpret_cast<BA_ONLAUNCHAPPROVEDEXECOMPLETE_ARGS*>(pvArgs), reinterpret_cast<BA_ONLAUNCHAPPROVEDEXECOMPLETE_RESULTS*>(pvResults));
+            break;
+        case BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANMSIPACKAGE:
+            OnPlanMsiPackageFallback(reinterpret_cast<BA_ONPLANMSIPACKAGE_ARGS*>(pvArgs), reinterpret_cast<BA_ONPLANMSIPACKAGE_RESULTS*>(pvResults));
             break;
         default:
             BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "WIXSTDBA: Forwarding unknown BA message: %d", message);
@@ -1617,6 +1629,18 @@ private: // privates
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONLAUNCHAPPROVEDEXECOMPLETE, pArgs, pResults, m_pvBAFunctionsProcContext);
     }
 
+    void OnPlanMsiPackageFallback(
+        __in BA_ONPLANMSIPACKAGE_ARGS* pArgs,
+        __inout BA_ONPLANMSIPACKAGE_RESULTS* pResults
+        )
+    {
+        BURN_MSI_PROPERTY actionMsiProperty = pResults->actionMsiProperty;
+        INSTALLUILEVEL uiLevel = pResults->uiLevel;
+        BOOL fDisableExternalUiHandler = pResults->fDisableExternalUiHandler;
+        m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANMSIPACKAGE, pArgs, pResults, m_pvBAFunctionsProcContext);
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_MSI_PACKAGE, m_hModule, pArgs->wzPackageId, actionMsiProperty, uiLevel, fDisableExternalUiHandler ? "yes" : "no", pResults->actionMsiProperty, pResults->uiLevel, pResults->fDisableExternalUiHandler ? "yes" : "no");
+    }
+
     //
     // UiThreadProc - entrypoint for UI thread.
     //
@@ -1752,10 +1776,13 @@ private: // privates
         GetBundleFileVersion();
         // don't fail if we couldn't get the version info; best-effort only
 
+        hr = InitializePackageInfo();
+        BalExitOnFailure(hr, "Failed to initialize wixstdba package information.");
+
         if (m_fPrereq)
         {
-            hr = ParsePrerequisiteInformationFromXml(pixdManifest);
-            BalExitOnFailure(hr, "Failed to read prerequisite information.");
+            hr = InitializePrerequisiteInformation();
+            BalExitOnFailure(hr, "Failed to initialize prerequisite information.");
         }
         else
         {
@@ -1982,100 +2009,77 @@ private: // privates
     }
 
 
-    HRESULT ParsePrerequisiteInformationFromXml(
-        __in IXMLDOMDocument* pixdManifest
+    HRESULT InitializePackageInfo()
+    {
+        HRESULT hr = S_OK;
+        BAL_INFO_PACKAGE* pPackage = NULL;
+
+        for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
+        {
+            pPackage = &m_Bundle.packages.rgPackages[i];
+
+            hr = InitializePackageInfoForPackage(pPackage);
+            BalExitOnFailure(hr, "Failed to initialize wixstdba package info for package: %ls.", pPackage->sczId);
+        }
+
+    LExit:
+        return hr;
+    }
+
+
+    HRESULT InitializePackageInfoForPackage(
+        __in BAL_INFO_PACKAGE* pPackage
         )
     {
         HRESULT hr = S_OK;
-        IXMLDOMNode* pNode = NULL;
-        IXMLDOMNodeList* pNodes = NULL;
-        DWORD cNodes = 0;
-        LPWSTR scz = NULL;
-        WIXSTDBA_PREREQ_PACKAGE* pPrereqPackage = NULL;
+
+        pPackage->pvCustomData = MemAlloc(sizeof(WIXSTDBA_PACKAGE_INFO), TRUE);
+        BalExitOnNull(pPackage->pvCustomData, hr, E_OUTOFMEMORY, "Failed to allocate memory for wixstdba package info.");
+
+    LExit:
+        return hr;
+    }
+
+
+    HRESULT InitializePrerequisiteInformation()
+    {
+        HRESULT hr = S_OK;
         BAL_INFO_PACKAGE* pPackage = NULL;
 
-        hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixMbaPrereqInformation", &pNodes);
-        if (S_FALSE == hr)
+        for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
         {
-            hr = E_INVALIDARG;
-            BalExitOnFailure(hr, "BootstrapperApplication.xml manifest is missing prerequisite information.");
-        }
-        BalExitOnFailure(hr, "Failed to select prerequisite information nodes.");
-
-        hr = pNodes->get_length((long*)&cNodes);
-        BalExitOnFailure(hr, "Failed to get prerequisite information node count.");
-
-        m_cPrereqPackages = cNodes;
-        m_rgPrereqPackages = static_cast<WIXSTDBA_PREREQ_PACKAGE*>(MemAlloc(sizeof(WIXSTDBA_PREREQ_PACKAGE) * m_cPrereqPackages, TRUE));
-
-        hr = DictCreateWithEmbeddedKey(&m_shPrereqSupportPackages, m_cPrereqPackages, reinterpret_cast<void **>(&m_rgPrereqPackages), offsetof(WIXSTDBA_PREREQ_PACKAGE, sczPackageId), DICT_FLAG_NONE);
-        BalExitOnFailure(hr, "Failed to create the prerequisite package dictionary.");
-
-        for (DWORD i = 0; i < cNodes; ++i)
-        {
-            hr = XmlNextElement(pNodes, &pNode, NULL);
-            BalExitOnFailure(hr, "Failed to get next node.");
-
-            hr = XmlGetAttributeEx(pNode, L"PackageId", &scz);
-            BalExitOnFailure(hr, "Failed to get @PackageId.");
-
-            hr = DictGetValue(m_shPrereqSupportPackages, scz, reinterpret_cast<void **>(&pPrereqPackage));
-            if (SUCCEEDED(hr))
+            pPackage = &m_Bundle.packages.rgPackages[i];
+            if (!pPackage->fPrereqPackage)
             {
-                hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-                BalExitOnFailure(hr, "Duplicate prerequisite information: %ls", scz);
-            }
-            else if (E_NOTFOUND != hr)
-            {
-                BalExitOnFailure(hr, "Failed to check if \"%ls\" was in the prerequisite package dictionary.", scz);
+                continue;
             }
 
-            hr = BalInfoFindPackageById(&m_Bundle.packages, scz, &pPackage);
-            BalExitOnFailure(hr, "Failed to get info about \"%ls\" from BootstrapperApplicationData.", scz);
-
-            pPrereqPackage = &m_rgPrereqPackages[i];
-            pPrereqPackage->sczPackageId = pPackage->sczId;
-            hr = DictAddValue(m_shPrereqSupportPackages, pPrereqPackage);
-            BalExitOnFailure(hr, "Failed to add \"%ls\" to the prerequisite package dictionary.", pPrereqPackage->sczPackageId);
-
-            hr = XmlGetAttributeEx(pNode, L"LicenseFile", &scz);
-            if (E_NOTFOUND != hr)
+            if (pPackage->sczPrereqLicenseFile)
             {
-                BalExitOnFailure(hr, "Failed to get @LicenseFile.");
-
                 if (m_sczLicenseFile)
                 {
                     hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
                     BalExitOnFailure(hr, "More than one license file specified in prerequisite info.");
                 }
 
-                m_sczLicenseFile = scz;
-                scz = NULL;
+                hr = StrAllocString(&m_sczLicenseFile, pPackage->sczPrereqLicenseFile, 0);
+                BalExitOnFailure(hr, "Failed to copy license file location from prereq package.");
             }
 
-            hr = XmlGetAttributeEx(pNode, L"LicenseUrl", &scz);
-            if (E_NOTFOUND != hr)
+            if (pPackage->sczPrereqLicenseUrl)
             {
-                BalExitOnFailure(hr, "Failed to get @LicenseUrl.");
-
                 if (m_sczLicenseUrl)
                 {
                     hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
                     BalExitOnFailure(hr, "More than one license URL specified in prerequisite info.");
                 }
 
-                m_sczLicenseUrl = scz;
-                scz = NULL;
+                hr = StrAllocString(&m_sczLicenseUrl, pPackage->sczPrereqLicenseUrl, 0);
+                BalExitOnFailure(hr, "Failed to copy license URL from prereq package.");
             }
-
-            // Prepare next iteration.
-            ReleaseNullObject(pNode);
         }
 
     LExit:
-        ReleaseObject(pNode);
-        ReleaseObject(pNodes);
-        ReleaseStr(scz);
         return hr;
     }
 
@@ -2182,37 +2186,31 @@ private: // privates
         return hr;
     }
 
-    HRESULT GetPrereqPackage(
+    HRESULT GetPackageInfo(
         __in_z LPCWSTR wzPackageId,
-        __out WIXSTDBA_PREREQ_PACKAGE** ppPrereqPackage,
+        __out WIXSTDBA_PACKAGE_INFO** ppPackageInfo,
         __out BAL_INFO_PACKAGE** ppPackage
         )
     {
         HRESULT hr = E_NOTFOUND;
-        WIXSTDBA_PREREQ_PACKAGE* pPrereqPackage = NULL;
+        WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
         BAL_INFO_PACKAGE* pPackage = NULL;
 
         Assert(wzPackageId && *wzPackageId);
         Assert(ppPackage);
-        Assert(ppPrereqPackage);
+        Assert(ppPackageInfo);
 
-        if (m_shPrereqSupportPackages)
+        hr = BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
+        if (E_NOTFOUND != hr)
         {
-            hr = DictGetValue(m_shPrereqSupportPackages, wzPackageId, reinterpret_cast<void **>(&pPrereqPackage));
-            if (E_NOTFOUND != hr)
-            {
-                ExitOnFailure(hr, "Failed to check the dictionary of prerequisite packages.");
+            ExitOnFailure(hr, "Failed trying to find the requested package.");
 
-                // Ignore error.
-                BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
-            }
+            pPackageInfo = reinterpret_cast<WIXSTDBA_PACKAGE_INFO*>(pPackage->pvCustomData);
         }
 
-        if (pPrereqPackage)
-        {
-            *ppPrereqPackage = pPrereqPackage;
-            *ppPackage = pPackage;
-        }
+        *ppPackageInfo = pPackageInfo;
+        *ppPackage = pPackage;
+
     LExit:
         return hr;
     }
@@ -3636,9 +3634,6 @@ public:
         m_fSupportCacheOnly = FALSE;
 
         m_sdOverridableVariables = NULL;
-        m_shPrereqSupportPackages = NULL;
-        m_rgPrereqPackages = NULL;
-        m_cPrereqPackages = 0;
         m_pTaskbarList = NULL;
         m_uTaskbarButtonCreatedMessage = UINT_MAX;
         m_fTaskbarButtonOK = FALSE;
@@ -3667,11 +3662,14 @@ public:
         AssertSz(!::IsWindow(m_hWnd), "Window should have been destroyed before destructor.");
         AssertSz(!m_pTheme, "Theme should have been released before destructor.");
 
+        for (DWORD i = 0; i < m_Bundle.packages.cPackages; ++i)
+        {
+            ReleaseMem(m_Bundle.packages.rgPackages[i].pvCustomData);
+        }
+
         ::DeleteCriticalSection(&m_csShowingInternalUiThisPackage);
         ReleaseObject(m_pTaskbarList);
         ReleaseDict(m_sdOverridableVariables);
-        ReleaseDict(m_shPrereqSupportPackages);
-        ReleaseMem(m_rgPrereqPackages);
         ReleaseStr(m_sczFailedMessage);
         ReleaseStr(m_sczConfirmCloseMessage);
         BalConditionsUninitialize(&m_Conditions);
@@ -3738,10 +3736,6 @@ private:
     BOOL m_fSupportCacheOnly;
 
     STRINGDICT_HANDLE m_sdOverridableVariables;
-
-    WIXSTDBA_PREREQ_PACKAGE* m_rgPrereqPackages;
-    DWORD m_cPrereqPackages;
-    STRINGDICT_HANDLE m_shPrereqSupportPackages;
 
     BOOL m_fPrereq;
     BOOL m_fPrereqInstalled;

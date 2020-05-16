@@ -71,3 +71,10 @@ Language=English
 WIXSTDBA: Planned MSI feature: %2!ls! for %1!ls!, wixstdba requested: %3!hs!, bafunctions requested: %4!hs!
 .
 
+MessageId=7
+Severity=Success
+SymbolicName=MSG_WIXSTDBA_PLANNED_MSI_PACKAGE
+Language=English
+WIXSTDBA: Planned MSI package: %1!ls!, wixstdba requested: actionMsiProperty=%2!d!;uiLevel=%3!d!;disableExternalUiHandler=%4!hs!, bafunctions requested: actionMsiProperty=%5!d!;uiLevel=%6!d!;disableExternalUiHandler=%7!hs!
+.
+

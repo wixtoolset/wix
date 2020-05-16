@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -11,6 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.19" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.22" />
   </ItemGroup>
 </Project>
