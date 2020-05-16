@@ -104,6 +104,23 @@ namespace WixToolset.Bal
                     {
                         switch (attribute.Name.LocalName)
                         {
+                            case "DisplayInternalUICondition":
+                                switch (parentElement.Name.LocalName)
+                                {
+                                    case "MsiPackage":
+                                    case "MspPackage":
+                                        var displayInternalUICondition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
+                                        section.AddTuple(new WixBalPackageInfoTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, packageId))
+                                        {
+                                            PackageId = packageId,
+                                            DisplayInternalUICondition = displayInternalUICondition,
+                                        });
+                                        break;
+                                    default:
+                                        this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
+                                        break;
+                                }
+                                break;
                             case "PrereqLicenseFile":
 
                                 if (!this.prereqInfoTuplesByPackageId.TryGetValue(packageId, out prereqInfo))

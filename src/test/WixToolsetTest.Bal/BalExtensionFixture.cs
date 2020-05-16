@@ -4,12 +4,47 @@ namespace WixToolsetTest.Bal
 {
     using System.IO;
     using System.Linq;
+    using System.Xml;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
     using Xunit;
 
     public class BalExtensionFixture
     {
+        [Fact]
+        public void CanBuildUsingDisplayInternalUICondition()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\WixStdBa");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "DisplayInternalUIConditionBundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", Path.Combine(bundleSourceFolder, "data"),
+                    "-o", bundleFile,
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var balPackageInfos = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
+                var balPackageInfo = (XmlNode)Assert.Single(balPackageInfos);
+                Assert.Equal("<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='1' />", balPackageInfo.GetTestXml());
+            }
+        }
+
         [Fact]
         public void CanBuildUsingWixStdBa()
         {

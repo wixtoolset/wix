@@ -456,6 +456,53 @@ public: // IBootstrapperApplication
     }
 
 
+    virtual STDMETHODIMP OnPlanMsiPackage(
+        __in_z LPCWSTR wzPackageId,
+        __in BOOL fExecute,
+        __in BOOTSTRAPPER_ACTION_STATE action,
+        __inout BOOL* pfCancel,
+        __inout BURN_MSI_PROPERTY* pActionMsiProperty,
+        __inout INSTALLUILEVEL* pUiLevel,
+        __inout BOOL* pfDisableExternalUiHandler
+        )
+    {
+        HRESULT hr = S_OK;
+        WIXSTDBA_PACKAGE_INFO* pPackageInfo = NULL;
+        BAL_INFO_PACKAGE* pPackage = NULL;
+        BOOL fShowInternalUI = FALSE;
+        INSTALLUILEVEL uiLevel = INSTALLUILEVEL_NOCHANGE;
+
+        switch (m_command.display)
+        {
+        case BOOTSTRAPPER_DISPLAY_FULL:
+            uiLevel = INSTALLUILEVEL_FULL;
+            break;
+
+        case BOOTSTRAPPER_DISPLAY_PASSIVE:
+            uiLevel = INSTALLUILEVEL_REDUCED;
+            break;
+        }
+
+        if (INSTALLUILEVEL_NOCHANGE != uiLevel)
+        {
+            hr = GetPackageInfo(wzPackageId, &pPackageInfo, &pPackage);
+            if (SUCCEEDED(hr) && pPackage->sczDisplayInternalUICondition)
+            {
+                hr = BalEvaluateCondition(pPackage->sczDisplayInternalUICondition, &fShowInternalUI);
+                BalExitOnFailure(hr, "Failed to evaluate condition for package '%ls': %ls", wzPackageId, pPackage->sczDisplayInternalUICondition);
+
+                if (fShowInternalUI)
+                {
+                    *pUiLevel = uiLevel;
+                }
+            }
+        }
+
+    LExit:
+        return __super::OnPlanMsiPackage(wzPackageId, fExecute, action, pfCancel, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler);
+    }
+
+
     virtual STDMETHODIMP OnPlanComplete(
         __in HRESULT hrStatus
         )

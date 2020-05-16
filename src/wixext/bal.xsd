@@ -277,6 +277,21 @@
         </xs:annotation>
     </xs:attribute>
 
+    <xs:attribute name="DisplayInternalUICondition" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>
+                Specifies whether the bundle will show the UI authored into the msi package. If not specified or the condition evaluates
+                to false, all information is routed to the bootstrapper application to provide a unified installation experience.
+                Otherwise, the UI authored into the msi package will be displayed on top of any bootstrapper application UI.
+                WixStdBA doesn't support EmbeddedUI.
+            </xs:documentation>
+            <xs:appinfo>
+                <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+                <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+
     <xs:attribute name="Overridable" type="YesNoType">
         <xs:annotation>
             <xs:documentation>

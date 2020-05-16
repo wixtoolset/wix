@@ -11,6 +11,7 @@ namespace WixToolset.Bal
         WixBalBAFactoryAssembly,
         WixBalBAFunctions,
         WixBalCondition,
+        WixBalPackageInfo,
         WixDncOptions,
         WixMbaPrereqInformation,
         WixStdbaOptions,
@@ -44,6 +45,9 @@ namespace WixToolset.Bal
                 case BalTupleDefinitionType.WixBalCondition:
                     return BalTupleDefinitions.WixBalCondition;
 
+                case BalTupleDefinitionType.WixBalPackageInfo:
+                    return BalTupleDefinitions.WixBalPackageInfo;
+
                 case BalTupleDefinitionType.WixDncOptions:
                     return BalTupleDefinitions.WixDncOptions;
 
@@ -66,6 +70,7 @@ namespace WixToolset.Bal
             WixBalBAFactoryAssembly.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
             WixBalBAFunctions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
             WixBalCondition.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
+            WixBalPackageInfo.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
             WixDncOptions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
             WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
             WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag);
