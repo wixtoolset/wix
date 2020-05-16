@@ -16,6 +16,8 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
+        private static readonly char[] ColonCharacter = new[] { ':' };
+
         public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadTuple> payloadTuples, string intermediateFolder)
         {
             this.Section = section;
@@ -271,6 +273,51 @@ namespace WixToolset.Core.Burn.Bundles
                         if (!field.IsNull())
                         {
                             writer.WriteAttributeString(field.Definition.Name, field.AsString());
+                        }
+                    }
+
+                    writer.WriteEndElement();
+                }
+            }
+
+            var dataTablesById = this.Section.Tuples.OfType<WixCustomTableTuple>()
+                                                .Where(t => t.Unreal && t.Id != null)
+                                                .ToDictionary(t => t.Id.Id);
+            var dataRowsByTable = this.Section.Tuples.OfType<WixCustomRowTuple>()
+                                              .GroupBy(t => t.Table);
+            foreach (var tableDataRows in dataRowsByTable)
+            {
+                var tableName = tableDataRows.Key;
+                if (!dataTablesById.TryGetValue(tableName, out var tableTuple))
+                {
+                    // This should have been a linker error.
+                    continue;
+                }
+
+                var columnNames = tableTuple.ColumnNames.Split('\t');
+
+                // We simply assert that the table (and field) name is valid, because
+                // this is up to the extension developer to get right. An author will
+                // only affect the attribute value, and that will get properly escaped.
+#if DEBUG
+                Debug.Assert(Common.IsIdentifier(tableName));
+                foreach (var columnName in columnNames)
+                {
+                    Debug.Assert(Common.IsIdentifier(columnName));
+                }
+#endif // DEBUG
+
+                foreach (var rowTuple in tableDataRows)
+                {
+                    writer.WriteStartElement(tableName);
+
+                    //var rowFields = rowTuple.FieldDataSeparated;
+                    foreach (var field in rowTuple.FieldDataSeparated)
+                    {
+                        var splitField = field.Split(ColonCharacter, 2);
+                        if (splitField.Length == 2)
+                        {
+                            writer.WriteAttributeString(splitField[0], splitField[1]);
                         }
                     }
 

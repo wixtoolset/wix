@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <PackageGroupRef Id="MinimalPackageGroup" />
+        </PackageGroup>
+
+        <CustomTable Id="BundleCustomTable" Unreal="yes">
+            <Column Id="Id" Type="string" PrimaryKey="yes" />
+            <Column Id="Column2" Type="string" PrimaryKey="yes" />
+
+            <Row>
+                <Data Column="Id">one</Data>
+                <Data Column="Column2">two</Data>
+            </Row>
+            <Row>
+                <Data Column="Column2">&lt;</Data>
+                <Data Column="Id">&gt;</Data>
+            </Row>
+            <Row>
+                <Data Column="Id">1</Data>
+                <Data Column="Column2">2</Data>
+            </Row>
+        </CustomTable>
+    </Fragment>
+</Wix>
