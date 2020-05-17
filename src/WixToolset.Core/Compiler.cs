@@ -79,6 +79,12 @@ namespace WixToolset.Core
         public Platform CurrentPlatform => this.Context.Platform;
 
         /// <summary>
+        /// Gets or sets the platform which the compiler will use when defaulting 64-bit attributes and elements.
+        /// </summary>
+        /// <value>The platform which the compiler will use when defaulting 64-bit attributes and elements.</value>
+        public bool IsCurrentPlatform64Bit => this.Context.Platform == Platform.ARM64 || this.Context.Platform == Platform.IA64 || this.Context.Platform == Platform.X64;
+
+        /// <summary>
         /// Gets or sets the option to show pedantic messages.
         /// </summary>
         /// <value>The option to show pedantic messages.</value>
@@ -1777,7 +1783,7 @@ namespace WixToolset.Core
                 }
             }
 
-            if (!explicitWin64 && (Platform.IA64 == this.CurrentPlatform || Platform.X64 == this.CurrentPlatform))
+            if (!explicitWin64 && this.IsCurrentPlatform64Bit)
             {
                 search64bit = true;
             }
@@ -2250,7 +2256,7 @@ namespace WixToolset.Core
                 }
             }
 
-            if (!explicitWin64 && (Platform.IA64 == this.CurrentPlatform || Platform.X64 == this.CurrentPlatform))
+            if (!explicitWin64 && this.IsCurrentPlatform64Bit)
             {
                 //bits |= MsiInterop.MsidbComponentAttributes64bit;
                 win64 = true;
@@ -3405,7 +3411,7 @@ namespace WixToolset.Core
                 id = Identifier.Invalid;
             }
 
-            if (!explicitWin64 && (CustomActionTargetType.VBScript == targetType || CustomActionTargetType.JScript == targetType) && (Platform.IA64 == this.CurrentPlatform || Platform.X64 == this.CurrentPlatform))
+            if (!explicitWin64 && this.IsCurrentPlatform64Bit && (CustomActionTargetType.VBScript == targetType || CustomActionTargetType.JScript == targetType))
             {
                 win64 = true;
             }
@@ -5509,6 +5515,12 @@ namespace WixToolset.Core
                             break;
                         case "ia64":
                             procArch = "ia64";
+                            break;
+                        case "arm":
+                            procArch = "arm";
+                            break;
+                        case "arm64":
+                            procArch = "arm64";
                             break;
                         case "":
                             break;

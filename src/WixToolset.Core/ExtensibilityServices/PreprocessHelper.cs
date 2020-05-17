@@ -244,6 +244,9 @@ namespace WixToolset.Core.ExtensibilityServices
                                 case Platform.ARM:
                                     return "arm";
 
+                                case Platform.ARM64:
+                                    return "arm64";
+
                                 default:
                                     throw new ArgumentException("Unknown platform enumeration '{0}' encountered.", context.Platform.ToString());
                             }

@@ -90,7 +90,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                         {
                             if (null != record)
                             {
-                                // since the cabinets are stored in case-sensitive streams inside the msi, but the file system is not case-sensitive,
+                                // since the cabinets are stored in case-sensitive streams inside the msi, but the file system is not (typically) case-sensitive,
                                 // embedded cabinets must be extracted to a canonical file name (like their diskid) to ensure extraction will always work
                                 var cabinetFile = Path.Combine(this.IntermediateFolder, String.Concat("Media", Path.DirectorySeparatorChar, diskId.ToString(CultureInfo.InvariantCulture), ".cab"));
 
