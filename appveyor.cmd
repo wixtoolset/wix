@@ -9,5 +9,8 @@ msbuild -p:Configuration=Release src\test\WixToolsetTest.Firewall\WixToolsetTest
 
 msbuild -p:Configuration=Release -t:Pack src\wixext\WixToolset.Firewall.wixext.csproj
 
+msbuild -p:Configuration=Release src\test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj
+dotnet test -c Release --no-build src\test\WixToolsetTest.Firewall
+
 @popd
 @endlocal

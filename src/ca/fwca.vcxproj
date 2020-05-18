@@ -2,10 +2,37 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props')" />
-  <Import Project="..\..\packages\WixToolset.WcaUtil.4.0.8\build\WixToolset.WcaUtil.props" Condition="Exists('..\..\packages\WixToolset.WcaUtil.4.0.8\build\WixToolset.WcaUtil.props')" />
+  <Import Project="..\..\packages\WixToolset.DUtil.4.0.23\build\WixToolset.DUtil.props" Condition="Exists('..\..\packages\WixToolset.DUtil.4.0.23\build\WixToolset.DUtil.props')" />
+  <Import Project="..\..\packages\WixToolset.WcaUtil.4.0.11\build\WixToolset.WcaUtil.props" Condition="Exists('..\..\packages\WixToolset.WcaUtil.4.0.11\build\WixToolset.WcaUtil.props')" />
 
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+
+    <ProjectConfiguration Include="Debug|X64">
+      <Configuration>Debug</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|X64">
+      <Configuration>Release</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -20,7 +47,7 @@
     <ProjectGuid>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <TargetName>fwca</TargetName>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>fwca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Firewall CustomAction</Description>
@@ -57,7 +84,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.18\build\WixToolset.DUtil.props'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.WcaUtil.4.0.8\build\WixToolset.WcaUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.WcaUtil.4.0.8\build\WixToolset.WcaUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.DUtil.4.0.23\build\WixToolset.DUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.DUtil.4.0.23\build\WixToolset.DUtil.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.WcaUtil.4.0.11\build\WixToolset.WcaUtil.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.WcaUtil.4.0.11\build\WixToolset.WcaUtil.props'))" />
   </Target>
 </Project>

@@ -7,6 +7,7 @@ namespace WixToolset.Firewall
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
+    using WixToolset.Extensibility.Data;
     using WixToolset.Firewall.Tuples;
 
     /// <summary>
@@ -292,18 +293,8 @@ namespace WixToolset.Firewall
                     tuple.Attributes = attributes;
                 }
 
-                if (this.Context.Platform == Platform.ARM)
-                {
-                    // Ensure ARM version of the CA is referenced
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsInstall_ARM");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsUninstall_ARM");
-                }
-                else
-                {
-                    // All other supported platforms use x86
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsInstall");
-                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, TupleDefinitions.CustomAction, "WixSchedFirewallExceptionsUninstall");
-                }
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFirewallExceptionsUninstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64 | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
             }
         }
 

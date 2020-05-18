@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Project DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0086\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0086\build\WixToolset.MSBuild.props')" />
+  <Import Project="..\..\packages\WixToolset.MSBuild.4.0.0-build-0093\build\WixToolset.MSBuild.props" Condition="Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0093\build\WixToolset.MSBuild.props')" />
   <Import Project="..\FindLocalWix.props" />
   <PropertyGroup>
     <ProjectGuid>{1acffefd-505a-41a5-acbf-a02b7b473aa2}</ProjectGuid>
@@ -13,12 +13,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="FirewallExtension.wxs" />
+    <Compile Include="FirewallExtension_arm.wxs" />
+    <Compile Include="FirewallExtension_arm64.wxs" />
+    <Compile Include="FirewallExtension_x64.wxs" />
     <Compile Include="FirewallExtension_x86.wxs" />
     <EmbeddedResource Include="en-us.wxl" />
     <EmbeddedResource Include="es-es.wxl" />
     <EmbeddedResource Include="ja-jp.wxl" />
     <EmbeddedResource Include="pl-pl.wxl" />
   </ItemGroup>
+
+  <ItemGroup>
+    <BindInputPaths Include="$(OutputPath)Win32">
+        <BindName>x86</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath)x64)">
+        <BindName>x64</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath)arm)">
+        <BindName>arm</BindName>
+    </BindInputPaths>
+    <BindInputPaths Include="$(OutputPath)arm64)">
+        <BindName>arm64</BindName>
+    </BindInputPaths>
+  </ItemGroup>
+
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
@@ -26,6 +45,22 @@
     <ProjectReference Include="..\ca\fwca.vcxproj">
       <Name>fwca</Name>
       <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
+      <Properties>Platform=ARM</Properties>
+    </ProjectReference>
+    <ProjectReference Include="..\ca\fwca.vcxproj">
+      <Name>fwca</Name>
+      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
+      <Properties>Platform=ARM64</Properties>
+    </ProjectReference>
+    <ProjectReference Include="..\ca\fwca.vcxproj">
+      <Name>fwca</Name>
+      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
+      <Properties>Platform=x86</Properties>
+    </ProjectReference>
+    <ProjectReference Include="..\ca\fwca.vcxproj">
+      <Name>fwca</Name>
+      <Project>{F72D34CA-48DA-4DFD-91A9-A0C78BEF6981}</Project>
+      <Properties>Platform=x64</Properties>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' AND Exists('$(WixTargetsPath)') " />
@@ -38,7 +73,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0086\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0086\build\WixToolset.MSBuild.props'))" />
+    <Error Condition="!Exists('..\..\packages\WixToolset.MSBuild.4.0.0-build-0093\build\WixToolset.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WixToolset.MSBuild.4.0.0-build-0093\build\WixToolset.MSBuild.props'))" />
   </Target>
   <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
 </Project>

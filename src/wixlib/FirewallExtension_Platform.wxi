@@ -2,33 +2,33 @@
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?include caSuffix.wxi ?>
+    <?include caDecor.wxi ?>
     <Fragment>
         <UIRef Id="WixFirewallErrors" />
         <UI>
-            <ProgressText Action="WixSchedFirewallExceptionsInstall$(var.Suffix)">!(loc.WixSchedFirewallExceptionsInstall)</ProgressText>
-            <ProgressText Action="WixSchedFirewallExceptionsUninstall$(var.Suffix)">!(loc.WixSchedFirewallExceptionsUninstall)</ProgressText>
-            <ProgressText Action="WixRollbackFirewallExceptionsInstall$(var.DeferredSuffix)">!(loc.WixRollbackFirewallExceptionsInstall)</ProgressText>
-            <ProgressText Action="WixExecFirewallExceptionsInstall$(var.DeferredSuffix)">!(loc.WixExecFirewallExceptionsInstall)</ProgressText>
-            <ProgressText Action="WixRollbackFirewallExceptionsUninstall$(var.DeferredSuffix)">!(loc.WixRollbackFirewallExceptionsUninstall)</ProgressText>
-            <ProgressText Action="WixExecFirewallExceptionsUninstall$(var.DeferredSuffix)">!(loc.WixExecFirewallExceptionsUninstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)">!(loc.WixSchedFirewallExceptionsInstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)">!(loc.WixSchedFirewallExceptionsUninstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)RollbackFirewallExceptionsInstall$(var.Suffix)">!(loc.WixRollbackFirewallExceptionsInstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)ExecFirewallExceptionsInstall$(var.Suffix)">!(loc.WixExecFirewallExceptionsInstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)RollbackFirewallExceptionsUninstall$(var.Suffix)">!(loc.WixRollbackFirewallExceptionsUninstall)</ProgressText>
+            <ProgressText Action="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)">!(loc.WixExecFirewallExceptionsUninstall)</ProgressText>
         </UI>
 
-        <CustomAction Id="WixSchedFirewallExceptionsInstall$(var.Suffix)" BinaryKey="WixFirewallCA$(var.Suffix)" DllEntry="SchedFirewallExceptionsInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixSchedFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="WixFirewallCA$(var.Suffix)" DllEntry="SchedFirewallExceptionsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixRollbackFirewallExceptionsInstall$(var.DeferredSuffix)" BinaryKey="WixFirewallCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixExecFirewallExceptionsInstall$(var.DeferredSuffix)" BinaryKey="WixFirewallCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixRollbackFirewallExceptionsUninstall$(var.DeferredSuffix)" BinaryKey="WixFirewallCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
-        <CustomAction Id="WixExecFirewallExceptionsUninstall$(var.DeferredSuffix)" BinaryKey="WixFirewallCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="SchedFirewallExceptionsInstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="SchedFirewallExceptionsUninstall" Execute="immediate" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsInstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsInstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)RollbackFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" />
+        <CustomAction Id="$(var.Prefix)ExecFirewallExceptionsUninstall$(var.Suffix)" BinaryKey="$(var.Prefix)FWCA$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" />
 
         <!--
             We need the firewall on Windows XP SP2 or later.
         -->
         <InstallExecuteSequence>
-            <Custom Action="WixSchedFirewallExceptionsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes">
+            <Custom Action="$(var.Prefix)SchedFirewallExceptionsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes">
                 <![CDATA[ VersionNT >= 600 OR (VersionNT >= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel >= 2) OR (MsiNTProductType > 1 AND ServicePackLevel >= 1))) ]]>
             </Custom>
-            <Custom Action="WixSchedFirewallExceptionsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes">
+            <Custom Action="$(var.Prefix)SchedFirewallExceptionsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes">
                 <![CDATA[ VersionNT >= 600 OR (VersionNT >= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel >= 2) OR (MsiNTProductType > 1 AND ServicePackLevel >= 1))) ]]>
             </Custom>
         </InstallExecuteSequence>
@@ -36,6 +36,6 @@
 
     <!-- Firewall Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="WixFirewallCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))fwca.dll" />
+        <Binary Id="$(var.Prefix)FWCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))fwca.dll" />
     </Fragment>
 </Include>
