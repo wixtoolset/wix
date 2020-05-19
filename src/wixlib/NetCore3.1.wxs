@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <Variable Name="AspNetCoreRuntime31InstallDir" Value="[ProgramFiles64Folder]dotnet\shared\Microsoft.AspNetCore.App\3.1.0" />
+        <util:DirectorySearch Id="AspNetCoreRuntime31Installed" Path="[AspNetCoreRuntime31InstallDir]" Variable="AspNetCoreRuntime31Installed" Result="exists" />
+
+        <WixVariable Id="AspNetCoreRuntime31WebDetectCondition" Value="AspNetCoreRuntime31Installed" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime31WebInstallCondition" Value="" Overridable="yes" />
+
+        <PackageGroup Id="AspNetCoreRuntime31Web">
+            <ExePackage
+                Name="aspnetcore-runtime-3.1.0-win-x64.exe"
+                InstallCommand="/install /quiet /norestart /log &quot;[AspNetCoreRuntime31Log]&quot;"
+                RepairCommand="/repair /quiet /norestart /log &quot;[AspNetCoreRuntime31Log]&quot;"
+                UninstallCommand="/uninstall /quiet /norestart /log &quot;[AspNetCoreRuntime31Log]&quot;"
+                PerMachine="yes"
+                DetectCondition="!(wix.AspNetCoreRuntime31WebDetectCondition)"
+                InstallCondition="!(wix.AspNetCoreRuntime31WebInstallCondition)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/a16689d1-0872-4ef9-a592-406d3038d8f7/cf4f84504385a599f0cb6a5c113ccb34/aspnetcore-runtime-3.1.0-win-x64.exe"
+                LogPathVariable="AspNetCoreRuntime31Log"
+                Compressed="no">
+                <!-- heat.exe payload "aspnetcore-runtime-3.1.0-win-x64.exe" -o "aspnetcore-runtime.wxs" -->
+                <RemotePayload
+                  CertificatePublicKey="6608A9DBA86701156A4C17CE63BA99BE8B932F8D"
+                  CertificateThumbprint="62009AAABDAE749FD47D19150958329BF6FF4B34"
+                  Description="Microsoft ASP.NET Core 3.1.0 - Shared Framework"
+                  Hash="2DFD4F9EA2E174A7199C40ED3A826886F1E19EF8"
+                  ProductName="Microsoft ASP.NET Core 3.1.0 - Shared Framework"
+                  Size="7811768"
+                  Version="3.1.0.19566" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+
+    <Fragment>
+        <Variable Name="WindowsDesktopRuntime31InstallDir" Value="[ProgramFiles64Folder]dotnet\shared\Microsoft.WindowsDesktop.App\3.1.0" />
+        <util:DirectorySearch Id="WindowsDesktopRuntime31Installed" Path="[WindowsDesktopRuntime31InstallDir]" Variable="WindowsDesktopRuntime31Installed" Result="exists" />
+
+        <WixVariable Id="WindowsDesktopRuntime31WebDetectCondition" Value="WindowsDesktopRuntime31Installed" Overridable="yes" />
+        <WixVariable Id="WindowsDesktopRuntime31WebInstallCondition" Value="" Overridable="yes" />
+
+        <PackageGroup Id="WindowsDesktopRuntime31Web">
+            <ExePackage
+                Name="windowsdesktop-runtime-3.1.0-win-x64.exe"
+                InstallCommand="/install /quiet /norestart /log &quot;[WindowsDesktopRuntime31Log]&quot;"
+                RepairCommand="/repair /quiet /norestart /log &quot;[WindowsDesktopRuntime31Log]&quot;"
+                UninstallCommand="/uninstall /quiet /norestart /log &quot;[WindowsDesktopRuntime31Log]&quot;"
+                PerMachine="yes"
+                DetectCondition="!(wix.WindowsDesktopRuntime31WebDetectCondition)"
+                InstallCondition="!(wix.WindowsDesktopRuntime31WebInstallCondition)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/a1510e74-b31a-4434-b8a0-8074ff31fb3f/b7de8ecba4a14d8312551cfdc745dea1/windowsdesktop-runtime-3.1.0-win-x64.exe"
+                LogPathVariable="WindowsDesktopRuntime31Log"
+                Compressed="no">
+                <!-- heat.exe payload "windowsdesktop-runtime-3.1.0-win-x64.exe" -o "windowsdesktop-runtime.wxs" -->
+                <RemotePayload
+                  CertificatePublicKey="6608A9DBA86701156A4C17CE63BA99BE8B932F8D"
+                  CertificateThumbprint="62009AAABDAE749FD47D19150958329BF6FF4B34"
+                  Description="Microsoft Windows Desktop Runtime - 3.1.0 (x64)"
+                  Hash="C16F271754879BA78868947486F37871C9F0E40F"
+                  ProductName="Microsoft Windows Desktop Runtime - 3.1.0 (x64)"
+                  Size="54443856"
+                  Version="3.1.0.28315" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

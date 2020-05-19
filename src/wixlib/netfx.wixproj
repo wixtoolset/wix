@@ -27,6 +27,10 @@
     <Compile Include="NetFx461.wxs" />
     <Compile Include="NetFx462.wxs" />
     <Compile Include="NetFxExtension_x86.wxs" />
+    <Compile Include="NetCore3.1.wxs" />
+    <Compile Include="NetCore3.1.1.wxs" />
+    <Compile Include="NetCore3.1.2.wxs" />
+    <Compile Include="NetCore3.1.3.wxs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
