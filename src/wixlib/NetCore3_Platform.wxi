@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs"
+         xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+         xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <?define AspNetCoreId = ASPNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
+  <?define AspNetCoreRedistId = AspNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
+  <?define AspNetCoreRedistLog = AspNetCoreRuntime$(var.NetCoreIdVersion)RedistLog?>
+  <?define AspNetCoreRedistInstallCommand = /install /quiet /norestart /log &quot;[$(var.AspNetCoreRedistLog)]&quot;?>
+  <?define AspNetCoreRedistUninstallCommand = /uninstall /quiet /norestart /log &quot;[$(var.AspNetCoreRedistLog)]&quot;?>
+
+  <?define DesktopNetCoreId = DESKTOPNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
+  <?define DesktopNetCoreRedistId = DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
+  <?define DesktopNetCoreRedistLog = DesktopNetCoreRuntime$(var.NetCoreIdVersion)RedistLog?>
+  <?define DesktopNetCoreRedistInstallCommand = /install /quiet /norestart /log &quot;[$(var.DesktopNetCoreRedistLog)]&quot;?>
+  <?define DesktopNetCoreRedistUninstallCommand = /uninstall /quiet /norestart /log &quot;[$(var.DesktopNetCoreRedistLog)]&quot;?>
+
+  <?define DotNetCoreId = DOTNETCORERUNTIME$(var.NetCoreIdVersion)_$(var.NetCorePlatform)?>
+  <?define DotNetCoreRedistId = DotNetCoreRuntime$(var.NetCoreIdVersion)Redist_$(var.NetCorePlatform)?>
+  <?define DotNetCoreRedistLog = DotNetCoreRuntime$(var.NetCoreIdVersion)RedistLog?>
+  <?define DotNetCoreRedistInstallCommand = /install /quiet /norestart /log &quot;[$(var.DotNetCoreRedistLog)]&quot;?>
+  <?define DotNetCoreRedistUninstallCommand = /uninstall /quiet /norestart /log &quot;[$(var.DotNetCoreRedistLog)]&quot;?>
+
+  <?define DotNetHomeId = DOTNETHOME_$(var.NetCorePlatform)?>
+  <?define NetCoreEulaLink = https://go.microsoft.com/fwlink/?LinkId=329770?>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="$(var.DotNetHomeId)" />
+    <util:DirectorySearch
+        Id="$(var.AspNetCoreId)"
+        Variable="$(var.AspNetCoreId)"
+        Path="[$(var.DotNetHomeId)]\shared\Microsoft.AspNetCore.App\$(var.NetCoreVersion)"
+        Result="exists"
+        After="$(var.DotNetHomeId)" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="$(var.DotNetHomeId)" />
+    <util:DirectorySearch
+        Id="$(var.DesktopNetCoreId)"
+        Variable="$(var.DesktopNetCoreId)"
+        Path="[$(var.DotNetHomeId)]\shared\Microsoft.WindowsDesktop.App\$(var.NetCoreVersion)"
+        Result="exists"
+        After="$(var.DotNetHomeId)" />
+  </Fragment>
+
+  <Fragment>
+    <util:RegistrySearchRef Id="$(var.DotNetHomeId)" />
+    <util:DirectorySearch
+        Id="$(var.DotNetCoreId)"
+        Variable="$(var.DotNetCoreId)"
+        Path="[$(var.DotNetHomeId)]\shared\Microsoft.NETCore.App\$(var.NetCoreVersion)"
+        Result="exists"
+        After="$(var.DotNetHomeId)" />
+  </Fragment>
+
+  <!--
+  <Fragment>
+    <PackageGroup Id="$(var.AspNetCoreRedistId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.AspNetCoreRedistId)" />
+  </Fragment>
+
+  <Fragment>
+    <PackageGroup Id="$(var.DesktopNetCoreRedistId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DesktopNetCoreRedistId)" />
+  </Fragment>
+  -->
+
+  <Fragment>
+    <PackageGroup Id="$(var.DotNetCoreRedistId)AsPrereq" />
+
+    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DotNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
+  </Fragment>
+</Include>

@@ -1,30 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+    <?define NetCorePlatform = x64?>
+    <?define NetCoreIdVersion = 311?>
+    <?define NetCoreVersion = 3.1.1?>
+    <?include NetCore3_Platform.wxi?>
+
+    <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/fa469b98-e312-4744-9dab-a46d2242b0ab/ae5e1eb530e312d68b501b7dd03d4c00/aspnetcore-runtime-3.1.1-win-x64.exe?>
+    <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/a1d41522-4da0-42bc-b3f2-e4b7d842974d/03101425368c87c55c1fe7cafbb4e0fb/windowsdesktop-runtime-3.1.1-win-x64.exe?>
+
     <Fragment>
-        <Variable Name="AspNetCoreRuntime31InstallDir" Value="[ProgramFiles64Folder]dotnet\shared\Microsoft.AspNetCore.App\3.1.1"/>
-        <util:DirectorySearch Id="AspNetCoreRuntime31Installed" Path="[AspNetCoreRuntime31InstallDir]" Variable="AspNetCoreRuntime31Installed" Result="exists"/>
+        <util:DirectorySearchRef Id="$(var.AspNetCoreId)" />
 
-        <WixVariable Id="AspNetCoreRuntime31WebDetectCondition" Value="AspNetCoreRuntime31Installed" Overridable="yes"/>
-        <WixVariable Id="AspNetCoreRuntime31WebInstallCondition" Value="" Overridable="yes"/>
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.AspNetCoreId)" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
 
-        <PackageGroup Id="AspNetCoreRuntime31Web">
+        <PackageGroup Id="$(var.AspNetCoreRedistId)">
             <ExePackage
-              Name="aspnetcore-runtime-3.1.1-win-x64.exe"
-              InstallCommand="/install /quiet /norestart /log &quot;[AspNetCoreRuntime31Log]&quot;"
-              RepairCommand="/repair /quiet /norestart /log &quot;[AspNetCoreRuntime31Log]&quot;"
-              UninstallCommand="/uninstall /quiet /norestart /log &quot;[AspNetCoreRuntime31Log]&quot;"
-              PerMachine="yes"
-              DetectCondition="!(wix.AspNetCoreRuntime31WebDetectCondition)"
-              InstallCondition="!(wix.AspNetCoreRuntime31WebInstallCondition)"
-              Vital="yes"
-              Permanent="yes"
-              Protocol="burn"
-              DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/fa469b98-e312-4744-9dab-a46d2242b0ab/ae5e1eb530e312d68b501b7dd03d4c00/aspnetcore-runtime-3.1.1-win-x64.exe"
-              LogPathVariable="AspNetCoreRuntime31Log"
-              Compressed="no">
-                <!-- "%WIX%\bin\heat.exe" payload "aspnetcore-runtime-3.1.1-win-x64.exe" -o "aspnetcore-runtime.wxs" -->
+                Name="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)aspnetcore-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                InstallCommand="$(var.AspNetCoreRedistInstallCommand)"
+                RepairCommand="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand)"
+                UninstallCommand="$(var.AspNetCoreRedistUninstallCommand)"
+                PerMachine="yes"
+                DetectCondition="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)"
+                InstallCondition="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)"
+                Id="$(var.AspNetCoreRedistId)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="$(var.AspNetCoreRedistLink)"
+                LogPathVariable="$(var.AspNetCoreRedistLog)"
+                Compressed="no">
                 <RemotePayload
                   CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
                   CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
@@ -38,28 +49,29 @@
     </Fragment>
 
     <Fragment>
-        <Variable Name="WindowsDesktopRuntime31InstallDir" Value="[ProgramFiles64Folder]dotnet\shared\Microsoft.WindowsDesktop.App\3.1.1"/>
-        <util:DirectorySearch Id="WindowsDesktopRuntime31Installed" Path="[WindowsDesktopRuntime31InstallDir]" Variable="WindowsDesktopRuntime31Installed" Result="exists"/>
+        <util:DirectorySearchRef Id="$(var.DesktopNetCoreId)" />
 
-        <WixVariable Id="WindowsDesktopRuntime31WebDetectCondition" Value="WindowsDesktopRuntime31Installed" Overridable="yes"/>
-        <WixVariable Id="WindowsDesktopRuntime31WebInstallCondition" Value="" Overridable="yes"/>
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DesktopNetCoreId)" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
 
-        <PackageGroup Id="WindowsDesktopRuntime31Web">
+        <PackageGroup Id="$(var.DesktopNetCoreRedistId)">
             <ExePackage
-              Name="windowsdesktop-runtime-3.1.1-win-x64.exe"
-              InstallCommand="/install /quiet /norestart /log &quot;[WindowsDesktopRuntime31Log]&quot;"
-              RepairCommand="/repair /quiet /norestart /log &quot;[WindowsDesktopRuntime31Log]&quot;"
-              UninstallCommand="/uninstall /quiet /norestart /log &quot;[WindowsDesktopRuntime31Log]&quot;"
-              PerMachine="yes"
-              DetectCondition="!(wix.WindowsDesktopRuntime31WebDetectCondition)"
-              InstallCondition="!(wix.WindowsDesktopRuntime31WebInstallCondition)"
-              Vital="yes"
-              Permanent="yes"
-              Protocol="burn"
-              DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/a1d41522-4da0-42bc-b3f2-e4b7d842974d/03101425368c87c55c1fe7cafbb4e0fb/windowsdesktop-runtime-3.1.1-win-x64.exe"
-              LogPathVariable="WindowsDesktopRuntime31Log"
-              Compressed="no">
-                <!-- "%WIX%\bin\heat.exe" payload "windowsdesktop-runtime-3.1.1-win-x64.exe" -o "windowsdesktop-runtime.wxs" -->
+                Name="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)windowsdesktop-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                InstallCommand="$(var.DesktopNetCoreRedistInstallCommand)"
+                RepairCommand="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand)"
+                UninstallCommand="$(var.DesktopNetCoreRedistUninstallCommand)"
+                PerMachine="yes"
+                DetectCondition="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)"
+                InstallCondition="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)"
+                Id="$(var.DesktopNetCoreRedistId)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="$(var.DesktopNetCoreRedistLink)"
+                LogPathVariable="$(var.DesktopNetCoreRedistLog)"
+                Compressed="no">
                 <RemotePayload
                   CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
                   CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"

@@ -12,17 +12,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\UsingDotNetCorePackages\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\example.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingNativeImage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <Target Name="CopyExtensions" AfterTargets="Build">
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(WixExtension)" />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\..\wixext\WixToolset.Netfx.wixext.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />

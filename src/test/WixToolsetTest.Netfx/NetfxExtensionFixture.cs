@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.Netfx
 {
+    using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
@@ -10,6 +11,31 @@ namespace WixToolsetTest.Netfx
 
     public class NetfxExtensionFixture
     {
+        [Fact]
+        public void CanBuildUsingDotNetCorePackages()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "Bundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+                    "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundleFile,
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+            }
+        }
+
         [Fact]
         public void CanBuildUsingNativeImage()
         {

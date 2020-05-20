@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+    <Bundle Name="WixStdBa" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="75D5D534-E177-4689-AAE9-CAC1C39002C2">
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <bal:WixStandardBootstrapperApplication LicenseUrl="http://wixtoolset.org/about/license/" />
+        </BootstrapperApplicationRef>
+        <Chain>
+            <PackageGroupRef Id="AspNetCoreRuntime310Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime310Redist_x64" />
+            <PackageGroupRef Id="AspNetCoreRuntime311Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime311Redist_x64" />
+            <PackageGroupRef Id="AspNetCoreRuntime312Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime312Redist_x64" />
+            <PackageGroupRef Id="AspNetCoreRuntime313Redist_x64" />
+            <PackageGroupRef Id="DesktopNetCoreRuntime313Redist_x64" />
+            <PackageGroupRef Id="DotNetCoreRuntime313Redist_x64" />
+        </Chain>
+    </Bundle>
+</Wix>
