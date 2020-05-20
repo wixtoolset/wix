@@ -5,12 +5,51 @@
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
     <?define NetCorePlatform = x64?>
-    <?define NetCoreIdVersion = 311?>
-    <?define NetCoreVersion = 3.1.1?>
+    <?define NetCoreIdVersion = 310?>
+    <?define NetCoreVersion = 3.1.0?>
     <?include NetCore3_Platform.wxi?>
 
-    <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/fa469b98-e312-4744-9dab-a46d2242b0ab/ae5e1eb530e312d68b501b7dd03d4c00/aspnetcore-runtime-3.1.1-win-x64.exe?>
-    <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/a1d41522-4da0-42bc-b3f2-e4b7d842974d/03101425368c87c55c1fe7cafbb4e0fb/windowsdesktop-runtime-3.1.1-win-x64.exe?>
+    <?define AspNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/a16689d1-0872-4ef9-a592-406d3038d8f7/cf4f84504385a599f0cb6a5c113ccb34/aspnetcore-runtime-3.1.0-win-x64.exe?>
+    <?define DesktopNetCoreRedistLink = https://download.visualstudio.microsoft.com/download/pr/a1510e74-b31a-4434-b8a0-8074ff31fb3f/b7de8ecba4a14d8312551cfdc745dea1/windowsdesktop-runtime-3.1.0-win-x64.exe?>
+    <?define DotNetCoreRedistLink = ?>
+
+    <Fragment>
+        <util:DirectorySearchRef Id="$(var.DotNetCoreId)" />
+
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DotNetCoreId)" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
+
+        <!--
+        <PackageGroup Id="$(var.DotNetCoreRedistId)">
+            <ExePackage
+                Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                InstallCommand="$(var.DotNetCoreRedistInstallCommand)"
+                RepairCommand="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand)"
+                UninstallCommand="$(var.DotNetCoreRedistUninstallCommand)"
+                PerMachine="yes"
+                DetectCondition="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)"
+                InstallCondition="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)"
+                Id="$(var.DotNetCoreRedistId)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="$(var.DotNetCoreRedistLink)"
+                LogPathVariable="$(var.DotNetCoreRedistLog)"
+                Compressed="no">
+                TODO: Get RemotePayload info
+                <RemotePayload CertificatePublicKey=""
+                               CertificateThumbprint=""
+                               Description=""
+                               Hash=""
+                               ProductName=""
+                               Size=""
+                               Version=""/>
+            </ExePackage>
+        </PackageGroup>
+        -->
+    </Fragment>
 
     <Fragment>
         <util:DirectorySearchRef Id="$(var.AspNetCoreId)" />
@@ -37,13 +76,13 @@
                 LogPathVariable="$(var.AspNetCoreRedistLog)"
                 Compressed="no">
                 <RemotePayload
-                  CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                  CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                  Description="Microsoft ASP.NET Core 3.1.1 - Shared Framework"
-                  Hash="6614D5792D9335632D66C3EB7DE942A7AE10D6BE"
-                  ProductName="Microsoft ASP.NET Core 3.1.1 - Shared Framework"
-                  Size="7867488"
-                  Version="3.1.1.19615"/>
+                  CertificatePublicKey="6608A9DBA86701156A4C17CE63BA99BE8B932F8D"
+                  CertificateThumbprint="62009AAABDAE749FD47D19150958329BF6FF4B34"
+                  Description="Microsoft ASP.NET Core 3.1.0 - Shared Framework"
+                  Hash="2DFD4F9EA2E174A7199C40ED3A826886F1E19EF8"
+                  ProductName="Microsoft ASP.NET Core 3.1.0 - Shared Framework"
+                  Size="7811768"
+                  Version="3.1.0.19566" />
             </ExePackage>
         </PackageGroup>
     </Fragment>
@@ -73,13 +112,13 @@
                 LogPathVariable="$(var.DesktopNetCoreRedistLog)"
                 Compressed="no">
                 <RemotePayload
-                  CertificatePublicKey="6ADD0C9D1AC70DA3668644B1C78884E82E3F3457"
-                  CertificateThumbprint="711AF71DC4C4952C8ED65BB4BA06826ED3922A32"
-                  Description="Microsoft Windows Desktop Runtime - 3.1.1 (x64)"
-                  Hash="AE723619D9CD6407F3D4B4948DF4F026A99781DC"
-                  ProductName="Microsoft Windows Desktop Runtime - 3.1.1 (x64)"
-                  Size="54211664"
-                  Version="3.1.1.28408"/>
+                  CertificatePublicKey="6608A9DBA86701156A4C17CE63BA99BE8B932F8D"
+                  CertificateThumbprint="62009AAABDAE749FD47D19150958329BF6FF4B34"
+                  Description="Microsoft Windows Desktop Runtime - 3.1.0 (x64)"
+                  Hash="C16F271754879BA78868947486F37871C9F0E40F"
+                  ProductName="Microsoft Windows Desktop Runtime - 3.1.0 (x64)"
+                  Size="54443856"
+                  Version="3.1.0.28315" />
             </ExePackage>
         </PackageGroup>
     </Fragment>

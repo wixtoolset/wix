@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+    <?define NetCorePlatform = x86?>
+    <?define NetCoreIdVersion = 310?>
+    <?define NetCoreVersion = 3.1.0?>
+    <?include NetCore3_Platform.wxi?>
+
+    <?define AspNetCoreRedistLink = ?>
+    <?define DesktopNetCoreRedistLink = ?>
+    <?define DotNetCoreRedistLink = ?>
+
+    <Fragment>
+        <util:DirectorySearchRef Id="$(var.DotNetCoreId)" />
+
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DotNetCoreId)" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
+
+        <!--
+        <PackageGroup Id="$(var.DotNetCoreRedistId)">
+            <ExePackage
+                Name="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)dotnet-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                InstallCommand="$(var.DotNetCoreRedistInstallCommand)"
+                RepairCommand="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand)"
+                UninstallCommand="$(var.DotNetCoreRedistUninstallCommand)"
+                PerMachine="yes"
+                DetectCondition="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)"
+                InstallCondition="!(wix.DotNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)"
+                Id="$(var.DotNetCoreRedistId)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="$(var.DotNetCoreRedistLink)"
+                LogPathVariable="$(var.DotNetCoreRedistLog)"
+                Compressed="no">
+                TODO: Get RemotePayload info
+                <RemotePayload CertificatePublicKey=""
+                               CertificateThumbprint=""
+                               Description=""
+                               Hash=""
+                               ProductName=""
+                               Size=""
+                               Version=""/>
+            </ExePackage>
+        </PackageGroup>
+        -->
+    </Fragment>
+
+    <Fragment>
+        <util:DirectorySearchRef Id="$(var.AspNetCoreId)" />
+
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.AspNetCoreId)" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
+
+        <!--
+        <PackageGroup Id="$(var.AspNetCoreRedistId)">
+            <ExePackage
+                Name="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)aspnetcore-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                InstallCommand="$(var.AspNetCoreRedistInstallCommand)"
+                RepairCommand="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand)"
+                UninstallCommand="$(var.AspNetCoreRedistUninstallCommand)"
+                PerMachine="yes"
+                DetectCondition="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)"
+                InstallCondition="!(wix.AspNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)"
+                Id="$(var.AspNetCoreRedistId)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="$(var.AspNetCoreRedistLink)"
+                LogPathVariable="$(var.AspNetCoreRedistLog)"
+                Compressed="no">
+                TODO: Get RemotePayload info
+                <RemotePayload
+                  CertificatePublicKey=""
+                  CertificateThumbprint=""
+                  Description=""
+                  Hash=""
+                  ProductName=""
+                  Size=""
+                  Version="" />
+            </ExePackage>
+        </PackageGroup>
+        -->
+    </Fragment>
+
+    <Fragment>
+        <util:DirectorySearchRef Id="$(var.DesktopNetCoreId)" />
+
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition" Value="$(var.DesktopNetCoreId)" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition" Value="" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory" Value="redist\" Overridable="yes" />
+        <WixVariable Id="DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand" Value="" Overridable="yes" />
+
+        <!--
+        <PackageGroup Id="$(var.DesktopNetCoreRedistId)">
+            <ExePackage
+                Name="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)PackageDirectory)windowsdesktop-runtime-$(var.NetCoreVersion)-win-$(var.NetCorePlatform).exe"
+                InstallCommand="$(var.DesktopNetCoreRedistInstallCommand)"
+                RepairCommand="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)RepairCommand)"
+                UninstallCommand="$(var.DesktopNetCoreRedistUninstallCommand)"
+                PerMachine="yes"
+                DetectCondition="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)DetectCondition)"
+                InstallCondition="!(wix.DesktopNetCoreRuntime$(var.NetCoreIdVersion)Redist$(var.NetCorePlatform)InstallCondition)"
+                Id="$(var.DesktopNetCoreRedistId)"
+                Vital="yes"
+                Permanent="yes"
+                Protocol="burn"
+                DownloadUrl="$(var.DesktopNetCoreRedistLink)"
+                LogPathVariable="$(var.DesktopNetCoreRedistLog)"
+                Compressed="no">
+                TODO: Get RemotePayload info
+                <RemotePayload
+                  CertificatePublicKey=""
+                  CertificateThumbprint=""
+                  Description=""
+                  Hash=""
+                  ProductName=""
+                  Size=""
+                  Version="" />
+            </ExePackage>
+        </PackageGroup>
+        -->
+    </Fragment>
+</Wix>

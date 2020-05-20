@@ -27,10 +27,16 @@
     <Compile Include="NetFx461.wxs" />
     <Compile Include="NetFx462.wxs" />
     <Compile Include="NetFxExtension_x86.wxs" />
-    <Compile Include="NetCore3.1.wxs" />
-    <Compile Include="NetCore3.1.1.wxs" />
-    <Compile Include="NetCore3.1.2.wxs" />
-    <Compile Include="NetCore3.1.3.wxs" />
+    <Compile Include="NetCore3.1.0_x64.wxs" />
+    <Compile Include="NetCore3.1.0_x86.wxs" />
+    <Compile Include="NetCore3.1.1_x64.wxs" />
+    <Compile Include="NetCore3.1.1_x86.wxs" />
+    <Compile Include="NetCore3.1.2_x64.wxs" />
+    <Compile Include="NetCore3.1.2_x86.wxs" />
+    <Compile Include="NetCore3.1.3_x64.wxs" />
+    <Compile Include="NetCore3.1.3_x86.wxs" />
+    <Compile Include="NetCore3.1.4_x64.wxs" />
+    <Compile Include="NetCore3.1.4_x86.wxs" />
     <Compile Include="NetCoreShared.wxs" />
   </ItemGroup>
   <ItemGroup>
