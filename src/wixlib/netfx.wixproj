@@ -11,8 +11,6 @@
     <Pedantic>true</Pedantic>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="NetFx472.wxs" />
-    <Compile Include="NetFx48.wxs" />
     <Compile Include="NetFxExtension.wxs" />
     <Compile Include="NetFx1.wxs" />
     <Compile Include="NetFx1.1.wxs" />
@@ -26,6 +24,8 @@
     <Compile Include="NetFx46.wxs" />
     <Compile Include="NetFx461.wxs" />
     <Compile Include="NetFx462.wxs" />
+    <Compile Include="NetFx472.wxs" />
+    <Compile Include="NetFx48.wxs" />
     <Compile Include="NetFxExtension_x86.wxs" />
     <Compile Include="NetCore3.1.0_x64.wxs" />
     <Compile Include="NetCore3.1.0_x86.wxs" />
