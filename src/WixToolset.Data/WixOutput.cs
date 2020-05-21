@@ -183,6 +183,8 @@ namespace WixToolset.Data
         /// <returns>Stream to the data of the file.</returns>
         public Stream CreateDataStream(string name)
         {
+            this.DeleteExistingEntry(name);
+
             var entry = this.archive.CreateEntry(name);
 
             return entry.Open();
@@ -195,6 +197,8 @@ namespace WixToolset.Data
         /// <param name="path">Path to file on disk to include in the output.</param>
         public void ImportDataStream(string name, string path)
         {
+            this.DeleteExistingEntry(name);
+
             this.archive.CreateEntryFromFile(path, name, System.IO.Compression.CompressionLevel.Optimal);
         }
 
@@ -255,6 +259,15 @@ namespace WixToolset.Data
             }
 
             this.disposed = true;
+        }
+
+        private void DeleteExistingEntry(string name)
+        {
+            var entry = this.archive.GetEntry(name);
+            if (entry != null)
+            {
+                entry.Delete();
+            }
         }
     }
 }

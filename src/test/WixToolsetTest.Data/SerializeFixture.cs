@@ -32,20 +32,83 @@ namespace WixToolsetTest.Data
             intermediate.UpdateLevel(IntermediateLevels.Resolved);
 
             var path = Path.GetTempFileName();
-            intermediate.Save(path);
+            try
+            {
+                intermediate.Save(path);
 
-            var loaded = Intermediate.Load(path);
+                var loaded = Intermediate.Load(path);
 
-            Assert.True(loaded.HasLevel(IntermediateLevels.Compiled));
-            Assert.True(loaded.HasLevel(IntermediateLevels.Linked));
-            Assert.True(loaded.HasLevel(IntermediateLevels.Resolved));
+                Assert.True(loaded.HasLevel(IntermediateLevels.Compiled));
+                Assert.True(loaded.HasLevel(IntermediateLevels.Linked));
+                Assert.True(loaded.HasLevel(IntermediateLevels.Resolved));
 
-            var tuple = (ComponentTuple)loaded.Sections.Single().Tuples.Single();
+                var tuple = (ComponentTuple)loaded.Sections.Single().Tuples.Single();
 
-            Assert.Equal("TestComponent", tuple.Id.Id);
-            Assert.Equal(AccessModifier.Public, tuple.Id.Access);
-            Assert.Equal("TestFolder", tuple.DirectoryRef);
-            Assert.Equal(ComponentLocation.Either, tuple.Location);
+                Assert.Equal("TestComponent", tuple.Id.Id);
+                Assert.Equal(AccessModifier.Public, tuple.Id.Access);
+                Assert.Equal("TestFolder", tuple.DirectoryRef);
+                Assert.Equal(ComponentLocation.Either, tuple.Location);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [Fact]
+        public void CanUpdateIntermediate()
+        {
+            var sln = new SourceLineNumber("test.wxs", 1);
+            var section = new IntermediateSection("test", SectionType.Product, 65001);
+
+            section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "TestComponent"))
+            {
+                ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
+                DirectoryRef = "TestFolder",
+                Location = ComponentLocation.Either,
+            });
+
+            var intermediate = new Intermediate("TestIntermediate", IntermediateLevels.Compiled, new[] { section }, null);
+
+            var path = Path.GetTempFileName();
+            try
+            {
+                intermediate.Save(path);
+
+                var uri = new Uri(Path.GetFullPath(path));
+                var stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+
+                using (var wixout = WixOutput.Read(uri, stream))
+                {
+                    var loaded = Intermediate.Load(wixout);
+                    var tuple = (ComponentTuple)loaded.Sections.Single().Tuples.Single();
+
+                    Assert.Equal("TestComponent", tuple.Id.Id);
+                    Assert.Equal(AccessModifier.Public, tuple.Id.Access);
+
+                    wixout.Reopen(writable: true);
+
+                    section.Tuples.Add(new ComponentTuple(sln, new Identifier(AccessModifier.Public, "NewComponent"))
+                    {
+                        ComponentId = new Guid(1, 0, 0, new byte[8]).ToString("B"),
+                    });
+
+                    intermediate.Save(wixout);
+                    loaded = Intermediate.Load(wixout);
+
+                    var newTuple = loaded.Sections.Single().Tuples.Where(t => t.Id.Id == "NewComponent");
+                    Assert.Single(newTuple);
+                }
+
+                var loadedAfterDispose = Intermediate.Load(path);
+                var newTupleStillThere = loadedAfterDispose.Sections.Single().Tuples.Where(t => t.Id.Id == "NewComponent");
+                Assert.Single(newTupleStillThere);
+
+            }
+            finally
+            {
+                File.Delete(path);
+            }
         }
 
         [Fact]
