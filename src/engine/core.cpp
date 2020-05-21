@@ -431,7 +431,7 @@ extern "C" HRESULT CorePlan(
         ExitOnFailure(hr, "Failed to plan the layout of the bundle.");
 
         // Plan the packages' layout.
-        hr = PlanPackages(&pEngineState->registration, &pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, FALSE, pEngineState->command.relationType, sczLayoutDirectory, &hSyncpointEvent);
+        hr = PlanPackages(&pEngineState->registration, &pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, FALSE, pEngineState->command.display, pEngineState->command.relationType, sczLayoutDirectory, &hSyncpointEvent);
         ExitOnFailure(hr, "Failed to plan packages.");
     }
     else if (BOOTSTRAPPER_ACTION_UPDATE_REPLACE == action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED == action)
@@ -440,7 +440,7 @@ extern "C" HRESULT CorePlan(
 
         pUpgradeBundlePackage = &pEngineState->update.package;
 
-        hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.relationType, &hSyncpointEvent);
+        hr = PlanUpdateBundle(&pEngineState->userExperience, pUpgradeBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
         ExitOnFailure(hr, "Failed to plan update.");
     }
     else if (pEngineState->registration.fEnabledForwardCompatibleBundle)
@@ -449,7 +449,7 @@ extern "C" HRESULT CorePlan(
 
         pForwardCompatibleBundlePackage = &pEngineState->registration.forwardCompatibleBundle;
 
-        hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.relationType, &hSyncpointEvent);
+        hr = PlanPassThroughBundle(&pEngineState->userExperience, pForwardCompatibleBundlePackage, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->command.display, pEngineState->command.relationType, &hSyncpointEvent);
         ExitOnFailure(hr, "Failed to plan passthrough.");
     }
     else // doing an action that modifies the machine state.
@@ -471,7 +471,7 @@ extern "C" HRESULT CorePlan(
             hr = PlanRelatedBundlesBegin(&pEngineState->userExperience, &pEngineState->registration, pEngineState->command.relationType, &pEngineState->plan);
             ExitOnFailure(hr, "Failed to plan related bundles.");
 
-            hr = PlanPackages(&pEngineState->registration, &pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->registration.fInstalled, pEngineState->command.relationType, NULL, &hSyncpointEvent);
+            hr = PlanPackages(&pEngineState->registration, &pEngineState->userExperience, &pEngineState->packages, &pEngineState->plan, &pEngineState->log, &pEngineState->variables, pEngineState->registration.fInstalled, pEngineState->command.display, pEngineState->command.relationType, NULL, &hSyncpointEvent);
             ExitOnFailure(hr, "Failed to plan packages.");
 
             // Schedule the update of related bundles last.

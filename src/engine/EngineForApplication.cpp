@@ -709,6 +709,12 @@ static HRESULT BAEngineApply(
 {
     HRESULT hr = S_OK;
 
+    ExitOnNull(pArgs->hwndParent, hr, E_INVALIDARG, "BA passed NULL hwndParent to Apply.");
+    if (!::IsWindow(pArgs->hwndParent))
+    {
+        ExitOnFailure(hr = E_INVALIDARG, "BA passed invalid hwndParent to Apply.");
+    }
+
     if (!::PostThreadMessageW(pContext->dwThreadId, WM_BURN_APPLY, 0, reinterpret_cast<LPARAM>(pArgs->hwndParent)))
     {
         ExitWithLastError(hr, "Failed to post apply message.");

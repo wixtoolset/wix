@@ -31,6 +31,7 @@ static HRESULT ProcessPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
@@ -472,6 +473,7 @@ extern "C" HRESULT PlanPackages(
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fBundleInstalled,
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent
@@ -509,7 +511,7 @@ extern "C" HRESULT PlanPackages(
             }
         }
 
-        hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
+        hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
         ExitOnFailure(hr, "Failed to process package.");
 
         // Attempt to remove orphaned packages during uninstall. Currently only MSI packages are supported and should not require source.
@@ -534,7 +536,7 @@ extern "C" HRESULT PlanPackages(
             ExitOnFailure(hr, "Failed to copy installed ProductCode");
 
             // Process the compatible MSI package like any other.
-            hr = ProcessPackage(fBundlePerMachine, pPackage, pUX, pPlan, pCompatiblePackage, pLog, pVariables, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
+            hr = ProcessPackage(fBundlePerMachine, pPackage, pUX, pPlan, pCompatiblePackage, pLog, pVariables, display, relationType, wzLayoutDirectory, phSyncpointEvent, &pRollbackBoundary, &nonpermanentPackageIndices);
             ExitOnFailure(hr, "Failed to process compatible package.");
 
             if (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pCompatiblePackage->execute)
@@ -785,6 +787,7 @@ extern "C" HRESULT PlanPassThroughBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout HANDLE* phSyncpointEvent
     )
@@ -794,7 +797,7 @@ extern "C" HRESULT PlanPassThroughBundle(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan passthrough package.
-    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
+    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
     ExitOnFailure(hr, "Failed to process passthrough package.");
 
     // If we still have an open rollback boundary, complete it.
@@ -818,6 +821,7 @@ extern "C" HRESULT PlanUpdateBundle(
     __in BURN_PLAN* pPlan,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __inout HANDLE* phSyncpointEvent
     )
@@ -827,7 +831,7 @@ extern "C" HRESULT PlanUpdateBundle(
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundary = NULL;
 
     // Plan update package.
-    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
+    hr = ProcessPackage(fBundlePerMachine, NULL, pUX, pPlan, pPackage, pLog, pVariables, display, relationType, NULL, phSyncpointEvent, &pRollbackBoundary, NULL);
     ExitOnFailure(hr, "Failed to process update package.");
 
     // If we still have an open rollback boundary, complete it.
@@ -853,6 +857,7 @@ static HRESULT ProcessPackage(
     __in BURN_PACKAGE* pPackage,
     __in BURN_LOGGING* pLog,
     __in BURN_VARIABLES* pVariables,
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z_opt LPCWSTR wzLayoutDirectory,
     __inout HANDLE* phSyncpointEvent,
@@ -906,7 +911,7 @@ static HRESULT ProcessPackage(
                 }
             }
 
-            hr = PlanExecutePackage(fBundlePerMachine, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
+            hr = PlanExecutePackage(fBundlePerMachine, display, pUX, pPlan, pPackage, pLog, pVariables, phSyncpointEvent);
             ExitOnFailure(hr, "Failed to plan execute package.");
 
             if (pPackage->fUninstallable && pNonpermanentPackageIndices)
@@ -1086,6 +1091,7 @@ LExit:
 
 extern "C" HRESULT PlanExecutePackage(
     __in BOOL fPerMachine,
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage,
@@ -1150,11 +1156,11 @@ extern "C" HRESULT PlanExecutePackage(
         break;
 
     case BURN_PACKAGE_TYPE_MSI:
-        hr = MsiEnginePlanAddPackage(pUserExperience, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
+        hr = MsiEnginePlanAddPackage(display, pUserExperience, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
         break;
 
     case BURN_PACKAGE_TYPE_MSP:
-        hr = MspEnginePlanAddPackage(pUserExperience, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
+        hr = MspEnginePlanAddPackage(display, pUserExperience, pPackage, pPlan, pLog, pVariables, *phSyncpointEvent, pPackage->fAcquire);
         break;
 
     case BURN_PACKAGE_TYPE_MSU:

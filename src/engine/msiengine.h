@@ -32,6 +32,7 @@ HRESULT MsiEnginePlanCalculatePackage(
     __out_opt BOOL* pfBARequestedCache
     );
 HRESULT MsiEnginePlanAddPackage(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
@@ -67,6 +68,7 @@ HRESULT MsiEngineConcatProperties(
     __in BOOL fObfuscateHiddenVariables
     );
 HRESULT MsiEngineCalculateInstallUiLevel(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzPackageId,
     __in BOOL fExecute,

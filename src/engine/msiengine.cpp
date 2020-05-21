@@ -873,6 +873,7 @@ LExit:
 // PlanAdd - adds the calculated execute and rollback actions for the package.
 //
 extern "C" HRESULT MsiEnginePlanAddPackage(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
@@ -928,7 +929,7 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
         pAction->msiPackage.rgFeatures = rgRollbackFeatureActions;
         rgRollbackFeatureActions = NULL;
 
-        hr = MsiEngineCalculateInstallUiLevel(pUserExperience, pPackage->sczId, FALSE, pAction->msiPackage.action,
+        hr = MsiEngineCalculateInstallUiLevel(display, pUserExperience, pPackage->sczId, FALSE, pAction->msiPackage.action,
             &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler);
         ExitOnFailure(hr, "Failed to get msi ui options.");
 
@@ -954,7 +955,7 @@ extern "C" HRESULT MsiEnginePlanAddPackage(
         pAction->msiPackage.rgFeatures = rgFeatureActions;
         rgFeatureActions = NULL;
 
-        hr = MsiEngineCalculateInstallUiLevel(pUserExperience, pPackage->sczId, TRUE, pAction->msiPackage.action,
+        hr = MsiEngineCalculateInstallUiLevel(display, pUserExperience, pPackage->sczId, TRUE, pAction->msiPackage.action,
             &pAction->msiPackage.actionMsiProperty, &pAction->msiPackage.uiLevel, &pAction->msiPackage.fDisableExternalUiHandler);
         ExitOnFailure(hr, "Failed to get msi ui options.");
 
@@ -1416,6 +1417,7 @@ LExit:
 }
 
 extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in LPCWSTR wzPackageId,
     __in BOOL fExecute,
@@ -1425,8 +1427,14 @@ extern "C" HRESULT MsiEngineCalculateInstallUiLevel(
     __out BOOL* pfDisableExternalUiHandler
     )
 {
-    *pUiLevel = static_cast<INSTALLUILEVEL>(INSTALLUILEVEL_NONE | INSTALLUILEVEL_SOURCERESONLY);
+    *pUiLevel = INSTALLUILEVEL_NONE;
     *pfDisableExternalUiHandler = FALSE;
+
+    if (BOOTSTRAPPER_DISPLAY_FULL == display ||
+        BOOTSTRAPPER_DISPLAY_PASSIVE == display)
+    {
+        *pUiLevel = static_cast<INSTALLUILEVEL>(*pUiLevel | INSTALLUILEVEL_SOURCERESONLY);
+    }
 
     switch (actionState)
     {

@@ -44,6 +44,7 @@ static void DeterminePatchChainedTarget(
     __out BOOL* pfSlipstreamed
     );
 static HRESULT PlanTargetProduct(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fRollback,
     __in BURN_PLAN* pPlan,
@@ -396,6 +397,7 @@ LExit:
 // PlanAdd - adds the calculated execute and rollback actions for the package.
 //
 extern "C" HRESULT MspEnginePlanAddPackage(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan,
@@ -433,13 +435,13 @@ extern "C" HRESULT MspEnginePlanAddPackage(
 
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->execute)
         {
-            hr = PlanTargetProduct(pUserExperience, FALSE, pPlan, pLog, pVariables, pTargetProduct->execute, pPackage, pTargetProduct, hCacheEvent);
+            hr = PlanTargetProduct(display, pUserExperience, FALSE, pPlan, pLog, pVariables, pTargetProduct->execute, pPackage, pTargetProduct, hCacheEvent);
             ExitOnFailure(hr, "Failed to plan target product.");
         }
 
         if (BOOTSTRAPPER_ACTION_STATE_NONE != pTargetProduct->rollback)
         {
-            hr = PlanTargetProduct(pUserExperience, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct, hCacheEvent);
+            hr = PlanTargetProduct(display, pUserExperience, TRUE, pPlan, pLog, pVariables, pTargetProduct->rollback, pPackage, pTargetProduct, hCacheEvent);
             ExitOnFailure(hr, "Failed to plan rollack target product.");
         }
     }
@@ -877,6 +879,7 @@ static void DeterminePatchChainedTarget(
 }
 
 static HRESULT PlanTargetProduct(
+    __in BOOTSTRAPPER_DISPLAY display,
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in BOOL fRollback,
     __in BURN_PLAN* pPlan,
@@ -934,7 +937,7 @@ static HRESULT PlanTargetProduct(
         hr = StrAllocString(&pAction->mspTarget.sczTargetProductCode, pTargetProduct->wzTargetProductCode, 0);
         ExitOnFailure(hr, "Failed to copy target product code.");
 
-        hr = MsiEngineCalculateInstallUiLevel(pUserExperience, pPackage->sczId, !fRollback, pAction->mspTarget.action,
+        hr = MsiEngineCalculateInstallUiLevel(display, pUserExperience, pPackage->sczId, !fRollback, pAction->mspTarget.action,
             &pAction->mspTarget.actionMsiProperty, &pAction->mspTarget.uiLevel, &pAction->mspTarget.fDisableExternalUiHandler);
         ExitOnFailure(hr, "Failed to get msp ui options.");
 
