@@ -1973,12 +1973,13 @@ static int FilterResult(
     __in int nResult
     )
 {
+    DWORD dwFilteredAllowedResults = dwAllowedResults & MB_TYPEMASK;
     if (IDNOACTION == nResult || IDERROR == nResult) // do nothing and errors pass through.
     {
     }
     else
     {
-        switch (dwAllowedResults)
+        switch (dwFilteredAllowedResults)
         {
         case MB_OK:
             nResult = IDOK;
