@@ -16,6 +16,10 @@
     <Content Include="TestData\UsingFirewall\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingFirewall\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingFirewall\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\UsingOutboundFirewall\example.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\UsingOutboundFirewall\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\UsingOutboundFirewall\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\UsingOutboundFirewall\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

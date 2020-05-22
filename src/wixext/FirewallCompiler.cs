@@ -81,6 +81,7 @@ namespace WixToolset.Firewall
             string scope = null;
             string remoteAddresses = null;
             string description = null;
+            int? direction = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -177,6 +178,11 @@ namespace WixToolset.Firewall
                         case "Description":
                             description = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
+                        case "Outbound":
+                            direction = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes
+                                ? FirewallConstants.NET_FW_RULE_DIR_OUT
+                                : FirewallConstants.NET_FW_RULE_DIR_IN;
+                            break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
                             break;
@@ -260,6 +266,7 @@ namespace WixToolset.Firewall
                     Profile = profile ?? FirewallConstants.NET_FW_PROFILE2_ALL,
                     ComponentRef = componentId,
                     Description = description,
+                    Direction = direction ?? FirewallConstants.NET_FW_RULE_DIR_IN,
                 });
 
                 if (!String.IsNullOrEmpty(port))

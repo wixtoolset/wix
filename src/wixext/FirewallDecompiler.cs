@@ -146,6 +146,19 @@ namespace WixToolset.Firewall
                     fire.Description = (string)row[9];
                 }
 
+                if (!row.IsColumnEmpty(10))
+                {
+                    switch (Convert.ToInt32(row[10]))
+                    {
+                        case FirewallConstants.NET_FW_RULE_DIR_IN:
+                            fire.Direction = Firewall.FirewallException.DirectionType.@in;
+                            break;
+                        case FirewallConstants.NET_FW_RULE_DIR_OUT:
+                            fire.Direction = Firewall.FirewallException.DirectionType.@out;
+                            break;
+                    }
+                }
+
                 Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[8]);
                 if (null != component)
                 {

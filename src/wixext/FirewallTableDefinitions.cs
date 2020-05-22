@@ -21,6 +21,7 @@ namespace WixToolset.Firewall
                 new ColumnDefinition("Profile", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Integer, minValue: 1, maxValue: 2147483647, description: "Profile (1=domain; 2=private; 4=public; 2147483647=all)."),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing component that controls the firewall configuration.", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("Description", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Description displayed in Windows Firewall manager for this firewall rule."),
+                new ColumnDefinition("Direction", ColumnType.Number, 1, primaryKey: false, nullable: true, ColumnCategory.Integer, minValue: 1, maxValue: 2, description: "Direction (1=in; 2=out)"),
             },
             tupleIdIsPrimaryKey: true
         );
