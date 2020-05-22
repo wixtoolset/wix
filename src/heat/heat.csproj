@@ -12,6 +12,8 @@
     <!-- <PackAsTool>true</PackAsTool> -->
     <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='netcoreapp2.1' ">win-x86</RuntimeIdentifier>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <AppConfig>app.config</AppConfig>
+    <ApplicationManifest>heat.exe.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup>
