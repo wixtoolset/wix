@@ -74,7 +74,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         patchGroup.Add(facade);
                     }
-                    else
+                    else if (!facade.FromModule)
                     {
                         var fileRow = fileRows.Get(facade.Id);
                         fileRow.Sequence = ++lastSequence;

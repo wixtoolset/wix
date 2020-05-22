@@ -9,9 +9,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Runtime.InteropServices;
     using System.Text;
     using WixToolset.Core.Bind;
+    using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
-    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
@@ -21,6 +21,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class MergeModulesCommand
     {
+        public MergeModulesCommand(IMessaging messaging)
+        {
+            this.Messaging = messaging;
+        }
+
         public IEnumerable<FileFacade> FileFacades { private get; set; }
 
         public IMessaging Messaging { private get; set; }
@@ -51,7 +56,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             string logPath = null;
             try
             {
-                merge = MsmInterop.GetMsmMerge();
+                var interop = new MsmInterop();
+                merge = interop.GetMsmMerge();
 
                 logPath = Path.Combine(this.IntermediateFolder, "merge.log");
                 merge.OpenLog(logPath);

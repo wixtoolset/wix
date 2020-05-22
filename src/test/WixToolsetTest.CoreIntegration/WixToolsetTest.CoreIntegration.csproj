@@ -77,6 +77,9 @@
     <Content Include="TestData\SimpleBundle\data\fakeba.dll" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\data\MsiPackage\Shared.dll" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleBundle\data\MsiPackage\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMerge\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMerge\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SimpleMerge\.data\test.msm" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SimpleModule\Module.wxs" CopyToOutputDirectory="PreserveNewest" />

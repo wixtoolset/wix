@@ -505,7 +505,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // necessary.
                 foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
                 {
-                    var sequenceTableName = sequence.ToString();
+                    var sequenceTableName = (sequence == SequenceTable.AdvertiseExecuteSequence) ? "AdvtExecuteSequence" : sequence.ToString();
                     var sequenceTable = output.Tables[sequenceTableName];
 
                     if (null == sequenceTable)
@@ -519,8 +519,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
 
-                var command = new MergeModulesCommand();
+                var command = new MergeModulesCommand(this.Messaging);
                 command.FileFacades = fileFacades;
+                command.IntermediateFolder = this.IntermediateFolder;
                 command.Output = output;
                 command.OutputPath = this.OutputPath;
                 command.SuppressedTableNames = suppressedTableNames;

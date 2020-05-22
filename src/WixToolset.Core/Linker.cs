@@ -356,7 +356,7 @@ namespace WixToolset.Core
                             case TupleDefinitionType.WixMerge:
                                 if (SectionType.Product == resolvedSection.Type)
                                 {
-                                    this.ResolveFeatures(tuple, 0, 7, modulesToFeatures, null);
+                                    this.ResolveFeatures(tuple, -1, (int)WixMergeTupleFields.FeatureRef, modulesToFeatures, null);
                                 }
                                 break;
 
@@ -1316,7 +1316,7 @@ namespace WixToolset.Core
         /// <param name="multipleFeatureComponents">Hashtable of known components under multiple features.</param>
         private void ResolveFeatures(IntermediateTuple tuple, int connectionColumn, int featureColumn, ConnectToFeatureCollection connectToFeatures, Hashtable multipleFeatureComponents)
         {
-            var connectionId = tuple.AsString(connectionColumn);
+            var connectionId = connectionColumn < 0 ? tuple.Id.Id : tuple.AsString(connectionColumn);
             var featureId = tuple.AsString(featureColumn);
 
             if (EmptyGuid == featureId)

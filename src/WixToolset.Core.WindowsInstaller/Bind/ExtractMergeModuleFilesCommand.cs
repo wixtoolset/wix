@@ -48,7 +48,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var mergeModulesFileFacades = new List<FileFacade>();
 
-            var merge = MsmInterop.GetMsmMerge();
+            var interop = new MsmInterop();
+            var merge = interop.GetMsmMerge();
 
             // Index all of the file rows to be able to detect collisions with files in the Merge Modules.
             // It may seem a bit expensive to build up this index solely for the purpose of checking collisions

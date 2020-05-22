@@ -8,6 +8,9 @@ namespace WixToolsetTest.CoreIntegration
     using Example.Extension;
     using WixBuildTools.TestSupport;
     using WixToolset.Core.TestPackage;
+    using WixToolset.Data;
+    using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class MsiQueryFixture
@@ -1169,6 +1172,53 @@ namespace WixToolsetTest.CoreIntegration
                     "WIX_DOWNGRADE_DETECTED",
                     "WIX_UPGRADE_DETECTED",
                 }, secureProperties.Substring(prefix.Length).Split(';').OrderBy(p => p));
+            }
+        }
+
+        [Fact]
+        public void CanMergeModule()
+        {
+            var folder = TestData.Get(@"TestData\SimpleMerge");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+                var msiPath = Path.Combine(intermediateFolder, @"bin\test.msi");
+                var cabPath = Path.Combine(intermediateFolder, @"bin\cab1.cab");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, ".data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+                Assert.Empty(section.Tuples.OfType<FileTuple>());
+
+                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                Assert.Null(data.Tables["File"]);
+
+                var results = Query.QueryDatabase(msiPath, new[] { "File" });
+                Assert.Equal(new[]
+                {
+                    "File:filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE\tModuleComponent.243FB739_4D05_472F_9CFB_EF6B1017B6DE\ttest.txt\t17\t\t\t512\t0"
+                }, results);
+
+                var files = Query.GetCabinetFiles(cabPath);
+                Assert.Equal(new[]
+                {
+                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                }, files.Select(f => f.Name).ToArray());
             }
         }
     }
