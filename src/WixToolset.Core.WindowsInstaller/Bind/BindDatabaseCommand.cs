@@ -134,7 +134,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             bool compressed;
             bool longNames;
             int installerVersion;
-            string modularizationGuid;
+            string modularizationSuffix;
             {
                 var command = new BindSummaryInfoCommand(section);
                 command.Execute();
@@ -142,7 +142,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 compressed = command.Compressed;
                 longNames = command.LongNames;
                 installerVersion = command.InstallerVersion;
-                modularizationGuid = command.ModularizationGuid;
+                modularizationSuffix = command.ModularizationSuffix;
             }
 
             // Add binder variables for all properties.
@@ -362,7 +362,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Modularize identifiers.
             if (OutputType.Module == output.Type)
             {
-                var command = new ModularizeCommand(output, modularizationGuid, section.Tuples.OfType<WixSuppressModularizationTuple>());
+                var command = new ModularizeCommand(output, modularizationSuffix, section.Tuples.OfType<WixSuppressModularizationTuple>());
                 command.Execute();
             }
             else if (output.Type == OutputType.Patch)
@@ -448,6 +448,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.BackendExtensions = this.BackendExtensions;
                 command.LayoutDirectory = layoutDirectory;
                 command.Compressed = compressed;
+                command.ModularizationSuffix = modularizationSuffix;
                 command.FileRowsByCabinet = filesByCabinetMedia;
                 command.ResolveMedia = this.ResolveMedia;
                 command.TableDefinitions = tableDefinitions;

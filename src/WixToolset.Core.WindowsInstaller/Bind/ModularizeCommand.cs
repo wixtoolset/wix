@@ -15,10 +15,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class ModularizeCommand
     {
-        public ModularizeCommand(WindowsInstallerData output, string modularizationGuid, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
+        public ModularizeCommand(WindowsInstallerData output, string modularizationSuffix, IEnumerable<WixSuppressModularizationTuple> suppressTuples)
         {
             this.Output = output;
-            this.ModularizationGuid = modularizationGuid;
+            this.ModularizationSuffix = modularizationSuffix;
 
             // Gather all the unique suppress modularization identifiers.
             this.SuppressModularizationIdentifiers = new HashSet<string>(suppressTuples.Select(s => s.Id.Id));
@@ -26,7 +26,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private WindowsInstallerData Output { get; }
 
-        private string ModularizationGuid { get; }
+        private string ModularizationSuffix { get; }
 
         private HashSet<string> SuppressModularizationIdentifiers { get; }
 
@@ -129,7 +129,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // if we're not supposed to suppress modularization of this identifier
                         if (!this.SuppressModularizationIdentifiers.Contains(fieldData))
                         {
-                            fieldData = String.Concat(fieldData, ".", this.ModularizationGuid);
+                            fieldData = String.Concat(fieldData, this.ModularizationSuffix);
                         }
                         break;
 
@@ -178,8 +178,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 var identifier = group.Value;
                                 if (!WindowsInstallerStandard.IsStandardProperty(identifier) && !this.SuppressModularizationIdentifiers.Contains(identifier))
                                 {
-                                    sb.Insert(group.Index + group.Length, '.');
-                                    sb.Insert(group.Index + group.Length + 1, this.ModularizationGuid);
+                                    sb.Insert(group.Index + group.Length, this.ModularizationSuffix);
                                 }
                             }
                         }
@@ -193,7 +192,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (!this.SuppressModularizationIdentifiers.Contains(fieldData) &&
                             0 < fieldData.Length && !Char.IsDigit(fieldData, 0))
                         {
-                            fieldData = String.Concat(fieldData, ".", this.ModularizationGuid);
+                            fieldData = String.Concat(fieldData, this.ModularizationSuffix);
                         }
                         break;
 
@@ -203,11 +202,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             var start = fieldData.LastIndexOf(".", StringComparison.Ordinal);
                             if (-1 == start)
                             {
-                                fieldData = String.Concat(fieldData, ".", this.ModularizationGuid);
+                                fieldData = String.Concat(fieldData, this.ModularizationSuffix);
                             }
                             else
                             {
-                                fieldData = String.Concat(fieldData.Substring(0, start), ".", this.ModularizationGuid, fieldData.Substring(start));
+                                fieldData = String.Concat(fieldData.Substring(0, start), this.ModularizationSuffix, fieldData.Substring(start));
                             }
                         }
                         break;
@@ -218,7 +217,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             if (!String.IsNullOrEmpty(keys[i]))
                             {
-                                keys[i] = String.Concat(keys[i], ".", this.ModularizationGuid);
+                                keys[i] = String.Concat(keys[i], this.ModularizationSuffix);
                             }
                         }
 

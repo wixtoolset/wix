@@ -35,14 +35,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Modularization guid, or null if the output is not a module.
         /// </summary>
-        public string ModularizationGuid { get; private set; }
+        public string ModularizationSuffix { get; private set; }
 
         public void Execute()
         {
             this.Compressed = false;
             this.LongNames = false;
             this.InstallerVersion = 0;
-            this.ModularizationGuid = null;
+            this.ModularizationSuffix = null;
 
             var foundCreateDataTime = false;
             var foundLastSaveDataTime = false;
@@ -71,7 +71,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         if (SectionType.Module == this.Section.Type)
                         {
-                            this.ModularizationGuid = packageCode.Substring(1, 36).Replace('-', '_');
+                            this.ModularizationSuffix = "." + packageCode.Substring(1, 36).Replace('-', '_');
                         }
                         else if ("*" == packageCode)
                         {

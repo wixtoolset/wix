@@ -166,8 +166,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var files = cabinetWorkItem.FileFacades
                 .Select(facade => facade.Hash == null ?
-                    new CabinetCompressFile(facade.SourcePath, facade.Id) :
-                    new CabinetCompressFile(facade.SourcePath, facade.Id, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
+                    new CabinetCompressFile(facade.SourcePath, facade.Id + cabinetWorkItem.ModularizationSuffix) :
+                    new CabinetCompressFile(facade.SourcePath, facade.Id + cabinetWorkItem.ModularizationSuffix, facade.Hash.HashPart1, facade.Hash.HashPart2, facade.Hash.HashPart3, facade.Hash.HashPart4))
                 .ToList();
 
             var cab = new Cabinet(cabinetPath);

@@ -75,6 +75,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public bool Compressed { private get; set; }
 
+        public string ModularizationSuffix { private get; set; }
+
         public Dictionary<MediaTuple, IEnumerable<FileFacade>> FileRowsByCabinet { private get; set; }
 
         public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
@@ -214,9 +216,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // create a cabinet work item if it's not being skipped
             if (CabinetBuildOption.BuildAndCopy == resolvedCabinet.BuildOption || CabinetBuildOption.BuildAndMove == resolvedCabinet.BuildOption)
             {
-                int maxThreshold = 0; // default to the threshold for best smartcabbing (makes smallest cabinet).
-
-                cabinetWorkItem = new CabinetWorkItem(fileFacades, resolvedCabinet.Path, maxThreshold, compressionLevel/*, this.FileManager*/);
+                // Default to the threshold for best smartcabbing (makes smallest cabinet).
+                cabinetWorkItem = new CabinetWorkItem(fileFacades, resolvedCabinet.Path, maxThreshold: 0, compressionLevel, this.ModularizationSuffix /*, this.FileManager*/);
             }
             else // reuse the cabinet from the cabinet cache.
             {

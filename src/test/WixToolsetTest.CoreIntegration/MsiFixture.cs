@@ -346,15 +346,32 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msm")));
+                var msmPath = Path.Combine(intermediateFolder, @"bin\test.msm");
+                Assert.True(File.Exists(msmPath));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
 
                 var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
                 var section = intermediate.Sections.Single();
 
                 var fileTuple = section.Tuples.OfType<FileTuple>().Single();
+                Assert.Equal("filyIq8rqcxxf903Hsn5K9L0SWV73g", fileTuple.Id.Id);
                 Assert.Equal(Path.Combine(folder, @"data\test.txt"), fileTuple[FileTupleFields.Source].AsPath().Path);
                 Assert.Equal(@"test.txt", fileTuple[FileTupleFields.Source].PreviousValue.AsPath().Path);
+
+                var data = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var fileRows = data.Tables["File"].Rows;
+                Assert.Equal(new[]
+                {
+                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                }, fileRows.Select(r => r.FieldAsString(0)).ToArray());
+
+                var cabPath = Path.Combine(intermediateFolder, "msm-test.cab");
+                Query.ExtractStream(msmPath, "MergeModule.CABinet", cabPath);
+                var files = Query.GetCabinetFiles(cabPath);
+                Assert.Equal(new[]
+                {
+                    "filyIq8rqcxxf903Hsn5K9L0SWV73g.243FB739_4D05_472F_9CFB_EF6B1017B6DE"
+                }, files.Select(f => Path.Combine(f.Path, f.Name)).ToArray());
             }
         }
 
