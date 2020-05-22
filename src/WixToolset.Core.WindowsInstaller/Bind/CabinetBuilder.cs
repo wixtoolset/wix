@@ -150,13 +150,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // Get the Value for Max Uncompressed Media Size
                     maxPreCompressedSizeInBytes = (ulong)this.MaximumUncompressedMediaSize * 1024 * 1024;
 
-                    foreach (FileFacade facade in cabinetWorkItem.FileFacades) // No other easy way than looping to get the only row
+                    var facade = cabinetWorkItem.FileFacades.First();
+
+                    // If the file is larger than MaximumUncompressedFileSize set Maximum Cabinet Size for Cabinet Splitting
+                    if ((ulong)facade.FileSize >= maxPreCompressedSizeInBytes)
                     {
-                        if ((ulong)facade.FileSize >= maxPreCompressedSizeInBytes)
-                        {
-                            // If file is larger than MaximumUncompressedFileSize set Maximum Cabinet Size for Cabinet Splitting
-                            maxCabinetSize = this.MaximumCabinetSizeForLargeFileSplitting;
-                        }
+                        maxCabinetSize = this.MaximumCabinetSizeForLargeFileSplitting;
                     }
                 }
             }

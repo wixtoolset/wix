@@ -452,7 +452,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.FileRowsByCabinet = filesByCabinetMedia;
                 command.ResolveMedia = this.ResolveMedia;
                 command.TableDefinitions = tableDefinitions;
-                command.TempFilesLocation = this.IntermediateFolder;
+                command.IntermediateFolder = this.IntermediateFolder;
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -887,8 +887,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </remarks>
         private void ValidateComponentGuids(WindowsInstallerData output)
         {
-            Table componentTable = output.Tables["Component"];
-            if (null != componentTable)
+            if (output.TryGetTable("Component", out var componentTable))
             {
                 Dictionary<string, bool> componentGuidConditions = new Dictionary<string, bool>(componentTable.Rows.Count);
 

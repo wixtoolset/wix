@@ -59,7 +59,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IMessaging Messaging { private get; set; }
 
-        public string TempFilesLocation { private get; set; }
+        public string IntermediateFolder { private get; set; }
 
         /// <summary>
         /// Sets the default compression level to use for cabinets
@@ -95,15 +95,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             this.lastCabinetAddedToMediaTable = new Dictionary<string, string>();
 
-            this.SetCabbingThreadCount();
+            // If the cabbing thread count wasn't provided, default the number of cabbing threads to the number of processors.
+            if (this.CabbingThreadCount <= 0)
+            {
+                this.CabbingThreadCount = this.CalculateCabbingThreadCount();
+            }
 
             // Send Binder object to Facilitate NewCabNamesCallBack Callback
             var cabinetBuilder = new CabinetBuilder(this.Messaging, this.CabbingThreadCount, Marshal.GetFunctionPointerForDelegate(this.newCabNamesCallBack));
 
             // Supply Compile MediaTemplate Attributes to Cabinet Builder
-            this.GetMediaTemplateAttributes(out var MaximumCabinetSizeForLargeFileSplitting, out var MaximumUncompressedMediaSize);
-            cabinetBuilder.MaximumCabinetSizeForLargeFileSplitting = MaximumCabinetSizeForLargeFileSplitting;
-            cabinetBuilder.MaximumUncompressedMediaSize = MaximumUncompressedMediaSize;
+            this.GetMediaTemplateAttributes(out var maximumCabinetSizeForLargeFileSplitting, out var maximumUncompressedMediaSize);
+            cabinetBuilder.MaximumCabinetSizeForLargeFileSplitting = maximumCabinetSizeForLargeFileSplitting;
+            cabinetBuilder.MaximumUncompressedMediaSize = maximumUncompressedMediaSize;
 
             foreach (var entry in this.FileRowsByCabinet)
             {
@@ -133,44 +137,36 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        /// <summary>
-        /// Sets the thead count to the number of processors if the current thread count is set to 0.
-        /// </summary>
-        /// <remarks>The thread count value must be greater than 0 otherwise and exception will be thrown.</remarks>
-        private void SetCabbingThreadCount()
+        private int CalculateCabbingThreadCount()
         {
-            // default the number of cabbing threads to the number of processors if it wasn't specified
-            if (0 == this.CabbingThreadCount)
+            var cabbingThreadCount = 1;  // default to 1 if the environment variable is not set.
+
+            var numberOfProcessors = Environment.GetEnvironmentVariable("NUMBER_OF_PROCESSORS");
+
+            try
             {
-                string numberOfProcessors = System.Environment.GetEnvironmentVariable("NUMBER_OF_PROCESSORS");
-
-                try
+                if (!String.IsNullOrEmpty(numberOfProcessors))
                 {
-                    if (null != numberOfProcessors)
+                    cabbingThreadCount = Convert.ToInt32(numberOfProcessors, CultureInfo.InvariantCulture.NumberFormat);
+
+                    if (cabbingThreadCount <= 0)
                     {
-                        this.CabbingThreadCount = Convert.ToInt32(numberOfProcessors, CultureInfo.InvariantCulture.NumberFormat);
-
-                        if (0 >= this.CabbingThreadCount)
-                        {
-                            throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
-                        }
+                        throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
                     }
-                    else // default to 1 if the environment variable is not set
-                    {
-                        this.CabbingThreadCount = 1;
-                    }
+                }
 
-                    this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
-                }
-                catch (ArgumentException)
-                {
-                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
-                }
-                catch (FormatException)
-                {
-                    throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
-                }
+                this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(this.CabbingThreadCount.ToString()));
             }
+            catch (ArgumentException)
+            {
+                throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
+            }
+            catch (FormatException)
+            {
+                throw new WixException(ErrorMessages.IllegalEnvironmentVariable("NUMBER_OF_PROCESSORS", numberOfProcessors));
+            }
+
+            return cabbingThreadCount;
         }
 
 
@@ -185,18 +181,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
-            string tempCabinetFileX = Path.Combine(this.TempFilesLocation, mediaRow.Cabinet);
+            string tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaRow.Cabinet);
 
             // check for an empty cabinet
             if (!fileFacades.Any())
             {
-                string cabinetName = mediaRow.Cabinet;
-
-                // remove the leading '#' from the embedded cabinet name to make the warning easier to understand
-                if (cabinetName.StartsWith("#", StringComparison.Ordinal))
-                {
-                    cabinetName = cabinetName.Substring(1);
-                }
+                // Remove the leading '#' from the embedded cabinet name to make the warning easier to understand
+                var cabinetName = mediaRow.Cabinet.TrimStart('#');
 
                 // If building a patch, remind them to run -p for torch.
                 if (OutputType.Patch == output.Type)
