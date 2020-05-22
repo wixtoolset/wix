@@ -23,13 +23,13 @@
   </PropertyGroup>
 
   <Target Name="BuildWixNative" BeforeTargets="GetCopyToOutputDirectoryItems" Condition=" '$(NCrunch)'=='' ">
-    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" Targets="Build;BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" Targets="Build;BuiltProjectOutputGroup;ContentFilesProjectOutputGroup;DebugSymbolsProjectOutputGroup">
       <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
     </MSBuild>
-    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=x64" Targets="Build;BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=x64" Targets="Build;BuiltProjectOutputGroup;ContentFilesProjectOutputGroup;DebugSymbolsProjectOutputGroup">
       <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
     </MSBuild>
-
+      
     <WriteLinesToFile File="$(NativeFileListPath)" Lines="@(_NativeProjectOutput)" Overwrite="true" />
 
     <ItemGroup>

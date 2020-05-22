@@ -14,8 +14,10 @@
   </metadata>
 
   <files>
+    <file src="Win32\mergemod.dll" target="runtimes\win-x86\native" />
     <file src="Win32\wixnative.exe" target="runtimes\win-x86\native" />
     <file src="Win32\wixnative.pdb" target="runtimes\win-x86\native" />
+    <file src="x64\mergemod.dll" target="runtimes\win-x64\native" />
     <file src="x64\wixnative.exe" target="runtimes\win-x64\native" />
     <file src="x64\wixnative.pdb" target="runtimes\win-x64\native" />
   </files>

@@ -69,6 +69,14 @@
     <None Include="packages.config" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="$(Platform)\mergemod.dll">
+      <DeploymentContent>true</DeploymentContent>
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="Pack" DependsOnTargets="GetBuildVersion">
     <Exec Command='nuget pack runtime.win.WixToolset.Core.Native.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Core.Native;Version="$(BuildVersionSimple)";Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
   </Target>
