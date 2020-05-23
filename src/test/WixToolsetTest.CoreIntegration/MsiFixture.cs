@@ -790,7 +790,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact(Skip = "Not implemented yet.")]
+        [Fact]
         public void CanBuildInstanceTransform()
         {
             var folder = TestData.Get(@"TestData\InstanceTransform");
@@ -813,7 +813,30 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 var output = WindowsInstallerData.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"), false);
-                Assert.NotEmpty(output.SubStorages);
+                var substorage = output.SubStorages.Single();
+                Assert.Equal("I1", substorage.Name);
+
+                var data = substorage.Data;
+                Assert.Equal(new[]
+                {
+                    "_SummaryInformation",
+                    "Property",
+                    "Upgrade"
+                }, data.Tables.Select(t => t.Name).ToArray());
+
+                Assert.Equal(new[]
+                {
+                    "INSTANCEPROPERTY\tI1",
+                    "ProductName\tMsiPackage (Instance 1)",
+                }, JoinRows(data.Tables["Property"]));
+
+                Assert.Equal(new[]
+                {
+                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
+                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t\t1.0.0.0\t1033\t1\t0\t0",
+                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
+                    "{047730A5-30FE-4A62-A520-DA9381B8226A}\t1.0.0.0\t\t1033\t2\t0\t0"
+                }, JoinRows(data.Tables["Upgrade"]));
             }
         }
 
@@ -848,6 +871,16 @@ namespace WixToolsetTest.CoreIntegration
                     });
 
                 Assert.False(File.Exists(msiPath));
+            }
+        }
+
+        private static string[] JoinRows(Table table)
+        {
+            return table.Rows.Select(r => JoinFields(r.Fields)).ToArray();
+
+            string JoinFields(Field[] fields)
+            {
+                return String.Join('\t', fields.Select(f => f.ToString()));
             }
         }
     }
