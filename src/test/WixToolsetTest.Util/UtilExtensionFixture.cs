@@ -158,7 +158,6 @@ namespace WixToolsetTest.Util
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-burnStub", burnStubPath,
                     "-o", bundlePath
                 });
 
