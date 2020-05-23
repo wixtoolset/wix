@@ -10,6 +10,51 @@ namespace WixToolsetTest.WixCop
     public class WixCopFixture
     {
         [Fact]
+        public void CanConvertPermissionExFile()
+        {
+            const string beforeFileName = "v3.wxs";
+            const string afterFileName = "v4_expected.wxs";
+            var folder = TestData.Get(@"TestData\PermissionEx");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder(true);
+                var targetFile = Path.Combine(baseFolder, beforeFileName);
+                File.Copy(Path.Combine(folder, beforeFileName), Path.Combine(baseFolder, beforeFileName));
+
+                var runner = new WixCopRunner
+                {
+                    FixErrors = true,
+                    SearchPatterns =
+                    {
+                        targetFile,
+                    },
+                };
+
+                var result = runner.Execute();
+
+                Assert.Equal(2, result.ExitCode);
+
+                var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
+                var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");
+                Assert.Equal(expected, actual);
+
+                var runner2 = new WixCopRunner
+                {
+                    FixErrors = true,
+                    SearchPatterns =
+                    {
+                        targetFile,
+                    },
+                };
+
+                var result2 = runner2.Execute();
+
+                Assert.Equal(0, result2.ExitCode);
+            }
+        }
+
+        [Fact]
         public void CanConvertSingleFile()
         {
             const string beforeFileName = "SingleFile.wxs";
