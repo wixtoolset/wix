@@ -96,16 +96,14 @@ namespace WixToolsetTest.Util
             var folder = TestData.Get(@"TestData\PermissionEx");
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(BuildX64, "Binary", "CreateFolder", "CustomAction", "Wix4SecureObject");
+            var results = build.BuildAndQuery(BuildX64, "Wix4SecureObject");
             Assert.Equal(new[]
             {
-                "Binary:Wix4UtilCA_X64\t[Binary data]",
-                "CreateFolder:INSTALLFOLDER\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
-                "CustomAction:Wix4ExecSecureObjects_X64\t11265\tWix4UtilCA_X64\tExecSecureObjects\t",
-                "CustomAction:Wix4ExecSecureObjectsRollback_X64\t11521\tWix4UtilCA_X64\tExecSecureObjectsRollback\t",
-                "CustomAction:Wix4SchedSecureObjects_X64\t1\tWix4UtilCA_X64\tSchedSecureObjects\t",
-                "CustomAction:Wix4SchedSecureObjectsRollback_X64\t1\tWix4UtilCA_X64\tSchedSecureObjectsRollback\t",
+                "Wix4SecureObject:ExampleRegistryKey\tRegistry\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+                "Wix4SecureObject:filF5_pLhBuF5b4N9XEo52g_hUM5Lo\tFile\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
                 "Wix4SecureObject:INSTALLFOLDER\tCreateFolder\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+                "Wix4SecureObject:regO7jgNdgqG_TfURLgXPo2jRcxzx8\tRegistry\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+                "Wix4SecureObject:testsvc\tServiceInstall\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
             }, results.OrderBy(s => s).ToArray());
         }
 
