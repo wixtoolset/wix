@@ -24,7 +24,9 @@ namespace WixToolset.Converters
 
         private const char XDocumentNewLine = '\n'; // XDocument normalizes "\r\n" to just "\n".
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
+        private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
 
+        private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
         private static readonly XName FileElementName = WixNamespace + "File";
@@ -33,6 +35,7 @@ namespace WixToolset.Converters
         private static readonly XName MspPackageElementName = WixNamespace + "MspPackage";
         private static readonly XName MsuPackageElementName = WixNamespace + "MsuPackage";
         private static readonly XName PayloadElementName = WixNamespace + "Payload";
+        private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
         private static readonly XName WixElementWithoutNamespaceName = XNamespace.None + "Wix";
@@ -52,7 +55,7 @@ namespace WixToolset.Converters
             { "http://schemas.microsoft.com/wix/PSExtension", "http://wixtoolset.org/schemas/v4/wxs/powershell" },
             { "http://schemas.microsoft.com/wix/SqlExtension", "http://wixtoolset.org/schemas/v4/wxs/sql" },
             { "http://schemas.microsoft.com/wix/TagExtension", "http://wixtoolset.org/schemas/v4/wxs/tag" },
-            { "http://schemas.microsoft.com/wix/UtilExtension", "http://wixtoolset.org/schemas/v4/wxs/util" },
+            { "http://schemas.microsoft.com/wix/UtilExtension", WixUtilNamespace },
             { "http://schemas.microsoft.com/wix/VSExtension", "http://wixtoolset.org/schemas/v4/wxs/vs" },
             { "http://wixtoolset.org/schemas/thmutil/2010", "http://wixtoolset.org/schemas/v4/thmutil" },
             { "http://schemas.microsoft.com/wix/2009/Lux", "http://wixtoolset.org/schemas/v4/lux" },
@@ -88,6 +91,7 @@ namespace WixToolset.Converters
                 { Wix3Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.CustomActionElementName, this.ConvertCustomActionElement },
+                { Wix3Converter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
                 { Wix3Converter.PropertyElementName, this.ConvertPropertyElement },
                 { Wix3Converter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
                 { Wix3Converter.IncludeElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
@@ -417,6 +421,21 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertUtilPermissionExElement(XElement element)
+        {
+            if (null == element.Attribute("Inheritable"))
+            {
+                var inheritable = element.Parent.Name == CreateFolderElementName;
+                if (!inheritable)
+                {
+                    if (this.OnError(ConverterTestType.AssignPermissionExInheritable, element, "The PermissionEx Inheritable attribute is being set to 'no' to ensure it remains the same as the v3 default"))
+                    {
+                        element.Add(new XAttribute("Inheritable", "no"));
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Converts a Wix element.
         /// </summary>
@@ -675,6 +694,11 @@ namespace WixToolset.Converters
             /// BootstrapperApplicationData attribute is deprecated and replaced with Unreal.
             /// </summary>
             BootstrapperApplicationDataDeprecated,
+
+            /// <summary>
+            /// Inheritable is new and is now defaulted to 'yes' which is a change in behavior for all but children of CreateFolder.
+            /// </summary>
+            AssignPermissionExInheritable,
         }
     }
 }
