@@ -155,7 +155,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         propertyRow.Value = Common.GenerateGuid();
 
-#if TODO_FIX_INSTANCE_TRANSFORM // Is this still necessary?
+#if TODO_PATCHING // Is this still necessary?
 
                         // Update the target ProductCode in any instance transforms.
                         foreach (SubStorage subStorage in this.Output.SubStorages)
@@ -294,7 +294,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.FileFacades = fileFacades;
                 command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
                 command.OverwriteHash = true;
-                command.TableDefinitions = tableDefinitions;
                 command.VariableCache = variableCache;
                 command.Execute();
             }

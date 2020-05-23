@@ -12,7 +12,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
-    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -35,8 +34,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         public IEnumerable<FileFacade> UpdateFileFacades { private get; set; }
 
         public bool OverwriteHash { private get; set; }
-
-        public TableDefinitionCollection TableDefinitions { private get; set; }
 
         public IDictionary<string, string> VariableCache { private get; set; }
 
