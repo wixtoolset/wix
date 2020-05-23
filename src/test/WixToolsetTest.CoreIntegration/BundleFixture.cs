@@ -174,6 +174,35 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact(Skip = "Test demonstrates failure")]
+        public void CantBuildSingleExeBundleWithInvalidArgument()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "SingleExeBundle", "SingleExePackageGroup.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", exePath,
+                    "-nonexistentswitch", "param",
+                });
+
+                Assert.NotEqual(0, result.ExitCode);
+
+                Assert.False(File.Exists(exePath));
+            }
+        }
+
         [Fact]
         public void CanBuildSingleExeRemotePayloadBundle()
         {
