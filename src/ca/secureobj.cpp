@@ -3,10 +3,10 @@
 #include "precomp.h"
 
 // structs
-LPCWSTR wzQUERY_SECUREOBJECTS = L"SELECT `Wix4SecureObject`.`Wix4SecureObject`, `Wix4SecureObject`.`Table`, `Wix4SecureObject`.`Domain`, `Wix4SecureObject`.`User`, "
+LPCWSTR wzQUERY_SECUREOBJECTS = L"SELECT `Wix4SecureObject`.`Wix4SecureObject`, `Wix4SecureObject`.`Table`, `Wix4SecureObject`.`Domain`, `Wix4SecureObject`.`User`, `Wix4SecureObject`.`Attributes`, "
                                 L"`Wix4SecureObject`.`Permission`, `Wix4SecureObject`.`Component_`, `Component`.`Attributes` FROM `Wix4SecureObject`,`Component` WHERE "
                                 L"`Wix4SecureObject`.`Component_`=`Component`.`Component`";
-enum eQUERY_SECUREOBJECTS { QSO_SECUREOBJECT = 1, QSO_TABLE, QSO_DOMAIN, QSO_USER, QSO_PERMISSION, QSO_COMPONENT, QSO_COMPATTRIBUTES };
+enum eQUERY_SECUREOBJECTS { QSO_SECUREOBJECT = 1, QSO_TABLE, QSO_DOMAIN, QSO_USER, QSO_ATTRIBUTES, QSO_PERMISSION, QSO_COMPONENT, QSO_COMPATTRIBUTES };
 
 LPCWSTR wzQUERY_REGISTRY = L"SELECT `Registry`.`Registry`, `Registry`.`Root`, `Registry`.`Key` FROM `Registry` WHERE `Registry`.`Registry`=?";
 enum eQUERY_OBJECTCOMPONENT { QSOC_REGISTRY = 1, QSOC_REGROOT, QSOC_REGKEY };
@@ -15,6 +15,11 @@ LPCWSTR wzQUERY_SERVICEINSTALL = L"SELECT `ServiceInstall`.`Name` FROM `ServiceI
 enum eQUERY_SECURESERVICEINSTALL { QSSI_NAME = 1 };
 
 enum eOBJECTTYPE { OT_UNKNOWN, OT_SERVICE, OT_FOLDER, OT_FILE, OT_REGISTRY };
+
+enum eSECURE_OBJECT_ATTRIBUTE
+{
+    SECURE_OBJECT_ATTRIBUTE_INHERITABLE = 0x1,
+};
 
 static eOBJECTTYPE EObjectTypeFromString(
     __in LPCWSTR pwzTable
@@ -335,6 +340,7 @@ extern "C" UINT __stdcall SchedSecureObjects(
 
     DWORD cObjects = 0;
     eOBJECTTYPE eType = OT_UNKNOWN;
+    DWORD dwAttributes = 0;
 
     //
     // initialize
@@ -409,7 +415,6 @@ extern "C" UINT __stdcall SchedSecureObjects(
             // add the data to the CustomActionData
             hr = WcaGetRecordString(hRec, QSO_SECUREOBJECT, &pwzData);
             ExitOnFailure(hr, "failed to get name of object");
-
             hr = WcaWriteStringToCaData(pwzTable, &pwzCustomActionData);
             ExitOnFailure(hr, "failed to add data to CustomActionData");
 
@@ -421,6 +426,11 @@ extern "C" UINT __stdcall SchedSecureObjects(
             hr = WcaGetRecordFormattedString(hRec, QSO_USER, &pwzData);
             ExitOnFailure(hr, "failed to get user to configure object");
             hr = WcaWriteStringToCaData(pwzData, &pwzCustomActionData);
+            ExitOnFailure(hr, "failed to add data to CustomActionData");
+
+            hr = WcaGetRecordInteger(hRec, QSO_ATTRIBUTES, reinterpret_cast<int*>(&dwAttributes));
+            ExitOnFailure(hr, "failed to get attributes to configure object");
+            hr = WcaWriteIntegerToCaData(dwAttributes, &pwzCustomActionData);
             ExitOnFailure(hr, "failed to add data to CustomActionData");
 
             hr = WcaGetRecordString(hRec, QSO_PERMISSION, &pwzData);
@@ -568,7 +578,7 @@ LExit:
                    called as Type 1025 CustomAction (deferred binary DLL)
 
  NOTE: deferred CustomAction since it modifies the machine
- NOTE: CustomActionData == wzObject\twzTable\twzDomain\twzUser\tdwPermissions\twzObject\t...
+ NOTE: CustomActionData == wzObject\twzTable\twzDomain\twzUser\tdwAttributes\tdwPermissions\t...
 ******************************************************************/
 extern "C" UINT __stdcall ExecSecureObjects(
     __in MSIHANDLE hInstall
@@ -586,6 +596,7 @@ extern "C" UINT __stdcall ExecSecureObjects(
     DWORD dwRevision = 0;
     LPWSTR pwzUser = NULL;
     DWORD dwPermissions = 0;
+    DWORD dwAttributes = 0;
     LPWSTR pwzAccount = NULL;
     PSID psid = NULL;
 
@@ -626,8 +637,10 @@ extern "C" UINT __stdcall ExecSecureObjects(
         ExitOnFailure(hr, "failed to process CustomActionData");
         hr = WcaReadStringFromCaData(&pwz, &pwzUser);
         ExitOnFailure(hr, "failed to process CustomActionData");
+        hr = WcaReadIntegerFromCaData(&pwz, reinterpret_cast<int*>(&dwAttributes));
+        ExitOnFailure(hr, "failed to process CustomActionData");
         hr = WcaReadIntegerFromCaData(&pwz, reinterpret_cast<int*>(&dwPermissions));
-        ExitOnFailure(hr, "failed to processCustomActionData");
+        ExitOnFailure(hr, "failed to process CustomActionData");
 
         WcaLog(LOGMSG_VERBOSE, "Securing Object: %ls Type: %ls User: %ls", pwzObject, pwzTable, pwzUser);
 
@@ -690,7 +703,7 @@ extern "C" UINT __stdcall ExecSecureObjects(
         //
         ea.grfAccessMode = SET_ACCESS;
 
-        if (0 == lstrcmpW(L"CreateFolder", pwzTable))
+        if (dwAttributes & SECURE_OBJECT_ATTRIBUTE_INHERITABLE)
         {
             ea.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
         }

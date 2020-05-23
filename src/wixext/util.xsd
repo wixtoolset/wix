@@ -775,6 +775,11 @@
     <xs:complexType>
       <xs:attribute name="Domain" type="xs:string"></xs:attribute>
       <xs:attribute name="User" use="required" type="xs:string"></xs:attribute>
+      <xs:attribute name="Inheritable" type="xs:YesNoType">
+        <xs:annotation>
+          <xs:documentation>Whether the permissions are inheritable. The default is "yes".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <!-- Common ACLs -->
       <xs:attribute name="Read" type="YesNoType"></xs:attribute>
       <xs:attribute name="Delete" type="YesNoType"></xs:attribute>

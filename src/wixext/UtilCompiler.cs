@@ -49,6 +49,11 @@ namespace WixToolset.Util
             TypeMask = 0xf,
         }
 
+        internal enum WixPermissionExAttributes
+        {
+            Inheritable = 0x01
+        }
+
         internal enum WixRemoveFolderExOn
         {
             Install = 1,
@@ -2367,6 +2372,8 @@ namespace WixToolset.Util
             string domain = null;
             string[] specialPermissions = null;
             string user = null;
+            var inheritable = YesNoType.NotSet;
+            int attributes = 0;
 
             var permissionType = PermissionType.SecureObjects;
 
@@ -2407,6 +2414,9 @@ namespace WixToolset.Util
                             }
                             domain = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
+                        case "Inheritable":
+                            inheritable = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
                         case "User":
                             user = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -2444,6 +2454,8 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.GenericReadNotAllowed(sourceLineNumbers));
             }
 
+            attributes |= inheritable == YesNoType.No ? 0 : (int)WixPermissionExAttributes.Inheritable; // default to inheritable.
+
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
             if (!this.Messaging.EncounteredError)
@@ -2457,6 +2469,7 @@ namespace WixToolset.Util
                     Table = tableName,
                     Domain = domain,
                     User = user,
+                    Attributes = attributes,
                     Permission = permission,
                     ComponentRef = componentId,
                 });

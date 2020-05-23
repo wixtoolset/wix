@@ -105,7 +105,7 @@ namespace WixToolsetTest.Util
                 "CustomAction:Wix4ExecSecureObjectsRollback_X64\t11521\tWix4UtilCA_X64\tExecSecureObjectsRollback\t",
                 "CustomAction:Wix4SchedSecureObjects_X64\t1\tWix4UtilCA_X64\tSchedSecureObjects\t",
                 "CustomAction:Wix4SchedSecureObjectsRollback_X64\t1\tWix4UtilCA_X64\tSchedSecureObjectsRollback\t",
-                "Wix4SecureObject:INSTALLFOLDER\tCreateFolder\t\tEveryone\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
+                "Wix4SecureObject:INSTALLFOLDER\tCreateFolder\t\tEveryone\t1\t268435456\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo",
             }, results.OrderBy(s => s).ToArray());
         }
 

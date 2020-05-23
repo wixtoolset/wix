@@ -15,6 +15,7 @@ namespace WixToolset.Util
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Table), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Domain), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.User), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.Permission), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(SecureObjectsTupleFields.ComponentRef), IntermediateFieldType.String),
             },
@@ -32,6 +33,7 @@ namespace WixToolset.Util.Tuples
         Table,
         Domain,
         User,
+        Attributes,
         Permission,
         ComponentRef,
     }
@@ -70,6 +72,12 @@ namespace WixToolset.Util.Tuples
         {
             get => this.Fields[(int)SecureObjectsTupleFields.User].AsString();
             set => this.Set((int)SecureObjectsTupleFields.User, value);
+        }
+
+        public int Attributes
+        {
+            get => this.Fields[(int)SecureObjectsTupleFields.Attributes].AsNumber();
+            set => this.Set((int)SecureObjectsTupleFields.Attributes, value);
         }
 
         public int? Permission
