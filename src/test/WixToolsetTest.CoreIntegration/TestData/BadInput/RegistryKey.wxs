@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ex="http://www.example.com/scheams/v1/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MiscComponent" Guid="7C40C257-AB36-4B8C-8FD1-C56E0AC4AAEF">
+                <RegistryKey>
+                  <ex:Example />
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
