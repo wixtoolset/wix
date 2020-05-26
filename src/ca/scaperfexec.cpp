@@ -87,10 +87,10 @@ extern "C" UINT __stdcall RegisterPerfmon(
 
     HMODULE hMod = NULL;
     PFNPERFCOUNTERTEXTSTRINGS pfnPerfCounterTextString;
-    DWORD_PTR dwRet;
+    DWORD dwRet;
     LPWSTR pwzShortPath = NULL;
-    DWORD_PTR cchShortPath = MAX_PATH;
-    DWORD_PTR cchShortPathLength  = 0;
+    DWORD cchShortPath = MAX_PATH;
+    DWORD cchShortPathLength  = 0;
 
     LPWSTR pwzCommand = NULL;
 

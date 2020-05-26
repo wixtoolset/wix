@@ -875,7 +875,7 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "CloseApplications", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "CloseApplications", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -1181,8 +1181,8 @@ namespace WixToolset.Util
                 }
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureSmbInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureSmbUninstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureSmbInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureSmbUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
             if (!this.Messaging.EncounteredError)
             {
@@ -1489,7 +1489,7 @@ namespace WixToolset.Util
                 IconIndex = iconIndex,
             });
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedInternetShortcuts", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedInternetShortcuts", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
             // make sure we have a CreateFolder table so that the immediate CA can add temporary rows to handle installation and uninstallation
             this.ParseHelper.EnsureTable(section, sourceLineNumbers, "CreateFolder");
@@ -1677,8 +1677,8 @@ namespace WixToolset.Util
                 this.ParseHelper.CreateRegistryTuple(section, sourceLineNumbers, RegistryRootType.LocalMachine, performanceKey, "Counter Types", sbCounterTypes.ToString(), componentId, false);
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "InstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "UninstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "InstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "UninstallPerfCounterData", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
 
         /// <summary>
@@ -2156,8 +2156,8 @@ namespace WixToolset.Util
                 });
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonInstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonUninstall", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
 
 
@@ -2204,8 +2204,8 @@ namespace WixToolset.Util
                 });
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestRegister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestUnregister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestRegister", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigurePerfmonManifestUnregister", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
 
         /// <summary>
@@ -2248,7 +2248,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFormatFiles", this.Context.Platform, CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedFormatFiles", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                 section.AddTuple(new WixFormatFilesTuple(sourceLineNumbers)
                 {
@@ -2348,8 +2348,8 @@ namespace WixToolset.Util
 
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureEventManifestRegister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureEventManifestUnregister", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureEventManifestRegister", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureEventManifestUnregister", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
             if (null != messageFile || null != parameterFile || null != resourceFile)
             {
@@ -2460,7 +2460,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedSecureObjects", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X64 | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedSecureObjects", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                 var id = this.ParseHelper.CreateIdentifier("sec", objectId, tableName, domain, user);
                 section.AddTuple(new SecureObjectsTuple(sourceLineNumbers, id)
@@ -2809,7 +2809,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RemoveFoldersEx", this.Context.Platform, CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RemoveFoldersEx", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                 section.AddTuple(new WixRemoveFolderExTuple(sourceLineNumbers, id)
                 {
@@ -2885,7 +2885,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RegisterRestartResources", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "RegisterRestartResources", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                 section.AddTuple(new WixRestartResourceTuple(sourceLineNumbers, id)
                 {
@@ -2977,7 +2977,7 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedServiceConfig", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedServiceConfig", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
 
                 section.AddTuple(new ServiceConfigTuple(sourceLineNumbers)
                 {
@@ -3081,7 +3081,7 @@ namespace WixToolset.Util
                     Attributes = attributes,
                 });
 
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "TouchFileDuringInstall", this.Context.Platform, CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "TouchFileDuringInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
             }
         }
 
@@ -3285,7 +3285,7 @@ namespace WixToolset.Util
 
             if (null != componentId)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureUsers", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "ConfigureUsers", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
             }
 
             if (!this.Messaging.EncounteredError)
@@ -3669,7 +3669,7 @@ namespace WixToolset.Util
                 }
             }
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlConfig", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlConfig", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
 
         /// <summary>
@@ -3720,7 +3720,7 @@ namespace WixToolset.Util
 
         private void AddReferenceToSchedXmlFile(SourceLineNumber sourceLineNumbers, IntermediateSection section)
         {
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.ARM | CustomActionPlatforms.X86);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "SchedXmlFile", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM | CustomActionPlatforms.ARM64);
         }
 
         /// <summary>

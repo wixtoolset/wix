@@ -43,13 +43,13 @@ namespace WixToolsetTest.Util
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4FileShare", "Wix4FileSharePermissions");
             Assert.Equal(new[]
             {
-                "Binary:Wix4UtilCA_X86\t[Binary data]",
-                "CustomAction:Wix4ConfigureSmbInstall_X86\t1\tWix4UtilCA_X86\tConfigureSmbInstall\t",
-                "CustomAction:Wix4ConfigureSmbUninstall_X86\t1\tWix4UtilCA_X86\tConfigureSmbUninstall\t",
-                "CustomAction:Wix4CreateSmb_X86\t11265\tWix4UtilCA_X86\tCreateSmb\t",
-                "CustomAction:Wix4CreateSmbRollback_X86\t11585\tWix4UtilCA_X86\tDropSmb\t",
-                "CustomAction:Wix4DropSmb_X86\t11265\tWix4UtilCA_X86\tDropSmb\t",
-                "CustomAction:Wix4DropSmbRollback_X86\t11585\tWix4UtilCA_X86\tCreateSmb\t",
+                "Binary:Wix4UtilCA_X64\t[Binary data]",
+                "CustomAction:Wix4ConfigureSmbInstall_X64\t1\tWix4UtilCA_X64\tConfigureSmbInstall\t",
+                "CustomAction:Wix4ConfigureSmbUninstall_X64\t1\tWix4UtilCA_X64\tConfigureSmbUninstall\t",
+                "CustomAction:Wix4CreateSmb_X64\t11265\tWix4UtilCA_X64\tCreateSmb\t",
+                "CustomAction:Wix4CreateSmbRollback_X64\t11585\tWix4UtilCA_X64\tDropSmb\t",
+                "CustomAction:Wix4DropSmb_X64\t11265\tWix4UtilCA_X64\tDropSmb\t",
+                "CustomAction:Wix4DropSmbRollback_X64\t11585\tWix4UtilCA_X64\tCreateSmb\t",
                 "Wix4FileShare:ExampleFileShare\texample\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tAn example file share\tINSTALLFOLDER",
                 "Wix4FileSharePermissions:ExampleFileShare\tEveryone\t1",
             }, results.OrderBy(s => s).ToArray());
@@ -61,13 +61,13 @@ namespace WixToolsetTest.Util
             var folder = TestData.Get(@"TestData\CloseApplication");
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4CloseApplication");
+            var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4CloseApplication");
             Assert.Equal(new[]
             {
-                "Binary:Wix4UtilCA_X86\t[Binary data]",
-                "CustomAction:Wix4CheckRebootRequired_X86\t65\tWix4UtilCA_X86\tWixCheckRebootRequired\t",
-                "CustomAction:Wix4CloseApplications_X86\t1\tWix4UtilCA_X86\tWixCloseApplications\t",
-                "CustomAction:Wix4CloseApplicationsDeferred_X86\t3073\tWix4UtilCA_X86\tWixCloseApplicationsDeferred\t",
+                "Binary:Wix4UtilCA_A64\t[Binary data]",
+                "CustomAction:Wix4CheckRebootRequired_A64\t65\tWix4UtilCA_A64\tWixCheckRebootRequired\t",
+                "CustomAction:Wix4CloseApplications_A64\t1\tWix4UtilCA_A64\tWixCloseApplications\t",
+                "CustomAction:Wix4CloseApplicationsDeferred_A64\t3073\tWix4UtilCA_A64\tWixCloseApplicationsDeferred\t",
                 "Wix4CloseApplication:CloseMyApp\texplorer.exe\t\t\t3\t\tMYAPPISRUNNING\t\t",
             }, results.OrderBy(s => s).ToArray());
         }
@@ -81,10 +81,10 @@ namespace WixToolsetTest.Util
             var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "RemoveFile", "Wix4InternetShortcut");
             Assert.Equal(new[]
             {
-                "Binary:Wix4UtilCA_X86\t[Binary data]",
-                "CustomAction:Wix4CreateInternetShortcuts_X86\t3073\tWix4UtilCA_X86\tWixCreateInternetShortcuts\t",
-                "CustomAction:Wix4RollbackInternetShortcuts_X86\t3329\tWix4UtilCA_X86\tWixRollbackInternetShortcuts\t",
-                "CustomAction:Wix4SchedInternetShortcuts_X86\t1\tWix4UtilCA_X86\tWixSchedInternetShortcuts\t",
+                "Binary:Wix4UtilCA_X64\t[Binary data]",
+                "CustomAction:Wix4CreateInternetShortcuts_X64\t3073\tWix4UtilCA_X64\tWixCreateInternetShortcuts\t",
+                "CustomAction:Wix4RollbackInternetShortcuts_X64\t3329\tWix4UtilCA_X64\tWixRollbackInternetShortcuts\t",
+                "CustomAction:Wix4SchedInternetShortcuts_X64\t1\tWix4UtilCA_X64\tWixSchedInternetShortcuts\t",
                 "RemoveFile:wixshortcut\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tvtpzs3bw.lnk|WiX Toolset.lnk\tINSTALLFOLDER\t2",
                 "Wix4InternetShortcut:wixshortcut\tfilF5_pLhBuF5b4N9XEo52g_hUM5Lo\tINSTALLFOLDER\tWiX Toolset.lnk\thttps://wixtoolset.org\t0\t\t0",
             }, results.OrderBy(s => s).ToArray());
@@ -113,19 +113,19 @@ namespace WixToolsetTest.Util
             var folder = TestData.Get(@"TestData\EventManifest");
             var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4EventManifest", "Wix4XmlFile");
+            var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4EventManifest", "Wix4XmlFile");
             Assert.Equal(new[]
             {
-                "Binary:Wix4UtilCA_X86\t[Binary data]",
-                "CustomAction:Wix4ConfigureEventManifestRegister_X86\t1\tWix4UtilCA_X86\tConfigureEventManifestRegister\t",
-                "CustomAction:Wix4ConfigureEventManifestUnregister_X86\t1\tWix4UtilCA_X86\tConfigureEventManifestUnregister\t",
-                "CustomAction:Wix4ExecXmlFile_X86\t11265\tWix4UtilCA_X86\tExecXmlFile\t",
-                "CustomAction:Wix4ExecXmlFileRollback_X86\t11521\tWix4UtilCA_X86\tExecXmlFileRollback\t",
-                "CustomAction:Wix4RegisterEventManifest_X86\t3073\tWix4UtilCA_X86\tCAQuietExec\t",
-                "CustomAction:Wix4RollbackRegisterEventManifest_X86\t3393\tWix4UtilCA_X86\tCAQuietExec\t",
-                "CustomAction:Wix4RollbackUnregisterEventManifest_X86\t3329\tWix4UtilCA_X86\tCAQuietExec\t",
-                "CustomAction:Wix4SchedXmlFile_X86\t1\tWix4UtilCA_X86\tSchedXmlFile\t",
-                "CustomAction:Wix4UnregisterEventManifest_X86\t3137\tWix4UtilCA_X86\tCAQuietExec\t",
+                "Binary:Wix4UtilCA_A64\t[Binary data]",
+                "CustomAction:Wix4ConfigureEventManifestRegister_A64\t1\tWix4UtilCA_A64\tConfigureEventManifestRegister\t",
+                "CustomAction:Wix4ConfigureEventManifestUnregister_A64\t1\tWix4UtilCA_A64\tConfigureEventManifestUnregister\t",
+                "CustomAction:Wix4ExecXmlFile_A64\t11265\tWix4UtilCA_A64\tExecXmlFile\t",
+                "CustomAction:Wix4ExecXmlFileRollback_A64\t11521\tWix4UtilCA_A64\tExecXmlFileRollback\t",
+                "CustomAction:Wix4RegisterEventManifest_A64\t3073\tWix4UtilCA_A64\tCAQuietExec\t",
+                "CustomAction:Wix4RollbackRegisterEventManifest_A64\t3393\tWix4UtilCA_A64\tCAQuietExec\t",
+                "CustomAction:Wix4RollbackUnregisterEventManifest_A64\t3329\tWix4UtilCA_A64\tCAQuietExec\t",
+                "CustomAction:Wix4SchedXmlFile_A64\t1\tWix4UtilCA_A64\tSchedXmlFile\t",
+                "CustomAction:Wix4UnregisterEventManifest_A64\t3137\tWix4UtilCA_A64\tCAQuietExec\t",
                 "Wix4EventManifest:Manifest.dll\t[#Manifest.dll]",
                 "Wix4XmlFile:Config_Manifest.dllMessageFile\t[#Manifest.dll]\t/*/*/*/*[\\[]@messageFileName[\\]]\tmessageFileName\t[Manifest.dll]\t4100\tManifest.dll\t",
                 "Wix4XmlFile:Config_Manifest.dllResourceFile\t[#Manifest.dll]\t/*/*/*/*[\\[]@resourceFileName[\\]]\tresourceFileName\t[Manifest.dll]\t4100\tManifest.dll\t",
@@ -199,6 +199,16 @@ namespace WixToolsetTest.Util
             var newArgs = args.ToList();
             newArgs.Add("-platform");
             newArgs.Add("x64");
+
+            var result = WixRunner.Execute(newArgs.ToArray());
+            result.AssertSuccess();
+        }
+
+        private static void BuildARM64(string[] args)
+        {
+            var newArgs = args.ToList();
+            newArgs.Add("-platform");
+            newArgs.Add("arm64");
 
             var result = WixRunner.Execute(newArgs.ToArray());
             result.AssertSuccess();
