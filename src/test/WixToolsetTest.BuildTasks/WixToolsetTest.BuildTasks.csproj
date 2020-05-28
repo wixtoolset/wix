@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Project Sdk="Microsoft.NET.Sdk">
@@ -12,6 +12,10 @@
   <ItemGroup>
     <Content Include="TestData\HeatFilePackage\HeatFilePackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\HeatFilePackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultpleFilesSameFileName\HeatFileMultpleFilesSameFileName.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultpleFilesSameFileName\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultpleFilesSameFileName\MyProgram.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\HeatFileMultpleFilesSameFileName\MyProgram.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.de-de.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />

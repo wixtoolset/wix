@@ -415,7 +415,7 @@
   <Target Name="HarvestFile"
     DependsOnTargets="$(HarvestFileDependsOn)"
     Inputs="@(HarvestFile);%(HarvestFile.Transforms)"
-    Outputs="$(IntermediateOutputPath)_%(HarvestFile.Filename)_file.wxs"
+    Outputs="@(HarvestFile->'$(IntermediateOutputPath)_%(ComponentGroupName)_%(DirectoryRefId)_%(Filename)%(Extension)_file.wxs')"
     Condition=" '@(HarvestFile)' != '' ">
 
     <HeatFile
@@ -427,7 +427,7 @@
       VerboseOutput="$(HarvestFileVerboseOutput)"
       AutogenerateGuids="$(HarvestFileAutogenerateGuids)"
       GenerateGuidsNow="$(HarvestFileGenerateGuidsNow)"
-      OutputFile="$(IntermediateOutputPath)_%(HarvestFile.Filename)_file.wxs"
+      OutputFile="$(IntermediateOutputPath)_%(HarvestFile.ComponentGroupName)_%(HarvestFile.DirectoryRefId)_%(HarvestFile.Filename)%(HarvestFile.Extension)_file.wxs"
       SuppressFragments="$(HarvestFileSuppressFragments)"
       SuppressUniqueIds="$(HarvestFileSuppressUniqueIds)"
       Transforms="%(HarvestFile.Transforms)"
