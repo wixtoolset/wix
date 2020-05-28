@@ -19,12 +19,11 @@
 
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
-    <WixBinDir Condition=" '$(WixBinDir)' == ''">$(MSBuildThisFileDirectory)</WixBinDir>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp2.1\</WixBinDir>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net461\</WixBinDir>
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
-    <WixHarvestTargetsPath Condition=" '$(WixHarvestTargetsPath)' == '' ">$(WixBinDir)wix.harvest.targets</WixHarvestTargetsPath>
-    <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(WixBinDir)wix.signing.targets</WixSigningTargetsPath>
-    <LuxTargetsPath Condition=" '$(LuxTargetsPath)' == '' ">$(WixBinDir)lux.targets</LuxTargetsPath>
-    <LuxTasksPath Condition=" '$(LuxTasksPath)' == '' ">$(WixBinDir)LuxTasks.dll</LuxTasksPath>
+    <WixHarvestTargetsPath Condition=" '$(WixHarvestTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.harvest.targets</WixHarvestTargetsPath>
+    <WixSigningTargetsPath Condition=" '$(WixSigningTargetsPath)' == '' ">$(MSBuildThisFileDirectory)wix.signing.targets</WixSigningTargetsPath>
   </PropertyGroup>
 
   <!-- This makes the project files a dependency of all targets so that things rebuild if they change -->
@@ -32,7 +31,6 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <MSBuildAllProjects Condition="Exists('$(WixHarvestTargetsPath)')">$(MSBuildAllProjects);$(WixHarvestTargetsPath)</MSBuildAllProjects>
     <MSBuildAllProjects Condition="Exists('$(WixSigningTargetsPath)')">$(MSBuildAllProjects);$(WixSigningTargetsPath)</MSBuildAllProjects>
-    <MSBuildAllProjects Condition="Exists('$(LuxTargetsPath)')">$(MSBuildAllProjects);$(LuxTargetsPath)</MSBuildAllProjects>
     <MSBuildAllProjects Condition="Exists('$(CustomBeforeWixTargets)')">$(MSBuildAllProjects);$(CustomBeforeWixTargets)</MSBuildAllProjects>
     <MSBuildAllProjects Condition="Exists('$(CustomAfterWixTargets)')">$(MSBuildAllProjects);$(CustomAfterWixTargets)</MSBuildAllProjects>
   </PropertyGroup>
@@ -1055,7 +1053,6 @@
 
   <Import Project="$(WixHarvestTargetsPath)" Condition=" '$(WixHarvestTargetsPath)' != '' and Exists('$(WixHarvestTargetsPath)')" />
   <Import Project="$(WixSigningTargetsPath)" Condition=" '$(WixSigningTargetsPath)' != '' and Exists('$(WixSigningTargetsPath)')" />
-  <Import Project="$(LuxTargetsPath)" Condition=" '$(LuxTargetsPath)' != '' and Exists('$(LuxTargetsPath)')" />
 
   <!-- Extension point: Define CustomAfterWixTargets to a .targets file that you want to include after this file. -->
   <Import Project="$(CustomAfterWixTargets)" Condition=" '$(CustomAfterWixTargets)' != '' and Exists('$(CustomAfterWixTargets)')" />

@@ -17,15 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="redirects\wix.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="redirects\wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="wix.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="wix.ca.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="wix.signing.targets" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\WixToolset.Tools.Core\WixToolset.Tools.Core.csproj" />
   </ItemGroup>
 

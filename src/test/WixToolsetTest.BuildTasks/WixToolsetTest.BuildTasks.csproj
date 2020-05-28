@@ -32,6 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\WixToolset.MSBuild\wix.harvest.targets" Link="wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\WixToolset.MSBuild\wix.signing.targets" Link="wix.signing.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\WixToolset.MSBuild\wix.targets" Link="wix.targets" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" />
   </ItemGroup>
 

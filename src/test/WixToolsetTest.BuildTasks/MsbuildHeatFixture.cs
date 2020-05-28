@@ -14,7 +14,8 @@ namespace WixToolsetTest.BuildTasks
 
     public class MsbuildHeatFixture
     {
-        private static readonly string WixTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(HeatTask).Assembly.CodeBase).AbsolutePath), "wix.targets");
+        private static readonly string WixBinPath = Path.GetDirectoryName(new Uri(typeof(WixBuild).Assembly.CodeBase).AbsolutePath) + "\\";
+        private static readonly string WixTargetsPath = Path.Combine(WixBinPath, "wix.targets");
 
         [Fact]
         public void CanBuildHeatFilePackage()
@@ -30,6 +31,7 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });
@@ -86,6 +88,7 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });

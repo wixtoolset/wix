@@ -4,12 +4,6 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- These properties can be overridden to support non-default installations. -->
-  <PropertyGroup>
-    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildThisFileFullPath)</WixTargetsPath>
-    <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixTargetsPath)WixToolset.BuildTasks.dll</WixTasksPath>
-  </PropertyGroup>
-
   <!-- These tasks are extensions for harvesting WiX source code from other sources. -->
   <UsingTask TaskName="HeatFile" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="HeatDirectory" AssemblyFile="$(WixTasksPath)" />

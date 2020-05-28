@@ -6,6 +6,7 @@
     <ProjectGuid>59c4b122-5167-445b-8fc4-09dcd4eced89</ProjectGuid>
     <OutputName>thmviewer</OutputName>
     <OutputType>Package</OutputType>
+    <WixBinDir>$(OutputPath)\net461\win-x86\</WixBinDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +24,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Import Project="$(OutputPath)\net461\win-x86\wix.targets" />
+  <Import Project="..\WixToolset.MSBuild\wix.targets" />
 
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
