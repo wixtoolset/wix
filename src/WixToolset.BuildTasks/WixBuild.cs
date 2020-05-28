@@ -16,7 +16,7 @@ namespace WixToolset.BuildTasks
     /// <summary>
     /// An MSBuild task to run the WiX compiler.
     /// </summary>
-    public sealed class DoIt : ToolsetTask
+    public sealed class WixBuild : ToolsetTask
     {
         public string[] Cultures { get; set; }
 

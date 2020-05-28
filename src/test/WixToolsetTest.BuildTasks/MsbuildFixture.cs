@@ -11,7 +11,7 @@ namespace WixToolsetTest.BuildTasks
 
     public class MsbuildFixture
     {
-        private static readonly string WixTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(DoIt).Assembly.CodeBase).AbsolutePath), "wix.targets");
+        private static readonly string WixTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(WixBuild).Assembly.CodeBase).AbsolutePath), "wix.targets");
 
         [Fact]
         public void CanBuildSimpleBundle()

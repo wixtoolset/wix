@@ -25,7 +25,7 @@ namespace WixToolsetTest.BuildTasks
                 var pdbPath = Path.Combine(baseFolder, @"bin\testpackage.wixpdb");
                 var engine = new FakeBuildEngine();
 
-                var task = new DoIt
+                var task = new WixBuild
                 {
                     BuildEngine = engine,
                     SourceFiles = new[]
@@ -75,7 +75,7 @@ namespace WixToolsetTest.BuildTasks
                 var pdbPath = Path.Combine(baseFolder, @"bin\testpackage.wixpdb");
                 var engine = new FakeBuildEngine();
 
-                var task = new DoIt
+                var task = new WixBuild
                 {
                     BuildEngine = engine,
                     SourceFiles = new[]

@@ -101,7 +101,7 @@
   -->
 
   <!-- These tasks can be used as general-purpose build tasks. -->
-  <UsingTask TaskName="DoIt" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixBuild" AssemblyFile="$(WixTasksPath)" />
 
   <!-- These tasks are specific to the build process defined in this file, and are not considered general-purpose build tasks. -->
   <UsingTask TaskName="CreateItemAvoidingInference" AssemblyFile="$(WixTasksPath)" />
@@ -629,7 +629,7 @@
       <PdbOutputFile>$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)</PdbOutputFile>
     </PropertyGroup>
 
-    <DoIt
+    <WixBuild
         SourceFiles="@(_CompileWithObjectPath)"
         LibraryFiles="@(WixLibProjects);@(_ResolvedWixLibraryPaths)"
         LocalizationFiles="@(EmbeddedResource)"
