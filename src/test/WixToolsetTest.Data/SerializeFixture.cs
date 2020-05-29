@@ -8,7 +8,10 @@ namespace WixToolsetTest.Data
     using WixToolset.Data;
     using WixToolset.Data.Bind;
     using WixToolset.Data.Tuples;
+    using WixToolset.Data.WindowsInstaller.Rows;
     using Xunit;
+
+    using Wid = WixToolset.Data.WindowsInstaller;
 
     public class SerializeFixture
     {
@@ -377,6 +380,43 @@ namespace WixToolsetTest.Data
                     "TestVar1/TestValue1/False",
                     "TestVar2/TestValue2/True",
                 }, loc.Variables.Select(v => String.Join("/", v.Id, v.Value, v.Overridable)).ToArray());
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [Fact]
+        public void CanSaveAndLoadWindowsInstallerData()
+        {
+            var sln = new SourceLineNumber("test.wxs", 1);
+            var windowsInstallerData = new Wid.WindowsInstallerData(sln)
+            {
+                Type = OutputType.Product,
+            };
+
+            var fileTable = windowsInstallerData.EnsureTable(Wid.WindowsInstallerTableDefinitions.File);
+            var fileRow = (FileRow)fileTable.CreateRow(sln);
+            fileRow.File = "TestFile";
+
+            var path = Path.GetTempFileName();
+            try
+            {
+                using (var wixout = WixOutput.Create(path))
+                {
+                    windowsInstallerData.Save(wixout);
+                }
+
+                var loaded = Wid.WindowsInstallerData.Load(path);
+
+                var loadedTable = Assert.Single(loaded.Tables);
+                Assert.Equal(Wid.WindowsInstallerTableDefinitions.File.Name, loadedTable.Name);
+
+                var loadedRow = Assert.Single(loadedTable.Rows);
+                var loadedFileRow = Assert.IsType<FileRow>(loadedRow);
+
+                Assert.Equal("TestFile", loadedFileRow.File);
             }
             finally
             {

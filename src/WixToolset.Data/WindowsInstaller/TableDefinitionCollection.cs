@@ -132,8 +132,9 @@ namespace WixToolset.Data.WindowsInstaller
         /// Loads a collection of table definitions from a XmlReader in memory.
         /// </summary>
         /// <param name="reader">Reader to get data from.</param>
+        /// <param name="tableDefinitions">Table definitions to use for strongly-typed rows.</param>
         /// <returns>The TableDefinitionCollection represented by the xml.</returns>
-        internal static TableDefinitionCollection Read(XmlReader reader)
+        internal static TableDefinitionCollection Read(XmlReader reader, TableDefinitionCollection tableDefinitions)
         {
             if ("tableDefinitions" != reader.LocalName)
             {
@@ -160,7 +161,7 @@ namespace WixToolset.Data.WindowsInstaller
                             switch (reader.LocalName)
                             {
                                 case "tableDefinition":
-                                    tableDefinitionCollection.Add(TableDefinition.Read(reader));
+                                    tableDefinitionCollection.Add(TableDefinition.Read(reader, tableDefinitions));
                                     break;
                                 default:
                                     throw new XmlException();

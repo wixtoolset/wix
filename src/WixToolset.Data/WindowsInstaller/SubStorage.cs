@@ -36,8 +36,9 @@ namespace WixToolset.Data.WindowsInstaller
         /// Creates a SubStorage from the XmlReader.
         /// </summary>
         /// <param name="reader">Reader to get data from.</param>
+        /// <param name="tableDefinitions">Table definitions to use for strongly-typed rows.</param>
         /// <returns>New SubStorage object.</returns>
-        internal static SubStorage Read(XmlReader reader)
+        internal static SubStorage Read(XmlReader reader, TableDefinitionCollection tableDefinitions)
         {
             if (reader.LocalName != "subStorage")
             {
@@ -71,7 +72,7 @@ namespace WixToolset.Data.WindowsInstaller
                             switch (reader.LocalName)
                             {
                                 case WindowsInstallerData.XmlElementName:
-                                    data = WindowsInstallerData.Read(reader, true);
+                                    data = WindowsInstallerData.Read(reader, tableDefinitions, true);
                                     break;
                                 default:
                                     throw new XmlException();

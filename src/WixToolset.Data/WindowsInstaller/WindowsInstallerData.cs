@@ -113,9 +113,22 @@ namespace WixToolset.Data.WindowsInstaller
         /// <returns>Output object.</returns>
         public static WindowsInstallerData Load(string path, bool suppressVersionCheck = false)
         {
+            var tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
+            return WindowsInstallerData.Load(path, tableDefinitions, suppressVersionCheck);
+        }
+
+        /// <summary>
+        /// Loads an output from a path on disk.
+        /// </summary>
+        /// <param name="path">Path to output file saved on disk.</param>
+        /// <param name="tableDefinitions">Table definitions to use for creating strongly-typed rows.</param>
+        /// <param name="suppressVersionCheck">Suppresses wix.dll version mismatch check.</param>
+        /// <returns>Output object.</returns>
+        public static WindowsInstallerData Load(string path, TableDefinitionCollection tableDefinitions, bool suppressVersionCheck = false)
+        {
             using (var wixOutput = WixOutput.Read(path))
             {
-                return WindowsInstallerData.Load(wixOutput, suppressVersionCheck);
+                return WindowsInstallerData.Load(wixOutput, tableDefinitions, suppressVersionCheck);
             }
         }
 
@@ -127,13 +140,26 @@ namespace WixToolset.Data.WindowsInstaller
         /// <returns>Output object.</returns>
         public static WindowsInstallerData Load(WixOutput wixOutput, bool suppressVersionCheck = false)
         {
+            var tableDefinitions = new TableDefinitionCollection(WindowsInstallerTableDefinitions.All);
+            return WindowsInstallerData.Load(wixOutput, tableDefinitions, suppressVersionCheck);
+        }
+
+        /// <summary>
+        /// Loads an output from a WixOutput object.
+        /// </summary>
+        /// <param name="wixOutput">WixOutput object.</param>
+        /// <param name="tableDefinitions">Table definitions to use for creating strongly-typed rows.</param>
+        /// <param name="suppressVersionCheck">Suppresses wix.dll version mismatch check.</param>
+        /// <returns>Output object.</returns>
+        public static WindowsInstallerData Load(WixOutput wixOutput, TableDefinitionCollection tableDefinitions, bool suppressVersionCheck = false)
+        {
             using (var stream = wixOutput.GetDataStream(WixOutputStreamName))
             using (var reader = XmlReader.Create(stream, null, wixOutput.Uri.AbsoluteUri))
             {
                 try
                 {
                     reader.MoveToContent();
-                    return WindowsInstallerData.Read(reader, suppressVersionCheck);
+                    return WindowsInstallerData.Read(reader, tableDefinitions, suppressVersionCheck);
                 }
                 catch (XmlException xe)
                 {
@@ -146,9 +172,10 @@ namespace WixToolset.Data.WindowsInstaller
         /// Processes an XmlReader and builds up the output object.
         /// </summary>
         /// <param name="reader">Reader to get data from.</param>
+        /// <param name="tableDefinitions">Table definitions to use for creating strongly-typed rows.</param>
         /// <param name="suppressVersionCheck">Suppresses wix.dll version mismatch check.</param>
         /// <returns>The Output represented by the Xml.</returns>
-        internal static WindowsInstallerData Read(XmlReader reader, bool suppressVersionCheck)
+        internal static WindowsInstallerData Read(XmlReader reader, TableDefinitionCollection tableDefinitions, bool suppressVersionCheck)
         {
             if (!reader.LocalName.Equals(WindowsInstallerData.XmlElementName))
             {
@@ -203,7 +230,7 @@ namespace WixToolset.Data.WindowsInstaller
             }
 
             // loop through the rest of the xml building up the Output object
-            TableDefinitionCollection tableDefinitions = null;
+            TableDefinitionCollection xmlTableDefinitions = null;
             var tables = new List<Table>();
             if (!empty)
             {
@@ -218,17 +245,17 @@ namespace WixToolset.Data.WindowsInstaller
                             switch (reader.LocalName)
                             {
                                 case "subStorage":
-                                    output.SubStorages.Add(SubStorage.Read(reader));
+                                    output.SubStorages.Add(SubStorage.Read(reader, tableDefinitions));
                                     break;
                                 case "table":
-                                    if (null == tableDefinitions)
+                                    if (null == xmlTableDefinitions)
                                     {
                                         throw new XmlException();
                                     }
-                                    tables.Add(Table.Read(reader, tableDefinitions));
+                                    tables.Add(Table.Read(reader, xmlTableDefinitions));
                                     break;
                                 case "tableDefinitions":
-                                    tableDefinitions = TableDefinitionCollection.Read(reader);
+                                    xmlTableDefinitions = TableDefinitionCollection.Read(reader, tableDefinitions);
                                     break;
                                 default:
                                     throw new XmlException();

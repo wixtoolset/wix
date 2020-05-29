@@ -156,12 +156,16 @@ namespace WixToolset.Data.WindowsInstaller
         /// Parses table definition from xml reader.
         /// </summary>
         /// <param name="reader">Reader to get data from.</param>
+        /// <param name="tableDefinitions">Table definitions to use for strongly-typed rows.</param>
         /// <returns>The TableDefintion represented by the Xml.</returns>
-        internal static TableDefinition Read(XmlReader reader)
+        internal static TableDefinition Read(XmlReader reader, TableDefinitionCollection tableDefinitions)
         {
             var empty = reader.IsEmptyElement;
             string name = null;
+            IntermediateTupleDefinition tupleDefinition = null;
             var unreal = false;
+            var tupleIdIsPrimaryKey = false;
+            Type strongRowType = null;
 
             while (reader.MoveToNextAttribute())
             {
@@ -179,6 +183,13 @@ namespace WixToolset.Data.WindowsInstaller
             if (null == name)
             {
                 throw new XmlException();
+            }
+
+            if (tableDefinitions.TryGet(name, out var tableDefinition))
+            {
+                tupleDefinition = tableDefinition.TupleDefinition;
+                tupleIdIsPrimaryKey = tableDefinition.TupleIdIsPrimaryKey;
+                strongRowType = tableDefinition.StrongRowType;
             }
 
             var columns = new List<ColumnDefinition>();
@@ -226,7 +237,7 @@ namespace WixToolset.Data.WindowsInstaller
                 }
             }
 
-            return new TableDefinition(name, null, columns.ToArray(), unreal);
+            return new TableDefinition(name, tupleDefinition, columns.ToArray(), unreal, tupleIdIsPrimaryKey, strongRowType);
         }
 
         /// <summary>
