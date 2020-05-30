@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thmviewer", "src\thmviewer\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "heat", "src\heat\heat.csproj", "{B1F18B6F-FBD8-4911-B3BF-40D801DA77D7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.MSBuild", "src\test\WixToolsetTest.MSBuild\WixToolsetTest.MSBuild.csproj", "{7B610B7B-C69D-4A4C-9D65-F304C44479E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,6 +116,14 @@ Global
 		{B1F18B6F-FBD8-4911-B3BF-40D801DA77D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B1F18B6F-FBD8-4911-B3BF-40D801DA77D7}.Release|x86.ActiveCfg = Release|Any CPU
 		{B1F18B6F-FBD8-4911-B3BF-40D801DA77D7}.Release|x86.Build.0 = Release|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Debug|x86.Build.0 = Debug|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B610B7B-C69D-4A4C-9D65-F304C44479E7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

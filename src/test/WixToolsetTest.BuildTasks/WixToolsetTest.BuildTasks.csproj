@@ -10,31 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="TestData\HeatFilePackage\HeatFilePackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\HeatFilePackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\HeatFileMultpleFilesSameFileName\HeatFileMultpleFilesSameFileName.wixproj" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\HeatFileMultpleFilesSameFileName\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\HeatFileMultpleFilesSameFileName\MyProgram.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\HeatFileMultpleFilesSameFileName\MyProgram.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.de-de.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\SimpleBundle\Bundle.wxs" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="TestData\SimpleMsiPackage\SimpleBundle\SimpleBundle.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" Link="TestData\SimpleMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\Package.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" Link="TestData\SimpleMsiPackage\MsiPackage\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\WixToolsetTest.MSBuild\TestData\SimpleMsiPackage\MsiPackage\data\test.txt" Link="TestData\SimpleMsiPackage\MsiPackage\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\WixToolset.MSBuild\wix.harvest.targets" Link="wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\WixToolset.MSBuild\wix.signing.targets" Link="wix.signing.targets" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\WixToolset.MSBuild\wix.targets" Link="wix.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\WixToolset.MSBuild\tools\wix.harvest.targets" Link="wix.harvest.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\WixToolset.MSBuild\tools\wix.signing.targets" Link="wix.signing.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\WixToolset.MSBuild\tools\wix.targets" Link="wix.targets" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

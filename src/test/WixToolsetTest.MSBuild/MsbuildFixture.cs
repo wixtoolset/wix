@@ -1,18 +1,16 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.BuildTasks
+namespace WixToolsetTest.MSBuild
 {
     using System;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
-    using WixToolset.BuildTasks;
     using Xunit;
 
     public class MsbuildFixture
     {
-        private static readonly string WixBinPath = Path.GetDirectoryName(new Uri(typeof(WixBuild).Assembly.CodeBase).AbsolutePath) + "\\";
-        private static readonly string WixTargetsPath = Path.Combine(WixBinPath, "wix.targets");
+        private static readonly string WixTargetsPath = Path.Combine(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "tools", "wix.targets");
 
         [Fact]
         public void CanBuildSimpleBundle()
@@ -28,7 +26,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });
@@ -66,7 +63,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });
@@ -129,7 +125,6 @@ namespace WixToolsetTest.BuildTasks
                 {
                     wixpdbType == null ? String.Empty : $"-p:WixPdbType={wixpdbType}",
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                 });
@@ -157,7 +152,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                     $"-p:InstallerPlatform=x64",
@@ -183,7 +177,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                     "-p:SuppressIces=\"ICE45;ICE46\""
@@ -206,7 +199,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                     "-p:SuppressSpecificWarnings=\"1118;1102\""
@@ -232,7 +224,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                     "-p:OutputType=IntermediatePostLink"
@@ -261,7 +252,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                     "-v:diag"
@@ -280,7 +270,6 @@ namespace WixToolsetTest.BuildTasks
                 result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}",
                     "-t:Clean",

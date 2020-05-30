@@ -1,12 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolsetTest.BuildTasks
+namespace WixToolsetTest.MSBuild
 {
     using System;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
-    using WixToolset.BuildTasks;
     using WixToolset.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
@@ -14,8 +13,7 @@ namespace WixToolsetTest.BuildTasks
 
     public class MsbuildHeatFixture
     {
-        private static readonly string WixBinPath = Path.GetDirectoryName(new Uri(typeof(WixBuild).Assembly.CodeBase).AbsolutePath) + "\\";
-        private static readonly string WixTargetsPath = Path.Combine(WixBinPath, "wix.targets");
+        private static readonly string WixTargetsPath = Path.Combine(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "tools", "wix.targets");
 
         [Fact]
         public void CanBuildHeatFilePackage()
@@ -31,7 +29,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });
@@ -77,7 +74,7 @@ namespace WixToolsetTest.BuildTasks
         [Fact]
         public void CanBuildHeatFileWithMultipleFilesPackage()
         {
-            var projectPath = TestData.Get(@"TestData\HeatFileMultpleFilesSameFileName\HeatFileMultpleFilesSameFileName.wixproj");
+            var projectPath = TestData.Get(@"TestData\HeatFileMultipleFilesSameFileName\HeatFileMultipleFilesSameFileName.wixproj");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -88,7 +85,6 @@ namespace WixToolsetTest.BuildTasks
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:WixBinDir={WixBinPath}",
                     $"-p:IntermediateOutputPath={intermediateFolder}",
                     $"-p:OutputPath={binFolder}"
                 });
@@ -140,7 +136,7 @@ namespace WixToolsetTest.BuildTasks
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                var pdbPath = Path.Combine(binFolder, "HeatFileMultpleFilesSameFileName.wixpdb");
+                var pdbPath = Path.Combine(binFolder, "HeatFileMultipleFilesSameFileName.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);

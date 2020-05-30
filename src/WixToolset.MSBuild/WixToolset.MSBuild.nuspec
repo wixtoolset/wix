@@ -12,11 +12,6 @@
 
   <files>
     <file src="$projectFolder$$id$.props" target="build" />
-    <file src="$projectFolder$wix.ca.targets" target="tools" />
-    <file src="$projectFolder$wix.harvest.targets" target="tools" />
-    <file src="$projectFolder$wix.signing.targets" target="tools" />
-    <file src="$projectFolder$wix.targets" target="tools" />
-    <file src="net461\**\*" target="tools\net461" />
-    <file src="netcoreapp2.1\**\*" target="tools\netcoreapp2.1" />
+    <file src="tools\**\*" target="tools" />
   </files>
 </package>
