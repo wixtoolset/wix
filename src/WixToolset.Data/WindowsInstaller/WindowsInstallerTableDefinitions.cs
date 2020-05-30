@@ -1925,20 +1925,6 @@ namespace WixToolset.Data.WindowsInstaller
             tupleIdIsPrimaryKey: true
         );
 
-        public static readonly TableDefinition WixMedia = new TableDefinition(
-            "WixMedia",
-            null,
-            new[]
-            {
-                new ColumnDefinition("DiskId_", ColumnType.Number, 2, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("CompressionLevel", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 4),
-                new ColumnDefinition("Layout", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            strongRowType: typeof(WixMediaRow),
-            tupleIdIsPrimaryKey: false
-        );
-
         public static readonly TableDefinition WixMediaTemplate = new TableDefinition(
             "WixMediaTemplate",
             TupleDefinitions.WixMediaTemplate,
@@ -2353,7 +2339,6 @@ namespace WixToolset.Data.WindowsInstaller
             WixFragment,
             WixInstanceComponent,
             WixInstanceTransforms,
-            WixMedia,
             WixMediaTemplate,
             WixMerge,
             WixOrdering,
