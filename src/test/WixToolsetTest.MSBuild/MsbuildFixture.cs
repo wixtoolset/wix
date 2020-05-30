@@ -11,10 +11,10 @@ namespace WixToolsetTest.MSBuild
 
     public class MsbuildFixture
     {
-        private static readonly string WixPropsPath = Path.Combine(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "build", "WixToolset.MSBuild.props");
-
-        [Fact]
-        public void CanBuildSimpleBundle()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleBundle(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage");
 
@@ -25,10 +25,7 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "SimpleBundle.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
-                {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
                 var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
@@ -49,8 +46,10 @@ namespace WixToolsetTest.MSBuild
             }
         }
 
-        [Fact]
-        public void CanBuildSimpleMsiPackage()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -61,10 +60,7 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
-                {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
                 var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
@@ -86,8 +82,10 @@ namespace WixToolsetTest.MSBuild
             }
         }
 
-        [Fact]
-        public void CanBuildWithDefaultAndExplicitlyFullWixpdbs()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildWithDefaultAndExplicitlyFullWixpdbs(BuildSystem buildSystem)
         {
             var expectedOutputs = new[]
                 {
@@ -96,21 +94,23 @@ namespace WixToolsetTest.MSBuild
                     @"bin\x86\Debug\en-US\MsiPackage.wixpdb",
                 };
 
-            this.AssertWixpdb(null, expectedOutputs);
-            this.AssertWixpdb("Full", expectedOutputs);
+            this.AssertWixpdb(buildSystem, null, expectedOutputs);
+            this.AssertWixpdb(buildSystem, "Full", expectedOutputs);
         }
 
-        [Fact]
-        public void CanBuildWithNoWixpdb()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildWithNoWixpdb(BuildSystem buildSystem)
         {
-            this.AssertWixpdb("NONE", new[]
+            this.AssertWixpdb(buildSystem, "NONE", new[]
                 {
                     @"bin\x86\Debug\en-US\cab1.cab",
                     @"bin\x86\Debug\en-US\MsiPackage.msi",
                 });
         }
 
-        private void AssertWixpdb(string wixpdbType, string[] expectedOutputFiles)
+        private void AssertWixpdb(BuildSystem buildSystem, string wixpdbType, string[] expectedOutputFiles)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -121,10 +121,9 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     wixpdbType == null ? String.Empty : $"-p:WixPdbType={wixpdbType}",
-                    $"-p:WixMSBuildProps={WixPropsPath}",
                 });
                 result.AssertSuccess();
 
@@ -136,8 +135,10 @@ namespace WixToolsetTest.MSBuild
             }
         }
 
-        [Fact]
-        public void CanBuild64BitMsiPackage()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuild64BitMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -148,10 +149,9 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                    $"-p:InstallerPlatform=x64",
+                    $"-p:Platform=x64",
                 });
                 result.AssertSuccess();
 
@@ -164,15 +164,17 @@ namespace WixToolsetTest.MSBuild
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    @"bin\x86\Debug\en-US\cab1.cab",
-                    @"bin\x86\Debug\en-US\MsiPackage.msi",
-                    @"bin\x86\Debug\en-US\MsiPackage.wixpdb",
+                    @"bin\x64\Debug\en-US\cab1.cab",
+                    @"bin\x64\Debug\en-US\MsiPackage.msi",
+                    @"bin\x64\Debug\en-US\MsiPackage.wixpdb",
                 }, paths);
             }
         }
 
-        [Fact(Skip = "Currently fails")]
-        public void CanBuildSimpleMsiPackageWithIceSuppressions()
+        [Theory(Skip = "Currently fails")]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMsiPackageWithIceSuppressions(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -183,17 +185,18 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                    "-p:SuppressIces=\"ICE45;ICE46\""
+                    "-p:SuppressIces=\"ICE45;ICE46\"",
                 });
                 result.AssertSuccess();
             }
         }
 
-        [Fact]
-        public void CanBuildSimpleMsiPackageWithWarningSuppressions()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMsiPackageWithWarningSuppressions(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -204,10 +207,9 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                    "-p:SuppressSpecificWarnings=\"1118;1102\""
+                    "-p:SuppressSpecificWarnings=\"1118;1102\"",
                 });
                 result.AssertSuccess();
 
@@ -216,8 +218,10 @@ namespace WixToolsetTest.MSBuild
             }
         }
 
-        [Fact]
-        public void CanBuildSimpleMsiPackageAsWixipl()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -228,10 +232,9 @@ namespace WixToolsetTest.MSBuild
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                    "-p:OutputType=IntermediatePostLink"
+                    "-p:OutputType=IntermediatePostLink",
                 });
                 result.AssertSuccess();
 
@@ -242,8 +245,10 @@ namespace WixToolsetTest.MSBuild
             }
         }
 
-        [Fact]
-        public void CanBuildAndCleanSimpleMsiPackage()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildAndCleanSimpleMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -254,10 +259,9 @@ namespace WixToolsetTest.MSBuild
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
                 // Build
-                var result = MsbuildRunner.Execute(projectPath, new[]
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                    "-v:diag"
+                    "-v:diag",
                 });
                 result.AssertSuccess();
 
@@ -270,11 +274,10 @@ namespace WixToolsetTest.MSBuild
                 Assert.NotEmpty(createdPaths);
 
                 // Clean
-                result = MsbuildRunner.Execute(projectPath, new[]
+                result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
                     "-t:Clean",
-                    "-v:diag"
+                    "-v:diag",
                 });
                 result.AssertSuccess();
 

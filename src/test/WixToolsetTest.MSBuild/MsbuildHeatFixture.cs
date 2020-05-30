@@ -13,10 +13,10 @@ namespace WixToolsetTest.MSBuild
 
     public class MsbuildHeatFixture
     {
-        private static readonly string WixPropsPath = Path.Combine(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "build", "WixToolset.MSBuild.props");
-
-        [Fact]
-        public void CanBuildHeatFilePackage()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildHeatFilePackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\HeatFilePackage");
 
@@ -28,10 +28,7 @@ namespace WixToolsetTest.MSBuild
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
                 var projectPath = Path.Combine(baseFolder, "HeatFilePackage.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
-                {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
                 var heatCommandLines = result.Output.Where(line => line.TrimStart().StartsWith("heat.exe file"));
@@ -71,8 +68,10 @@ namespace WixToolsetTest.MSBuild
             }
         }
 
-        [Fact]
-        public void CanBuildHeatFileWithMultipleFilesPackage()
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildHeatFileWithMultipleFilesPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\HeatFileMultipleFilesSameFileName");
 
@@ -84,10 +83,7 @@ namespace WixToolsetTest.MSBuild
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
                 var projectPath = Path.Combine(baseFolder, "HeatFileMultipleFilesSameFileName.wixproj");
 
-                var result = MsbuildRunner.Execute(projectPath, new[]
-                {
-                    $"-p:WixMSBuildProps={WixPropsPath}",
-                });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
                 var heatCommandLines = result.Output.Where(line => line.TrimStart().StartsWith("heat.exe file"));
