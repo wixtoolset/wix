@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\Directory.Build.props" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
 
   <PropertyGroup>
     <ProjectGuid>59c4b122-5167-445b-8fc4-09dcd4eced89</ProjectGuid>
@@ -23,7 +23,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Import Project="$(OutputPath)\publish\WixToolset.MSBuild\tools\wix.targets" />
+  <Import Project="$(WixTargetsPath)" />
 
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -11,7 +11,7 @@
   </metadata>
 
   <files>
-    <file src="$projectFolder$$id$.props" target="build" />
+    <file src="build\**\*" target="build" />
     <file src="tools\**\*" target="tools" />
   </files>
 </package>

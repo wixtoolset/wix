@@ -13,7 +13,7 @@ namespace WixToolsetTest.MSBuild
 
     public class MsbuildHeatFixture
     {
-        private static readonly string WixTargetsPath = Path.Combine(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "tools", "wix.targets");
+        private static readonly string WixPropsPath = Path.Combine(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "build", "WixToolset.MSBuild.props");
 
         [Fact]
         public void CanBuildHeatFilePackage()
@@ -30,7 +30,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                 });
                 result.AssertSuccess();
 
@@ -86,7 +86,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                 });
                 result.AssertSuccess();
 

@@ -11,7 +11,7 @@ namespace WixToolsetTest.MSBuild
 
     public class MsbuildFixture
     {
-        private static readonly string WixTargetsPath = Path.Combine(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "tools", "wix.targets");
+        private static readonly string WixPropsPath = Path.Combine(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "build", "WixToolset.MSBuild.props");
 
         [Fact]
         public void CanBuildSimpleBundle()
@@ -27,7 +27,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                 });
                 result.AssertSuccess();
 
@@ -63,7 +63,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                 });
                 result.AssertSuccess();
 
@@ -124,7 +124,7 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     wixpdbType == null ? String.Empty : $"-p:WixPdbType={wixpdbType}",
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                 });
                 result.AssertSuccess();
 
@@ -150,7 +150,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                     $"-p:InstallerPlatform=x64",
                 });
                 result.AssertSuccess();
@@ -185,7 +185,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                     "-p:SuppressIces=\"ICE45;ICE46\""
                 });
                 result.AssertSuccess();
@@ -206,7 +206,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                     "-p:SuppressSpecificWarnings=\"1118;1102\""
                 });
                 result.AssertSuccess();
@@ -230,7 +230,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                     "-p:OutputType=IntermediatePostLink"
                 });
                 result.AssertSuccess();
@@ -256,7 +256,7 @@ namespace WixToolsetTest.MSBuild
                 // Build
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                     "-v:diag"
                 });
                 result.AssertSuccess();
@@ -272,7 +272,7 @@ namespace WixToolsetTest.MSBuild
                 // Clean
                 result = MsbuildRunner.Execute(projectPath, new[]
                 {
-                    $"-p:WixTargetsPath={WixTargetsPath}",
+                    $"-p:WixMSBuildProps={WixPropsPath}",
                     "-t:Clean",
                     "-v:diag"
                 });

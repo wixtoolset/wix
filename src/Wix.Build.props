@@ -9,4 +9,6 @@
   <ItemGroup>
     <BindInputPaths Include="$(OutputPath)Win32\" />
   </ItemGroup>
+
+  <Import Project="$(OutputPath)\publish\WixToolset.MSBuild\build\WixToolset.MSBuild.props" />
 </Project>
