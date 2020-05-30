@@ -18,19 +18,19 @@ namespace WixToolsetTest.MSBuild
         [Fact]
         public void CanBuildHeatFilePackage()
         {
-            var projectPath = TestData.Get(@"TestData\HeatFilePackage\HeatFilePackage.wixproj");
+            var sourceFolder = TestData.Get(@"TestData\HeatFilePackage");
 
-            using (var fs = new DisposableFileSystem())
+            using (var fs = new TestDataFolderFileSystem())
             {
-                var baseFolder = fs.GetFolder();
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+                var projectPath = Path.Combine(baseFolder, "HeatFilePackage.wixproj");
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:IntermediateOutputPath={intermediateFolder}",
-                    $"-p:OutputPath={binFolder}"
                 });
                 result.AssertSuccess();
 
@@ -40,7 +40,7 @@ namespace WixToolsetTest.MSBuild
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Empty(warnings);
 
-                var generatedFilePath = Path.Combine(intermediateFolder, @"_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
+                var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Debug", "_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
@@ -60,7 +60,7 @@ namespace WixToolsetTest.MSBuild
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                var pdbPath = Path.Combine(binFolder, "HeatFilePackage.wixpdb");
+                var pdbPath = Path.Combine(binFolder, "x86", "Debug", "HeatFilePackage.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);
@@ -74,19 +74,19 @@ namespace WixToolsetTest.MSBuild
         [Fact]
         public void CanBuildHeatFileWithMultipleFilesPackage()
         {
-            var projectPath = TestData.Get(@"TestData\HeatFileMultipleFilesSameFileName\HeatFileMultipleFilesSameFileName.wixproj");
+            var sourceFolder = TestData.Get(@"TestData\HeatFileMultipleFilesSameFileName");
 
-            using (var fs = new DisposableFileSystem())
+            using (var fs = new TestDataFolderFileSystem())
             {
-                var baseFolder = fs.GetFolder();
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
                 var binFolder = Path.Combine(baseFolder, @"bin\");
                 var intermediateFolder = Path.Combine(baseFolder, @"obj\");
+                var projectPath = Path.Combine(baseFolder, "HeatFileMultipleFilesSameFileName.wixproj");
 
                 var result = MsbuildRunner.Execute(projectPath, new[]
                 {
                     $"-p:WixTargetsPath={WixTargetsPath}",
-                    $"-p:IntermediateOutputPath={intermediateFolder}",
-                    $"-p:OutputPath={binFolder}"
                 });
                 result.AssertSuccess();
 
@@ -96,7 +96,7 @@ namespace WixToolsetTest.MSBuild
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Empty(warnings);
 
-                var generatedFilePath = Path.Combine(intermediateFolder, @"_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
+                var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Debug", "_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
@@ -116,7 +116,7 @@ namespace WixToolsetTest.MSBuild
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                generatedFilePath = Path.Combine(intermediateFolder, @"_JsonProductComponents_INSTALLFOLDER_MyProgram.json_file.wxs");
+                generatedFilePath = Path.Combine(intermediateFolder, "x86", "Debug", "_JsonProductComponents_INSTALLFOLDER_MyProgram.json_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 generatedContents = File.ReadAllText(generatedFilePath);
@@ -136,7 +136,7 @@ namespace WixToolsetTest.MSBuild
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                var pdbPath = Path.Combine(binFolder, "HeatFileMultipleFilesSameFileName.wixpdb");
+                var pdbPath = Path.Combine(binFolder, "x86", "Debug", "HeatFileMultipleFilesSameFileName.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);
