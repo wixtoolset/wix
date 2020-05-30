@@ -49,6 +49,41 @@ namespace WixToolsetTest.MSBuild
         [Theory]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMergeModule(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData\MergeModule\SimpleMergeModule");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "SimpleMergeModule.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                result.AssertSuccess();
+
+                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
+                Assert.Single(platformSwitches);
+
+                var warnings = result.Output.Where(line => line.Contains(": warning"));
+                Assert.Empty(warnings);
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.Equal(new[]
+                {
+                    @"bin\x86\Debug\SimpleMergeModule.msm",
+                    @"bin\x86\Debug\SimpleMergeModule.wixpdb",
+                }, paths);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -78,6 +113,39 @@ namespace WixToolsetTest.MSBuild
                     @"bin\x86\Debug\en-US\cab1.cab",
                     @"bin\x86\Debug\en-US\MsiPackage.msi",
                     @"bin\x86\Debug\en-US\MsiPackage.wixpdb",
+                }, paths);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildSimpleMsiPackageWithMergeModule(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData\MergeModule");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "MergeMsiPackage");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "MergeMsiPackage.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning"));
+                Assert.Empty(warnings);
+
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                Assert.Equal(new[]
+                {
+                    @"bin\x86\Debug\cab1.cab",
+                    @"bin\x86\Debug\MergeMsiPackage.msi",
+                    @"bin\x86\Debug\MergeMsiPackage.wixpdb",
                 }, paths);
             }
         }

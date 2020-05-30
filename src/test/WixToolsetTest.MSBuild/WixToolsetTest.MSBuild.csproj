@@ -15,6 +15,11 @@
     <Content Include="TestData\HeatFileMultipleFilesSameFileName\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\HeatFileMultipleFilesSameFileName\MyProgram.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\HeatFileMultipleFilesSameFileName\MyProgram.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\MergeMsiPackage\MergeMsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\MergeMsiPackage\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\SimpleMergeModule\data\MergeModule.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\SimpleMergeModule\MergeModule.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\MergeModule\SimpleMergeModule\SimpleMergeModule.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\MsiPackage.wixproj" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.de-de.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\MultiCulturalMsiPackage\MsiPackage\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
