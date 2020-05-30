@@ -4,96 +4,148 @@ namespace WixBuildTools.TestSupport
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Text;
 
-    public static class MsbuildRunner
+    public class MsbuildRunner : ExternalExecutable
     {
-        private static readonly string VswhereRelativePath = @"Microsoft Visual Studio\Installer\vswhere.exe";
-        private static readonly string[] VswhereFindArguments = new[] { "-property", "installationPath" };
+        private static readonly string VswhereFindArguments = "-property installationPath";
         private static readonly string Msbuild15RelativePath = @"MSBuild\15.0\Bin\MSBuild.exe";
-        private static readonly string Msbuild16RelativePath = @"MSBuild\Current\Bin\MSBuild.exe";
+        private static readonly string Msbuild15RelativePath64 = @"MSBuild\15.0\Bin\amd64\MSBuild.exe";
+        private static readonly string MsbuildCurrentRelativePath = @"MSBuild\Current\Bin\MSBuild.exe";
+        private static readonly string MsbuildCurrentRelativePath64 = @"MSBuild\Current\Bin\amd64\MSBuild.exe";
 
         private static readonly object InitLock = new object();
 
-        private static string Msbuild15Path;
-        private static string Msbuild16Path;
+        private static bool Initialized;
+        private static MsbuildRunner Msbuild15Runner;
+        private static MsbuildRunner Msbuild15Runner64;
+        private static MsbuildRunner MsbuildCurrentRunner;
+        private static MsbuildRunner MsbuildCurrentRunner64;
 
-        public static MsbuildRunnerResult Execute(string projectPath, string[] arguments = null) => InitAndExecute(String.Empty, projectPath, arguments);
+        public static MsbuildRunnerResult Execute(string projectPath, string[] arguments = null, bool x64 = false) =>
+            InitAndExecute(String.Empty, projectPath, arguments, x64);
 
-        public static MsbuildRunnerResult ExecuteWithMsbuild15(string projectPath, string[] arguments = null) => InitAndExecute("15", projectPath, arguments);
+        public static MsbuildRunnerResult ExecuteWithMsbuild15(string projectPath, string[] arguments = null, bool x64 = false) =>
+            InitAndExecute("15", projectPath, arguments, x64);
 
-        public static MsbuildRunnerResult ExecuteWithMsbuild16(string projectPath, string[] arguments = null) => InitAndExecute("16", projectPath, arguments);
+        public static MsbuildRunnerResult ExecuteWithMsbuildCurrent(string projectPath, string[] arguments = null, bool x64 = false) =>
+            InitAndExecute("Current", projectPath, arguments, x64);
 
-        private static MsbuildRunnerResult InitAndExecute(string msbuildVersion, string projectPath, string[] arguments)
+        private static MsbuildRunnerResult InitAndExecute(string msbuildVersion, string projectPath, string[] arguments, bool x64)
         {
             lock (InitLock)
             {
-                if (Msbuild15Path == null && Msbuild16Path == null)
+                if (!Initialized)
                 {
-                    var vswherePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), VswhereRelativePath);
-                    if (!File.Exists(vswherePath))
+                    Initialized = true;
+                    var vswhereResult = VswhereRunner.Execute(VswhereFindArguments, true);
+                    if (vswhereResult.ExitCode != 0)
                     {
-                        throw new InvalidOperationException($"Failed to find vswhere at: {vswherePath}");
+                        throw new InvalidOperationException($"Failed to execute vswhere.exe, exit code: {vswhereResult.ExitCode}. Output:\r\n{String.Join("\r\n", vswhereResult.StandardOutput)}");
                     }
 
-                    var result = RunProcessCaptureOutput(vswherePath, VswhereFindArguments);
-                    if (result.ExitCode != 0)
-                    {
-                        throw new InvalidOperationException($"Failed to execute vswhere.exe, exit code: {result.ExitCode}");
-                    }
+                    string msbuild15Path = null;
+                    string msbuild15Path64 = null;
+                    string msbuildCurrentPath = null;
+                    string msbuildCurrentPath64 = null;
 
-                    Msbuild15Path = String.Empty;
-                    Msbuild16Path = String.Empty;
-
-                    foreach (var installPath in result.Output)
+                    foreach (var installPath in vswhereResult.StandardOutput)
                     {
-                        if (String.IsNullOrEmpty(Msbuild16Path))
+                        if (msbuildCurrentPath == null)
                         {
-                            var path = Path.Combine(installPath, Msbuild16RelativePath);
+                            var path = Path.Combine(installPath, MsbuildCurrentRelativePath);
                             if (File.Exists(path))
                             {
-                                Msbuild16Path = path;
+                                msbuildCurrentPath = path;
                             }
                         }
 
-                        if (String.IsNullOrEmpty(Msbuild15Path))
+                        if (msbuildCurrentPath64 == null)
+                        {
+                            var path = Path.Combine(installPath, MsbuildCurrentRelativePath64);
+                            if (File.Exists(path))
+                            {
+                                msbuildCurrentPath64 = path;
+                            }
+                        }
+
+                        if (msbuild15Path == null)
                         {
                             var path = Path.Combine(installPath, Msbuild15RelativePath);
                             if (File.Exists(path))
                             {
-                                Msbuild15Path = path;
+                                msbuild15Path = path;
                             }
                         }
+
+                        if (msbuild15Path64 == null)
+                        {
+                            var path = Path.Combine(installPath, Msbuild15RelativePath64);
+                            if (File.Exists(path))
+                            {
+                                msbuild15Path64 = path;
+                            }
+                        }
+                    }
+
+                    if (msbuildCurrentPath != null)
+                    {
+                        MsbuildCurrentRunner = new MsbuildRunner(msbuildCurrentPath);
+                    }
+
+                    if (msbuildCurrentPath64 != null)
+                    {
+                        MsbuildCurrentRunner64 = new MsbuildRunner(msbuildCurrentPath64);
+                    }
+
+                    if (msbuild15Path != null)
+                    {
+                        Msbuild15Runner = new MsbuildRunner(msbuild15Path);
+                    }
+
+                    if (msbuild15Path64 != null)
+                    {
+                        Msbuild15Runner64 = new MsbuildRunner(msbuild15Path64);
                     }
                 }
             }
 
-            var msbuildPath = !String.IsNullOrEmpty(Msbuild15Path) ? Msbuild15Path : Msbuild16Path;
-
-            if (msbuildVersion == "15")
+            MsbuildRunner runner;
+            switch (msbuildVersion)
             {
-                msbuildPath = Msbuild15Path;
-            }
-            else if (msbuildVersion == "16")
-            {
-                msbuildPath = Msbuild16Path;
+                case "15":
+                    {
+                        runner = x64 ? Msbuild15Runner64 : Msbuild15Runner;
+                        break;
+                    }
+                case "Current":
+                    {
+                        runner = x64 ? MsbuildCurrentRunner64 : MsbuildCurrentRunner;
+                        break;
+                    }
+                default:
+                    {
+                        runner = x64 ? MsbuildCurrentRunner64 ?? Msbuild15Runner64
+                                     : MsbuildCurrentRunner ?? Msbuild15Runner;
+                        break;
+                    }
             }
 
-            return ExecuteCore(msbuildVersion, msbuildPath, projectPath, arguments);
+            if (runner == null)
+            {
+                throw new InvalidOperationException($"Failed to find an installed{(x64 ? " 64-bit" : String.Empty)} MSBuild{msbuildVersion}");
+            }
+
+            return runner.ExecuteCore(projectPath, arguments);
         }
 
-        private static MsbuildRunnerResult ExecuteCore(string msbuildVersion, string msbuildPath, string projectPath, string[] arguments)
-        {
-            if (String.IsNullOrEmpty(msbuildPath))
-            {
-                throw new InvalidOperationException($"Failed to find an installed MSBuild{msbuildVersion}");
-            }
+        private MsbuildRunner(string exePath) : base(exePath) { }
 
+        private MsbuildRunnerResult ExecuteCore(string projectPath, string[] arguments)
+        {
             var total = new List<string>
             {
-                projectPath
+                projectPath,
             };
 
             if (arguments != null)
@@ -101,69 +153,16 @@ namespace WixBuildTools.TestSupport
                 total.AddRange(arguments);
             }
 
+            var args = CombineArguments(total);
+            var mergeErrorIntoOutput = true;
             var workingFolder = Path.GetDirectoryName(projectPath);
-            return RunProcessCaptureOutput(msbuildPath, total.ToArray(), workingFolder);
-        }
+            var result = this.Run(args, mergeErrorIntoOutput, workingFolder);
 
-        private static MsbuildRunnerResult RunProcessCaptureOutput(string executablePath, string[] arguments = null, string workingFolder = null)
-        {
-            var startInfo = new ProcessStartInfo(executablePath)
+            return new MsbuildRunnerResult
             {
-                Arguments = CombineArguments(arguments),
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                WorkingDirectory = workingFolder,
+                ExitCode = result.ExitCode,
+                Output = result.StandardOutput,
             };
-
-            var exitCode = 0;
-            var output = new List<string>();
-
-            using (var process = Process.Start(startInfo))
-            {
-                process.OutputDataReceived += (s, e) => { if (e.Data != null) { output.Add(e.Data); } };
-                process.ErrorDataReceived += (s, e) => { if (e.Data != null) { output.Add(e.Data); } };
-
-                process.BeginErrorReadLine();
-                process.BeginOutputReadLine();
-
-                process.WaitForExit();
-                exitCode = process.ExitCode;
-            }
-
-            return new MsbuildRunnerResult { ExitCode = exitCode, Output = output.ToArray() };
-        }
-
-        private static string CombineArguments(string[] arguments)
-        {
-            if (arguments == null)
-            {
-                return null;
-            }
-
-            var sb = new StringBuilder();
-
-            foreach (var arg in arguments)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(' ');
-                }
-
-                if (arg.IndexOf(' ') > -1)
-                {
-                    sb.Append("\"");
-                    sb.Append(arg);
-                    sb.Append("\"");
-                }
-                else
-                {
-                    sb.Append(arg);
-                }
-            }
-
-            return sb.ToString();
         }
     }
 }
