@@ -43,7 +43,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
             this.ExpectedEmbeddedFiles = context.ExpectedEmbeddedFiles;
-            this.FileSystemExtensions = context.FileSystemExtensions;
+            this.FileSystemManager = new FileSystemManager(context.FileSystemExtensions);
             this.Intermediate = context.IntermediateRepresentation;
             this.IntermediateFolder = context.IntermediateFolder;
             this.OutputPath = context.OutputPath;
@@ -79,7 +79,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public IEnumerable<IExpectedExtractFile> ExpectedEmbeddedFiles { get; }
 
-        public IEnumerable<IFileSystemExtension> FileSystemExtensions { get; }
+        public FileSystemManager FileSystemManager { get; }
 
         public bool DeltaBinaryPatch { get; set; }
 
@@ -116,7 +116,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var trackedFiles = new List<ITrackedFile>();
 
             var containsMergeModules = false;
-            var suppressedTableNames = new HashSet<string>();
 
             // If there are any fields to resolve later, create the cache to populate during bind.
             var variableCache = this.DelayedFields.Any() ? new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) : null;
@@ -226,7 +225,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return null;
             }
 
-            WindowsInstallerData output;
             this.Intermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
             this.Messaging.Write(VerboseMessages.UpdatingFileInformation());
 
@@ -268,14 +266,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else if (SectionType.Patch == section.Type)
             {
-                // Merge transform data into the output object.
-                //IEnumerable<FileFacade> filesFromTransform = this.CopyFromTransformData(this.Output);
-
-                //var command = new CopyTransformDataCommand(this.Messaging, /*output*/this.SubStorages, tableDefinitions, copyOutFileRows: true);
-                //command.Output = output;
-                //command.TableDefinitions = this.TableDefinitions;
-                //command.CopyOutFileRows = true;
-                var command = new GetFileFacadesFromTransforms(this.Messaging, this.SubStorages, tableDefinitions);
+                var command = new GetFileFacadesFromTransforms(this.Messaging, this.FileSystemManager, this.SubStorages);
                 command.Execute();
                 var filesFromTransforms = command.FileFacades;
 
@@ -338,6 +329,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            // Update file sequence.
+            {
+                var command = new UpdateMediaSequencesCommand(section, fileFacades);
+                command.Execute();
+            }
+
             // stop processing if an error previously occurred
             if (this.Messaging.EncounteredError)
             {
@@ -345,6 +342,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // Time to create the output object. Try to put as much above here as possible, updating the IR is better.
+            WindowsInstallerData output;
             {
                 var command = new CreateOutputFromIRCommand(this.Messaging, section, tableDefinitions, this.BackendExtensions, this.WindowsInstallerBackendHelper);
                 command.Execute();
@@ -352,14 +350,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 output = command.Output;
             }
 
-            // Update file sequence.
-            {
-                var command = new UpdateMediaSequencesCommand(output, fileFacades);
-                command.Execute();
-            }
-
             // Modularize identifiers.
-            if (OutputType.Module == output.Type)
+            if (output.Type == OutputType.Module)
             {
                 var command = new ModularizeCommand(output, modularizationSuffix, section.Tuples.OfType<WixSuppressModularizationTuple>());
                 command.Execute();
@@ -457,18 +449,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 trackedFiles.AddRange(command.TrackedFiles);
             }
 
-#if DELETE
-                if (OutputType.Patch == output.Type)
-                {
-                    // Copy output data back into the transforms.
-#if TODO_PATCHING
-                    var command = new CopyTransformDataCommand(this.Messaging, output, tableDefinitions, copyOutFileRows: false);
-                    command.Execute();
-
-                    this.CopyToTransformData(this.Output);
-#endif
-                }
-#endif
+            if (output.Type == OutputType.Patch)
+            {
+                // Copy output data back into the transforms.
+                var command = new UpdateTransformsWithFileFacades(this.Messaging, output, this.SubStorages, tableDefinitions, fileFacades);
+                command.Execute();
+            }
 
             // stop processing if an error previously occurred
             if (this.Messaging.EncounteredError)
@@ -483,8 +469,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var trackMsi = this.BackendHelper.TrackFile(this.OutputPath, TrackedFileType.Final);
                 trackedFiles.Add(trackMsi);
 
-                var temporaryFiles = this.GenerateDatabase(output, tableDefinitions, trackMsi.Path, false, false);
-                trackedFiles.AddRange(temporaryFiles);
+                var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, trackMsi.Path, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns: false, this.SuppressAddingValidationRows, useSubdirectory: false);
+                command.Execute();
+
+                trackedFiles.AddRange(command.GeneratedTemporaryFiles);
             }
 
             // Stop processing if an error previously occurred.
@@ -498,31 +486,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.MergingModules());
 
-                // Add back possibly suppressed sequence tables since all sequence tables must be present
-                // for the merge process to work. We'll drop the suppressed sequence tables again as
-                // necessary.
-                foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
-                {
-                    var sequenceTableName = (sequence == SequenceTable.AdvertiseExecuteSequence) ? "AdvtExecuteSequence" : sequence.ToString();
-                    var sequenceTable = output.Tables[sequenceTableName];
-
-                    if (null == sequenceTable)
-                    {
-                        sequenceTable = output.EnsureTable(tableDefinitions[sequenceTableName]);
-                    }
-
-                    if (0 == sequenceTable.Rows.Count)
-                    {
-                        suppressedTableNames.Add(sequenceTableName);
-                    }
-                }
-
                 var command = new MergeModulesCommand(this.Messaging);
                 command.FileFacades = fileFacades;
                 command.IntermediateFolder = this.IntermediateFolder;
                 command.Output = output;
                 command.OutputPath = this.OutputPath;
-                command.SuppressedTableNames = suppressedTableNames;
+                command.TableDefinitions = tableDefinitions;
                 command.Execute();
             }
 
@@ -607,38 +576,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return wixout;
         }
 
-#if TODO_PATCHING
-        /// <summary>
-        /// Copy file data between transform substorages and the patch output object
-        /// </summary>
-        /// <param name="output">The output to bind.</param>
-        /// <param name="allFileRows">True if copying from transform to patch, false the other way.</param>
-        private IEnumerable<FileFacade> CopyFromTransformData(Output output)
-        {
-            var command = new CopyTransformDataCommand();
-            command.CopyOutFileRows = true;
-            command.Output = output;
-            command.TableDefinitions = this.TableDefinitions;
-            command.Execute();
-
-            return command.FileFacades;
-        }
-
-        /// <summary>
-        /// Copy file data between transform substorages and the patch output object
-        /// </summary>
-        /// <param name="output">The output to bind.</param>
-        /// <param name="allFileRows">True if copying from transform to patch, false the other way.</param>
-        private void CopyToTransformData(Output output)
-        {
-            var command = new CopyTransformDataCommand();
-            command.CopyOutFileRows = false;
-            command.Output = output;
-            command.TableDefinitions = this.TableDefinitions;
-            command.Execute();
-        }
-#endif
-
         /// <summary>
         /// Validate that there are no duplicate GUIDs in the output.
         /// </summary>
@@ -650,7 +587,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             if (output.TryGetTable("Component", out var componentTable))
             {
-                Dictionary<string, bool> componentGuidConditions = new Dictionary<string, bool>(componentTable.Rows.Count);
+                var componentGuidConditions = new Dictionary<string, bool>(componentTable.Rows.Count);
 
                 foreach (Data.WindowsInstaller.Rows.ComponentRow row in componentTable.Rows)
                 {
@@ -658,12 +595,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // there's already an error that prevented it from being replaced with a real GUID.
                     if (!String.IsNullOrEmpty(row.Guid) && "*" != row.Guid)
                     {
-                        bool thisComponentHasCondition = !String.IsNullOrEmpty(row.Condition);
-                        bool allComponentsHaveConditions = thisComponentHasCondition;
+                        var thisComponentHasCondition = !String.IsNullOrEmpty(row.Condition);
+                        var allComponentsHaveConditions = thisComponentHasCondition;
 
                         if (componentGuidConditions.ContainsKey(row.Guid))
                         {
-                            allComponentsHaveConditions = componentGuidConditions[row.Guid] && thisComponentHasCondition;
+                            allComponentsHaveConditions = thisComponentHasCondition && componentGuidConditions[row.Guid];
 
                             if (allComponentsHaveConditions)
                             {
@@ -727,21 +664,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return layout;
-        }
-
-        /// <summary>
-        /// Creates the MSI/MSM/PCP database.
-        /// </summary>
-        /// <param name="output">Output to create database for.</param>
-        /// <param name="databaseFile">The database file to create.</param>
-        /// <param name="keepAddedColumns">Whether to keep columns added in a transform.</param>
-        /// <param name="useSubdirectory">Whether to use a subdirectory based on the <paramref name="databaseFile"/> file name for intermediate files.</param>
-        private IEnumerable<ITrackedFile> GenerateDatabase(WindowsInstallerData output, TableDefinitionCollection tableDefinitions, string databaseFile, bool keepAddedColumns, bool useSubdirectory)
-        {
-            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemExtensions, output, databaseFile, tableDefinitions, this.IntermediateFolder, this.Codepage, keepAddedColumns, this.SuppressAddingValidationRows, useSubdirectory);
-            command.Execute();
-
-            return command.GeneratedTemporaryFiles;
         }
     }
 }

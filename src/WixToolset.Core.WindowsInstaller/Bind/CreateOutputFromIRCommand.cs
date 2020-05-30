@@ -499,7 +499,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row.FileSize = tuple.FileSize;
             row.Version = tuple.Version;
             row.Language = tuple.Language;
-            row.DiskId = tuple.DiskId ?? 1; // TODO: is 0 the correct thing to default here
+            row.DiskId = tuple.DiskId ?? 1; // TODO: is 1 the correct thing to default here
+            row.Sequence = tuple.Sequence;
             row.Source = tuple.Source.Path;
 
             var attributes = (tuple.Attributes & FileTupleAttributes.Checksum) == FileTupleAttributes.Checksum ? WindowsInstallerConstants.MsidbFileAttributesChecksum : 0;

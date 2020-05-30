@@ -15,18 +15,27 @@ namespace WixToolset.Core.Bind
         {
             this.FileTuple = file;
             this.AssemblyTuple = assembly;
+
+            this.Identifier = file.Id;
+            this.ComponentRef = file.ComponentRef;
         }
 
         public FileFacade(bool fromModule, FileTuple file)
         {
             this.FromModule = fromModule;
             this.FileTuple = file;
+
+            this.Identifier = file.Id;
+            this.ComponentRef = file.ComponentRef;
         }
 
-        internal FileFacade(FileRow row)
+        public FileFacade(FileRow row)
         {
             this.FromTransform = true;
             this.FileRow = row;
+
+            this.Identifier = new Identifier(AccessModifier.Private, row.File);
+            this.ComponentRef = row.Component;
         }
 
         public bool FromModule { get; }
@@ -39,11 +48,11 @@ namespace WixToolset.Core.Bind
 
         private AssemblyTuple AssemblyTuple { get; }
 
-        public string Id => this.FileRow == null ? this.FileTuple.Id.Id : this.FileRow.File;
+        public string Id => this.Identifier.Id;
 
-        public Identifier Identifier => this.FileRow == null ? this.FileTuple.Id : throw new NotImplementedException();
+        public Identifier Identifier { get; }
 
-        public string ComponentRef => this.FileRow == null ? this.FileTuple.ComponentRef : this.FileRow.Component;
+        public string ComponentRef { get; }
 
         public int DiskId
         {
@@ -137,7 +146,7 @@ namespace WixToolset.Core.Bind
             }
         }
 
-        public AssemblyType? AssemblyType => this.FileRow == null ? this.AssemblyTuple?.Type : throw new NotImplementedException();
+        public AssemblyType? AssemblyType => this.FileRow == null ? this.AssemblyTuple?.Type : null;
 
         public string AssemblyApplicationFileRef => this.FileRow == null ? this.AssemblyTuple?.ApplicationFileRef : throw new NotImplementedException();
 
@@ -153,5 +162,10 @@ namespace WixToolset.Core.Bind
         /// Gets or sets the MsiFileHash row for this file.
         /// </summary>
         public MsiFileHashTuple Hash { get; set; }
+
+        /// <summary>
+        /// Allows direct access to the underlying FileRow as requried for patching.
+        /// </summary>
+        public FileRow GetFileRow() => this.FileRow ?? throw new NotImplementedException();
     }
 }

@@ -334,6 +334,7 @@ namespace WixToolset.Core.CommandLine
                     context.DelayedFields = resolveResult.DelayedFields;
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
                     context.Extensions = this.ExtensionManager.GetServices<IBinderExtension>();
+                    context.FileSystemExtensions = this.ExtensionManager.GetServices<IFileSystemExtension>();
                     context.Ices = Array.Empty<string>(); // TODO: set this correctly
                     context.IntermediateFolder = intermediateFolder;
                     context.IntermediateRepresentation = resolveResult.IntermediateRepresentation;

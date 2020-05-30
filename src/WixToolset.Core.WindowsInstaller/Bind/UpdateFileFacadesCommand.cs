@@ -39,20 +39,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public void Execute()
         {
+            var assemblyNameTuples = this.Section.Tuples.OfType<MsiAssemblyNameTuple>().ToDictionary(t => t.Id.Id);
+
             foreach (var file in this.UpdateFileFacades)
             {
-                this.UpdateFileFacade(file);
+                this.UpdateFileFacade(file, assemblyNameTuples);
             }
         }
 
-        private void UpdateFileFacade(FileFacade facade)
+        private void UpdateFileFacade(FileFacade facade, Dictionary<string, MsiAssemblyNameTuple> assemblyNameTuples)
         {
-            var assemblyNameTuples = new Dictionary<string, MsiAssemblyNameTuple>();
-            foreach (var assemblyTuple in this.Section.Tuples.OfType<MsiAssemblyNameTuple>())
-            {
-                assemblyNameTuples.Add(assemblyTuple.ComponentRef + "/" + assemblyTuple.Name, assemblyTuple);
-            }
-
             FileInfo fileInfo = null;
             try
             {
@@ -335,7 +331,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var lookup = String.Concat(facade.ComponentRef, "/", name);
                 if (!assemblyNameTuples.TryGetValue(lookup, out var assemblyNameTuple))
                 {
-                    assemblyNameTuple = this.Section.AddTuple(new MsiAssemblyNameTuple(facade.SourceLineNumber)
+                    assemblyNameTuple = this.Section.AddTuple(new MsiAssemblyNameTuple(facade.SourceLineNumber, new Identifier(AccessModifier.Private, facade.ComponentRef, name))
                     {
                         ComponentRef = facade.ComponentRef,
                         Name = name,
@@ -348,6 +344,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
 
                     facade.AssemblyNames.Add(assemblyNameTuple);
+
+                    assemblyNameTuples.Add(assemblyNameTuple.Id.Id, assemblyNameTuple);
                 }
 
                 assemblyNameTuple.Value = value;

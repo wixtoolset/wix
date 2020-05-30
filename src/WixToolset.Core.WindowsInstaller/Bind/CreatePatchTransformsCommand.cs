@@ -45,7 +45,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     var baselineData = this.GetData(tuple.BaselineFile.Path);
                     var updateData = this.GetData(tuple.UpdateFile.Path);
 
-                    var command = new GenerateTransformCommand(this.Messaging, baselineData, updateData, false);
+                    var command = new GenerateTransformCommand(this.Messaging, baselineData, updateData, preserveUnchangedRows: true, showPedanticMessages: false);
                     transform = command.Execute();
                 }
                 else

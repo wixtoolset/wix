@@ -147,7 +147,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     foreach (MediaRow transformMediaRow in transformMediaTable.Rows)
                     {
-                        if (mediaTuple.LastSequence < transformMediaRow.LastSequence)
+                        if (!mediaTuple.LastSequence.HasValue || mediaTuple.LastSequence < transformMediaRow.LastSequence)
                         {
                             // The Binder will pre-increment the sequence.
                             mediaTuple.LastSequence = transformMediaRow.LastSequence;
@@ -156,14 +156,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // Use the Media/@DiskId if greater than the last sequence for backward compatibility.
-                if (mediaTuple.LastSequence < mediaTuple.DiskId)
+                if (!mediaTuple.LastSequence.HasValue || mediaTuple.LastSequence < mediaTuple.DiskId)
                 {
                     mediaTuple.LastSequence = mediaTuple.DiskId;
                 }
 
                 // Ignore media table in the transform.
                 mainTransform.Transform.Tables.Remove("Media");
-                mainTransform.Transform.Tables.Remove("WixMedia");
                 mainTransform.Transform.Tables.Remove("MsiDigitalSignature");
 
                 var pairedTransform = this.BuildPairedTransform(summaryInfo, patchMetadata, patchIdTuple, mainTransform.Transform, mediaTuple, baselineTuple, out var productCode);
@@ -767,15 +766,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (transform.TryGetTable("File", out var fileTable))
             {
                 var componentWithChangedKeyPath = new Dictionary<string, string>();
-                foreach (var row in fileTable.Rows)
+                foreach (FileRow row in fileTable.Rows)
                 {
                     if (RowOperation.None == row.Operation)
                     {
                         continue;
                     }
 
-                    var fileId = row.FieldAsString(0);
-                    var componentId = row.FieldAsString(1);
+                    var fileId = row.File;
+                    var componentId = row.Component;
 
                     // If this file is the keypath of a component
                     if (componentKeyPath.TryGetValue(componentId, out var keyPath) && keyPath.Equals(fileId, StringComparison.Ordinal))
@@ -972,7 +971,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (row.Operation == RowOperation.None)
                     {
-                        // ignore the rows without section id.
+                        // Ignore the rows without section id.
                         if (isSectionIdEmpty)
                         {
                             currentTable.Rows.RemoveAt(i);
@@ -1157,47 +1156,33 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return null;
             }
 
-            // copy File table
+            // Copy File table
             if (mainTransform.Tables.TryGetTable("File", out var mainFileTable) && 0 < mainFileTable.Rows.Count)
             {
-#if TODO_PATCHING
-                // We require file source information.
-                var mainWixFileTable = mainTransform.Tables["WixFile"];
-                if (null == mainWixFileTable)
-                {
-                    this.Messaging.Write(ErrorMessages.AdminImageRequired(productCode));
-                    return null;
-                }
-
-                var mainFileRows = new RowDictionary<FileRow>(mainFileTable);
-
                 var pairedFileTable = pairedTransform.EnsureTable(mainFileTable.Definition);
-                {
-                    var mainFileRow = mainFileRows[mainWixFileRow.File];
 
-                    // set File.Sequence to non null to satisfy transform bind
+                foreach (FileRow mainFileRow in mainFileTable.Rows)
+                {
+                    // Set File.Sequence to non null to satisfy transform bind.
                     mainFileRow.Sequence = 1;
 
-                    // delete's don't need rows in the paired transform
+                    // Delete's don't need rows in the paired transform.
                     if (mainFileRow.Operation == RowOperation.Delete)
                     {
                         continue;
                     }
 
-                    var pairedFileRow = (FileRow)pairedFileTable.CreateRow(null);
+                    var pairedFileRow = (FileRow)pairedFileTable.CreateRow(mainFileRow.SourceLineNumbers);
                     pairedFileRow.Operation = RowOperation.Modify;
-                    for (var i = 0; i < mainFileRow.Fields.Length; i++)
-                    {
-                        pairedFileRow[i] = mainFileRow[i];
-                    }
+                    mainFileRow.CopyTo(pairedFileRow);
 
-                    // override authored media for patch bind
-                    mainWixFileRow.DiskId = mediaTuple.DiskId;
+                    // Override authored media for patch bind.
+                    mainFileRow.DiskId = mediaTuple.DiskId;
 
-                    // suppress any change to File.Sequence to avoid bloat
+                    // Suppress any change to File.Sequence to avoid bloat.
                     mainFileRow.Fields[7].Modified = false;
 
-                    // force File row to appear in the transform
+                    // Force File row to appear in the transform.
                     switch (mainFileRow.Operation)
                     {
                         case RowOperation.Modify:
@@ -1211,19 +1196,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             break;
                     }
                 }
-#endif
             }
 
             // Add Media row to pairedTransform
             var pairedMediaTable = pairedTransform.EnsureTable(this.tableDefinitions["Media"]);
-            var pairedMediaRow = pairedMediaTable.CreateRow(mediaTuple.SourceLineNumbers);
+            var pairedMediaRow = (MediaRow)pairedMediaTable.CreateRow(mediaTuple.SourceLineNumbers);
             pairedMediaRow.Operation = RowOperation.Add;
-            pairedMediaRow[0] = mediaTuple.DiskId;
-            pairedMediaRow[1] = mediaTuple.LastSequence ?? 0;
-            pairedMediaRow[2] = mediaTuple.DiskPrompt;
-            pairedMediaRow[3] = mediaTuple.Cabinet;
-            pairedMediaRow[4] = mediaTuple.VolumeLabel;
-            pairedMediaRow[5] = mediaTuple.Source;
+            pairedMediaRow.DiskId = mediaTuple.DiskId;
+            pairedMediaRow.LastSequence = mediaTuple.LastSequence ?? 0;
+            pairedMediaRow.DiskPrompt = mediaTuple.DiskPrompt;
+            pairedMediaRow.Cabinet = mediaTuple.Cabinet;
+            pairedMediaRow.VolumeLabel = mediaTuple.VolumeLabel;
+            pairedMediaRow.Source = mediaTuple.Source;
 
             // Add PatchPackage for this Media
             var pairedPackageTable = pairedTransform.EnsureTable(this.tableDefinitions["PatchPackage"]);
@@ -1283,7 +1267,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var patchTargetTuples = tuples.OfType<WixPatchTargetTuple>().ToList();
 
-            if (patchTargetTuples.Count > 0)
+            if (patchTargetTuples.Any())
             {
                 var targets = new SortedSet<string>();
                 var replace = true;

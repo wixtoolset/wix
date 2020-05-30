@@ -3,23 +3,21 @@
 namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     internal class BindTransformCommand
     {
-        public BindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IFileSystemExtension> extensions, string intermediateFolder, WindowsInstallerData transform, string outputPath, TableDefinitionCollection tableDefinitions)
+        public BindTransformCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, string intermediateFolder, WindowsInstallerData transform, string outputPath, TableDefinitionCollection tableDefinitions)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
-            this.Extensions = extensions;
+            this.FileSystemManager = fileSystemManager;
             this.IntermediateFolder = intermediateFolder;
             this.Transform = transform;
             this.OutputPath = outputPath;
@@ -30,7 +28,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IBackendHelper BackendHelper { get; }
 
-        private IEnumerable<IFileSystemExtension> Extensions { get; }
+        private FileSystemManager FileSystemManager { get; }
 
         private TableDefinitionCollection TableDefinitions { get; }
 
@@ -353,7 +351,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 targetRow[i] = emptyFile;
                                 modifiedRow = true;
                             }
-                            else if (!this.CompareFiles(objectField.PreviousData, (string)objectField.Data))
+                            else if (!this.FileSystemManager.CompareFiles(objectField.PreviousData, (string)objectField.Data))
                             {
                                 targetRow[i] = objectField.PreviousData;
                                 modifiedRow = true;
@@ -438,29 +436,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private bool CompareFiles(string targetFile, string updatedFile)
-        {
-            bool? compared = null;
-            foreach (var extension in this.Extensions)
-            {
-                compared = extension.CompareFiles(targetFile, updatedFile);
-                if (compared.HasValue)
-                {
-                    break;
-                }
-            }
-
-            if (!compared.HasValue)
-            {
-                throw new InvalidOperationException(); // TODO: something needs to be said here that none of the binder file managers returned a result.
-            }
-
-            return compared.Value;
-        }
-
         private void GenerateDatabase(WindowsInstallerData output, string outputPath, bool keepAddedColumns)
         {
-            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.Extensions, output, outputPath, this.TableDefinitions, this.IntermediateFolder, codepage: -1, keepAddedColumns, suppressAddingValidationRows: true, useSubdirectory: true );
+            var command = new GenerateDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, output, outputPath, this.TableDefinitions, this.IntermediateFolder, codepage: -1, keepAddedColumns, suppressAddingValidationRows: true, useSubdirectory: true);
             command.Execute();
         }
     }

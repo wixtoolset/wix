@@ -10,7 +10,6 @@ namespace WixToolset.Core.WindowsInstaller
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -25,11 +24,12 @@ namespace WixToolset.Core.WindowsInstaller
         /// <summary>
         /// Instantiates a new Differ class.
         /// </summary>
-        public GenerateTransformCommand(IMessaging messaging, WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput, bool showPedanticMessages)
+        public GenerateTransformCommand(IMessaging messaging, WindowsInstallerData targetOutput, WindowsInstallerData updatedOutput, bool preserveUnchangedRows, bool showPedanticMessages)
         {
             this.messaging = messaging;
             this.TargetOutput = targetOutput;
             this.UpdatedOutput = updatedOutput;
+            this.PreserveUnchangedRows = preserveUnchangedRows;
             this.ShowPedanticMessages = showPedanticMessages;
         }
 
@@ -111,10 +111,10 @@ namespace WixToolset.Core.WindowsInstaller
                 }
                 else if (TableOperation.None == operation)
                 {
-                    var modified = transform.EnsureTable(updatedTable.Definition);
+                    var modifiedTable = transform.EnsureTable(updatedTable.Definition);
                     foreach (var row in rows)
                     {
-                        modified.Rows.Add(row);
+                        modifiedTable.Rows.Add(row);
                     }
                 }
             }
@@ -242,10 +242,7 @@ namespace WixToolset.Core.WindowsInstaller
                     {
                         var columnDefinition = updatedRow.Fields[i].Column;
 
-                        if (columnDefinition.Unreal)
-                        {
-                        }
-                        else if (!columnDefinition.PrimaryKey)
+                        if (!columnDefinition.PrimaryKey)
                         {
                             var modified = false;
 

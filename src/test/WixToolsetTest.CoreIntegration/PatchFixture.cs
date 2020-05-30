@@ -16,7 +16,7 @@ namespace WixToolsetTest.CoreIntegration
     {
         private static readonly XNamespace PatchNamespace = "http://www.microsoft.com/msi/patch_applicability.xsd";
 
-        [Fact(Skip = "Skip until patches have files in them")]
+        [Fact]
         public void CanBuildSimplePatch()
         {
             var folder = TestData.Get(@"TestData\PatchSingle");
@@ -45,7 +45,7 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(cab));
 
                 var files = Query.GetCabinetFiles(cab);
-                Assert.Equal(new[] { "a", "b" }, files.Select(f => f.ArchiveName).ToArray()); // This test may not be quite correct, yet.
+                Assert.Equal(new[] { "a.txt", "b.txt" }, files.Select(f => f.Name).ToArray());
             }
         }
 

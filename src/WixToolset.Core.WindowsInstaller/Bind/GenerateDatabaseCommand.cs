@@ -10,17 +10,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
     internal class GenerateDatabaseCommand
     {
-        public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, IEnumerable<IFileSystemExtension> fileSystemExtensions, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, int codepage, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
+        public GenerateDatabaseCommand(IMessaging messaging, IBackendHelper backendHelper, FileSystemManager fileSystemManager, WindowsInstallerData data, string outputPath, TableDefinitionCollection tableDefinitions, string intermediateFolder, int codepage, bool keepAddedColumns, bool suppressAddingValidationRows, bool useSubdirectory)
         {
             this.Messaging = messaging;
             this.BackendHelper = backendHelper;
-            this.Extensions = fileSystemExtensions;
+            this.FileSystemManager = fileSystemManager;
             this.Data = data;
             this.OutputPath = outputPath;
             this.TableDefinitions = tableDefinitions;
@@ -35,7 +34,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IBackendHelper BackendHelper { get; }
 
-        private IEnumerable<IFileSystemExtension> Extensions { get; }
+        private FileSystemManager FileSystemManager { get; }
 
         /// <summary>
         /// Whether to keep columns added in a transform.
@@ -371,7 +370,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         var transformFile = Path.Combine(this.IntermediateFolder, String.Concat(subStorage.Name, ".mst"));
 
                         // Bind the transform.
-                        var command = new BindTransformCommand(this.Messaging, this.BackendHelper, this.Extensions, this.IntermediateFolder, subStorage.Data, transformFile, this.TableDefinitions);
+                        var command = new BindTransformCommand(this.Messaging, this.BackendHelper, this.FileSystemManager, this.IntermediateFolder, subStorage.Data, transformFile, this.TableDefinitions);
                         command.Execute();
 
                         if (this.Messaging.EncounteredError)

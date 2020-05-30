@@ -12,6 +12,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Core.Native;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
@@ -34,7 +35,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public string OutputPath { private get; set; }
 
-        public IEnumerable<string> SuppressedTableNames { private get; set; }
+        public TableDefinitionCollection TableDefinitions { private get; set; }
 
         public string IntermediateFolder { private get; set; }
 
@@ -48,6 +49,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 return;
             }
+
+            var suppressedTableNames = this.AddBackSuppresedSequenceTables();
 
             IMsmMerge2 merge = null;
             bool commit = true;
@@ -212,9 +215,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            using (Database db = new Database(this.OutputPath, OpenDatabase.Direct))
+            using (var db = new Database(this.OutputPath, OpenDatabase.Direct))
             {
-                Table suppressActionTable = this.Output.Tables["WixSuppressAction"];
+                var suppressActionTable = this.Output.Tables["WixSuppressAction"];
 
                 // suppress individual actions
                 if (null != suppressActionTable)
@@ -239,40 +242,38 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
 
                 // query for merge module actions in suppressed sequences and drop them
-                foreach (string tableName in this.SuppressedTableNames)
+                foreach (var tableName in suppressedTableNames)
                 {
                     if (!db.TableExists(tableName))
                     {
                         continue;
                     }
 
-                    using (View view = db.OpenExecuteView(String.Concat("SELECT `Action` FROM ", tableName)))
+                    using (var view = db.OpenExecuteView(String.Concat("SELECT `Action` FROM ", tableName)))
                     {
-                        foreach (Record resultRecord in view.Records)
+                        foreach (var resultRecord in view.Records)
                         {
                             this.Messaging.Write(WarningMessages.SuppressMergedAction(resultRecord.GetString(1), tableName));
                         }
                     }
 
                     // drop suppressed sequences
-                    using (View view = db.OpenExecuteView(String.Concat("DROP TABLE ", tableName)))
+                    using (var view = db.OpenExecuteView(String.Concat("DROP TABLE ", tableName)))
                     {
                     }
 
                     // delete the validation rows
-                    using (View view = db.OpenView(String.Concat("DELETE FROM _Validation WHERE `Table` = ?")))
+                    using (var view = db.OpenView(String.Concat("DELETE FROM _Validation WHERE `Table` = ?")))
+                    using (var record = new Record(1))
                     {
-                        using (Record record = new Record(1))
-                        {
-                            record.SetString(1, tableName);
-                            view.Execute(record);
-                        }
+                        record.SetString(1, tableName);
+                        view.Execute(record);
                     }
                 }
 
                 // now update the Attributes column for the files from the Merge Modules
                 this.Messaging.Write(VerboseMessages.ResequencingMergeModuleFiles());
-                using (View view = db.OpenView("SELECT `Sequence`, `Attributes` FROM `File` WHERE `File`=?"))
+                using (var view = db.OpenView("SELECT `Sequence`, `Attributes` FROM `File` WHERE `File`=?"))
                 {
                     foreach (var file in this.FileFacades)
                     {
@@ -281,13 +282,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             continue;
                         }
 
-                        using (Record record = new Record(1))
+                        using (var record = new Record(1))
                         {
                             record.SetString(1, file.Id);
                             view.Execute(record);
                         }
 
-                        using (Record recordUpdate = view.Fetch())
+                        using (var recordUpdate = view.Fetch())
                         {
                             if (null == recordUpdate)
                             {
@@ -331,6 +332,32 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 db.Commit();
             }
+        }
+
+        private IEnumerable<string> AddBackSuppresedSequenceTables()
+        {
+            // Add back possibly suppressed sequence tables since all sequence tables must be present
+            // for the merge process to work. We'll drop the suppressed sequence tables again as
+            // necessary.
+            var suppressedTableNames = new HashSet<string>();
+
+            foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
+            {
+                var sequenceTableName = (sequence == SequenceTable.AdvertiseExecuteSequence) ? "AdvtExecuteSequence" : sequence.ToString();
+                var sequenceTable = this.Output.Tables[sequenceTableName];
+
+                if (null == sequenceTable)
+                {
+                    sequenceTable = this.Output.EnsureTable(this.TableDefinitions[sequenceTableName]);
+                }
+
+                if (0 == sequenceTable.Rows.Count)
+                {
+                    suppressedTableNames.Add(sequenceTableName);
+                }
+            }
+
+            return suppressedTableNames;
         }
     }
 }
