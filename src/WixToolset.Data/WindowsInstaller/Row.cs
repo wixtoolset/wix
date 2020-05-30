@@ -237,6 +237,18 @@ namespace WixToolset.Data.WindowsInstaller
         }
 
         /// <summary>
+        /// Copies this row to the target row.
+        /// </summary>
+        /// <param name="target">Row to copy data to.</param>
+        public void CopyTo(Row target)
+        {
+            for (var i = 0; i < this.Fields.Length; i++)
+            {
+                target[i] = this[i];
+            }
+        }
+
+        /// <summary>
         /// Returns a string representation of the Row.
         /// </summary>
         /// <returns>A string representation of the Row.</returns>
