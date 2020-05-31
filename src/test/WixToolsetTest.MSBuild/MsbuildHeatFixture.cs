@@ -37,7 +37,7 @@ namespace WixToolsetTest.MSBuild
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Empty(warnings);
 
-                var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Debug", "_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
+                var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
@@ -57,7 +57,7 @@ namespace WixToolsetTest.MSBuild
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                var pdbPath = Path.Combine(binFolder, "x86", "Debug", "HeatFilePackage.wixpdb");
+                var pdbPath = Path.Combine(binFolder, "x86", "Release", "HeatFilePackage.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);
@@ -92,7 +92,7 @@ namespace WixToolsetTest.MSBuild
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Empty(warnings);
 
-                var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Debug", "_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
+                var generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
@@ -112,7 +112,7 @@ namespace WixToolsetTest.MSBuild
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                generatedFilePath = Path.Combine(intermediateFolder, "x86", "Debug", "_JsonProductComponents_INSTALLFOLDER_MyProgram.json_file.wxs");
+                generatedFilePath = Path.Combine(intermediateFolder, "x86", "Release", "_JsonProductComponents_INSTALLFOLDER_MyProgram.json_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
 
                 generatedContents = File.ReadAllText(generatedFilePath);
@@ -132,7 +132,7 @@ namespace WixToolsetTest.MSBuild
                     "</Fragment>" +
                     "</Wix>", testXml);
 
-                var pdbPath = Path.Combine(binFolder, "x86", "Debug", "HeatFileMultipleFilesSameFileName.wixpdb");
+                var pdbPath = Path.Combine(binFolder, "x86", "Release", "HeatFileMultipleFilesSameFileName.wixpdb");
                 Assert.True(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);

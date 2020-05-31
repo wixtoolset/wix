@@ -40,8 +40,8 @@ namespace WixToolsetTest.MSBuild
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    @"bin\x86\Debug\SimpleBundle.exe",
-                    @"bin\x86\Debug\SimpleBundle.wixpdb",
+                    @"bin\x86\Release\SimpleBundle.exe",
+                    @"bin\x86\Release\SimpleBundle.wixpdb",
                 }, paths);
             }
         }
@@ -75,8 +75,8 @@ namespace WixToolsetTest.MSBuild
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    @"bin\x86\Debug\SimpleMergeModule.msm",
-                    @"bin\x86\Debug\SimpleMergeModule.wixpdb",
+                    @"bin\x86\Release\SimpleMergeModule.msm",
+                    @"bin\x86\Release\SimpleMergeModule.wixpdb",
                 }, paths);
             }
         }
@@ -110,9 +110,9 @@ namespace WixToolsetTest.MSBuild
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    @"bin\x86\Debug\en-US\cab1.cab",
-                    @"bin\x86\Debug\en-US\MsiPackage.msi",
-                    @"bin\x86\Debug\en-US\MsiPackage.wixpdb",
+                    @"bin\x86\Release\en-US\cab1.cab",
+                    @"bin\x86\Release\en-US\MsiPackage.msi",
+                    @"bin\x86\Release\en-US\MsiPackage.wixpdb",
                 }, paths);
             }
         }
@@ -143,9 +143,9 @@ namespace WixToolsetTest.MSBuild
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    @"bin\x86\Debug\cab1.cab",
-                    @"bin\x86\Debug\MergeMsiPackage.msi",
-                    @"bin\x86\Debug\MergeMsiPackage.wixpdb",
+                    @"bin\x86\Release\cab1.cab",
+                    @"bin\x86\Release\MergeMsiPackage.msi",
+                    @"bin\x86\Release\MergeMsiPackage.wixpdb",
                 }, paths);
             }
         }
@@ -157,9 +157,9 @@ namespace WixToolsetTest.MSBuild
         {
             var expectedOutputs = new[]
                 {
-                    @"bin\x86\Debug\en-US\cab1.cab",
-                    @"bin\x86\Debug\en-US\MsiPackage.msi",
-                    @"bin\x86\Debug\en-US\MsiPackage.wixpdb",
+                    @"bin\x86\Release\en-US\cab1.cab",
+                    @"bin\x86\Release\en-US\MsiPackage.msi",
+                    @"bin\x86\Release\en-US\MsiPackage.wixpdb",
                 };
 
             this.AssertWixpdb(buildSystem, null, expectedOutputs);
@@ -173,8 +173,8 @@ namespace WixToolsetTest.MSBuild
         {
             this.AssertWixpdb(buildSystem, "NONE", new[]
                 {
-                    @"bin\x86\Debug\en-US\cab1.cab",
-                    @"bin\x86\Debug\en-US\MsiPackage.msi",
+                    @"bin\x86\Release\en-US\cab1.cab",
+                    @"bin\x86\Release\en-US\MsiPackage.msi",
                 });
         }
 
@@ -232,9 +232,9 @@ namespace WixToolsetTest.MSBuild
                     .ToArray();
                 Assert.Equal(new[]
                 {
-                    @"bin\x64\Debug\en-US\cab1.cab",
-                    @"bin\x64\Debug\en-US\MsiPackage.msi",
-                    @"bin\x64\Debug\en-US\MsiPackage.wixpdb",
+                    @"bin\x64\Release\en-US\cab1.cab",
+                    @"bin\x64\Release\en-US\MsiPackage.msi",
+                    @"bin\x64\Release\en-US\MsiPackage.wixpdb",
                 }, paths);
             }
         }
@@ -309,7 +309,7 @@ namespace WixToolsetTest.MSBuild
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .Single();
-                Assert.Equal(@"bin\x86\Debug\MsiPackage.wixipl", path);
+                Assert.Equal(@"bin\x86\Release\MsiPackage.wixipl", path);
             }
         }
 
@@ -360,7 +360,7 @@ namespace WixToolsetTest.MSBuild
                     "Package.wxs",
                     "PackageComponents.wxs",
                     @"data\test.txt",
-                    @"obj\x86\Debug\MsiPackage.wixproj.FileListAbsolute.txt",
+                    @"obj\x86\Release\MsiPackage.wixproj.FileListAbsolute.txt",
                 };
 
                 var remainingPaths = Directory.EnumerateFiles(baseFolder, @"*.*", SearchOption.AllDirectories)
