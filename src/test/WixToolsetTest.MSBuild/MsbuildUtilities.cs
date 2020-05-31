@@ -22,6 +22,9 @@ namespace WixToolsetTest.MSBuild
             var allArgs = new List<string>
             {
                 $"-p:WixMSBuildProps={MsbuildUtilities.WixPropsPath}",
+                // Node reuse means that child msbuild processes can stay around after the build completes.
+                // Under that scenario, the root msbuild does not reliably close its streams which causes us to hang.
+                "-nr:false",
             };
 
             if (arguments != null)
