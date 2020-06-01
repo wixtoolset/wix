@@ -28,9 +28,6 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
-                Assert.Single(platformSwitches);
-
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Empty(warnings);
 
@@ -62,9 +59,6 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
-
-                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
-                Assert.Single(platformSwitches);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
                 Assert.Empty(warnings);
@@ -98,7 +92,7 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x86"));
+                var platformSwitches = result.Output.Where(line => line.Contains("-platform x86"));
                 Assert.Single(platformSwitches);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
@@ -223,7 +217,7 @@ namespace WixToolsetTest.MSBuild
                 });
                 result.AssertSuccess();
 
-                var platformSwitches = result.Output.Where(line => line.TrimStart().StartsWith("wix.exe build -platform x64"));
+                var platformSwitches = result.Output.Where(line => line.Contains("-platform x64"));
                 Assert.Single(platformSwitches);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
@@ -287,9 +281,11 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
-        public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem)
+        [InlineData(BuildSystem.MSBuild, null)]
+        [InlineData(BuildSystem.MSBuild, true)]
+        [InlineData(BuildSystem.MSBuild64, null)]
+        [InlineData(BuildSystem.MSBuild64, true)]
+        public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem, bool? outOfProc)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
 
@@ -303,8 +299,13 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     "-p:OutputType=IntermediatePostLink",
-                });
+                }, outOfProc: outOfProc);
                 result.AssertSuccess();
+
+                var expectedOutOfProc = outOfProc.HasValue && outOfProc.Value;
+                var expectedWixCommand = $"{(expectedOutOfProc ? "wix.exe" : "(wix.exe)")} build";
+                var buildCommands = result.Output.Where(line => line.TrimStart().Contains(expectedWixCommand));
+                Assert.Single(buildCommands);
 
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))

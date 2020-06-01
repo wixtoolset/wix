@@ -249,11 +249,6 @@
 
     <Error
       Code="WIX102"
-      Condition=" '$(MSBuildToolsVersion)' == '' OR '$(MSBuildToolsVersion)' &lt; '4.0' "
-      Text="MSBuild v$(MSBuildToolsVersion) is not supported by the project &quot;$(MSBuildProjectFile)&quot;. You must use MSBuild v4.0 or later." />
-
-    <Error
-      Code="WIX103"
       Condition=" '$(WixPdbType)' != 'none' and '$(WixPdbType)' != 'full' "
       Text="The WixPdbType property '$(WixPdbType)' is not valid in project &quot;$(MSBuildProjectFile)&quot;. Supported values are: 'full', 'none'" />
 
@@ -695,7 +690,11 @@
 
         SuppressValidation="$(SuppressValidation)"
         SuppressIces="$(SuppressIces)"
-        AdditionalCub="$(AdditionalCub)" />
+        AdditionalCub="$(AdditionalCub)"
+
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+        ToolExe="$(WixToolExe)"
+        ToolPath="$(WixToolDir)" />
 
     <!--
     SuppressAllWarnings="$(CompilerSuppressAllWarnings);$(LinkerSuppressAllWarnings)"

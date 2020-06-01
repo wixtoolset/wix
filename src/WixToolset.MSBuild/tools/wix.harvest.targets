@@ -3,6 +3,10 @@
 
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- These properties can be overridden to support non-default installations. -->
+  <PropertyGroup>
+    <HeatToolDir Condition=" '$(HeatToolDir)' == '' ">$(WixToolDir)</HeatToolDir>
+  </PropertyGroup>
 
   <!-- These tasks are extensions for harvesting WiX source code from other sources. -->
   <UsingTask TaskName="HeatFile" AssemblyFile="$(WixTasksPath)" />
@@ -274,7 +278,10 @@
       Configuration="%(_AllHeatProjects.Configuration)"
       Platform="%(_AllHeatProjects.Platform)"
       GenerateWixVariables="$(HarvestProjectsGenerateWixVariables)"
-      AdditionalOptions="$(HarvestProjectsAdditionalOptions)">
+      AdditionalOptions="$(HarvestProjectsAdditionalOptions)"
+      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+      ToolExe="$(HeatToolExe)"
+      ToolPath="$(HeatToolDir)">
 
       <Output TaskParameter="OutputFile" ItemName="Compile" />
       <Output TaskParameter="OutputFile" ItemName="FileWrites" />
@@ -359,7 +366,10 @@
       SuppressCom="%(HarvestDirectory.SuppressCom)"
       SuppressRootDirectory="%(HarvestDirectory.SuppressRootDirectory)"
       SuppressRegistry="%(HarvestDirectory.SuppressRegistry)"
-      AdditionalOptions="$(HarvestDirectoryAdditionalOptions)">
+      AdditionalOptions="$(HarvestDirectoryAdditionalOptions)"
+      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+      ToolExe="$(HeatToolExe)"
+      ToolPath="$(HeatToolDir)">
 
       <Output TaskParameter="OutputFile" ItemName="Compile" />
       <Output TaskParameter="OutputFile" ItemName="FileWrites" />
@@ -432,7 +442,10 @@
       SuppressCom="%(HarvestFile.SuppressCom)"
       SuppressRegistry="%(HarvestFile.SuppressRegistry)"
       SuppressRootDirectory="%(HarvestFile.SuppressRootDirectory)"
-      AdditionalOptions="$(HarvestFileAdditionalOptions)">
+      AdditionalOptions="$(HarvestFileAdditionalOptions)"
+      RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
+      ToolExe="$(HeatToolExe)"
+      ToolPath="$(HeatToolDir)">
 
       <Output TaskParameter="OutputFile" ItemName="Compile" />
       <Output TaskParameter="OutputFile" ItemName="FileWrites" />

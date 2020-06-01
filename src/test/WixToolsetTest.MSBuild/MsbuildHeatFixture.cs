@@ -31,7 +31,9 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var heatCommandLines = result.Output.Where(line => line.TrimStart().StartsWith("heat.exe file"));
+                var expectedOutOfProc = false;
+                var expectedHeatCommand = $"{(expectedOutOfProc ? "heat.exe" : "(heat.exe)")} file";
+                var heatCommandLines = result.Output.Where(line => line.Contains(expectedHeatCommand));
                 Assert.Single(heatCommandLines);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
@@ -86,7 +88,9 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var heatCommandLines = result.Output.Where(line => line.TrimStart().StartsWith("heat.exe file"));
+                var expectedOutOfProc = false;
+                var expectedHeatCommand = $"{(expectedOutOfProc ? "heat.exe" : "(heat.exe)")} file";
+                var heatCommandLines = result.Output.Where(line => line.Contains(expectedHeatCommand));
                 Assert.Equal(2, heatCommandLines.Count());
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));

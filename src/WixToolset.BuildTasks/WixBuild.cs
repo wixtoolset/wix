@@ -4,10 +4,7 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.InteropServices;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Utilities;
-    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -80,11 +77,10 @@ namespace WixToolset.BuildTasks
         public string AdditionalCub { get; set; }
 
         protected override string TaskShortName => "WIX";
+        protected override string ToolName => "wix.exe";
 
-        protected override void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
+        protected override int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
         {
-            this.Log.LogMessage(MessageImportance.Normal, "wix.exe " + commandLineString);
-
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
 
@@ -95,7 +91,7 @@ namespace WixToolset.BuildTasks
             commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
-            command?.Execute();
+            return command?.Execute() ?? -1;
         }
 
         protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)

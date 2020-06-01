@@ -17,7 +17,7 @@ namespace WixToolsetTest.MSBuild
     {
         public static readonly string WixPropsPath = Path.Combine(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "build", "WixToolset.MSBuild.props");
 
-        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release")
+        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null)
         {
             var allArgs = new List<string>
             {
@@ -27,6 +27,11 @@ namespace WixToolsetTest.MSBuild
                 // Under that scenario, the root msbuild does not reliably close its streams which causes us to hang.
                 "-nr:false",
             };
+
+            if (outOfProc.HasValue)
+            {
+                allArgs.Add($"-p:RunWixToolsOutOfProc={outOfProc.Value}");
+            }
 
             if (arguments != null)
             {

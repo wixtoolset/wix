@@ -3,14 +3,16 @@
 namespace WixToolset.BuildTasks
 {
     using System;
+    using System.IO;
     using System.Runtime.InteropServices;
+    using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
-    public abstract class ToolsetTask : Task
+    public abstract class ToolsetTask : ToolTask
     {
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.
@@ -25,6 +27,12 @@ namespace WixToolset.BuildTasks
         /// Gets or sets whether to display the logo.
         /// </summary>
         public bool NoLogo { get; set; }
+
+        /// <summary>
+        /// Gets or sets a flag indicating whether the task
+        /// should be run as separate process or in-proc.
+        /// </summary>
+        public bool RunAsSeparateProcess { get; set; }
 
         /// <summary>
         /// Gets or sets whether all warnings should be suppressed.
@@ -51,19 +59,27 @@ namespace WixToolset.BuildTasks
         /// </summary>
         public bool VerboseOutput { get; set; }
 
-        public override bool Execute()
+        protected sealed override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+            if (this.RunAsSeparateProcess)
+            {
+                return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
+            }
 
+            return this.ExecuteInProc($"{commandLineCommands} {responseFileCommands}");
+        }
+
+        private int ExecuteInProc(string commandLineString)
+        {
+            this.Log.LogMessage(MessageImportance.Normal, $"({this.ToolName}){commandLineString}");
+
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var listener = new MsbuildMessageListener(this.Log, this.TaskShortName, this.BuildEngine.ProjectFileOfTaskNode);
+            int exitCode = -1;
 
             try
             {
-                var commandLineBuilder = new WixCommandLineBuilder();
-                this.BuildCommandLine(commandLineBuilder);
-
-                var commandLineString = commandLineBuilder.ToString();
-                this.ExecuteCore(serviceProvider, listener, commandLineString);
+                exitCode = this.ExecuteCore(serviceProvider, listener, commandLineString);
             }
             catch (WixException e)
             {
@@ -79,7 +95,47 @@ namespace WixToolset.BuildTasks
                 }
             }
 
-            return !this.Log.HasLoggedErrors;
+            if (exitCode == 0 && this.Log.HasLoggedErrors)
+            {
+                exitCode = -1;
+            }
+            return exitCode;
+        }
+
+        /// <summary>
+        /// Get the path to the executable.
+        /// </summary>
+        /// <remarks>
+        /// ToolTask only calls GenerateFullPathToTool when the ToolPath property is not set.
+        /// WiX never sets the ToolPath property, but the user can through $(WixToolDir).
+        /// If we return only a file name, ToolTask will search the system paths for it.
+        /// </remarks>
+        protected sealed override string GenerateFullPathToTool()
+        {
+            var thisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
+            if (this.RunAsSeparateProcess)
+            {
+                return Path.Combine(Path.GetDirectoryName(thisDllPath), this.ToolExe);
+            }
+
+            // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
+            return thisDllPath;
+        }
+
+        protected sealed override string GenerateResponseFileCommands()
+        {
+            var commandLineBuilder = new WixCommandLineBuilder();
+            this.BuildCommandLine(commandLineBuilder);
+            return commandLineBuilder.ToString();
+        }
+
+        protected sealed override void LogToolCommand(string message)
+        {
+            // Only log this if we're actually going to do it.
+            if (this.RunAsSeparateProcess)
+            {
+                base.LogToolCommand(message);
+            }
         }
 
         /// <summary>
@@ -98,7 +154,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendIfTrue("-wx", this.TreatWarningsAsErrors);
         }
 
-        protected abstract void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener messageListener, string commandLineString);
+        protected abstract int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener messageListener, string commandLineString);
 
         protected abstract string TaskShortName { get; }
     }

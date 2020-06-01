@@ -59,7 +59,8 @@ namespace WixToolset.BuildTasks
             set { this.transforms = value; }
         }
 
-        protected override string TaskShortName => "HEAT";
+        protected sealed override string TaskShortName => "HEAT";
+        protected sealed override string ToolName => "heat.exe";
 
         /// <summary>
         /// Gets the name of the heat operation performed by the task.
@@ -71,10 +72,8 @@ namespace WixToolset.BuildTasks
             get;
         }
 
-        protected override void ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
+        protected sealed override int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
         {
-            this.Log.LogMessage(MessageImportance.Normal, "heat.exe " + commandLineString);
-
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
 
@@ -83,7 +82,7 @@ namespace WixToolset.BuildTasks
 
             var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider, true);
             var command = commandLine.ParseStandardCommandLine(arguments);
-            command?.Execute();
+            return command?.Execute() ?? -1;
         }
 
         /// <summary>
