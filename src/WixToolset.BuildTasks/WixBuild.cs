@@ -5,15 +5,11 @@ namespace WixToolset.BuildTasks
     using System;
     using System.Collections.Generic;
     using Microsoft.Build.Framework;
-    using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// An MSBuild task to run the WiX compiler.
     /// </summary>
-    public sealed class WixBuild : ToolsetTask
+    public sealed partial class WixBuild : ToolsetTask
     {
         public string[] Cultures { get; set; }
 
@@ -76,23 +72,7 @@ namespace WixToolset.BuildTasks
         public string[] SuppressIces { get; set; }
         public string AdditionalCub { get; set; }
 
-        protected override string TaskShortName => "WIX";
         protected override string ToolName => "wix.exe";
-
-        protected override int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
-        {
-            var messaging = serviceProvider.GetService<IMessaging>();
-            messaging.SetListener(listener);
-
-            var arguments = serviceProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(commandLineString);
-
-            var commandLine = serviceProvider.GetService<ICommandLine>();
-            commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
-            commandLine.Arguments = arguments;
-            var command = commandLine.ParseStandardCommandLine();
-            return command?.Execute() ?? -1;
-        }
 
         protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
@@ -124,30 +104,6 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-lib ", this.LibraryFiles);
             commandLineBuilder.AppendTextIfNotWhitespace(this.AdditionalOptions);
             commandLineBuilder.AppendFileNamesIfNotNull(this.SourceFiles, " ");
-        }
-
-        private IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
-        {
-            var extensionManager = serviceProvider.GetService<IExtensionManager>();
-
-            foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
-            {
-                extensionManager.Add(type.Assembly);
-            }
-
-            foreach (var extension in extensions)
-            {
-                try
-                {
-                    extensionManager.Load(extension);
-                }
-                catch (WixException e)
-                {
-                    messaging.Write(e.Error);
-                }
-            }
-
-            return extensionManager;
         }
 
         private IEnumerable<string> CalculateBindPathStrings()

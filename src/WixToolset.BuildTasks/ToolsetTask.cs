@@ -4,15 +4,9 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.IO;
-    using System.Runtime.InteropServices;
-    using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-    using WixToolset.Core;
-    using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
 
-    public abstract class ToolsetTask : ToolTask
+    public abstract partial class ToolsetTask : ToolTask
     {
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.
@@ -59,49 +53,6 @@ namespace WixToolset.BuildTasks
         /// </summary>
         public bool VerboseOutput { get; set; }
 
-        protected sealed override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
-        {
-            if (this.RunAsSeparateProcess)
-            {
-                return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
-            }
-
-            return this.ExecuteInProc($"{commandLineCommands} {responseFileCommands}");
-        }
-
-        private int ExecuteInProc(string commandLineString)
-        {
-            this.Log.LogMessage(MessageImportance.Normal, $"({this.ToolName}){commandLineString}");
-
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
-            var listener = new MsbuildMessageListener(this.Log, this.TaskShortName, this.BuildEngine.ProjectFileOfTaskNode);
-            int exitCode = -1;
-
-            try
-            {
-                exitCode = this.ExecuteCore(serviceProvider, listener, commandLineString);
-            }
-            catch (WixException e)
-            {
-                listener.Write(e.Error);
-            }
-            catch (Exception e)
-            {
-                this.Log.LogErrorFromException(e, showStackTrace: true, showDetail: true, null);
-
-                if (e is NullReferenceException || e is SEHException)
-                {
-                    throw;
-                }
-            }
-
-            if (exitCode == 0 && this.Log.HasLoggedErrors)
-            {
-                exitCode = -1;
-            }
-            return exitCode;
-        }
-
         /// <summary>
         /// Get the path to the executable.
         /// </summary>
@@ -113,13 +64,12 @@ namespace WixToolset.BuildTasks
         protected sealed override string GenerateFullPathToTool()
         {
             var thisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
-            if (this.RunAsSeparateProcess)
+            if (!this.RunAsSeparateProcess)
             {
-                return Path.Combine(Path.GetDirectoryName(thisDllPath), this.ToolExe);
+                // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
+                return thisDllPath;
             }
-
-            // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
-            return thisDllPath;
+            return Path.Combine(Path.GetDirectoryName(thisDllPath), this.ToolExe);
         }
 
         protected sealed override string GenerateResponseFileCommands()
@@ -127,15 +77,6 @@ namespace WixToolset.BuildTasks
             var commandLineBuilder = new WixCommandLineBuilder();
             this.BuildCommandLine(commandLineBuilder);
             return commandLineBuilder.ToString();
-        }
-
-        protected sealed override void LogToolCommand(string message)
-        {
-            // Only log this if we're actually going to do it.
-            if (this.RunAsSeparateProcess)
-            {
-                base.LogToolCommand(message);
-            }
         }
 
         /// <summary>
@@ -153,9 +94,5 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-wx ", this.TreatSpecificWarningsAsErrors);
             commandLineBuilder.AppendIfTrue("-wx", this.TreatWarningsAsErrors);
         }
-
-        protected abstract int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener messageListener, string commandLineString);
-
-        protected abstract string TaskShortName { get; }
     }
 }

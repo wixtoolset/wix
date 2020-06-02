@@ -3,16 +3,12 @@
 namespace WixToolset.BuildTasks
 {
     using Microsoft.Build.Framework;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Data;
-    using WixToolset.Extensibility.Services;
-    using WixToolset.Harvesters;
 
     /// <summary>
     /// A base MSBuild task to run the WiX harvester.
     /// Specific harvester tasks should extend this class.
     /// </summary>
-    public abstract class HeatTask : ToolsetTask
+    public abstract partial class HeatTask : ToolsetTask
     {
         private bool autogenerageGuids;
         private bool generateGuidsNow;
@@ -59,7 +55,6 @@ namespace WixToolset.BuildTasks
             set { this.transforms = value; }
         }
 
-        protected sealed override string TaskShortName => "HEAT";
         protected sealed override string ToolName => "heat.exe";
 
         /// <summary>
@@ -70,19 +65,6 @@ namespace WixToolset.BuildTasks
         protected abstract string OperationName
         {
             get;
-        }
-
-        protected sealed override int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
-        {
-            var messaging = serviceProvider.GetService<IMessaging>();
-            messaging.SetListener(listener);
-
-            var arguments = serviceProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(commandLineString);
-
-            var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider, true);
-            var command = commandLine.ParseStandardCommandLine(arguments);
-            return command?.Execute() ?? -1;
         }
 
         /// <summary>
