@@ -144,8 +144,9 @@ namespace WixToolset.Data
         WixComplexReference,
         WixComponentGroup,
         WixComponentSearch,
-        WixCustomRow,
         WixCustomTable,
+        WixCustomTableCell,
+        WixCustomTableColumn,
         WixDeltaPatchFile,
         WixDeltaPatchSymbolPaths,
         WixDependencyProvider,
@@ -613,11 +614,14 @@ namespace WixToolset.Data
                 case TupleDefinitionType.WixComponentSearch:
                     return TupleDefinitions.WixComponentSearch;
 
-                case TupleDefinitionType.WixCustomRow:
-                    return TupleDefinitions.WixCustomRow;
-
                 case TupleDefinitionType.WixCustomTable:
                     return TupleDefinitions.WixCustomTable;
+
+                case TupleDefinitionType.WixCustomTableCell:
+                    return TupleDefinitions.WixCustomTableCell;
+
+                case TupleDefinitionType.WixCustomTableColumn:
+                    return TupleDefinitions.WixCustomTableColumn;
 
                 case TupleDefinitionType.WixDeltaPatchFile:
                     return TupleDefinitions.WixDeltaPatchFile;

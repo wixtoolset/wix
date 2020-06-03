@@ -1733,42 +1733,6 @@ namespace WixToolset.Data.WindowsInstaller
             tupleIdIsPrimaryKey: false
         );
 
-        public static readonly TableDefinition WixCustomRow = new TableDefinition(
-            "WixCustomRow",
-            TupleDefinitions.WixCustomRow,
-            new[]
-            {
-                new ColumnDefinition("Table", ColumnType.String, 62, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("FieldData", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            tupleIdIsPrimaryKey: false
-        );
-
-        public static readonly TableDefinition WixCustomTable = new TableDefinition(
-            "WixCustomTable",
-            TupleDefinitions.WixCustomTable,
-            new[]
-            {
-                new ColumnDefinition("Table", ColumnType.String, 62, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("ColumnCount", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("ColumnNames", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("ColumnTypes", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("PrimaryKeys", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("MinValues", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("MaxValues", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("KeyTables", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("KeyColumns", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Categories", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Sets", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Descriptions", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Modularizations", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("BootstrapperApplicationData", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            tupleIdIsPrimaryKey: true
-        );
-
         public static readonly TableDefinition WixDirectory = new TableDefinition(
             "WixDirectory",
             null,
@@ -2325,8 +2289,6 @@ namespace WixToolset.Data.WindowsInstaller
             WixComplexReference,
             WixComponentGroup,
             WixControl,
-            WixCustomRow,
-            WixCustomTable,
             WixDirectory,
             WixEnsureTable,
             WixFeatureGroup,
