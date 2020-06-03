@@ -692,7 +692,7 @@
         SuppressIces="$(SuppressIces)"
         AdditionalCub="$(AdditionalCub)"
 
-        RunAsSeparateProcess="false"
+        RunAsSeparateProcess="$(RunWixToolsOutOfProc)"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)" />
 

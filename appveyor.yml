@@ -30,6 +30,8 @@ nuget:
 skip_branch_with_pr: true
 skip_tags: true
 
+test: off
+
 artifacts:
 - path: build\Release\**\*.nupkg
   name: nuget

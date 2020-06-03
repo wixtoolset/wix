@@ -291,11 +291,11 @@ namespace WixToolsetTest.MSBuild
 
         [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk, null)]
-        //[InlineData(BuildSystem.DotNetCoreSdk, true)]
+        [InlineData(BuildSystem.DotNetCoreSdk, true)]
         [InlineData(BuildSystem.MSBuild, null)]
-        //[InlineData(BuildSystem.MSBuild, true)]
+        [InlineData(BuildSystem.MSBuild, true)]
         [InlineData(BuildSystem.MSBuild64, null)]
-        //[InlineData(BuildSystem.MSBuild64, true)]
+        [InlineData(BuildSystem.MSBuild64, true)]
         public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem, bool? outOfProc)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -381,8 +381,8 @@ namespace WixToolsetTest.MSBuild
 
         [Theory]
         [InlineData(BuildSystem.DotNetCoreSdk)]
-        //[InlineData(BuildSystem.MSBuild)]
-        //[InlineData(BuildSystem.MSBuild64)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
         public void ReportsInnerExceptionForUnexpectedExceptions(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
