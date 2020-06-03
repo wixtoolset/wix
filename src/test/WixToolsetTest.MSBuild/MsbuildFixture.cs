@@ -12,6 +12,7 @@ namespace WixToolsetTest.MSBuild
     public class MsbuildFixture
     {
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleBundle(BuildSystem buildSystem)
@@ -44,6 +45,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMergeModule(BuildSystem buildSystem)
@@ -76,6 +78,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackage(BuildSystem buildSystem)
@@ -112,6 +115,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithMergeModule(BuildSystem buildSystem)
@@ -145,6 +149,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildWithDefaultAndExplicitlyFullWixpdbs(BuildSystem buildSystem)
@@ -161,6 +166,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildWithNoWixpdb(BuildSystem buildSystem)
@@ -198,6 +204,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuild64BitMsiPackage(BuildSystem buildSystem)
@@ -234,6 +241,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory(Skip = "Currently fails")]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithIceSuppressions(BuildSystem buildSystem)
@@ -249,13 +257,14 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    "-p:SuppressIces=\"ICE45;ICE46\"",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "SuppressIces", "ICE45;ICE46"),
                 });
                 result.AssertSuccess();
             }
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithWarningSuppressions(BuildSystem buildSystem)
@@ -271,7 +280,7 @@ namespace WixToolsetTest.MSBuild
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
-                    "-p:SuppressSpecificWarnings=\"1118;1102\"",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "SuppressSpecificWarnings", "1118;1102"),
                 });
                 result.AssertSuccess();
 
@@ -281,6 +290,8 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk, null)]
+        [InlineData(BuildSystem.DotNetCoreSdk, true)]
         [InlineData(BuildSystem.MSBuild, null)]
         [InlineData(BuildSystem.MSBuild, true)]
         [InlineData(BuildSystem.MSBuild64, null)]
@@ -302,10 +313,8 @@ namespace WixToolsetTest.MSBuild
                 }, outOfProc: outOfProc);
                 result.AssertSuccess();
 
-                var expectedOutOfProc = outOfProc.HasValue && outOfProc.Value;
-                var expectedWixCommand = $"{(expectedOutOfProc ? "wix.exe" : "(wix.exe)")} build";
-                var buildCommands = result.Output.Where(line => line.TrimStart().Contains(expectedWixCommand));
-                Assert.Single(buildCommands);
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem, outOfProc);
+                Assert.Single(wixBuildCommands);
 
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -315,6 +324,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildAndCleanSimpleMsiPackage(BuildSystem buildSystem)
@@ -328,10 +338,7 @@ namespace WixToolsetTest.MSBuild
                 var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
 
                 // Build
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
-                {
-                    "-v:diag",
-                });
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, verbosityLevel: "diag");
                 result.AssertSuccess();
 
                 var buildOutput = String.Join("\r\n", result.Output);
@@ -346,8 +353,7 @@ namespace WixToolsetTest.MSBuild
                 result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
                 {
                     "-t:Clean",
-                    "-v:diag",
-                });
+                }, verbosityLevel: "diag");
                 result.AssertSuccess();
 
                 var cleanOutput = String.Join("\r\n", result.Output);

@@ -4,10 +4,13 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.IO;
+    using System.Runtime.InteropServices;
     using Microsoft.Build.Utilities;
 
     public abstract partial class ToolsetTask : ToolTask
     {
+        private static readonly string ThisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
+
         /// <summary>
         /// Gets or sets additional options that are appended the the tool command-line.
         /// </summary>
@@ -53,6 +56,8 @@ namespace WixToolset.BuildTasks
         /// </summary>
         public bool VerboseOutput { get; set; }
 
+        private string ToolFullPath => Path.Combine(Path.GetDirectoryName(ThisDllPath), this.ToolExe);
+
         /// <summary>
         /// Get the path to the executable.
         /// </summary>
@@ -63,13 +68,20 @@ namespace WixToolset.BuildTasks
         /// </remarks>
         protected sealed override string GenerateFullPathToTool()
         {
-            var thisDllPath = new Uri(typeof(ToolsetTask).Assembly.CodeBase).AbsolutePath;
+#if !NETCOREAPP
             if (!this.RunAsSeparateProcess)
             {
                 // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
-                return thisDllPath;
+                return ThisDllPath;
             }
-            return Path.Combine(Path.GetDirectoryName(thisDllPath), this.ToolExe);
+            return this.ToolFullPath;
+#else
+            if (IsSelfExecutable(this.ToolFullPath, out var toolFullPath))
+            {
+                return toolFullPath;
+            }
+            return DotnetFullPath;
+#endif
         }
 
         protected sealed override string GenerateResponseFileCommands()
@@ -94,5 +106,36 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-wx ", this.TreatSpecificWarningsAsErrors);
             commandLineBuilder.AppendIfTrue("-wx", this.TreatWarningsAsErrors);
         }
+
+#if NETCOREAPP
+        private static readonly string DotnetFullPath = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet";
+
+        protected override string GenerateCommandLineCommands()
+        {
+            if (IsSelfExecutable(this.ToolFullPath, out var toolFullPath))
+            {
+                return null;
+            }
+            else
+            {
+                return $"exec \"{toolFullPath}\"";
+            }
+        }
+
+        private static bool IsSelfExecutable(string proposedToolFullPath, out string toolFullPath)
+        {
+            var toolFullPathWithoutExtension = Path.Combine(Path.GetDirectoryName(proposedToolFullPath), Path.GetFileNameWithoutExtension(proposedToolFullPath));
+            var exeExtension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : String.Empty;
+            var exeToolFullPath = $"{toolFullPathWithoutExtension}{exeExtension}";
+            if (File.Exists(exeToolFullPath))
+            {
+                toolFullPath = exeToolFullPath;
+                return true;
+            }
+
+            toolFullPath = $"{toolFullPathWithoutExtension}.dll";
+            return false;
+        }
+#endif
     }
 }

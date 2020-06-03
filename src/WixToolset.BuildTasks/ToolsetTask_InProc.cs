@@ -1,5 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#if !NETCOREAPP
 namespace WixToolset.BuildTasks
 {
     using System;
@@ -69,3 +70,4 @@ namespace WixToolset.BuildTasks
         protected abstract string TaskShortName { get; }
     }
 }
+#endif

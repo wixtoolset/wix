@@ -18,19 +18,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Tools.Core\WixToolset.Tools.Core.csproj" />
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net461'">
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" />
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="4.0.*" />
     <PackageReference Include="WixToolset.Harvesters" Version="4.0.*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="14.3" Condition="'$(TargetFramework)'=='net461'" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" Condition="'$(TargetFramework)'=='netcoreapp2.1' " />
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1' ">
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
   </ItemGroup>
 
   <ItemGroup>

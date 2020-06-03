@@ -3,6 +3,7 @@
 namespace WixToolsetTest.MSBuild
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using WixBuildTools.TestSupport;
@@ -14,6 +15,7 @@ namespace WixToolsetTest.MSBuild
     public class MsbuildHeatFixture
     {
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildHeatFilePackage(BuildSystem buildSystem)
@@ -31,9 +33,7 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var expectedOutOfProc = false;
-                var expectedHeatCommand = $"{(expectedOutOfProc ? "heat.exe" : "(heat.exe)")} file";
-                var heatCommandLines = result.Output.Where(line => line.Contains(expectedHeatCommand));
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
                 Assert.Single(heatCommandLines);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
@@ -71,6 +71,7 @@ namespace WixToolsetTest.MSBuild
         }
 
         [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]
         [InlineData(BuildSystem.MSBuild64)]
         public void CanBuildHeatFileWithMultipleFilesPackage(BuildSystem buildSystem)
@@ -88,9 +89,7 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var expectedOutOfProc = false;
-                var expectedHeatCommand = $"{(expectedOutOfProc ? "heat.exe" : "(heat.exe)")} file";
-                var heatCommandLines = result.Output.Where(line => line.Contains(expectedHeatCommand));
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
                 Assert.Equal(2, heatCommandLines.Count());
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
