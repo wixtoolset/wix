@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WixToolset.Tools.Core\WixToolset.Tools.Core.csproj" />
+    <Compile Include="..\WixToolset.Tools.Core\ConsoleMessageListener.cs" Link="ConsoleMessageListener.cs" />
   </ItemGroup>
 
   <ItemGroup>

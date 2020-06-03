@@ -6,7 +6,6 @@ namespace WixToolset.BuildTasks
     using System.Collections.Generic;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-    using WixToolset.Tools.Core;
 
     /// <summary>
     /// This task assigns Culture metadata to files based on the value of the Culture attribute on the

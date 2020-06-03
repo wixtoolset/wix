@@ -3,7 +3,6 @@
 namespace WixToolset.BuildTasks
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
@@ -136,7 +135,7 @@ namespace WixToolset.BuildTasks
                 // Do not overwrite the ObjectPath metadata if it already was set.
                 if (string.IsNullOrEmpty(this.CompileWithObjectPath[i].GetMetadata("ObjectPath")))
                 {
-                    SetObjectPath(this.CompileWithObjectPath[i]);
+                    this.SetObjectPath(this.CompileWithObjectPath[i]);
                 }
             }
 

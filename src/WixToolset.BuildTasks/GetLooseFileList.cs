@@ -3,16 +3,11 @@
 namespace WixToolset.BuildTasks
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
-    using System.Xml;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using WixToolset.Dtf.WindowsInstaller;
-    using Microsoft.Win32;
 
     /// <summary>
     /// This task assigns Culture metadata to files based on the value of the Culture attribute on the
@@ -154,7 +149,7 @@ namespace WixToolset.BuildTasks
                         string directoryParent = (string)(directoryRecords[i + 1]);
                         string defaultDir = (string)(directoryRecords[i + 2]);
 
-                        string sourceDir = SourceDirFromDefaultDir(defaultDir);
+                        string sourceDir = this.SourceDirFromDefaultDir(defaultDir);
 
                         DirectoryIdDefaultDir[directoryId] = sourceDir;
                         DirectoryIdParent[directoryId] = directoryParent;
@@ -206,7 +201,7 @@ namespace WixToolset.BuildTasks
                 for (i = 0; i < fileRecords.Count; i += 3)
                 {
                     string componentId = (string)(fileRecords[i]);
-                    string fileName = SourceFileFromFileName((string)(fileRecords[i + 1]));
+                    string fileName = this.SourceFileFromFileName((string)(fileRecords[i + 1]));
                     int attributes = (int)(fileRecords[i + 2]);
 
                     // If the whole database is marked uncompressed, use the directory layout made above

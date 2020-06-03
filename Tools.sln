@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixCop", "src\wixcop\WixCop.csproj", "{2E54120B-8958-40B1-A7FC-851446994CD8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Tools.Core", "src\WixToolset.Tools.Core\WixToolset.Tools.Core.csproj", "{9C3B486F-AE0E-43BA-823A-30808B73C6B4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.WixCop", "src\test\WixToolsetTest.WixCop\WixToolsetTest.WixCop.csproj", "{F1A8112B-95A1-4AF7-81CB-523BE7DB8E5C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thmviewer", "src\thmviewer\thmviewer.vcxproj", "{95228C13-97F5-484A-B4A2-ECF4618B0881}"
@@ -86,14 +84,6 @@ Global
 		{2E54120B-8958-40B1-A7FC-851446994CD8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2E54120B-8958-40B1-A7FC-851446994CD8}.Release|x86.ActiveCfg = Release|Any CPU
 		{2E54120B-8958-40B1-A7FC-851446994CD8}.Release|x86.Build.0 = Release|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Debug|x86.Build.0 = Debug|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Release|x86.ActiveCfg = Release|Any CPU
-		{9C3B486F-AE0E-43BA-823A-30808B73C6B4}.Release|x86.Build.0 = Release|Any CPU
 		{F1A8112B-95A1-4AF7-81CB-523BE7DB8E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1A8112B-95A1-4AF7-81CB-523BE7DB8E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1A8112B-95A1-4AF7-81CB-523BE7DB8E5C}.Debug|x86.ActiveCfg = Debug|Any CPU

@@ -9,7 +9,6 @@ namespace WixToolset.BuildTasks
     using System.Xml;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-    using WixToolset.Tools.Core;
 
     /// <summary>
     /// This task refreshes the generated file that contains ComponentGroupRefs
