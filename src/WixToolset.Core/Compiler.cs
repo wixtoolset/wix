@@ -8,6 +8,7 @@ namespace WixToolset.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using WixToolset.Data;
@@ -3667,20 +3668,8 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string tableId = null;
-
-            string categories = null;
-            var columnCount = 0;
-            string columnNames = null;
-            string columnTypes = null;
-            string descriptions = null;
-            string keyColumns = null;
-            string keyTables = null;
-            string maxValues = null;
-            string minValues = null;
-            string modularizations = null;
-            string primaryKeys = null;
-            string sets = null;
-            var bootstrapperApplicationData = false;
+            var unreal = false;
+            var columns = new List<WixCustomTableColumnTuple>();
 
             foreach (var attrib in node.Attributes())
             {
@@ -3692,7 +3681,7 @@ namespace WixToolset.Core
                         tableId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
                     case "Unreal":
-                        bootstrapperApplicationData = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        unreal = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3722,22 +3711,20 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "Column":
-                        ++columnCount;
-
-                        var category = String.Empty;
                         string columnName = null;
-                        string columnType = null;
+                        var category = String.Empty;
+                        IntermediateFieldType? columnType = null;
                         var description = String.Empty;
-                        var keyColumn = CompilerConstants.IntegerNotSet;
+                        int? keyColumn = null;
                         var keyTable = String.Empty;
                         var localizable = false;
-                        var maxValue = CompilerConstants.LongNotSet;
-                        var minValue = CompilerConstants.LongNotSet;
-                        var modularization = "None";
+                        long? maxValue = null;
+                        long? minValue = null;
+                        var modularization = WixCustomTableColumnModularizeType.None;
                         var nullable = false;
                         var primaryKey = false;
                         var setValues = String.Empty;
-                        string typeName = null;
+                        var columnUnreal = false;
                         var width = 0;
 
                         foreach (var childAttrib in child.Attributes())
@@ -3769,7 +3756,43 @@ namespace WixToolset.Core
                                 minValue = this.Core.GetAttributeLongValue(childSourceLineNumbers, childAttrib, Int32.MinValue + 1, Int32.MaxValue);
                                 break;
                             case "Modularize":
-                                modularization = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
+                                var modularizeValue = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
+                                switch (modularizeValue)
+                                {
+                                case "column":
+                                    modularization = WixCustomTableColumnModularizeType.Column;
+                                    break;
+                                case "companionFile":
+                                    modularization = WixCustomTableColumnModularizeType.CompanionFile;
+                                    break;
+                                case "condition":
+                                    modularization = WixCustomTableColumnModularizeType.Condition;
+                                    break;
+                                case "controlEventArgument":
+                                    modularization = WixCustomTableColumnModularizeType.ControlEventArgument;
+                                    break;
+                                case "controlText":
+                                    modularization = WixCustomTableColumnModularizeType.ControlText;
+                                    break;
+                                case "icon":
+                                    modularization = WixCustomTableColumnModularizeType.Icon;
+                                    break;
+                                case "none":
+                                    modularization = WixCustomTableColumnModularizeType.None;
+                                    break;
+                                case "property":
+                                    modularization = WixCustomTableColumnModularizeType.Property;
+                                    break;
+                                case "semicolonDelimited":
+                                    modularization = WixCustomTableColumnModularizeType.SemicolonDelimited;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Modularize", modularizeValue, "column", "companionFile", "condition", "controlEventArgument", "controlText", "icon", "property", "semicolonDelimited"));
+                                    columnType = IntermediateFieldType.String; // set a value to prevent expected attribute error below.
+                                    break;
+                                }
                                 break;
                             case "Nullable":
                                 nullable = YesNoType.Yes == this.Core.GetAttributeYesNoValue(childSourceLineNumbers, childAttrib);
@@ -3785,23 +3808,27 @@ namespace WixToolset.Core
                                 switch (typeValue)
                                 {
                                 case "binary":
-                                    typeName = "OBJECT";
+                                    columnType = IntermediateFieldType.Path;
                                     break;
                                 case "int":
-                                    typeName = "SHORT";
+                                    columnType = IntermediateFieldType.Number;
                                     break;
                                 case "string":
-                                    typeName = "CHAR";
+                                    columnType = IntermediateFieldType.String;
                                     break;
                                 case "":
                                     break;
                                 default:
                                     this.Core.Write(ErrorMessages.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Type", typeValue, "binary", "int", "string"));
+                                    columnType = IntermediateFieldType.String; // set a value to prevent expected attribute error below.
                                     break;
                                 }
                                 break;
                             case "Width":
                                 width = this.Core.GetAttributeIntegerValue(childSourceLineNumbers, childAttrib, 0, Int32.MaxValue);
+                                break;
+                            case "Unreal":
+                                columnUnreal = YesNoType.Yes == this.Core.GetAttributeYesNoValue(childSourceLineNumbers, childAttrib);
                                 break;
                             default:
                                 this.Core.UnexpectedAttribute(child, childAttrib);
@@ -3814,99 +3841,58 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Id"));
                         }
 
-                        if (null == typeName)
+                        if (!columnType.HasValue)
                         {
                             this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Type"));
                         }
-                        else if ("SHORT" == typeName)
+                        else if (columnType == IntermediateFieldType.Number)
                         {
                             if (2 != width && 4 != width)
                             {
                                 this.Core.Write(ErrorMessages.CustomTableIllegalColumnWidth(childSourceLineNumbers, child.Name.LocalName, "Width", width));
                             }
-                            columnType = String.Concat(nullable ? "I" : "i", width);
                         }
-                        else if ("CHAR" == typeName)
+                        else if (columnType == IntermediateFieldType.Path)
                         {
-                            var typeChar = localizable ? "l" : "s";
-                            columnType = String.Concat(nullable ? typeChar.ToUpper(CultureInfo.InvariantCulture) : typeChar.ToLower(CultureInfo.InvariantCulture), width);
-                        }
-                        else if ("OBJECT" == typeName)
-                        {
-                            if ("Binary" != category)
+                            if (String.IsNullOrEmpty(category))
+                            {
+                                category = "Binary";
+                            }
+                            else if (category != "Binary")
                             {
                                 this.Core.Write(ErrorMessages.ExpectedBinaryCategory(childSourceLineNumbers));
                             }
-                            columnType = String.Concat(nullable ? "V" : "v", width);
                         }
 
                         this.Core.ParseForExtensionElements(child);
 
-                        columnNames = String.Concat(columnNames, null == columnNames ? String.Empty : "\t", columnName);
-                        columnTypes = String.Concat(columnTypes, null == columnTypes ? String.Empty : "\t", columnType);
-                        if (primaryKey)
-                        {
-                            primaryKeys = String.Concat(primaryKeys, null == primaryKeys ? String.Empty : "\t", columnName);
-                        }
-
-                        minValues = String.Concat(minValues, null == minValues ? String.Empty : "\t", CompilerConstants.LongNotSet != minValue ? minValue.ToString(CultureInfo.InvariantCulture) : String.Empty);
-                        maxValues = String.Concat(maxValues, null == maxValues ? String.Empty : "\t", CompilerConstants.LongNotSet != maxValue ? maxValue.ToString(CultureInfo.InvariantCulture) : String.Empty);
-                        keyTables = String.Concat(keyTables, null == keyTables ? String.Empty : "\t", keyTable);
-                        keyColumns = String.Concat(keyColumns, null == keyColumns ? String.Empty : "\t", CompilerConstants.IntegerNotSet != keyColumn ? keyColumn.ToString(CultureInfo.InvariantCulture) : String.Empty);
-                        categories = String.Concat(categories, null == categories ? String.Empty : "\t", category);
-                        sets = String.Concat(sets, null == sets ? String.Empty : "\t", setValues);
-                        descriptions = String.Concat(descriptions, null == descriptions ? String.Empty : "\t", description);
-                        modularizations = String.Concat(modularizations, null == modularizations ? String.Empty : "\t", modularization);
-
-                        break;
-                    case "Row":
-                        string dataValue = null;
-
-                        foreach (var childAttrib in child.Attributes())
-                        {
-                            this.Core.ParseExtensionAttribute(child, childAttrib);
-                        }
-
-                        foreach (var data in child.Elements())
-                        {
-                            var dataSourceLineNumbers = Preprocessor.GetSourceLineNumbers(data);
-                            switch (data.Name.LocalName)
-                            {
-                            case "Data":
-                                columnName = null;
-                                foreach (var dataAttrib in data.Attributes())
-                                {
-                                    switch (dataAttrib.Name.LocalName)
-                                    {
-                                    case "Column":
-                                        columnName = this.Core.GetAttributeValue(dataSourceLineNumbers, dataAttrib);
-                                        break;
-                                    default:
-                                        this.Core.UnexpectedAttribute(data, dataAttrib);
-                                        break;
-                                    }
-                                }
-
-                                if (null == columnName)
-                                {
-                                    this.Core.Write(ErrorMessages.ExpectedAttribute(dataSourceLineNumbers, data.Name.LocalName, "Column"));
-                                }
-
-                                dataValue = String.Concat(dataValue, null == dataValue ? String.Empty : WixCustomRowTuple.FieldSeparator.ToString(), columnName, ":", Common.GetInnerText(data));
-                                break;
-                            }
-                        }
-
-                        this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixCustomTable, tableId);
-
                         if (!this.Core.EncounteredError)
                         {
-                            this.Core.AddTuple(new WixCustomRowTuple(childSourceLineNumbers)
+                            var attributes = primaryKey ? WixCustomTableColumnTupleAttributes.PrimaryKey : WixCustomTableColumnTupleAttributes.None;
+                            attributes |= localizable ? WixCustomTableColumnTupleAttributes.Localizable : WixCustomTableColumnTupleAttributes.None;
+                            attributes |= nullable ? WixCustomTableColumnTupleAttributes.Nullable : WixCustomTableColumnTupleAttributes.None;
+                            attributes |= columnUnreal ? WixCustomTableColumnTupleAttributes.Unreal : WixCustomTableColumnTupleAttributes.None;
+
+                            columns.Add(new WixCustomTableColumnTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, columnName))
                             {
-                                Table = tableId,
-                                FieldData = dataValue,
+                                TableRef = tableId,
+                                Name = columnName,
+                                Type = columnType.Value,
+                                Attributes = attributes,
+                                Width = width,
+                                Category = category,
+                                Description = description,
+                                KeyColumn = keyColumn,
+                                KeyTable = keyTable,
+                                MaxValue = maxValue,
+                                MinValue = minValue,
+                                Modularize = modularization,
+                                Set = setValues,
                             });
                         }
+                        break;
+                    case "Row":
+                        this.ParseRow(child, tableId);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -3919,32 +3905,95 @@ namespace WixToolset.Core
                 }
             }
 
-            if (0 < columnCount)
+            if (columns.Count > 0)
             {
-                if (null == primaryKeys || 0 == primaryKeys.Length)
+                if (!columns.Where(c => c.PrimaryKey).Any())
                 {
                     this.Core.Write(ErrorMessages.CustomTableMissingPrimaryKey(sourceLineNumbers));
                 }
 
                 if (!this.Core.EncounteredError)
                 {
+                    var columnNames = String.Join(new string(WixCustomTableTuple.ColumnNamesSeparator, 1), columns.Select(c => c.Name));
+
                     this.Core.AddTuple(new WixCustomTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
                     {
-                        ColumnCount = columnCount,
                         ColumnNames = columnNames,
-                        ColumnTypes = columnTypes,
-                        PrimaryKeys = primaryKeys,
-                        MinValues = minValues,
-                        MaxValues = maxValues,
-                        KeyTables = keyTables,
-                        KeyColumns = keyColumns,
-                        Categories = categories,
-                        Sets = sets,
-                        Descriptions = descriptions,
-                        Modularizations = modularizations,
-                        Unreal = bootstrapperApplicationData,
+                        Unreal = unreal,
                     });
+
+                    foreach (var column in columns)
+                    {
+                        this.Core.AddTuple(column);
+                    }
                 }
+            }
+        }
+
+        private void ParseRow(XElement node, string tableId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var rowId = Guid.NewGuid().ToString("N").ToUpperInvariant();
+
+            foreach (var attrib in node.Attributes())
+            {
+                this.Core.ParseExtensionAttribute(node, attrib);
+            }
+
+            foreach (var child in node.Elements())
+            {
+                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                switch (child.Name.LocalName)
+                {
+                    case "Data":
+                        string columnName = null;
+                        string data = null;
+                        foreach (var attrib in child.Attributes())
+                        {
+                            switch (attrib.Name.LocalName)
+                            {
+                                case "Column":
+                                    columnName = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                                    break;
+                                case "Value":
+                                    data = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                                    break;
+                                default:
+                                    this.Core.ParseExtensionAttribute(child, attrib);
+                                    break;
+                            }
+                        }
+
+                        if (null == columnName)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Column"));
+                        }
+
+                        if (String.IsNullOrEmpty(data))
+                        {
+                            data = Common.GetInnerText(child);
+                        }
+
+                        if (!this.Core.EncounteredError)
+                        {
+                            this.Core.AddTuple(new WixCustomTableCellTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, rowId, columnName))
+                            {
+                                RowId = rowId,
+                                ColumnRef = columnName,
+                                TableRef = tableId,
+                                Data = data
+                            });
+                        }
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                }
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixCustomTable, tableId);
             }
         }
 

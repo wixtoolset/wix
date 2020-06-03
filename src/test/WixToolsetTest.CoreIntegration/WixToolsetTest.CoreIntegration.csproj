@@ -34,7 +34,13 @@
     <Content Include="TestData\Class\IconIndex0.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Class\OldClassTableDef.msi" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomAction\UnscheduledCustomAction.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomTable\CustomTableWithFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomTable\data\file1.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomTable\data\test.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomTable\data\file2.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomTable\LocalizedCustomTable.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\CustomTable\CustomTable.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\CustomTable\LocalizedCustomTable.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DefaultDir\DefaultDir.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\DialogsInInstallUISequence\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\EnsureTable\EnsureTable.wxs" CopyToOutputDirectory="PreserveNewest" />

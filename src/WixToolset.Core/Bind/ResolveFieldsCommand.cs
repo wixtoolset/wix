@@ -4,7 +4,9 @@ namespace WixToolset.Core.Bind
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -42,6 +44,9 @@ namespace WixToolset.Core.Bind
 
             var fileResolver = new FileResolver(this.BindPaths, this.Extensions);
 
+            // Build the column lookup only when needed.
+            Dictionary<string, WixCustomTableColumnTuple> customColumnsById = null;
+
             foreach (var sections in this.Intermediate.Sections)
             {
                 foreach (var tuple in sections.Tuples)
@@ -53,13 +58,37 @@ namespace WixToolset.Core.Bind
                             continue;
                         }
 
+                        var fieldType = field.Type;
+
+                        // Custom table cells require an extra look up to the column definition as the
+                        // cell's data type is always a string (because strings can store anything) but
+                        // the column definition may be more specific.
+                        if (tuple.Definition.Type == TupleDefinitionType.WixCustomTableCell)
+                        {
+                            // We only care about the Data in a CustomTable cell.
+                            if (field.Name != nameof(WixCustomTableCellTupleFields.Data))
+                            {
+                                continue;
+                            }
+
+                            if (customColumnsById == null)
+                            {
+                                customColumnsById = this.Intermediate.Sections.SelectMany(s => s.Tuples.OfType<WixCustomTableColumnTuple>()).ToDictionary(t => t.Id.Id);
+                            }
+
+                            if (customColumnsById.TryGetValue(tuple.Fields[(int)WixCustomTableCellTupleFields.TableRef].AsString() + "/" + tuple.Fields[(int)WixCustomTableCellTupleFields.ColumnRef].AsString(), out var customColumn))
+                            {
+                                fieldType = customColumn.Type;
+                            }
+                        }
+
                         var isDefault = true;
 
                         // Check to make sure we're in a scenario where we can handle variable resolution.
                         if (null != delayedFields)
                         {
                             // resolve localization and wix variables
-                            if (field.Type == IntermediateFieldType.String)
+                            if (fieldType == IntermediateFieldType.String)
                             {
                                 var original = field.AsString();
                                 if (!String.IsNullOrEmpty(original))
@@ -87,7 +116,7 @@ namespace WixToolset.Core.Bind
                         }
 
                         // Resolve file paths
-                        if (field.Type == IntermediateFieldType.Path)
+                        if (fieldType == IntermediateFieldType.Path)
                         {
                             var objectField = field.AsPath();
 
@@ -226,29 +255,5 @@ namespace WixToolset.Core.Bind
 
             this.DelayedFields = delayedFields;
         }
-
-#if false
-        private string ResolveFile(string source, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage = BindStage.Normal)
-        {
-            string path = null;
-            foreach (var extension in this.Extensions)
-            {
-                path = extension.ResolveFile(source, type, sourceLineNumbers, bindStage);
-                if (null != path)
-                {
-                    break;
-                }
-            }
-
-            throw new NotImplementedException(); // need to do default binder stuff
-
-            //if (null == path)
-            //{
-            //    throw new WixFileNotFoundException(sourceLineNumbers, source, type);
-            //}
-
-            //return path;
-        }
-#endif
     }
 }

@@ -281,20 +281,20 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             var dataTablesById = this.Section.Tuples.OfType<WixCustomTableTuple>()
-                                                .Where(t => t.Unreal && t.Id != null)
-                                                .ToDictionary(t => t.Id.Id);
-            var dataRowsByTable = this.Section.Tuples.OfType<WixCustomRowTuple>()
-                                              .GroupBy(t => t.Table);
-            foreach (var tableDataRows in dataRowsByTable)
+                                                    .Where(t => t.Unreal && t.Id != null)
+                                                    .ToDictionary(t => t.Id.Id);
+            var cellsByTable = this.Section.Tuples.OfType<WixCustomTableCellTuple>()
+                                                  .GroupBy(t => t.TableRef);
+            foreach (var tableCells in cellsByTable)
             {
-                var tableName = tableDataRows.Key;
+                var tableName = tableCells.Key;
                 if (!dataTablesById.TryGetValue(tableName, out var tableTuple))
                 {
                     // This should have been a linker error.
                     continue;
                 }
 
-                var columnNames = tableTuple.ColumnNames.Split('\t');
+                var columnNames = tableTuple.ColumnNamesSeparated;
 
                 // We simply assert that the table (and field) name is valid, because
                 // this is up to the extension developer to get right. An author will
@@ -307,17 +307,18 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 #endif // DEBUG
 
-                foreach (var rowTuple in tableDataRows)
+                foreach (var rowCells in tableCells.GroupBy(t => t.RowId))
                 {
+                    var rowDataByColumn = rowCells.ToDictionary(t => t.ColumnRef, t => t.Data);
+
                     writer.WriteStartElement(tableName);
 
-                    //var rowFields = rowTuple.FieldDataSeparated;
-                    foreach (var field in rowTuple.FieldDataSeparated)
+                    // Write all row data as attributes in table column order.
+                    foreach (var column in columnNames)
                     {
-                        var splitField = field.Split(ColonCharacter, 2);
-                        if (splitField.Length == 2)
+                        if (rowDataByColumn.TryGetValue(column, out var data))
                         {
-                            writer.WriteAttributeString(splitField[0], splitField[1]);
+                            writer.WriteAttributeString(column, data);
                         }
                     }
 

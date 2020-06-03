@@ -18,8 +18,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
         private const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
 
-        private static readonly char[] ColonCharacter = new[] { ':' };
-
         public CreateOutputFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Messaging = messaging;
@@ -54,171 +52,174 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddSectionToOutput()
         {
+            var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellTuple>>();
+
             foreach (var tuple in this.Section.Tuples)
             {
                 var unknownTuple = false;
                 switch (tuple.Definition.Type)
                 {
-                case TupleDefinitionType.AppSearch:
-                    this.AddTupleDefaultly(tuple);
-                    this.Output.EnsureTable(this.TableDefinitions["Signature"]);
-                    break;
-
-                case TupleDefinitionType.Assembly:
-                    this.AddAssemblyTuple((AssemblyTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.BBControl:
-                    this.AddBBControlTuple((BBControlTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Class:
-                    this.AddClassTuple((ClassTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Control:
-                    this.AddControlTuple((ControlTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Component:
-                    this.AddComponentTuple((ComponentTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.CustomAction:
-                    this.AddCustomActionTuple((CustomActionTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Dialog:
-                    this.AddDialogTuple((DialogTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Directory:
-                    this.AddDirectoryTuple((DirectoryTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Environment:
-                    this.AddEnvironmentTuple((EnvironmentTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Error:
-                    this.AddErrorTuple((ErrorTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Feature:
-                    this.AddFeatureTuple((FeatureTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.File:
-                    this.AddFileTuple((FileTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.IniFile:
-                    this.AddIniFileTuple((IniFileTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Media:
-                    this.AddMediaTuple((MediaTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.ModuleConfiguration:
-                    this.AddModuleConfigurationTuple((ModuleConfigurationTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.MsiEmbeddedUI:
-                    this.AddMsiEmbeddedUITuple((MsiEmbeddedUITuple)tuple);
-                    break;
-
-                case TupleDefinitionType.MsiServiceConfig:
-                    this.AddMsiServiceConfigTuple((MsiServiceConfigTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.MsiServiceConfigFailureActions:
-                    this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.MoveFile:
-                    this.AddMoveFileTuple((MoveFileTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.ProgId:
-                    this.AddTupleDefaultly(tuple);
-                    this.Output.EnsureTable(this.TableDefinitions["Extension"]);
-                    break;
-
-                case TupleDefinitionType.Property:
-                    this.AddPropertyTuple((PropertyTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.RemoveFile:
-                    this.AddRemoveFileTuple((RemoveFileTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Registry:
-                    this.AddRegistryTuple((RegistryTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.RegLocator:
-                    this.AddRegLocatorTuple((RegLocatorTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.RemoveRegistry:
-                    this.AddRemoveRegistryTuple((RemoveRegistryTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.ServiceControl:
-                    this.AddServiceControlTuple((ServiceControlTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.ServiceInstall:
-                    this.AddServiceInstallTuple((ServiceInstallTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Shortcut:
-                    this.AddShortcutTuple((ShortcutTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.TextStyle:
-                    this.AddTextStyleTuple((TextStyleTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.Upgrade:
-                    this.AddUpgradeTuple((UpgradeTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.WixAction:
-                    this.AddWixActionTuple((WixActionTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.WixMediaTemplate:
-                    this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.WixCustomRow:
-                    this.AddWixCustomRowTuple((WixCustomRowTuple)tuple);
-                    break;
-
-                case TupleDefinitionType.WixEnsureTable:
-                    this.AddWixEnsureTableTuple((WixEnsureTableTuple)tuple);
-                    break;
-
-                // ignored.
-                case TupleDefinitionType.WixComponentGroup:
-                case TupleDefinitionType.WixDeltaPatchFile:
-                case TupleDefinitionType.WixFeatureGroup:
-                case TupleDefinitionType.WixPatchBaseline:
+                    case TupleDefinitionType.AppSearch:
+                        this.AddTupleDefaultly(tuple);
+                        this.Output.EnsureTable(this.TableDefinitions["Signature"]);
                         break;
 
-                // Already processed.
-                case TupleDefinitionType.WixCustomTable:
-                    break;
+                    case TupleDefinitionType.Assembly:
+                        this.AddAssemblyTuple((AssemblyTuple)tuple);
+                        break;
 
-                case TupleDefinitionType.MustBeFromAnExtension:
-                    unknownTuple = !this.AddTupleFromExtension(tuple);
-                    break;
+                    case TupleDefinitionType.BBControl:
+                        this.AddBBControlTuple((BBControlTuple)tuple);
+                        break;
 
-                default:
-                    unknownTuple = !this.AddTupleDefaultly(tuple);
-                    break;
+                    case TupleDefinitionType.Class:
+                        this.AddClassTuple((ClassTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Control:
+                        this.AddControlTuple((ControlTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Component:
+                        this.AddComponentTuple((ComponentTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.CustomAction:
+                        this.AddCustomActionTuple((CustomActionTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Dialog:
+                        this.AddDialogTuple((DialogTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Directory:
+                        this.AddDirectoryTuple((DirectoryTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Environment:
+                        this.AddEnvironmentTuple((EnvironmentTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Error:
+                        this.AddErrorTuple((ErrorTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Feature:
+                        this.AddFeatureTuple((FeatureTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.File:
+                        this.AddFileTuple((FileTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.IniFile:
+                        this.AddIniFileTuple((IniFileTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Media:
+                        this.AddMediaTuple((MediaTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.ModuleConfiguration:
+                        this.AddModuleConfigurationTuple((ModuleConfigurationTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.MsiEmbeddedUI:
+                        this.AddMsiEmbeddedUITuple((MsiEmbeddedUITuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.MsiServiceConfig:
+                        this.AddMsiServiceConfigTuple((MsiServiceConfigTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.MsiServiceConfigFailureActions:
+                        this.AddMsiServiceConfigFailureActionsTuple((MsiServiceConfigFailureActionsTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.MoveFile:
+                        this.AddMoveFileTuple((MoveFileTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.ProgId:
+                        this.AddTupleDefaultly(tuple);
+                        this.Output.EnsureTable(this.TableDefinitions["Extension"]);
+                        break;
+
+                    case TupleDefinitionType.Property:
+                        this.AddPropertyTuple((PropertyTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.RemoveFile:
+                        this.AddRemoveFileTuple((RemoveFileTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Registry:
+                        this.AddRegistryTuple((RegistryTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.RegLocator:
+                        this.AddRegLocatorTuple((RegLocatorTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.RemoveRegistry:
+                        this.AddRemoveRegistryTuple((RemoveRegistryTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.ServiceControl:
+                        this.AddServiceControlTuple((ServiceControlTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.ServiceInstall:
+                        this.AddServiceInstallTuple((ServiceInstallTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Shortcut:
+                        this.AddShortcutTuple((ShortcutTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.TextStyle:
+                        this.AddTextStyleTuple((TextStyleTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.Upgrade:
+                        this.AddUpgradeTuple((UpgradeTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.WixAction:
+                        this.AddWixActionTuple((WixActionTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.WixMediaTemplate:
+                        this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple);
+                        break;
+
+                    case TupleDefinitionType.WixCustomTableCell:
+                        this.IndexCustomTableCellTuple((WixCustomTableCellTuple)tuple, cellsByTableAndRowId);
+                        break;
+
+                    case TupleDefinitionType.WixEnsureTable:
+                        this.AddWixEnsureTableTuple((WixEnsureTableTuple)tuple);
+                        break;
+
+                    // ignored.
+                    case TupleDefinitionType.WixComponentGroup:
+                    case TupleDefinitionType.WixDeltaPatchFile:
+                    case TupleDefinitionType.WixFeatureGroup:
+                    case TupleDefinitionType.WixPatchBaseline:
+                        break;
+
+                    // Already processed by LoadTableDefinitions.
+                    case TupleDefinitionType.WixCustomTable:
+                    case TupleDefinitionType.WixCustomTableColumn:
+                        break;
+
+                    case TupleDefinitionType.MustBeFromAnExtension:
+                        unknownTuple = !this.AddTupleFromExtension(tuple);
+                        break;
+
+                    default:
+                        unknownTuple = !this.AddTupleDefaultly(tuple);
+                        break;
                 }
 
                 if (unknownTuple)
@@ -226,6 +227,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.Messaging.Write(WarningMessages.TupleNotTranslatedToOutput(tuple));
                 }
             }
+
+            this.AddIndexedCellTuples(cellsByTableAndRowId);
         }
 
         private void AddAssemblyTuple(AssemblyTuple tuple)
@@ -383,16 +386,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private void AddDialogTuple(DialogTuple tuple)
         {
             var attributes = tuple.Visible ? WindowsInstallerConstants.MsidbDialogAttributesVisible : 0;
-            attributes|= tuple.Modal ? WindowsInstallerConstants.MsidbDialogAttributesModal : 0;
-            attributes|= tuple.Minimize ? WindowsInstallerConstants.MsidbDialogAttributesMinimize : 0;
-            attributes|= tuple.CustomPalette ? WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette: 0;
-            attributes|= tuple.ErrorDialog ? WindowsInstallerConstants.MsidbDialogAttributesError : 0;
-            attributes|= tuple.LeftScroll ? WindowsInstallerConstants.MsidbDialogAttributesLeftScroll : 0;
-            attributes|= tuple.KeepModeless ? WindowsInstallerConstants.MsidbDialogAttributesKeepModeless : 0;
-            attributes|= tuple.RightAligned ? WindowsInstallerConstants.MsidbDialogAttributesRightAligned : 0;
-            attributes|= tuple.RightToLeft ? WindowsInstallerConstants.MsidbDialogAttributesRTLRO : 0;
-            attributes|= tuple.SystemModal ? WindowsInstallerConstants.MsidbDialogAttributesSysModal : 0;
-            attributes|= tuple.TrackDiskSpace ? WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace : 0;
+            attributes |= tuple.Modal ? WindowsInstallerConstants.MsidbDialogAttributesModal : 0;
+            attributes |= tuple.Minimize ? WindowsInstallerConstants.MsidbDialogAttributesMinimize : 0;
+            attributes |= tuple.CustomPalette ? WindowsInstallerConstants.MsidbDialogAttributesUseCustomPalette : 0;
+            attributes |= tuple.ErrorDialog ? WindowsInstallerConstants.MsidbDialogAttributesError : 0;
+            attributes |= tuple.LeftScroll ? WindowsInstallerConstants.MsidbDialogAttributesLeftScroll : 0;
+            attributes |= tuple.KeepModeless ? WindowsInstallerConstants.MsidbDialogAttributesKeepModeless : 0;
+            attributes |= tuple.RightAligned ? WindowsInstallerConstants.MsidbDialogAttributesRightAligned : 0;
+            attributes |= tuple.RightToLeft ? WindowsInstallerConstants.MsidbDialogAttributesRTLRO : 0;
+            attributes |= tuple.SystemModal ? WindowsInstallerConstants.MsidbDialogAttributesSysModal : 0;
+            attributes |= tuple.TrackDiskSpace ? WindowsInstallerConstants.MsidbDialogAttributesTrackDiskSpace : 0;
 
             var row = this.CreateRow(tuple, "Dialog");
             row[0] = tuple.Id.Id;
@@ -419,7 +422,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 targetName = ".";
             }
 
-            var defaultDir = String.IsNullOrEmpty(sourceName) ? targetName :  targetName + ":" + sourceName ;
+            var defaultDir = String.IsNullOrEmpty(sourceName) ? targetName : targetName + ":" + sourceName;
 
             var row = this.CreateRow(tuple, "Directory");
             row[0] = tuple.Id.Id;
@@ -436,25 +439,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             switch (tuple.Action)
             {
-            case EnvironmentActionType.Create:
-                action = "+";
-                break;
-            case EnvironmentActionType.Set:
-                action = "=";
-                break;
-            case EnvironmentActionType.Remove:
-                action = "!";
-                break;
+                case EnvironmentActionType.Create:
+                    action = "+";
+                    break;
+                case EnvironmentActionType.Set:
+                    action = "=";
+                    break;
+                case EnvironmentActionType.Remove:
+                    action = "!";
+                    break;
             }
 
             switch (tuple.Part)
             {
-            case EnvironmentPartType.First:
-                value = String.Concat(value, tuple.Separator, "[~]");
-                break;
-            case EnvironmentPartType.Last:
-                value = String.Concat("[~]", tuple.Separator, value);
-                break;
+                case EnvironmentPartType.First:
+                    value = String.Concat(value, tuple.Separator, "[~]");
+                    break;
+                case EnvironmentPartType.Last:
+                    value = String.Concat("[~]", tuple.Separator, value);
+                    break;
             }
 
             var row = this.CreateRow(tuple, "Environment");
@@ -661,40 +664,40 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             switch (tuple.ValueType)
             {
-            case RegistryValueType.Binary:
-                value = String.Concat("#x", value);
-                break;
-            case RegistryValueType.Expandable:
-                value = String.Concat("#%", value);
-                break;
-            case RegistryValueType.Integer:
-                value = String.Concat("#", value);
-                break;
-            case RegistryValueType.MultiString:
-                switch (tuple.ValueAction)
-                {
-                case RegistryValueActionType.Append:
-                    value = String.Concat("[~]", value);
+                case RegistryValueType.Binary:
+                    value = String.Concat("#x", value);
                     break;
-                case RegistryValueActionType.Prepend:
-                    value = String.Concat(value, "[~]");
+                case RegistryValueType.Expandable:
+                    value = String.Concat("#%", value);
                     break;
-                case RegistryValueActionType.Write:
-                default:
-                    if (null != value && -1 == value.IndexOf("[~]", StringComparison.Ordinal))
+                case RegistryValueType.Integer:
+                    value = String.Concat("#", value);
+                    break;
+                case RegistryValueType.MultiString:
+                    switch (tuple.ValueAction)
                     {
-                        value = String.Format(CultureInfo.InvariantCulture, "[~]{0}[~]", value);
+                        case RegistryValueActionType.Append:
+                            value = String.Concat("[~]", value);
+                            break;
+                        case RegistryValueActionType.Prepend:
+                            value = String.Concat(value, "[~]");
+                            break;
+                        case RegistryValueActionType.Write:
+                        default:
+                            if (null != value && -1 == value.IndexOf("[~]", StringComparison.Ordinal))
+                            {
+                                value = String.Format(CultureInfo.InvariantCulture, "[~]{0}[~]", value);
+                            }
+                            break;
                     }
                     break;
-                }
-                break;
-            case RegistryValueType.String:
-                // escape the leading '#' character for string registry keys
-                if (null != value && value.StartsWith("#", StringComparison.Ordinal))
-                {
-                    value = String.Concat("#", value);
-                }
-                break;
+                case RegistryValueType.String:
+                    // escape the leading '#' character for string registry keys
+                    if (null != value && value.StartsWith("#", StringComparison.Ordinal))
+                    {
+                        value = String.Concat("#", value);
+                    }
+                    break;
             }
 
             var row = this.CreateRow(tuple, "Registry");
@@ -757,7 +760,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             row[3] = tuple.Arguments;
             if (tuple.Wait.HasValue)
             {
-                row[4] =  tuple.Wait.Value ? 1 : 0;
+                row[4] = tuple.Wait.Value ? 1 : 0;
             }
             row[5] = tuple.ComponentRef;
         }
@@ -938,83 +941,89 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 row[2] = tuple.Sequence;
             }
         }
-        
-        private void AddWixCustomRowTuple(WixCustomRowTuple tuple)
+
+        private void IndexCustomTableCellTuple(WixCustomTableCellTuple wixCustomTableCellTuple, Dictionary<string, List<WixCustomTableCellTuple>> cellsByTableAndRowId)
         {
-            var customTableDefinition = this.TableDefinitions[tuple.Table];
-
-            if (customTableDefinition.Unreal)
+            var tableAndRowId = wixCustomTableCellTuple.TableRef + "/" + wixCustomTableCellTuple.RowId;
+            if (!cellsByTableAndRowId.TryGetValue(tableAndRowId, out var cells))
             {
-
-                return;
+                cells = new List<WixCustomTableCellTuple>();
+                cellsByTableAndRowId.Add(tableAndRowId, cells);
             }
 
-            var customRow = this.CreateRow(tuple, customTableDefinition);
+            cells.Add(wixCustomTableCellTuple);
+        }
+
+        private void AddIndexedCellTuples(Dictionary<string, List<WixCustomTableCellTuple>> cellsByTableAndRowId)
+        {
+            foreach (var rowOfCells in cellsByTableAndRowId.Values)
+            {
+                var firstCellTuple = rowOfCells[0];
+                var customTableDefinition = this.TableDefinitions[firstCellTuple.TableRef];
+
+                if (customTableDefinition.Unreal)
+                {
+                    return;
+                }
+
+                var customRow = this.CreateRow(firstCellTuple, customTableDefinition);
+                var customRowFieldsByColumnName = customRow.Fields.ToDictionary(f => f.Column.Name);
 
 #if TODO // SectionId seems like a good thing to preserve.
-            customRow.SectionId = tuple.SectionId;
+                customRow.SectionId = tuple.SectionId;
 #endif
-
-            var data = tuple.FieldDataSeparated;
-
-            for (var i = 0; i < data.Length; ++i)
-            {
-                var foundColumn = false;
-                var item = data[i].Split(ColonCharacter, 2);
-
-                for (var j = 0; j < customRow.Fields.Length; ++j)
+                foreach (var cell in rowOfCells)
                 {
-                    if (customRow.Fields[j].Column.Name == item[0])
+                    var data = cell.Data;
+
+                    if (customRowFieldsByColumnName.TryGetValue(cell.ColumnRef, out var rowField))
                     {
-                        if (0 < item[1].Length)
+                        if (!String.IsNullOrEmpty(data))
                         {
-                            if (ColumnType.Number == customRow.Fields[j].Column.Type)
+                            if (rowField.Column.Type == ColumnType.Number)
                             {
                                 try
                                 {
-                                    customRow.Fields[j].Data = Convert.ToInt32(item[1], CultureInfo.InvariantCulture);
+                                    rowField.Data = Convert.ToInt32(data, CultureInfo.InvariantCulture);
                                 }
                                 catch (FormatException)
                                 {
-                                    this.Messaging.Write(ErrorMessages.IllegalIntegerValue(tuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name, item[1]));
+                                    this.Messaging.Write(ErrorMessages.IllegalIntegerValue(cell.SourceLineNumbers, rowField.Column.Name, customTableDefinition.Name, data));
                                 }
                                 catch (OverflowException)
                                 {
-                                    this.Messaging.Write(ErrorMessages.IllegalIntegerValue(tuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name, item[1]));
+                                    this.Messaging.Write(ErrorMessages.IllegalIntegerValue(cell.SourceLineNumbers, rowField.Column.Name, customTableDefinition.Name, data));
                                 }
                             }
-                            else if (ColumnCategory.Identifier == customRow.Fields[j].Column.Category)
+                            else if (rowField.Column.Category == ColumnCategory.Identifier)
                             {
-                                if (Common.IsIdentifier(item[1]) || Common.IsValidBinderVariable(item[1]) || ColumnCategory.Formatted == customRow.Fields[j].Column.Category)
+                                if (Common.IsIdentifier(data) || Common.IsValidBinderVariable(data) || ColumnCategory.Formatted == rowField.Column.Category)
                                 {
-                                    customRow.Fields[j].Data = item[1];
+                                    rowField.Data = data;
                                 }
                                 else
                                 {
-                                    this.Messaging.Write(ErrorMessages.IllegalIdentifier(tuple.SourceLineNumbers, "Data", item[1]));
+                                    this.Messaging.Write(ErrorMessages.IllegalIdentifier(cell.SourceLineNumbers, "Data", data));
                                 }
                             }
                             else
                             {
-                                customRow.Fields[j].Data = item[1];
+                                rowField.Data = data;
                             }
                         }
-                        foundColumn = true;
-                        break;
+                    }
+                    else
+                    {
+                        this.Messaging.Write(ErrorMessages.UnexpectedCustomTableColumn(cell.SourceLineNumbers, cell.ColumnRef));
                     }
                 }
 
-                if (!foundColumn)
+                for (var i = 0; i < customTableDefinition.Columns.Length; ++i)
                 {
-                    this.Messaging.Write(ErrorMessages.UnexpectedCustomTableColumn(tuple.SourceLineNumbers, item[0]));
-                }
-            }
-
-            for (var i = 0; i < customTableDefinition.Columns.Length; ++i)
-            {
-                if (!customTableDefinition.Columns[i].Nullable && (null == customRow.Fields[i].Data || 0 == customRow.Fields[i].Data.ToString().Length))
-                {
-                    this.Messaging.Write(ErrorMessages.NoDataForColumn(tuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
+                    if (!customTableDefinition.Columns[i].Nullable && (null == customRow.Fields[i].Data || 0 == customRow.Fields[i].Data.ToString().Length))
+                    {
+                        this.Messaging.Write(ErrorMessages.NoDataForColumn(firstCellTuple.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
+                    }
                 }
             }
         }

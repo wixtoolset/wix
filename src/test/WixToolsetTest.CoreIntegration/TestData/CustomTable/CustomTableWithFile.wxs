@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentGroupRef Id="MinimalComponentGroup" />
+        </ComponentGroup>
+
+        <CustomTable Id="CustomTableWithFile">
+            <Column Id="Column1" Type="string" PrimaryKey="yes" />
+            <Column Id="Source" Type="binary" Width="0" />
+            <Row>
+                <Data Column="Column1">Row1</Data>
+                <Data Column="Source">file1.txt</Data>
+            </Row>
+            <Row>
+                <Data Column="Source">SourceDir\file2.txt</Data>
+                <Data Column="Column1">Row2</Data>
+            </Row>
+        </CustomTable>
+
+    </Fragment>
+</Wix>

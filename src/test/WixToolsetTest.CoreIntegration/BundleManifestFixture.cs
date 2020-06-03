@@ -46,7 +46,7 @@ namespace WixToolsetTest.CoreIntegration
                 var customElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:BundleCustomTable");
                 Assert.Equal(3, customElements.Count);
                 Assert.Equal("<BundleCustomTable Id='one' Column2='two' />", customElements[0].GetTestXml());
-                Assert.Equal("<BundleCustomTable Column2='&lt;' Id='&gt;' />", customElements[1].GetTestXml());
+                Assert.Equal("<BundleCustomTable Id='&gt;' Column2='&lt;' />", customElements[1].GetTestXml());
                 Assert.Equal("<BundleCustomTable Id='1' Column2='2' />", customElements[2].GetTestXml());
             }
         }

@@ -314,18 +314,19 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                             break;
 
                                         case ColumnType.Object:
-                                            if (null != row[i])
+                                            var path = row.FieldAsString(i);
+                                            if (null != path)
                                             {
                                                 needStream = true;
                                                 try
                                                 {
-                                                    record.SetStream(i + 1, row.FieldAsString(i));
+                                                    record.SetStream(i + 1, path);
                                                 }
                                                 catch (Win32Exception e)
                                                 {
                                                     if (0xA1 == e.NativeErrorCode) // ERROR_BAD_PATHNAME
                                                     {
-                                                        throw new WixException(ErrorMessages.FileNotFound(row.SourceLineNumbers, row.FieldAsString(i)));
+                                                        throw new WixException(ErrorMessages.FileNotFound(row.SourceLineNumbers, path));
                                                     }
                                                     else
                                                     {
