@@ -56,7 +56,19 @@ namespace WixToolset.BuildTasks
         /// </summary>
         public bool VerboseOutput { get; set; }
 
-        private string ToolFullPath => Path.Combine(Path.GetDirectoryName(ThisDllPath), this.ToolExe);
+        private string DefaultToolFullPath => Path.Combine(Path.GetDirectoryName(ThisDllPath), this.ToolExe);
+
+        private string ToolFullPath
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this.ToolPath))
+                {
+                    return this.DefaultToolFullPath;
+                }
+                return Path.Combine(this.ToolPath, this.ToolExe);
+            }
+        }
 
         /// <summary>
         /// Get the path to the executable.
@@ -74,9 +86,9 @@ namespace WixToolset.BuildTasks
                 // We need to return a path that exists, so if we're not actually going to run the tool then just return this dll path.
                 return ThisDllPath;
             }
-            return this.ToolFullPath;
+            return this.DefaultToolFullPath;
 #else
-            if (IsSelfExecutable(this.ToolFullPath, out var toolFullPath))
+            if (IsSelfExecutable(this.DefaultToolFullPath, out var toolFullPath))
             {
                 return toolFullPath;
             }

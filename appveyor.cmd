@@ -23,6 +23,7 @@ dotnet publish -c %_C% -o %_P%\WixToolset.MSBuild\tools\netcoreapp2.1\ -f netcor
 dotnet publish -c %_C% -o %_P%\WixToolset.MSBuild\tools\netcoreapp2.1\ -f netcoreapp2.1 src\wix
 dotnet publish -c %_C% -o %_P%\WixToolset.MSBuild\tools\netcoreapp2.1\ -f netcoreapp2.1 src\wixcop
 dotnet publish -c %_C% -o %_P%\WixToolset.MSBuild\ src\WixToolset.MSBuild
+dotnet publish -c %_C% -o %_P%\WixToolset.MSBuild\broken\net461\ -f net461 -r dne src\wix
 
 dotnet pack -c %_C% src\dotnet-wix
 dotnet pack -c %_C% src\WixToolset.MSBuild

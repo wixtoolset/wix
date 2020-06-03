@@ -378,5 +378,31 @@ namespace WixToolsetTest.MSBuild
                 Assert.Empty(remainingPaths);
             }
         }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void ReportsInnerExceptionForUnexpectedExceptions(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixToolDir", Path.Combine(MsbuildUtilities.WixMsbuildPath, "broken", "net461")),
+                }, outOfProc: true);
+                Assert.Equal(1, result.ExitCode);
+
+                var expectedMessage = "System.PlatformNotSupportedException: Could not find platform specific 'wixnative.exe' ---> System.IO.FileNotFoundException: Could not find internal piece of WiX Toolset from";
+                Assert.Contains(result.Output, m => m.Contains(expectedMessage));
+            }
+        }
     }
 }

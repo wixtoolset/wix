@@ -17,7 +17,8 @@ namespace WixToolsetTest.MSBuild
 
     public static class MsbuildUtilities
     {
-        public static readonly string WixPropsPath = Path.Combine(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild", "build", "WixToolset.MSBuild.props");
+        public static readonly string WixMsbuildPath = Path.Combine(new Uri(typeof(MsbuildUtilities).Assembly.CodeBase).AbsolutePath, "..", "..", "publish", "WixToolset.MSBuild");
+        public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "build", "WixToolset.MSBuild.props");
 
         public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", bool? outOfProc = null, string verbosityLevel = "normal")
         {
