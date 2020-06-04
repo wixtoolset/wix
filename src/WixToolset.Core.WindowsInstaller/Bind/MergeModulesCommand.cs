@@ -6,6 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
     using WixToolset.Core.Bind;
@@ -14,65 +15,66 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
-    /// Update file information.
+    /// Merge modules into the database at output path.
     /// </summary>
     internal class MergeModulesCommand
     {
-        public MergeModulesCommand(IMessaging messaging)
+        public MergeModulesCommand(IMessaging messaging, IEnumerable<FileFacade> fileFacades, IntermediateSection section, IEnumerable<string> suppressedTableNames, string outputPath, string intermediateFolder)
         {
             this.Messaging = messaging;
+            this.FileFacades = fileFacades;
+            this.Section = section;
+            this.SuppressedTableNames = suppressedTableNames ?? Array.Empty<string>();
+            this.OutputPath = outputPath;
+            this.IntermediateFolder = intermediateFolder;
         }
 
-        public IEnumerable<FileFacade> FileFacades { private get; set; }
+        private IMessaging Messaging { get; }
 
-        public IMessaging Messaging { private get; set; }
+        private IEnumerable<FileFacade> FileFacades { get; }
 
-        public WindowsInstallerData Output { private get; set; }
+        private IntermediateSection Section { get; }
 
-        public string OutputPath { private get; set; }
+        private IEnumerable<string> SuppressedTableNames { get; }
 
-        public TableDefinitionCollection TableDefinitions { private get; set; }
+        private string OutputPath { get; }
 
-        public string IntermediateFolder { private get; set; }
+        private string IntermediateFolder { get; }
 
         public void Execute()
         {
-            Table wixMergeTable = this.Output.Tables["WixMerge"];
-            Table wixFeatureModulesTable = this.Output.Tables["WixFeatureModules"];
-
-            // check for merge rows to see if there is any work to do
-            if (null == wixMergeTable || 0 == wixMergeTable.Rows.Count)
+            var wixMergeTuples = this.Section.Tuples.OfType<WixMergeTuple>().ToList();
+            if (!wixMergeTuples.Any())
             {
                 return;
             }
 
-            var suppressedTableNames = this.AddBackSuppresedSequenceTables();
-
             IMsmMerge2 merge = null;
-            bool commit = true;
-            bool logOpen = false;
-            bool databaseOpen = false;
-            string logPath = null;
+            var commit = true;
+            var logOpen = false;
+            var databaseOpen = false;
+            var logPath = Path.Combine(this.IntermediateFolder, "merge.log");
+
             try
             {
                 var interop = new MsmInterop();
                 merge = interop.GetMsmMerge();
 
-                logPath = Path.Combine(this.IntermediateFolder, "merge.log");
                 merge.OpenLog(logPath);
                 logOpen = true;
 
                 merge.OpenDatabase(this.OutputPath);
                 databaseOpen = true;
 
+                var featureModulesByMergeId = this.Section.Tuples.OfType<WixFeatureModulesTuple>().GroupBy(t => t.WixMergeRef).ToDictionary(g => g.Key);
+
                 // process all the merge rows
-                foreach (WixMergeRow wixMergeRow in wixMergeTable.Rows)
+                foreach (var wixMergeRow in wixMergeTuples)
                 {
-                    bool moduleOpen = false;
+                    var moduleOpen = false;
 
                     try
                     {
@@ -84,7 +86,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         catch (FormatException)
                         {
-                            this.Messaging.Write(ErrorMessages.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, wixMergeRow.Language));
+                            this.Messaging.Write(ErrorMessages.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.Language.ToString()));
                             continue;
                         }
 
@@ -99,20 +101,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             callback = new ConfigurationCallback(wixMergeRow.ConfigurationData);
                         }
 
-                        // merge the module into the database that's being built
+                        // Merge the module into the database that's being built.
                         this.Messaging.Write(VerboseMessages.MergingMergeModule(wixMergeRow.SourceFile));
-                        merge.MergeEx(wixMergeRow.Feature, wixMergeRow.Directory, callback);
+                        merge.MergeEx(wixMergeRow.FeatureRef, wixMergeRow.DirectoryRef, callback);
 
-                        // connect any non-primary features
-                        if (null != wixFeatureModulesTable)
+                        // Connect any non-primary features.
+                        if (featureModulesByMergeId.TryGetValue(wixMergeRow.Id.Id, out var featureModules))
                         {
-                            foreach (Row row in wixFeatureModulesTable.Rows)
+                            foreach (var featureModule in featureModules)
                             {
-                                if (wixMergeRow.Id == (string)row[1])
-                                {
-                                    this.Messaging.Write(VerboseMessages.ConnectingMergeModule(wixMergeRow.SourceFile, (string)row[0]));
-                                    merge.Connect((string)row[0]);
-                                }
+                                this.Messaging.Write(VerboseMessages.ConnectingMergeModule(wixMergeRow.SourceFile, featureModule.FeatureRef));
+                                merge.Connect(featureModule.FeatureRef);
                             }
                         }
                     }
@@ -122,17 +121,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     finally
                     {
-                        IMsmErrors mergeErrors = merge.Errors;
+                        var mergeErrors = merge.Errors;
 
                         // display all the errors encountered during the merge operations for this module
-                        for (int i = 1; i <= mergeErrors.Count; i++)
+                        for (var i = 1; i <= mergeErrors.Count; i++)
                         {
-                            IMsmError mergeError = mergeErrors[i];
-                            StringBuilder databaseKeys = new StringBuilder();
-                            StringBuilder moduleKeys = new StringBuilder();
+                            var mergeError = mergeErrors[i];
+                            var databaseKeys = new StringBuilder();
+                            var moduleKeys = new StringBuilder();
 
                             // build a string of the database keys
-                            for (int j = 1; j <= mergeError.DatabaseKeys.Count; j++)
+                            for (var j = 1; j <= mergeError.DatabaseKeys.Count; j++)
                             {
                                 if (1 != j)
                                 {
@@ -142,7 +141,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
 
                             // build a string of the module keys
-                            for (int j = 1; j <= mergeError.ModuleKeys.Count; j++)
+                            for (var j = 1; j <= mergeError.ModuleKeys.Count; j++)
                             {
                                 if (1 != j)
                                 {
@@ -155,10 +154,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             switch (mergeError.Type)
                             {
                                 case MsmErrorType.msmErrorExclusion:
-                                    this.Messaging.Write(ErrorMessages.MergeExcludedModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id, moduleKeys.ToString()));
+                                    this.Messaging.Write(ErrorMessages.MergeExcludedModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleKeys.ToString()));
                                     break;
                                 case MsmErrorType.msmErrorFeatureRequired:
-                                    this.Messaging.Write(ErrorMessages.MergeFeatureRequired(wixMergeRow.SourceLineNumbers, mergeError.ModuleTable, moduleKeys.ToString(), wixMergeRow.SourceFile, wixMergeRow.Id));
+                                    this.Messaging.Write(ErrorMessages.MergeFeatureRequired(wixMergeRow.SourceLineNumbers, mergeError.ModuleTable, moduleKeys.ToString(), wixMergeRow.SourceFile, wixMergeRow.Id.Id));
                                     break;
                                 case MsmErrorType.msmErrorLanguageFailed:
                                     this.Messaging.Write(ErrorMessages.MergeLanguageFailed(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
@@ -217,32 +216,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             using (var db = new Database(this.OutputPath, OpenDatabase.Direct))
             {
-                var suppressActionTable = this.Output.Tables["WixSuppressAction"];
-
-                // suppress individual actions
-                if (null != suppressActionTable)
+                // Suppress individual actions.
+                foreach (var suppressAction in this.Section.Tuples.OfType<WixSuppressActionTuple>())
                 {
-                    foreach (Row row in suppressActionTable.Rows)
+                    var tableName = suppressAction.SequenceTable.WindowsInstallerTableName();
+                    if (db.TableExists(tableName))
                     {
-                        if (db.TableExists((string)row[0]))
-                        {
-                            string query = String.Format(CultureInfo.InvariantCulture, "SELECT * FROM {0} WHERE `Action` = '{1}'", row[0].ToString(), (string)row[1]);
+                        var query = $"SELECT * FROM {tableName} WHERE `Action` = '{suppressAction.Action}'";
 
-                            using (View view = db.OpenExecuteView(query))
-                            using (Record record = view.Fetch())
+                        using (var view = db.OpenExecuteView(query))
+                        using (var record = view.Fetch())
+                        {
+                            if (null != record)
                             {
-                                if (null != record)
-                                {
-                                    this.Messaging.Write(WarningMessages.SuppressMergedAction((string)row[1], row[0].ToString()));
-                                    view.Modify(ModifyView.Delete, record);
-                                }
+                                this.Messaging.Write(WarningMessages.SuppressMergedAction(suppressAction.Action, tableName));
+                                view.Modify(ModifyView.Delete, record);
                             }
                         }
                     }
                 }
 
-                // query for merge module actions in suppressed sequences and drop them
-                foreach (var tableName in suppressedTableNames)
+                // Query for merge module actions in suppressed sequences and drop them.
+                foreach (var tableName in this.SuppressedTableNames)
                 {
                     if (!db.TableExists(tableName))
                     {
@@ -332,32 +327,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 db.Commit();
             }
-        }
-
-        private IEnumerable<string> AddBackSuppresedSequenceTables()
-        {
-            // Add back possibly suppressed sequence tables since all sequence tables must be present
-            // for the merge process to work. We'll drop the suppressed sequence tables again as
-            // necessary.
-            var suppressedTableNames = new HashSet<string>();
-
-            foreach (SequenceTable sequence in Enum.GetValues(typeof(SequenceTable)))
-            {
-                var sequenceTableName = (sequence == SequenceTable.AdvertiseExecuteSequence) ? "AdvtExecuteSequence" : sequence.ToString();
-                var sequenceTable = this.Output.Tables[sequenceTableName];
-
-                if (null == sequenceTable)
-                {
-                    sequenceTable = this.Output.EnsureTable(this.TableDefinitions[sequenceTableName]);
-                }
-
-                if (0 == sequenceTable.Rows.Count)
-                {
-                    suppressedTableNames.Add(sequenceTableName);
-                }
-            }
-
-            return suppressedTableNames;
         }
     }
 }

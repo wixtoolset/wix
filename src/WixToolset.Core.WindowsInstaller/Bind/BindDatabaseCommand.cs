@@ -350,11 +350,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 output = command.Output;
             }
 
-            // Modularize identifiers.
+            IEnumerable<string> suppressedTableNames = null;
             if (output.Type == OutputType.Module)
             {
-                var command = new ModularizeCommand(output, modularizationSuffix, section.Tuples.OfType<WixSuppressModularizationTuple>());
-                command.Execute();
+                // Modularize identifiers.
+                var modularize = new ModularizeCommand(output, modularizationSuffix, section.Tuples.OfType<WixSuppressModularizationTuple>());
+                modularize.Execute();
+
+                // Ensure all sequence tables in place because, mergemod.dll requires them.
+                var unsuppress = new AddBackSuppresedSequenceTablesCommand(output, tableDefinitions);
+                suppressedTableNames = unsuppress.Execute();
             }
             else if (output.Type == OutputType.Patch)
             {
@@ -486,12 +491,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.MergingModules());
 
-                var command = new MergeModulesCommand(this.Messaging);
-                command.FileFacades = fileFacades;
-                command.IntermediateFolder = this.IntermediateFolder;
-                command.Output = output;
-                command.OutputPath = this.OutputPath;
-                command.TableDefinitions = tableDefinitions;
+                var command = new MergeModulesCommand(this.Messaging, fileFacades, section, suppressedTableNames, this.OutputPath, this.IntermediateFolder);
                 command.Execute();
             }
 
@@ -591,7 +591,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 foreach (Data.WindowsInstaller.Rows.ComponentRow row in componentTable.Rows)
                 {
-                    // we don't care about unmanaged components and if there's a * GUID remaining,
+                    // We don't care about unmanaged components and if there's a * GUID remaining,
                     // there's already an error that prevented it from being replaced with a real GUID.
                     if (!String.IsNullOrEmpty(row.Guid) && "*" != row.Guid)
                     {
@@ -633,13 +633,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             command.Execute();
         }
 
-        private string ResolveMedia(MediaTuple mediaRow, string mediaLayoutDirectory, string layoutDirectory)
+        private string ResolveMedia(MediaTuple media, string mediaLayoutDirectory, string layoutDirectory)
         {
             string layout = null;
 
             foreach (var extension in this.BackendExtensions)
             {
-                layout = extension.ResolveMedia(mediaRow, mediaLayoutDirectory, layoutDirectory);
+                layout = extension.ResolveMedia(media, mediaLayoutDirectory, layoutDirectory);
                 if (!String.IsNullOrEmpty(layout))
                 {
                     break;
