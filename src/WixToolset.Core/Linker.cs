@@ -168,7 +168,7 @@ namespace WixToolset.Core
                 // references that particpate in groups.
                 sections = resolve.ResolvedSections.ToList();
 
-                // TODO: consider filtering "localizations" down to only those localizations from 
+                // TODO: consider filtering "localizations" down to only those localizations from
                 //       intermediates in the sections.
 
                 this.FlattenSectionsComplexReferences(sections);
@@ -261,8 +261,8 @@ namespace WixToolset.Core
                                         if (WindowsInstallerStandard.IsStandardDirectory(directory))
                                         {
                                             // if the directory table contains references to standard windows folders
-                                            // mergemod.dll will add customactions to set the MSM directory to 
-                                            // the same directory as the standard windows folder and will add references to 
+                                            // mergemod.dll will add customactions to set the MSM directory to
+                                            // the same directory as the standard windows folder and will add references to
                                             // custom action to all the standard sequence tables. A problem will occur
                                             // if the MSI does not have these tables as mergemod.dll does not add these
                                             // tables to the MSI if absent. This code adds the tables in case mergemod.dll
@@ -982,7 +982,7 @@ namespace WixToolset.Core
                         }
 
                         // If the child of the complex reference is another group, then in Step 2
-                        // we're going to have to process this complex reference again to copy 
+                        // we're going to have to process this complex reference again to copy
                         // the child group's references into the parent group.
                         if ((ComplexReferenceChildType.ComponentGroup == wixComplexReferenceRow.ChildType) ||
                             (ComplexReferenceChildType.FeatureGroup == wixComplexReferenceRow.ChildType) ||
@@ -1081,14 +1081,14 @@ namespace WixToolset.Core
                     var childTypeAndId = this.CombineTypeAndId(wixComplexReferenceRow.ChildType, wixComplexReferenceRow.Child);
                     if (loopDetector.Contains(childTypeAndId))
                     {
-                        // Create a comma delimited list of the references that participate in the 
+                        // Create a comma delimited list of the references that participate in the
                         // loop for the error message. Start at the bottom of the stack and work the
                         // way up to present the loop as a directed graph.
                         var loop = String.Join(" -> ", loopDetector);
 
                         this.Messaging.Write(ErrorMessages.ReferenceLoopDetected(wixComplexReferenceRow?.SourceLineNumbers, loop));
 
-                        // Cleanup the parentGroupsNeedingProcessing and the loopDetector just like the 
+                        // Cleanup the parentGroupsNeedingProcessing and the loopDetector just like the
                         // exit of this method does at the end because we are exiting early.
                         loopDetector.Pop();
                         parentGroupsNeedingProcessing.Remove(parentTypeAndId);
@@ -1097,7 +1097,7 @@ namespace WixToolset.Core
                     }
 
                     // Check to see if the child group still needs to be processed. If so,
-                    // go do that so that we'll get all of that children's (and children's 
+                    // go do that so that we'll get all of that children's (and children's
                     // children) complex references correctly merged into our parent group.
                     if (parentGroupsNeedingProcessing.ContainsKey(childTypeAndId))
                     {
@@ -1107,7 +1107,7 @@ namespace WixToolset.Core
                     // If the child is a parent to anything (i.e. the parent has grandchildren)
                     // clone each of the children's complex references, repoint them to the parent
                     // complex reference (because we're moving references up the tree), and finally
-                    // add the cloned child's complex reference to the list of complex references 
+                    // add the cloned child's complex reference to the list of complex references
                     // that we'll eventually add to the parent group.
                     if (parentGroups.TryGetValue(childTypeAndId, out var referencesToChild))
                     {
@@ -1148,7 +1148,7 @@ namespace WixToolset.Core
                 }
                 else if (i > 0)
                 {
-                    // Since the list is already sorted, we can find duplicates by simply 
+                    // Since the list is already sorted, we can find duplicates by simply
                     // looking at the next sibling in the list and tossing out one if they
                     // match.
                     var crefCompare = referencesToParent[i - 1];

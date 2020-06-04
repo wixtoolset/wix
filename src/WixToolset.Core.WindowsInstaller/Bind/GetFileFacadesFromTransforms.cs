@@ -27,7 +27,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private IEnumerable<SubStorage> SubStorages { get; }
 
-        public IEnumerable<FileFacade> FileFacades { get; private set; }
+        public List<FileFacade> FileFacades { get; private set; }
 
         public void Execute()
         {

@@ -238,6 +238,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // This must occur after all variables and source paths have been resolved.
             List<FileFacade> fileFacades;
+            if (SectionType.Patch == section.Type)
+            {
+                var command = new GetFileFacadesFromTransforms(this.Messaging, this.FileSystemManager, this.SubStorages);
+                command.Execute();
+
+                fileFacades = command.FileFacades;
+            }
+            else
             {
                 var command = new GetFileFacadesCommand(section);
                 command.Execute();
@@ -254,23 +262,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     containsMergeModules = true;
 
-                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, section, wixMergeTuples);
-                    command.FileFacades = fileFacades;
-                    command.OutputInstallerVersion = installerVersion;
-                    command.SuppressLayout = this.SuppressLayout;
-                    command.IntermediateFolder = this.IntermediateFolder;
+                    var command = new ExtractMergeModuleFilesCommand(this.Messaging, wixMergeTuples, fileFacades, installerVersion, this.IntermediateFolder, this.SuppressLayout);
                     command.Execute();
 
                     fileFacades.AddRange(command.MergeModulesFileFacades);
                 }
-            }
-            else if (SectionType.Patch == section.Type)
-            {
-                var command = new GetFileFacadesFromTransforms(this.Messaging, this.FileSystemManager, this.SubStorages);
-                command.Execute();
-                var filesFromTransforms = command.FileFacades;
-
-                fileFacades.AddRange(filesFromTransforms);
             }
 
             // stop processing if an error previously occurred
@@ -368,11 +364,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     output.SubStorages.Add(storage);
                 }
             }
-            else // we can create instance transforms since Component Guids are set.
-            {
-                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.BackendHelper);
-                command.Execute();
-            }
 
 #if TODO_FINISH_UPDATE
             // Extended binder extensions can be called now that fields are resolved.
@@ -411,6 +402,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 #endif
 
             this.ValidateComponentGuids(output);
+
+            // We can create instance transforms since Component Guids and Outputs are created.
+            if (output.Type == OutputType.Product)
+            {
+                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.BackendHelper);
+                command.Execute();
+            }
 
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)

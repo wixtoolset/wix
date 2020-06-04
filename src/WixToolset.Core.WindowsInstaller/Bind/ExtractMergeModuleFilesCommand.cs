@@ -21,26 +21,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class ExtractMergeModuleFilesCommand
     {
-        public ExtractMergeModuleFilesCommand(IMessaging messaging, IntermediateSection section, List<WixMergeTuple> wixMergeTuples)
+        public ExtractMergeModuleFilesCommand(IMessaging messaging, IEnumerable<WixMergeTuple> wixMergeTuples, IEnumerable<FileFacade> fileFacades, int installerVersion, string intermediateFolder, bool suppressLayout)
         {
             this.Messaging = messaging;
-            this.Section = section;
             this.WixMergeTuples = wixMergeTuples;
+            this.FileFacades = fileFacades;
+            this.OutputInstallerVersion = installerVersion;
+            this.IntermediateFolder = intermediateFolder;
+            this.SuppressLayout = suppressLayout;
         }
 
         private IMessaging Messaging { get; }
 
-        private IntermediateSection Section { get; }
+        private IEnumerable<WixMergeTuple> WixMergeTuples { get; }
 
-        private List<WixMergeTuple> WixMergeTuples { get; }
+        private IEnumerable<FileFacade> FileFacades { get; }
 
-        public IEnumerable<FileFacade> FileFacades { private get; set; }
+        private int OutputInstallerVersion { get; }
 
-        public int OutputInstallerVersion { private get; set; }
+        private string IntermediateFolder { get; }
 
-        public bool SuppressLayout { private get; set; }
-
-        public string IntermediateFolder { private get; set; }
+        private bool SuppressLayout { get; }
 
         public IEnumerable<FileFacade> MergeModulesFileFacades { get; private set; }
 
