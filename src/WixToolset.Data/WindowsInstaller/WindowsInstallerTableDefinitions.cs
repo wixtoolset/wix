@@ -1692,23 +1692,6 @@ namespace WixToolset.Data.WindowsInstaller
             tupleIdIsPrimaryKey: false
         );
 
-        public static readonly TableDefinition WixComplexReference = new TableDefinition(
-            "WixComplexReference",
-            TupleDefinitions.WixComplexReference,
-            new[]
-            {
-                new ColumnDefinition("Parent", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown, forceLocalizable: true),
-                new ColumnDefinition("ParentAttributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("ParentLanguage", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Unknown),
-                new ColumnDefinition("Child", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown, forceLocalizable: true),
-                new ColumnDefinition("ChildAttributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            strongRowType: typeof(WixComplexReferenceRow),
-            tupleIdIsPrimaryKey: false
-        );
-
         public static readonly TableDefinition WixComponentGroup = new TableDefinition(
             "WixComponentGroup",
             TupleDefinitions.WixComponentGroup,
@@ -1790,18 +1773,6 @@ namespace WixToolset.Data.WindowsInstaller
             },
             unreal: true,
             strongRowType: typeof(WixGroupRow),
-            tupleIdIsPrimaryKey: false
-        );
-
-        public static readonly TableDefinition WixFeatureModules = new TableDefinition(
-            "WixFeatureModules",
-            TupleDefinitions.WixFeatureModules,
-            new[]
-            {
-                new ColumnDefinition("Feature_", ColumnType.String, 38, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("WixMerge_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
             tupleIdIsPrimaryKey: false
         );
 
@@ -1906,25 +1877,6 @@ namespace WixToolset.Data.WindowsInstaller
             tupleIdIsPrimaryKey: false
         );
 
-        public static readonly TableDefinition WixMerge = new TableDefinition(
-            "WixMerge",
-            TupleDefinitions.WixMerge,
-            new[]
-            {
-                new ColumnDefinition("WixMerge", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Language", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown, forceLocalizable: true),
-                new ColumnDefinition("Directory_", ColumnType.String, 72, primaryKey: false, nullable: true, ColumnCategory.Unknown),
-                new ColumnDefinition("SourceFile", ColumnType.Object, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("DiskId", ColumnType.Number, 2, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("FileCompression", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown),
-                new ColumnDefinition("ConfigurationData", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Unknown),
-                new ColumnDefinition("Feature_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            strongRowType: typeof(WixMergeRow),
-            tupleIdIsPrimaryKey: true
-        );
-
         public static readonly TableDefinition WixOrdering = new TableDefinition(
             "WixOrdering",
             TupleDefinitions.WixOrdering,
@@ -1968,55 +1920,6 @@ namespace WixToolset.Data.WindowsInstaller
             unreal: true,
             strongRowType: typeof(WixDeltaPatchSymbolPathsRow),
             tupleIdIsPrimaryKey: false
-        );
-
-        public static readonly TableDefinition WixProperty = new TableDefinition(
-            "WixProperty",
-            TupleDefinitions.WixProperty,
-            new[]
-            {
-                new ColumnDefinition("Property_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Unknown, modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            strongRowType: typeof(WixPropertyRow),
-            tupleIdIsPrimaryKey: false
-        );
-
-        public static readonly TableDefinition WixSimpleReference = new TableDefinition(
-            "WixSimpleReference",
-            TupleDefinitions.WixSimpleReference,
-            new[]
-            {
-                new ColumnDefinition("Table", ColumnType.String, 32, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("PrimaryKeys", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            strongRowType: typeof(WixSimpleReferenceRow),
-            tupleIdIsPrimaryKey: false
-        );
-
-        public static readonly TableDefinition WixSuppressAction = new TableDefinition(
-            "WixSuppressAction",
-            TupleDefinitions.WixSuppressAction,
-            new[]
-            {
-                new ColumnDefinition("SequenceTable", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-                new ColumnDefinition("Action", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            tupleIdIsPrimaryKey: false
-        );
-
-        public static readonly TableDefinition WixSuppressModularization = new TableDefinition(
-            "WixSuppressModularization",
-            TupleDefinitions.WixSuppressModularization,
-            new[]
-            {
-                new ColumnDefinition("WixSuppressModularization", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Unknown),
-            },
-            unreal: true,
-            tupleIdIsPrimaryKey: true
         );
 
         public static readonly TableDefinition WixPatchBaseline = new TableDefinition(
@@ -2286,7 +2189,6 @@ namespace WixToolset.Data.WindowsInstaller
             ExternalFiles,
             WixAction,
             WixBBControl,
-            WixComplexReference,
             WixComponentGroup,
             WixControl,
             WixDirectory,
@@ -2294,7 +2196,6 @@ namespace WixToolset.Data.WindowsInstaller
             WixFeatureGroup,
             WixPatchFamilyGroup,
             WixGroup,
-            WixFeatureModules,
             WixFile,
             WixBindUpdatedFiles,
             WixBuildInfo,
@@ -2302,14 +2203,9 @@ namespace WixToolset.Data.WindowsInstaller
             WixInstanceComponent,
             WixInstanceTransforms,
             WixMediaTemplate,
-            WixMerge,
             WixOrdering,
             WixDeltaPatchFile,
             WixDeltaPatchSymbolPaths,
-            WixProperty,
-            WixSimpleReference,
-            WixSuppressAction,
-            WixSuppressModularization,
             WixPatchBaseline,
             WixPatchRef,
             WixPatchId,
