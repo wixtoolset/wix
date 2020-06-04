@@ -10,7 +10,7 @@ namespace WixToolsetTest.CoreIntegration
 
     public class BadInputFixture
     {
-        [Fact(Skip = "Test demonstrates failure")]
+        [Fact]
         public void RegistryKeyWithoutAttributesDoesntCrash()
         {
             var folder = TestData.Get(@"TestData\BadInput");

@@ -949,7 +949,7 @@ namespace WixToolset.Core
             var id = this.ParsePayloadElementContent(node, parentType, parentId, previousType, previousId, true);
             var context = new Dictionary<string, string>
             {
-                ["Id"] = id.Id
+                ["Id"] = id?.Id
             };
 
             foreach (var child in node.Elements())
@@ -1044,7 +1044,7 @@ namespace WixToolset.Core
             // Now that the PayloadId is known, we can parse the extension attributes.
             var context = new Dictionary<string, string>
             {
-                ["Id"] = id.Id
+                ["Id"] = id?.Id
             };
 
             foreach (var extensionAttribute in extensionAttributes)
@@ -2070,7 +2070,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "Id", id.Id } };
+                    var context = new Dictionary<string, string>() { { "Id", id?.Id } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
             }

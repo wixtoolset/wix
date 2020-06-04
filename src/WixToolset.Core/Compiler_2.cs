@@ -1794,7 +1794,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "RegistryId", id.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
+                    var context = new Dictionary<string, string>() { { "RegistryId", id?.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
             }
@@ -1991,7 +1991,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "RegistryId", id.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
+                    var context = new Dictionary<string, string>() { { "RegistryId", id?.Id }, { "ComponentId", componentId }, { "Win64", win64Component.ToString() } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
             }
@@ -3658,7 +3658,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "ServiceInstallId", id.Id }, { "ServiceInstallName", name }, { "ServiceInstallComponentId", componentId }, { "Win64", win64Component.ToString() } };
+                    var context = new Dictionary<string, string>() { { "ServiceInstallId", id?.Id }, { "ServiceInstallName", name }, { "ServiceInstallComponentId", componentId }, { "Win64", win64Component.ToString() } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
             }

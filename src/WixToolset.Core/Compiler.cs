@@ -2416,7 +2416,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "ComponentId", id.Id }, { "DirectoryId", directoryId }, { "Win64", win64.ToString() }, };
+                    var context = new Dictionary<string, string>() { { "ComponentId", id?.Id }, { "DirectoryId", directoryId }, { "Win64", win64.ToString() }, };
                     var possibleKeyPath = this.Core.ParsePossibleKeyPathExtensionElement(node, child, context);
                     if (null != possibleKeyPath)
                     {
@@ -5753,7 +5753,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    var context = new Dictionary<string, string>() { { "FileId", id.Id }, { "ComponentId", componentId }, { "DirectoryId", directoryId }, { "Win64", win64Component.ToString() } };
+                    var context = new Dictionary<string, string>() { { "FileId", id?.Id }, { "ComponentId", componentId }, { "DirectoryId", directoryId }, { "Win64", win64Component.ToString() } };
                     this.Core.ParseExtensionElement(node, child, context);
                 }
             }
