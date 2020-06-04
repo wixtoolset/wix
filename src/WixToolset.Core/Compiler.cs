@@ -3873,7 +3873,7 @@ namespace WixToolset.Core
                             attributes |= nullable ? WixCustomTableColumnTupleAttributes.Nullable : WixCustomTableColumnTupleAttributes.None;
                             attributes |= columnUnreal ? WixCustomTableColumnTupleAttributes.Unreal : WixCustomTableColumnTupleAttributes.None;
 
-                            columns.Add(new WixCustomTableColumnTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, columnName))
+                            var column = this.Core.AddTuple(new WixCustomTableColumnTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, tableId, columnName))
                             {
                                 TableRef = tableId,
                                 Name = columnName,
@@ -3889,6 +3889,7 @@ namespace WixToolset.Core
                                 Modularize = modularization,
                                 Set = setValues,
                             });
+                            columns.Add(column);
                         }
                         break;
                     case "Row":
@@ -3921,11 +3922,6 @@ namespace WixToolset.Core
                         ColumnNames = columnNames,
                         Unreal = unreal,
                     });
-
-                    foreach (var column in columns)
-                    {
-                        this.Core.AddTuple(column);
-                    }
                 }
             }
         }
