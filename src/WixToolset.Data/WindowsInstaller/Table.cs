@@ -60,6 +60,27 @@ namespace WixToolset.Data.WindowsInstaller
         }
 
         /// <summary>
+        /// Validates the rows of this OutputTable and throws if it collides on
+        /// primary keys.
+        /// </summary>
+        public void ValidateRows()
+        {
+            var primaryKeys = new Dictionary<string, SourceLineNumber>();
+
+            foreach (var row in this.Rows)
+            {
+                var primaryKey = row.GetPrimaryKey();
+
+                if (primaryKeys.TryGetValue(primaryKey, out var collisionSourceLineNumber))
+                {
+                    throw new WixException(ErrorMessages.DuplicatePrimaryKey(collisionSourceLineNumber, primaryKey, this.Definition.Name));
+                }
+
+                primaryKeys.Add(primaryKey, row.SourceLineNumbers);
+            }
+        }
+
+        /// <summary>
         /// Parse a table from the xml.
         /// </summary>
         /// <param name="reader">XmlReader where the intermediate is persisted.</param>
@@ -164,27 +185,6 @@ namespace WixToolset.Data.WindowsInstaller
             }
 
             writer.WriteEndElement();
-        }
-
-        /// <summary>
-        /// Validates the rows of this OutputTable and throws if it collides on
-        /// primary keys.
-        /// </summary>
-        public void ValidateRows()
-        {
-            var primaryKeys = new Dictionary<string, SourceLineNumber>();
-
-            foreach (var row in this.Rows)
-            {
-                var primaryKey = row.GetPrimaryKey();
-
-                if (primaryKeys.TryGetValue(primaryKey, out var collisionSourceLineNumber))
-                {
-                    throw new WixException(ErrorMessages.DuplicatePrimaryKey(collisionSourceLineNumber, primaryKey, this.Definition.Name));
-                }
-
-                primaryKeys.Add(primaryKey, row.SourceLineNumbers);
-            }
         }
     }
 }
