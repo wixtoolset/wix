@@ -12,9 +12,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// for the merge process to work. We'll drop the suppressed sequence tables again as
     /// necessary.
     /// </summary>
-    internal class AddBackSuppresedSequenceTablesCommand
+    internal class AddBackSuppressedSequenceTablesCommand
     {
-        public AddBackSuppresedSequenceTablesCommand(WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
+        public AddBackSuppressedSequenceTablesCommand(WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
             this.Output = output;
             this.TableDefinitions = tableDefinitions;

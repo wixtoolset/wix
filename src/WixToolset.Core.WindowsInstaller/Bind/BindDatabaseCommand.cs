@@ -354,7 +354,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 modularize.Execute();
 
                 // Ensure all sequence tables in place because, mergemod.dll requires them.
-                var unsuppress = new AddBackSuppresedSequenceTablesCommand(output, tableDefinitions);
+                var unsuppress = new AddBackSuppressedSequenceTablesCommand(output, tableDefinitions);
                 suppressedTableNames = unsuppress.Execute();
             }
             else if (output.Type == OutputType.Patch)
