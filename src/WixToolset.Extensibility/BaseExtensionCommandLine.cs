@@ -9,7 +9,7 @@ namespace WixToolset.Extensibility
 
     public abstract class BaseExtensionCommandLine : IExtensionCommandLine
     {
-        public IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => Enumerable.Empty<ExtensionCommandLineSwitch>();
+        public virtual IEnumerable<ExtensionCommandLineSwitch> CommandLineSwitches => Enumerable.Empty<ExtensionCommandLineSwitch>();
 
         public virtual void PostParse()
         {
@@ -24,7 +24,7 @@ namespace WixToolset.Extensibility
             return false;
         }
 
-        public virtual bool TryParseCommand(ICommandLineParser parser, out ICommandLineCommand command)
+        public virtual bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {
             command = null;
             return false;
