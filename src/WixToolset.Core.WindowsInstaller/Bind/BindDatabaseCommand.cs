@@ -403,13 +403,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             this.ValidateComponentGuids(output);
 
-            // We can create instance transforms since Component Guids and Outputs are created.
-            if (output.Type == OutputType.Product)
-            {
-                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.BackendHelper);
-                command.Execute();
-            }
-
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)
             {
@@ -452,17 +445,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 trackedFiles.AddRange(command.TrackedFiles);
             }
 
-            if (output.Type == OutputType.Patch)
-            {
-                // Copy output data back into the transforms.
-                var command = new UpdateTransformsWithFileFacades(this.Messaging, output, this.SubStorages, tableDefinitions, fileFacades);
-                command.Execute();
-            }
-
             // stop processing if an error previously occurred
             if (this.Messaging.EncounteredError)
             {
                 return null;
+            }
+
+            // We can create instance transforms since Component Guids and Outputs are created.
+            if (output.Type == OutputType.Product)
+            {
+                var command = new CreateInstanceTransformsCommand(section, output, tableDefinitions, this.BackendHelper);
+                command.Execute();
+            }
+            else if (output.Type == OutputType.Patch)
+            {
+                // Copy output data back into the transforms.
+                var command = new UpdateTransformsWithFileFacades(this.Messaging, output, this.SubStorages, tableDefinitions, fileFacades);
+                command.Execute();
             }
 
             // Generate database file.

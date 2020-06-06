@@ -54,35 +54,6 @@ namespace WixToolset.Core.CommandLine
             }
 
             return command;
-            //switch (commandType)
-            //{
-            //case CommandTypes.Build:
-            //{
-            //    var sourceFiles = GatherSourceFiles(files, outputFolder);
-            //    var variables = this.GatherPreprocessorVariables(defines);
-            //    var bindPathList = this.GatherBindPaths(bindPaths);
-            //    var filterCultures = CalculateFilterCultures(cultures);
-            //    var type = CalculateOutputType(outputType, outputFile);
-            //    var platform = CalculatePlatform(platformType);
-            //    return new BuildCommand(this.ServiceProvider, sourceFiles, variables, locFiles, libraryFiles, filterCultures, outputFile, type, platform, cabCachePath, bindFiles, bindPathList, includePaths, intermediateFolder, contentsFile, outputsFile, builtOutputsFile);
-            //}
-
-            //case CommandTypes.Compile:
-            //{
-            //    var sourceFiles = GatherSourceFiles(files, outputFolder);
-            //    var variables = this.GatherPreprocessorVariables(defines);
-            //    var platform = CalculatePlatform(platformType);
-            //    return new CompileCommand(this.ServiceProvider, sourceFiles, variables, platform);
-            //}
-
-            //case CommandTypes.Decompile:
-            //{
-            //    var sourceFiles = GatherSourceFiles(files, outputFolder);
-            //    return new DecompileCommand(this.ServiceProvider, sourceFiles, outputFile);
-            //}
-            //}
-
-            //return null;
         }
 
         private ICommandLineCommand Parse(ICommandLineContext context)
@@ -109,7 +80,7 @@ namespace WixToolset.Core.CommandLine
                 // First argument must be the command or global switch (that creates a command).
                 if (command == null)
                 {
-                    if (!this.TryParseUnknownCommandArg(arg, parser, out command, extensions))
+                    if (!this.TryParseCommand(arg, parser, out command, extensions))
                     {
                         parser.ErrorArgument = arg;
                     }
@@ -121,7 +92,7 @@ namespace WixToolset.Core.CommandLine
                         parser.ErrorArgument = arg;
                     }
                 }
-                else if (!TryParseCommandLineArgumentWithExtension(arg, parser, extensions) && command?.TryParseArgument(parser, arg) == false)
+                else if (!TryParseCommandLineArgumentWithExtension(arg, parser, extensions) && !command.TryParseArgument(parser, arg))
                 {
                     parser.ErrorArgument = arg;
                 }
@@ -135,7 +106,7 @@ namespace WixToolset.Core.CommandLine
             return command ?? new HelpCommand();
         }
         
-        private bool TryParseUnknownCommandArg(string arg, ICommandLineParser parser, out ICommandLineCommand command, IEnumerable<IExtensionCommandLine> extensions)
+        private bool TryParseCommand(string arg, ICommandLineParser parser, out ICommandLineCommand command, IEnumerable<IExtensionCommandLine> extensions)
         {
             command = null;
 
@@ -147,6 +118,7 @@ namespace WixToolset.Core.CommandLine
                 case "?":
                 case "h":
                 case "help":
+                case "-help":
                     command = new HelpCommand();
                     break;
 
@@ -179,7 +151,7 @@ namespace WixToolset.Core.CommandLine
                 {
                     foreach (var extension in extensions)
                     {
-                        if (extension.TryParseCommand(parser, out command))
+                        if (extension.TryParseCommand(parser, arg, out command))
                         {
                             break;
                         }

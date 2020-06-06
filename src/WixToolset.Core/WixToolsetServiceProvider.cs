@@ -96,8 +96,7 @@ namespace WixToolset.Core
             return service != null;
         }
 
-        public bool TryGetService<T>(out T service)
-            where T : class
+        public bool TryGetService<T>(out T service) where T : class
         {
             var success = this.TryGetService(typeof(T), out var untypedService);
             service = (T)untypedService;
@@ -109,8 +108,7 @@ namespace WixToolset.Core
             return this.TryGetService(serviceType, out var service) ? service : throw new ArgumentException($"Unknown service type: {serviceType.Name}", nameof(serviceType));
         }
 
-        public T GetService<T>()
-            where T : class
+        public T GetService<T>() where T : class
         {
             return (T)this.GetService(typeof(T));
         }
@@ -120,14 +118,12 @@ namespace WixToolset.Core
             this.CreationFunctions[serviceType] = creationFunction;
         }
 
-        public void AddService<T>(Func<IWixToolsetCoreServiceProvider, Dictionary<Type, object>, T> creationFunction)
-            where T : class
+        public void AddService<T>(Func<IWixToolsetCoreServiceProvider, Dictionary<Type, object>, T> creationFunction) where T : class
         {
             this.AddService(typeof(T), creationFunction);
         }
 
-        private static T AddSingleton<T>(Dictionary<Type, object> singletons, T service)
-            where T : class
+        private static T AddSingleton<T>(Dictionary<Type, object> singletons, T service) where T : class
         {
             singletons.Add(typeof(T), service);
             return service;

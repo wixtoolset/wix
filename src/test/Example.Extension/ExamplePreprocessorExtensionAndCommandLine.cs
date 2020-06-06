@@ -34,7 +34,7 @@ namespace Example.Extension
             return false;
         }
 
-        public bool TryParseCommand(ICommandLineParser parser, out ICommandLineCommand command)
+        public bool TryParseCommand(ICommandLineParser parser, string argument, out ICommandLineCommand command)
         {
             command = null;
             return false;

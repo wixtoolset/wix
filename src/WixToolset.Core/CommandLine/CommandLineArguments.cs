@@ -12,6 +12,11 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLineArguments : ICommandLineArguments
     {
+        public CommandLineArguments(IWixToolsetServiceProvider serviceProvider)
+        {
+            this.Messaging = serviceProvider.GetService<IMessaging>();
+        }
+
         public string[] OriginalArguments { get; set; }
 
         public string[] Arguments { get; set; }
@@ -20,12 +25,7 @@ namespace WixToolset.Core.CommandLine
 
         public string ErrorArgument { get; set; }
 
-        private IWixToolsetServiceProvider ServiceProvider { get; }
-
-        public CommandLineArguments(IWixToolsetServiceProvider serviceProvider)
-        {
-            this.ServiceProvider = serviceProvider;
-        }
+        private IMessaging Messaging { get; }
 
         public void Populate(string commandLine)
         {
@@ -41,27 +41,25 @@ namespace WixToolset.Core.CommandLine
             this.ProcessArgumentsAndParseExtensions(this.OriginalArguments);
         }
 
-        public ICommandLineParser Parse()
-        {
-            var messaging = this.ServiceProvider.GetService<IMessaging>();
-
-            return new CommandLineParser(messaging, this.Arguments, this.ErrorArgument);
-        }
+        public ICommandLineParser Parse() => new CommandLineParser(this.Messaging, this.Arguments, this.ErrorArgument);
 
         private void FlattenArgumentsWithResponseFilesIntoOriginalArguments(string[] commandLineArguments)
         {
-            List<string> args = new List<string>();
+            var args = new List<string>();
 
             foreach (var arg in commandLineArguments)
             {
-                if ('@' == arg[0])
+                if (arg != null)
                 {
-                    var responseFileArguments = CommandLineArguments.ParseResponseFile(arg.Substring(1));
-                    args.AddRange(responseFileArguments);
-                }
-                else
-                {
-                    args.Add(arg);
+                    if ('@' == arg[0])
+                    {
+                        var responseFileArguments = CommandLineArguments.ParseResponseFile(arg.Substring(1));
+                        args.AddRange(responseFileArguments);
+                    }
+                    else
+                    {
+                        args.Add(arg);
+                    }
                 }
             }
 
@@ -103,7 +101,7 @@ namespace WixToolset.Core.CommandLine
         {
             string arguments;
 
-            using (StreamReader reader = new StreamReader(responseFile))
+            using (var reader = new StreamReader(responseFile))
             {
                 arguments = reader.ReadToEnd();
             }
@@ -131,7 +129,7 @@ namespace WixToolset.Core.CommandLine
             // The current argument string being built; when completed it will be added to the list.
             var arg = new StringBuilder();
 
-            for (int i = 0; i <= arguments.Length; i++)
+            for (var i = 0; i <= arguments.Length; i++)
             {
                 if (i == arguments.Length || (Char.IsWhiteSpace(arguments[i]) && !insideQuote))
                 {
@@ -182,10 +180,10 @@ namespace WixToolset.Core.CommandLine
             var id = Environment.GetEnvironmentVariables();
 
             var regex = new Regex("(?<=\\%)(?:[\\w\\.]+)(?=\\%)");
-            MatchCollection matches = regex.Matches(arguments);
+            var matches = regex.Matches(arguments);
 
-            string value = String.Empty;
-            for (int i = 0; i <= (matches.Count - 1); i++)
+            var value = String.Empty;
+            for (var i = 0; i <= (matches.Count - 1); i++)
             {
                 try
                 {
@@ -204,9 +202,6 @@ namespace WixToolset.Core.CommandLine
             return arguments;
         }
 
-        private static bool IsSwitchAt(string[] args, int index)
-        {
-            return args.Length > index && !String.IsNullOrEmpty(args[index]) && ('/' == args[index][0] || '-' == args[index][0]);
-        }
+        private static bool IsSwitchAt(string[] args, int index) => args.Length > index && !String.IsNullOrEmpty(args[index]) && ('/' == args[index][0] || '-' == args[index][0]);
     }
 }
