@@ -21,10 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\WixToolset.Tools.Core\ConsoleMessageListener.cs" Link="ConsoleMessageListener.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="WixToolset.Converters" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.Burn" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.WindowsInstaller" Version="4.0.*" />
   </ItemGroup>

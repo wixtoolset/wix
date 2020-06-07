@@ -4,6 +4,7 @@ namespace WixToolset.Tools
 {
     using System;
     using System.Runtime.InteropServices;
+    using WixToolset.Converters;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -24,7 +25,8 @@ namespace WixToolset.Tools
         [MTAThread]
         public static int Main(string[] args)
         {
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider()
+                                                                  .AddConverter();
 
             var listener = new ConsoleMessageListener("WIX", "wix.exe");
 
