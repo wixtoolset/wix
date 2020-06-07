@@ -12,11 +12,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="TestData\PermissionEx\v3.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\PermissionEx\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Preprocessor\ConvertedPreprocessor.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Preprocessor\Preprocessor.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Preprocessor\wixcop.settings.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec\v3.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec.bad\v3.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\QtExec.bad\v4_expected.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFile\ConvertedSingleFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\SingleFile\SingleFile.wxs" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.Converters\WixToolset.Converters.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
   </ItemGroup>
 
   <ItemGroup>
