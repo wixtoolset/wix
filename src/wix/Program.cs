@@ -4,6 +4,8 @@ namespace WixToolset.Tools
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Converters;
     using WixToolset.Core;
     using WixToolset.Data;
@@ -23,17 +25,27 @@ namespace WixToolset.Tools
         /// <param name="args">Commandline arguments for the application.</param>
         /// <returns>Returns the application error code.</returns>
         [MTAThread]
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider()
-                                                                  .AddConverter();
-
+            var cts = new CancellationTokenSource();
             var listener = new ConsoleMessageListener("WIX", "wix.exe");
+
+            Console.CancelKeyPress += (s, e) =>
+            {
+                cts.Cancel();
+                e.Cancel = true;
+            };
 
             try
             {
-                var program = new Program();
-                return program.Run(serviceProvider, listener, args);
+                var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider()
+                                                                      .AddConverter();
+
+                return await Run(serviceProvider, listener, args, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                return -1;
             }
             catch (WixException e)
             {
@@ -58,9 +70,11 @@ namespace WixToolset.Tools
         /// Executes the wix command-line interface.
         /// </summary>
         /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
+        /// <param name="listener">Listener to use for the messaging system.</param>
         /// <param name="args">Command-line arguments to execute.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Returns the application error code.</returns>
-        public int Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args)
+        public static Task<int> Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args, CancellationToken cancellationToken)
         {
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
@@ -72,7 +86,7 @@ namespace WixToolset.Tools
             commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
-            return command?.Execute() ?? 1;
+            return command?.ExecuteAsync(cancellationToken) ?? Task.FromResult(1);
         }
 
         private static IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
