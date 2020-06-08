@@ -4,25 +4,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
-    <Description>Core</Description>
-    <Title>WiX Toolset Core</Title>
+    <Description>Extension Cache</Description>
+    <Title>WiX Toolset Extension Cache</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Data" Version="4.0.*" />
-    <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" />
+    <ProjectReference Include="..\WixToolset.Core\WixToolset.Core.csproj" />
   </ItemGroup>
 
-  <!--
-    These package references are duplicated in WixToolset.Core.TestPackage.csproj. If
-    you update these here, be sure to update them there.
-  -->
   <ItemGroup>
-    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.6.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
-    <PackageReference Include="NuGet.Versioning" Version="5.6.0" />
+    <PackageReference Include="NuGet.Credentials" Version="5.6.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.6.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -102,6 +102,48 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact]
+        public void CannotBuildWithMissingExtension()
+        {
+            var folder = TestData.Get(@"TestData\ExampleExtension");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var exception = Assert.Throws<WixException>(() => 
+                    WixRunner.Execute(new[]
+                    {
+                        "build",
+                        Path.Combine(folder, "Package.wxs"),
+                        "-ext", "ExampleExtension.DoesNotExist"
+                    }));
+
+                Assert.StartsWith("The extension 'ExampleExtension.DoesNotExist' could not be found. Checked paths: ", exception.Message);
+            }
+        }
+
+        [Fact]
+        public void CannotBuildWithMissingVersionedExtension()
+        {
+            var folder = TestData.Get(@"TestData\ExampleExtension");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var exception = Assert.Throws<WixException>(() =>
+                    WixRunner.Execute(new[]
+                    {
+                        "build",
+                        Path.Combine(folder, "Package.wxs"),
+                        "-ext", "ExampleExtension.DoesNotExist/1.0.0"
+                    }));
+
+                Assert.StartsWith("The extension 'ExampleExtension.DoesNotExist/1.0.0' could not be found. Checked paths: ", exception.Message);
+            }
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args)

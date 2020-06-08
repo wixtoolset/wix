@@ -28,59 +28,65 @@ namespace WixToolset.Core.ExtensibilityServices
             var types = extensionAssembly.GetTypes().Where(t => !t.IsAbstract && !t.IsInterface && typeof(IExtensionFactory).IsAssignableFrom(t));
             var factories = types.Select(this.CreateExtensionFactory).ToList();
 
-            this.extensionFactories.AddRange(factories);
-        }
-
-        private IExtensionFactory CreateExtensionFactory(Type type)
-        {
-            var constructor = type.GetConstructor(new[] { typeof(IWixToolsetCoreServiceProvider) });
-            if (constructor != null)
+            if (!factories.Any())
             {
-                return (IExtensionFactory)constructor.Invoke(new[] { this.ServiceProvider });
+                var path = Path.GetFullPath(new Uri(extensionAssembly.CodeBase).LocalPath);
+                throw new WixException(ErrorMessages.InvalidExtension(path, "The extension does not implement IExtensionFactory. All extensions must have at least one implementation of IExtensionFactory."));
             }
 
-            return (IExtensionFactory)Activator.CreateInstance(type);
+            this.extensionFactories.AddRange(factories);
         }
 
         public void Load(string extensionPath)
         {
+            var checkPath = extensionPath;
+            var checkedPaths = new List<string> { checkPath };
             try
             {
-                Assembly assembly;
+                if (!TryLoadFromPath(checkPath, out var assembly) && !Path.IsPathRooted(extensionPath))
+                {
+                    if (TryParseExtensionReference(extensionPath, out var extensionId, out var extensionVersion))
+                    {
+                        foreach (var cachePath in this.CacheLocations())
+                        {
+                            var extensionFolder = Path.Combine(cachePath, extensionId);
 
-                // Absolute path to an assembly which means only "load from" will work even though we'd prefer to
-                // use Assembly.Load (see the documentation for Assembly.LoadFrom why).
-                if (Path.IsPathRooted(extensionPath))
-                {
-                    assembly = Assembly.LoadFrom(extensionPath);
+                            var versionFolder = extensionVersion;
+                            if (String.IsNullOrEmpty(versionFolder) && !TryFindLatestVersionInFolder(extensionFolder, out versionFolder))
+                            {
+                                checkedPaths.Add(extensionFolder);
+                                continue;
+                            }
+
+                            checkPath = Path.Combine(extensionFolder, versionFolder, "tools", extensionId + ".dll");
+                            checkedPaths.Add(checkPath);
+
+                            if (TryLoadFromPath(checkPath, out assembly))
+                            {
+                                break;
+                            }
+                        }
+                    }
                 }
-                else if (ExtensionManager.TryExtensionLoad(extensionPath, out assembly))
+
+                if (assembly == null)
                 {
-                    // Loaded the assembly by name from the probing path.
-                }
-                else if (ExtensionManager.TryExtensionLoad(Path.GetFileNameWithoutExtension(extensionPath), out assembly))
-                {
-                    // Loaded the assembly by filename alone along the probing path.
-                }
-                else // relative path to an assembly
-                {
-                    // We want to use Assembly.Load when we can because it has some benefits over Assembly.LoadFrom
-                    // (see the documentation for Assembly.LoadFrom). However, it may fail when the path is a relative
-                    // path, so we should try Assembly.LoadFrom one last time. We could have detected a directory
-                    // separator character and used Assembly.LoadFrom directly, but dealing with path canonicalization
-                    // issues is something we don't want to deal with if we don't have to.
-                    assembly = Assembly.LoadFrom(extensionPath);
+                    throw new WixException(ErrorMessages.CouldNotFindExtensionInPaths(extensionPath, checkedPaths));
                 }
 
                 this.Add(assembly);
             }
             catch (ReflectionTypeLoadException rtle)
             {
-                throw new WixException(ErrorMessages.InvalidExtension(extensionPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))));
+                throw new WixException(ErrorMessages.InvalidExtension(checkPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))));
+            }
+            catch (WixException)
+            {
+                throw;
             }
             catch (Exception e)
             {
-                throw new WixException(ErrorMessages.InvalidExtension(extensionPath, e.Message), e);
+                throw new WixException(ErrorMessages.InvalidExtension(checkPath, e.Message), e);
             }
         }
 
@@ -104,18 +110,120 @@ namespace WixToolset.Core.ExtensibilityServices
             return extensions.Cast<T>().ToList();
         }
 
-        private static bool TryExtensionLoad(string assemblyName, out Assembly assembly)
+        private IExtensionFactory CreateExtensionFactory(Type type)
+        {
+            var constructor = type.GetConstructor(new[] { typeof(IWixToolsetCoreServiceProvider) });
+            if (constructor != null)
+            {
+                return (IExtensionFactory)constructor.Invoke(new[] { this.ServiceProvider });
+            }
+
+            return (IExtensionFactory)Activator.CreateInstance(type);
+        }
+
+        private IEnumerable<string> CacheLocations()
+        {
+            var path = Path.Combine(Environment.CurrentDirectory, @".wix\extensions\");
+            if (Directory.Exists(path))
+            {
+                yield return path;
+            }
+
+            path = Environment.GetEnvironmentVariable("WIX_EXTENSIONS") ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            path = Path.Combine(path, @".wix\extensions\");
+            if (Directory.Exists(path))
+            {
+                yield return path;
+            }
+
+            if (Environment.Is64BitOperatingSystem)
+            {
+                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), @"WixToolset\extensions\");
+                if (Directory.Exists(path))
+                {
+                    yield return path;
+                }
+            }
+
+            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), @"WixToolset\extensions\");
+            if (Directory.Exists(path))
+            {
+                yield return path;
+            }
+
+            path = Path.Combine(Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath), @"extensions\");
+            if (Directory.Exists(path))
+            {
+                yield return path;
+            }
+        }
+
+        private static bool TryParseExtensionReference(string extensionReference, out string extensionId, out string extensionVersion)
+        {
+            extensionId = extensionReference ?? String.Empty;
+            extensionVersion = String.Empty;
+
+            var index = extensionId.LastIndexOf('/');
+            if (index > 0)
+            {
+                extensionVersion = extensionReference.Substring(index + 1);
+                extensionId = extensionReference.Substring(0, index);
+
+                if (!NuGet.Versioning.NuGetVersion.TryParse(extensionVersion, out _))
+                {
+                    return false;
+                }
+
+                if (String.IsNullOrEmpty(extensionId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool TryFindLatestVersionInFolder(string basePath, out string foundVersionFolder)
+        {
+            foundVersionFolder = null;
+
+            try
+            {
+                NuGet.Versioning.NuGetVersion version = null;
+                foreach (var versionPath in Directory.GetDirectories(basePath))
+                {
+                    var versionFolder = Path.GetFileName(versionPath);
+                    if (NuGet.Versioning.NuGetVersion.TryParse(versionFolder, out var checkVersion) &&
+                        (version == null || version < checkVersion))
+                    {
+                        foundVersionFolder = versionFolder;
+                        version = checkVersion;
+                    }
+                }
+            }
+            catch (IOException)
+            {
+            }
+
+            return !String.IsNullOrEmpty(foundVersionFolder);
+        }
+
+        private static bool TryLoadFromPath(string extensionPath, out Assembly assembly)
         {
             try
             {
-                assembly = Assembly.Load(assemblyName);
-                return true;
+                if (File.Exists(extensionPath))
+                {
+                    assembly = Assembly.LoadFrom(extensionPath);
+                    return true;
+                }
             }
             catch (IOException e) when (e is FileLoadException || e is FileNotFoundException)
             {
-                  assembly = null;
-                  return false;
             }
+
+            assembly = null;
+            return false;
         }
     }
 }
