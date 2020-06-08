@@ -2,8 +2,8 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -26,5 +26,7 @@ namespace WixToolset.Extensibility.Data
         IDictionary<string, string> Variables { get; set; }
 
         SourceLineNumber CurrentSourceLineNumber { get; set; }
+
+        CancellationToken CancellationToken { get; set; }
     }
 }

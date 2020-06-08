@@ -2,8 +2,8 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
@@ -25,5 +25,7 @@ namespace WixToolset.Extensibility.Data
         Platform Platform { get; set; }
 
         XDocument Source { get; set; }
+
+        CancellationToken CancellationToken { get; set; }
     }
 }

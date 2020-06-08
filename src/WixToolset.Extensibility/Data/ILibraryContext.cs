@@ -2,8 +2,8 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -22,5 +22,7 @@ namespace WixToolset.Extensibility.Data
         IEnumerable<Localization> Localizations { get; set; }
 
         IEnumerable<Intermediate> Intermediates { get; set; }
+
+        CancellationToken CancellationToken { get; set; }
     }
 }

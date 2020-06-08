@@ -2,8 +2,8 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -44,5 +44,7 @@ namespace WixToolset.Extensibility.Data
         bool SuppressValidation { get; set; }
 
         bool SuppressLayout { get; set; }
+
+        CancellationToken CancellationToken { get; set; }
     }
 }

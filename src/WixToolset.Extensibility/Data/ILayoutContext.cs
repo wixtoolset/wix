@@ -2,8 +2,8 @@
 
 namespace WixToolset.Extensibility.Data
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using WixToolset.Extensibility.Services;
 
     public interface ILayoutContext
@@ -25,5 +25,7 @@ namespace WixToolset.Extensibility.Data
         string BuiltOutputsFile { get; set; }
 
         bool SuppressAclReset { get; set; }
+
+        CancellationToken CancellationToken { get; set; }
     }
 }
