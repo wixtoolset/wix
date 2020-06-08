@@ -158,7 +158,7 @@ namespace WixToolsetTest.Converters
                     targetFile
                 }, serviceProvider, out var messages);
 
-            return new WixRunnerResult { ExitCode = exitCode, Messages = messages.ToArray() };
+            return new WixRunnerResult { ExitCode = exitCode.Result, Messages = messages.ToArray() };
         }
 
         private static void EnsureFixed(string targetFile)

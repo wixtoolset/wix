@@ -5,6 +5,8 @@ namespace WixToolset.Converters
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Xml;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -110,12 +112,12 @@ namespace WixToolset.Converters
             }
         }
 
-        public int Execute()
+        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (this.ShowHelp)
             {
                 DisplayHelp();
-                return 1;
+                return Task.FromResult(1);
             }
 
             // parse the settings if any were specified
@@ -133,7 +135,7 @@ namespace WixToolset.Converters
 
             var converter = new Wix3Converter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
 
-            var errors = this.InspectSubDirectories(converter, Path.GetFullPath("."));
+            var errors = this.InspectSubDirectories(converter, Path.GetFullPath("."), cancellationToken);
 
             foreach (var searchPattern in this.SearchPatterns)
             {
@@ -144,7 +146,7 @@ namespace WixToolset.Converters
                 }
             }
 
-            return errors != 0 ? 2 : 0;
+            return Task.FromResult(errors != 0 ? 2 : 0);
         }
 
         private static void DisplayHelp()
@@ -202,7 +204,7 @@ namespace WixToolset.Converters
         /// </summary>
         /// <param name="directory">The directory whose sub-directories will be inspected.</param>
         /// <returns>The number of errors that were found.</returns>
-        private int InspectSubDirectories(Wix3Converter converter, string directory)
+        private int InspectSubDirectories(Wix3Converter converter, string directory, CancellationToken cancellationToken)
         {
             var errors = 0;
 
@@ -210,6 +212,8 @@ namespace WixToolset.Converters
             {
                 foreach (var sourceFilePath in GetFiles(directory, searchPattern))
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     var file = new FileInfo(sourceFilePath);
 
                     if (!this.ExemptFiles.Contains(file.Name.ToUpperInvariant()))
@@ -224,7 +228,7 @@ namespace WixToolset.Converters
             {
                 foreach (var childDirectoryPath in Directory.GetDirectories(directory))
                 {
-                    errors += this.InspectSubDirectories(converter, childDirectoryPath);
+                    errors += this.InspectSubDirectories(converter, childDirectoryPath, cancellationToken);
                 }
             }
 
