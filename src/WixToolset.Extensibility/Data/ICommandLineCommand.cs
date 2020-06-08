@@ -2,6 +2,8 @@
 
 namespace WixToolset.Extensibility.Data
 {
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -22,8 +24,9 @@ namespace WixToolset.Extensibility.Data
         /// <summary>
         /// Executes the command.
         /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Exit code for the command.</returns>
-        int Execute();
+        Task<int> ExecuteAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Allows the command to parse command-line arguments.
