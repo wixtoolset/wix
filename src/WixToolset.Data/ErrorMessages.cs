@@ -1239,6 +1239,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.InvalidEmbeddedUIFileName, "The EmbeddedUI/@Name attribute value, '{0}', does not contain an extension. Windows Installer will not load an embedded UI DLL without an extension. Include an extension or just omit the Name attribute so it defaults to the file name portion of the Source attribute value.", codepage);
         }
 
+        public static Message CouldNotFindExtensionInPaths(string extensionPath, IEnumerable<string> checkedPaths)
+        {
+            return Message(null, Ids.InvalidExtension, "The extension '{0}' could not be found. Checked paths: {1}", extensionPath, String.Join(", ", checkedPaths));
+        }
+
         public static Message InvalidExtension(string extension)
         {
             return Message(null, Ids.InvalidExtension, "The extension '{0}' could not be loaded.", extension);
