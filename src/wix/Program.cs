@@ -8,6 +8,7 @@ namespace WixToolset.Tools
     using System.Threading.Tasks;
     using WixToolset.Converters;
     using WixToolset.Core;
+    using WixToolset.Core.ExtensionCache;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -39,6 +40,7 @@ namespace WixToolset.Tools
             try
             {
                 var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider()
+                                                                      .AddExtensionCacheManager()
                                                                       .AddConverter();
 
                 return await Run(serviceProvider, listener, args, cts.Token);
