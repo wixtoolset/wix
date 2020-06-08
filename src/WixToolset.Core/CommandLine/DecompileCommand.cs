@@ -4,6 +4,8 @@ namespace WixToolset.Core.CommandLine
 {
     using System;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -29,12 +31,12 @@ namespace WixToolset.Core.CommandLine
 
         public IMessaging Messaging { get; }
 
-        public int Execute()
+        public Task<int> ExecuteAsync(CancellationToken _)
         {
             if (this.commandLine.ShowHelp)
             {
                 Console.WriteLine("TODO: Show decompile command help");
-                return -1;
+                return Task.FromResult(-1);
             }
 
             var context = this.ServiceProvider.GetService<IDecompileContext>();
@@ -61,10 +63,10 @@ namespace WixToolset.Core.CommandLine
 
             if (this.Messaging.EncounteredError)
             {
-                return 1;
+                return Task.FromResult(1);
             }
 
-            return 0;
+            return Task.FromResult(0);
         }
 
         public bool TryParseArgument(ICommandLineParser parser, string argument)

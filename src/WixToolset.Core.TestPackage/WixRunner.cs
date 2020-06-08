@@ -4,6 +4,8 @@ namespace WixToolset.Core.TestPackage
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -13,17 +15,18 @@ namespace WixToolset.Core.TestPackage
         public static int Execute(string[] args, out List<Message> messages)
         {
             var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
-            return Execute(args, serviceProvider, out messages);
+            var task = Execute(args, serviceProvider, out messages);
+            return task.Result;
         }
 
         public static WixRunnerResult Execute(params string[] args)
         {
             var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var exitCode = Execute(args, serviceProvider, out var messages);
-            return new WixRunnerResult { ExitCode = exitCode, Messages = messages.ToArray() };
+            return new WixRunnerResult { ExitCode = exitCode.Result, Messages = messages.ToArray() };
         }
 
-        public static int Execute(string[] args, IWixToolsetServiceProvider serviceProvider, out List<Message> messages)
+        public static Task<int> Execute(string[] args, IWixToolsetServiceProvider serviceProvider, out List<Message> messages)
         {
             var listener = new TestMessageListener();
 
@@ -39,7 +42,7 @@ namespace WixToolset.Core.TestPackage
             commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
-            return command?.Execute() ?? 1;
+            return command?.ExecuteAsync(CancellationToken.None) ?? Task.FromResult(1);
         }
 
         private static IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, string[] extensions)

@@ -6,6 +6,8 @@ namespace WixToolset.Core.CommandLine
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -54,12 +56,12 @@ namespace WixToolset.Core.CommandLine
 
         private string BuiltOutputsFile { get; set; }
 
-        public int Execute()
+        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             if (this.commandLine.ShowHelp)
             {
                 Console.WriteLine("TODO: Show build command help");
-                return -1;
+                return Task.FromResult(-1);
             }
 
             this.IntermediateFolder = this.commandLine.CalculateIntermedateFolder();
@@ -107,23 +109,23 @@ namespace WixToolset.Core.CommandLine
 
             if (this.Messaging.EncounteredError)
             {
-                return this.Messaging.LastErrorNumber;
+                return Task.FromResult(this.Messaging.LastErrorNumber);
             }
 
-            var wixobjs = this.CompilePhase(preprocessorVariables, codeFiles);
+            var wixobjs = this.CompilePhase(preprocessorVariables, codeFiles, cancellationToken);
 
-            var wxls = this.LoadLocalizationFiles(this.commandLine.LocalizationFilePaths, preprocessorVariables);
+            var wxls = this.LoadLocalizationFiles(this.commandLine.LocalizationFilePaths, preprocessorVariables, cancellationToken);
 
             if (this.Messaging.EncounteredError)
             {
-                return this.Messaging.LastErrorNumber;
+                return Task.FromResult(this.Messaging.LastErrorNumber);
             }
 
             if (this.OutputType == OutputType.Library)
             {
                 using (new IntermediateFieldContext("wix.lib"))
                 {
-                    var wixlib = this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths);
+                    var wixlib = this.LibraryPhase(wixobjs, wxls, this.commandLine.BindFiles, this.commandLine.BindPaths, cancellationToken);
 
                     if (!this.Messaging.EncounteredError)
                     {
@@ -137,7 +139,7 @@ namespace WixToolset.Core.CommandLine
                 {
                     if (wixipl == null)
                     {
-                        wixipl = this.LinkPhase(wixobjs, this.commandLine.LibraryFilePaths, creator);
+                        wixipl = this.LinkPhase(wixobjs, this.commandLine.LibraryFilePaths, creator, cancellationToken);
                     }
 
                     if (!this.Messaging.EncounteredError)
@@ -157,14 +159,14 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.BindPaths, cancellationToken);
                             }
                         }
                     }
                 }
             }
 
-            return this.Messaging.LastErrorNumber;
+            return Task.FromResult(this.Messaging.LastErrorNumber);
         }
 
         public bool TryParseArgument(ICommandLineParser parser, string argument)
@@ -210,13 +212,13 @@ namespace WixToolset.Core.CommandLine
             }
         }
 
-        private IEnumerable<Intermediate> CompilePhase(IDictionary<string, string> preprocessorVariables, IEnumerable<SourceFile> sourceFiles)
+        private IEnumerable<Intermediate> CompilePhase(IDictionary<string, string> preprocessorVariables, IEnumerable<SourceFile> sourceFiles, CancellationToken cancellationToken)
         {
             var intermediates = new List<Intermediate>();
 
             foreach (var sourceFile in sourceFiles)
             {
-                var document = this.Preprocess(preprocessorVariables, sourceFile.SourcePath);
+                var document = this.Preprocess(preprocessorVariables, sourceFile.SourcePath, cancellationToken);
 
                 if (this.Messaging.EncounteredError)
                 {
@@ -228,6 +230,7 @@ namespace WixToolset.Core.CommandLine
                 context.OutputPath = sourceFile.OutputPath;
                 context.Platform = this.Platform;
                 context.Source = document;
+                context.CancellationToken = cancellationToken;
 
                 Intermediate intermediate = null;
                 try
@@ -251,7 +254,7 @@ namespace WixToolset.Core.CommandLine
             return intermediates;
         }
 
-        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations, bool bindFiles, IEnumerable<IBindPath> bindPaths)
+        private Intermediate LibraryPhase(IEnumerable<Intermediate> intermediates, IEnumerable<Localization> localizations, bool bindFiles, IEnumerable<IBindPath> bindPaths, CancellationToken cancellationToken)
         {
             var context = this.ServiceProvider.GetService<ILibraryContext>();
             context.BindFiles = bindFiles;
@@ -259,6 +262,7 @@ namespace WixToolset.Core.CommandLine
             context.Extensions = this.ExtensionManager.GetServices<ILibrarianExtension>();
             context.Localizations = localizations;
             context.Intermediates = intermediates;
+            context.CancellationToken = cancellationToken;
 
             Intermediate library = null;
             try
@@ -274,7 +278,7 @@ namespace WixToolset.Core.CommandLine
             return library;
         }
 
-        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, IEnumerable<string> libraryFiles, ITupleDefinitionCreator creator)
+        private Intermediate LinkPhase(IEnumerable<Intermediate> intermediates, IEnumerable<string> libraryFiles, ITupleDefinitionCreator creator, CancellationToken cancellationToken)
         {
             var libraries = this.LoadLibraries(libraryFiles, creator);
 
@@ -289,12 +293,13 @@ namespace WixToolset.Core.CommandLine
             context.ExpectedOutputType = this.OutputType;
             context.Intermediates = intermediates.Concat(libraries).ToList();
             context.TupleDefinitionCreator = creator;
+            context.CancellationToken = cancellationToken;
 
             var linker = this.ServiceProvider.GetService<ILinker>();
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<IBindPath> bindPaths)
+        private void BindPhase(Intermediate output, IEnumerable<Localization> localizations, IEnumerable<string> filterCultures, string cabCachePath, IEnumerable<IBindPath> bindPaths, CancellationToken cancellationToken)
         {
             var intermediateFolder = this.IntermediateFolder;
             if (String.IsNullOrEmpty(intermediateFolder))
@@ -312,6 +317,7 @@ namespace WixToolset.Core.CommandLine
                 context.IntermediateFolder = intermediateFolder;
                 context.IntermediateRepresentation = output;
                 context.Localizations = localizations;
+                context.CancellationToken = cancellationToken;
 
                 var resolver = this.ServiceProvider.GetService<IResolver>();
                 resolveResult = resolver.Resolve(context);
@@ -343,6 +349,7 @@ namespace WixToolset.Core.CommandLine
                     context.PdbPath = this.PdbType == PdbType.None ? null : this.PdbFile ?? Path.ChangeExtension(this.OutputFile, ".wixpdb");
                     context.SuppressIces = Array.Empty<string>(); // TODO: set this correctly
                     context.SuppressValidation = true; // TODO: set this correctly
+                    context.CancellationToken = cancellationToken;
 
                     var binder = this.ServiceProvider.GetService<IBinder>();
                     bindResult = binder.Bind(context);
@@ -363,6 +370,7 @@ namespace WixToolset.Core.CommandLine
                     context.OutputsFile = this.OutputsFile;
                     context.BuiltOutputsFile = this.BuiltOutputsFile;
                     context.SuppressAclReset = false; // TODO: correctly set SuppressAclReset
+                    context.CancellationToken = cancellationToken;
 
                     var layout = this.ServiceProvider.GetService<ILayoutCreator>();
                     layout.Layout(context);
@@ -392,14 +400,14 @@ namespace WixToolset.Core.CommandLine
             return Array.Empty<Intermediate>();
         }
 
-        private IEnumerable<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables)
+        private IEnumerable<Localization> LoadLocalizationFiles(IEnumerable<string> locFiles, IDictionary<string, string> preprocessorVariables, CancellationToken cancellationToken)
         {
             var localizations = new List<Localization>();
             var parser = this.ServiceProvider.GetService<ILocalizationParser>();
 
             foreach (var loc in locFiles)
             {
-                var document = this.Preprocess(preprocessorVariables, loc);
+                var document = this.Preprocess(preprocessorVariables, loc, cancellationToken);
 
                 if (this.Messaging.EncounteredError)
                 {
@@ -413,7 +421,7 @@ namespace WixToolset.Core.CommandLine
             return localizations;
         }
 
-        private XDocument Preprocess(IDictionary<string, string> preprocessorVariables, string sourcePath)
+        private XDocument Preprocess(IDictionary<string, string> preprocessorVariables, string sourcePath, CancellationToken cancellationToken)
         {
             var context = this.ServiceProvider.GetService<IPreprocessContext>();
             context.Extensions = this.ExtensionManager.GetServices<IPreprocessorExtension>();
@@ -421,6 +429,7 @@ namespace WixToolset.Core.CommandLine
             context.IncludeSearchPaths = this.IncludeSearchPaths;
             context.SourcePath = sourcePath;
             context.Variables = preprocessorVariables;
+            context.CancellationToken = cancellationToken;
 
             IPreprocessResult result = null;
             try

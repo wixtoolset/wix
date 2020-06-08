@@ -2,8 +2,8 @@
 
 namespace WixToolset.Core
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -34,5 +34,7 @@ namespace WixToolset.Core
         public string BuiltOutputsFile { get; set; }
 
         public bool SuppressAclReset { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }

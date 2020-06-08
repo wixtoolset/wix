@@ -3,6 +3,8 @@
 namespace WixToolset.Core.CommandLine
 {
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -12,12 +14,12 @@ namespace WixToolset.Core.CommandLine
 
         public bool StopParsing => true;
 
-        public int Execute()
+        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             Console.WriteLine("wix version {0}", ThisAssembly.AssemblyInformationalVersion);
             Console.WriteLine();
 
-            return 0;
+            return Task.FromResult(0);
         }
 
         public bool TryParseArgument(ICommandLineParser parseHelper, string argument) => true; // eat any arguments

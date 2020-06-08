@@ -4,7 +4,8 @@ namespace WixToolset.Core.CommandLine
 {
     using System;
     using System.Collections.Generic;
-    using System.Xml.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -47,12 +48,9 @@ namespace WixToolset.Core.CommandLine
 
         public bool StopParsing => throw new NotImplementedException();
 
-        public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
-        {
-            throw new NotImplementedException();
-        }
+        public bool TryParseArgument(ICommandLineParser parseHelper, string argument) => throw new NotImplementedException();
 
-        public int Execute()
+        public Task<int> ExecuteAsync(CancellationToken _)
         {
             foreach (var sourceFile in this.SourceFiles)
             {
@@ -91,7 +89,7 @@ namespace WixToolset.Core.CommandLine
                 intermediate.Save(sourceFile.OutputPath);
             }
 
-            return 0;
+            return Task.FromResult(0);
         }
     }
 }

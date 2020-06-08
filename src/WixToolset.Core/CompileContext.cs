@@ -2,8 +2,8 @@
 
 namespace WixToolset.Core
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -28,5 +28,7 @@ namespace WixToolset.Core
         public Platform Platform { get; set; }
 
         public XDocument Source { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }

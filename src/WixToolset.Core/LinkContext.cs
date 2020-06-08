@@ -2,8 +2,8 @@
 
 namespace WixToolset.Core
 {
-    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -27,5 +27,7 @@ namespace WixToolset.Core
         public IEnumerable<Intermediate> Intermediates { get; set; }
 
         public ITupleDefinitionCreator TupleDefinitionCreator { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }

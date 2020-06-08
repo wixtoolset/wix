@@ -1,8 +1,10 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 namespace WixToolset.Core.CommandLine
 {
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -12,11 +14,11 @@ namespace WixToolset.Core.CommandLine
 
         public bool StopParsing => true;
 
-        public int Execute()
+        public Task<int> ExecuteAsync(CancellationToken _)
         {
             Console.WriteLine("TODO: Show list of available commands");
 
-            return -1;
+            return Task.FromResult(-1);
         }
 
         public bool TryParseArgument(ICommandLineParser parseHelper, string argument)
