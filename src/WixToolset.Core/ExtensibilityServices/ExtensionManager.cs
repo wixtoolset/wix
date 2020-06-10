@@ -123,14 +123,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
         private IEnumerable<string> CacheLocations()
         {
-            var path = Path.Combine(Environment.CurrentDirectory, @".wix\extensions\");
+            var path = Path.Combine(Environment.CurrentDirectory, ".wix", "extensions");
             if (Directory.Exists(path))
             {
                 yield return path;
             }
 
             path = Environment.GetEnvironmentVariable("WIX_EXTENSIONS") ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            path = Path.Combine(path, @".wix\extensions\");
+            path = Path.Combine(path, ".wix", "extensions");
             if (Directory.Exists(path))
             {
                 yield return path;

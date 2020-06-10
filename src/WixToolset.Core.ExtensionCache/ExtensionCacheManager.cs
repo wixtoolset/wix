@@ -19,16 +19,16 @@ namespace WixToolset.Core.ExtensionCache
     /// <summary>
     /// Extension cache manager.
     /// </summary>
-    public class ExtensionCacheManager
+    internal class ExtensionCacheManager
     {
         public string CacheFolder(bool global) => global ? this.GlobalCacheFolder() : this.LocalCacheFolder();
 
-        public string LocalCacheFolder() => Path.Combine(Environment.CurrentDirectory, @".wix\extensions\");
+        public string LocalCacheFolder() => Path.Combine(Environment.CurrentDirectory, ".wix", "extensions");
 
         public string GlobalCacheFolder()
         {
             var baseFolder = Environment.GetEnvironmentVariable("WIX_EXTENSIONS") ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return Path.Combine(baseFolder, @".wix\extensions\");
+            return Path.Combine(baseFolder, ".wix", "extensions");
         }
 
         public async Task<bool> AddAsync(bool global, string extension, CancellationToken cancellationToken)
@@ -84,12 +84,8 @@ namespace WixToolset.Core.ExtensionCache
             }
             else if (!String.IsNullOrEmpty(extensionVersion)) // looking for an explicit version of an extension.
             {
-                var extensionFolder = Path.Combine(cacheFolder, extensionId, extensionVersion);
-                if (Directory.Exists(extensionFolder))
-                {
-                    var present = ExtensionFileExists(cacheFolder, extensionId, extensionVersion);
-                    found.Add(new CachedExtension(extensionId, extensionVersion, !present));
-                }
+                var present = ExtensionFileExists(cacheFolder, extensionId, extensionVersion);
+                found.Add(new CachedExtension(extensionId, extensionVersion, !present));
             }
             else // looking for all versions of an extension or all versions of all extensions.
             {

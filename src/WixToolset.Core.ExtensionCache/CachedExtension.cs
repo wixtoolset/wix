@@ -2,9 +2,9 @@
 
 namespace WixToolset.Core.ExtensionCache
 {
-    public class CachedExtension
+    internal class CachedExtension
     {
-        internal CachedExtension(string id, string version, bool damaged)
+        public CachedExtension(string id, string version, bool damaged)
         {
             this.Id = id;
             this.Version = version;

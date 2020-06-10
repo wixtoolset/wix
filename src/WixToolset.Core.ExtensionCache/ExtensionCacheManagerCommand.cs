@@ -116,7 +116,7 @@ namespace WixToolset.Core.ExtensionCache
 
         private async Task<bool> AddExtensions(ExtensionCacheManager cacheManager, CancellationToken cancellationToken)
         {
-            var success = true;
+            var success = false;
 
             foreach (var extensionRef in this.ExtensionReferences)
             {
@@ -129,7 +129,7 @@ namespace WixToolset.Core.ExtensionCache
 
         private async Task<bool> RemoveExtensions(ExtensionCacheManager cacheManager, CancellationToken cancellationToken)
         {
-            var success = true;
+            var success = false;
 
             foreach (var extensionRef in this.ExtensionReferences)
             {
