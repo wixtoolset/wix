@@ -52,11 +52,11 @@ namespace WixToolset.Data.Tuples
     [Flags]
     public enum WixCustomTableColumnTupleAttributes
     {
-        None,
-        PrimaryKey,
-        Localizable,
-        Nullable,
-        Unreal,
+        None = 0x0,
+        PrimaryKey = 0x1,
+        Localizable = 0x2,
+        Nullable = 0x4,
+        Unreal = 0x8,
     }
 
     public enum WixCustomTableColumnModularizeType

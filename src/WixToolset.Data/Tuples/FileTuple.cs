@@ -78,7 +78,7 @@ namespace WixToolset.Data.Tuples
     [Flags]
     public enum FileTupleAttributes : int
     {
-        None,
+        None = 0x0,
         ReadOnly = 0x1,
         Hidden = 0x2,
         System = 0x4,

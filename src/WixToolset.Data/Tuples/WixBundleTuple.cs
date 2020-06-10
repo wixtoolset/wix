@@ -70,11 +70,11 @@ namespace WixToolset.Data.Tuples
     [Flags]
     public enum WixBundleAttributes
     {
-        None,
-        DisableModify,
-        DisableRemove,
-        SingleChangeUninstallButton,
-        PerMachine,
+        None = 0x0,
+        DisableModify = 0x1,
+        DisableRemove = 0x2,
+        SingleChangeUninstallButton = 0x4,
+        PerMachine = 0x8,
     }
 
     public class WixBundleTuple : IntermediateTuple

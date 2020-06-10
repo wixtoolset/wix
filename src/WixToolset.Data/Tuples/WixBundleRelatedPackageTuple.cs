@@ -38,7 +38,7 @@ namespace WixToolset.Data.Tuples
     [Flags]
     public enum WixBundleRelatedPackageAttributes
     {
-        None,
+        None = 0x0,
         OnlyDetect = 0x1,
         MinInclusive = 0x2,
         MaxInclusive = 0x4,
