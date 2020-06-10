@@ -201,11 +201,29 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddWixEnsureTableTuple((WixEnsureTableTuple)tuple);
                         break;
 
-                    // ignored.
+                    // Tuples used internally and are not added to the output.
                     case TupleDefinitionType.WixComponentGroup:
+                    case TupleDefinitionType.WixComplexReference:
                     case TupleDefinitionType.WixDeltaPatchFile:
+                    case TupleDefinitionType.WixDeltaPatchSymbolPaths:
+                    case TupleDefinitionType.WixFragment:
                     case TupleDefinitionType.WixFeatureGroup:
+                    case TupleDefinitionType.WixInstanceComponent:
+                    case TupleDefinitionType.WixInstanceTransforms:
+                    case TupleDefinitionType.WixFeatureModules:
+                    case TupleDefinitionType.WixMerge:
+                    case TupleDefinitionType.WixOrdering:
                     case TupleDefinitionType.WixPatchBaseline:
+                    case TupleDefinitionType.WixPatchFamilyGroup:
+                    case TupleDefinitionType.WixPatchId:
+                    case TupleDefinitionType.WixPatchRef:
+                    case TupleDefinitionType.WixPatchTarget:
+                    case TupleDefinitionType.WixProperty:
+                    case TupleDefinitionType.WixSimpleReference:
+                    case TupleDefinitionType.WixSuppressAction:
+                    case TupleDefinitionType.WixSuppressModularization:
+                    case TupleDefinitionType.WixUI:
+                    case TupleDefinitionType.WixVariable:
                         break;
 
                     // Already processed by LoadTableDefinitions.
