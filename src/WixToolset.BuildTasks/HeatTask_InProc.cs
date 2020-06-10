@@ -3,6 +3,9 @@
 #if !NETCOREAPP
 namespace WixToolset.BuildTasks
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -12,18 +15,7 @@ namespace WixToolset.BuildTasks
     {
         protected sealed override string TaskShortName => "HEAT";
 
-        protected sealed override int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
-        {
-            var messaging = serviceProvider.GetService<IMessaging>();
-            messaging.SetListener(listener);
-
-            var arguments = serviceProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(commandLineString);
-
-            var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider, true);
-            var command = commandLine.ParseStandardCommandLine(arguments);
-            return command?.Execute() ?? -1;
-        }
+        protected sealed override Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider serviceProvider, string commandLineString, CancellationToken cancellationToken) => throw new NotImplementedException();
     }
 }
 #endif

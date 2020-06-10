@@ -3,6 +3,8 @@
 #if !NETCOREAPP
 namespace WixToolset.BuildTasks
 {
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -12,10 +14,9 @@ namespace WixToolset.BuildTasks
     {
         protected override string TaskShortName => "WIX";
 
-        protected override int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string commandLineString)
+        protected override Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider serviceProvider, string commandLineString, CancellationToken cancellationToken)
         {
             var messaging = serviceProvider.GetService<IMessaging>();
-            messaging.SetListener(listener);
 
             var arguments = serviceProvider.GetService<ICommandLineArguments>();
             arguments.Populate(commandLineString);
@@ -24,7 +25,7 @@ namespace WixToolset.BuildTasks
             commandLine.ExtensionManager = this.CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
             commandLine.Arguments = arguments;
             var command = commandLine.ParseStandardCommandLine();
-            return command?.Execute() ?? -1;
+            return command?.ExecuteAsync(cancellationToken) ?? Task.FromResult(1);
         }
 
         private IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)

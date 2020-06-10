@@ -5,6 +5,8 @@ namespace WixToolset.BuildTasks
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.Build.Framework;
     using WixToolset.Core;
     using WixToolset.Data;
@@ -27,13 +29,17 @@ namespace WixToolset.BuildTasks
         {
             this.Log.LogMessage(MessageImportance.Normal, $"({this.ToolName}){commandLineString}");
 
-            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var listener = new MsbuildMessageListener(this.Log, this.TaskShortName, this.BuildEngine.ProjectFileOfTaskNode);
-            int exitCode = -1;
+            var exitCode = -1;
 
             try
             {
-                exitCode = this.ExecuteCore(serviceProvider, listener, commandLineString);
+                var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+
+                var messaging = serviceProvider.GetService<IMessaging>();
+                messaging.SetListener(listener);
+
+                exitCode = this.ExecuteCoreAsync(serviceProvider, commandLineString, CancellationToken.None).GetAwaiter().GetResult();
             }
             catch (WixException e)
             {
@@ -65,7 +71,7 @@ namespace WixToolset.BuildTasks
             }
         }
 
-        protected abstract int ExecuteCore(IWixToolsetServiceProvider serviceProvider, IMessageListener messageListener, string commandLineString);
+        protected abstract Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider serviceProvider, string commandLineString, CancellationToken cancellationToken);
 
         protected abstract string TaskShortName { get; }
     }

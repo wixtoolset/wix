@@ -33,7 +33,7 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem, true);
                 Assert.Single(heatCommandLines);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));
@@ -89,7 +89,7 @@ namespace WixToolsetTest.MSBuild
                 var result = MsbuildUtilities.BuildProject(buildSystem, projectPath);
                 result.AssertSuccess();
 
-                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
+                var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem, true);
                 Assert.Equal(2, heatCommandLines.Count());
 
                 var warnings = result.Output.Where(line => line.Contains(": warning"));

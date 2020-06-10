@@ -4,6 +4,8 @@ namespace WixToolset.Tools.Heat
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
     using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
@@ -23,7 +25,7 @@ namespace WixToolset.Tools.Heat
         /// <param name="args">Commandline arguments for the application.</param>
         /// <returns>Returns the application error code.</returns>
         [MTAThread]
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var listener = new ConsoleMessageListener("HEAT", "heat.exe");
@@ -31,7 +33,7 @@ namespace WixToolset.Tools.Heat
             try
             {
                 var program = new Program();
-                return program.Run(serviceProvider, listener, args);
+                return await program.Run(serviceProvider, listener, args);
             }
             catch (WixException e)
             {
@@ -58,7 +60,7 @@ namespace WixToolset.Tools.Heat
         /// <param name="serviceProvider">Service provider to use throughout this execution.</param>
         /// <param name="args">The commandline arguments.</param>
         /// <returns>Returns the application error code.</returns>
-        public int Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args)
+        public Task<int> Run(IWixToolsetServiceProvider serviceProvider, IMessageListener listener, string[] args)
         {
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
@@ -68,7 +70,7 @@ namespace WixToolset.Tools.Heat
 
             var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider);
             var command = commandLine.ParseStandardCommandLine(arguments);
-            return command?.Execute() ?? 1;
+            return command?.ExecuteAsync(CancellationToken.None) ?? Task.FromResult(1);
         }
     }
 }

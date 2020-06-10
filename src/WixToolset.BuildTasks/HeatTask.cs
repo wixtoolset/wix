@@ -17,6 +17,11 @@ namespace WixToolset.BuildTasks
         private bool suppressUniqueIds;
         private string[] transforms;
 
+        public HeatTask()
+        {
+            this.RunAsSeparateProcess = true;
+        }
+
         public bool AutogenerateGuids
         {
             get { return this.autogenerageGuids; }

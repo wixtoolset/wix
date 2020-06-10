@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\WixToolset.Tools.Core\ConsoleMessageListener.cs" Link="ConsoleMessageListener.cs" />
+    <Compile Include="..\wix\ConsoleMessageListener.cs" Link="ConsoleMessageListener.cs" />
   </ItemGroup>
 
   <ItemGroup>
