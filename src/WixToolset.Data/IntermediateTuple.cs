@@ -165,7 +165,12 @@ namespace WixToolset.Data
             var id = (idJson == null) ? null : Identifier.Deserialize(idJson);
             var sourceLineNumbers = (sourceLineNumbersJson == null) ? null : SourceLineNumber.Deserialize(sourceLineNumbersJson);
 
-            creator.TryGetTupleDefinitionByName(definitionName, out var definition); // TODO: this isn't sufficient.
+            // TODO: this isn't sufficient.
+            if (!creator.TryGetTupleDefinitionByName(definitionName, out var definition))
+            {
+                throw new WixException(ErrorMessages.UnknownSymbolType(definitionName));
+            }
+
             var tuple = definition.CreateTuple(sourceLineNumbers, id);
 
             for (var i = 0; i < fieldsJson.Count && i < tuple.Fields.Length; ++i)

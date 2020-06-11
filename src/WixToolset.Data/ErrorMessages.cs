@@ -2279,6 +2279,11 @@ namespace WixToolset.Data
             return Message(null, Ids.IntermediatesMustBeResolved, "Intermediates being bound must have been resolved. This intermediate was not resolved: {0}", invalidIntermediate);
         }
 
+        public static Message UnknownSymbolType(string symbolName)
+        {
+            return Message(null, Ids.UnknownSymbolType, "Could not deserialize symbol of type type '{0}' because it is not a standard symbol type or one provided by a loaded extension.", symbolName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2680,6 +2685,7 @@ namespace WixToolset.Data
             IntermediatesMustBeResolved = 396,
             MissingBundleSearch = 397,
             CircularSearchReference = 398,
+            UnknownSymbolType = 399,
         }
     }
 }
