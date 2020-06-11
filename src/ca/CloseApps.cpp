@@ -333,7 +333,7 @@ extern "C" UINT __stdcall WixCloseApplications(
             dwTerminateExitCode = 0;
             hr = S_OK;
         }
-        ExitOnFailure(hr, "failed to get timeout from Wix4CloseApplication table");
+        ExitOnFailure(hr, "failed to get terminate exit-code from Wix4CloseApplication table");
 
         hr = WcaGetRecordInteger(hRec, QCA_TIMEOUT, reinterpret_cast<int*>(&dwTimeout));
         if (S_FALSE == hr)
