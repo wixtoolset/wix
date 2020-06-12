@@ -18,20 +18,22 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     {
         private const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
 
-        public AssignMediaCommand(IntermediateSection section, IMessaging messaging)
+        public AssignMediaCommand(IntermediateSection section, IMessaging messaging, IEnumerable<FileFacade> fileFacades, bool compressed)
         {
             this.CabinetNameTemplate = "Cab{0}.cab";
             this.Section = section;
             this.Messaging = messaging;
+            this.FileFacades = fileFacades;
+            this.FilesCompressed = compressed;
         }
 
         private IntermediateSection Section { get; }
 
         private IMessaging Messaging { get; }
 
-        public IEnumerable<FileFacade> FileFacades { private get; set; }
+        private IEnumerable<FileFacade> FileFacades { get; }
 
-        public bool FilesCompressed { private get; set; }
+        private bool FilesCompressed { get; }
 
         public string CabinetNameTemplate { private get; set; }
 

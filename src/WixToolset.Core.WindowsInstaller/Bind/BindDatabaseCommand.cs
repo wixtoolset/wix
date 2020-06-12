@@ -277,11 +277,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Gather information about files that do not come from merge modules.
             {
-                var command = new UpdateFileFacadesCommand(this.Messaging, section);
-                command.FileFacades = fileFacades;
-                command.UpdateFileFacades = fileFacades.Where(f => !f.FromModule);
-                command.OverwriteHash = true;
-                command.VariableCache = variableCache;
+                var command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, fileFacades.Where(f => !f.FromModule), variableCache, overwriteHash: true);
                 command.Execute();
             }
 
@@ -290,9 +286,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
             IEnumerable<FileFacade> uncompressedFiles;
             {
-                var command = new AssignMediaCommand(section, this.Messaging);
-                command.FileFacades = fileFacades;
-                command.FilesCompressed = compressed;
+                var command = new AssignMediaCommand(section, this.Messaging, fileFacades, compressed);
                 command.Execute();
 
                 assignedMediaRows = command.MediaRows;
@@ -312,6 +306,42 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var command = new ResolveDelayedFieldsCommand(this.Messaging, this.DelayedFields, variableCache);
                 command.Execute();
             }
+
+#if TODO_FINISH_UPDATE // use tuples instead of rows
+            // Extended binder extensions can be called now that fields are resolved.
+            {
+                Table updatedFiles = this.Output.EnsureTable(this.TableDefinitions["WixBindUpdatedFiles"]);
+
+                foreach (IBinderExtension extension in this.Extensions)
+                {
+                    extension.AfterResolvedFields(this.Output);
+                }
+
+                List<FileFacade> updatedFileFacades = new List<FileFacade>();
+
+                foreach (Row updatedFile in updatedFiles.Rows)
+                {
+                    string updatedId = updatedFile.FieldAsString(0);
+
+                    FileFacade updatedFacade = fileFacades.First(f => f.File.File.Equals(updatedId));
+
+                    updatedFileFacades.Add(updatedFacade);
+                }
+
+                if (updatedFileFacades.Any())
+                {
+                    UpdateFileFacadesCommand command = new UpdateFileFacadesCommand(this.Messaging, section, fileFacades, updateFileFacades, variableCache, overwriteHash: false);
+                    //command.FileFacades = fileFacades;
+                    //command.UpdateFileFacades = updatedFileFacades;
+                    //command.ModularizationGuid = modularizationGuid;
+                    //command.Output = this.Output;
+                    //command.OverwriteHash = true;
+                    //command.TableDefinitions = this.TableDefinitions;
+                    //command.VariableCache = variableCache;
+                    command.Execute();
+                }
+            }
+#endif
 
             // Set generated component guids.
             {
@@ -375,42 +405,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     output.SubStorages.Add(storage);
                 }
             }
-
-#if TODO_FINISH_UPDATE
-            // Extended binder extensions can be called now that fields are resolved.
-            {
-                Table updatedFiles = this.Output.EnsureTable(this.TableDefinitions["WixBindUpdatedFiles"]);
-
-                foreach (IBinderExtension extension in this.Extensions)
-                {
-                    extension.AfterResolvedFields(this.Output);
-                }
-
-                List<FileFacade> updatedFileFacades = new List<FileFacade>();
-
-                foreach (Row updatedFile in updatedFiles.Rows)
-                {
-                    string updatedId = updatedFile.FieldAsString(0);
-
-                    FileFacade updatedFacade = fileFacades.First(f => f.File.File.Equals(updatedId));
-
-                    updatedFileFacades.Add(updatedFacade);
-                }
-
-                if (updatedFileFacades.Any())
-                {
-                    UpdateFileFacadesCommand command = new UpdateFileFacadesCommand();
-                    command.FileFacades = fileFacades;
-                    command.UpdateFileFacades = updatedFileFacades;
-                    command.ModularizationGuid = modularizationGuid;
-                    command.Output = this.Output;
-                    command.OverwriteHash = true;
-                    command.TableDefinitions = this.TableDefinitions;
-                    command.VariableCache = variableCache;
-                    command.Execute();
-                }
-            }
-#endif
 
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)

@@ -19,23 +19,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
-        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section)
+        public UpdateFileFacadesCommand(IMessaging messaging, IntermediateSection section, IEnumerable<FileFacade> fileFacades, IEnumerable<FileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash)
         {
             this.Messaging = messaging;
             this.Section = section;
+            this.FileFacades = fileFacades;
+            this.UpdateFileFacades = updateFileFacades;
+            this.VariableCache = variableCache;
+            this.OverwriteHash = overwriteHash;
         }
 
         private IMessaging Messaging { get; }
 
         private IntermediateSection Section { get; }
 
-        public IEnumerable<FileFacade> FileFacades { private get; set; }
+        private IEnumerable<FileFacade> FileFacades { get; }
 
-        public IEnumerable<FileFacade> UpdateFileFacades { private get; set; }
+        private IEnumerable<FileFacade> UpdateFileFacades { get; }
 
-        public bool OverwriteHash { private get; set; }
+        private bool OverwriteHash { get; }
 
-        public IDictionary<string, string> VariableCache { private get; set; }
+        private IDictionary<string, string> VariableCache { get; }
 
         public void Execute()
         {
