@@ -26,6 +26,7 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
 
+        private static readonly XName ColumnElementName = WixNamespace + "Column";
         private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
@@ -82,6 +83,7 @@ namespace WixToolset.Converters
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
             {
+                { Wix3Converter.ColumnElementName, this.ConvertColumnElement },
                 { Wix3Converter.CustomTableElementName, this.ConvertCustomTableElement },
                 { Wix3Converter.DirectoryElementName, this.ConvertDirectoryElement },
                 { Wix3Converter.FileElementName, this.ConvertFileElement },
@@ -295,6 +297,31 @@ namespace WixToolset.Converters
             if (this.ConvertElementMapping.TryGetValue(element.Name, out var convert))
             {
                 convert(element);
+            }
+        }
+
+        private void ConvertColumnElement(XElement element)
+        {
+            var category = element.Attribute("Category");
+            if (category != null)
+            {
+                var camelCaseValue = LowercaseFirstChar(category.Value);
+                if (category.Value != camelCaseValue &&
+                    this.OnError(ConverterTestType.ColumnCategoryCamelCase, element, "The CustomTable Category attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", category.Name))
+                {
+                    category.Value = camelCaseValue;
+                }
+            }
+
+            var modularization = element.Attribute("Modularize");
+            if (modularization != null)
+            {
+                var camelCaseValue = LowercaseFirstChar(modularization.Value);
+                if (category.Value != camelCaseValue &&
+                    this.OnError(ConverterTestType.ColumnModularizeCamelCase, element, "The CustomTable Modularize attribute contains an incorrectly cased '{0}' value. Lowercase the first character instead.", modularization.Name))
+                {
+                    modularization.Value = camelCaseValue;
+                }
             }
         }
 
@@ -583,7 +610,7 @@ namespace WixToolset.Converters
         /// <remarks>This is duplicated from WiX's Common class.</remarks>
         private static string GetIdentifierFromName(string name)
         {
-            string result = IllegalIdentifierCharacters.Replace(name, "_"); // replace illegal characters with "_".
+            var result = IllegalIdentifierCharacters.Replace(name, "_"); // replace illegal characters with "_".
 
             // MSI identifiers must begin with an alphabetic character or an
             // underscore. Prefix all other values with an underscore.
@@ -593,6 +620,21 @@ namespace WixToolset.Converters
             }
 
             return result;
+        }
+
+        private static string LowercaseFirstChar(string value)
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                var c = Char.ToLowerInvariant(value[0]);
+                if (c != value[0])
+                {
+                    var remainder = value.Length > 1 ? value.Substring(1) : String.Empty;
+                    return c + remainder;
+                }
+            }
+
+            return value;
         }
 
         /// <summary>
@@ -699,6 +741,16 @@ namespace WixToolset.Converters
             /// Inheritable is new and is now defaulted to 'yes' which is a change in behavior for all but children of CreateFolder.
             /// </summary>
             AssignPermissionExInheritable,
+
+            /// <summary>
+            /// Column element's Category attribute is camel-case.
+            /// </summary>
+            ColumnCategoryCamelCase,
+
+            /// <summary>
+            /// Column element's Modularize attribute is camel-case.
+            /// </summary>
+            ColumnModularizeCamelCase,
         }
     }
 }
