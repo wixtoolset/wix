@@ -319,6 +319,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            {
+                var command = new ValidateComponentGuidsCommand(this.Messaging, section);
+                command.Execute();
+            }
+
             // Add missing CreateFolder tuples to null-keypath components.
             {
                 var command = new AddCreateFoldersCommand(section);
@@ -406,8 +411,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 #endif
-
-            this.ValidateComponentGuids(output);
 
             // Stop processing if an error previously occurred.
             if (this.Messaging.EncounteredError)
@@ -577,48 +580,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             wixout.Reopen();
 
             return wixout;
-        }
-
-        /// <summary>
-        /// Validate that there are no duplicate GUIDs in the output.
-        /// </summary>
-        /// <remarks>
-        /// Duplicate GUIDs without conditions are an error condition; with conditions, it's a
-        /// warning, as the conditions might be mutually exclusive.
-        /// </remarks>
-        private void ValidateComponentGuids(WindowsInstallerData output)
-        {
-            if (output.TryGetTable("Component", out var componentTable))
-            {
-                var componentGuidConditions = new Dictionary<string, bool>(componentTable.Rows.Count);
-
-                foreach (Data.WindowsInstaller.Rows.ComponentRow row in componentTable.Rows)
-                {
-                    // We don't care about unmanaged components and if there's a * GUID remaining,
-                    // there's already an error that prevented it from being replaced with a real GUID.
-                    if (!String.IsNullOrEmpty(row.Guid) && "*" != row.Guid)
-                    {
-                        var thisComponentHasCondition = !String.IsNullOrEmpty(row.Condition);
-                        var allComponentsHaveConditions = thisComponentHasCondition;
-
-                        if (componentGuidConditions.ContainsKey(row.Guid))
-                        {
-                            allComponentsHaveConditions = thisComponentHasCondition && componentGuidConditions[row.Guid];
-
-                            if (allComponentsHaveConditions)
-                            {
-                                this.Messaging.Write(WarningMessages.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(row.SourceLineNumbers, row.Component, row.Guid));
-                            }
-                            else
-                            {
-                                this.Messaging.Write(ErrorMessages.DuplicateComponentGuids(row.SourceLineNumbers, row.Component, row.Guid));
-                            }
-                        }
-
-                        componentGuidConditions[row.Guid] = allComponentsHaveConditions;
-                    }
-                }
-            }
         }
 
         private string ResolveMedia(MediaTuple media, string mediaLayoutDirectory, string layoutDirectory)
