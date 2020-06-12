@@ -1495,7 +1495,7 @@ namespace WixToolset.Core
                         Sunken = sunken,
                         Visible = !hidden,
                         Text = text,
-                        SourceFile = sourceFile,
+                        SourceFile = String.IsNullOrEmpty(sourceFile) ? null : new IntermediateFieldPathValue { Path = sourceFile }
                     });
 
                     bbTuple.Set((int)BBControlTupleFields.X, x);
@@ -1524,7 +1524,7 @@ namespace WixToolset.Core
                         Property = !String.IsNullOrEmpty(property) ? property : checkBoxPropertyRef,
                         Text = text,
                         Help = (null == tooltip && null == help) ? null : String.Concat(tooltip, "|", help), // Separator is required, even if only one is non-null.};
-                        SourceFile = sourceFile
+                        SourceFile = String.IsNullOrEmpty(sourceFile) ? null : new IntermediateFieldPathValue { Path = sourceFile }
                     });
 
                     controlTuple.Set((int)BBControlTupleFields.X, x);

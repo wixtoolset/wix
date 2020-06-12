@@ -325,6 +325,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
+            // Update control text from files on disk.
+            {
+                var command = new UpdateControlTextCommand(this.Messaging, section);
+                command.Execute();
+            }
+
             // Update file sequence.
             {
                 var command = new UpdateMediaSequencesCommand(section, fileFacades);
@@ -613,21 +619,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Update Control and BBControl text by reading from files when necessary.
-        /// </summary>
-        /// <param name="output">Internal representation of the msi database to operate upon.</param>
-        private void UpdateControlText(WindowsInstallerData output)
-        {
-            var command = new UpdateControlTextCommand();
-            command.Messaging = this.Messaging;
-            command.BBControlTable = output.Tables["BBControl"];
-            command.WixBBControlTable = output.Tables["WixBBControl"];
-            command.ControlTable = output.Tables["Control"];
-            command.WixControlTable = output.Tables["WixControl"];
-            command.Execute();
         }
 
         private string ResolveMedia(MediaTuple media, string mediaLayoutDirectory, string layoutDirectory)

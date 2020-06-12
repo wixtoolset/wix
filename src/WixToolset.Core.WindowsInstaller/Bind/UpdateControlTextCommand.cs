@@ -4,43 +4,33 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.IO;
+    using System.Linq;
     using WixToolset.Data;
-    using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Data.WindowsInstaller.Rows;
+    using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Services;
 
     internal class UpdateControlTextCommand
     {
-        public IMessaging Messaging { private get; set; }
+        public UpdateControlTextCommand(IMessaging messaging, IntermediateSection section)
+        {
+            this.Messaging = messaging;
+            this.Section = section;
+        }
 
-        public Table BBControlTable { private get; set; }
+        private IMessaging Messaging { get; }
 
-        public Table WixBBControlTable { private get; set; }
-
-        public Table ControlTable { private get; set; }
-
-        public Table WixControlTable { private get; set; }
+        private IntermediateSection Section { get; }
 
         public void Execute()
         {
-            if (null != this.WixBBControlTable)
+            foreach (var bbControl in this.Section.Tuples.OfType<BBControlTuple>().Where(t => t.SourceFile != null))
             {
-                RowDictionary<BBControlRow> bbControlRows = new RowDictionary<BBControlRow>(this.BBControlTable);
-                foreach (Row wixRow in this.WixBBControlTable.Rows)
-                {
-                    BBControlRow bbControlRow = bbControlRows.Get(wixRow.GetPrimaryKey());
-                    bbControlRow.Text = this.ReadTextFile(bbControlRow.SourceLineNumbers, wixRow.FieldAsString(2));
-                }
+                bbControl.Text = this.ReadTextFile(bbControl.SourceLineNumbers, bbControl.SourceFile.Path);
             }
 
-            if (null != this.WixControlTable)
+            foreach (var control in this.Section.Tuples.OfType<ControlTuple>().Where(t => t.SourceFile != null))
             {
-                RowDictionary<ControlRow> controlRows = new RowDictionary<ControlRow>(this.ControlTable);
-                foreach (Row wixRow in this.WixControlTable.Rows)
-                {
-                    ControlRow controlRow = controlRows.Get(wixRow.GetPrimaryKey());
-                    controlRow.Text = this.ReadTextFile(controlRow.SourceLineNumbers, wixRow.FieldAsString(2));
-                }
+                control.Text = this.ReadTextFile(control.SourceLineNumbers, control.SourceFile.Path);
             }
         }
 
@@ -52,13 +42,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <returns>Text string read from file.</returns>
         private string ReadTextFile(SourceLineNumber sourceLineNumbers, string source)
         {
-            string text = null;
-
             try
             {
-                using (StreamReader reader = new StreamReader(source))
+                using (var reader = new StreamReader(source))
                 {
-                    text = reader.ReadToEnd();
+                    return reader.ReadToEnd();
                 }
             }
             catch (DirectoryNotFoundException e)
@@ -78,7 +66,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.Messaging.Write(ErrorMessages.FileNotFound(sourceLineNumbers, source));
             }
 
-            return text;
+            return null;
         }
     }
 }
