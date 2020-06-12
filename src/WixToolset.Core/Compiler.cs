@@ -3712,7 +3712,6 @@ namespace WixToolset.Core
                     {
                     case "Column":
                         string columnName = null;
-                        var category = String.Empty;
                         IntermediateFieldType? columnType = null;
                         var description = String.Empty;
                         int? keyColumn = null;
@@ -3720,6 +3719,7 @@ namespace WixToolset.Core
                         var localizable = false;
                         long? maxValue = null;
                         long? minValue = null;
+                        WixCustomTableColumnCategoryType? category = null;
                         var modularization = WixCustomTableColumnModularizeType.None;
                         var nullable = false;
                         var primaryKey = false;
@@ -3735,7 +3735,97 @@ namespace WixToolset.Core
                                 columnName = this.Core.GetAttributeIdentifierValue(childSourceLineNumbers, childAttrib);
                                 break;
                             case "Category":
-                                category = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
+                                var categoryValue = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
+                                switch (categoryValue)
+                                {
+                                case "text":
+                                    category = WixCustomTableColumnCategoryType.Text;
+                                    break;
+                                case "upperCase":
+                                    category = WixCustomTableColumnCategoryType.UpperCase;
+                                    break;
+                                case "lowerCase":
+                                    category = WixCustomTableColumnCategoryType.LowerCase;
+                                    break;
+                                case "integer":
+                                    category = WixCustomTableColumnCategoryType.Integer;
+                                    break;
+                                case "doubleInteger":
+                                    category = WixCustomTableColumnCategoryType.DoubleInteger;
+                                    break;
+                                case "timeDate":
+                                    category = WixCustomTableColumnCategoryType.TimeDate;
+                                    break;
+                                case "identifier":
+                                    category = WixCustomTableColumnCategoryType.Identifier;
+                                    break;
+                                case "property":
+                                    category = WixCustomTableColumnCategoryType.Property;
+                                    break;
+                                case "filename":
+                                    category = WixCustomTableColumnCategoryType.Filename;
+                                    break;
+                                case "wildCardFilename":
+                                    category = WixCustomTableColumnCategoryType.WildCardFilename;
+                                    break;
+                                case "path":
+                                    category = WixCustomTableColumnCategoryType.Path;
+                                    break;
+                                case "paths":
+                                    category = WixCustomTableColumnCategoryType.Paths;
+                                    break;
+                                case "anyPath":
+                                    category = WixCustomTableColumnCategoryType.AnyPath;
+                                    break;
+                                case "defaultDir":
+                                    category = WixCustomTableColumnCategoryType.DefaultDir;
+                                    break;
+                                case "regPath":
+                                    category = WixCustomTableColumnCategoryType.RegPath;
+                                    break;
+                                case "formatted":
+                                    category = WixCustomTableColumnCategoryType.Formatted;
+                                    break;
+                                case "formattedSddl":
+                                    category = WixCustomTableColumnCategoryType.FormattedSddl;
+                                    break;
+                                case "template":
+                                    category = WixCustomTableColumnCategoryType.Template;
+                                    break;
+                                case "condition":
+                                    category = WixCustomTableColumnCategoryType.Condition;
+                                    break;
+                                case "guid":
+                                    category = WixCustomTableColumnCategoryType.Guid;
+                                    break;
+                                case "version":
+                                    category = WixCustomTableColumnCategoryType.Version;
+                                    break;
+                                case "language":
+                                    category = WixCustomTableColumnCategoryType.Language;
+                                    break;
+                                case "binary":
+                                    category = WixCustomTableColumnCategoryType.Binary;
+                                    break;
+                                case "customSource":
+                                    category = WixCustomTableColumnCategoryType.CustomSource;
+                                    break;
+                                case "cabinet":
+                                    category = WixCustomTableColumnCategoryType.Cabinet;
+                                    break;
+                                case "shortcut":
+                                    category = WixCustomTableColumnCategoryType.Shortcut;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(childSourceLineNumbers, child.Name.LocalName, "Category", categoryValue,
+                                        "text", "upperCase", "lowerCase", "integer", "doubleInteger", "timeDate", "identifier", "property", "filename",
+                                        "wildCardFilename", "path", "paths", "anyPath", "defaultDir", "regPath", "formatted", "formattedSddl", "template",
+                                        "condition", "guid", "version", "language", "binary", "customSource", "cabinet", "shortcut"));
+                                    columnType = IntermediateFieldType.String; // set a value to prevent expected attribute error below.
+                                    break;
+                                }
                                 break;
                             case "Description":
                                 description = this.Core.GetAttributeValue(childSourceLineNumbers, childAttrib);
@@ -3854,11 +3944,11 @@ namespace WixToolset.Core
                         }
                         else if (columnType == IntermediateFieldType.Path)
                         {
-                            if (String.IsNullOrEmpty(category))
+                            if (!category.HasValue)
                             {
-                                category = "Binary";
+                                category = WixCustomTableColumnCategoryType.Binary;
                             }
-                            else if (category != "Binary")
+                            else if (category != WixCustomTableColumnCategoryType.Binary)
                             {
                                 this.Core.Write(ErrorMessages.ExpectedBinaryCategory(childSourceLineNumbers));
                             }

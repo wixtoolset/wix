@@ -4481,82 +4481,82 @@ namespace WixToolset.Core.WindowsInstaller
                         switch (columnDefinition.Category)
                         {
                         case ColumnCategory.Text:
-                            column.Category = Wix.Column.CategoryType.Text;
+                            column.Category = Wix.Column.CategoryType.text;
                             break;
                         case ColumnCategory.UpperCase:
-                            column.Category = Wix.Column.CategoryType.UpperCase;
+                            column.Category = Wix.Column.CategoryType.upperCase;
                             break;
                         case ColumnCategory.LowerCase:
-                            column.Category = Wix.Column.CategoryType.LowerCase;
+                            column.Category = Wix.Column.CategoryType.lowerCase;
                             break;
                         case ColumnCategory.Integer:
-                            column.Category = Wix.Column.CategoryType.Integer;
+                            column.Category = Wix.Column.CategoryType.integer;
                             break;
                         case ColumnCategory.DoubleInteger:
-                            column.Category = Wix.Column.CategoryType.DoubleInteger;
+                            column.Category = Wix.Column.CategoryType.doubleInteger;
                             break;
                         case ColumnCategory.TimeDate:
-                            column.Category = Wix.Column.CategoryType.TimeDate;
+                            column.Category = Wix.Column.CategoryType.timeDate;
                             break;
                         case ColumnCategory.Identifier:
-                            column.Category = Wix.Column.CategoryType.Identifier;
+                            column.Category = Wix.Column.CategoryType.identifier;
                             break;
                         case ColumnCategory.Property:
-                            column.Category = Wix.Column.CategoryType.Property;
+                            column.Category = Wix.Column.CategoryType.property;
                             break;
                         case ColumnCategory.Filename:
-                            column.Category = Wix.Column.CategoryType.Filename;
+                            column.Category = Wix.Column.CategoryType.filename;
                             break;
                         case ColumnCategory.WildCardFilename:
-                            column.Category = Wix.Column.CategoryType.WildCardFilename;
+                            column.Category = Wix.Column.CategoryType.wildCardFilename;
                             break;
                         case ColumnCategory.Path:
-                            column.Category = Wix.Column.CategoryType.Path;
+                            column.Category = Wix.Column.CategoryType.path;
                             break;
                         case ColumnCategory.Paths:
-                            column.Category = Wix.Column.CategoryType.Paths;
+                            column.Category = Wix.Column.CategoryType.paths;
                             break;
                         case ColumnCategory.AnyPath:
-                            column.Category = Wix.Column.CategoryType.AnyPath;
+                            column.Category = Wix.Column.CategoryType.anyPath;
                             break;
                         case ColumnCategory.DefaultDir:
-                            column.Category = Wix.Column.CategoryType.DefaultDir;
+                            column.Category = Wix.Column.CategoryType.defaultDir;
                             break;
                         case ColumnCategory.RegPath:
-                            column.Category = Wix.Column.CategoryType.RegPath;
+                            column.Category = Wix.Column.CategoryType.regPath;
                             break;
                         case ColumnCategory.Formatted:
-                            column.Category = Wix.Column.CategoryType.Formatted;
+                            column.Category = Wix.Column.CategoryType.formatted;
                             break;
                         case ColumnCategory.FormattedSDDLText:
-                            column.Category = Wix.Column.CategoryType.FormattedSddl;
+                            column.Category = Wix.Column.CategoryType.formattedSddl;
                             break;
                         case ColumnCategory.Template:
-                            column.Category = Wix.Column.CategoryType.Template;
+                            column.Category = Wix.Column.CategoryType.template;
                             break;
                         case ColumnCategory.Condition:
-                            column.Category = Wix.Column.CategoryType.Condition;
+                            column.Category = Wix.Column.CategoryType.condition;
                             break;
                         case ColumnCategory.Guid:
-                            column.Category = Wix.Column.CategoryType.Guid;
+                            column.Category = Wix.Column.CategoryType.guid;
                             break;
                         case ColumnCategory.Version:
-                            column.Category = Wix.Column.CategoryType.Version;
+                            column.Category = Wix.Column.CategoryType.version;
                             break;
                         case ColumnCategory.Language:
-                            column.Category = Wix.Column.CategoryType.Language;
+                            column.Category = Wix.Column.CategoryType.language;
                             break;
                         case ColumnCategory.Binary:
-                            column.Category = Wix.Column.CategoryType.Binary;
+                            column.Category = Wix.Column.CategoryType.binary;
                             break;
                         case ColumnCategory.CustomSource:
-                            column.Category = Wix.Column.CategoryType.CustomSource;
+                            column.Category = Wix.Column.CategoryType.customSource;
                             break;
                         case ColumnCategory.Cabinet:
-                            column.Category = Wix.Column.CategoryType.Cabinet;
+                            column.Category = Wix.Column.CategoryType.cabinet;
                             break;
                         case ColumnCategory.Shortcut:
-                            column.Category = Wix.Column.CategoryType.Shortcut;
+                            column.Category = Wix.Column.CategoryType.shortcut;
                             break;
                         default:
                             throw new InvalidOperationException($"Unknown custom column category '{columnDefinition.Category.ToString()}'.");

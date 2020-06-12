@@ -87,84 +87,85 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var category = ColumnCategory.Unknown;
                 switch (column.Category)
                 {
-                    case "Text":
+                    case WixCustomTableColumnCategoryType.Text:
                         category = ColumnCategory.Text;
                         break;
-                    case "UpperCase":
+                    case WixCustomTableColumnCategoryType.UpperCase:
                         category = ColumnCategory.UpperCase;
                         break;
-                    case "LowerCase":
+                    case WixCustomTableColumnCategoryType.LowerCase:
                         category = ColumnCategory.LowerCase;
                         break;
-                    case "Integer":
+                    case WixCustomTableColumnCategoryType.Integer:
                         category = ColumnCategory.Integer;
                         break;
-                    case "DoubleInteger":
+                    case WixCustomTableColumnCategoryType.DoubleInteger:
                         category = ColumnCategory.DoubleInteger;
                         break;
-                    case "TimeDate":
+                    case WixCustomTableColumnCategoryType.TimeDate:
                         category = ColumnCategory.TimeDate;
                         break;
-                    case "Identifier":
+                    case WixCustomTableColumnCategoryType.Identifier:
                         category = ColumnCategory.Identifier;
                         break;
-                    case "Property":
+                    case WixCustomTableColumnCategoryType.Property:
                         category = ColumnCategory.Property;
                         break;
-                    case "Filename":
+                    case WixCustomTableColumnCategoryType.Filename:
                         category = ColumnCategory.Filename;
                         break;
-                    case "WildCardFilename":
+                    case WixCustomTableColumnCategoryType.WildCardFilename:
                         category = ColumnCategory.WildCardFilename;
                         break;
-                    case "Path":
+                    case WixCustomTableColumnCategoryType.Path:
                         category = ColumnCategory.Path;
                         break;
-                    case "Paths":
+                    case WixCustomTableColumnCategoryType.Paths:
                         category = ColumnCategory.Paths;
                         break;
-                    case "AnyPath":
+                    case WixCustomTableColumnCategoryType.AnyPath:
                         category = ColumnCategory.AnyPath;
                         break;
-                    case "DefaultDir":
+                    case WixCustomTableColumnCategoryType.DefaultDir:
                         category = ColumnCategory.DefaultDir;
                         break;
-                    case "RegPath":
+                    case WixCustomTableColumnCategoryType.RegPath:
                         category = ColumnCategory.RegPath;
                         break;
-                    case "Formatted":
+                    case WixCustomTableColumnCategoryType.Formatted:
                         category = ColumnCategory.Formatted;
                         break;
-                    case "FormattedSddl":
+                    case WixCustomTableColumnCategoryType.FormattedSddl:
                         category = ColumnCategory.FormattedSDDLText;
                         break;
-                    case "Template":
+                    case WixCustomTableColumnCategoryType.Template:
                         category = ColumnCategory.Template;
                         break;
-                    case "Condition":
+                    case WixCustomTableColumnCategoryType.Condition:
                         category = ColumnCategory.Condition;
                         break;
-                    case "Guid":
+                    case WixCustomTableColumnCategoryType.Guid:
                         category = ColumnCategory.Guid;
                         break;
-                    case "Version":
+                    case WixCustomTableColumnCategoryType.Version:
                         category = ColumnCategory.Version;
                         break;
-                    case "Language":
+                    case WixCustomTableColumnCategoryType.Language:
                         category = ColumnCategory.Language;
                         break;
-                    case "Binary":
+                    case WixCustomTableColumnCategoryType.Binary:
                         category = ColumnCategory.Binary;
                         break;
-                    case "CustomSource":
+                    case WixCustomTableColumnCategoryType.CustomSource:
                         category = ColumnCategory.CustomSource;
                         break;
-                    case "Cabinet":
+                    case WixCustomTableColumnCategoryType.Cabinet:
                         category = ColumnCategory.Cabinet;
                         break;
-                    case "Shortcut":
+                    case WixCustomTableColumnCategoryType.Shortcut:
                         category = ColumnCategory.Shortcut;
                         break;
+                    case null:
                     default:
                         break;
                 }
