@@ -171,9 +171,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)BBControlTupleFields.Text, value);
         }
 
-        public string SourceFile
+        public IntermediateFieldPathValue SourceFile
         {
-            get => (string)this.Fields[(int)BBControlTupleFields.SourceFile];
+            get => this.Fields[(int)BBControlTupleFields.SourceFile].AsPath();
             set => this.Set((int)BBControlTupleFields.SourceFile, value);
         }
     }

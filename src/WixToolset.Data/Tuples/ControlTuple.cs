@@ -294,9 +294,9 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)ControlTupleFields.TrackDiskSpace, value);
         }
 
-        public string SourceFile
+        public IntermediateFieldPathValue SourceFile
         {
-            get => (string)this.Fields[(int)ControlTupleFields.SourceFile];
+            get => this.Fields[(int)ControlTupleFields.SourceFile].AsPath();
             set => this.Set((int)ControlTupleFields.SourceFile, value);
         }
     }
