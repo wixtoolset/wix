@@ -4,7 +4,6 @@ namespace WixToolsetTest.Converters.Mocks
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;

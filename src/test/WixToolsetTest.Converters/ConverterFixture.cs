@@ -3,16 +3,12 @@
 namespace WixToolsetTest.Converters
 {
     using System;
-    using System.IO;
-    using System.Text;
     using System.Xml.Linq;
     using WixToolset.Converters;
-    using WixToolset.Data;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
+    using WixToolsetTest.Converters.Mocks;
     using Xunit;
 
-    public class ConverterFixture
+    public class ConverterFixture : BaseConverterFixture
     {
         private static readonly XNamespace Wix4Namespace = "http://wixtoolset.org/schemas/v4/wxs";
 
@@ -32,7 +28,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -54,7 +50,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 4, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -87,7 +83,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 4, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -123,7 +119,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 4, null, null);
 
             var conversions = converter.ConvertDocument(document);
@@ -161,7 +157,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 4, null, null);
 
             var conversions = converter.ConvertDocument(document);
@@ -195,7 +191,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -231,7 +227,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -255,7 +251,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
             var errors = converter.ConvertDocument(document);
             Assert.Equal(0, errors);
@@ -278,7 +274,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -307,7 +303,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -340,7 +336,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -370,7 +366,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -399,7 +395,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -438,7 +434,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -467,7 +463,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -495,7 +491,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -523,7 +519,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -551,7 +547,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -579,7 +575,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -613,7 +609,7 @@ namespace WixToolsetTest.Converters
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
-            var messaging = new DummyMessaging();
+            var messaging = new MockMessaging();
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
@@ -622,53 +618,6 @@ namespace WixToolsetTest.Converters
 
             Assert.Equal(6, errors);
             Assert.Equal(expected, actual);
-        }
-
-        private static string UnformattedDocumentString(XDocument document)
-        {
-            var sb = new StringBuilder();
-
-            using (var writer = new StringWriter(sb))
-            {
-                document.Save(writer, SaveOptions.DisableFormatting);
-            }
-
-            return sb.ToString();
-        }
-
-        private class DummyMessaging : IMessaging
-        {
-            public bool EncounteredError { get; set; }
-
-            public int LastErrorNumber { get; set; }
-
-            public bool ShowVerboseMessages { get; set; }
-
-            public bool SuppressAllWarnings { get; set; }
-
-            public bool WarningsAsError { get; set; }
-
-            public void ElevateWarningMessage(int warningNumber)
-            {
-            }
-
-            public string FormatMessage(Message message) => String.Empty;
-
-            public void SetListener(IMessageListener listener)
-            {
-            }
-
-            public void SuppressWarningMessage(int warningNumber)
-            {
-            }
-
-            public void Write(Message message)
-            {
-            }
-
-            public void Write(string message, bool verbose = false)
-            {
-            }
         }
     }
 }
