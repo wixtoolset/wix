@@ -59,6 +59,36 @@ namespace WixToolset.Data.Tuples
         Unreal = 0x8,
     }
 
+    public enum WixCustomTableColumnCategoryType
+    {
+        Text,
+        UpperCase,
+        LowerCase,
+        Integer,
+        DoubleInteger,
+        TimeDate,
+        Identifier,
+        Property,
+        Filename,
+        WildCardFilename,
+        Path,
+        Paths,
+        AnyPath,
+        DefaultDir,
+        RegPath,
+        Formatted,
+        FormattedSddl,
+        Template,
+        Condition,
+        Guid,
+        Version,
+        Language,
+        Binary,
+        CustomSource,
+        Cabinet,
+        Shortcut,
+    }
+
     public enum WixCustomTableColumnModularizeType
     {
         None,
@@ -138,10 +168,10 @@ namespace WixToolset.Data.Tuples
             set => this.Set((int)WixCustomTableColumnTupleFields.KeyColumn, value);
         }
 
-        public string Category
+        public WixCustomTableColumnCategoryType? Category
         {
-            get => (string)this.Fields[(int)WixCustomTableColumnTupleFields.Category];
-            set => this.Set((int)WixCustomTableColumnTupleFields.Category, value);
+            get => (WixCustomTableColumnCategoryType?)this.Fields[(int)WixCustomTableColumnTupleFields.Category].AsNullableNumber();
+            set => this.Set((int)WixCustomTableColumnTupleFields.Category, (int?)value);
         }
 
         public string Set

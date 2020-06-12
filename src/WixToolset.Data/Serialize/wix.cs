@@ -55497,157 +55497,157 @@ namespace WixToolset.Data.Serialize
             }
             if (("Text" == value))
             {
-                parsedValue = CategoryType.Text;
+                parsedValue = CategoryType.text;
             }
             else
             {
                 if (("UpperCase" == value))
                 {
-                    parsedValue = CategoryType.UpperCase;
+                    parsedValue = CategoryType.upperCase;
                 }
                 else
                 {
                     if (("LowerCase" == value))
                     {
-                        parsedValue = CategoryType.LowerCase;
+                        parsedValue = CategoryType.lowerCase;
                     }
                     else
                     {
                         if (("Integer" == value))
                         {
-                            parsedValue = CategoryType.Integer;
+                            parsedValue = CategoryType.integer;
                         }
                         else
                         {
                             if (("DoubleInteger" == value))
                             {
-                                parsedValue = CategoryType.DoubleInteger;
+                                parsedValue = CategoryType.doubleInteger;
                             }
                             else
                             {
                                 if (("TimeDate" == value))
                                 {
-                                    parsedValue = CategoryType.TimeDate;
+                                    parsedValue = CategoryType.timeDate;
                                 }
                                 else
                                 {
                                     if (("Identifier" == value))
                                     {
-                                        parsedValue = CategoryType.Identifier;
+                                        parsedValue = CategoryType.identifier;
                                     }
                                     else
                                     {
                                         if (("Property" == value))
                                         {
-                                            parsedValue = CategoryType.Property;
+                                            parsedValue = CategoryType.property;
                                         }
                                         else
                                         {
                                             if (("Filename" == value))
                                             {
-                                                parsedValue = CategoryType.Filename;
+                                                parsedValue = CategoryType.filename;
                                             }
                                             else
                                             {
                                                 if (("WildCardFilename" == value))
                                                 {
-                                                    parsedValue = CategoryType.WildCardFilename;
+                                                    parsedValue = CategoryType.wildCardFilename;
                                                 }
                                                 else
                                                 {
                                                     if (("Path" == value))
                                                     {
-                                                        parsedValue = CategoryType.Path;
+                                                        parsedValue = CategoryType.path;
                                                     }
                                                     else
                                                     {
                                                         if (("Paths" == value))
                                                         {
-                                                            parsedValue = CategoryType.Paths;
+                                                            parsedValue = CategoryType.paths;
                                                         }
                                                         else
                                                         {
                                                             if (("AnyPath" == value))
                                                             {
-                                                                parsedValue = CategoryType.AnyPath;
+                                                                parsedValue = CategoryType.anyPath;
                                                             }
                                                             else
                                                             {
                                                                 if (("DefaultDir" == value))
                                                                 {
-                                                                    parsedValue = CategoryType.DefaultDir;
+                                                                    parsedValue = CategoryType.defaultDir;
                                                                 }
                                                                 else
                                                                 {
                                                                     if (("RegPath" == value))
                                                                     {
-                                                                        parsedValue = CategoryType.RegPath;
+                                                                        parsedValue = CategoryType.regPath;
                                                                     }
                                                                     else
                                                                     {
                                                                         if (("Formatted" == value))
                                                                         {
-                                                                            parsedValue = CategoryType.Formatted;
+                                                                            parsedValue = CategoryType.formatted;
                                                                         }
                                                                         else
                                                                         {
                                                                             if (("FormattedSddl" == value))
                                                                             {
-                                                                                parsedValue = CategoryType.FormattedSddl;
+                                                                                parsedValue = CategoryType.formattedSddl;
                                                                             }
                                                                             else
                                                                             {
                                                                                 if (("Template" == value))
                                                                                 {
-                                                                                    parsedValue = CategoryType.Template;
+                                                                                    parsedValue = CategoryType.template;
                                                                                 }
                                                                                 else
                                                                                 {
                                                                                     if (("Condition" == value))
                                                                                     {
-                                                                                        parsedValue = CategoryType.Condition;
+                                                                                        parsedValue = CategoryType.condition;
                                                                                     }
                                                                                     else
                                                                                     {
                                                                                         if (("Guid" == value))
                                                                                         {
-                                                                                            parsedValue = CategoryType.Guid;
+                                                                                            parsedValue = CategoryType.guid;
                                                                                         }
                                                                                         else
                                                                                         {
                                                                                             if (("Version" == value))
                                                                                             {
-                                                                                                parsedValue = CategoryType.Version;
+                                                                                                parsedValue = CategoryType.version;
                                                                                             }
                                                                                             else
                                                                                             {
                                                                                                 if (("Language" == value))
                                                                                                 {
-                                                                                                    parsedValue = CategoryType.Language;
+                                                                                                    parsedValue = CategoryType.language;
                                                                                                 }
                                                                                                 else
                                                                                                 {
                                                                                                     if (("Binary" == value))
                                                                                                     {
-                                                                                                        parsedValue = CategoryType.Binary;
+                                                                                                        parsedValue = CategoryType.binary;
                                                                                                     }
                                                                                                     else
                                                                                                     {
                                                                                                         if (("CustomSource" == value))
                                                                                                         {
-                                                                                                            parsedValue = CategoryType.CustomSource;
+                                                                                                            parsedValue = CategoryType.customSource;
                                                                                                         }
                                                                                                         else
                                                                                                         {
                                                                                                             if (("Cabinet" == value))
                                                                                                             {
-                                                                                                                parsedValue = CategoryType.Cabinet;
+                                                                                                                parsedValue = CategoryType.cabinet;
                                                                                                             }
                                                                                                             else
                                                                                                             {
                                                                                                                 if (("Shortcut" == value))
                                                                                                                 {
-                                                                                                                    parsedValue = CategoryType.Shortcut;
+                                                                                                                    parsedValue = CategoryType.shortcut;
                                                                                                                 }
                                                                                                                 else
                                                                                                                 {
@@ -55834,109 +55834,109 @@ namespace WixToolset.Data.Serialize
             }
             if (this.categoryFieldSet)
             {
-                if ((this.categoryField == CategoryType.Text))
+                if ((this.categoryField == CategoryType.text))
                 {
-                    writer.WriteAttributeString("Category", "Text");
+                    writer.WriteAttributeString("Category", "text");
                 }
-                if ((this.categoryField == CategoryType.UpperCase))
+                if ((this.categoryField == CategoryType.upperCase))
                 {
-                    writer.WriteAttributeString("Category", "UpperCase");
+                    writer.WriteAttributeString("Category", "upperCase");
                 }
-                if ((this.categoryField == CategoryType.LowerCase))
+                if ((this.categoryField == CategoryType.lowerCase))
                 {
-                    writer.WriteAttributeString("Category", "LowerCase");
+                    writer.WriteAttributeString("Category", "lowerCase");
                 }
-                if ((this.categoryField == CategoryType.Integer))
+                if ((this.categoryField == CategoryType.integer))
                 {
-                    writer.WriteAttributeString("Category", "Integer");
+                    writer.WriteAttributeString("Category", "integer");
                 }
-                if ((this.categoryField == CategoryType.DoubleInteger))
+                if ((this.categoryField == CategoryType.doubleInteger))
                 {
-                    writer.WriteAttributeString("Category", "DoubleInteger");
+                    writer.WriteAttributeString("Category", "doubleInteger");
                 }
-                if ((this.categoryField == CategoryType.TimeDate))
+                if ((this.categoryField == CategoryType.timeDate))
                 {
-                    writer.WriteAttributeString("Category", "TimeDate");
+                    writer.WriteAttributeString("Category", "timeDate");
                 }
-                if ((this.categoryField == CategoryType.Identifier))
+                if ((this.categoryField == CategoryType.identifier))
                 {
-                    writer.WriteAttributeString("Category", "Identifier");
+                    writer.WriteAttributeString("Category", "identifier");
                 }
-                if ((this.categoryField == CategoryType.Property))
+                if ((this.categoryField == CategoryType.property))
                 {
-                    writer.WriteAttributeString("Category", "Property");
+                    writer.WriteAttributeString("Category", "property");
                 }
-                if ((this.categoryField == CategoryType.Filename))
+                if ((this.categoryField == CategoryType.filename))
                 {
-                    writer.WriteAttributeString("Category", "Filename");
+                    writer.WriteAttributeString("Category", "filename");
                 }
-                if ((this.categoryField == CategoryType.WildCardFilename))
+                if ((this.categoryField == CategoryType.wildCardFilename))
                 {
-                    writer.WriteAttributeString("Category", "WildCardFilename");
+                    writer.WriteAttributeString("Category", "wildCardFilename");
                 }
-                if ((this.categoryField == CategoryType.Path))
+                if ((this.categoryField == CategoryType.path))
                 {
-                    writer.WriteAttributeString("Category", "Path");
+                    writer.WriteAttributeString("Category", "path");
                 }
-                if ((this.categoryField == CategoryType.Paths))
+                if ((this.categoryField == CategoryType.paths))
                 {
-                    writer.WriteAttributeString("Category", "Paths");
+                    writer.WriteAttributeString("Category", "paths");
                 }
-                if ((this.categoryField == CategoryType.AnyPath))
+                if ((this.categoryField == CategoryType.anyPath))
                 {
-                    writer.WriteAttributeString("Category", "AnyPath");
+                    writer.WriteAttributeString("Category", "anyPath");
                 }
-                if ((this.categoryField == CategoryType.DefaultDir))
+                if ((this.categoryField == CategoryType.defaultDir))
                 {
-                    writer.WriteAttributeString("Category", "DefaultDir");
+                    writer.WriteAttributeString("Category", "defaultDir");
                 }
-                if ((this.categoryField == CategoryType.RegPath))
+                if ((this.categoryField == CategoryType.regPath))
                 {
-                    writer.WriteAttributeString("Category", "RegPath");
+                    writer.WriteAttributeString("Category", "regPath");
                 }
-                if ((this.categoryField == CategoryType.Formatted))
+                if ((this.categoryField == CategoryType.formatted))
                 {
-                    writer.WriteAttributeString("Category", "Formatted");
+                    writer.WriteAttributeString("Category", "formatted");
                 }
-                if ((this.categoryField == CategoryType.FormattedSddl))
+                if ((this.categoryField == CategoryType.formattedSddl))
                 {
-                    writer.WriteAttributeString("Category", "FormattedSddl");
+                    writer.WriteAttributeString("Category", "formattedSddl");
                 }
-                if ((this.categoryField == CategoryType.Template))
+                if ((this.categoryField == CategoryType.template))
                 {
-                    writer.WriteAttributeString("Category", "Template");
+                    writer.WriteAttributeString("Category", "template");
                 }
-                if ((this.categoryField == CategoryType.Condition))
+                if ((this.categoryField == CategoryType.condition))
                 {
-                    writer.WriteAttributeString("Category", "Condition");
+                    writer.WriteAttributeString("Category", "condition");
                 }
-                if ((this.categoryField == CategoryType.Guid))
+                if ((this.categoryField == CategoryType.guid))
                 {
-                    writer.WriteAttributeString("Category", "Guid");
+                    writer.WriteAttributeString("Category", "guid");
                 }
-                if ((this.categoryField == CategoryType.Version))
+                if ((this.categoryField == CategoryType.version))
                 {
-                    writer.WriteAttributeString("Category", "Version");
+                    writer.WriteAttributeString("Category", "version");
                 }
-                if ((this.categoryField == CategoryType.Language))
+                if ((this.categoryField == CategoryType.language))
                 {
-                    writer.WriteAttributeString("Category", "Language");
+                    writer.WriteAttributeString("Category", "language");
                 }
-                if ((this.categoryField == CategoryType.Binary))
+                if ((this.categoryField == CategoryType.binary))
                 {
                     writer.WriteAttributeString("Category", "Binary");
                 }
-                if ((this.categoryField == CategoryType.CustomSource))
+                if ((this.categoryField == CategoryType.customSource))
                 {
-                    writer.WriteAttributeString("Category", "CustomSource");
+                    writer.WriteAttributeString("Category", "customSource");
                 }
-                if ((this.categoryField == CategoryType.Cabinet))
+                if ((this.categoryField == CategoryType.cabinet))
                 {
-                    writer.WriteAttributeString("Category", "Cabinet");
+                    writer.WriteAttributeString("Category", "cabinet");
                 }
-                if ((this.categoryField == CategoryType.Shortcut))
+                if ((this.categoryField == CategoryType.shortcut))
                 {
-                    writer.WriteAttributeString("Category", "Shortcut");
+                    writer.WriteAttributeString("Category", "shortcut");
                 }
             }
             if (this.setFieldSet)
@@ -56090,57 +56090,57 @@ namespace WixToolset.Data.Serialize
             
             NotSet = -1,
             
-            Text,
+            text,
             
-            UpperCase,
+            upperCase,
             
-            LowerCase,
+            lowerCase,
             
-            Integer,
+            integer,
             
-            DoubleInteger,
+            doubleInteger,
             
-            TimeDate,
+            timeDate,
             
-            Identifier,
+            identifier,
             
-            Property,
+            property,
             
-            Filename,
+            filename,
             
-            WildCardFilename,
+            wildCardFilename,
             
-            Path,
+            path,
             
-            Paths,
+            paths,
             
-            AnyPath,
+            anyPath,
             
-            DefaultDir,
+            defaultDir,
             
-            RegPath,
+            regPath,
             
-            Formatted,
+            formatted,
             
-            FormattedSddl,
+            formattedSddl,
             
-            Template,
+            template,
             
-            Condition,
+            condition,
             
-            Guid,
+            guid,
             
-            Version,
+            version,
             
-            Language,
+            language,
             
-            Binary,
+            binary,
             
-            CustomSource,
+            customSource,
             
-            Cabinet,
+            cabinet,
             
-            Shortcut,
+            shortcut,
         }
         
         [GeneratedCode("WixBuildTools.XsdGen", "4.0.0.0")]
