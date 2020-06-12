@@ -15,9 +15,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
     internal class CreateOutputFromIRCommand
     {
-        private const int DefaultMaximumUncompressedMediaSize = 200; // Default value is 200 MB
-        private const int MaxValueOfMaxCabSizeForLargeFileSplitting = 2 * 1024; // 2048 MB (i.e. 2 GB)
-
         public CreateOutputFromIRCommand(IMessaging messaging, IntermediateSection section, TableDefinitionCollection tableDefinitions, IEnumerable<IWindowsInstallerBackendBinderExtension> backendExtensions, IWindowsInstallerBackendHelper backendHelper)
         {
             this.Messaging = messaging;
@@ -189,10 +186,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         this.AddWixActionTuple((WixActionTuple)tuple);
                         break;
 
-                    case TupleDefinitionType.WixMediaTemplate:
-                        this.AddWixMediaTemplateTuple((WixMediaTemplateTuple)tuple);
-                        break;
-
                     case TupleDefinitionType.WixCustomTableCell:
                         this.IndexCustomTableCellTuple((WixCustomTableCellTuple)tuple, cellsByTableAndRowId);
                         break;
@@ -202,6 +195,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     // Tuples used internally and are not added to the output.
+                    case TupleDefinitionType.WixBuildInfo:
                     case TupleDefinitionType.WixComponentGroup:
                     case TupleDefinitionType.WixComplexReference:
                     case TupleDefinitionType.WixDeltaPatchFile:
@@ -211,6 +205,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     case TupleDefinitionType.WixInstanceComponent:
                     case TupleDefinitionType.WixInstanceTransforms:
                     case TupleDefinitionType.WixFeatureModules:
+                    case TupleDefinitionType.WixGroup:
+                    case TupleDefinitionType.WixMediaTemplate:
                     case TupleDefinitionType.WixMerge:
                     case TupleDefinitionType.WixOrdering:
                     case TupleDefinitionType.WixPatchBaseline:
@@ -946,7 +942,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    bool after = (null == tuple.Before);
+                    var after = (null == tuple.Before);
                     row[2] = after ? tuple.After : tuple.Before;
                     row[3] = after ? 1 : 0;
                 }
@@ -1050,17 +1046,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var tableDefinition = this.TableDefinitions[tuple.Table];
             this.Output.EnsureTable(tableDefinition);
-        }
-
-        private void AddWixMediaTemplateTuple(WixMediaTemplateTuple tuple)
-        {
-            var row = (WixMediaTemplateRow)this.CreateRow(tuple, "WixMediaTemplate");
-            row.CabinetTemplate = tuple.CabinetTemplate;
-            row.CompressionLevel = tuple.CompressionLevel;
-            row.DiskPrompt = tuple.DiskPrompt;
-            row.VolumeLabel = tuple.VolumeLabel;
-            row.MaximumUncompressedMediaSize = tuple.MaximumUncompressedMediaSize ?? DefaultMaximumUncompressedMediaSize;
-            row.MaximumCabinetSizeForLargeFileSplitting = tuple.MaximumCabinetSizeForLargeFileSplitting ?? MaxValueOfMaxCabSizeForLargeFileSplitting;
         }
 
         private bool AddTupleFromExtension(IntermediateTuple tuple)

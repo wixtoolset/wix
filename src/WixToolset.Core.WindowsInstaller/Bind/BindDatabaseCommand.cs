@@ -428,7 +428,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper);
+                var mediaTemplate = section.Tuples.OfType<WixMediaTemplateTuple>().FirstOrDefault();
+
+                var command = new CreateCabinetsCommand(this.ServiceProvider, this.BackendHelper, mediaTemplate);
                 command.CabbingThreadCount = this.CabbingThreadCount;
                 command.CabCachePath = this.CabCachePath;
                 command.DefaultCompressionLevel = this.DefaultCompressionLevel;
@@ -438,7 +440,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.LayoutDirectory = layoutDirectory;
                 command.Compressed = compressed;
                 command.ModularizationSuffix = modularizationSuffix;
-                command.FileRowsByCabinet = filesByCabinetMedia;
+                command.FileFacadesByCabinet = filesByCabinetMedia;
                 command.ResolveMedia = this.ResolveMedia;
                 command.TableDefinitions = tableDefinitions;
                 command.IntermediateFolder = this.IntermediateFolder;

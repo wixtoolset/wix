@@ -160,6 +160,7 @@ namespace WixToolset.Core.WindowsInstaller
             {
                 if (index.TryGetValue(primaryKey, out var collisionRow))
                 {
+#if TODO_PATCH // This case doesn't seem like it can happen any longer.
                     // Overriding WixActionRows have a primary key defined and take precedence in the index.
                     if (row is WixActionRow actionRow)
                     {
@@ -176,6 +177,7 @@ namespace WixToolset.Core.WindowsInstaller
                         // If we got this far, the row does not need to be indexed.
                         return;
                     }
+#endif
 
                     if (this.ShowPedanticMessages)
                     {

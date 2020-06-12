@@ -12,7 +12,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data;
     using WixToolset.Data.Tuples;
     using WixToolset.Data.WindowsInstaller;
-    using WixToolset.Data.WindowsInstaller.Rows;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -33,7 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private Dictionary<string, string> lastCabinetAddedToMediaTable; // Key is First Cabinet Name, Value is Last Cabinet Added in the Split Sequence
 
-        public CreateCabinetsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper)
+        public CreateCabinetsCommand(IWixToolsetServiceProvider serviceProvider, IBackendHelper backendHelper, WixMediaTemplateTuple mediaTemplate)
         {
             this.fileTransfers = new List<IFileTransfer>();
 
@@ -44,11 +43,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ServiceProvider = serviceProvider;
 
             this.BackendHelper = backendHelper;
+
+            this.MediaTemplate = mediaTemplate;
         }
 
-        public IWixToolsetServiceProvider ServiceProvider { get; }
+        private IWixToolsetServiceProvider ServiceProvider { get; }
 
-        public IBackendHelper BackendHelper { get; }
+        private IBackendHelper BackendHelper { get; }
+
+        private WixMediaTemplateTuple MediaTemplate { get; }
 
         /// <summary>
         /// Sets the number of threads to use for cabinet creation.
@@ -77,7 +80,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         public string ModularizationSuffix { private get; set; }
 
-        public Dictionary<MediaTuple, IEnumerable<FileFacade>> FileRowsByCabinet { private get; set; }
+        public Dictionary<MediaTuple, IEnumerable<FileFacade>> FileFacadesByCabinet { private get; set; }
 
         public Func<MediaTuple, string, string, string> ResolveMedia { private get; set; }
 
@@ -90,7 +93,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <param name="output">Output to generate image for.</param>
         /// <param name="layoutDirectory">The directory in which the image should be layed out.</param>
         /// <param name="compressed">Flag if source image should be compressed.</param>
-        /// <returns>The uncompressed file rows.</returns>
         public void Execute()
         {
             this.lastCabinetAddedToMediaTable = new Dictionary<string, string>();
@@ -109,7 +111,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             cabinetBuilder.MaximumCabinetSizeForLargeFileSplitting = maximumCabinetSizeForLargeFileSplitting;
             cabinetBuilder.MaximumUncompressedMediaSize = maximumUncompressedMediaSize;
 
-            foreach (var entry in this.FileRowsByCabinet)
+            foreach (var entry in this.FileFacadesByCabinet)
             {
                 var mediaTuple = entry.Key;
                 var files = entry.Value;
@@ -175,28 +177,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// </summary>
         /// <param name="output">Output for the current database.</param>
         /// <param name="cabinetDir">Directory to create cabinet in.</param>
-        /// <param name="mediaRow">MediaRow containing information about the cabinet.</param>
+        /// <param name="mediaTuple">Media tuple containing information about the cabinet.</param>
         /// <param name="fileFacades">Collection of files in this cabinet.</param>
         /// <returns>created CabinetWorkItem object</returns>
-        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaTuple mediaRow, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
+        private CabinetWorkItem CreateCabinetWorkItem(WindowsInstallerData output, string cabinetDir, MediaTuple mediaTuple, CompressionLevel compressionLevel, IEnumerable<FileFacade> fileFacades)
         {
             CabinetWorkItem cabinetWorkItem = null;
-            string tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaRow.Cabinet);
+            var tempCabinetFileX = Path.Combine(this.IntermediateFolder, mediaTuple.Cabinet);
 
             // check for an empty cabinet
             if (!fileFacades.Any())
             {
                 // Remove the leading '#' from the embedded cabinet name to make the warning easier to understand
-                var cabinetName = mediaRow.Cabinet.TrimStart('#');
+                var cabinetName = mediaTuple.Cabinet.TrimStart('#');
 
                 // If building a patch, remind them to run -p for torch.
                 if (OutputType.Patch == output.Type)
                 {
-                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaRow.SourceLineNumbers, cabinetName, true));
+                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaTuple.SourceLineNumbers, cabinetName, true));
                 }
                 else
                 {
-                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaRow.SourceLineNumbers, cabinetName));
+                    this.Messaging.Write(WarningMessages.EmptyCabinet(mediaTuple.SourceLineNumbers, cabinetName));
                 }
             }
 
@@ -212,7 +214,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             else // reuse the cabinet from the cabinet cache.
             {
-                this.Messaging.Write(VerboseMessages.ReusingCabCache(mediaRow.SourceLineNumbers, mediaRow.Cabinet, resolvedCabinet.Path));
+                this.Messaging.Write(VerboseMessages.ReusingCabCache(mediaTuple.SourceLineNumbers, mediaTuple.Cabinet, resolvedCabinet.Path));
 
                 try
                 {
@@ -226,27 +228,27 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (Exception e)
                 {
-                    this.Messaging.Write(WarningMessages.CannotUpdateCabCache(mediaRow.SourceLineNumbers, resolvedCabinet.Path, e.Message));
+                    this.Messaging.Write(WarningMessages.CannotUpdateCabCache(mediaTuple.SourceLineNumbers, resolvedCabinet.Path, e.Message));
                 }
             }
 
-            var trackResolvedCabinet = this.BackendHelper.TrackFile(resolvedCabinet.Path, TrackedFileType.Intermediate, mediaRow.SourceLineNumbers);
+            var trackResolvedCabinet = this.BackendHelper.TrackFile(resolvedCabinet.Path, TrackedFileType.Intermediate, mediaTuple.SourceLineNumbers);
             this.trackedFiles.Add(trackResolvedCabinet);
 
-            if (mediaRow.Cabinet.StartsWith("#", StringComparison.Ordinal))
+            if (mediaTuple.Cabinet.StartsWith("#", StringComparison.Ordinal))
             {
                 var streamsTable = output.EnsureTable(this.TableDefinitions["_Streams"]);
 
-                var streamRow = streamsTable.CreateRow(mediaRow.SourceLineNumbers);
-                streamRow[0] = mediaRow.Cabinet.Substring(1);
+                var streamRow = streamsTable.CreateRow(mediaTuple.SourceLineNumbers);
+                streamRow[0] = mediaTuple.Cabinet.Substring(1);
                 streamRow[1] = resolvedCabinet.Path;
             }
             else
             {
-                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaRow.Cabinet), TrackedFileType.Final, mediaRow.SourceLineNumbers);
+                var trackDestination = this.BackendHelper.TrackFile(Path.Combine(cabinetDir, mediaTuple.Cabinet), TrackedFileType.Final, mediaTuple.SourceLineNumbers);
                 this.trackedFiles.Add(trackDestination);
 
-                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, trackDestination.Path, resolvedCabinet.BuildOption == CabinetBuildOption.BuildAndMove, mediaRow.SourceLineNumbers);
+                var transfer = this.BackendHelper.CreateFileTransfer(resolvedCabinet.Path, trackDestination.Path, resolvedCabinet.BuildOption == CabinetBuildOption.BuildAndMove, mediaTuple.SourceLineNumbers);
                 this.fileTransfers.Add(transfer);
             }
 
@@ -417,36 +419,24 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// <summary>
         /// Gets Compiler Values of MediaTemplate Attributes governing Maximum Cabinet Size after applying Environment Variable Overrides
         /// </summary>
-        /// <param name="output">Output to generate image for.</param>
-        /// <param name="fileRows">The indexed file rows.</param>
         private void GetMediaTemplateAttributes(out int maxCabSizeForLargeFileSplitting, out int maxUncompressedMediaSize)
         {
             // Get Environment Variable Overrides for MediaTemplate Attributes governing Maximum Cabinet Size
-            string mcslfsString = Environment.GetEnvironmentVariable("WIX_MCSLFS");
-            string mumsString = Environment.GetEnvironmentVariable("WIX_MUMS");
-            int maxCabSizeForLargeFileInMB = 0;
-            int maxPreCompressedSizeInMB = 0;
-            ulong testOverFlow = 0;
+            var mcslfsString = Environment.GetEnvironmentVariable("WIX_MCSLFS");
+            var mumsString = Environment.GetEnvironmentVariable("WIX_MUMS");
 
             // Supply Compile MediaTemplate Attributes to Cabinet Builder
-            Table mediaTemplateTable = this.Output.Tables["WixMediaTemplate"];
-            if (mediaTemplateTable != null)
+            if (this.MediaTemplate != null)
             {
-                WixMediaTemplateRow mediaTemplateRow = (WixMediaTemplateRow)mediaTemplateTable.Rows[0];
-
                 // Get the Value for Max Cab Size for File Splitting
+                var maxCabSizeForLargeFileInMB = 0;
                 try
                 {
                     // Override authored mcslfs value if environment variable is authored.
-                    if (!String.IsNullOrEmpty(mcslfsString))
-                    {
-                        maxCabSizeForLargeFileInMB = Int32.Parse(mcslfsString);
-                    }
-                    else
-                    {
-                        maxCabSizeForLargeFileInMB = mediaTemplateRow.MaximumCabinetSizeForLargeFileSplitting;
-                    }
-                    testOverFlow = (ulong)maxCabSizeForLargeFileInMB * 1024 * 1024;
+                    maxCabSizeForLargeFileInMB = !String.IsNullOrEmpty(mcslfsString) ? Int32.Parse(mcslfsString) : this.MediaTemplate.MaximumCabinetSizeForLargeFileSplitting ?? MaxValueOfMaxCabSizeForLargeFileSplitting;
+
+                    var testOverFlow = (ulong)maxCabSizeForLargeFileInMB * 1024 * 1024;
+                    maxCabSizeForLargeFileSplitting = maxCabSizeForLargeFileInMB;
                 }
                 catch (FormatException)
                 {
@@ -457,18 +447,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     throw new WixException(ErrorMessages.MaximumCabinetSizeForLargeFileSplittingTooLarge(null, maxCabSizeForLargeFileInMB, MaxValueOfMaxCabSizeForLargeFileSplitting));
                 }
 
+                var maxPreCompressedSizeInMB = 0;
                 try
                 {
                     // Override authored mums value if environment variable is authored.
-                    if (!String.IsNullOrEmpty(mumsString))
-                    {
-                        maxPreCompressedSizeInMB = Int32.Parse(mumsString);
-                    }
-                    else
-                    {
-                        maxPreCompressedSizeInMB = mediaTemplateRow.MaximumUncompressedMediaSize;
-                    }
-                    testOverFlow = (ulong)maxPreCompressedSizeInMB * 1024 * 1024;
+                    maxPreCompressedSizeInMB = !String.IsNullOrEmpty(mumsString) ? Int32.Parse(mumsString) : this.MediaTemplate.MaximumUncompressedMediaSize ?? DefaultMaximumUncompressedMediaSize;
+
+                    var testOverFlow = (ulong)maxPreCompressedSizeInMB * 1024 * 1024;
+                    maxUncompressedMediaSize = maxPreCompressedSizeInMB;
                 }
                 catch (FormatException)
                 {
@@ -478,9 +464,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     throw new WixException(ErrorMessages.MaximumUncompressedMediaSizeTooLarge(null, maxPreCompressedSizeInMB));
                 }
-
-                maxCabSizeForLargeFileSplitting = maxCabSizeForLargeFileInMB;
-                maxUncompressedMediaSize = maxPreCompressedSizeInMB;
             }
             else
             {
