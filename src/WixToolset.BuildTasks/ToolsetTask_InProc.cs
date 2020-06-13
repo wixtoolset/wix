@@ -34,12 +34,12 @@ namespace WixToolset.BuildTasks
 
             try
             {
-                var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+                var coreProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
 
-                var messaging = serviceProvider.GetService<IMessaging>();
+                var messaging = coreProvider.GetService<IMessaging>();
                 messaging.SetListener(listener);
 
-                exitCode = this.ExecuteCoreAsync(serviceProvider, commandLineString, CancellationToken.None).GetAwaiter().GetResult();
+                exitCode = this.ExecuteCoreAsync(coreProvider, commandLineString, CancellationToken.None).GetAwaiter().GetResult();
             }
             catch (WixException e)
             {
@@ -71,7 +71,7 @@ namespace WixToolset.BuildTasks
             }
         }
 
-        protected abstract Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider serviceProvider, string commandLineString, CancellationToken cancellationToken);
+        protected abstract Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider coreProvider, string commandLineString, CancellationToken cancellationToken);
 
         protected abstract string TaskShortName { get; }
     }

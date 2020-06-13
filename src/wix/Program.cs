@@ -8,7 +8,9 @@ namespace WixToolset.Tools
     using System.Threading.Tasks;
     using WixToolset.Converters;
     using WixToolset.Core;
+    using WixToolset.Core.Burn;
     using WixToolset.Core.ExtensionCache;
+    using WixToolset.Core.WindowsInstaller;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -40,6 +42,8 @@ namespace WixToolset.Tools
             try
             {
                 var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider()
+                                                                      .AddWindowsInstallerBackend()
+                                                                      .AddBundleBackend()
                                                                       .AddExtensionCacheManager()
                                                                       .AddConverter();
 
@@ -81,38 +85,10 @@ namespace WixToolset.Tools
             var messaging = serviceProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
 
-            var arguments = serviceProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(args);
-
             var commandLine = serviceProvider.GetService<ICommandLine>();
-            commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, messaging, arguments.Extensions);
-            commandLine.Arguments = arguments;
-            var command = commandLine.ParseStandardCommandLine();
+            var command = commandLine.CreateCommand(args);
             return command?.ExecuteAsync(cancellationToken) ?? Task.FromResult(1);
         }
 
-        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, IMessaging messaging, string[] extensions)
-        {
-            var extensionManager = serviceProvider.GetService<IExtensionManager>();
-
-            foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
-            {
-                extensionManager.Add(type.Assembly);
-            }
-
-            foreach (var extension in extensions)
-            {
-                try
-                {
-                    extensionManager.Load(extension);
-                }
-                catch (WixException e)
-                {
-                    messaging.Write(e.Error);
-                }
-            }
-
-            return extensionManager;
-        }
     }
 }

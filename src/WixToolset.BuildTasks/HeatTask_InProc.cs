@@ -6,16 +6,13 @@ namespace WixToolset.BuildTasks
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Harvesters;
 
     public partial class HeatTask
     {
         protected sealed override string TaskShortName => "HEAT";
 
-        protected sealed override Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider serviceProvider, string commandLineString, CancellationToken cancellationToken) => throw new NotImplementedException();
+        protected sealed override Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider coreProvider, string commandLineString, CancellationToken cancellationToken) => throw new NotImplementedException();
     }
 }
 #endif
