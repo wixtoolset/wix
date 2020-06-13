@@ -6,12 +6,12 @@ namespace WixToolset.Converters
 
     public static class WixToolsetCoreServiceProviderExtensions
     {
-        public static IWixToolsetCoreServiceProvider AddConverter(this IWixToolsetCoreServiceProvider serviceProvider)
+        public static IWixToolsetCoreServiceProvider AddConverter(this IWixToolsetCoreServiceProvider coreProvider)
         {
-            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+            var extensionManager = coreProvider.GetService<IExtensionManager>();
             extensionManager.Add(typeof(ConverterExtensionFactory).Assembly);
 
-            return serviceProvider;
+            return coreProvider;
         }
     }
 }
