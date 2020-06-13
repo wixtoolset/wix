@@ -6,6 +6,8 @@ namespace WixToolset.Core.TestPackage
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using WixToolset.Core.Burn;
+    using WixToolset.Core.WindowsInstaller;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -26,40 +28,21 @@ namespace WixToolset.Core.TestPackage
             return new WixRunnerResult { ExitCode = exitCode.Result, Messages = messages.ToArray() };
         }
 
-        public static Task<int> Execute(string[] args, IWixToolsetServiceProvider serviceProvider, out List<Message> messages)
+        public static Task<int> Execute(string[] args, IWixToolsetCoreServiceProvider coreProvider, out List<Message> messages)
         {
+            coreProvider.AddWindowsInstallerBackend()
+                        .AddBundleBackend();
+
             var listener = new TestMessageListener();
 
             messages = listener.Messages;
 
-            var messaging = serviceProvider.GetService<IMessaging>();
+            var messaging = coreProvider.GetService<IMessaging>();
             messaging.SetListener(listener);
 
-            var arguments = serviceProvider.GetService<ICommandLineArguments>();
-            arguments.Populate(args);
-
-            var commandLine = serviceProvider.GetService<ICommandLine>();
-            commandLine.ExtensionManager = CreateExtensionManagerWithStandardBackends(serviceProvider, arguments.Extensions);
-            commandLine.Arguments = arguments;
-            var command = commandLine.ParseStandardCommandLine();
+            var commandLine = coreProvider.GetService<ICommandLine>();
+            var command = commandLine.CreateCommand(args);
             return command?.ExecuteAsync(CancellationToken.None) ?? Task.FromResult(1);
-        }
-
-        private static IExtensionManager CreateExtensionManagerWithStandardBackends(IWixToolsetServiceProvider serviceProvider, string[] extensions)
-        {
-            var extensionManager = serviceProvider.GetService<IExtensionManager>();
-
-            foreach (var type in new[] { typeof(WixToolset.Core.Burn.WixToolsetStandardBackend), typeof(WixToolset.Core.WindowsInstaller.WixToolsetStandardBackend) })
-            {
-                extensionManager.Add(type.Assembly);
-            }
-
-            foreach (var extension in extensions)
-            {
-                extensionManager.Load(extension);
-            }
-
-            return extensionManager;
         }
     }
 }

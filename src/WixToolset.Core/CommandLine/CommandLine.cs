@@ -21,30 +21,35 @@ namespace WixToolset.Core.CommandLine
 
     internal class CommandLine : ICommandLine
     {
-        public CommandLine(IWixToolsetServiceProvider serviceProvider)
-        {
-            this.ServiceProvider = serviceProvider;
-
-            this.Messaging = this.ServiceProvider.GetService<IMessaging>();
-        }
+        public CommandLine(IWixToolsetServiceProvider serviceProvider) => this.ServiceProvider = serviceProvider;
 
         private IWixToolsetServiceProvider ServiceProvider { get; }
 
-        private IMessaging Messaging { get; set; }
+        public ICommandLineCommand CreateCommand(string[] args)
+        {
+            var arguments = this.ServiceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(args);
 
-        public IExtensionManager ExtensionManager { get; set; }
+            this.LoadExtensions(arguments.Extensions);
 
-        public ICommandLineArguments Arguments { get; set; }
+            return this.ParseStandardCommandLine(arguments);
+        }
 
-        public static string ExpectedArgument { get; } = "expected argument";
+        public ICommandLineCommand CreateCommand(string commandLine)
+        {
+            var arguments = this.ServiceProvider.GetService<ICommandLineArguments>();
+            arguments.Populate(commandLine);
 
-        public bool ShowHelp { get; private set; }
+            this.LoadExtensions(arguments.Extensions);
 
-        public ICommandLineCommand ParseStandardCommandLine()
+            return this.ParseStandardCommandLine(arguments);
+        }
+
+        public ICommandLineCommand ParseStandardCommandLine(ICommandLineArguments arguments)
         {
             var context = this.ServiceProvider.GetService<ICommandLineContext>();
-            context.ExtensionManager = this.ExtensionManager ?? this.ServiceProvider.GetService<IExtensionManager>();
-            context.Arguments = this.Arguments;
+            context.ExtensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+            context.Arguments = arguments;
 
             var command = this.Parse(context);
 
@@ -56,9 +61,19 @@ namespace WixToolset.Core.CommandLine
             return command;
         }
 
+        private void LoadExtensions(string[] extensions)
+        {
+            var extensionManager = this.ServiceProvider.GetService<IExtensionManager>();
+
+            foreach (var extension in extensions)
+            {
+                extensionManager.Load(extension);
+            }
+        }
+
         private ICommandLineCommand Parse(ICommandLineContext context)
         {
-            var extensions = this.ExtensionManager.GetServices<IExtensionCommandLine>();
+            var extensions = context.ExtensionManager.GetServices<IExtensionCommandLine>();
 
             foreach (var extension in extensions)
             {
@@ -80,7 +95,7 @@ namespace WixToolset.Core.CommandLine
                 // First argument must be the command or global switch (that creates a command).
                 if (command == null)
                 {
-                    if (!this.TryParseCommand(arg, parser, out command, extensions))
+                    if (!this.TryParseCommand(arg, parser, extensions, out command))
                     {
                         parser.ErrorArgument = arg;
                     }
@@ -105,8 +120,8 @@ namespace WixToolset.Core.CommandLine
 
             return command ?? new HelpCommand();
         }
-        
-        private bool TryParseCommand(string arg, ICommandLineParser parser, out ICommandLineCommand command, IEnumerable<IExtensionCommandLine> extensions)
+
+        private bool TryParseCommand(string arg, ICommandLineParser parser, IEnumerable<IExtensionCommandLine> extensions, out ICommandLineCommand command)
         {
             command = null;
 
@@ -115,17 +130,17 @@ namespace WixToolset.Core.CommandLine
                 var parameter = arg.Substring(1);
                 switch (parameter.ToLowerInvariant())
                 {
-                case "?":
-                case "h":
-                case "help":
-                case "-help":
-                    command = new HelpCommand();
-                    break;
+                    case "?":
+                    case "h":
+                    case "help":
+                    case "-help":
+                        command = new HelpCommand();
+                        break;
 
-                case "version":
-                case "-version":
-                    command = new VersionCommand();
-                    break;
+                    case "version":
+                    case "-version":
+                        command = new VersionCommand();
+                        break;
                 }
             }
             else
@@ -134,17 +149,17 @@ namespace WixToolset.Core.CommandLine
                 {
                     switch (commandType)
                     {
-                    case CommandTypes.Build:
-                        command = new BuildCommand(this.ServiceProvider);
-                        break;
+                        case CommandTypes.Build:
+                            command = new BuildCommand(this.ServiceProvider);
+                            break;
 
-                    case CommandTypes.Compile:
-                        command = new CompileCommand(this.ServiceProvider);
-                        break;
+                        case CommandTypes.Compile:
+                            command = new CompileCommand(this.ServiceProvider);
+                            break;
 
-                    case CommandTypes.Decompile:
-                        command = new DecompileCommand(this.ServiceProvider);
-                        break;
+                        case CommandTypes.Decompile:
+                            command = new DecompileCommand(this.ServiceProvider);
+                            break;
                     }
                 }
                 else

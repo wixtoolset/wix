@@ -63,7 +63,7 @@ namespace WixToolset.Extensibility
         {
             if (this.databaseFile != null)
             {
-                this.sourceLineNumbers = new SourceLineNumber(databaseFile);
+                this.sourceLineNumbers = new SourceLineNumber(this.databaseFile);
             }
         }
 

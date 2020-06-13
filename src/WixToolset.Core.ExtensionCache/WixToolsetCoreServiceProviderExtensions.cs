@@ -8,16 +8,16 @@ namespace WixToolset.Core.ExtensionCache
 
     public static class WixToolsetCoreServiceProviderExtensions
     {
-        public static IWixToolsetCoreServiceProvider AddExtensionCacheManager(this IWixToolsetCoreServiceProvider serviceProvider)
+        public static IWixToolsetCoreServiceProvider AddExtensionCacheManager(this IWixToolsetCoreServiceProvider coreProvider)
         {
-            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+            var extensionManager = coreProvider.GetService<IExtensionManager>();
             extensionManager.Add(typeof(ExtensionCacheManagerExtensionFactory).Assembly);
 
-            serviceProvider.AddService(CreateExtensionCacheManager);
-            return serviceProvider;
+            coreProvider.AddService(CreateExtensionCacheManager);
+            return coreProvider;
         }
 
-        private static ExtensionCacheManager CreateExtensionCacheManager(IWixToolsetCoreServiceProvider provider, Dictionary<Type, object> singletons)
+        private static ExtensionCacheManager CreateExtensionCacheManager(IWixToolsetCoreServiceProvider coreProvider, Dictionary<Type, object> singletons)
         {
             var extensionCacheManager = new ExtensionCacheManager();
             singletons.Add(typeof(ExtensionCacheManager), extensionCacheManager);
