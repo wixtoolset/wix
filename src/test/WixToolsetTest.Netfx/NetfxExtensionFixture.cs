@@ -42,17 +42,81 @@ namespace WixToolsetTest.Netfx
             var folder = TestData.Get(@"TestData\UsingNativeImage");
             var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
 
-            var results = build.BuildAndQuery(Build, "Wix4NetFxNativeImage");
+            var results = build.BuildAndQuery(Build, "Binary", "CustomAction", "Wix4NetFxNativeImage");
             Assert.Equal(new[]
             {
+                "Binary:Wix4NetFxCA_X86\t[Binary data]",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X86\t3649\tWix4NetFxCA_X86\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageInstall_X86\t3137\tWix4NetFxCA_X86\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageUninstall_X86\t3137\tWix4NetFxCA_X86\tExecNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_X86\t1\tWix4NetFxCA_X86\tSchedNetFx\t",
+                "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingNativeImageX64()
+        {
+            var folder = TestData.Get(@"TestData\UsingNativeImage");
+            var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction", "Wix4NetFxNativeImage");
+            Assert.Equal(new[]
+            {
+                "Binary:Wix4NetFxCA_X64\t[Binary data]",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_X64\t3649\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageInstall_X64\t3137\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageUninstall_X64\t3137\tWix4NetFxCA_X64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_X64\t1\tWix4NetFxCA_X64\tSchedNetFx\t",
+                "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
+            }, results.OrderBy(s => s).ToArray());
+        }
+
+        [Fact]
+        public void CanBuildUsingNativeImageARM64()
+        {
+            var folder = TestData.Get(@"TestData\UsingNativeImage");
+            var build = new Builder(folder, typeof(NetfxExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildARM64, "Binary", "CustomAction", "Wix4NetFxNativeImage");
+            Assert.Equal(new[]
+            {
+                "Binary:Wix4NetFxCA_A64\t[Binary data]",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitInstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageCommitUninstall_A64\t3649\tWix4NetFxCA_A64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageInstall_A64\t3137\tWix4NetFxCA_A64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxExecuteNativeImageUninstall_A64\t3137\tWix4NetFxCA_A64\tExecNetFx\t",
+                "CustomAction:Wix4NetFxScheduleNativeImage_A64\t1\tWix4NetFxCA_A64\tSchedNetFx\t",
                 "Wix4NetFxNativeImage:ExampleNgen\tfil6349_KNDJhqShNzVdHX3ihhvA6Y\t3\t8\t\t",
             }, results.OrderBy(s => s).ToArray());
         }
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
+        }
+
+        private static void BuildX64(string[] args)
+        {
+            var newArgs = args.ToList();
+            newArgs.Add("-platform");
+            newArgs.Add("x64");
+
+            var result = WixRunner.Execute(newArgs.ToArray());
+            result.AssertSuccess();
+        }
+
+        private static void BuildARM64(string[] args)
+        {
+            var newArgs = args.ToList();
+            newArgs.Add("-platform");
+            newArgs.Add("arm64");
+
+            var result = WixRunner.Execute(newArgs.ToArray());
+            result.AssertSuccess();
         }
     }
 }
