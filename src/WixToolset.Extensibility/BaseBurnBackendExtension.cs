@@ -6,7 +6,7 @@ namespace WixToolset.Extensibility
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    public class BaseBurnBackendExtension : IBurnBackendExtension
+    public abstract class BaseBurnBackendExtension : IBurnBackendExtension
     {
         /// <summary>
         /// Context for use by the extension.
@@ -18,8 +18,18 @@ namespace WixToolset.Extensibility
         /// </summary>
         protected IMessaging Messaging { get; private set; }
 
+        /// <summary>
+        /// Backend helper for use by the extension.
+        /// </summary>
+        protected IBurnBackendHelper BackendHelper { get; private set; }
+
         public virtual void BundleFinalize()
         {
+        }
+
+        public virtual bool IsTupleForExtension(IntermediateTuple tuple)
+        {
+            return false;
         }
 
         public virtual void PostBackendBind(IBindResult result)
@@ -30,6 +40,7 @@ namespace WixToolset.Extensibility
         {
             this.Context = context;
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
+            this.BackendHelper = context.ServiceProvider.GetService<IBurnBackendHelper>();
         }
 
         public virtual IResolveFileResult ResolveRelatedFile(string source, string relatedSource, string type, SourceLineNumber sourceLineNumbers, BindStage bindStage)
@@ -40,6 +51,17 @@ namespace WixToolset.Extensibility
         public virtual string ResolveUrl(string url, string fallbackUrl, string packageId, string payloadId, string fileName)
         {
             return null;
+        }
+
+        public virtual bool TryAddTupleToDataManifest(IntermediateSection section, IntermediateTuple tuple)
+        {
+            if (this.IsTupleForExtension(tuple) && tuple.HasTag(WixToolset.Data.Burn.BurnConstants.BootstrapperApplicationDataTupleDefinitionTag))
+            {
+                this.BackendHelper.AddBootstrapperApplicationData(tuple);
+                return true;
+            }
+
+            return false;
         }
     }
 }
