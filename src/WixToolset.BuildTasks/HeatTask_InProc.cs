@@ -10,6 +10,8 @@ namespace WixToolset.BuildTasks
 
     public partial class HeatTask
     {
+        public override bool RunAsSeparateProcess { get => true; }
+
         protected sealed override string TaskShortName => "HEAT";
 
         protected sealed override Task<int> ExecuteCoreAsync(IWixToolsetCoreServiceProvider coreProvider, string commandLineString, CancellationToken cancellationToken) => throw new NotImplementedException();

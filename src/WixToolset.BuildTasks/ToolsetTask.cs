@@ -29,7 +29,7 @@ namespace WixToolset.BuildTasks
         /// Gets or sets a flag indicating whether the task
         /// should be run as separate process or in-proc.
         /// </summary>
-        public bool RunAsSeparateProcess { get; set; }
+        public virtual bool RunAsSeparateProcess { get; set; }
 
         /// <summary>
         /// Gets or sets whether all warnings should be suppressed.
