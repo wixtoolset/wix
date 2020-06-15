@@ -6,6 +6,7 @@
     <BurnExes Include="$(MSBuildThisFileDirectory)..\tools\**\burn.exe" />
     <None Include="@(BurnExes)">
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <Visible>False</Visible>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
