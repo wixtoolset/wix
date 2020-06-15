@@ -89,7 +89,7 @@ namespace WixToolset.Core.Native
                 if (!found && AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES") is string searchDirectoriesString)
                 {
                     possiblePaths = searchDirectoriesString;
-                    var separatorChar = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':';
+                    var separatorChar = Path.PathSeparator;
                     var searchDirectories = searchDirectoriesString?.Split(separatorChar);
                     foreach (var directoryPath in searchDirectories)
                     {
