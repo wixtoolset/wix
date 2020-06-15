@@ -6,6 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using WixToolset.Core.WindowsInstaller.Msi;
     using WixToolset.Data;
@@ -131,54 +132,51 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             var validationTable = this.Data.EnsureTable(this.TableDefinitions["_Validation"]);
 
-            foreach (var table in this.Data.Tables)
+            // Add the validation rows for real tables and columns.
+            foreach (var table in this.Data.Tables.Where(t => !t.Definition.Unreal))
             {
-                if (!table.Definition.Unreal)
+                foreach (var columnDef in table.Definition.Columns.Where(c => !c.Unreal))
                 {
-                    // Add the validation rows for this table.
-                    foreach (var columnDef in table.Definition.Columns)
+                    var row = validationTable.CreateRow(null);
+
+                    row[0] = table.Name;
+
+                    row[1] = columnDef.Name;
+
+                    if (columnDef.Nullable)
                     {
-                        var row = validationTable.CreateRow(null);
-
-                        row[0] = table.Name;
-
-                        row[1] = columnDef.Name;
-
-                        if (columnDef.Nullable)
-                        {
-                            row[2] = "Y";
-                        }
-                        else
-                        {
-                            row[2] = "N";
-                        }
-
-                        if (columnDef.MinValue.HasValue)
-                        {
-                            row[3] = columnDef.MinValue.Value;
-                        }
-
-                        if (columnDef.MaxValue.HasValue)
-                        {
-                            row[4] = columnDef.MaxValue.Value;
-                        }
-
-                        row[5] = columnDef.KeyTable;
-
-                        if (columnDef.KeyColumn.HasValue)
-                        {
-                            row[6] = columnDef.KeyColumn.Value;
-                        }
-
-                        if (ColumnCategory.Unknown != columnDef.Category)
-                        {
-                            row[7] = columnDef.Category.ToString();
-                        }
-
-                        row[8] = columnDef.Possibilities;
-
-                        row[9] = columnDef.Description;
+                        row[2] = "Y";
                     }
+                    else
+                    {
+                        row[2] = "N";
+                    }
+
+                    if (columnDef.MinValue.HasValue)
+                    {
+                        row[3] = columnDef.MinValue.Value;
+                    }
+
+                    if (columnDef.MaxValue.HasValue)
+                    {
+                        row[4] = columnDef.MaxValue.Value;
+                    }
+
+                    row[5] = columnDef.KeyTable;
+
+                    if (columnDef.KeyColumn.HasValue)
+                    {
+                        row[6] = columnDef.KeyColumn.Value;
+                    }
+
+                    if (ColumnCategory.Unknown != columnDef.Category)
+                    {
+                        row[7] = columnDef.Category.ToString();
+                    }
+
+                    row[8] = columnDef.Possibilities;
+
+                    row[9] = columnDef.Description;
                 }
             }
         }
