@@ -196,6 +196,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     // Tuples used internally and are not added to the output.
                     case TupleDefinitionType.WixBuildInfo:
+                    case TupleDefinitionType.WixBindUpdatedFiles:
                     case TupleDefinitionType.WixComponentGroup:
                     case TupleDefinitionType.WixComplexReference:
                     case TupleDefinitionType.WixDeltaPatchFile:
