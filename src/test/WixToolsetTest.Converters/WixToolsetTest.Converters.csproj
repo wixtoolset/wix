@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <PackageReference Include="WixBuildTools.TestSupport" Version="4.0.*" />
+    <PackageReference Include="WixToolset.Core" Version="4.0.*" />
     <PackageReference Include="WixToolset.Core.TestPackage" Version="4.0.*" />
   </ItemGroup>
 
