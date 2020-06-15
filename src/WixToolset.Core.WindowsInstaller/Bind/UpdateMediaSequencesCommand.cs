@@ -29,9 +29,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 var lastSequence = 0;
 
-                // Order by Component to group the files by directory.
-                var optimized = this.OptimizedFileFacades();
-                foreach (var facade in optimized)
+                foreach (var facade in this.FileFacades)
                 {
                     facade.Sequence = ++lastSequence;
                 }
@@ -43,8 +41,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var patchGroups = new Dictionary<int, List<FileFacade>>();
 
                 // sequence the non-patch-added files
-                var optimized = this.OptimizedFileFacades();
-                foreach (var facade in optimized)
+                foreach (var facade in this.FileFacades)
                 {
                     if (null == mediaTuple)
                     {
@@ -107,14 +104,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     mediaTuple.LastSequence = lastSequence;
                 }
             }
-        }
-
-        private IEnumerable<FileFacade> OptimizedFileFacades()
-        {
-            // TODO: Sort these facades even smarter by directory path and component id 
-            //       and maybe file size or file extension and other creative ideas to
-            //       get optimal install speed out of MSI.
-            return this.FileFacades.OrderBy(f => f.ComponentRef);
         }
     }
 }

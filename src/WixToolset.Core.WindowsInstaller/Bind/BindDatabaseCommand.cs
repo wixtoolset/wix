@@ -281,19 +281,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Assign files to media.
-            Dictionary<int, MediaTuple> assignedMediaRows;
-            Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
-            IEnumerable<FileFacade> uncompressedFiles;
-            {
-                var command = new AssignMediaCommand(section, this.Messaging, fileFacades, compressed);
-                command.Execute();
-
-                assignedMediaRows = command.MediaRows;
-                filesByCabinetMedia = command.FileFacadesByCabinetMedia;
-                uncompressedFiles = command.UncompressedFileFacades;
-            }
-
             // stop processing if an error previously occurred
             if (this.Messaging.EncounteredError)
             {
@@ -366,10 +353,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Update file sequence.
+            // Assign files to media and update file sequences.
+            Dictionary<MediaTuple, IEnumerable<FileFacade>> filesByCabinetMedia;
+            IEnumerable<FileFacade> uncompressedFiles;
             {
-                var command = new UpdateMediaSequencesCommand(section, fileFacades);
-                command.Execute();
+                var order = new OptimizeFileFacadesOrderCommand(fileFacades);
+                order.Execute();
+
+                fileFacades = order.FileFacades;
+
+                var assign = new AssignMediaCommand(section, this.Messaging, fileFacades, compressed);
+                assign.Execute();
+
+                filesByCabinetMedia = assign.FileFacadesByCabinetMedia;
+                uncompressedFiles = assign.UncompressedFileFacades;
+
+                var update = new UpdateMediaSequencesCommand(section, fileFacades);
+                update.Execute();
             }
 
             // stop processing if an error previously occurred

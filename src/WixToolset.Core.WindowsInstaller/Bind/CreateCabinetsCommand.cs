@@ -171,7 +171,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return cabbingThreadCount;
         }
 
-
         /// <summary>
         /// Creates a work item to create a cabinet.
         /// </summary>

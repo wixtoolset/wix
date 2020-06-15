@@ -7,7 +7,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using WixToolset.Core.Bind;
     using WixToolset.Core.Native;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
@@ -18,12 +17,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal sealed class CabinetBuilder
     {
-        private Queue cabinetWorkItems;
-        private object lockObject;
+        private readonly object lockObject = new object();
+
+        private readonly Queue cabinetWorkItems;
         private int threadCount;
 
         // Address of Binder's callback function for Cabinet Splitting
-        private IntPtr newCabNamesCallBackAddress;
+        private readonly IntPtr newCabNamesCallBackAddress;
 
         /// <summary>
         /// Instantiate a new CabinetBuilder.
@@ -38,7 +38,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             this.cabinetWorkItems = new Queue();
-            this.lockObject = new object();
             this.Messaging = messaging;
             this.threadCount = threadCount;
 
@@ -56,10 +55,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         /// Enqueues a CabinetWorkItem to the queue.
         /// </summary>
         /// <param name="cabinetWorkItem">cabinet work item</param>
-        public void Enqueue(CabinetWorkItem cabinetWorkItem)
-        {
-            this.cabinetWorkItems.Enqueue(cabinetWorkItem);
-        }
+        public void Enqueue(CabinetWorkItem cabinetWorkItem) => this.cabinetWorkItems.Enqueue(cabinetWorkItem);
 
         /// <summary>
         /// Create the queued cabinets.
