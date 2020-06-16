@@ -1,2 +1,2 @@
 # Core
-WixToolset.Core, command line tools and MSBuild integration
+WixToolset.Core - preprocessor, compiler, linker and binder for Windows Installer and Burn
