@@ -1964,18 +1964,15 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
+                    case "MultiString":
                     case "MultiStringValue":
                         if (RegistryValueType.MultiString != valueType && null != value)
                         {
                             this.Core.Write(ErrorMessages.RegistryMultipleValuesWithoutMultiString(sourceLineNumbers, node.Name.LocalName, "Value", child.Name.LocalName, "Type"));
                         }
-                        else if (null == value)
-                        {
-                            value = Common.GetInnerText(child);
-                        }
                         else
                         {
-                            value = String.Concat(value, "[~]", Common.GetInnerText(child));
+                            value = this.ParseRegistryMultiStringElement(child, value);
                         }
                         break;
                     case "Permission":
@@ -2067,6 +2064,42 @@ namespace WixToolset.Core
             }
 
             return keyPath;
+        }
+
+        private string ParseRegistryMultiStringElement(XElement node, string value)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string multiStringValue = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Value":
+                        multiStringValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+            }
+
+            if (multiStringValue == null)
+            {
+                multiStringValue = Common.GetInnerText(node);
+            }
+
+            if (multiStringValue == null)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            return (null == value) ? multiStringValue : String.Concat(value, "[~]", multiStringValue);
         }
 
         /// <summary>

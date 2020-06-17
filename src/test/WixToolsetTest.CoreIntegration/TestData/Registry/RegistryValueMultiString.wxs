@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MultiStringComponent" Guid="7C40C257-AB36-4B8C-8FD1-C56E0AC4AAEF">
+                <RegistryValue Root="HKLM" Key="Path\To\Key" Type="multiString" KeyPath="yes">
+                    <MultiString Value="a" />
+                    <MultiStringValue Value="b" />
+                    <MultiString Value="c" />
+                </RegistryValue>
+                <RegistryValue Root="HKLM" Key="Path\To\AnotherKey" Name="Secret" Type="binary"  />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

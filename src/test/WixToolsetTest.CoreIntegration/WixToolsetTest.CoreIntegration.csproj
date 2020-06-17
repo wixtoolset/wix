@@ -74,6 +74,7 @@
     <Content Include="TestData\ProductWithComponentGroupRef\MinimalComponentGroup.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ProductWithComponentGroupRef\Product.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Registry\RegistryValue.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\Registry\RegistryValueMultiString.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\Registry\RemoveRegistryKey.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\ReserveCost\ReserveCost.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\SequenceTables\DecompiledSequenceTables.wxs" CopyToOutputDirectory="PreserveNewest" />
