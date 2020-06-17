@@ -29,7 +29,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     var name = ReadString(reader, assembly.Name);
                     var culture = ReadString(reader, assembly.Culture);
-                    var architecture = headers.PEHeader.Magic == PEMagic.PE32Plus ? "AMD64" : (headers.CorHeader.Flags & CorFlags.Requires32Bit) == CorFlags.Requires32Bit ? "x86" : (headers.CorHeader.Flags & CorFlags.ILOnly) == CorFlags.ILOnly ? "MSIL" : null;
+                    var architecture = ArchitectureFromHeaders(headers);
                     var version = assembly.Version.ToString();
                     var publicKeyToken = ReadPublicKeyToken(reader, assembly.PublicKey);
 
@@ -142,6 +142,28 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return new AssemblyName(win32Name, null, win32Version, null, win32ProcessorArchitecture, win32PublicKeyToken, win32Type);
+        }
+
+        private static string ArchitectureFromHeaders(PEHeaders headers)
+        {
+            if (headers.PEHeader.Magic == PEMagic.PE32Plus)
+            {
+                return "AMD64";
+            }
+            else if ((headers.CorHeader.Flags & CorFlags.Requires32Bit) == CorFlags.Requires32Bit)
+            {
+                return "x86";
+            }
+            else if ((headers.CorHeader.Flags & CorFlags.ILOnly) == CorFlags.ILOnly)
+            {
+                return "MSIL";
+            }
+            else
+            {
+                // We return "x86" here because that seems to best match the Fusion-based
+                // GetAssemblyIdentityFromFile() method of acquiring the assembly identity.
+                return "x86";
+            }
         }
 
         private static string ReadString(MetadataReader reader, StringHandle handle)
