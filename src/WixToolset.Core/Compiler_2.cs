@@ -2621,6 +2621,9 @@ namespace WixToolset.Core
                                 this.Core.UnexpectedAttribute(child, attrib);
                             }
                             break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                            break;
                         case "Dialog":
                             if (showDialog)
                             {
@@ -2678,7 +2681,10 @@ namespace WixToolset.Core
                 }
 
                 // Get the condition from the inner text of the element.
-                condition = this.Core.GetConditionInnerText(child);
+                if (condition == null)
+                {
+                    condition = this.Core.GetConditionInnerText(child);
+                }
 
                 if (customAction && "Custom" == actionName)
                 {
@@ -2901,128 +2907,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "RequiredPrivilege":
-                        var privilege = this.Core.GetTrimmedInnerText(child);
-                        switch (privilege)
-                        {
-                        case "assignPrimaryToken":
-                            privilege = "SeAssignPrimaryTokenPrivilege";
-                            break;
-                        case "audit":
-                            privilege = "SeAuditPrivilege";
-                            break;
-                        case "backup":
-                            privilege = "SeBackupPrivilege";
-                            break;
-                        case "changeNotify":
-                            privilege = "SeChangeNotifyPrivilege";
-                            break;
-                        case "createGlobal":
-                            privilege = "SeCreateGlobalPrivilege";
-                            break;
-                        case "createPagefile":
-                            privilege = "SeCreatePagefilePrivilege";
-                            break;
-                        case "createPermanent":
-                            privilege = "SeCreatePermanentPrivilege";
-                            break;
-                        case "createSymbolicLink":
-                            privilege = "SeCreateSymbolicLinkPrivilege";
-                            break;
-                        case "createToken":
-                            privilege = "SeCreateTokenPrivilege";
-                            break;
-                        case "debug":
-                            privilege = "SeDebugPrivilege";
-                            break;
-                        case "enableDelegation":
-                            privilege = "SeEnableDelegationPrivilege";
-                            break;
-                        case "impersonate":
-                            privilege = "SeImpersonatePrivilege";
-                            break;
-                        case "increaseBasePriority":
-                            privilege = "SeIncreaseBasePriorityPrivilege";
-                            break;
-                        case "increaseQuota":
-                            privilege = "SeIncreaseQuotaPrivilege";
-                            break;
-                        case "increaseWorkingSet":
-                            privilege = "SeIncreaseWorkingSetPrivilege";
-                            break;
-                        case "loadDriver":
-                            privilege = "SeLoadDriverPrivilege";
-                            break;
-                        case "lockMemory":
-                            privilege = "SeLockMemoryPrivilege";
-                            break;
-                        case "machineAccount":
-                            privilege = "SeMachineAccountPrivilege";
-                            break;
-                        case "manageVolume":
-                            privilege = "SeManageVolumePrivilege";
-                            break;
-                        case "profileSingleProcess":
-                            privilege = "SeProfileSingleProcessPrivilege";
-                            break;
-                        case "relabel":
-                            privilege = "SeRelabelPrivilege";
-                            break;
-                        case "remoteShutdown":
-                            privilege = "SeRemoteShutdownPrivilege";
-                            break;
-                        case "restore":
-                            privilege = "SeRestorePrivilege";
-                            break;
-                        case "security":
-                            privilege = "SeSecurityPrivilege";
-                            break;
-                        case "shutdown":
-                            privilege = "SeShutdownPrivilege";
-                            break;
-                        case "syncAgent":
-                            privilege = "SeSyncAgentPrivilege";
-                            break;
-                        case "systemEnvironment":
-                            privilege = "SeSystemEnvironmentPrivilege";
-                            break;
-                        case "systemProfile":
-                            privilege = "SeSystemProfilePrivilege";
-                            break;
-                        case "systemTime":
-                        case "modifySystemTime":
-                            privilege = "SeSystemtimePrivilege";
-                            break;
-                        case "takeOwnership":
-                            privilege = "SeTakeOwnershipPrivilege";
-                            break;
-                        case "tcb":
-                        case "trustedComputerBase":
-                            privilege = "SeTcbPrivilege";
-                            break;
-                        case "timeZone":
-                        case "modifyTimeZone":
-                            privilege = "SeTimeZonePrivilege";
-                            break;
-                        case "trustedCredManAccess":
-                        case "trustedCredentialManagerAccess":
-                            privilege = "SeTrustedCredManAccessPrivilege";
-                            break;
-                        case "undock":
-                            privilege = "SeUndockPrivilege";
-                            break;
-                        case "unsolicitedInput":
-                            privilege = "SeUnsolicitedInputPrivilege";
-                            break;
-                        default:
-                            // allow everything else to pass through that are hopefully "formatted" Properties.
-                            break;
-                        }
-
-                        if (null != requiredPrivileges)
-                        {
-                            requiredPrivileges = String.Concat(requiredPrivileges, "[~]");
-                        }
-                        requiredPrivileges = String.Concat(requiredPrivileges, privilege);
+                        requiredPrivileges = this.ParseRequiredPrivilege(child, requiredPrivileges);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -3126,6 +3011,157 @@ namespace WixToolset.Core
                     });
                 }
             }
+        }
+
+        private string ParseRequiredPrivilege(XElement node, string requiredPrivileges)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string privilege = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Name":
+                            privilege = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (privilege)
+                            {
+                                case "assignPrimaryToken":
+                                    privilege = "SeAssignPrimaryTokenPrivilege";
+                                    break;
+                                case "audit":
+                                    privilege = "SeAuditPrivilege";
+                                    break;
+                                case "backup":
+                                    privilege = "SeBackupPrivilege";
+                                    break;
+                                case "changeNotify":
+                                    privilege = "SeChangeNotifyPrivilege";
+                                    break;
+                                case "createGlobal":
+                                    privilege = "SeCreateGlobalPrivilege";
+                                    break;
+                                case "createPagefile":
+                                    privilege = "SeCreatePagefilePrivilege";
+                                    break;
+                                case "createPermanent":
+                                    privilege = "SeCreatePermanentPrivilege";
+                                    break;
+                                case "createSymbolicLink":
+                                    privilege = "SeCreateSymbolicLinkPrivilege";
+                                    break;
+                                case "createToken":
+                                    privilege = "SeCreateTokenPrivilege";
+                                    break;
+                                case "debug":
+                                    privilege = "SeDebugPrivilege";
+                                    break;
+                                case "enableDelegation":
+                                    privilege = "SeEnableDelegationPrivilege";
+                                    break;
+                                case "impersonate":
+                                    privilege = "SeImpersonatePrivilege";
+                                    break;
+                                case "increaseBasePriority":
+                                    privilege = "SeIncreaseBasePriorityPrivilege";
+                                    break;
+                                case "increaseQuota":
+                                    privilege = "SeIncreaseQuotaPrivilege";
+                                    break;
+                                case "increaseWorkingSet":
+                                    privilege = "SeIncreaseWorkingSetPrivilege";
+                                    break;
+                                case "loadDriver":
+                                    privilege = "SeLoadDriverPrivilege";
+                                    break;
+                                case "lockMemory":
+                                    privilege = "SeLockMemoryPrivilege";
+                                    break;
+                                case "machineAccount":
+                                    privilege = "SeMachineAccountPrivilege";
+                                    break;
+                                case "manageVolume":
+                                    privilege = "SeManageVolumePrivilege";
+                                    break;
+                                case "profileSingleProcess":
+                                    privilege = "SeProfileSingleProcessPrivilege";
+                                    break;
+                                case "relabel":
+                                    privilege = "SeRelabelPrivilege";
+                                    break;
+                                case "remoteShutdown":
+                                    privilege = "SeRemoteShutdownPrivilege";
+                                    break;
+                                case "restore":
+                                    privilege = "SeRestorePrivilege";
+                                    break;
+                                case "security":
+                                    privilege = "SeSecurityPrivilege";
+                                    break;
+                                case "shutdown":
+                                    privilege = "SeShutdownPrivilege";
+                                    break;
+                                case "syncAgent":
+                                    privilege = "SeSyncAgentPrivilege";
+                                    break;
+                                case "systemEnvironment":
+                                    privilege = "SeSystemEnvironmentPrivilege";
+                                    break;
+                                case "systemProfile":
+                                    privilege = "SeSystemProfilePrivilege";
+                                    break;
+                                case "systemTime":
+                                case "modifySystemTime":
+                                    privilege = "SeSystemtimePrivilege";
+                                    break;
+                                case "takeOwnership":
+                                    privilege = "SeTakeOwnershipPrivilege";
+                                    break;
+                                case "tcb":
+                                case "trustedComputerBase":
+                                    privilege = "SeTcbPrivilege";
+                                    break;
+                                case "timeZone":
+                                case "modifyTimeZone":
+                                    privilege = "SeTimeZonePrivilege";
+                                    break;
+                                case "trustedCredManAccess":
+                                case "trustedCredentialManagerAccess":
+                                    privilege = "SeTrustedCredManAccessPrivilege";
+                                    break;
+                                case "undock":
+                                    privilege = "SeUndockPrivilege";
+                                    break;
+                                case "unsolicitedInput":
+                                    privilege = "SeUnsolicitedInputPrivilege";
+                                    break;
+                                default:
+                                    // allow everything else to pass through that are hopefully "formatted" Properties.
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+            }
+
+            if (privilege == null)
+            {
+                privilege = Common.GetInnerText(node);
+            }
+
+            if (privilege == null)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            return (requiredPrivileges == null) ? privilege : String.Concat(requiredPrivileges, "[~]", privilege);
         }
 
         /// <summary>
@@ -3427,11 +3463,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                     case "ServiceArgument":
-                        if (null != arguments)
-                        {
-                            arguments = String.Concat(arguments, "[~]");
-                        }
-                        arguments = String.Concat(arguments, this.Core.GetTrimmedInnerText(child));
+                        arguments = this.ParseServiceArgument(child, arguments);
                         break;
                     default:
                         this.Core.UnexpectedElement(node, child);
@@ -3460,6 +3492,42 @@ namespace WixToolset.Core
                     ComponentRef = componentId
                 });
             }
+        }
+
+        private string ParseServiceArgument(XElement node, string arguments)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string argument = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Value":
+                            argument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+            }
+
+            if (argument == null)
+            {
+                argument = this.Core.GetTrimmedInnerText(node);
+            }
+
+            if (argument == null)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            return (arguments == null) ? argument : String.Concat(arguments, "[~]", argument);
         }
 
         /// <summary>
@@ -3746,6 +3814,9 @@ namespace WixToolset.Core
                     case "Action":
                         actionName = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Directory, id);
@@ -3786,7 +3857,10 @@ namespace WixToolset.Core
                 }
             }
 
-            condition = this.Core.GetConditionInnerText(node);
+            if (condition == null)
+            {
+                condition = this.Core.GetConditionInnerText(node);
+            }
 
             if (null == id)
             {
@@ -3831,6 +3905,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string actionName = null;
             string id = null;
+            string condition = null;
             string afterAction = null;
             string beforeAction = null;
             var executionType = CustomActionExecutionType.Immediate;
@@ -3848,6 +3923,9 @@ namespace WixToolset.Core
                         break;
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "After":
                         afterAction = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -3914,7 +3992,10 @@ namespace WixToolset.Core
                 }
             }
 
-            var condition = this.Core.GetConditionInnerText(node);
+            if (condition == null)
+            {
+                condition = this.Core.GetConditionInnerText(node);
+            }
 
             if (null == id)
             {

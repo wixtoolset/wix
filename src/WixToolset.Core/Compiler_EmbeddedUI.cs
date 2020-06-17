@@ -23,6 +23,7 @@ namespace WixToolset.Core
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
             string commandLine = null;
+            string condition = null;
             string source = null;
             var type = 0;
 
@@ -46,6 +47,9 @@ namespace WixToolset.Core
                         break;
                     case "CommandLine":
                         commandLine = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "FileSource":
                         if (null != source)
@@ -76,8 +80,11 @@ namespace WixToolset.Core
                 }
             }
 
-            // Get the condition from the inner text of the element.
-            var condition = this.Core.GetConditionInnerText(node);
+            if (condition == null)
+            {
+                // Get the condition from the inner text of the element.
+                condition = this.Core.GetConditionInnerText(node);
+            }
 
             if (null == id)
             {

@@ -666,6 +666,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string action = null;
+            string message = null;
             string template = null;
 
             foreach (var attrib in node.Attributes())
@@ -676,6 +677,9 @@ namespace WixToolset.Core
                     {
                     case "Action":
                         action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Message":
+                        message = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Template":
                         template = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -696,6 +700,11 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
 
+            if (null == message)
+            {
+                message = Common.GetInnerText(node);
+            }
+
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
@@ -703,7 +712,7 @@ namespace WixToolset.Core
                 this.Core.AddTuple(new ActionTextTuple(sourceLineNumbers)
                 {
                     Action = action,
-                    Description = Common.GetInnerText(node),
+                    Description = message,
                     Template = template,
                 });
             }
@@ -728,6 +737,9 @@ namespace WixToolset.Core
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
+                    case "Value":
+                        text = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
                         break;
@@ -739,7 +751,10 @@ namespace WixToolset.Core
                 }
             }
 
-            text = Common.GetInnerText(node);
+            if (null == text)
+            {
+                text = Common.GetInnerText(node);
+            }
 
             if (null == id)
             {
@@ -1406,6 +1421,9 @@ namespace WixToolset.Core
                                 case "SourceFile":
                                     sourceFile = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
                                     break;
+                                case "Value":
+                                    text = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                                    break;
                                 default:
                                     this.Core.UnexpectedAttribute(child, attrib);
                                     break;
@@ -1417,10 +1435,14 @@ namespace WixToolset.Core
                             }
                         }
 
-                        text = Common.GetInnerText(child);
+                        if (null == text)
+                        {
+                            text = Common.GetInnerText(child);
+                        }
+
                         if (!String.IsNullOrEmpty(text) && null != sourceFile)
                         {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(childSourceLineNumbers, child.Name.LocalName, "SourceFile"));
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "SourceFile", "Text"));
                         }
                         break;
                     default:
@@ -1589,6 +1611,9 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     case "Control":
                         if (null != control)
                         {
@@ -1627,7 +1652,10 @@ namespace WixToolset.Core
                 }
             }
 
-            condition = this.Core.GetConditionInnerText(node);
+            if (null == condition)
+            {
+                condition = this.Core.GetConditionInnerText(node);
+            }
 
             if (null == control)
             {
