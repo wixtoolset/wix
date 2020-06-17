@@ -2644,7 +2644,6 @@ namespace WixToolset.Core.WindowsInstaller
                         continue;
                     }
 
-                    var actionsTable = new Table(this.tableDefinitions["WixAction"]);
                     var table = tables[String.Concat("Module", sequenceTableName)];
 
                     if (null != table)
