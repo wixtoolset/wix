@@ -5358,6 +5358,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var id = CompilerConstants.IntegerNotSet;
+            string message = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -5367,6 +5368,9 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         id = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                        break;
+                    case "Message":
+                        message = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -5385,13 +5389,18 @@ namespace WixToolset.Core
                 id = CompilerConstants.IllegalInteger;
             }
 
+            if (String.IsNullOrEmpty(message))
+            {
+                message = Common.GetInnerText(node);
+            }
+
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
             {
                 this.Core.AddTuple(new ErrorTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, id))
                 {
-                    Message = Common.GetInnerText(node)
+                    Message = message
                 });
             }
         }

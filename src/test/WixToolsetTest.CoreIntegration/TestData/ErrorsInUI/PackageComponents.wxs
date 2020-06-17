@@ -2,10 +2,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <UI>
-            <Error Id="1234">
-                Category 55 Emergency Doomsday Crisis
-            </Error>
-            <Error Id="5678"><![CDATA[ ]]></Error>
+            <Error Id="1234" Message="Category 55 Emergency Doomsday Crisis" />
+            <Error Id="5678" Message=" " />
         </UI>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component>
