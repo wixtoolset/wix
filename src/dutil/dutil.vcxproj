@@ -42,8 +42,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>dutil</TargetName>
     <MultiTargetLibrary>true</MultiTargetLibrary>
-    <PlatformToolset>v141_xp</PlatformToolset>
-    <PlatformToolset Condition="$(Platform.StartsWith('ARM'))">v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset native library foundation</Description>
   </PropertyGroup>
