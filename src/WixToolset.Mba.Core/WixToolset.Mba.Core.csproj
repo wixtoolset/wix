@@ -1,76 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{E7E1841E-A58E-4901-B9CA-4845B807D45F}</ProjectGuid>
+    <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
     <AssemblyName>WixToolset.Mba.Core</AssemblyName>
-    <OutputType>Library</OutputType>
     <RootNamespace>WixToolset.Mba.Core</RootNamespace>
-    <NoWarn>0693;1591</NoWarn>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <DebugType>embedded</DebugType>
     <Description>Managed Bootstrapper Application Core</Description>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>true</Optimize>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="BalUtil.cs" />
-    <Compile Include="BaseBootstrapperApplicationFactory.cs" />
-    <Compile Include="BootstrapperApplication.cs" />
-    <Compile Include="BootstrapperApplicationData.cs" />
-    <Compile Include="BootstrapperApplicationFactoryAttribute.cs" />
-    <Compile Include="BootstrapperCommand.cs" />
-    <Compile Include="BundleInfo.cs" />
-    <Compile Include="Engine.cs" />
-    <Compile Include="EventArgs.cs" />
-    <Compile Include="IBootstrapperApplication.cs" />
-    <Compile Include="IBootstrapperApplicationData.cs" />
-    <Compile Include="IBootstrapperApplicationFactory.cs" />
-    <Compile Include="IBootstrapperCommand.cs" />
-    <Compile Include="IBootstrapperEngine.cs" />
-    <Compile Include="IBundleInfo.cs" />
-    <Compile Include="IDefaultBootstrapperApplication.cs" />
-    <Compile Include="IEngine.cs" />
-    <Compile Include="IPackageInfo.cs" />
-    <Compile Include="IVariables.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="PackageInfo.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
 
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-
-  <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack $(AssemblyName).nuspec -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=$(AssemblyName);Version="$(BuildVersionSimple)";Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
-  </Target>
-
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets'))" />
-  </Target>
-
-  <PropertyGroup Condition=" '$(CreateDocumentation)'!='false' ">
+  <PropertyGroup Condition=" '$(UsingMicrosoftNETSdk)'!='true' and '$(CreateDocumentation)'!='false' ">
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Target Name="SetNuspecProperties" AfterTargets="GetBuildVersion">
+    <PropertyGroup>
+      <NuspecBasePath>$(OutputPath)</NuspecBasePath>
+      <NuspecProperties>Configuration=$(Configuration);Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
 </Project>

@@ -332,14 +332,14 @@ namespace WixToolset.Mba.Core
         internal sealed class Variables<T> : IVariables<T>
         {
             // .NET 2.0 does not support Func<T, TResult> or Action<T1, T2>.
-            internal delegate T Getter<T>(string name);
-            internal delegate void Setter<T>(string name, T value);
+            internal delegate T Getter(string name);
+            internal delegate void Setter(string name, T value);
 
-            private Getter<T> getter;
-            private Setter<T> setter;
+            private Getter getter;
+            private Setter setter;
             private Predicate<string> contains;
 
-            internal Variables(Getter<T> getter, Setter<T> setter, Predicate<string> contains)
+            internal Variables(Getter getter, Setter setter, Predicate<string> contains)
             {
                 this.getter = getter;
                 this.setter = setter;

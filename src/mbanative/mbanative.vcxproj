@@ -31,11 +31,16 @@
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>mbanative</TargetName>
     <ProjectModuleDefinitionFile>mbanative.def</ProjectModuleDefinitionFile>
+    <Description>Native component of WixToolset.Mba.Core</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="..\NativeMultiTargeting.Build.props" />
+
+  <ImportGroup Label="Shared">
+    <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
+  </ImportGroup>
 
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\balutil\inc</ProjectAdditionalIncludeDirectories>
@@ -63,8 +68,11 @@
     <ProjectReference Include="..\balutil\balutil.vcxproj" />
   </ItemGroup>
 
+  <Target Name="Pack" DependsOnTargets="GetBuildVersion">
+    <Exec Command='nuget pack runtime.win.WixToolset.Mba.Core.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Mba.Core;Version="$(BuildVersionSimple)";Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)"' />
+  </Target>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.2.1.65\build\Nerdbank.GitVersioning.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

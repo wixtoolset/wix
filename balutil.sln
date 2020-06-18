@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "balutil", "src\balutil\balu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bextutil", "src\bextutil\bextutil.vcxproj", "{06027492-1CB9-48BC-B31E-C1F9356ED07E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixToolset.Mba.Core", "src\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj", "{E7E1841E-A58E-4901-B9CA-4845B807D45F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Mba.Core", "src\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj", "{E7E1841E-A58E-4901-B9CA-4845B807D45F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mbanative", "src\mbanative\mbanative.vcxproj", "{665E0441-17F9-4105-B202-EDF274657F6E}"
 EndProject
@@ -52,10 +52,10 @@ Global
 		{665E0441-17F9-4105-B202-EDF274657F6E}.Release|x64.ActiveCfg = Release|Win32
 		{665E0441-17F9-4105-B202-EDF274657F6E}.Release|x86.ActiveCfg = Release|Win32
 		{665E0441-17F9-4105-B202-EDF274657F6E}.Release|x86.Build.0 = Release|Win32
-		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x64.ActiveCfg = Debug|x64
-		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x64.Build.0 = Debug|x64
-		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x86.ActiveCfg = Debug|x86
-		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x86.Build.0 = Debug|x86
+		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x64.Build.0 = Debug|Any CPU
+		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Debug|x86.Build.0 = Debug|Any CPU
 		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Release|x64.ActiveCfg = Release|Any CPU
 		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Release|x64.Build.0 = Release|Any CPU
 		{F54997F7-10D7-409B-B9F2-DB546490EDC0}.Release|x86.ActiveCfg = Release|Any CPU
