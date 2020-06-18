@@ -8,10 +8,6 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1701</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\mbanative\mbanative.vcxproj">
       <Project>{665E0441-17F9-4105-B202-EDF274657F6E}</Project>
