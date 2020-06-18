@@ -41,8 +41,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>wcautil</TargetName>
     <MultiTargetLibrary>true</MultiTargetLibrary>
-    <PlatformToolset>v141_xp</PlatformToolset>
-    <PlatformToolset Condition="$(Platform.StartsWith('ARM'))">v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Custom Action native utility library</Description>
   </PropertyGroup>
