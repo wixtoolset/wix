@@ -17,18 +17,5 @@
                 <Data Column="Component_">test.txt</Data>
             </Row>
         </CustomTable>
-
-        <CustomTable Id="CustomTable2" Unreal="yes">
-            <Column Id="ColumnA" Type="string" PrimaryKey="yes" />
-            <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" />
-            <Row>
-                <Data Column="ColumnA">RowA</Data>
-                <Data Column="Component_">test.txt</Data>
-            </Row>
-            <Row>
-                <Data Column="ColumnA">RowB</Data>
-                <Data Column="Component_">test.txt</Data>
-            </Row>
-        </CustomTable>
     </Fragment>
 </Wix>

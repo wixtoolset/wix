@@ -7,6 +7,7 @@ namespace WixToolset.Core
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
@@ -275,6 +276,9 @@ namespace WixToolset.Core
                         break;
                     case "BootstrapperApplicationRef":
                         this.ParseBootstrapperApplicationRefElement(child);
+                        break;
+                    case "BundleCustomData":
+                        this.ParseBundleCustomDataElement(child);
                         break;
                     case "BundleExtension":
                         this.ParseBundleExtensionElement(child);
@@ -764,6 +768,246 @@ namespace WixToolset.Core
             else
             {
                 this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBootstrapperApplication, id);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Parses a BundleCustomData element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        private void ParseBundleCustomDataElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string customDataId = null;
+            WixBundleCustomDataType? customDataType = null;
+            string extensionId = null;
+            var attributeDefinitions = new List<WixBundleCustomDataAttributeTuple>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            customDataId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Type":
+                            var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (typeValue)
+                            {
+                                case "bootstrapperApplication":
+                                    customDataType = WixBundleCustomDataType.BootstrapperApplication;
+                                    break;
+                                case "bundleExtension":
+                                    customDataType = WixBundleCustomDataType.BundleExtension;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "bootstrapperApplication", "bundleExtension"));
+                                    customDataType = WixBundleCustomDataType.Unknown; // set a value to prevent expected attribute error below.
+                                    break;
+                            }
+                            break;
+                        case "ExtensionId":
+                            extensionId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundleExtension, extensionId);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == customDataId)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            var hasExtensionId = null != extensionId;
+            if (hasExtensionId && !customDataType.HasValue)
+            {
+                customDataType = WixBundleCustomDataType.BundleExtension;
+            }
+
+            if (!customDataType.HasValue)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Type"));
+            }
+            else if (hasExtensionId)
+            {
+                if (customDataType.Value == WixBundleCustomDataType.BootstrapperApplication)
+                {
+                    this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ExtensonId", "Type", "bootstrapperApplication"));
+                }
+            }
+            else if (customDataType.Value == WixBundleCustomDataType.BundleExtension)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ExtensionId", "Type", "bundleExtension"));
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    switch (child.Name.LocalName)
+                    {
+                        case "BundleAttributeDefinition":
+                            var attributeDefinition = this.ParseBundleAttributeDefinitionElement(child, childSourceLineNumbers, customDataId);
+                            if (attributeDefinition != null)
+                            {
+                                attributeDefinitions.Add(attributeDefinition);
+                            }
+                            break;
+                        case "BundleElement":
+                            this.ParseBundleElementElement(child, childSourceLineNumbers, customDataId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+            if (attributeDefinitions.Count > 0)
+            {
+                if (!this.Core.EncounteredError)
+                {
+                    var attributeNames = String.Join(new string(WixBundleCustomDataTuple.AttributeNamesSeparator, 1), attributeDefinitions.Select(c => c.Name));
+
+                    this.Core.AddTuple(new WixBundleCustomDataTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, customDataId))
+                    {
+                        AttributeNames = attributeNames,
+                        Type = customDataType.Value,
+                        BundleExtensionRef = extensionId,
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses a BundleAttributeDefinition element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="sourceLineNumbers">Element's SourceLineNumbers.</param>
+        /// <param name="customDataId">BundleCustomData Id.</param>
+        private WixBundleCustomDataAttributeTuple ParseBundleAttributeDefinitionElement(XElement node, SourceLineNumber sourceLineNumbers, string customDataId)
+        {
+            string attributeName = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                switch (attrib.Name.LocalName)
+                {
+                    case "Id":
+                        attributeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                }
+            }
+
+            if (null == attributeName)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (this.Core.EncounteredError)
+            {
+                return null;
+            }
+
+            var customDataAttribute = this.Core.AddTuple(new WixBundleCustomDataAttributeTuple(sourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, attributeName))
+            {
+                CustomDataRef = customDataId,
+                Name = attributeName,
+            });
+            return customDataAttribute;
+        }
+
+        /// <summary>
+        /// Parses a BundleElement element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="sourceLineNumbers">Element's SourceLineNumbers.</param>
+        /// <param name="customDataId">BundleCustomData Id.</param>
+        private void ParseBundleElementElement(XElement node, SourceLineNumber sourceLineNumbers, string customDataId)
+        {
+            var elementId = Guid.NewGuid().ToString("N").ToUpperInvariant();
+
+            foreach (var attrib in node.Attributes())
+            {
+                this.Core.ParseExtensionAttribute(node, attrib);
+            }
+
+            foreach (var child in node.Elements())
+            {
+                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                switch (child.Name.LocalName)
+                {
+                    case "BundleAttribute":
+                        string attributeName = null;
+                        string value = null;
+                        foreach (var attrib in child.Attributes())
+                        {
+                            switch (attrib.Name.LocalName)
+                            {
+                                case "Id":
+                                    attributeName = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                                    break;
+                                case "Value":
+                                    value = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                                    break;
+                                default:
+                                    this.Core.ParseExtensionAttribute(child, attrib);
+                                    break;
+                            }
+                        }
+
+                        if (null == attributeName)
+                        {
+                            this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Id"));
+                        }
+
+                        if (String.IsNullOrEmpty(value))
+                        {
+                            value = Common.GetInnerText(child);
+                        }
+
+                        if (!this.Core.EncounteredError)
+                        {
+                            this.Core.AddTuple(new WixBundleCustomDataCellTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, elementId, attributeName))
+                            {
+                                ElementId = elementId,
+                                AttributeRef = attributeName,
+                                CustomDataRef = customDataId,
+                                Value = value,
+                            });
+                        }
+                        break;
+                    default:
+                        this.Core.UnexpectedElement(node, child);
+                        break;
+                }
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.WixBundleCustomData, customDataId);
             }
         }
 

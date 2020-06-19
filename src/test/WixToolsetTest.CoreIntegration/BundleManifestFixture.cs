@@ -13,7 +13,7 @@ namespace WixToolsetTest.CoreIntegration
     public class BundleManifestFixture
     {
         [Fact]
-        public void PopulatesBAManifestWithUnrealCustomTable()
+        public void PopulatesBAManifestWithBootstrapperApplicationBundleCustomData()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -43,11 +43,50 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var customElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:BundleCustomTable");
+                var customElements = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:BundleCustomTableBA");
                 Assert.Equal(3, customElements.Count);
-                Assert.Equal("<BundleCustomTable Id='one' Column2='two' />", customElements[0].GetTestXml());
-                Assert.Equal("<BundleCustomTable Id='&gt;' Column2='&lt;' />", customElements[1].GetTestXml());
-                Assert.Equal("<BundleCustomTable Id='1' Column2='2' />", customElements[2].GetTestXml());
+                Assert.Equal("<BundleCustomTableBA Id='one' Column2='two' />", customElements[0].GetTestXml());
+                Assert.Equal("<BundleCustomTableBA Id='&gt;' Column2='&lt;' />", customElements[1].GetTestXml());
+                Assert.Equal("<BundleCustomTableBA Id='1' Column2='2' />", customElements[2].GetTestXml());
+            }
+        }
+
+        [Fact]
+        public void PopulatesBEManifestWithBundleExtensionBundleCustomData()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleCustomTable", "BundleCustomTable.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
+                    Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", bundlePath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(bundlePath));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var customElements = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='CustomTableExtension']/be:BundleCustomTableBE");
+                Assert.Equal(3, customElements.Count);
+                Assert.Equal("<BundleCustomTableBE Id='one' Column2='two' />", customElements[0].GetTestXml());
+                Assert.Equal("<BundleCustomTableBE Id='&gt;' Column2='&lt;' />", customElements[1].GetTestXml());
+                Assert.Equal("<BundleCustomTableBE Id='1' Column2='2' />", customElements[2].GetTestXml());
             }
         }
 

@@ -208,7 +208,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 columns.Add(columnDefinition);
             }
 
-            var customTable = new TableDefinition(tuple.Id.Id, null, columns, tuple.Unreal);
+            var customTable = new TableDefinition(tuple.Id.Id, null, columns);
             return customTable;
         }
     }

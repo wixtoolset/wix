@@ -5,22 +5,42 @@
             <PackageGroupRef Id="MinimalPackageGroup" />
         </PackageGroup>
 
-        <CustomTable Id="BundleCustomTable" Unreal="yes">
-            <Column Id="Id" Type="string" PrimaryKey="yes" />
-            <Column Id="Column2" Type="string" PrimaryKey="yes" />
+        <BundleCustomData Id="BundleCustomTableBA" Type="bootstrapperApplication">
+            <BundleAttributeDefinition Id="Id" />
+            <BundleAttributeDefinition Id="Column2" />
 
-            <Row>
-                <Data Column="Id">one</Data>
-                <Data Column="Column2">two</Data>
-            </Row>
-            <Row>
-                <Data Column="Column2">&lt;</Data>
-                <Data Column="Id">&gt;</Data>
-            </Row>
-            <Row>
-                <Data Column="Id">1</Data>
-                <Data Column="Column2">2</Data>
-            </Row>
-        </CustomTable>
+            <BundleElement>
+                <BundleAttribute Id="Id">one</BundleAttribute>
+                <BundleAttribute Id="Column2">two</BundleAttribute>
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Column2">&lt;</BundleAttribute>
+                <BundleAttribute Id="Id">&gt;</BundleAttribute>
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Id">1</BundleAttribute>
+                <BundleAttribute Id="Column2">2</BundleAttribute>
+            </BundleElement>
+        </BundleCustomData>
+
+        <BundleCustomData Id="BundleCustomTableBE" Type="bundleExtension" ExtensionId="CustomTableExtension">
+            <BundleAttributeDefinition Id="Id" />
+            <BundleAttributeDefinition Id="Column2" />
+
+            <BundleElement>
+                <BundleAttribute Id="Id">one</BundleAttribute>
+                <BundleAttribute Id="Column2">two</BundleAttribute>
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Column2">&lt;</BundleAttribute>
+                <BundleAttribute Id="Id">&gt;</BundleAttribute>
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Id">1</BundleAttribute>
+                <BundleAttribute Id="Column2">2</BundleAttribute>
+            </BundleElement>
+        </BundleCustomData>
+
+        <BundleExtension Id="CustomTableExtension" SourceFile="fakeba.dll" />
     </Fragment>
 </Wix>

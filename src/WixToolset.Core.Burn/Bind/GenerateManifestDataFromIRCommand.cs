@@ -2,6 +2,7 @@
 
 namespace WixToolset.Core.Burn.Bind
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -37,8 +38,8 @@ namespace WixToolset.Core.Burn.Bind
         public void Execute()
         {
             var tuples = this.Section.Tuples.ToList();
-            var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellTuple>>();
-            var customTablesById = new Dictionary<string, WixCustomTableTuple>();
+            var cellsByCustomDataAndElementId = new Dictionary<string, List<WixBundleCustomDataCellTuple>>();
+            var customDataById = new Dictionary<string, WixBundleCustomDataTuple>();
 
             foreach (var kvp in this.ExtensionSearchTuplesById)
             {
@@ -63,6 +64,7 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixBundle:
                     case TupleDefinitionType.WixBundleCatalog:
                     case TupleDefinitionType.WixBundleContainer:
+                    case TupleDefinitionType.WixBundleCustomDataAttribute:
                     case TupleDefinitionType.WixBundleExePackage:
                     case TupleDefinitionType.WixBundleExtension:
                     case TupleDefinitionType.WixBundleMsiFeature:
@@ -82,7 +84,6 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixBundleVariable:
                     case TupleDefinitionType.WixChain:
                     case TupleDefinitionType.WixComponentSearch:
-                    case TupleDefinitionType.WixCustomTableColumn:
                     case TupleDefinitionType.WixDependencyProvider:
                     case TupleDefinitionType.WixFileSearch:
                     case TupleDefinitionType.WixGroup:
@@ -95,12 +96,12 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixUpdateRegistration:
                         break;
 
-                    case TupleDefinitionType.WixCustomTable:
-                        unknownTuple = !this.IndexCustomTableTuple((WixCustomTableTuple)tuple, customTablesById);
+                    case TupleDefinitionType.WixBundleCustomData:
+                        unknownTuple = !this.IndexBundleCustomDataTuple((WixBundleCustomDataTuple)tuple, customDataById);
                         break;
 
-                    case TupleDefinitionType.WixCustomTableCell:
-                        this.IndexCustomTableCellTuple((WixCustomTableCellTuple)tuple, cellsByTableAndRowId);
+                    case TupleDefinitionType.WixBundleCustomDataCell:
+                        this.IndexBundleCustomDataCellTuple((WixBundleCustomDataCellTuple)tuple, cellsByCustomDataAndElementId);
                         break;
 
                     case TupleDefinitionType.MustBeFromAnExtension:
@@ -118,68 +119,87 @@ namespace WixToolset.Core.Burn.Bind
                 }
             }
 
-            this.AddIndexedCellTuples(customTablesById, cellsByTableAndRowId);
+            this.AddIndexedCellTuples(customDataById, cellsByCustomDataAndElementId);
         }
 
-        private bool IndexCustomTableTuple(WixCustomTableTuple wixCustomTableTuple, Dictionary<string, WixCustomTableTuple> customTablesById)
+        private bool IndexBundleCustomDataTuple(WixBundleCustomDataTuple wixBundleCustomDataTuple, Dictionary<string, WixBundleCustomDataTuple> customDataById)
         {
-            if (!wixCustomTableTuple.Unreal)
+            switch (wixBundleCustomDataTuple.Type)
             {
-                return false;
+                case WixBundleCustomDataType.BootstrapperApplication:
+                case WixBundleCustomDataType.BundleExtension:
+                    break;
+                default:
+                    return false;
             }
 
-            var tableId = wixCustomTableTuple.Id.Id;
-            customTablesById.Add(tableId, wixCustomTableTuple);
+            var customDataId = wixBundleCustomDataTuple.Id.Id;
+            customDataById.Add(customDataId, wixBundleCustomDataTuple);
             return true;
         }
 
-        private void IndexCustomTableCellTuple(WixCustomTableCellTuple wixCustomTableCellTuple, Dictionary<string, List<WixCustomTableCellTuple>> cellsByTableAndRowId)
+        private void IndexBundleCustomDataCellTuple(WixBundleCustomDataCellTuple wixBundleCustomDataCellTuple, Dictionary<string, List<WixBundleCustomDataCellTuple>> cellsByCustomDataAndElementId)
         {
-            var tableAndRowId = wixCustomTableCellTuple.TableRef + "/" + wixCustomTableCellTuple.RowId;
-            if (!cellsByTableAndRowId.TryGetValue(tableAndRowId, out var cells))
+            var tableAndRowId = wixBundleCustomDataCellTuple.CustomDataRef + "/" + wixBundleCustomDataCellTuple.ElementId;
+            if (!cellsByCustomDataAndElementId.TryGetValue(tableAndRowId, out var cells))
             {
-                cells = new List<WixCustomTableCellTuple>();
-                cellsByTableAndRowId.Add(tableAndRowId, cells);
+                cells = new List<WixBundleCustomDataCellTuple>();
+                cellsByCustomDataAndElementId.Add(tableAndRowId, cells);
             }
 
-            cells.Add(wixCustomTableCellTuple);
+            cells.Add(wixBundleCustomDataCellTuple);
         }
 
-        private void AddIndexedCellTuples(Dictionary<string, WixCustomTableTuple> customTablesById, Dictionary<string, List<WixCustomTableCellTuple>> cellsByTableAndRowId)
+        private void AddIndexedCellTuples(Dictionary<string, WixBundleCustomDataTuple> customDataById, Dictionary<string, List<WixBundleCustomDataCellTuple>> cellsByCustomDataAndElementId)
         {
-            var sb = new StringBuilder();
-            using (var writer = XmlWriter.Create(sb, BurnBackendHelper.WriterSettings))
+            foreach (var elementValues in cellsByCustomDataAndElementId.Values)
             {
-                foreach (var rowOfCells in cellsByTableAndRowId.Values)
-                {
-                    var tableId = rowOfCells[0].TableRef;
-                    var tableTuple = customTablesById[tableId];
+                var elementName = elementValues[0].CustomDataRef;
+                var customDataTuple = customDataById[elementName];
 
-                    if (!tableTuple.Unreal)
+                var attributeNames = customDataTuple.AttributeNamesSeparated;
+
+                var elementValuesByAttribute = elementValues.ToDictionary(t => t.AttributeRef, t => t.Value);
+
+                var sb = new StringBuilder();
+                using (var writer = XmlWriter.Create(sb, BurnBackendHelper.WriterSettings))
+                {
+                    switch (customDataTuple.Type)
                     {
-                        return;
+                        case WixBundleCustomDataType.BootstrapperApplication:
+                            writer.WriteStartElement(elementName, BurnCommon.BADataNamespace);
+                            break;
+                        case WixBundleCustomDataType.BundleExtension:
+                            writer.WriteStartElement(elementName, BurnCommon.BundleExtensionDataNamespace);
+                            break;
+                        default:
+                            throw new NotImplementedException();
                     }
 
-                    var columnNames = tableTuple.ColumnNamesSeparated;
-
-                    var rowDataByColumn = rowOfCells.ToDictionary(t => t.ColumnRef, t => t.Data);
-
-                    writer.WriteStartElement(tableId, BurnCommon.BADataNamespace);
-
                     // Write all row data as attributes in table column order.
-                    foreach (var column in columnNames)
+                    foreach (var attributeName in attributeNames)
                     {
-                        if (rowDataByColumn.TryGetValue(column, out var data))
+                        if (elementValuesByAttribute.TryGetValue(attributeName, out var value))
                         {
-                            writer.WriteAttributeString(column, data);
+                            writer.WriteAttributeString(attributeName, value);
                         }
                     }
 
                     writer.WriteEndElement();
                 }
-            }
 
-            this.BackendHelper.AddBootstrapperApplicationData(sb.ToString());
+                switch (customDataTuple.Type)
+                {
+                    case WixBundleCustomDataType.BootstrapperApplication:
+                        this.BackendHelper.AddBootstrapperApplicationData(sb.ToString());
+                        break;
+                    case WixBundleCustomDataType.BundleExtension:
+                        this.BackendHelper.AddBundleExtensionData(customDataTuple.BundleExtensionRef, sb.ToString());
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
         }
 
         private bool AddTupleFromExtension(IntermediateTuple tuple)
