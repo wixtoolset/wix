@@ -146,6 +146,9 @@ namespace WixToolsetTest.CoreIntegration
                     "<ExampleSearch Id='ExampleSearchBar' SearchFor='Bar' />" +
                     "<ExampleSearch Id='ExampleSearchFoo' SearchFor='Foo' />" +
                     "</BundleExtension>", bundleExtensionDatas[0].GetTestXml());
+
+                var exampleSearches = extractResult.SelectBundleExtensionDataNodes("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']/be:ExampleSearch");
+                Assert.Equal(2, exampleSearches.Count);
             }
         }
 

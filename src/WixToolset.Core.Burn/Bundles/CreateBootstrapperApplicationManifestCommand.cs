@@ -4,7 +4,6 @@ namespace WixToolset.Core.Burn.Bundles
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -16,9 +15,7 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBootstrapperApplicationManifestCommand
     {
-        private static readonly char[] ColonCharacter = new[] { ':' };
-
-        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadTuple> payloadTuples, string intermediateFolder)
+        public CreateBootstrapperApplicationManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, IEnumerable<PackageFacade> chainPackages, int lastUXPayloadIndex, Dictionary<string, WixBundlePayloadTuple> payloadTuples, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
             this.BundleTuple = bundleTuple;
@@ -26,6 +23,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.LastUXPayloadIndex = lastUXPayloadIndex;
             this.Payloads = payloadTuples;
             this.IntermediateFolder = intermediateFolder;
+            this.InternalBurnBackendHelper = internalBurnBackendHelper;
         }
 
         private IntermediateSection Section { get; }
@@ -33,6 +31,8 @@ namespace WixToolset.Core.Burn.Bundles
         private WixBundleTuple BundleTuple { get; }
 
         private IEnumerable<PackageFacade> ChainPackages { get; }
+
+        private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
 
         private int LastUXPayloadIndex { get; }
 
@@ -71,7 +71,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.WritePayloadInfo(writer);
 
-                this.WriteCustomBootstrapperApplicationData(writer);
+                this.InternalBurnBackendHelper.WriteBootstrapperApplicationData(writer);
 
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
@@ -240,90 +240,6 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("LayoutOnly", payloadTuple.LayoutOnly ? "yes" : "no");
 
                 writer.WriteEndElement();
-            }
-        }
-
-        private void WriteCustomBootstrapperApplicationData(XmlTextWriter writer)
-        {
-            var dataTuplesGroupedByDefinitionName = this.Section.Tuples
-                .Where(t => t.Definition.HasTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag))
-                .GroupBy(t => t.Definition);
-
-            foreach (var group in dataTuplesGroupedByDefinitionName)
-            {
-                var definition = group.Key;
-
-                // We simply assert that the table (and field) name is valid, because
-                // this is up to the extension developer to get right. An author will
-                // only affect the attribute value, and that will get properly escaped.
-#if DEBUG
-                Debug.Assert(Common.IsIdentifier(definition.Name));
-                foreach (var fieldDef in definition.FieldDefinitions)
-                {
-                    Debug.Assert(Common.IsIdentifier(fieldDef.Name));
-                }
-#endif // DEBUG
-
-                foreach (var row in group)
-                {
-                    writer.WriteStartElement(definition.Name);
-
-                    foreach (var field in row.Fields)
-                    {
-                        if (!field.IsNull())
-                        {
-                            writer.WriteAttributeString(field.Definition.Name, field.AsString());
-                        }
-                    }
-
-                    writer.WriteEndElement();
-                }
-            }
-
-            var dataTablesById = this.Section.Tuples.OfType<WixCustomTableTuple>()
-                                                    .Where(t => t.Unreal && t.Id != null)
-                                                    .ToDictionary(t => t.Id.Id);
-            var cellsByTable = this.Section.Tuples.OfType<WixCustomTableCellTuple>()
-                                                  .GroupBy(t => t.TableRef);
-            foreach (var tableCells in cellsByTable)
-            {
-                var tableName = tableCells.Key;
-                if (!dataTablesById.TryGetValue(tableName, out var tableTuple))
-                {
-                    // This should have been a linker error.
-                    continue;
-                }
-
-                var columnNames = tableTuple.ColumnNamesSeparated;
-
-                // We simply assert that the table (and field) name is valid, because
-                // this is up to the extension developer to get right. An author will
-                // only affect the attribute value, and that will get properly escaped.
-#if DEBUG
-                Debug.Assert(Common.IsIdentifier(tableName));
-                foreach (var columnName in columnNames)
-                {
-                    Debug.Assert(Common.IsIdentifier(columnName));
-                }
-#endif // DEBUG
-
-                foreach (var rowCells in tableCells.GroupBy(t => t.RowId))
-                {
-                    var rowDataByColumn = rowCells.ToDictionary(t => t.ColumnRef, t => t.Data);
-
-                    writer.WriteStartElement(tableName);
-
-                    // Write all row data as attributes in table column order.
-                    foreach (var column in columnNames)
-                    {
-                        if (rowDataByColumn.TryGetValue(column, out var data))
-                        {
-                            writer.WriteAttributeString(column, data);
-                        }
-                    }
-
-                    writer.WriteEndElement();
-                }
             }
         }
 

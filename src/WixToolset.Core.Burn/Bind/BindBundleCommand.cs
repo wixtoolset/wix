@@ -30,6 +30,7 @@ namespace WixToolset.Core.Burn
             this.Messaging = context.ServiceProvider.GetService<IMessaging>();
 
             this.BackendHelper = context.ServiceProvider.GetService<IBackendHelper>();
+            this.InternalBurnBackendHelper = context.ServiceProvider.GetService<IInternalBurnBackendHelper>();
 
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
             this.DelayedFields = context.DelayedFields;
@@ -48,6 +49,8 @@ namespace WixToolset.Core.Burn
         private IMessaging Messaging { get; }
 
         private IBackendHelper BackendHelper { get; }
+
+        private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
 
         private CompressionLevel? DefaultCompressionLevel { get; }
 
@@ -386,6 +389,12 @@ namespace WixToolset.Core.Burn
             // Update the bundle per-machine/per-user scope based on the chained packages.
             this.ResolveBundleInstallScope(section, bundleTuple, orderedFacades);
 
+            // Generate data for all manifests.
+            {
+                var command = new GenerateManifestDataFromIRCommand(this.Messaging, section, this.BackendExtensions, this.InternalBurnBackendHelper, extensionSearchTuplesById);
+                command.Execute();
+            }
+
             // Give the extension one last hook before generating the output files.
             foreach (var extension in this.BackendExtensions)
             {
@@ -400,7 +409,7 @@ namespace WixToolset.Core.Burn
             // Generate the core-defined BA manifest tables...
             string baManifestPath;
             {
-                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleTuple, orderedFacades, uxPayloadIndex, payloadTuples, this.IntermediateFolder);
+                var command = new CreateBootstrapperApplicationManifestCommand(section, bundleTuple, orderedFacades, uxPayloadIndex, payloadTuples, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var baManifestPayload = command.BootstrapperApplicationManifestPayloadRow;
@@ -414,7 +423,7 @@ namespace WixToolset.Core.Burn
             // Generate the bundle extension manifest...
             string bextManifestPath;
             {
-                var command = new CreateBundleExtensionManifestCommand(section, bundleTuple, extensionSearchTuplesById, uxPayloadIndex, this.IntermediateFolder);
+                var command = new CreateBundleExtensionManifestCommand(section, bundleTuple, uxPayloadIndex, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
                 var bextManifestPayload = command.BundleExtensionManifestPayloadRow;

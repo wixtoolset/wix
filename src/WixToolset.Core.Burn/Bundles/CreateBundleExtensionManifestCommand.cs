@@ -3,11 +3,8 @@
 namespace WixToolset.Core.Burn.Bundles
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Text;
     using System.Xml;
     using WixToolset.Data;
@@ -16,20 +13,20 @@ namespace WixToolset.Core.Burn.Bundles
 
     internal class CreateBundleExtensionManifestCommand
     {
-        public CreateBundleExtensionManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, IDictionary<string, IList<IntermediateTuple>> extensionSearchTuplesByExtensionId, int lastUXPayloadIndex, string intermediateFolder)
+        public CreateBundleExtensionManifestCommand(IntermediateSection section, WixBundleTuple bundleTuple, int lastUXPayloadIndex, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
             this.BundleTuple = bundleTuple;
-            this.ExtensionSearchTuplesByExtensionId = extensionSearchTuplesByExtensionId;
             this.LastUXPayloadIndex = lastUXPayloadIndex;
             this.IntermediateFolder = intermediateFolder;
+            this.InternalBurnBackendHelper = internalBurnBackendHelper;
         }
 
         private IntermediateSection Section { get; }
 
         private WixBundleTuple BundleTuple { get; }
 
-        private IDictionary<string, IList<IntermediateTuple>> ExtensionSearchTuplesByExtensionId { get; }
+        private IInternalBurnBackendHelper InternalBurnBackendHelper { get; }
 
         private int LastUXPayloadIndex { get; }
 
@@ -58,68 +55,13 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteStartDocument();
                 writer.WriteStartElement("BundleExtensionData", BurnCommon.BundleExtensionDataNamespace);
 
-                foreach (var kvp in this.ExtensionSearchTuplesByExtensionId)
-                {
-                    this.WriteExtension(writer, kvp.Key, kvp.Value);
-                }
+                this.InternalBurnBackendHelper.WriteBundleExtensionData(writer);
 
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
             }
 
             return path;
-        }
-
-        private void WriteExtension(XmlTextWriter writer, string extensionId, IEnumerable<IntermediateTuple> tuples)
-        {
-            writer.WriteStartElement("BundleExtension");
-
-            writer.WriteAttributeString("Id", extensionId);
-
-            this.WriteBundleExtensionDataTuples(writer, tuples);
-
-            writer.WriteEndElement();
-        }
-
-        private void WriteBundleExtensionDataTuples(XmlTextWriter writer, IEnumerable<IntermediateTuple> tuples)
-        {
-            var dataTuplesGroupedByDefinitionName = tuples.GroupBy(t => t.Definition);
-
-            foreach (var group in dataTuplesGroupedByDefinitionName)
-            {
-                var definition = group.Key;
-
-                // We simply assert that the table (and field) name is valid, because
-                // this is up to the extension developer to get right. An author will
-                // only affect the attribute value, and that will get properly escaped.
-#if DEBUG
-                Debug.Assert(Common.IsIdentifier(definition.Name));
-                foreach (var fieldDef in definition.FieldDefinitions)
-                {
-                    Debug.Assert(Common.IsIdentifier(fieldDef.Name));
-                }
-#endif // DEBUG
-
-                foreach (var tuple in group)
-                {
-                    writer.WriteStartElement(definition.Name);
-
-                    if (tuple.Id != null)
-                    {
-                        writer.WriteAttributeString("Id", tuple.Id.Id);
-                    }
-
-                    foreach (var field in tuple.Fields)
-                    {
-                        if (!field.IsNull())
-                        {
-                            writer.WriteAttributeString(field.Definition.Name, field.AsString());
-                        }
-                    }
-
-                    writer.WriteEndElement();
-                }
-            }
         }
 
         private WixBundlePayloadTuple CreateBundleExtensionManifestPayloadRow(string bextManifestPath)
