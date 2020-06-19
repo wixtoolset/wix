@@ -159,6 +159,36 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void UnrealCustomTableIsNotPresentInMsi()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "CustomTable", "CustomTable.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "CustomTable2" });
+                Assert.Empty(results);
+            }
+        }
+
+        [Fact]
         public void CanCompileAndDecompile()
         {
             var folder = TestData.Get(@"TestData");

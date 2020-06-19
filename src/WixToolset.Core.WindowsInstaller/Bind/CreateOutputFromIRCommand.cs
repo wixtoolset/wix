@@ -4,7 +4,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
@@ -979,7 +978,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (customTableDefinition.Unreal)
                 {
-                    Debug.Assert(false, "CustomTableDefinition should never be unreal.");
                     continue;
                 }
 

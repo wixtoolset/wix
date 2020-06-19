@@ -3668,6 +3668,7 @@ namespace WixToolset.Core
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             string tableId = null;
+            var unreal = false;
             var columns = new List<WixCustomTableColumnTuple>();
 
             foreach (var attrib in node.Attributes())
@@ -3678,6 +3679,9 @@ namespace WixToolset.Core
                     {
                     case "Id":
                         tableId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        break;
+                    case "Unreal":
+                        unreal = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3741,6 +3745,7 @@ namespace WixToolset.Core
                     this.Core.AddTuple(new WixCustomTableTuple(sourceLineNumbers, new Identifier(AccessModifier.Public, tableId))
                     {
                         ColumnNames = columnNames,
+                        Unreal = unreal,
                     });
                 }
             }
