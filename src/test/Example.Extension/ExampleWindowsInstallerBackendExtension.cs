@@ -27,7 +27,7 @@ namespace Example.Extension
                 }
             }
 
-            return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(section, tuple, output, tableDefinitions);
+            return base.TryAddTupleToOutput(section, tuple, output, tableDefinitions);
         }
     }
 }
