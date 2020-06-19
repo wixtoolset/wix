@@ -55,7 +55,7 @@ namespace WixToolset.Extensibility
 
         public virtual bool TryAddTupleToOutput(IntermediateSection section, IntermediateTuple tuple, WindowsInstallerData output, TableDefinitionCollection tableDefinitions)
         {
-            if (this.TableDefinitions.Any())
+            if (this.TableDefinitions.Any(t => t.TupleDefinition == tuple.Definition))
             {
                 return this.BackendHelper.TryAddTupleToOutputMatchingTableDefinitions(section, tuple, output, tableDefinitions);
             }
