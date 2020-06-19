@@ -11,7 +11,6 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.ColumnNames), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixCustomTableTupleFields.Unreal), IntermediateFieldType.Bool),
             },
             typeof(WixCustomTableTuple));
     }
@@ -22,7 +21,6 @@ namespace WixToolset.Data.Tuples
     public enum WixCustomTableTupleFields
     {
         ColumnNames,
-        Unreal,
     }
 
     public class WixCustomTableTuple : IntermediateTuple
@@ -43,12 +41,6 @@ namespace WixToolset.Data.Tuples
         {
             get => (string)this.Fields[(int)WixCustomTableTupleFields.ColumnNames];
             set => this.Set((int)WixCustomTableTupleFields.ColumnNames, value);
-        }
-
-        public bool Unreal
-        {
-            get => (bool)this.Fields[(int)WixCustomTableTupleFields.Unreal];
-            set => this.Set((int)WixCustomTableTupleFields.Unreal, value);
         }
 
         public string[] ColumnNamesSeparated => this.ColumnNames.Split(ColumnNamesSeparator);

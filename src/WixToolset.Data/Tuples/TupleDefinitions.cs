@@ -120,6 +120,9 @@ namespace WixToolset.Data
         WixBundle,
         WixBundleCatalog,
         WixBundleContainer,
+        WixBundleCustomData,
+        WixBundleCustomDataAttribute,
+        WixBundleCustomDataCell,
         WixBundleExePackage,
         WixBundleExtension,
         WixBundleMsiFeature,
@@ -541,6 +544,15 @@ namespace WixToolset.Data
 
                 case TupleDefinitionType.WixBundleContainer:
                     return TupleDefinitions.WixBundleContainer;
+
+                case TupleDefinitionType.WixBundleCustomData:
+                    return TupleDefinitions.WixBundleCustomData;
+
+                case TupleDefinitionType.WixBundleCustomDataAttribute:
+                    return TupleDefinitions.WixBundleCustomDataAttribute;
+
+                case TupleDefinitionType.WixBundleCustomDataCell:
+                    return TupleDefinitions.WixBundleCustomDataCell;
 
                 case TupleDefinitionType.WixBundleExtension:
                     return TupleDefinitions.WixBundleExtension;
