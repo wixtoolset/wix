@@ -82,11 +82,13 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixBundleSlipstreamMsp:
                     case TupleDefinitionType.WixBundleUpdate:
                     case TupleDefinitionType.WixBundleVariable:
+                    case TupleDefinitionType.WixBuildInfo:
                     case TupleDefinitionType.WixChain:
                     case TupleDefinitionType.WixComponentSearch:
                     case TupleDefinitionType.WixDependencyProvider:
                     case TupleDefinitionType.WixFileSearch:
                     case TupleDefinitionType.WixGroup:
+                    case TupleDefinitionType.WixOrdering:
                     case TupleDefinitionType.WixProductSearch:
                     case TupleDefinitionType.WixRegistrySearch:
                     case TupleDefinitionType.WixRelatedBundle:
@@ -94,6 +96,10 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixSearchRelation:
                     case TupleDefinitionType.WixSetVariable:
                     case TupleDefinitionType.WixUpdateRegistration:
+                        break;
+
+                    // Tuples to investigate:
+                    case TupleDefinitionType.WixChainItem:
                         break;
 
                     case TupleDefinitionType.WixBundleCustomData:
