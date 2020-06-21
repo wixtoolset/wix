@@ -75,8 +75,10 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixBundlePackage:
                     case TupleDefinitionType.WixBundlePackageCommandLine:
                     case TupleDefinitionType.WixBundlePackageExitCode:
+                    case TupleDefinitionType.WixBundlePackageGroup:
                     case TupleDefinitionType.WixBundlePatchTargetCode:
                     case TupleDefinitionType.WixBundlePayload:
+                    case TupleDefinitionType.WixBundlePayloadGroup:
                     case TupleDefinitionType.WixBundleRelatedPackage:
                     case TupleDefinitionType.WixBundleRollbackBoundary:
                     case TupleDefinitionType.WixBundleSlipstreamMsp:
@@ -88,7 +90,6 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixDependencyProvider:
                     case TupleDefinitionType.WixFileSearch:
                     case TupleDefinitionType.WixGroup:
-                    case TupleDefinitionType.WixOrdering:
                     case TupleDefinitionType.WixProductSearch:
                     case TupleDefinitionType.WixRegistrySearch:
                     case TupleDefinitionType.WixRelatedBundle:
@@ -96,6 +97,13 @@ namespace WixToolset.Core.Burn.Bind
                     case TupleDefinitionType.WixSearchRelation:
                     case TupleDefinitionType.WixSetVariable:
                     case TupleDefinitionType.WixUpdateRegistration:
+                        break;
+
+                    // Tuples used before binding.
+                    case TupleDefinitionType.WixComplexReference:
+                    case TupleDefinitionType.WixOrdering:
+                    case TupleDefinitionType.WixSimpleReference:
+                    case TupleDefinitionType.WixVariable:
                         break;
 
                     // Tuples to investigate:
