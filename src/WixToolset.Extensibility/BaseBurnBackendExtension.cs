@@ -2,7 +2,10 @@
 
 namespace WixToolset.Extensibility
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -23,13 +26,13 @@ namespace WixToolset.Extensibility
         /// </summary>
         protected IBurnBackendHelper BackendHelper { get; private set; }
 
+        /// <summary>
+        /// Optional tuple definitions.
+        /// </summary>
+        protected virtual IEnumerable<IntermediateTupleDefinition> TupleDefinitions => Enumerable.Empty<IntermediateTupleDefinition>();
+
         public virtual void BundleFinalize()
         {
-        }
-
-        public virtual bool IsTupleForExtension(IntermediateTuple tuple)
-        {
-            return false;
         }
 
         public virtual void PostBackendBind(IBindResult result)
@@ -55,7 +58,8 @@ namespace WixToolset.Extensibility
 
         public virtual bool TryAddTupleToDataManifest(IntermediateSection section, IntermediateTuple tuple)
         {
-            if (this.IsTupleForExtension(tuple) && tuple.HasTag(WixToolset.Data.Burn.BurnConstants.BootstrapperApplicationDataTupleDefinitionTag))
+            if (this.TupleDefinitions.Any(t => t == tuple.Definition) &&
+                tuple.Definition.HasTag(BurnConstants.BootstrapperApplicationDataTupleDefinitionTag))
             {
                 this.BackendHelper.AddBootstrapperApplicationData(tuple);
                 return true;
