@@ -528,6 +528,11 @@ namespace WixToolset.Data
             return Message(null, Ids.ExpectedDirectoryGotFile, "The {0} option requires a directory, but the provided path is a file: {1}", option, path);
         }
 
+        public static Message ExpectedElement(SourceLineNumber sourceLineNumbers, string elementName)
+        {
+            return Message(sourceLineNumbers, Ids.ExpectedElement, "A {0} element must have at least one child element.", elementName);
+        }
+
         public static Message ExpectedElement(SourceLineNumber sourceLineNumbers, string elementName, string childName)
         {
             return Message(sourceLineNumbers, Ids.ExpectedElement, "A {0} element must have at least one child element of type {1}.", elementName, childName);
