@@ -5,10 +5,35 @@
             <PackageGroupRef Id="MinimalPackageGroup" />
         </PackageGroup>
 
-        <BundleCustomData Id="BundleCustomTableBA" Type="bootstrapperApplication">
+        <BundleCustomData Id="BundleCustomTableBA">
             <BundleAttributeDefinition Id="Id" />
             <BundleAttributeDefinition Id="Column2" />
 
+            <BundleElement>
+                <BundleAttribute Id="Id">one</BundleAttribute>
+                <BundleAttribute Id="Column2">two</BundleAttribute>
+            </BundleElement>
+            <BundleElement>
+                <BundleAttribute Id="Column2">&lt;</BundleAttribute>
+                <BundleAttribute Id="Id">&gt;</BundleAttribute>
+            </BundleElement>
+        </BundleCustomData>
+
+        <BundleCustomData Id="BundleCustomTableBE" ExtensionId="CustomTableExtension">
+            <BundleAttributeDefinition Id="Id" />
+            <BundleAttributeDefinition Id="Column2" />
+        </BundleCustomData>
+    </Fragment>
+
+    <Fragment>
+        <BundleCustomDataRef Id="BundleCustomTableBA">
+            <BundleElement>
+                <BundleAttribute Id="Id">1</BundleAttribute>
+                <BundleAttribute Id="Column2">2</BundleAttribute>
+            </BundleElement>
+        </BundleCustomDataRef>
+
+        <BundleCustomDataRef Id="BundleCustomTableBE">
             <BundleElement>
                 <BundleAttribute Id="Id">one</BundleAttribute>
                 <BundleAttribute Id="Column2">two</BundleAttribute>
@@ -21,25 +46,7 @@
                 <BundleAttribute Id="Id">1</BundleAttribute>
                 <BundleAttribute Id="Column2">2</BundleAttribute>
             </BundleElement>
-        </BundleCustomData>
-
-        <BundleCustomData Id="BundleCustomTableBE" Type="bundleExtension" ExtensionId="CustomTableExtension">
-            <BundleAttributeDefinition Id="Id" />
-            <BundleAttributeDefinition Id="Column2" />
-
-            <BundleElement>
-                <BundleAttribute Id="Id">one</BundleAttribute>
-                <BundleAttribute Id="Column2">two</BundleAttribute>
-            </BundleElement>
-            <BundleElement>
-                <BundleAttribute Id="Column2">&lt;</BundleAttribute>
-                <BundleAttribute Id="Id">&gt;</BundleAttribute>
-            </BundleElement>
-            <BundleElement>
-                <BundleAttribute Id="Id">1</BundleAttribute>
-                <BundleAttribute Id="Column2">2</BundleAttribute>
-            </BundleElement>
-        </BundleCustomData>
+        </BundleCustomDataRef>
 
         <BundleExtension Id="CustomTableExtension" SourceFile="fakeba.dll" />
     </Fragment>

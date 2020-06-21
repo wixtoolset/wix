@@ -6229,6 +6229,9 @@ namespace WixToolset.Core
                     case "BundleCustomData":
                         this.ParseBundleCustomDataElement(child);
                         break;
+                    case "BundleCustomDataRef":
+                        this.ParseBundleCustomDataRefElement(child);
+                        break;
                     case "BundleExtension":
                         this.ParseBundleExtensionElement(child);
                         break;

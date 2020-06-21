@@ -280,6 +280,9 @@ namespace WixToolset.Core
                     case "BundleCustomData":
                         this.ParseBundleCustomDataElement(child);
                         break;
+                    case "BundleCustomDataRef":
+                        this.ParseBundleCustomDataRefElement(child);
+                        break;
                     case "BundleExtension":
                         this.ParseBundleExtensionElement(child);
                         break;
@@ -784,6 +787,7 @@ namespace WixToolset.Core
             WixBundleCustomDataType? customDataType = null;
             string extensionId = null;
             var attributeDefinitions = new List<WixBundleCustomDataAttributeTuple>();
+            var foundAttributeDefinitions = false;
 
             foreach (var attrib in node.Attributes())
             {
@@ -831,9 +835,9 @@ namespace WixToolset.Core
             }
 
             var hasExtensionId = null != extensionId;
-            if (hasExtensionId && !customDataType.HasValue)
+            if (!customDataType.HasValue)
             {
-                customDataType = WixBundleCustomDataType.BundleExtension;
+                customDataType = hasExtensionId ? WixBundleCustomDataType.BundleExtension : WixBundleCustomDataType.BootstrapperApplication;
             }
 
             if (!customDataType.HasValue)
@@ -860,6 +864,8 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "BundleAttributeDefinition":
+                            foundAttributeDefinitions = true;
+
                             var attributeDefinition = this.ParseBundleAttributeDefinitionElement(child, childSourceLineNumbers, customDataId);
                             if (attributeDefinition != null)
                             {
@@ -893,6 +899,73 @@ namespace WixToolset.Core
                         BundleExtensionRef = extensionId,
                     });
                 }
+            }
+            else if (!foundAttributeDefinitions)
+            {
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName, "BundleAttributeDefinition"));
+            }
+        }
+
+        /// <summary>
+        /// Parses a BundleCustomDataRef element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        private void ParseBundleCustomDataRefElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string customDataId = null;
+            var foundChild = false;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            customDataId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == customDataId)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            foreach (var child in node.Elements())
+            {
+                foundChild = true;
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                    switch (child.Name.LocalName)
+                    {
+                        case "BundleElement":
+                            this.ParseBundleElementElement(child, childSourceLineNumbers, customDataId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionElement(node, child);
+                }
+            }
+
+            if (!foundChild)
+            {
+                this.Core.Write(ErrorMessages.ExpectedElement(sourceLineNumbers, node.Name.LocalName));
             }
         }
 
