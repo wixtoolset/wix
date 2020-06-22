@@ -1,6 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#include "dutilsources.h"
 
 #define DAPI __stdcall
 #define DAPIV __cdecl // used only for functions taking variable length arguments
@@ -19,13 +20,6 @@ typedef enum REPORT_LEVEL
     REPORT_DEBUG,     // reporting useful when debugging code
     REPORT_ERROR,     // always gets reported, but can never be specified
 } REPORT_LEVEL;
-
-typedef enum DUTIL_SOURCE
-{
-    DUTIL_SOURCE_UNKNOWN,
-
-    DUTIL_SOURCE_EXTERNAL = 256,
-} DUTIL_SOURCE;
 
 // asserts and traces
 typedef BOOL (DAPI *DUTIL_ASSERTDISPLAYFUNCTION)(__in_z LPCSTR sz);

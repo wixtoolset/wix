@@ -140,6 +140,7 @@
     <ClInclude Include="inc\dirutil.h" />
     <ClInclude Include="inc\dlutil.h" />
     <ClInclude Include="inc\dutil.h" />
+    <ClInclude Include="inc\dutilsources.h" />
     <ClInclude Include="inc\eseutil.h" />
     <ClInclude Include="inc\fileutil.h" />
     <ClInclude Include="inc\gdiputil.h" />

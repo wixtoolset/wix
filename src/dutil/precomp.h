@@ -40,6 +40,7 @@
 #include <commctrl.h>
 #include <dbt.h>
 
+#include "dutilsources.h"
 #include "dutil.h"
 #include "aclutil.h"
 #include "atomutil.h"
