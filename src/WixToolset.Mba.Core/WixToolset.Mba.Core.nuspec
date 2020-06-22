@@ -15,8 +15,6 @@
       <group>
         <dependency id="runtime.win.WixToolset.Mba.Core" version="$version$" />
       </group>
-      <group targetFramework=".NETFramework2.0" />
-      <group targetFramework=".NETStandard2.0" />
     </dependencies>
   </metadata>
 
