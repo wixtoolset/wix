@@ -13,11 +13,11 @@
             <Payload Name='!(wix.WixStdbaLicenseRtfName=license.rtf)' Compressed='yes' SourceFile='!(wix.WixStdbaLicenseRtf=LoremIpsumLicense.rtf)' />
         </PayloadGroup>
 
-        <CustomTable Id='WixStdbaInformation'>
-            <Row>
-                <Data Column='LicenseFile'>!(wix.WixStdbaLicenseRtfName=license.rtf)</Data>
-            </Row>
-        </CustomTable>
+        <BundleCustomDataRef Id='WixStdbaInformation'>
+            <BundleElement>
+                <BundleAttribute Id='LicenseFile'>!(wix.WixStdbaLicenseRtfName=license.rtf)</BundleAttribute>
+            </BundleElement>
+        </BundleCustomDataRef>
     </Fragment>
 
     <!-- RTF Large License Payload Group -->
@@ -30,11 +30,11 @@
             <Payload Name='!(wix.WixStdbaLicenseRtfName=license.rtf)' Compressed='yes' SourceFile='!(wix.WixStdbaLicenseRtf=LoremIpsumLicense.rtf)' />
         </PayloadGroup>
 
-        <CustomTable Id='WixStdbaInformation'>
-            <Row>
-                <Data Column='LicenseFile'>!(wix.WixStdbaLicenseRtfName=license.rtf)</Data>
-            </Row>
-        </CustomTable>
+        <BundleCustomDataRef Id='WixStdbaInformation'>
+            <BundleElement>
+                <BundleAttribute Id='LicenseFile'>!(wix.WixStdbaLicenseRtfName=license.rtf)</BundleAttribute>
+            </BundleElement>
+        </BundleCustomDataRef>
     </Fragment>
 
     <!-- Hyperlink License Payload Group -->
@@ -45,11 +45,11 @@
             <Payload Name='logo.png' Compressed='yes' SourceFile='!(wix.WixStdbaLogo=logo.png)' />
         </PayloadGroup>
 
-        <CustomTable Id='WixStdbaInformation'>
-            <Row>
-                <Data Column='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</Data>
-            </Row>
-        </CustomTable>
+        <BundleCustomDataRef Id='WixStdbaInformation'>
+            <BundleElement>
+                <BundleAttribute Id='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</BundleAttribute>
+            </BundleElement>
+        </BundleCustomDataRef>
     </Fragment>
 
     <!-- Hyperlink Large License Payload Group -->
@@ -60,11 +60,11 @@
             <Payload Name='logo.png' Compressed='yes' SourceFile='!(wix.WixStdbaLogo=logo.png)' />
         </PayloadGroup>
 
-        <CustomTable Id='WixStdbaInformation'>
-            <Row>
-                <Data Column='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</Data>
-            </Row>
-        </CustomTable>
+        <BundleCustomDataRef Id='WixStdbaInformation'>
+            <BundleElement>
+                <BundleAttribute Id='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</BundleAttribute>
+            </BundleElement>
+        </BundleCustomDataRef>
     </Fragment>
 
     <!-- HyperlinkSidebar License Payload Group -->
@@ -76,18 +76,18 @@
             <Payload Name='logoside.png' Compressed='yes' SourceFile='!(wix.WixStdbaLogoSide=logoside.png)' />
         </PayloadGroup>
 
-        <CustomTable Id='WixStdbaInformation'>
-            <Row>
-                <Data Column='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</Data>
-            </Row>
-        </CustomTable>
+        <BundleCustomDataRef Id='WixStdbaInformation'>
+            <BundleElement>
+                <BundleAttribute Id='LicenseUrl'>!(wix.WixStdbaLicenseUrl)</BundleAttribute>
+            </BundleElement>
+        </BundleCustomDataRef>
     </Fragment>
 
     <!-- BootstrapperApplicationData tables definition -->
     <Fragment>
-        <CustomTable Id='WixStdbaInformation' Unreal='yes'>
-            <Column Id='LicenseFile' Category='Text' Type='string' Width='0' Nullable='yes' PrimaryKey='yes' />
-            <Column Id='LicenseUrl' Category='Text' Type='string' Width='0' Nullable='yes' PrimaryKey='yes' />
-        </CustomTable>
+        <BundleCustomData Id='WixStdbaInformation'>
+            <BundleAttributeDefinition Id='LicenseFile' />
+            <BundleAttributeDefinition Id='LicenseUrl' />
+        </BundleCustomData>
     </Fragment>
 </Wix>

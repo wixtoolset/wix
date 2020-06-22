@@ -3,6 +3,7 @@
 namespace WixToolset.Bal
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Bal.Tuples;
     using WixToolset.Data;
@@ -12,6 +13,20 @@ namespace WixToolset.Bal
 
     public class BalBurnBackendExtension : BaseBurnBackendExtension
     {
+        private static readonly IntermediateTupleDefinition[] BurnTupleDefinitions =
+        {
+            BalTupleDefinitions.WixBalBAFactoryAssembly,
+            BalTupleDefinitions.WixBalBAFunctions,
+            BalTupleDefinitions.WixBalCondition,
+            BalTupleDefinitions.WixBalPackageInfo,
+            BalTupleDefinitions.WixDncOptions,
+            BalTupleDefinitions.WixMbaPrereqInformation,
+            BalTupleDefinitions.WixStdbaOptions,
+            BalTupleDefinitions.WixStdbaOverridableVariable,
+        };
+
+        protected override IEnumerable<IntermediateTupleDefinition> TupleDefinitions => BurnTupleDefinitions;
+
         public override void BundleFinalize()
         {
             base.BundleFinalize();

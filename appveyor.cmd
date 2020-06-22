@@ -1,17 +1,18 @@
 @setlocal
 @pushd %~dp0
+@set _C=Release
 
-nuget restore
+nuget restore || exit /b
 
-msbuild -p:Configuration=Release -t:Restore
+msbuild -p:Configuration=%_C% -t:Restore || exit /b
 
-msbuild -p:Configuration=Release
+msbuild -p:Configuration=%_C% || exit /b
 
-msbuild -p:Configuration=Release -t:Pack src\wixext\WixToolset.Bal.wixext.csproj
-msbuild -p:Configuration=Release -t:Pack src\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj
+msbuild -p:Configuration=%_C% -t:Pack src\wixext\WixToolset.Bal.wixext.csproj || exit /b
+msbuild -p:Configuration=%_C% -t:Pack src\WixToolset.Mba.Host\WixToolset.Mba.Host.csproj || exit /b
 
-msbuild -p:Configuration=Release src\test\WixToolsetTest.Bal\WixToolsetTest.Bal.csproj
-dotnet test -c Release --no-build src\test\WixToolsetTest.Bal
+msbuild -p:Configuration=%_C% src\test\WixToolsetTest.Bal\WixToolsetTest.Bal.csproj || exit /b
+dotnet test -c %_C% --no-build src\test\WixToolsetTest.Bal || exit /b
 
 @popd
 @endlocal

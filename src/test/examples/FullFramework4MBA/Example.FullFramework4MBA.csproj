@@ -5,11 +5,12 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <Description>Full Framework v4 MBA</Description>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
-    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.22" PrivateAssets="All" />
+    <PackageReference Include="WixToolset.Mba.Core" Version="4.0.26" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

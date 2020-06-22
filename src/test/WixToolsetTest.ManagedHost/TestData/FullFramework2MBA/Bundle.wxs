@@ -3,10 +3,10 @@
      xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="FullFramework2MBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
         <BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost">
-            <Payload SourceFile="Example.FullFramework2MBA\Example.FullFramework2MBA.dll" />
-            <Payload SourceFile="Example.FullFramework2MBA\mbanative.dll" />
-            <Payload SourceFile="Example.FullFramework2MBA\WixToolset.Mba.Core.dll" />
-            <Payload SourceFile="Example.FullFramework2MBA\WixToolset.Mba.Host.config" />
+            <Payload SourceFile="Example.FullFramework2MBA\net20\win-x86\Example.FullFramework2MBA.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\net20\win-x86\mbanative.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\net20\win-x86\WixToolset.Mba.Core.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\net20\win-x86\WixToolset.Mba.Host.config" />
         </BootstrapperApplicationRef>
         <Chain>
             <PackageGroupRef Id="NetFx462RedistAsPrereq" />
