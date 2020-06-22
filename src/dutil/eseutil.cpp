@@ -85,13 +85,13 @@ HRESULT HresultFromJetError(JET_ERR jEr)
     }
 
     // Log the actual Jet error code so we have record of it before it's morphed into an HRESULT to be compatible with the rest of our code
-    ExitTrace(hr, "Encountered Jet Error: 0x%08x", jEr);
+    ExitTraceSource(DUTIL_SOURCE_DEFAULT, hr, "Encountered Jet Error: 0x%08x", jEr);
 
     return hr;
 }
 
-#define ExitOnJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { ExitTrace(x, s, __VA_ARGS__); goto LExit; }}
-#define ExitOnRootJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { Dutil_RootFailure(__FILE__, __LINE__, x); ExitTrace(x, s, __VA_ARGS__); goto LExit; }}
+#define ExitOnJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { ExitTraceSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__); goto LExit; }}
+#define ExitOnRootJetFailure(e, x, s, ...) { x = HresultFromJetError(e); if (S_OK != x) { Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(DUTIL_SOURCE_DEFAULT, x, s, __VA_ARGS__); goto LExit; }}
 
 HRESULT DAPI EseBeginSession(
     __out JET_INSTANCE *pjiInstance,

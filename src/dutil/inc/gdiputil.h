@@ -2,7 +2,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
-#define ExitOnGdipFailure(g, x, s, ...) { x = GdipHresultFromStatus(g); if (FAILED(x)) { Dutil_RootFailure(__FILE__, __LINE__, x); ExitTrace(x, s, __VA_ARGS__); goto LExit; } }
+#define ExitOnGdipFailureSource(d, g, x, s, ...) { x = GdipHresultFromStatus(g); if (FAILED(x)) { Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, s, __VA_ARGS__); goto LExit; } }
+#define ExitOnGdipFailure(g, x, s, ...) ExitOnGdipFailureSource(DUTIL_SOURCE_DEFAULT, g, x, s, __VA_ARGS__)
 
 #ifdef __cplusplus
 extern "C" {

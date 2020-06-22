@@ -6,9 +6,11 @@
 extern "C" {
 #endif
 
-#define LogExitOnFailure(x, i, f, ...) if (FAILED(x)) { LogErrorId(x, i, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
+#define LogExitOnFailureSource(d, x, i, f, ...) if (FAILED(x)) { LogErrorId(x, i, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define LogExitOnRootFailureSource(d, x, i, f, ...) if (FAILED(x)) { LogErrorId(x, i, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 
-#define LogExitOnRootFailure(x, i, f, ...) if (FAILED(x)) { LogErrorId(x, i, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
+#define LogExitOnFailure(x, i, f, ...) LogExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, i, f, __VA_ARGS__)
+#define LogExitOnRootFailure(x, i, f, ...) LogExitOnRootFailureSource(DUTIL_SOURCE_DEFAULT, x, i, f, __VA_ARGS__)
 
 typedef HRESULT (DAPI *PFN_LOGSTRINGWORKRAW)(
     __in_z LPCSTR szString,

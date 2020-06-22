@@ -13,7 +13,25 @@ static DUTIL_ASSERTDISPLAYFUNCTION Dutil_pfnDisplayAssert = NULL;
 static BOOL Dutil_fNoAsserts = FALSE;
 static REPORT_LEVEL Dutil_rlCurrentTrace = REPORT_STANDARD;
 static BOOL Dutil_fTraceFilenames = FALSE;
+static DUTIL_CALLBACK_TRACEERROR vpfnTraceErrorCallback = NULL;
 
+
+DAPI_(HRESULT) DutilInitialize(
+    __in_opt DUTIL_CALLBACK_TRACEERROR pfnTraceErrorCallback
+    )
+{
+    HRESULT hr = S_OK;
+
+    vpfnTraceErrorCallback = pfnTraceErrorCallback;
+
+    return hr;
+}
+
+
+DAPI_(void) DutilUninitialize()
+{
+    vpfnTraceErrorCallback = NULL;
+}
 
 /*******************************************************************
 Dutil_SetAssertModule
@@ -216,7 +234,7 @@ extern "C" REPORT_LEVEL DAPI Dutil_TraceGetLevel()
 Dutil_Trace
 
 *******************************************************************/
-extern "C" void DAPI Dutil_Trace(
+extern "C" void DAPIV Dutil_Trace(
     __in_z LPCSTR szFile, 
     __in int iLine, 
     __in REPORT_LEVEL rl, 
@@ -293,7 +311,7 @@ extern "C" void DAPI Dutil_Trace(
 Dutil_TraceError
 
 *******************************************************************/
-extern "C" void DAPI Dutil_TraceError(
+extern "C" void DAPIV Dutil_TraceError(
     __in_z LPCSTR szFile, 
     __in int iLine, 
     __in REPORT_LEVEL rl, 
@@ -379,6 +397,25 @@ extern "C" void DAPI Dutil_TraceError(
     }
 }
 
+
+DAPIV_(void) Dutil_TraceErrorSource(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in UINT source,
+    __in HRESULT hr,
+    __in_z __format_string LPCSTR szFormat,
+    ...
+    )
+{
+    if (DUTIL_SOURCE_UNKNOWN != source && vpfnTraceErrorCallback)
+    {
+        va_list args;
+        va_start(args, szFormat);
+        vpfnTraceErrorCallback(szFile, iLine, rl, source, hr, szFormat, args);
+        va_end(args);
+    }
+}
 
 
 /*******************************************************************

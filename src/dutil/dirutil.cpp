@@ -254,7 +254,7 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
                     if (FAILED(hr))
                     {
                       // if we failed to delete a subdirectory, keep trying to finish any remaining files
-                      ExitTrace(hr, "Failed to delete subdirectory; continuing: %ls", sczDelete);
+                      ExitTraceSource(DUTIL_SOURCE_DEFAULT, hr, "Failed to delete subdirectory; continuing: %ls", sczDelete);
                       hr = S_OK;
                     }
                 }

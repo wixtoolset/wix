@@ -6,12 +6,18 @@
 extern "C" {
 #endif
 
-#define ConsoleExitOnFailure(x, c, f, ...) if (FAILED(x)) { ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define ConsoleExitOnLastError(x, c, f, ...) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; } }
-#define ConsoleExitOnNull(p, x, e, c, f, ...) if (NULL == p) { x = e; ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define ConsoleExitOnNullWithLastError(p, x, c, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define ConsoleExitWithLastError(x, c, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
+#define ConsoleExitOnFailureSource(d, x, c, f, ...) if (FAILED(x)) { ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define ConsoleExitOnLastErrorSource(d, x, c, f, ...) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; } }
+#define ConsoleExitOnNullSource(d, p, x, e, c, f, ...) if (NULL == p) { x = e; ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define ConsoleExitOnNullWithLastErrorSource(d, p, x, c, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define ConsoleExitWithLastErrorSource(d, x, c, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } ConsoleWriteError(x, c, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
 
+
+#define ConsoleExitOnFailure(x, c, f, ...) ConsoleExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, c, f, __VA_ARGS__)
+#define ConsoleExitOnLastError(x, c, f, ...) ConsoleExitOnLastErrorSource(DUTIL_SOURCE_DEFAULT, x, c, f, __VA_ARGS__)
+#define ConsoleExitOnNull(p, x, e, c, f, ...) ConsoleExitOnNullSource(DUTIL_SOURCE_DEFAULT, p, x, e, c, f, __VA_ARGS__)
+#define ConsoleExitOnNullWithLastError(p, x, c, f, ...) ConsoleExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, c, f, __VA_ARGS__)
+#define ConsoleExitWithLastError(x, c, f, ...) ConsoleExitWithLastErrorSource(DUTIL_SOURCE_DEFAULT, x, c, f, __VA_ARGS__)
 
 // enums
 typedef enum CONSOLE_COLOR { CONSOLE_COLOR_NORMAL, CONSOLE_COLOR_RED, CONSOLE_COLOR_YELLOW, CONSOLE_COLOR_GREEN } CONSOLE_COLOR;
