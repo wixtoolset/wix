@@ -12,6 +12,15 @@ static MSIHANDLE s_hDatabase;
 static char s_szCustomActionLogName[32];
 static UINT s_iRetVal;
 
+static void CALLBACK WcaTraceError(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    );
 
 /********************************************************************
  WcaGlobalInitialize() - initializes the Wca library, should be 
@@ -24,6 +33,7 @@ extern "C" void WIXAPI WcaGlobalInitialize(
     )
 {
     g_hInstCADLL = hInst;
+    DutilInitialize(&WcaTraceError);
     MemInitialize();
 
     AssertSetModule(g_hInstCADLL);
@@ -49,6 +59,7 @@ extern "C" void WIXAPI WcaGlobalFinalize()
     }
 #endif
     MemUninitialize();
+    DutilUninitialize();
     g_hInstCADLL = NULL;
 }
 
@@ -213,4 +224,20 @@ extern "C" void WIXAPI WcaSetReturnValue(
 extern "C" BOOL WIXAPI WcaCancelDetected()
 {
     return ERROR_INSTALL_USEREXIT == s_iRetVal;
+}
+
+static void CALLBACK WcaTraceError(
+    __in_z LPCSTR /*szFile*/,
+    __in int /*iLine*/,
+    __in REPORT_LEVEL /*rl*/,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    if (DUTIL_SOURCE_DEFAULT == source)
+    {
+        WcaLogErrorArgs(hrError, szFormat, args);
+    }
 }

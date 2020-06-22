@@ -228,7 +228,7 @@ extern "C" BOOL WIXAPI WcaDisplayAssert(
 
 
 /********************************************************************
- WcaLogError() - called before ExitOnXXX() macro exists the function
+ WcaLogError() - called before ExitOnXXX() macro exits the function
 
  NOTE: writes the hresult and error string to the MSI log
 ********************************************************************/
@@ -238,14 +238,32 @@ extern "C" void WcaLogError(
     ...
     )
 {
-    char szBuffer[LOG_BUFFER];
     va_list dots;
 
     va_start(dots, szMessage);
-    StringCchVPrintfA(szBuffer, countof(szBuffer), szMessage, dots);
+    WcaLogErrorArgs(hr, szMessage, dots);
     va_end(dots);
+}
+
+
+/********************************************************************
+ WcaLogErrorArgs() - called before ExitOnXXX() macro exits the function
+
+ NOTE: writes the hresult and error string to the MSI log
+********************************************************************/
+extern "C" void WcaLogErrorArgs(
+    __in HRESULT hr,
+    __in LPCSTR szMessage,
+    __in va_list args
+    )
+{
+    char szBuffer[LOG_BUFFER];
+
+    StringCchVPrintfA(szBuffer, countof(szBuffer), szMessage, args);
 
     // log the message if using Wca common layer
     if (WcaIsInitialized())
+    {
         WcaLog(LOGMSG_STANDARD, "Error 0x%x: %s", hr, szBuffer);
+    }
 }
