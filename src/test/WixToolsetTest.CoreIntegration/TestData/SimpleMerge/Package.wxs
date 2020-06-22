@@ -4,7 +4,6 @@
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
-    <MediaTemplate />
 
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <MergeRef Id="TestMsm" />
@@ -16,7 +15,7 @@
       <Directory Id="ProgramFilesFolder">
           <Directory Id="INSTALLFOLDER" Name="MsiPackage">
               <!--   -->
-              <Merge Id="TestMsm" Language="1033" SourceFile="test.msm" DiskId="1" />
+              <Merge Id="TestMsm" Language="1033" SourceFile="test.msm" />
           </Directory>
       </Directory>
     </Directory>

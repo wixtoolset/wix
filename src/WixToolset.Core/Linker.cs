@@ -140,7 +140,6 @@ namespace WixToolset.Core
 #endif
 
                 // First find the entry section and while processing all sections load all the symbols from all of the sections.
-                // sections.FindEntrySectionAndLoadSymbols(false, this, expectedOutputType, out entrySection, out allSymbols);
                 var find = new FindEntrySectionAndLoadSymbolsCommand(this.Messaging, sections, this.Context.ExpectedOutputType);
                 find.Execute();
 

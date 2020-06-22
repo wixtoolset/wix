@@ -164,7 +164,6 @@ namespace WixToolsetTest.CoreIntegration
                     "build",
                     Path.Combine(folder, "Package.wxs"),
                     Path.Combine(folder, "PackageComponents.wxs"),
-                    "-d", "MediaTemplateCompressionLevel",
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
@@ -174,7 +173,8 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.msi")));
-                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\cab1.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example1.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\example2.cab")));
                 Assert.True(File.Exists(Path.Combine(intermediateFolder, @"bin\test.wixpdb")));
             }
         }

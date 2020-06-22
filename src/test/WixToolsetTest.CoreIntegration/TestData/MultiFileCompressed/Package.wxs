@@ -6,7 +6,8 @@
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <?ifndef MediaTemplateCompressionLevel?>
-    <Media Id="1" Cabinet="example.cab" />
+    <Media Id="1" Cabinet="example1.cab" />
+    <Media Id="2" Cabinet="example2.cab" />
     <?elseif $(MediaTemplateCompressionLevel) = ""?>
     <MediaTemplate />
     <?else?>

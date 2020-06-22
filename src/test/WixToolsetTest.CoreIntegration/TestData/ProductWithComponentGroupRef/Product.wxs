@@ -4,7 +4,6 @@
         <Package InstallerVersion="500" Compressed="no" InstallScope="perMachine" />
 
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-        <MediaTemplate />
 
         <Feature Id="ProductFeature" Title="MsiPackageTitle">
             <ComponentGroupRef Id="ProductComponents" />

@@ -59,6 +59,18 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 throw new WixException(ErrorMessages.MediaTableCollision(null));
             }
 
+            // If neither tuple is authored, default to a media template.
+            if (SectionType.Product == this.Section.Type && mediaTemplateTuples.Count == 0 && mediaTuples.Count == 0)
+            {
+                var mediaTemplate = new WixMediaTemplateTuple()
+                {
+                    CabinetTemplate = "cab{0}.cab",
+                };
+
+                this.Section.AddTuple(mediaTemplate);
+                mediaTemplateTuples.Add(mediaTemplate);
+            }
+
             // When building merge module, all the files go to "#MergeModule.CABinet".
             if (SectionType.Module == this.Section.Type)
             {

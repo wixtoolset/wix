@@ -5870,7 +5870,6 @@ namespace WixToolset.Core
                 }
             }
 
-
             if (!this.Core.EncounteredError)
             {
                 var patchAttributes = PatchAttributeType.None;
@@ -5956,8 +5955,6 @@ namespace WixToolset.Core
                     });
                 }
             }
-
-            this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
 
             // If this component does not have a companion file this file is a possible keypath.
             possibleKeyPath = null;
@@ -7675,12 +7672,6 @@ namespace WixToolset.Core
             if (null == sourceFile)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "SourceFile"));
-            }
-
-            if (CompilerConstants.IntegerNotSet == diskId)
-            {
-                this.Core.Write(ErrorMessages.ExpectedAttributeInElementOrParent(sourceLineNumbers, node.Name.LocalName, "DiskId", "Directory"));
-                diskId = CompilerConstants.IllegalInteger;
             }
 
             foreach (var child in node.Elements())

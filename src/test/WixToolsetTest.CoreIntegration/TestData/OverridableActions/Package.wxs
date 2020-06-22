@@ -5,7 +5,6 @@
         <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
 
         <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
-        <MediaTemplate />
 
         <InstallExecuteSequence>
             <ValidateProductID Suppress="yes" />

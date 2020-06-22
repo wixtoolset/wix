@@ -12,8 +12,6 @@
       <RemoveExistingProducts After="InstallValidate" />
     </InstallExecuteSequence>
     
-    <MediaTemplate />
-
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>

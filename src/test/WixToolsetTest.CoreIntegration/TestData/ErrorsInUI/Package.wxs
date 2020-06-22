@@ -4,7 +4,6 @@
     <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
-    <MediaTemplate />
 
     <CustomAction Id="CanWeReferenceAnError_YesWeCan" Error="1234" />
     <CustomAction Id="TextErrorsWorkOKToo" Error="If you see this, something went wrong." />

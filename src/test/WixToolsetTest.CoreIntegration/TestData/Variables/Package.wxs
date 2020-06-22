@@ -17,7 +17,6 @@
     <Package InstallerVersion="200" Compressed="no" InstallScope="perMachine" />
 
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
-    <MediaTemplate />
 
     <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />

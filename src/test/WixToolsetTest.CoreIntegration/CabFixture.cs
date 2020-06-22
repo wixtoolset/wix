@@ -49,6 +49,42 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
+        [Fact(Skip = "Sequence number of file from merge module is 0 but should be 1.")]
+        public void CabinetFilesSequencedCorrectlyUsingMergeModule()
+        {
+            var folder = TestData.Get(@"TestData\SimpleMerge");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+                var cabPath = Path.Combine(baseFolder, @"bin\cab1.cab");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-bindpath", Path.Combine(folder, ".data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+                Assert.True(File.Exists(cabPath));
+
+                var fileTable = Query.QueryDatabase(msiPath, new[] { "File" });
+                var fileRows = fileTable.Select(r => new FileRow(r)).OrderBy(f => f.Sequence).ToList();
+
+                Assert.Equal(new[] { 1 }, fileRows.Select(f => f.Sequence).ToArray());
+                Assert.Equal(new[] { "test.txt" }, fileRows.Select(f => f.Name).ToArray());
+
+                var files = Query.GetCabinetFiles(cabPath);
+                Assert.Equal(fileRows.Select(f => f.Id).ToArray(), files.Select(f => f.Name).ToArray());
+            }
+        }
+
         private class FileRow
         {
             public FileRow(string row)
