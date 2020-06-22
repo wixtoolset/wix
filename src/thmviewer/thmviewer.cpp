@@ -6,6 +6,7 @@ static const LPCWSTR THMVWR_WINDOW_CLASS_MAIN = L"ThmViewerMain";
 
 static THEME* vpTheme = NULL;
 static DWORD vdwDisplayThreadId = 0;
+static LPWSTR vsczThemeLoadErrors = NULL;
 
 enum THMVWR_CONTROL
 {
@@ -39,6 +40,9 @@ static LRESULT CALLBACK MainWndProc(
     __in WPARAM wParam,
     __in LPARAM lParam
     );
+static void OnThemeLoadBegin(
+    __in_z_opt LPWSTR sczThemeLoadErrors
+    );
 static void OnThemeLoadError(
     __in THEME* pTheme,
     __in HRESULT hrFailure
@@ -47,6 +51,15 @@ static void OnNewTheme(
     __in THEME* pTheme,
     __in HWND hWnd,
     __in HANDLE_THEME* pHandle
+    );
+static void CALLBACK ThmviewerTraceError(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
     );
 
 
@@ -75,6 +88,8 @@ int WINAPI wWinMain(
     hr = ::CoInitialize(NULL);
     ExitOnFailure(hr, "Failed to initialize COM.");
     fComInitialized = TRUE;
+
+    DutilInitialize(&ThmviewerTraceError);
 
     hr = ProcessCommandLine(lpCmdLine, &sczThemeFile, &sczWxlFile);
     ExitOnFailure(hr, "Failed to process command line.");
@@ -161,6 +176,7 @@ LExit:
 
     ThemeFree(vpTheme);
     ThemeUninitialize();
+    DutilUninitialize();
 
     // uninitialize COM
     if (fComInitialized)
@@ -168,9 +184,43 @@ LExit:
         ::CoUninitialize();
     }
 
+    ReleaseNullStr(vsczThemeLoadErrors);
     ReleaseStr(sczThemeFile);
     ReleaseStr(sczWxlFile);
     return hr;
+}
+
+static void CALLBACK ThmviewerTraceError(
+    __in_z LPCSTR /*szFile*/,
+    __in int /*iLine*/,
+    __in REPORT_LEVEL /*rl*/,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    HRESULT hr = S_OK;
+    LPSTR sczFormattedAnsi = NULL;
+    LPWSTR sczMessage = NULL;
+
+    if (DUTIL_SOURCE_THMUTIL != source)
+    {
+        ExitFunction();
+    }
+
+    hr = StrAnsiAllocFormattedArgs(&sczFormattedAnsi, szFormat, args);
+    ExitOnFailure(hr, "Failed to format error log string.");
+
+    hr = StrAllocFormatted(&sczMessage, L"Error 0x%08x: %S\r\n", hrError, sczFormattedAnsi);
+    ExitOnFailure(hr, "Failed to prepend error number to error log string.");
+
+    hr = StrAllocConcat(&vsczThemeLoadErrors, sczMessage, 0);
+    ExitOnFailure(hr, "Failed to append theme load error.");
+
+LExit:
+    ReleaseStr(sczFormattedAnsi);
+    ReleaseStr(sczMessage);
 }
 
 
@@ -311,6 +361,10 @@ static LRESULT CALLBACK MainWndProc(
         }
         break;
 
+    case WM_THMVWR_THEME_LOAD_BEGIN:
+        OnThemeLoadBegin(vsczThemeLoadErrors);
+        return 0;
+
     case WM_THMVWR_THEME_LOAD_ERROR:
         OnThemeLoadError(vpTheme, lParam);
         return 0;
@@ -351,6 +405,13 @@ static LRESULT CALLBACK MainWndProc(
     return ThemeDefWindowProc(vpTheme, hWnd, uMsg, wParam, lParam);
 }
 
+static void OnThemeLoadBegin(
+    __in_z_opt LPWSTR sczThemeLoadErrors
+    )
+{
+    ReleaseNullStr(sczThemeLoadErrors);
+}
+
 static void OnThemeLoadError(
     __in THEME* pTheme,
     __in HRESULT hrFailure
@@ -358,6 +419,8 @@ static void OnThemeLoadError(
 {
     HRESULT hr = S_OK;
     LPWSTR sczMessage = NULL;
+    LPWSTR* psczErrors = NULL;
+    UINT cErrors = 0;
     TVINSERTSTRUCTW tvi = { };
 
     // Add the application node.
@@ -368,22 +431,37 @@ static void OnThemeLoadError(
     tvi.item.pszText = L"Failed to load theme.";
     tvi.hParent = reinterpret_cast<HTREEITEM>(ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
 
-    hr = StrAllocFormatted(&sczMessage, L"Error 0x%08x.", hrFailure);
-    ExitOnFailure(hr, "Failed to format error message.");
+    if (!vsczThemeLoadErrors)
+    {
+        hr = StrAllocFormatted(&sczMessage, L"Error 0x%08x.", hrFailure);
+        ExitOnFailure(hr, "Failed to format error message.");
 
-    tvi.item.pszText = sczMessage;
-    ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+        tvi.item.pszText = sczMessage;
+        ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
 
-    hr = StrAllocFromError(&sczMessage, hrFailure, NULL);
-    ExitOnFailure(hr, "Failed to format error message text.");
+        hr = StrAllocFromError(&sczMessage, hrFailure, NULL);
+        ExitOnFailure(hr, "Failed to format error message text.");
 
-    tvi.item.pszText = sczMessage;
-    ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+        tvi.item.pszText = sczMessage;
+        ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+    }
+    else
+    {
+        hr = StrSplitAllocArray(&psczErrors, &cErrors, vsczThemeLoadErrors, L"\r\n");
+        ExitOnFailure(hr, "Failed to split theme load errors.");
+
+        for (DWORD i = 0; i < cErrors; ++i)
+        {
+            tvi.item.pszText = psczErrors[i];
+            ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi));
+        }
+    }
 
     ThemeSendControlMessage(pTheme, THMVWR_CONTROL_TREE, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(tvi.hParent));
 
 LExit:
     ReleaseStr(sczMessage);
+    ReleaseMem(psczErrors);
 }
 
 

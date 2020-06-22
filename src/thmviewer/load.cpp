@@ -106,6 +106,8 @@ static DWORD WINAPI LoadThreadProc(
         FILETIME ftModified = { };
         FileGetTime(sczThemePath, NULL, NULL, &ftModified);
 
+        ::SendMessageW(hWnd, WM_THMVWR_THEME_LOAD_BEGIN, 0, 0);
+
         // Try to load the theme file.
         hr = ThemeLoadFromFile(sczThemePath, &pTheme);
         if (FAILED(hr))
