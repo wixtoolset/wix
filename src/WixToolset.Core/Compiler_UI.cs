@@ -1086,6 +1086,12 @@ namespace WixToolset.Core
             string x = null;
             string y = null;
 
+            string defaultCondition = null;
+            string enableCondition = null;
+            string disableCondition = null;
+            string hideCondition = null;
+            string showCondition = null;
+
             var hidden = false;
             var sunken = false;
             var indirect = false;
@@ -1220,6 +1226,21 @@ namespace WixToolset.Core
                         break;
                     case "Default":
                         isDefault = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DefaultCondition":
+                        defaultCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "EnableCondition":
+                        enableCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "DisableCondition":
+                        disableCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "HideCondition":
+                        hideCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
+                    case "ShowCondition":
+                        showCondition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Height":
                         height = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
@@ -1555,6 +1576,61 @@ namespace WixToolset.Core
                     controlTuple.Set((int)BBControlTupleFields.Height, height);
 
                     tuple = controlTuple;
+                }
+
+                if (!String.IsNullOrEmpty(defaultCondition))
+                {
+                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    {
+                        DialogRef = dialog,
+                        ControlRef = controlId.Id,
+                        Action = "Default",
+                        Condition = defaultCondition,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(enableCondition))
+                {
+                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    {
+                        DialogRef = dialog,
+                        ControlRef = controlId.Id,
+                        Action = "Enable",
+                        Condition = enableCondition,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(disableCondition))
+                {
+                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    {
+                        DialogRef = dialog,
+                        ControlRef = controlId.Id,
+                        Action = "Disable",
+                        Condition = disableCondition,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(hideCondition))
+                {
+                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    {
+                        DialogRef = dialog,
+                        ControlRef = controlId.Id,
+                        Action = "Hide",
+                        Condition = hideCondition,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(showCondition))
+                {
+                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
+                    {
+                        DialogRef = dialog,
+                        ControlRef = controlId.Id,
+                        Action = "Show",
+                        Condition = showCondition,
+                    });
                 }
             }
 
