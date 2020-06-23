@@ -6277,6 +6277,9 @@ namespace WixToolset.Core
                     case "MediaTemplate":
                         this.ParseMediaTemplateElement(child, null);
                         break;
+                    case "Launch":
+                        this.ParseLaunchElement(child);
+                        break;
                     case "PackageGroup":
                         this.ParsePackageGroupElement(child);
                         break;
@@ -6353,6 +6356,61 @@ namespace WixToolset.Core
             }
         }
 
+        /// <summary>
+        /// Parses a launch condition element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        private void ParseLaunchElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string condition = null;
+            string message = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Cndition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Message":
+                            message = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (String.IsNullOrEmpty(condition))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
+            }
+
+            if (String.IsNullOrEmpty(message))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Message"));
+            }
+
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
+                {
+                    Condition = condition,
+                    Description = message
+                });
+            }
+        }
 
         /// <summary>
         /// Parses a condition element.
