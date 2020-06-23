@@ -22,6 +22,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(CustomActionTupleFields.PatchUninstall), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(CustomActionTupleFields.TSAware), IntermediateFieldType.Bool),
                 new IntermediateFieldDefinition(nameof(CustomActionTupleFields.Win64), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(CustomActionTupleFields.ScriptFile), IntermediateFieldType.Path),
             },
             typeof(CustomActionTuple));
     }
@@ -43,6 +44,7 @@ namespace WixToolset.Data.Tuples
         PatchUninstall,
         TSAware,
         Win64,
+        ScriptFile
     }
 
     public enum CustomActionExecutionType
@@ -155,6 +157,12 @@ namespace WixToolset.Data.Tuples
         {
             get => this.Fields[(int)CustomActionTupleFields.Win64].AsBool();
             set => this.Set((int)CustomActionTupleFields.Win64, value);
+        }
+
+        public IntermediateFieldPathValue ScriptFile
+        {
+            get => this.Fields[(int)CustomActionTupleFields.ScriptFile].AsPath();
+            set => this.Set((int)CustomActionTupleFields.ScriptFile, value);
         }
     }
 }
