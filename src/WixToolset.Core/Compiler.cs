@@ -2151,6 +2151,9 @@ namespace WixToolset.Core
                         //    bits |= MsiInterop.MsidbComponentAttributesDisableRegistryReflection;
                         //}
                         break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     case "Directory":
                         directoryId = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, directoryId);
                         break;
