@@ -1208,6 +1208,9 @@ namespace WixToolset.Core
                     case "Id":
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
+                    case "Condition":
+                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     case "Sddl":
                         sddl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
@@ -1264,7 +1267,7 @@ namespace WixToolset.Core
                 {
                     LockObject = objectId,
                     Table = tableName,
-                    SDDLText =sddl,
+                    SDDLText = sddl,
                     Condition = condition
                 });
             }
