@@ -29,7 +29,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <UI>",
@@ -70,7 +69,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2\">",
@@ -107,7 +105,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Feature Id=\"Feature1\">",
@@ -144,7 +141,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
@@ -168,7 +164,7 @@ namespace WixToolsetTest.Converters
         public void FixPermissionExCondition()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<!-- comment -->",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
                 "    <Component Id='Comp1' Guid='*' Directory='ApplicationFolder'>",
@@ -181,7 +177,7 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<!-- comment -->",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\">",
@@ -199,7 +195,7 @@ namespace WixToolsetTest.Converters
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(4, errors);
+            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);

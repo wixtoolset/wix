@@ -58,7 +58,7 @@ namespace WixToolsetTest.Converters
                 var converter = new Wix3Converter(messaging, 4);
                 var errors = converter.ConvertFile(targetFile, true);
 
-                Assert.Equal(6, errors);
+                Assert.Equal(7, errors);
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");

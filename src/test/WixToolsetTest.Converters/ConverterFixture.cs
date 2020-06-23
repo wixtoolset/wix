@@ -13,15 +13,15 @@ namespace WixToolsetTest.Converters
         private static readonly XNamespace Wix4Namespace = "http://wixtoolset.org/schemas/v4/wxs";
 
         [Fact]
-        public void EnsuresDeclaration()
+        public void EnsuresNoDeclaration()
         {
             var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Fragment />",
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment />",
                 "</Wix>");
@@ -40,27 +40,6 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void EnsuresUtf8Declaration()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "    <Fragment />",
-                "</Wix>");
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 4, null, null);
-
-            var errors = converter.ConvertDocument(document);
-
-            Assert.Equal(1, errors);
-            Assert.Equal("1.0", document.Declaration.Version);
-            Assert.Equal("utf-8", document.Declaration.Encoding);
-        }
-
-        [Fact]
         public void CanFixWhitespace()
         {
             var parse = String.Join(Environment.NewLine,
@@ -74,7 +53,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "    <Fragment>",
                 "        <Property Id=\"Prop\" Value=\"Val\" />",
@@ -91,7 +69,7 @@ namespace WixToolsetTest.Converters
             var actual = UnformattedDocumentString(document);
 
             Assert.Equal(expected, actual);
-            Assert.Equal(4, errors);
+            Assert.Equal(5, errors);
         }
 
         [Fact]
@@ -108,7 +86,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "    <Fragment>",
                 "",
@@ -127,14 +104,13 @@ namespace WixToolsetTest.Converters
             var actual = UnformattedDocumentString(document);
 
             Assert.Equal(expected, actual);
-            Assert.Equal(3, conversions);
+            Assert.Equal(4, conversions);
         }
 
         [Fact]
         public void CanConvertWithNewLineAtEndOfFile()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Fragment>",
                 "",
@@ -145,7 +121,6 @@ namespace WixToolsetTest.Converters
                 "");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "    <Fragment>",
                 "",
@@ -178,7 +153,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment />",
                 "</Wix>");
@@ -192,7 +166,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             //Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
             Assert.Equal(expected, actual);
         }
@@ -207,7 +181,6 @@ namespace WixToolsetTest.Converters
                 "</w:Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<w:Wix xmlns:w=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <w:Fragment />",
                 "</w:Wix>");
@@ -221,7 +194,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetNamespaceOfPrefix("w"));
         }
@@ -238,7 +211,6 @@ namespace WixToolsetTest.Converters
                 "</w:Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<w:Wix xmlns:w=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
                 "  <w:Fragment>",
                 "    <Test />",
@@ -255,7 +227,7 @@ namespace WixToolsetTest.Converters
             var actual = UnformattedDocumentString(document);
 
             Assert.Equal(expected, actual);
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
             Assert.Equal(Wix4Namespace, document.Root.GetNamespaceOfPrefix("w"));
             Assert.Equal("http://wixtoolset.org/schemas/v4/wxs/util", document.Root.GetDefaultNamespace());
         }
@@ -270,7 +242,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\" xmlns:util=\"http://wixtoolset.org/schemas/v4/wxs/util\">",
                 "  <Fragment />",
                 "</Wix>");
@@ -284,7 +255,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
             Assert.Equal(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
         }
@@ -299,7 +270,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment />",
                 "</Wix>");
@@ -313,7 +283,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
         }
@@ -333,7 +303,6 @@ namespace WixToolsetTest.Converters
                 "</Include>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Include xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <?define Version = 1.2.3 ?>",
                 "  <Fragment>",
@@ -352,7 +321,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
             Assert.Equal(Wix4Namespace, document.Root.GetDefaultNamespace());
         }
@@ -367,7 +336,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <File Id=\"foo.txt\" Source=\"path\\to\\foo.txt\" />",
                 "</Wix>");
@@ -381,7 +349,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
         }
 
@@ -395,7 +363,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Directory Name=\"iamshort\" />",
                 "</Wix>");
@@ -409,7 +376,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
         }
 
@@ -417,13 +384,11 @@ namespace WixToolsetTest.Converters
         public void CanConvertSuppressSignatureValidationNo()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <MsiPackage SuppressSignatureValidation='no' />",
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <MsiPackage EnableSignatureValidation=\"yes\" />",
                 "</Wix>");
@@ -445,13 +410,11 @@ namespace WixToolsetTest.Converters
         public void CanConvertSuppressSignatureValidationYes()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Payload SuppressSignatureValidation='yes' />",
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Payload />",
                 "</Wix>");

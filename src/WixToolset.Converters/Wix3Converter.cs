@@ -203,9 +203,9 @@ namespace WixToolset.Converters
             {
                 try
                 {
-                    using (var writer = File.CreateText(this.SourceFile))
+                    using (var writer = XmlWriter.Create(this.SourceFile, new XmlWriterSettings { OmitXmlDeclaration = true }))
                     {
-                        document.Save(writer, SaveOptions.DisableFormatting | SaveOptions.OmitDuplicateNamespaces);
+                        document.Save(writer);
                     }
                 }
                 catch (UnauthorizedAccessException)
@@ -228,25 +228,16 @@ namespace WixToolset.Converters
 
             var declaration = document.Declaration;
 
-            // Convert the declaration.
+            // Remove the declaration.
             if (null != declaration)
             {
-                if (!String.Equals("utf-8", declaration.Encoding, StringComparison.OrdinalIgnoreCase))
+                if (this.OnError(ConverterTestType.DeclarationPresent, null, "This file contains an XML declaration on the first line."))
                 {
-                    if (this.OnError(ConverterTestType.DeclarationEncodingWrong, document.Root, "The XML declaration encoding is not properly set to 'utf-8'."))
-                    {
-                        declaration.Encoding = "utf-8";
-                    }
+                    document.Declaration = null;
                 }
             }
-            else // missing declaration
-            {
-                if (this.OnError(ConverterTestType.DeclarationMissing, null, "This file is missing an XML declaration on the first line."))
-                {
-                    document.Declaration = new XDeclaration("1.0", "utf-8", null);
-                    document.Root.AddBeforeSelf(new XText(XDocumentNewLine.ToString()));
-                }
-            }
+
+            TrimLeadingText(document);
 
             // Start converting the nodes at the top.
             this.ConvertNodes(document.Nodes(), 0);
@@ -903,6 +894,26 @@ namespace WixToolset.Converters
             return !String.IsNullOrEmpty(value);
         }
 
+        private static bool IsTextNode(XNode node, out XText text)
+        {
+            text = null;
+
+            if (node.NodeType == XmlNodeType.Text || node.NodeType == XmlNodeType.CDATA)
+            {
+                text = (XText)node;
+            }
+
+            return text != null;
+        }
+
+        private static void TrimLeadingText(XDocument document)
+        {
+            while (IsTextNode(document.Nodes().FirstOrDefault(), out var text))
+            {
+                text.Remove();
+            }
+        }
+
         private static string TrimTextValue(XText text)
         {
             var value = text.Value;
@@ -1052,6 +1063,11 @@ namespace WixToolset.Converters
             /// Explicit auto-GUID unnecessary.
             /// </summary>
             AutoGuidUnnecessary,
+
+            /// <summary>
+            /// Displayed when the XML declaration is present in the source file.
+            /// </summary>
+            DeclarationPresent,
         }
     }
 }

@@ -24,7 +24,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
                 "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
@@ -41,7 +40,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(6, errors);
+            Assert.Equal(7, errors);
             Assert.Equal(expected, actual);
         }
 
@@ -60,7 +59,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomAction Id=\"Foo\" Script=\"jscript\" ScriptFile=\"Foo.js\" />",
                 "</Wix>");
@@ -80,7 +78,7 @@ namespace WixToolsetTest.Converters
 
             var actual = UnformattedDocumentString(document);
 
-            Assert.Equal(1, errors);
+            Assert.Equal(2, errors);
             Assert.Equal(expected, actual);
 
             var script = File.ReadAllText("Foo.js");

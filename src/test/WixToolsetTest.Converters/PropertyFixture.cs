@@ -14,7 +14,6 @@ namespace WixToolsetTest.Converters
         public void CanFixCdataWhitespace()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Fragment>",
                 "    <Property Id='Prop'>",
@@ -24,7 +23,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Property Id=\"Prop\" Value=\"1&lt;2\" />",
@@ -48,7 +46,6 @@ namespace WixToolsetTest.Converters
         public void CanFixCdataWithWhitespace()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Fragment>",
                 "    <Property Id='Prop'>",
@@ -60,7 +57,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Property Id=\"Prop\" Value=\"1&lt;2\" />",
@@ -84,7 +80,6 @@ namespace WixToolsetTest.Converters
         public void CanKeepCdataWithOnlyWhitespace()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Fragment>",
                 "    <Property Id='Prop'><![CDATA[ ]]></Property>",
@@ -92,7 +87,6 @@ namespace WixToolsetTest.Converters
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <Property Id=\"Prop\" Value=\" \" />",

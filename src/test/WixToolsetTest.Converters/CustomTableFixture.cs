@@ -25,7 +25,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <CustomTable Id=\"Custom1\">",
@@ -64,7 +63,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <CustomTable Id=\"Custom1\">",
@@ -90,7 +88,6 @@ namespace WixToolsetTest.Converters
         public void FixCustomRowCdataValue()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
                 "    <CustomTable Id='Custom1'>",
@@ -105,7 +102,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <CustomTable Id=\"Custom1\">",
@@ -121,7 +117,7 @@ namespace WixToolsetTest.Converters
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(2, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);
@@ -142,7 +138,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <CustomTable Id=\"Custom1\">",
@@ -168,13 +163,11 @@ namespace WixToolsetTest.Converters
         public void CanConvertCustomTableBootstrapperApplicationData()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes' />",
                 "</Wix>");
 
             var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\" />",
                 "</Wix>");

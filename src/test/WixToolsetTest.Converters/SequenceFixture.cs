@@ -14,7 +14,6 @@ namespace WixToolsetTest.Converters
         public void FixCondition()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
                 "    <InstallUISequence>",
@@ -25,7 +24,6 @@ namespace WixToolsetTest.Converters
 
             var expected = new[]
             {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
                 "    <InstallUISequence>",
@@ -41,7 +39,7 @@ namespace WixToolsetTest.Converters
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(2, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);

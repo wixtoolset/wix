@@ -5,6 +5,7 @@ namespace WixToolsetTest.Converters
     using System;
     using System.IO;
     using System.Text;
+    using System.Xml;
     using System.Xml.Linq;
     using Xunit;
 
@@ -15,23 +16,18 @@ namespace WixToolsetTest.Converters
             var sb = new StringBuilder();
 
             using (var writer = new StringWriter(sb))
+            using (var xml = XmlWriter.Create(writer, new XmlWriterSettings { OmitXmlDeclaration = true }))
             {
-                document.Save(writer, SaveOptions.DisableFormatting);
+                document.Save(xml);
             }
 
-            return sb.ToString();
+            return sb.ToString().TrimStart();
         }
 
         protected static string[] UnformattedDocumentLines(XDocument document)
         {
-            var sb = new StringBuilder();
-
-            using (var writer = new StringWriter(sb))
-            {
-                document.Save(writer, SaveOptions.DisableFormatting);
-            }
-
-            return sb.ToString().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var unformatted = UnformattedDocumentString(document);
+            return unformatted.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         protected static void CompareLineByLine(string[] expectedLines, string[] actualLines)
