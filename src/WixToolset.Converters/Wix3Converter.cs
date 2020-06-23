@@ -407,6 +407,15 @@ namespace WixToolset.Converters
 
         private void ConvertComponentElement(XElement element)
         {
+            var guid = element.Attribute("Guid");
+            if (guid != null && guid.Value == "*")
+            {
+                if (this.OnError(ConverterTestType.AutoGuidUnnecessary, element, "Using '*' for the Component Guid attribute is unnecessary. Remove the attribute to remove the redundancy."))
+                {
+                    guid.Remove();
+                }
+            }
+
             var xCondition = element.Element(ConditionElementName);
             if (xCondition != null)
             {
@@ -523,6 +532,15 @@ namespace WixToolset.Converters
 
         private void ConvertProductElement(XElement element)
         {
+            var id = element.Attribute("Id");
+            if (id != null && id.Value == "*")
+            {
+                if (this.OnError(ConverterTestType.AutoGuidUnnecessary, element, "Using '*' for the Product Id attribute is unnecessary. Remove the attribute to remove the redundancy."))
+                {
+                    id.Remove();
+                }
+            }
+
             var xCondition = element.Element(ConditionElementName);
             if (xCondition != null)
             {
@@ -1029,6 +1047,11 @@ namespace WixToolset.Converters
             /// Inner text value should move to an attribute.
             /// </summary>
             InnerTextDeprecated,
+
+            /// <summary>
+            /// Explicit auto-GUID unnecessary.
+            /// </summary>
+            AutoGuidUnnecessary,
         }
     }
 }

@@ -171,7 +171,7 @@ namespace WixToolsetTest.Converters
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
-                "    <Component Id='Comp1' Directory='ApplicationFolder'>",
+                "    <Component Id='Comp1' Guid='*' Directory='ApplicationFolder'>",
                 "      <PermissionEx Sddl='sddl'>",
                 "        <Condition>1&lt;2</Condition>",
                 "      </PermissionEx>",
@@ -199,7 +199,7 @@ namespace WixToolsetTest.Converters
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(3, errors);
+            Assert.Equal(4, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);

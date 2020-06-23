@@ -6,7 +6,7 @@
 <?include WixVer.wxi ?>
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:swid="http://wixtoolset.org/schemas/v4/wxs/tag" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
-    <Product Id="*" Name="!(loc.ShortProduct) v$(var.WixMajorMinor) Core" Language="1033" Manufacturer="!(loc.Company)" Version="$(var.WixMsiProductVersion)" UpgradeCode="3618724B-2523-44F9-A908-866AA619504D">
+    <Product Name="!(loc.ShortProduct) v$(var.WixMajorMinor) Core" Language="1033" Manufacturer="!(loc.Company)" Version="$(var.WixMsiProductVersion)" UpgradeCode="3618724B-2523-44F9-A908-866AA619504D">
         <Package Compressed="yes" InstallerVersion="200" SummaryCodepage="1252" InstallScope="perMachine" />
         <swid:Tag Regid="!(loc.Regid)" InstallDirectory="INSTALLFOLDER" />
 
