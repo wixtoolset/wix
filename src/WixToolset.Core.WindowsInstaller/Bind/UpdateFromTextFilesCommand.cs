@@ -9,9 +9,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using WixToolset.Data.Tuples;
     using WixToolset.Extensibility.Services;
 
-    internal class UpdateControlTextCommand
+    internal class UpdateFromTextFilesCommand
     {
-        public UpdateControlTextCommand(IMessaging messaging, IntermediateSection section)
+        public UpdateFromTextFilesCommand(IMessaging messaging, IntermediateSection section)
         {
             this.Messaging = messaging;
             this.Section = section;
@@ -31,6 +31,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             foreach (var control in this.Section.Tuples.OfType<ControlTuple>().Where(t => t.SourceFile != null))
             {
                 control.Text = this.ReadTextFile(control.SourceLineNumbers, control.SourceFile.Path);
+            }
+
+            foreach (var customAction in this.Section.Tuples.OfType<CustomActionTuple>().Where(c => c.ScriptFile != null))
+            {
+                customAction.Target = this.ReadTextFile(customAction.SourceLineNumbers, customAction.ScriptFile.Path);
             }
         }
 

@@ -3134,6 +3134,8 @@ namespace WixToolset.Core
             string target = null;
             var explicitWin64 = false;
 
+            string scriptFile = null;
+
             CustomActionSourceType? sourceType = null;
             CustomActionTargetType? targetType = null;
             var executionType = CustomActionExecutionType.Immediate;
@@ -3160,7 +3162,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        //sourceBits = MsiInterop.MsidbCustomActionTypeBinaryData;
                         sourceType = CustomActionSourceType.Binary;
                         this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Binary, source); // add a reference to the appropriate Binary
                         break;
@@ -3170,7 +3171,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.CreateDirectoryReferenceFromInlineSyntax(sourceLineNumbers, attrib, null);
-                        //sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
                         sourceType = CustomActionSourceType.Directory;
                         break;
                     case "DllEntry":
@@ -3179,7 +3179,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        //targetBits = MsiInterop.MsidbCustomActionTypeDll;
                         targetType = CustomActionTargetType.Dll;
                         break;
                     case "Error":
@@ -3188,7 +3187,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        //targetBits = MsiInterop.MsidbCustomActionTypeTextData | MsiInterop.MsidbCustomActionTypeSourceFile;
                         sourceType = CustomActionSourceType.File;
                         targetType = CustomActionTargetType.TextData;
 
@@ -3206,7 +3204,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        //targetBits = MsiInterop.MsidbCustomActionTypeExe;
                         targetType = CustomActionTargetType.Exe;
                         break;
                     case "Execute":
@@ -3214,30 +3211,24 @@ namespace WixToolset.Core
                         switch (execute)
                         {
                         case "commit":
-                            //bits |= MsiInterop.MsidbCustomActionTypeInScript | MsiInterop.MsidbCustomActionTypeCommit;
                             executionType = CustomActionExecutionType.Commit;
                             break;
                         case "deferred":
-                            //bits |= MsiInterop.MsidbCustomActionTypeInScript;
                             executionType = CustomActionExecutionType.Deferred;
                             break;
                         case "firstSequence":
-                            //bits |= MsiInterop.MsidbCustomActionTypeFirstSequence;
                             executionType = CustomActionExecutionType.FirstSequence;
                             break;
                         case "immediate":
                             executionType = CustomActionExecutionType.Immediate;
                             break;
                         case "oncePerProcess":
-                            //bits |= MsiInterop.MsidbCustomActionTypeOncePerProcess;
                             executionType = CustomActionExecutionType.OncePerProcess;
                             break;
                         case "rollback":
-                            //bits |= MsiInterop.MsidbCustomActionTypeInScript | MsiInterop.MsidbCustomActionTypeRollback;
                             executionType = CustomActionExecutionType.Rollback;
                             break;
                         case "secondSequence":
-                            //bits |= MsiInterop.MsidbCustomActionTypeClientRepeat;
                             executionType = CustomActionExecutionType.ClientRepeat;
                             break;
                         default:
@@ -3251,23 +3242,14 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        //sourceBits = MsiInterop.MsidbCustomActionTypeSourceFile;
                         sourceType = CustomActionSourceType.File;
                         this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.File, source); // add a reference to the appropriate File
                         break;
                     case "HideTarget":
                         hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbCustomActionTypeHideTarget;
-                        //}
                         break;
                     case "Impersonate":
                         impersonate = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.No == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbCustomActionTypeNoImpersonate;
-                        //}
                         break;
                     case "JScriptCall":
                         if (null != target)
@@ -3275,15 +3257,10 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        //targetBits = MsiInterop.MsidbCustomActionTypeJScript;
                         targetType = CustomActionTargetType.JScript;
                         break;
                     case "PatchUninstall":
                         patchUninstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    extendedBits |= MsiInterop.MsidbCustomActionTypePatchUninstall;
-                        //}
                         break;
                     case "Property":
                         if (null != source)
@@ -3291,7 +3268,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileKey", "Property", "Script"));
                         }
                         source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        //sourceBits = MsiInterop.MsidbCustomActionTypeProperty;
                         sourceType = CustomActionSourceType.Property;
                         break;
                     case "Return":
@@ -3299,18 +3275,15 @@ namespace WixToolset.Core
                         switch (returnValue)
                         {
                         case "asyncNoWait":
-                            //bits |= MsiInterop.MsidbCustomActionTypeAsync | MsiInterop.MsidbCustomActionTypeContinue;
                             async = true;
                             ignoreResult = true;
                             break;
                         case "asyncWait":
-                            //bits |= MsiInterop.MsidbCustomActionTypeAsync;
                             async = true;
                             break;
                         case "check":
                             break;
                         case "ignore":
-                            //bits |= MsiInterop.MsidbCustomActionTypeContinue;
                             ignoreResult = true;
                             break;
                         case "":
@@ -3341,15 +3314,11 @@ namespace WixToolset.Core
                         switch (script)
                         {
                         case "jscript":
-                            //sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
                             sourceType = CustomActionSourceType.Directory;
-                            //targetBits = MsiInterop.MsidbCustomActionTypeJScript;
                             targetType = CustomActionTargetType.JScript;
                             break;
                         case "vbscript":
-                            //sourceBits = MsiInterop.MsidbCustomActionTypeDirectory;
                             sourceType = CustomActionSourceType.Directory;
-                            //targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
                             targetType = CustomActionTargetType.VBScript;
                             break;
                         case "":
@@ -3359,15 +3328,14 @@ namespace WixToolset.Core
                             break;
                         }
                         break;
+                    case "ScriptFile":
+                        scriptFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        break;
                     case "SuppressModularization":
                         suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
                     case "TerminalServerAware":
                         tsAware = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbCustomActionTypeTSAware;
-                        //}
                         break;
                     case "Value":
                         if (null != target)
@@ -3375,7 +3343,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        //targetBits = MsiInterop.MsidbCustomActionTypeTextData;
                         targetType = CustomActionTargetType.TextData;
                         break;
                     case "VBScriptCall":
@@ -3384,16 +3351,11 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
                         }
                         target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        //targetBits = MsiInterop.MsidbCustomActionTypeVBScript;
                         targetType = CustomActionTargetType.VBScript;
                         break;
                     case "Win64":
                         explicitWin64 = true;
                         win64 = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        //if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        //{
-                        //    bits |= MsiInterop.MsidbCustomActionType64BitScript;
-                        //}
                         break;
                     default:
                         this.Core.UnexpectedAttribute(node, attrib);
@@ -3423,7 +3385,12 @@ namespace WixToolset.Core
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
             if (inlineScript)
             {
-                target = innerText;
+                if (String.IsNullOrEmpty(scriptFile))
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ScriptFile", "Script"));
+
+                    target = innerText;
+                }
             }
             else if (CustomActionTargetType.VBScript == targetType) // non-inline vbscript
             {
@@ -3461,6 +3428,11 @@ namespace WixToolset.Core
             else if (!String.IsNullOrEmpty(innerText)) // inner text cannot be specified with non-script CAs
             {
                 this.Core.Write(ErrorMessages.CustomActionIllegalInnerText(sourceLineNumbers, node.Name.LocalName, innerText, "Script"));
+            }
+
+            if (!inlineScript && !String.IsNullOrEmpty(scriptFile))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "ScriptFile", "Script"));
             }
 
             if (win64 && CustomActionTargetType.VBScript != targetType && CustomActionTargetType.JScript != targetType)
@@ -3515,6 +3487,7 @@ namespace WixToolset.Core
                     TSAware = tsAware,
                     Win64 = win64,
                     Hidden = hidden,
+                    ScriptFile = new IntermediateFieldPathValue { Path = scriptFile }
                 });
 
                 if (YesNoType.Yes == suppressModularization)

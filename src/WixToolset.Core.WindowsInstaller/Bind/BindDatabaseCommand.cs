@@ -347,9 +347,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 command.Execute();
             }
 
-            // Update control text from files on disk.
+            // Update tuples that reference text files on disk.
             {
-                var command = new UpdateControlTextCommand(this.Messaging, section);
+                var command = new UpdateFromTextFilesCommand(this.Messaging, section);
                 command.Execute();
             }
 
