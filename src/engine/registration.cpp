@@ -893,7 +893,7 @@ extern "C" HRESULT RegistrationSessionEnd(
 
         if (FAILED(hr))
         {
-            ExitTrace(hr, "Failed to write volatile reboot required registry key.");
+            ExitTraceSource(DUTIL_SOURCE_DEFAULT, hr, "Failed to write volatile reboot required registry key.");
             hr = S_OK;
         }
     }

@@ -2,8 +2,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
-#define ExitTrace LogErrorString
-
 #include <windows.h>
 #include <aclapi.h>
 #include <Bits.h>
@@ -25,6 +23,10 @@
 #include <lmcons.h>
 #include <wininet.h>
 #include <stddef.h>
+
+#include <dutilsources.h>
+
+#define DUTIL_SOURCE_DEFAULT DUTIL_SOURCE_EXTERNAL
 
 #include <dutil.h>
 #include <aclutil.h>

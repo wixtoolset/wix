@@ -5,8 +5,7 @@
     <version>$version$</version>
     <authors>$authors$</authors>
     <owners>$authors$</owners>
-    <!-- <license type="expression">MS-RL</license> -->
-    <licenseUrl>https://licenses.nuget.org/MS-RL</licenseUrl>
+    <license type="expression">MS-RL</license>
     <projectUrl>https://github.com/wixtoolset/burn</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>

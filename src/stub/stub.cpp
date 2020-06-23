@@ -3,6 +3,16 @@
 #include "precomp.h"
 
 
+static void CALLBACK BurnTraceError(
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    );
+
 int WINAPI wWinMain(
     __in HINSTANCE hInstance,
     __in_opt HINSTANCE /* hPrevInstance */,
@@ -29,6 +39,8 @@ int WINAPI wWinMain(
         L"crypt32.dll", // required by DecryptFile() when loading feclient.dll.
         L"feclient.dll", // unsafely loaded by DecryptFile().
     };
+
+    DutilInitialize(&BurnTraceError);
 
     // Best effort attempt to get our file handle as soon as possible.
     hr = PathForCurrentProcess(&sczPath, NULL);
@@ -60,5 +72,23 @@ LExit:
     ReleaseFileHandle(hEngineFile);
     ReleaseStr(sczPath);
 
+    DutilUninitialize();
+
     return FAILED(hr) ? (int)hr : (int)dwExitCode;
+}
+
+static void CALLBACK BurnTraceError(
+    __in_z LPCSTR /*szFile*/,
+    __in int /*iLine*/,
+    __in REPORT_LEVEL /*rl*/,
+    __in UINT source,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
+    __in va_list args
+    )
+{
+    if (DUTIL_SOURCE_DEFAULT == source)
+    {
+        LogErrorStringArgs(hrError, szFormat, args);
+    }
 }

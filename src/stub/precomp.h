@@ -9,5 +9,6 @@
 #include <strutil.h>
 #include <fileutil.h>
 #include <pathutil.h>
+#include <logutil.h>
 
 #include "engine.h"
