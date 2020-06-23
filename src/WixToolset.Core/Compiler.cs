@@ -6345,7 +6345,7 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                        case "Cndition":
+                        case "Condition":
                             condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Message":

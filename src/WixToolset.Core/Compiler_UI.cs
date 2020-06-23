@@ -1425,7 +1425,7 @@ namespace WixToolset.Core
 
                         if (!String.IsNullOrEmpty(text) && null != sourceFile)
                         {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "SourceFile", "Text"));
+                            this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(childSourceLineNumbers, child.Name.LocalName, "SourceFile", "Value"));
                         }
                         break;
                     default:
