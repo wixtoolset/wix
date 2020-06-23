@@ -338,6 +338,7 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="node">The node to ensure inner text is a condition.</param>
         /// <returns>The value converted into a safe condition.</returns>
+        [Obsolete]
         string GetConditionInnerText(XElement node);
 
         /// <summary>
@@ -345,6 +346,7 @@ namespace WixToolset.Extensibility.Services
         /// </summary>
         /// <param name="element">The element with inner text to be trimmed.</param>
         /// <returns>The node's inner text trimmed.</returns>
+        [Obsolete]
         string GetTrimmedInnerText(XElement element);
 
         /// <summary>
