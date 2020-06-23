@@ -169,95 +169,6 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void CanFixCdataWhitespace()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <Fragment>",
-                "    <Property Id='Prop'>",
-                "       <![CDATA[1<2]]>",
-                "    </Property>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Fragment>",
-                "    <Property Id=\"Prop\"><![CDATA[1<2]]></Property>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
-
-            var errors = converter.ConvertDocument(document);
-
-            var actual = UnformattedDocumentString(document);
-
-            Assert.Equal(expected, actual);
-            Assert.Equal(2, errors);
-        }
-
-        [Fact]
-        public void CanFixCdataWithWhitespace()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <Fragment>",
-                "    <Property Id='Prop'>",
-                "       <![CDATA[",
-                "           1<2",
-                "       ]]>",
-                "    </Property>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Fragment>",
-                "    <Property Id=\"Prop\"><![CDATA[1<2]]></Property>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
-
-            var errors = converter.ConvertDocument(document);
-
-            var actual = UnformattedDocumentString(document);
-
-            Assert.Equal(expected, actual);
-            Assert.Equal(2, errors);
-        }
-
-        [Fact]
-        public void CanKeepCdataWithOnlyWhitespace()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <Fragment>",
-                "    <Property Id='Prop'><![CDATA[ ]]></Property>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
-            var errors = converter.ConvertDocument(document);
-            Assert.Equal(0, errors);
-        }
-
-        [Fact]
         public void CanConvertMainNamespace()
         {
             var parse = String.Join(Environment.NewLine,
@@ -475,34 +386,6 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void CanConvertCustomTableBootstrapperApplicationData()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes' />",
-                "</Wix>");
-
-            var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\" />",
-                "</Wix>");
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
-
-            var errors = converter.ConvertDocument(document);
-
-            var actual = UnformattedDocumentString(document);
-
-            Assert.Equal(1, errors);
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         public void CanConvertShortNameDirectoryWithoutName()
         {
             var parse = String.Join(Environment.NewLine,
@@ -583,40 +466,6 @@ namespace WixToolsetTest.Converters
             var actual = UnformattedDocumentString(document);
 
             Assert.Equal(1, errors);
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void CanConvertCustomAction()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <CustomAction Id='Foo' BinaryKey='WixCA' DllEntry='CAQuietExec' />",
-                "  <CustomAction Id='Foo' BinaryKey='WixCA_x64' DllEntry='CAQuietExec64' />",
-                "  <CustomAction Id='Foo' BinaryKey='UtilCA' DllEntry='WixQuietExec' />",
-                "  <CustomAction Id='Foo' BinaryKey='UtilCA_x64' DllEntry='WixQuietExec64' />",
-                "</Wix>");
-
-            var expected = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X86\" DllEntry=\"WixQuietExec\" />",
-                "  <CustomAction Id=\"Foo\" BinaryKey=\"Wix4UtilCA_X64\" DllEntry=\"WixQuietExec64\" />",
-                "</Wix>");
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
-
-            var errors = converter.ConvertDocument(document);
-
-            var actual = UnformattedDocumentString(document);
-
-            Assert.Equal(6, errors);
             Assert.Equal(expected, actual);
         }
     }

@@ -26,16 +26,43 @@ namespace WixToolset.Converters
         private static readonly XNamespace WixNamespace = "http://wixtoolset.org/schemas/v4/wxs";
         private static readonly XNamespace WixUtilNamespace = "http://wixtoolset.org/schemas/v4/wxs/util";
 
+        private static readonly XName AdminExecuteSequenceElementName = WixNamespace + "AdminExecuteSequence";
+        private static readonly XName AdminUISequenceSequenceElementName = WixNamespace + "AdminUISequence";
+        private static readonly XName AdvertiseExecuteSequenceElementName = WixNamespace + "AdvertiseExecuteSequence";
+        private static readonly XName InstallExecuteSequenceElementName = WixNamespace + "InstallExecuteSequence";
+        private static readonly XName InstallUISequenceSequenceElementName = WixNamespace + "InstallUISequence";
+        private static readonly XName EmbeddedChainerElementName = WixNamespace + "EmbeddedChainer";
         private static readonly XName ColumnElementName = WixNamespace + "Column";
+        private static readonly XName ComponentElementName = WixNamespace + "Component";
+        private static readonly XName ControlElementName = WixNamespace + "Control";
+        private static readonly XName ConditionElementName = WixNamespace + "Condition";
         private static readonly XName CreateFolderElementName = WixNamespace + "CreateFolder";
         private static readonly XName CustomTableElementName = WixNamespace + "CustomTable";
         private static readonly XName DirectoryElementName = WixNamespace + "Directory";
+        private static readonly XName FeatureElementName = WixNamespace + "Feature";
         private static readonly XName FileElementName = WixNamespace + "File";
+        private static readonly XName FragmentElementName = WixNamespace + "Fragment";
+        private static readonly XName ErrorElementName = WixNamespace + "Error";
+        private static readonly XName LaunchElementName = WixNamespace + "Launch";
+        private static readonly XName LevelElementName = WixNamespace + "Level";
         private static readonly XName ExePackageElementName = WixNamespace + "ExePackage";
         private static readonly XName MsiPackageElementName = WixNamespace + "MsiPackage";
         private static readonly XName MspPackageElementName = WixNamespace + "MspPackage";
         private static readonly XName MsuPackageElementName = WixNamespace + "MsuPackage";
         private static readonly XName PayloadElementName = WixNamespace + "Payload";
+        private static readonly XName PermissionExElementName = WixNamespace + "PermissionEx";
+        private static readonly XName ProductElementName = WixNamespace + "Product";
+        private static readonly XName ProgressTextElementName = WixNamespace + "ProgressText";
+        private static readonly XName PublishElementName = WixNamespace + "Publish";
+        private static readonly XName MultiStringValueElementName = WixNamespace + "MultiStringValue";
+        private static readonly XName RequiredPrivilegeElementName = WixNamespace + "RequiredPrivilege";
+        private static readonly XName RowElementName = WixNamespace + "Row";
+        private static readonly XName ServiceArgumentElementName = WixNamespace + "ServiceArgument";
+        private static readonly XName SetDirectoryElementName = WixNamespace + "SetDirectory";
+        private static readonly XName SetPropertyElementName = WixNamespace + "SetProperty";
+        private static readonly XName ShortcutPropertyElementName = WixNamespace + "ShortcutProperty";
+        private static readonly XName TextElementName = WixNamespace + "Text";
+        private static readonly XName UITextElementName = WixNamespace + "UIText";
         private static readonly XName UtilPermissionExElementName = WixUtilNamespace + "PermissionEx";
         private static readonly XName CustomActionElementName = WixNamespace + "CustomAction";
         private static readonly XName PropertyElementName = WixNamespace + "Property";
@@ -83,16 +110,40 @@ namespace WixToolset.Converters
         {
             this.ConvertElementMapping = new Dictionary<XName, Action<XElement>>
             {
+                { Wix3Converter.AdminExecuteSequenceElementName, this.ConvertSequenceElement },
+                { Wix3Converter.AdminUISequenceSequenceElementName, this.ConvertSequenceElement },
+                { Wix3Converter.AdvertiseExecuteSequenceElementName, this.ConvertSequenceElement },
+                { Wix3Converter.InstallUISequenceSequenceElementName, this.ConvertSequenceElement },
+                { Wix3Converter.InstallExecuteSequenceElementName, this.ConvertSequenceElement },
                 { Wix3Converter.ColumnElementName, this.ConvertColumnElement },
                 { Wix3Converter.CustomTableElementName, this.ConvertCustomTableElement },
+                { Wix3Converter.ControlElementName, this.ConvertControlElement },
+                { Wix3Converter.ComponentElementName, this.ConvertComponentElement },
                 { Wix3Converter.DirectoryElementName, this.ConvertDirectoryElement },
+                { Wix3Converter.FeatureElementName, this.ConvertFeatureElement },
                 { Wix3Converter.FileElementName, this.ConvertFileElement },
+                { Wix3Converter.FragmentElementName, this.ConvertFragmentElement },
+                { Wix3Converter.EmbeddedChainerElementName, this.ConvertEmbeddedChainerElement },
+                { Wix3Converter.ErrorElementName, this.ConvertErrorElement },
                 { Wix3Converter.ExePackageElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.MsiPackageElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.MspPackageElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.MsuPackageElementName, this.ConvertSuppressSignatureValidation },
                 { Wix3Converter.PayloadElementName, this.ConvertSuppressSignatureValidation },
+                { Wix3Converter.PermissionExElementName, this.ConvertPermissionExElement },
+                { Wix3Converter.ProductElementName, this.ConvertProductElement },
+                { Wix3Converter.ProgressTextElementName, this.ConvertProgressTextElement },
+                { Wix3Converter.PublishElementName, this.ConvertPublishElement },
+                { Wix3Converter.MultiStringValueElementName, this.ConvertMultiStringValueElement },
+                { Wix3Converter.RequiredPrivilegeElementName, this.ConvertRequiredPrivilegeElement },
+                { Wix3Converter.RowElementName, this.ConvertRowElement },
                 { Wix3Converter.CustomActionElementName, this.ConvertCustomActionElement },
+                { Wix3Converter.ServiceArgumentElementName, this.ConvertServiceArgumentElement },
+                { Wix3Converter.SetDirectoryElementName, this.ConvertSetDirectoryElement },
+                { Wix3Converter.SetPropertyElementName, this.ConvertSetPropertyElement },
+                { Wix3Converter.ShortcutPropertyElementName, this.ConvertShortcutPropertyElement },
+                { Wix3Converter.TextElementName, this.ConvertTextElement },
+                { Wix3Converter.UITextElementName, this.ConvertUITextElement },
                 { Wix3Converter.UtilPermissionExElementName, this.ConvertUtilPermissionExElement },
                 { Wix3Converter.PropertyElementName, this.ConvertPropertyElement },
                 { Wix3Converter.WixElementWithoutNamespaceName, this.ConvertElementWithoutNamespace },
@@ -173,6 +224,8 @@ namespace WixToolset.Converters
         /// <returns>The number of errors found.</returns>
         public int ConvertDocument(XDocument document)
         {
+            this.Errors = 0;
+
             var declaration = document.Declaration;
 
             // Convert the declaration.
@@ -336,6 +389,36 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertControlElement(XElement element)
+        {
+            var xCondition = element.Element(ConditionElementName);
+            if (xCondition != null)
+            {
+                var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
+                if (!String.IsNullOrEmpty(action) &&
+                    TryGetInnerText(xCondition, out var text) &&
+                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))
+                {
+                    element.Add(new XAttribute(action + "Condition", text));
+                    xCondition.Remove();
+                }
+            }
+        }
+
+        private void ConvertComponentElement(XElement element)
+        {
+            var xCondition = element.Element(ConditionElementName);
+            if (xCondition != null)
+            {
+                if (TryGetInnerText(xCondition, out var text) &&
+                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
+                {
+                    element.Add(new XAttribute("Condition", text));
+                    xCondition.Remove();
+                }
+            }
+        }
+
         private void ConvertDirectoryElement(XElement element)
         {
             if (null == element.Attribute("Name"))
@@ -349,6 +432,25 @@ namespace WixToolset.Converters
                         element.Add(new XAttribute("Name", shortName));
                         attribute.Remove();
                     }
+                }
+            }
+        }
+
+        private void ConvertFeatureElement(XElement element)
+        {
+            var xCondition = element.Element(ConditionElementName);
+            if (xCondition != null)
+            {
+                var level = xCondition.Attribute("Level")?.Value;
+                if (!String.IsNullOrEmpty(level) &&
+                    TryGetInnerText(xCondition, out var text) &&
+                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Level' element instead.", xCondition.Name.LocalName))
+                {
+                    xCondition.AddAfterSelf(new XElement(LevelElementName,
+                        new XAttribute("Value", level),
+                        new XAttribute("Condition", text)
+                        ));
+                    xCondition.Remove();
                 }
             }
         }
@@ -379,6 +481,90 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertFragmentElement(XElement element)
+        {
+            var xCondition = element.Element(ConditionElementName);
+            if (xCondition != null)
+            {
+                var message = xCondition.Attribute("Message")?.Value;
+
+                if (!String.IsNullOrEmpty(message) &&
+                    TryGetInnerText(xCondition, out var text) &&
+                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
+                {
+                    xCondition.AddAfterSelf(new XElement(LaunchElementName,
+                        new XAttribute("Condition", text),
+                        new XAttribute("Message", message)
+                        ));
+                    xCondition.Remove();
+                }
+            }
+        }
+
+        private void ConvertEmbeddedChainerElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+
+        private void ConvertErrorElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Message");
+
+        private void ConvertPermissionExElement(XElement element)
+        {
+            var xCondition = element.Element(ConditionElementName);
+            if (xCondition != null)
+            {
+                if (TryGetInnerText(xCondition, out var text) &&
+                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Condition' attribute instead.", xCondition.Name.LocalName))
+                {
+                    element.Add(new XAttribute("Condition", text));
+                    xCondition.Remove();
+                }
+            }
+        }
+
+        private void ConvertProgressTextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Message");
+
+        private void ConvertProductElement(XElement element)
+        {
+            var xCondition = element.Element(ConditionElementName);
+            if (xCondition != null)
+            {
+                var message = element.Attribute("Message")?.Value;
+
+                if (!String.IsNullOrEmpty(message) &&
+                    TryGetInnerText(xCondition, out var text) &&
+                    this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the 'Launch' element instead.", xCondition.Name.LocalName))
+                {
+                    xCondition.AddAfterSelf(new XElement(LaunchElementName,
+                        new XAttribute("Condition", text),
+                        new XAttribute("Message", message)
+                        ));
+                    xCondition.Remove();
+                }
+            }
+        }
+
+        private void ConvertPublishElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+
+        private void ConvertMultiStringValueElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+
+        private void ConvertRequiredPrivilegeElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Name");
+
+        private void ConvertRowElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+
+        private void ConvertSequenceElement(XElement element)
+        {
+            foreach (var child in element.Elements())
+            {
+                this.ConvertInnerTextToAttribute(child, "Condition");
+            }
+        }
+
+        private void ConvertServiceArgumentElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+
+        private void ConvertSetDirectoryElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+
+        private void ConvertSetPropertyElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Condition");
+
+        private void ConvertShortcutPropertyElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+
         private void ConvertSuppressSignatureValidation(XElement element)
         {
             var suppressSignatureValidation = element.Attribute("SuppressSignatureValidation");
@@ -396,6 +582,10 @@ namespace WixToolset.Converters
                 suppressSignatureValidation.Remove();
             }
         }
+
+        private void ConvertTextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
+
+        private void ConvertUITextElement(XElement element) => this.ConvertInnerTextToAttribute(element, "Value");
 
         private void ConvertCustomActionElement(XElement xCustomAction)
         {
@@ -436,6 +626,24 @@ namespace WixToolset.Converters
                     xProperty.Value = xProperty.Value.Replace("QtExec", "WixQuietExec");
                 }
             }
+
+            var xScript = xCustomAction.Attribute("Script");
+
+            if (xScript != null && TryGetInnerText(xCustomAction, out var scriptText))
+            {
+                if (this.OnError(ConverterTestType.InnerTextDeprecated, xCustomAction, "Using {0} element text is deprecated. Extract the text to a file and use the 'ScriptFile' attribute to reference it.", xCustomAction.Name.LocalName))
+                {
+                    var scriptFolder = Path.GetDirectoryName(this.SourceFile) ?? String.Empty;
+                    var id = xCustomAction.Attribute("Id")?.Value ?? Guid.NewGuid().ToString("N");
+                    var ext = (xScript.Value == "jscript") ? ".js" : (xScript.Value == "vbscript") ? ".vbs" : ".txt";
+
+                    var scriptFile = Path.Combine(scriptFolder, id + ext);
+                    File.WriteAllText(scriptFile, scriptText);
+
+                    RemoveChildren(xCustomAction);
+                    xCustomAction.Add(new XAttribute("ScriptFile", scriptFile));
+                }
+            }
         }
 
         private void ConvertPropertyElement(XElement xProperty)
@@ -446,6 +654,8 @@ namespace WixToolset.Converters
             {
                 this.OnError(ConverterTestType.QtExecCmdTimeoutAmbiguous, xProperty, "QtExecCmdTimeout was previously used for both CAQuietExec and CAQuietExec64. For WixQuietExec, use WixQuietExecCmdTimeout. For WixQuietExec64, use WixQuietExec64CmdTimeout.");
             }
+
+            this.ConvertInnerTextToAttribute(xProperty, "Value");
         }
 
         private void ConvertUtilPermissionExElement(XElement element)
@@ -483,13 +693,22 @@ namespace WixToolset.Converters
             }
         }
 
+        private void ConvertInnerTextToAttribute(XElement element, string attributeName)
+        {
+            if (TryGetInnerText(element, out var text) &&
+                this.OnError(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}' attribute instead.", element.Name.LocalName, attributeName))
+            {
+                element.Add(new XAttribute(attributeName, text));
+                RemoveChildren(element);
+            }
+        }
+
         private IEnumerable<ConverterTestType> YieldConverterTypes(IEnumerable<string> types)
         {
             if (null != types)
             {
                 foreach (var type in types)
                 {
-
                     if (Enum.TryParse<ConverterTestType>(type, true, out var itt))
                     {
                         yield return itt;
@@ -637,6 +856,60 @@ namespace WixToolset.Converters
             return value;
         }
 
+        private static string UppercaseFirstChar(string value)
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                var c = Char.ToUpperInvariant(value[0]);
+                if (c != value[0])
+                {
+                    var remainder = value.Length > 1 ? value.Substring(1) : String.Empty;
+                    return c + remainder;
+                }
+            }
+
+            return value;
+        }
+
+        private static bool TryGetInnerText(XElement element, out string value)
+        {
+            value = null;
+
+            var nodes = element.Nodes();
+
+            if (nodes.All(e => e.NodeType == XmlNodeType.Text || e.NodeType == XmlNodeType.CDATA))
+            {
+                value = String.Join(String.Empty, nodes.Cast<XText>().Select(TrimTextValue));
+            }
+
+            return !String.IsNullOrEmpty(value);
+        }
+
+        private static string TrimTextValue(XText text)
+        {
+            var value = text.Value;
+
+            if (String.IsNullOrEmpty(value))
+            {
+                return String.Empty;
+            }
+            else if (text.NodeType == XmlNodeType.CDATA && String.IsNullOrWhiteSpace(value))
+            {
+                return " ";
+            }
+
+            return value.Trim();
+        }
+
+        private static void RemoveChildren(XElement element)
+        {
+            var nodes = element.Nodes().ToList();
+            foreach (var node in nodes)
+            {
+                node.Remove();
+            }
+        }
+
         /// <summary>
         /// Converter test types.  These are used to condition error messages down to warnings.
         /// </summary>
@@ -751,6 +1024,11 @@ namespace WixToolset.Converters
             /// Column element's Modularize attribute is camel-case.
             /// </summary>
             ColumnModularizeCamelCase,
+
+            /// <summary>
+            /// Inner text value should move to an attribute.
+            /// </summary>
+            InnerTextDeprecated,
         }
     }
 }

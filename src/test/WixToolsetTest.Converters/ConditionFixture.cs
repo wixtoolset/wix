@@ -8,18 +8,22 @@ namespace WixToolsetTest.Converters
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
 
-    public class CustomTableFixture : BaseConverterFixture
+    public class ConditionFixture : BaseConverterFixture
     {
         [Fact]
-        public void FixCustomTableCategoryAndModularization()
+        public void FixControlCondition()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
-                "    <CustomTable Id='Custom1'>",
-                "      <Column Id='Column1' Type='string' Category='Text' Modularize='Column' />",
-                "    </CustomTable>",
+                "    <UI>",
+                "      <Dialog Id='Dlg1'>",
+                "        <Control Id='Control1'>",
+                "          <Condition Action='hide'>a&lt;>b</Condition>",
+                "        </Control>",
+                "      </Dialog>",
+                "    </UI>",
                 "  </Fragment>",
                 "</Wix>");
 
@@ -28,48 +32,13 @@ namespace WixToolsetTest.Converters
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <CustomTable Id=\"Custom1\">",
-                "      <Column Id=\"Column1\" Type=\"string\" Category=\"text\" Modularize=\"column\" />",
-                "    </CustomTable>",
-                "  </Fragment>",
-                "</Wix>"
-            };
-
-            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
-
-            var messaging = new MockMessaging();
-            var converter = new Wix3Converter(messaging, 2, null, null);
-
-            var errors = converter.ConvertDocument(document);
-            Assert.Equal(4, errors);
-
-            var actualLines = UnformattedDocumentLines(document);
-            CompareLineByLine(expected, actualLines);
-        }
-
-        [Fact]
-        public void FixCustomRowTextValue()
-        {
-            var parse = String.Join(Environment.NewLine,
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
-                "  <Fragment>",
-                "    <CustomTable Id='Custom1'>",
-                "      <Row Id='Column1'>",
-                "           Some value",
-                "      </Row>",
-                "    </CustomTable>",
-                "  </Fragment>",
-                "</Wix>");
-
-            var expected = new[]
-            {
-                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <Fragment>",
-                "    <CustomTable Id=\"Custom1\">",
-                "      <Row Id=\"Column1\" Value=\"Some value\" />",
-                "    </CustomTable>",
+                "    <UI>",
+                "      <Dialog Id=\"Dlg1\">",
+                "        <Control Id=\"Control1\" HideCondition=\"a&lt;&gt;b\">",
+                "          ",
+                "        </Control>",
+                "      </Dialog>",
+                "    </UI>",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -87,19 +56,15 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void FixCustomRowCdataValue()
+        public void FixComponentCondition()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
-                "    <CustomTable Id='Custom1'>",
-                "      <Row Id='Column1'>",
-                "       <![CDATA[",
-                "         Some value",
-                "       ]]>",
-                "      </Row>",
-                "    </CustomTable>",
+                "    <Component Id='Comp1' Directory='ApplicationFolder'>",
+                "      <Condition>1&lt;2</Condition>",
+                "    </Component>",
                 "  </Fragment>",
                 "</Wix>");
 
@@ -108,9 +73,9 @@ namespace WixToolsetTest.Converters
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <CustomTable Id=\"Custom1\">",
-                "      <Row Id=\"Column1\" Value=\"Some value\" />",
-                "    </CustomTable>",
+                "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\" Condition=\"1&lt;2\">",
+                "      ",
+                "    </Component>",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -128,15 +93,15 @@ namespace WixToolsetTest.Converters
         }
 
         [Fact]
-        public void FixCustomRowWithoutValue()
+        public void FixFeatureCondition()
         {
             var parse = String.Join(Environment.NewLine,
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
                 "  <Fragment>",
-                "    <CustomTable Id='Custom1'>",
-                "      <Row Id='Column1'></Row>",
-                "    </CustomTable>",
+                "    <Feature Id='Feature1'>",
+                "      <Condition Level='0'>PROP = 1</Condition>",
+                "    </Feature>",
                 "  </Fragment>",
                 "</Wix>");
 
@@ -145,9 +110,9 @@ namespace WixToolsetTest.Converters
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <CustomTable Id=\"Custom1\">",
-                "      <Row Id=\"Column1\"></Row>",
-                "    </CustomTable>",
+                "    <Feature Id=\"Feature1\">",
+                "      <Level Value=\"0\" Condition=\"PROP = 1\" />",
+                "    </Feature>",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -158,26 +123,34 @@ namespace WixToolsetTest.Converters
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
-            Assert.Equal(2, errors);
+            Assert.Equal(3, errors);
 
             var actualLines = UnformattedDocumentLines(document);
             CompareLineByLine(expected, actualLines);
         }
 
         [Fact]
-        public void CanConvertCustomTableBootstrapperApplicationData()
+        public void FixLaunchCondition()
         {
             var parse = String.Join(Environment.NewLine,
-                "<?xml version='1.0' encoding='utf-8'?>",
-                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
-                "  <CustomTable Id='FgAppx' BootstrapperApplicationData='yes' />",
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Condition Message='Stop the install'>",
+                "      1&lt;2",
+                "    </Condition>",
+                "  </Fragment>",
                 "</Wix>");
 
-            var expected = String.Join(Environment.NewLine,
+            var expected = new[]
+            {
                 "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
-                "  <CustomTable Id=\"FgAppx\" Unreal=\"yes\" />",
-                "</Wix>");
+                "  <Fragment>",
+                "    <Launch Condition=\"1&lt;2\" Message=\"Stop the install\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
 
             var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 
@@ -185,11 +158,51 @@ namespace WixToolsetTest.Converters
             var converter = new Wix3Converter(messaging, 2, null, null);
 
             var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
 
-            var actual = UnformattedDocumentString(document);
+            var actualLines = UnformattedDocumentLines(document);
+            CompareLineByLine(expected, actualLines);
+        }
 
-            Assert.Equal(1, errors);
-            Assert.Equal(expected, actual);
+        [Fact]
+        public void FixPermissionExCondition()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>",
+                "  <Fragment>",
+                "    <Component Id='Comp1' Directory='ApplicationFolder'>",
+                "      <PermissionEx Sddl='sddl'>",
+                "        <Condition>1&lt;2</Condition>",
+                "      </PermissionEx>",
+                "    </Component>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <Component Id=\"Comp1\" Directory=\"ApplicationFolder\">",
+                "      <PermissionEx Sddl=\"sddl\" Condition=\"1&lt;2\">",
+                "        ",
+                "      </PermissionEx>",
+                "    </Component>",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new Wix3Converter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+            Assert.Equal(3, errors);
+
+            var actualLines = UnformattedDocumentLines(document);
+            CompareLineByLine(expected, actualLines);
         }
     }
 }
