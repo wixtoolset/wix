@@ -4873,6 +4873,9 @@ namespace WixToolset.Core
                     case "FeatureRef":
                         this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id.Id);
                         break;
+                    case "Level":
+                        this.ParseLevelElement(child, id.Id);
+                        break;
                     case "MergeRef":
                         this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id.Id);
                         break;
@@ -7816,6 +7819,72 @@ namespace WixToolset.Core
             this.Core.ParseForExtensionElements(node);
 
             return String.Concat(name, "=", value);
+        }
+
+        /// <summary>
+        /// Parses a condition element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="featureId">Id of the parent Feature element.</param>
+        private void ParseLevelElement(XElement node, string featureId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string condition = null;
+            int? level = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            level = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (!level.HasValue)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
+            }
+
+            if (String.IsNullOrEmpty(condition))
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                if (CompilerConstants.IntegerNotSet == level)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
+                    level = CompilerConstants.IllegalInteger;
+                }
+
+                if (!this.Core.EncounteredError)
+                {
+                    this.Core.AddTuple(new ConditionTuple(sourceLineNumbers)
+                    {
+                        FeatureRef = featureId,
+                        Level = level.Value,
+                        Condition = condition
+                    });
+                }
+            }
         }
 
         /// <summary>
