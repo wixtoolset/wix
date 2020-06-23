@@ -10,12 +10,12 @@
             <BundleAttributeDefinition Id="Column2" />
 
             <BundleElement>
-                <BundleAttribute Id="Id">one</BundleAttribute>
-                <BundleAttribute Id="Column2">two</BundleAttribute>
+                <BundleAttribute Id="Id" Value="one" />
+                <BundleAttribute Id="Column2" Value="two" />
             </BundleElement>
             <BundleElement>
-                <BundleAttribute Id="Column2">&lt;</BundleAttribute>
-                <BundleAttribute Id="Id">&gt;</BundleAttribute>
+                <BundleAttribute Id="Column2" Value="&lt;" />
+                <BundleAttribute Id="Id" Value="&gt;" />
             </BundleElement>
         </BundleCustomData>
 
@@ -28,23 +28,23 @@
     <Fragment>
         <BundleCustomDataRef Id="BundleCustomTableBA">
             <BundleElement>
-                <BundleAttribute Id="Id">1</BundleAttribute>
-                <BundleAttribute Id="Column2">2</BundleAttribute>
+                <BundleAttribute Id="Id" Value="1" />
+                <BundleAttribute Id="Column2" Value="2" />
             </BundleElement>
         </BundleCustomDataRef>
 
         <BundleCustomDataRef Id="BundleCustomTableBE">
             <BundleElement>
-                <BundleAttribute Id="Id">one</BundleAttribute>
-                <BundleAttribute Id="Column2">two</BundleAttribute>
+                <BundleAttribute Id="Id" Value="one" />
+                <BundleAttribute Id="Column2" Value="two" />
             </BundleElement>
             <BundleElement>
-                <BundleAttribute Id="Column2">&lt;</BundleAttribute>
-                <BundleAttribute Id="Id">&gt;</BundleAttribute>
+                <BundleAttribute Id="Column2" Value="&lt;" />
+                <BundleAttribute Id="Id" Value="&gt;" />
             </BundleElement>
             <BundleElement>
-                <BundleAttribute Id="Id">1</BundleAttribute>
-                <BundleAttribute Id="Column2">2</BundleAttribute>
+                <BundleAttribute Id="Id" Value="1" />
+                <BundleAttribute Id="Column2" Value="2" />
             </BundleElement>
         </BundleCustomDataRef>
 

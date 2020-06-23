@@ -2319,14 +2319,6 @@ namespace WixToolset.Core
                     case "Class":
                         this.ParseClassElement(child, id.Id, YesNoType.NotSet, null, null, null, null);
                         break;
-                    case "Condition":
-                        if (null != condition)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                        }
-                        condition = this.ParseConditionElement(child, node.Name.LocalName, null, null);
-                        break;
                     case "CopyFile":
                         this.ParseCopyFileElement(child, id.Id, null);
                         break;
@@ -3382,17 +3374,12 @@ namespace WixToolset.Core
                 win64 = true;
             }
 
-            // get the inner text if any exists
-            var innerText = this.Core.GetTrimmedInnerText(node);
-
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
             if (inlineScript)
             {
                 if (String.IsNullOrEmpty(scriptFile))
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ScriptFile", "Script"));
-
-                    target = innerText;
                 }
             }
             else if (CustomActionTargetType.VBScript == targetType) // non-inline vbscript
@@ -3427,10 +3414,6 @@ namespace WixToolset.Core
             else if (CustomActionTargetType.TextData == targetType && CustomActionSourceType.Directory != sourceType && CustomActionSourceType.Property != sourceType && CustomActionSourceType.File != sourceType)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Value", "Directory", "Property", "Error"));
-            }
-            else if (!String.IsNullOrEmpty(innerText)) // inner text cannot be specified with non-script CAs
-            {
-                this.Core.Write(ErrorMessages.CustomActionIllegalInnerText(sourceLineNumbers, node.Name.LocalName, innerText, "Script"));
             }
 
             if (!inlineScript && !String.IsNullOrEmpty(scriptFile))
@@ -4051,11 +4034,6 @@ namespace WixToolset.Core
                         if (null == columnName)
                         {
                             this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Column"));
-                        }
-
-                        if (String.IsNullOrEmpty(data))
-                        {
-                            data = Common.GetInnerText(child);
                         }
 
                         if (!this.Core.EncounteredError)
@@ -4864,9 +4842,6 @@ namespace WixToolset.Core
                     case "Component":
                         this.ParseComponentElement(child, ComplexReferenceParentType.Feature, id.Id, null, CompilerConstants.IntegerNotSet, null, null);
                         break;
-                    case "Condition":
-                        this.ParseConditionElement(child, node.Name.LocalName, id.Id, null);
-                        break;
                     case "Feature":
                         this.ParseFeatureElement(child, ComplexReferenceParentType.Feature, id.Id, ref childDisplay);
                         break;
@@ -5366,11 +5341,6 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
                 id = CompilerConstants.IllegalInteger;
-            }
-
-            if (String.IsNullOrEmpty(message))
-            {
-                message = Common.GetInnerText(node);
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -6232,9 +6202,6 @@ namespace WixToolset.Core
                     case "ComponentGroup":
                         this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
                         break;
-                    case "Condition":
-                        this.ParseConditionElement(child, node.Name.LocalName, null, null);
-                        break;
                     case "Container":
                         this.ParseContainerElement(child);
                         break;
@@ -6416,161 +6383,6 @@ namespace WixToolset.Core
                     Description = message
                 });
             }
-        }
-
-        /// <summary>
-        /// Parses a condition element.
-        /// </summary>
-        /// <param name="node">Element to parse.</param>
-        /// <param name="parentElementLocalName">LocalName of the parent element.</param>
-        /// <param name="id">Id of the parent element.</param>
-        /// <param name="dialog">Dialog of the parent element if its a Control.</param>
-        /// <returns>The condition if one was found.</returns>
-        private string ParseConditionElement(XElement node, string parentElementLocalName, string id, string dialog)
-        {
-            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string action = null;
-            string condition = null;
-            var level = CompilerConstants.IntegerNotSet;
-            string message = null;
-
-            foreach (var attrib in node.Attributes())
-            {
-                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
-                {
-                    switch (attrib.Name.LocalName)
-                    {
-                    case "Action":
-                        if ("Control" == parentElementLocalName)
-                        {
-                            action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            switch (action)
-                            {
-                            case "default":
-                                action = "Default";
-                                break;
-                            case "disable":
-                                action = "Disable";
-                                break;
-                            case "enable":
-                                action = "Enable";
-                                break;
-                            case "hide":
-                                action = "Hide";
-                                break;
-                            case "show":
-                                action = "Show";
-                                break;
-                            case "":
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, action, "default", "disable", "enable", "hide", "show"));
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            this.Core.UnexpectedAttribute(node, attrib);
-                        }
-                        break;
-                    case "Level":
-                        if ("Feature" == parentElementLocalName)
-                        {
-                            level = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        }
-                        else
-                        {
-                            this.Core.UnexpectedAttribute(node, attrib);
-                        }
-                        break;
-                    case "Message":
-                        if ("Fragment" == parentElementLocalName || "Product" == parentElementLocalName)
-                        {
-                            message = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        }
-                        else
-                        {
-                            this.Core.UnexpectedAttribute(node, attrib);
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionAttribute(node, attrib);
-                }
-            }
-
-            // get the condition from the inner text of the element
-            condition = this.Core.GetConditionInnerText(node);
-
-            this.Core.ParseForExtensionElements(node);
-
-            // the condition should not be empty
-            if (null == condition || 0 == condition.Length)
-            {
-                condition = null;
-                this.Core.Write(ErrorMessages.ConditionExpected(sourceLineNumbers, node.Name.LocalName));
-            }
-
-            switch (parentElementLocalName)
-            {
-            case "Control":
-                if (null == action)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
-                }
-
-                if (!this.Core.EncounteredError)
-                {
-                    this.Core.AddTuple(new ControlConditionTuple(sourceLineNumbers)
-                    {
-                        DialogRef = dialog,
-                        ControlRef = id,
-                        Action = action,
-                        Condition = condition,
-                    });
-                }
-                break;
-            case "Feature":
-                if (CompilerConstants.IntegerNotSet == level)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Level"));
-                    level = CompilerConstants.IllegalInteger;
-                }
-
-                if (!this.Core.EncounteredError)
-                {
-                    this.Core.AddTuple(new ConditionTuple(sourceLineNumbers)
-                    {
-                        FeatureRef = id,
-                        Level = level,
-                        Condition = condition
-                    });
-                }
-                break;
-            case "Fragment":
-            case "Product":
-                if (null == message)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Message"));
-                }
-
-                if (!this.Core.EncounteredError)
-                {
-                    this.Core.AddTuple(new LaunchConditionTuple(sourceLineNumbers)
-                    {
-                        Condition = condition,
-                        Description = message
-                    });
-                }
-                break;
-            }
-
-            return condition;
         }
 
         /// <summary>

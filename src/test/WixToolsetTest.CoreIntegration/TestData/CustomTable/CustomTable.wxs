@@ -9,12 +9,12 @@
             <Column Id="Column1" Type="string" PrimaryKey="yes" Category="text" Modularize="column" Description="The first custom column." />
             <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" Description="The custom table's Component reference" />
             <Row>
-                <Data Column="Column1">Row1</Data>
-                <Data Column="Component_">test.txt</Data>
+                <Data Column="Column1" Value="Row1" />
+                <Data Column="Component_" Value="test.txt" />
             </Row>
             <Row>
-                <Data Column="Column1">Row2</Data>
-                <Data Column="Component_">test.txt</Data>
+                <Data Column="Column1" Value="Row2" />
+                <Data Column="Component_" Value="test.txt" />
             </Row>
         </CustomTable>
 
@@ -22,12 +22,12 @@
             <Column Id="ColumnA" Type="string" PrimaryKey="yes" />
             <Column Id="Component_" Type="string" Width="72" KeyTable="Component" KeyColumn="1" />
             <Row>
-                <Data Column="ColumnA">RowA</Data>
-                <Data Column="Component_">test.txt</Data>
+                <Data Column="ColumnA" Value="RowA" />
+                <Data Column="Component_" Value="test.txt" />
             </Row>
             <Row>
-                <Data Column="ColumnA">RowB</Data>
-                <Data Column="Component_">test.txt</Data>
+                <Data Column="ColumnA" Value="RowB" />
+                <Data Column="Component_" Value="test.txt" />
             </Row>
         </CustomTable>
     </Fragment>

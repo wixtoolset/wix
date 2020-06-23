@@ -700,11 +700,6 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Action"));
             }
 
-            if (null == message)
-            {
-                message = Common.GetInnerText(node);
-            }
-
             this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
@@ -749,11 +744,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
-            }
-
-            if (null == text)
-            {
-                text = Common.GetInnerText(node);
             }
 
             if (null == id)
@@ -1270,26 +1260,6 @@ namespace WixToolset.Core
                                 this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "16", "32", "48"));
                                 break;
                             }
-                            //if (0 < iconSizeValue.Length)
-                            //{
-                            //    var iconsSizeType = Wix.Control.ParseIconSizeType(iconSizeValue);
-                            //    switch (iconsSizeType)
-                            //    {
-                            //    case Wix.Control.IconSizeType.Item16:
-                            //        this.Core.TrySetBitFromName(specialAttributes, "Icon16", YesNoType.Yes, bits, 16);
-                            //        break;
-                            //    case Wix.Control.IconSizeType.Item32:
-                            //        this.Core.TrySetBitFromName(specialAttributes, "Icon32", YesNoType.Yes, bits, 16);
-                            //        break;
-                            //    case Wix.Control.IconSizeType.Item48:
-                            //        this.Core.TrySetBitFromName(specialAttributes, "Icon16", YesNoType.Yes, bits, 16);
-                            //        this.Core.TrySetBitFromName(specialAttributes, "Icon32", YesNoType.Yes, bits, 16);
-                            //        break;
-                            //    default:
-                            //        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, iconSizeValue, "16", "32", "48"));
-                            //        break;
-                            //    }
-                            //}
                         }
                         else
                         {
@@ -1411,9 +1381,6 @@ namespace WixToolset.Core
                     case "ComboBox":
                         this.ParseControlGroupElement(child, TupleDefinitionType.ComboBox, "ListItem");
                         break;
-                    case "Condition":
-                        this.ParseConditionElement(child, node.Name.LocalName, controlId.Id, dialog);
-                        break;
                     case "ListBox":
                         this.ParseControlGroupElement(child, TupleDefinitionType.ListBox, "ListItem");
                         break;
@@ -1454,11 +1421,6 @@ namespace WixToolset.Core
                             {
                                 this.Core.ParseExtensionAttribute(child, attrib);
                             }
-                        }
-
-                        if (null == text)
-                        {
-                            text = Common.GetInnerText(child);
                         }
 
                         if (!String.IsNullOrEmpty(text) && null != sourceFile)
@@ -1726,11 +1688,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
-            }
-
-            if (null == condition)
-            {
-                condition = this.Core.GetConditionInnerText(node);
             }
 
             if (null == control)

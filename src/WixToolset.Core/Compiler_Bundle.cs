@@ -1056,11 +1056,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Id"));
                         }
 
-                        if (String.IsNullOrEmpty(value))
-                        {
-                            value = Common.GetInnerText(child);
-                        }
-
                         if (!this.Core.EncounteredError)
                         {
                             this.Core.AddTuple(new WixBundleCustomDataCellTuple(childSourceLineNumbers, new Identifier(AccessModifier.Private, customDataId, elementId, attributeName))

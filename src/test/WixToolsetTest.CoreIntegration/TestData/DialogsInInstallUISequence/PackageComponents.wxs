@@ -4,16 +4,13 @@
         <UI Id="CustomDialog">
             <Dialog Id="FirstDialog" Width="100" Height="100">
                 <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="FirstDialogTitle" />
-                <Control Id="Header" Type="Text" X="0" Y="13" Width="90" Height="13" TabSkip="no" Text="FirstDialogHeader">
-                    <Condition Action="hide">Installed</Condition>
-                    <Condition Action="disable">Installed</Condition>
-                </Control>
+                <Control Id="Header" Type="Text" X="0" Y="13" Width="90" Height="13" TabSkip="no" Text="FirstDialogHeader"
+                         HideCondition="Installed" DisableCondition="Installed" />
             </Dialog>
             <Dialog Id="SecondDialog" Width="100" Height="100">
                 <Control Id="Title" Type="Text" X="0" Y="0" Width="90" Height="13" TabSkip="no" Text="SecondDialogTitle" />
-                <Control Id="OptionalCheckBox" Type="CheckBox" X="0" Y="13" Width="100" Height="40" Hidden="yes" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" CheckBoxValue="1" Text="[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]">
-                    <Condition Action="show">WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed</Condition>
-                </Control>
+                <Control Id="OptionalCheckBox" Type="CheckBox" X="0" Y="13" Width="100" Height="40" Hidden="yes" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOX" CheckBoxValue="1" Text="[WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT]"
+                         ShowCondition="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT AND NOT Installed" />
             </Dialog>
 
             <InstallUISequence>
@@ -29,8 +26,8 @@
             <Publish Dialog="FirstDialog" Control="Next" Event="NewDialog" Value="SecondDialog">Installed AND PATCH</Publish>
 
             <InstallUISequence>
-                <Show Dialog="FirstDialog" Before="SecondDialog">Installed AND PATCH</Show>
-                <Show Dialog="SecondDialog" Before="ExecuteAction">NOT Installed</Show>
+                <Show Dialog="FirstDialog" Before="SecondDialog" Condition="Installed AND PATCH" />
+                <Show Dialog="SecondDialog" Before="ExecuteAction" Condition="NOT Installed" />
             </InstallUISequence>
         </UI>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">

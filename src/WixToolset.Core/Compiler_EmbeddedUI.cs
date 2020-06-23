@@ -80,12 +80,6 @@ namespace WixToolset.Core
                 }
             }
 
-            if (condition == null)
-            {
-                // Get the condition from the inner text of the element.
-                condition = this.Core.GetConditionInnerText(node);
-            }
-
             if (null == id)
             {
                 id = this.Core.CreateIdentifier("mec", source, type.ToString());

@@ -322,26 +322,6 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Get an element's inner text and trims any extra whitespace.
-        /// </summary>
-        /// <param name="element">The element with inner text to be trimmed.</param>
-        /// <returns>The node's inner text trimmed.</returns>
-        public string GetTrimmedInnerText(XElement element)
-        {
-            return this.parseHelper.GetTrimmedInnerText(element);
-        }
-
-        /// <summary>
-        /// Gets element's inner text and ensure's it is safe for use in a condition by trimming any extra whitespace.
-        /// </summary>
-        /// <param name="element">The element to ensure inner text is a condition.</param>
-        /// <returns>The value converted into a safe condition.</returns>
-        public string GetConditionInnerText(XElement element)
-        {
-            return this.parseHelper.GetConditionInnerText(element);
-        }
-
-        /// <summary>
         /// Creates a version 3 name-based UUID.
         /// </summary>
         /// <param name="namespaceGuid">The namespace UUID.</param>

@@ -690,10 +690,8 @@ namespace WixToolset.Core
         /// <summary>
         /// Gets the text of an XElement.
         /// </summary>
-        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
-        /// <param name="attribute">The attribute containing the value to get.</param>
-        /// <param name="messageHandler">A delegate that receives error messages.</param>
-        /// <returns>The attribute's YesNoType value.</returns>
+        /// <param name="node">Element to get text.</param>
+        /// <returns>The element's text.</returns>
         internal static string GetInnerText(XElement node)
         {
             var text = node.Nodes().Where(n => XmlNodeType.Text == n.NodeType || XmlNodeType.CDATA == n.NodeType).Cast<XText>().FirstOrDefault();

@@ -27,7 +27,7 @@
         </InstallUISequence>
 
         <UI>
-            <ProgressText Action="CustomAction2">Progess2Text</ProgressText>
+            <ProgressText Action="CustomAction2" Message="Progess2Text" />
         </UI>
     </Fragment>
 </Wix>

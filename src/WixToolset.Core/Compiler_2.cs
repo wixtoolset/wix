@@ -186,9 +186,6 @@ namespace WixToolset.Core
                         case "ComponentGroup":
                             this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, null);
                             break;
-                        case "Condition":
-                            this.ParseConditionElement(child, node.Name.LocalName, null, null);
-                            break;
                         case "CustomAction":
                             this.ParseCustomActionElement(child);
                             break;
@@ -227,6 +224,9 @@ namespace WixToolset.Core
                             break;
                         case "InstanceTransforms":
                             this.ParseInstanceTransformsElement(child);
+                            break;
+                        case "Launch":
+                            this.ParseLaunchElement(child);
                             break;
                         case "MajorUpgrade":
                             this.ParseMajorUpgradeElement(child, contextValues);
@@ -1235,31 +1235,7 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("pme", objectId, tableName, sddl);
             }
 
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                    case "Condition":
-                        if (null != condition)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                        }
-
-                        condition = this.ParseConditionElement(child, node.Name.LocalName, null, null);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
+            this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
             {
@@ -1535,20 +1511,6 @@ namespace WixToolset.Core
             else if ("SecureCustomProperties" == id.Id || "AdminProperties" == id.Id || "MsiHiddenProperties" == id.Id)
             {
                 this.Core.Write(ErrorMessages.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
-            }
-
-            var innerText = this.Core.GetTrimmedInnerText(node);
-            if (null != value)
-            {
-                // cannot specify both the value attribute and inner text
-                if (!String.IsNullOrEmpty(innerText))
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
-                }
-            }
-            else // value attribute not specified, use inner text if any.
-            {
-                value = innerText;
             }
 
             if ("ErrorDialog" == id.Id)
@@ -2088,11 +2050,6 @@ namespace WixToolset.Core
                         break;
                     }
                 }
-            }
-
-            if (multiStringValue == null)
-            {
-                multiStringValue = Common.GetInnerText(node);
             }
 
             if (multiStringValue == null)
@@ -2683,12 +2640,6 @@ namespace WixToolset.Core
                     }
                 }
 
-                // Get the condition from the inner text of the element.
-                if (condition == null)
-                {
-                    condition = this.Core.GetConditionInnerText(child);
-                }
-
                 if (customAction && "Custom" == actionName)
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Action"));
@@ -3154,11 +3105,6 @@ namespace WixToolset.Core
 
             if (privilege == null)
             {
-                privilege = Common.GetInnerText(node);
-            }
-
-            if (privilege == null)
-            {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
             }
 
@@ -3520,11 +3466,6 @@ namespace WixToolset.Core
 
             if (argument == null)
             {
-                argument = this.Core.GetTrimmedInnerText(node);
-            }
-
-            if (argument == null)
-            {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Value"));
             }
 
@@ -3860,11 +3801,6 @@ namespace WixToolset.Core
                 }
             }
 
-            if (condition == null)
-            {
-                condition = this.Core.GetConditionInnerText(node);
-            }
-
             if (null == id)
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
@@ -3957,29 +3893,6 @@ namespace WixToolset.Core
                             this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
                             break;
                         }
-                        //if (0 < sequenceValue.Length)
-                        //{
-                        //    var sequenceType = Wix.Enums.ParseSequenceType(sequenceValue);
-                        //    switch (sequenceType)
-                        //    {
-                        //    case Wix.SequenceType.execute:
-                        //        sequences = new string[] { "InstallExecuteSequence" };
-                        //        break;
-                        //    case Wix.SequenceType.ui:
-                        //        sequences = new string[] { "InstallUISequence" };
-                        //        break;
-                        //    case Wix.SequenceType.first:
-                        //        firstSequence = true;
-                        //        // default puts it in both sequence which is what we want
-                        //        break;
-                        //    case Wix.SequenceType.both:
-                        //        // default so no work necessary.
-                        //        break;
-                        //    default:
-                        //        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, sequenceValue, "execute", "ui", "both"));
-                        //        break;
-                        //    }
-                        //}
                         break;
                     case "Value":
                         value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
@@ -3993,11 +3906,6 @@ namespace WixToolset.Core
                 {
                     this.Core.ParseExtensionAttribute(node, attrib);
                 }
-            }
-
-            if (condition == null)
-            {
-                condition = this.Core.GetConditionInnerText(node);
             }
 
             if (null == id)
@@ -4526,19 +4434,6 @@ namespace WixToolset.Core
             else if (null == id)
             {
                 id = this.Core.CreateIdentifier("scp", shortcutId, key.ToUpperInvariant());
-            }
-
-            var innerText = this.Core.GetTrimmedInnerText(node);
-            if (!String.IsNullOrEmpty(innerText))
-            {
-                if (String.IsNullOrEmpty(value))
-                {
-                    value = innerText;
-                }
-                else // cannot specify both the value attribute and inner text
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWithInnerText(sourceLineNumbers, node.Name.LocalName, "Value"));
-                }
             }
 
             if (String.IsNullOrEmpty(value))
