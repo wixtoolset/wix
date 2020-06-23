@@ -85,7 +85,7 @@
   </ItemGroup>
 
   <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack WixToolset.Burn.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=WixToolset.Burn;Version="$(BuildVersionSimple)";ProjectFolder=$(MSBuildThisFileDirectory);Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)"' />
+    <Exec Command='nuget pack WixToolset.Burn.nuspec -Symbols -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Id=WixToolset.Burn;Version="$(BuildVersionSimple)";ProjectFolder=$(MSBuildThisFileDirectory);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)"' />
   </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
