@@ -9,6 +9,7 @@
     <Title>WiX Toolset Bal Extension</Title>
     <IsTool>true</IsTool>
     <ContentTargetFolders>build</ContentTargetFolders>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
