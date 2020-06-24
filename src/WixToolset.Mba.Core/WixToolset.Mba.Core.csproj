@@ -9,6 +9,7 @@
     <DebugType>embedded</DebugType>
     <Description>Managed Bootstrapper Application Core</Description>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(UsingMicrosoftNETSdk)'!='true' and '$(CreateDocumentation)'!='false' ">
