@@ -9,12 +9,19 @@
 extern "C" {
 #endif
 
-#define BalExitOnFailure(x, f, ...) if (FAILED(x)) { BalLogError(x, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define BalExitOnRootFailure(x, f, ...) if (FAILED(x)) { BalLogError(x, f, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define BalExitOnLastError(x, f, ...) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { BalLogError(x, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; } }
-#define BalExitOnNull(p, x, e, f, ...) if (NULL == p) { x = e; BalLogError(x, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define BalExitOnNullWithLastError(p, x, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
-#define BalExitWithLastError(x, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); ExitTrace(x, f, __VA_ARGS__); goto LExit; }
+#define BalExitOnFailureSource(d, x, f, ...) if (FAILED(x)) { BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BalExitOnRootFailureSource(d, x, f, ...) if (FAILED(x)) { BalLogError(x, f, __VA_ARGS__); Dutil_RootFailure(__FILE__, __LINE__, x); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BalExitOnLastErrorSource(d, x, f, ...) { x = ::GetLastError(); x = HRESULT_FROM_WIN32(x); if (FAILED(x)) { BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; } }
+#define BalExitOnNullSource(d, p, x, e, f, ...) if (NULL == p) { x = e; BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BalExitOnNullWithLastErrorSource(d, p, x, f, ...) if (NULL == p) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+#define BalExitWithLastErrorSource(d, x, f, ...) { DWORD Dutil_er = ::GetLastError(); x = HRESULT_FROM_WIN32(Dutil_er); if (!FAILED(x)) { x = E_FAIL; } BalLogError(x, f, __VA_ARGS__); ExitTraceSource(d, x, f, __VA_ARGS__); goto LExit; }
+
+#define BalExitOnFailure(x, f, ...) BalExitOnFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
+#define BalExitOnRootFailure(x, f, ...) BalExitOnRootFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
+#define BalExitOnLastError(x, f, ...) BalExitOnLastErrorSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
+#define BalExitOnNull(p, x, e, f, ...) BalExitOnNullSource(DUTIL_SOURCE_DEFAULT, p, x, e, f, __VA_ARGS__)
+#define BalExitOnNullWithLastError(p, x, f, ...) BalExitOnNullWithLastErrorSource(DUTIL_SOURCE_DEFAULT, p, x, f, __VA_ARGS__)
+#define BalExitWithLastError(x, f, ...) BalExitWithLastErrorSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
 
 #ifndef FACILITY_WIX
 #define FACILITY_WIX 500
