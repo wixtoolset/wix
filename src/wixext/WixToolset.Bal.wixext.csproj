@@ -7,9 +7,10 @@
     <RootNamespace>WixToolset.Bal</RootNamespace>
     <Description>WiX Toolset Bal Extension</Description>
     <Title>WiX Toolset Bal Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
     <DebugType>embedded</DebugType>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileName).targets" />
@@ -18,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="all" />
     <PackageReference Include="WixToolset.Extensibility" Version="4.0.*" PrivateAssets="all" />
   </ItemGroup>
 
@@ -28,4 +30,11 @@
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="all" />
   </ItemGroup>
+
+  <Target Name="SetNuspecProperties" AfterTargets="CoreBuild">
+    <PropertyGroup>
+      <NuspecBasePath>$(OutputPath)..\</NuspecBasePath>
+      <NuspecProperties>$(NuspecProperties);Version=$(BuildVersionSimple);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildThisFileDirectory)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
 </Project>

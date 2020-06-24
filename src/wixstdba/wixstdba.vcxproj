@@ -100,7 +100,7 @@
       <Message>Compiling message file...</Message>
       <Command>mc.exe -h "$(IntDir)." -r "$(IntDir)." -A -c -z wixstdba.messages "$(InputDir)wixstdba.mc"
 rc.exe -fo "$(OutDir)wixstdba.res" "$(IntDir)wixstdba.messages.rc"</Command>
-      <Outputs>$(IntDir)wixstdba.messages.h;$(OutDir)wixstdba.messages.rc</Outputs>
+      <Outputs>$(IntDir)wixstdba.messages.h;$(IntDir)wixstdba.messages.rc</Outputs>
     </CustomBuild>
   </ItemGroup>
 
