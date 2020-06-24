@@ -5,6 +5,7 @@
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <Description>Core Native</Description>
     <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
