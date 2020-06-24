@@ -599,9 +599,7 @@ extern "C" UINT __stdcall ExecXmlFile(
             }
             else
             {
-                hr = E_NOTIMPL;
-                ExitTrace(hr, "Error: current MSXML version does not support xpath query.");
-                ExitFunction();
+                ExitOnFailure(hr = E_NOTIMPL, "Error: current MSXML version does not support xpath query.");
             }
         }
 
