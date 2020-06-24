@@ -50,7 +50,6 @@
     <CharacterSet>Unicode</CharacterSet>
     <TargetName>mbanative</TargetName>
     <ProjectModuleDefinitionFile>mbanative.def</ProjectModuleDefinitionFile>
-    <Description>Native component of WixToolset.Mba.Core</Description>
     <EnableSourceLink Condition=" '$(PlatformToolset)'=='v140' ">false</EnableSourceLink>
   </PropertyGroup>
 
@@ -90,10 +89,6 @@
   <ItemGroup>
     <ProjectReference Include="..\balutil\balutil.vcxproj" />
   </ItemGroup>
-
-  <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack runtime.win.WixToolset.Mba.Core.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Mba.Core;Version="$(BuildVersionSimple)";Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)"' />
-  </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

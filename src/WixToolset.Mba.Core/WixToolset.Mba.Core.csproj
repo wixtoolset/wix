@@ -61,7 +61,7 @@
   <Target Name="SetNuspecProperties" AfterTargets="GetBuildVersion">
     <PropertyGroup>
       <NuspecBasePath>$(OutputPath)</NuspecBasePath>
-      <NuspecProperties>Configuration=$(Configuration);Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
+      <NuspecProperties>Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl)</NuspecProperties>
     </PropertyGroup>
   </Target>
 </Project>
