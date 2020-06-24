@@ -11,6 +11,14 @@
   <ItemGroup>
     <ProjectReference Include="..\wixnative\wixnative.vcxproj">
       <PrivateAssets>All</PrivateAssets>
+      <Properties>Platform=ARM</Properties>
+    </ProjectReference>
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
+      <PrivateAssets>All</PrivateAssets>
+      <Properties>Platform=ARM64</Properties>
+    </ProjectReference>
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
+      <PrivateAssets>All</PrivateAssets>
       <Properties>Platform=Win32</Properties>
     </ProjectReference>
     <ProjectReference Include="..\wixnative\wixnative.vcxproj">
