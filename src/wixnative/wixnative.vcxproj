@@ -30,7 +30,6 @@
     <TargetName>wixnative</TargetName>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <Description>Native component of WixToolset.Core</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -68,18 +67,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(Platform)\mergemod.dll">
-      <DeploymentContent>true</DeploymentContent>
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <Target Name="Pack" DependsOnTargets="GetBuildVersion">
-    <Exec Command='nuget pack runtime.win.WixToolset.Core.Native.nuspec -BasePath "$(BaseOutputPath)$(Configuration)" -OutputDirectory "$(BaseOutputPath)$(Configuration)" -NoPackageAnalysis -Properties Configuration=$(Configuration);Id=runtime.win.WixToolset.Core.Native;Version="$(BuildVersionSimple)";Platform=$(PlatformTarget);Authors="$(Authors)";Copyright="$(Copyright)";Description="$(Description)";Title="$(Title)"' />
-  </Target>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

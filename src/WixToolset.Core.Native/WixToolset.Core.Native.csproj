@@ -5,8 +5,18 @@
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <Description>Core Native</Description>
     <DebugType>embedded</DebugType>
-    <!-- <BeforePack>SetNuspecProperties</BeforePack> -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
+      <PrivateAssets>All</PrivateAssets>
+      <Properties>Platform=Win32</Properties>
+    </ProjectReference>
+    <ProjectReference Include="..\wixnative\wixnative.vcxproj">
+      <PrivateAssets>All</PrivateAssets>
+      <Properties>Platform=x64</Properties>
+    </ProjectReference>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Data" Version="4.0.*" PrivateAssets="All" />
@@ -20,16 +30,16 @@
   <PropertyGroup>
     <NativeFileListPath Condition=" '$(NCrunch)'=='' ">$(MSBuildProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
     <NativeFileListPath Condition=" '$(NCrunch)'=='1' ">$(NCrunchOriginalProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\NativeFileList.txt</NativeFileListPath>
+    <MergeModDirectory>$(MSBuildThisFileDirectory)..\wixnative\</MergeModDirectory>
   </PropertyGroup>
 
   <Target Name="BuildWixNative" BeforeTargets="GetCopyToOutputDirectoryItems" Condition=" '$(NCrunch)'=='' ">
-    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=Win32" Targets="Build;BuiltProjectOutputGroup;ContentFilesProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-      <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
-    </MSBuild>
-    <MSBuild Projects="..\wixnative\wixnative.vcxproj" Properties="Platform=x64" Targets="Build;BuiltProjectOutputGroup;ContentFilesProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-      <Output TaskParameter="TargetOutputs" ItemName="_NativeProjectOutput" />
-    </MSBuild>
-      
+    <ItemGroup>
+      <_NativeProjectOutput Include="$(MergeModDirectory)x64\mergemod.dll" />
+      <_NativeProjectOutput Include="$(OutputPath)..\x64\wixnative.exe" />
+      <_NativeProjectOutput Include="$(OutputPath)..\x64\wixnative.pdb" />
+    </ItemGroup>
+
     <WriteLinesToFile File="$(NativeFileListPath)" Lines="@(_NativeProjectOutput)" Overwrite="true" />
 
     <ItemGroup>
@@ -60,8 +70,8 @@
 
   <Target Name="SetNuspecProperties" AfterTargets="CoreBuild">
     <PropertyGroup>
-      <NuspecBasePath>$(OutputPath)</NuspecBasePath>
-      <NuspecProperties>Configuration=$(Configuration);Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description)</NuspecProperties>
+      <NuspecBasePath>$(OutputPath)..\</NuspecBasePath>
+      <NuspecProperties>Id=$(MSBuildThisFileName);Version=$(BuildVersionSimple);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);MergeModDir=$(MergeModDirectory)</NuspecProperties>
     </PropertyGroup>
   </Target>
 </Project>
