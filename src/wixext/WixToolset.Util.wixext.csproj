@@ -7,9 +7,10 @@
     <RootNamespace>WixToolset.Util</RootNamespace>
     <Description>WiX Toolset Utility Extension</Description>
     <Title>WiX Toolset Util Extension</Title>
-    <IsTool>true</IsTool>
-    <ContentTargetFolders>build</ContentTargetFolders>
     <DebugType>embedded</DebugType>
+    <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <NuspecProperties>Id=$(MSBuildThisFileName);Authors=$(Authors);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,4 +32,11 @@
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.65" PrivateAssets="All" />
   </ItemGroup>
+
+  <Target Name="SetNuspecProperties" AfterTargets="CoreBuild">
+    <PropertyGroup>
+      <NuspecBasePath>$(OutputPath)..\</NuspecBasePath>
+      <NuspecProperties>$(NuspecProperties);Version=$(BuildVersionSimple);RepositoryCommit=$(SourceRevisionId);RepositoryType=$(RepositoryType);RepositoryUrl=$(PrivateRepositoryUrl);ProjectFolder=$(MSBuildThisFileDirectory)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
 </Project>
