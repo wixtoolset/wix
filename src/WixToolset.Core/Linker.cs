@@ -149,12 +149,12 @@ namespace WixToolset.Core
                     throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
                 }
 
-                // Add the missing standard action symbols.
-                this.LoadStandardActionSymbols(find.EntrySection, find.Symbols);
+                // Add the missing standard action tuples.
+                this.LoadStandardActions(find.EntrySection, find.TuplesByName);
 
-                // Resolve the symbol references to find the set of sections we care about for linking.
+                // Resolve the tuple references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
-                var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.Symbols);
+                var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.TuplesByName);
 
                 resolve.Execute();
 
@@ -190,16 +190,16 @@ namespace WixToolset.Core
                 }
 
                 // Display an error message for Components that were not referenced by a Feature.
-                foreach (var symbol in resolve.ReferencedSymbols.Where(s => s.Row.Definition.Type == TupleDefinitionType.Component))
+                foreach (var tupleWithSection in resolve.ReferencedTupleWithSections.Where(s => s.Tuple.Definition.Type == TupleDefinitionType.Component))
                 {
-                    if (!referencedComponents.Contains(symbol.Name))
+                    if (!referencedComponents.Contains(tupleWithSection.Name))
                     {
-                        this.Messaging.Write(ErrorMessages.OrphanedComponent(symbol.Row.SourceLineNumbers, symbol.Row.Id.Id));
+                        this.Messaging.Write(ErrorMessages.OrphanedComponent(tupleWithSection.Tuple.SourceLineNumbers, tupleWithSection.Tuple.Id.Id));
                     }
                 }
 
                 // Report duplicates that would ultimately end up being primary key collisions.
-                var reportDupes = new ReportConflictingSymbolsCommand(this.Messaging, find.PossiblyConflictingSymbols, resolve.ResolvedSections);
+                var reportDupes = new ReportConflictingTuplesCommand(this.Messaging, find.PossibleConflicts, resolve.ResolvedSections);
                 reportDupes.Execute();
 
                 if (this.Messaging.EncounteredError)
@@ -208,7 +208,7 @@ namespace WixToolset.Core
                 }
 
                 // resolve the feature to feature connects
-                this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.Symbols);
+                this.ResolveFeatureToFeatureConnects(featuresToFeatures, find.TuplesByName);
 
                 // Create the section to hold the linked content.
                 var resolvedSection = new IntermediateSection(find.EntrySection.Id, find.EntrySection.Type, find.EntrySection.Codepage);
@@ -734,17 +734,17 @@ namespace WixToolset.Core
         /// <summary>
         /// Load the standard action symbols.
         /// </summary>
-        /// <param name="symbols">Collection of symbols.</param>
-        private void LoadStandardActionSymbols(IntermediateSection section, IDictionary<string, Symbol> symbols)
+        /// <param name="tuplesByName">Collection of symbols.</param>
+        private void LoadStandardActions(IntermediateSection section, IDictionary<string, TupleWithSection> tuplesByName)
         {
-            foreach (var actionRow in WindowsInstallerStandard.StandardActions())
+            foreach (var actionTuple in WindowsInstallerStandard.StandardActions())
             {
-                var symbol = new Symbol(section, actionRow);
+                var tupleWithSection = new TupleWithSection(section, actionTuple);
 
-                // If the action's symbol has not already been defined (i.e. overriden by the user), add it now.
-                if (!symbols.ContainsKey(symbol.Name))
+                // If the action's tuple has not already been defined (i.e. overriden by the user), add it now.
+                if (!tuplesByName.ContainsKey(tupleWithSection.Name))
                 {
-                    symbols.Add(symbol.Name, symbol);
+                    tuplesByName.Add(tupleWithSection.Name, tupleWithSection);
                 }
             }
         }
@@ -1242,7 +1242,7 @@ namespace WixToolset.Core
         /// </summary>
         /// <param name="featuresToFeatures">Feature to feature complex references.</param>
         /// <param name="allSymbols">All symbols loaded from the sections.</param>
-        private void ResolveFeatureToFeatureConnects(ConnectToFeatureCollection featuresToFeatures, IDictionary<string, Symbol> allSymbols)
+        private void ResolveFeatureToFeatureConnects(ConnectToFeatureCollection featuresToFeatures, IDictionary<string, TupleWithSection> allSymbols)
         {
             foreach (ConnectToFeature connection in featuresToFeatures)
             {
@@ -1254,7 +1254,7 @@ namespace WixToolset.Core
 
                 if (allSymbols.TryGetValue(wixSimpleReferenceRow.SymbolicName, out var symbol))
                 {
-                    var featureTuple = (FeatureTuple)symbol.Row;
+                    var featureTuple = (FeatureTuple)symbol.Tuple;
                     featureTuple.ParentFeatureRef = connection.PrimaryFeature;
                 }
             }
