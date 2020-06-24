@@ -5728,11 +5728,6 @@ namespace WixToolset.Core
                 id = this.Core.CreateIdentifier("fil", directoryId, name ?? shortName);
             }
 
-            if (!this.compilingModule && CompilerConstants.IntegerNotSet == diskId)
-            {
-                diskId = 1; // default to first Media
-            }
-
             if (null != defaultVersion && null != companionFile)
             {
                 this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "DefaultVersion", "CompanionFile", companionFile));
@@ -5912,6 +5907,11 @@ namespace WixToolset.Core
                         ProcessorArchitecture = procArch,
                     });
                 }
+            }
+
+            if (CompilerConstants.IntegerNotSet != diskId)
+            {
+                this.Core.CreateSimpleReference(sourceLineNumbers, TupleDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
             }
 
             // If this component does not have a companion file this file is a possible keypath.

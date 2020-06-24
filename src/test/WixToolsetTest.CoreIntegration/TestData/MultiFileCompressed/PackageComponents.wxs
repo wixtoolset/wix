@@ -3,10 +3,10 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component>
-        <File DiskId="1" Source="$(env.WINDIR)\Notepad.exe" />
+        <File Source="$(env.WINDIR)\Notepad.exe" />
       </Component>
       <Component>
-        <File DiskId="2" Source="test.txt" />
+        <File Source="test.txt" />
       </Component>
     </ComponentGroup>
   </Fragment>

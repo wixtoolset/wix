@@ -56,7 +56,7 @@ namespace WixToolset.Core.Bind
 
         public int DiskId
         {
-            get => this.FileRow == null ? this.FileTuple.DiskId ?? 0 : this.FileRow.DiskId;
+            get => this.FileRow == null ? this.FileTuple.DiskId ?? 1 : this.FileRow.DiskId;
             set
             {
                 if (this.FileRow == null)
